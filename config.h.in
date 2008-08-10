@@ -1,0 +1,14 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#include "local.h"
+
+#define WMFS_VERSION            "@WMFS_VERSION@"
+#define WMFS_COMPILE_MACHINE    "@WMFS_COMPILE_MACHINE@"
+#define WMFS_COMPILE_BY         "@WMFS_COMPILE_BY@"
+#define WMFS_COMPILE_FLAGS      "@WMFS_COMPILE_FLAGS@"
+#define WMFS_LINKED_LIBS        "@WMFS_LINKED_LIBS@"
+
+void init_conf(void);
+
+#endif /* CONFIG_H */
