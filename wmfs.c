@@ -388,24 +388,20 @@ ishide(Client *c) {
 
 void
 keymovex(char *cmd) {
-     if(sel) {
-          if(cmd && !ishide(sel)) {
-               int tmp;
-               tmp = sel->x + atoi(cmd);
-               moveresize(sel,tmp, sel->y, sel->w, sel->h);
-          }
+     if(sel && cmd && !ishide(sel) && !sel->max) {
+          int tmp;
+          tmp = sel->x + atoi(cmd);
+          moveresize(sel,tmp, sel->y, sel->w, sel->h);
      }
      return;
 }
 
 void
 keymovey(char *cmd) {
-     if(sel && !ishide(sel)) {
-          if(cmd) {
-               int tmp;
-               tmp = sel->y + atoi(cmd);
-               moveresize(sel, sel->x, tmp, sel->w, sel->h);
-          }
+     if(sel && cmd && !ishide(sel) && !sel->max) {
+          int tmp;
+          tmp = sel->y + atoi(cmd);
+          moveresize(sel, sel->x, tmp, sel->w, sel->h);
      }
      return;
 }
@@ -430,7 +426,7 @@ keypress(XEvent *e) {
 
 void
 keyresize(char *cmd) {
-     if(sel && !ishide(sel)) {
+     if(sel && !ishide(sel) && !sel->max) {
           int temph=0, tempw=0, modh=0, modw=0,
                tmp=0;
 
@@ -534,13 +530,14 @@ mouseaction(Client *c, int x, int y, int type) {
      int  ocx, ocy;
      XEvent ev;
 
+     if(c->max)
+          return;
+
      ocx = c->x;
      ocy = c->y;
 
      if(XGrabPointer(dpy, root, 0, MouseMask, GrabModeAsync, GrabModeAsync,
                      None, cursor[((type) ?CurResize:CurMove)], CurrentTime) != GrabSuccess) return;
-     c->max = False;
-
      if(type)
           XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
 
