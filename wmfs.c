@@ -525,7 +525,6 @@ manage(Window w, XWindowAttributes *wa) {
                                      conf.colors.button,
                                      conf.colors.button);
      XSelectInput(dpy, c->button, ExposureMask | EnterWindowMask);
-     //   confrequest(c);
      grabbuttons(c, False);
      setsizehints(c);
      attach(c);
