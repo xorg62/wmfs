@@ -21,6 +21,7 @@ func_name_list_t func_list[] = {
      {"keymovex", keymovex},
      {"keymovey", keymovey},
      {"keyresize", keyresize},
+     {"layoutswitch",layoutswitch},
      {"tag", tag}
 };
 
@@ -137,11 +138,12 @@ init_conf(void) {
 
      if(ret == CFG_FILE_ERROR) {
           printf("WMFS: parsing configuration file failed\n");
-          return;
+          exit(1);
      }
-     else if(ret == CFG_PARSE_ERROR)
+     else if(ret == CFG_PARSE_ERROR) {
           cfg_error(cfg, "WMFS: parsing configuration file %s failed.\n", final_path);
-
+          exit(1);
+     }
 
      cfg_misc   = cfg_getsec(cfg, "misc");
      cfg_colors = cfg_getsec(cfg, "colors");

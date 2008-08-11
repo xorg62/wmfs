@@ -95,7 +95,7 @@ typedef struct {
 enum { CurNormal, CurResize, CurMove, CurInput, CurLast };
 enum { WMState, WMProtocols, WMName, WMDelete, WMLast };
 enum { NetSupported, NetWMName, NetLast };
-enum { Free, Tile, Max };
+enum { Free=0, Tile, Max};
 
 /* wmfs.c */
 void attach(Client *c);
@@ -119,6 +119,7 @@ void keymovey(char *cmd);
 void keypress(XEvent *e);
 void keyresize(char *cmd);
 void killclient(char *cmd);
+void layoutswitch(char *cmd);
 void mapclient(Client *c);
 void manage(Window w, XWindowAttributes *wa);
 void mouseaction(Client *c, int x, int y, int type);
@@ -153,6 +154,8 @@ int screen;
 Window root;
 Window bar;
 fd_set fd;
+struct tm *tm;
+time_t lt;
 Key keys[256];
 Atom wm_atom[WMLast];
 Atom net_atom[NetLast];
@@ -162,5 +165,6 @@ int fonth;
 int barheight;
 Client *clients;                     /* Fisrt Client */
 Client *sel;                         /* selected client */
-int seltag;                          /* selected tag */
+int seltag;
+char status[16];
 #endif /* LOCAL_H */

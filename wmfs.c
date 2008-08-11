@@ -157,6 +157,7 @@ getevent(void) {
              || event.xcrossing.detail == NotifyInferior) return;
           if((c = getclient(event.xcrossing.window))
              || (c = gettbar(event.xcrossing.window)))
+               if(c->win != bar)
                     focus(c);
           break;
 
@@ -230,25 +231,35 @@ getevent(void) {
                     tile(NULL);
                else if(event.xbutton.button == Button3)
                     mouseaction(c, event.xbutton.x_root, event.xbutton.y_root, Resize); /* type 1 for resize */
-               /* Button */
-          } else if((c = getbutton(event.xbutton.window))) {
+          }
+          /* Button */
+          else if((c = getbutton(event.xbutton.window))) {
                if(event.xbutton.button == Button1) {
-                    unmanage(c);
-                    XKillClient(dpy, c->win);
+                    killclient(NULL);
                } else if(event.xbutton.button == Button3)
                     togglemax(NULL);
-               /* Bar */
           }
+          /* Bar */
           else if(event.xbutton.window == bar) {
                for(i = 0; i < conf.ntag + 1; ++i) {
                     if(event.xbutton.x > taglen[i-1]
                        && event.xbutton.x < taglen[i]) {
                          if(event.xbutton.button == Button1) {
                               tagn(i);
+                              updateall();
+                         }
+                    }
+               }
+               if(sel) {
+                    if(event.xbutton.x >= taglen[conf.ntag]
+                       && event.xbutton.x < taglen[conf.ntag] + strlen(conf.symlayout[sel->layout])+30) {
+                         if(event.xbutton.button == Button1) {
+                              layoutswitch(NULL);
                          }
                     }
                }
           }
+          /* Root */
           else if(event.xbutton.window == root) {
                if(event.xbutton.button == Button4)
                     tagswitch("+1");
@@ -431,6 +442,7 @@ keypress(XEvent *e) {
              && keys[i].func)
           {
                keys[i].func(keys[i].cmd);
+               updateall();
           }
      return;
 }
@@ -466,6 +478,18 @@ killclient(char *cmd) {
           ev.xclient.data.l[0] = wm_atom[WMDelete];
           ev.xclient.data.l[1] = CurrentTime;
           XSendEvent(dpy, sel->win, False, NoEventMask, &ev);
+     }
+     return;
+}
+
+void
+layoutswitch(char *cmd) {
+     if(sel) {
+          switch(sel->layout) {
+          case Free: tile(NULL);      break;
+          case Tile: togglemax(NULL); break;
+          case Max:  togglemax(NULL); break;
+          }
      }
      return;
 }
@@ -602,6 +626,7 @@ moveresize(Client *c, int x, int y, int w, int h) {
           if(w <= 0 || h <= 0) return;
 
           /* }}} */
+
           c->layout = Free;
           c->max = False;
           if(c->x != x || c->y != y || c->w != w || c->h != h) {
@@ -712,10 +737,8 @@ tag(char *cmd) {
      for(c = clients; c; c = c->next) {
           if(!ishide(c))
                hide(c);
-          if(c->tag == tmp) {
+          if(c->tag == tmp)
                unhide(c);
-               updateall();
-          }
      }
      seltag = tmp;
      sel = NULL;
@@ -730,10 +753,8 @@ tagn(int tag) {
      for(c = clients; c; c = c->next) {
           if(!ishide(c))
                hide(c);
-          if(c->tag == tag) {
+          if(c->tag == tag)
                unhide(c);
-               updateall();
-          }
      }
      seltag = tag;
      sel = NULL;
@@ -754,10 +775,8 @@ tagswitch(char *cmd) {
      for(c = clients; c; c = c->next) {
           if(c->tag == seltag - tmp)
                hide(c);
-
           if(c->tag == seltag) {
                unhide(c);
-               updateall();
           }
      }
      sel = NULL;
@@ -781,7 +800,12 @@ tile(char *cmd) {
           if(clientpertag(seltag)-1)
                h = ((mh-bord) - conf.ttbarheight - barheight) / (clientpertag(seltag) - 1) ;
 
-         /* Master client in first (always the sel window) */
+          sel->ox = sel->x;
+          sel->oy = sel->y;
+          sel->ow = sel->w;
+          sel->oh = sel->h;
+
+          /* Master client in first (always the sel window) */
           moveresize(sel, 0, barto,
                      ((clientpertag(seltag) > 1) ? (mw-bord) / 2 : (mw-bord)),
                      ((mh-bord) - conf.ttbarheight - barheight));
@@ -790,18 +814,19 @@ tile(char *cmd) {
           /* tiling */
           for(i=0, c = clients; c; c = c->next, ++i) {
                if(c != sel && !ishide(c)) {
+                    c->ox = c->x;
+                    c->oy = c->y;
+                    c->ow = c->w;
+                    c->oh = c->h;
                     moveresize(c, x, y, w, h);
-                    if(i < i + 1) {
+                    if(i < i + 1)
                          y = c->y + c->h + bord + conf.ttbarheight;
-                         c->layout = Tile;
-                    }
+                   c->layout = Tile;
                }
-               return;
           }
      }
+     return;
 }
-
-
 void
 togglemax(char *cmd) {
      if(sel && !ishide(sel)) {
@@ -865,14 +890,12 @@ updateall(void) {
 
 void
 updatebar(void) {
-     struct tm *tm;
-     time_t lt;
-     int slen = 0, i;
-     char buf[conf.ntag][100] ;
-
+     int  i,j;
+     char buf[conf.ntag][100];
      tm = localtime(&lt);
      lt = time(NULL);
 
+     XRaiseWindow(dpy, bar);
      XClearWindow(dpy, bar);
      XSetForeground(dpy, gc, conf.colors.text);
 
@@ -900,8 +923,11 @@ updatebar(void) {
                  (sel) ? conf.symlayout[sel->layout] : conf.symlayout[Free],
                  (sel) ? strlen(conf.symlayout[sel->layout]) :strlen(conf.symlayout[Free]) );
 
+     sprintf(status, "%02d:%02d WMFS", tm->tm_hour, tm->tm_min);
+     j = strlen(status);
      XSetForeground(dpy, gc, conf.colors.text);
-     XDrawLine(dpy, bar, gc, mw-slen*6-5, 0 , mw-slen*6-5 , barheight);
+     XDrawString(dpy, bar, gc, mw- j*6, fonth -1 , status, j);
+     XDrawLine(dpy, bar, gc, mw-j*6-5, 0 , mw-j*6-5, barheight);
      return;
 }
 
@@ -992,7 +1018,7 @@ main(int argc,char **argv) {
           }
      }
 
-     if(!dpy) {printf("wmfs: cannot open X server\n"); exit(0);}
+     if(!dpy) {printf("wmfs: cannot open X server\n"); exit(1);}
 
      init();
      scan();
@@ -1005,3 +1031,4 @@ main(int argc,char **argv) {
      XCloseDisplay(dpy);
      return 0;
 }
+
