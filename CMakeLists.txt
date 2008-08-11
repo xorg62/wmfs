@@ -33,8 +33,9 @@ message("Project version : ${VERSION}")
 message("Using these CFLAGS : ${CFLAGS}")
 message("Linking with theses libraries : ${LIBRARIES_TO_LINK}")
 
-# Include pkg-config
+# Includes
 include(FindPkgConfig)
+#include(CPack) # need to configure it for packaging
 # Use pkgconfig to get required libraries
 pkg_check_modules(wmfs_required
   x11
