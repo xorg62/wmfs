@@ -129,7 +129,6 @@ init_conf(void) {
      char final_path[100];
      int ret, i, j, l;
 
-
      sprintf(final_path,"%s/%s",strdup(getenv("HOME")),strdup(FILE_NAME));
 
      cfg = cfg_init(opts, CFGF_NONE);
@@ -158,13 +157,13 @@ init_conf(void) {
      conf.ttbarheight  = cfg_getint(cfg_misc,        "titlebar_height");
 
      /* colors */
-     conf.bordernormal = cfg_getint(cfg_colors, "border_normal");
-     conf.borderfocus  = cfg_getint(cfg_colors, "border_focus");
-     conf.barcolor     = cfg_getint(cfg_colors, "bar");
-     conf.buttoncolor  = cfg_getint(cfg_colors, "button");
-     conf.textcolor    = cfg_getint(cfg_colors, "text");
-     conf.tagselfg     = cfg_getint(cfg_colors, "tag_sel_fg");
-     conf.tagselbg     = cfg_getint(cfg_colors, "tag_sel_bg");
+     conf.colors.bordernormal = cfg_getint(cfg_colors, "border_normal");
+     conf.colors.borderfocus  = cfg_getint(cfg_colors, "border_focus");
+     conf.colors.bar          = cfg_getint(cfg_colors, "bar");
+     conf.colors.button       = cfg_getint(cfg_colors, "button");
+     conf.colors.text         = cfg_getint(cfg_colors, "text");
+     conf.colors.tagselfg     = cfg_getint(cfg_colors, "tag_sel_fg");
+     conf.colors.tagselbg     = cfg_getint(cfg_colors, "tag_sel_bg");
 
      /* layout */
      for(i=0; i < 3; ++i)
@@ -176,7 +175,7 @@ init_conf(void) {
           conf.taglist[i] = strdup(cfg_getnstr(cfg_tag,"tag",i));
 
      /* keybind ('tention ça rigole plus) */
-
+     conf.nkeybind = cfg_size(cfg_keys, "key");
           for(j = 0; j <  cfg_size(cfg_keys, "key"); ++j) {
                cfgtmp = cfg_getnsec(cfg_keys, "key", j);
 

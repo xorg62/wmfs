@@ -34,9 +34,6 @@
 #define LEN(x)       (sizeof x / sizeof x[0])
 #define Move         0
 #define Resize       1
-#define Free         0
-#define Tile         1
-#define Max          2
 #define MAXTAG       36
 
 typedef struct Client Client;
@@ -45,11 +42,14 @@ struct Client {
      int tag;              /* tag num */
      int x, y, w, h;       /* window attribute */
      int ox, oy, ow, oh;   /* old window attribute */
+     int basew, baseh;
+     int incw, inch;
+     int maxw, maxh, minw, minh;
      int border;           /* border height */
      Window win;           /* window */
      Window tbar;          /* Titlebar? */
      Window button;        /* Close Button */
-     Bool max;             /* client info */
+     Bool max, tile;       /* client info */
      int layout;
      Client *next;         /* next client */
      Client *prev;         /* previous client */
@@ -63,10 +63,8 @@ typedef struct {
 } Key;
 
 typedef struct {
-
      char *name;
      void *func;
-
 } func_name_list_t;
 
 typedef struct {
@@ -76,24 +74,28 @@ typedef struct {
      bool raiseswitch;
      int borderheight;
      int ttbarheight;
-     /* color */
-     int bordernormal;
-     int borderfocus;
-     int barcolor;
-     int buttoncolor;
-     int textcolor;
-     int tagselfg;
-     int tagselbg;
+     struct {
+          int bordernormal;
+          int borderfocus;
+          int bar;
+          int button;
+          int text;
+          int tagselfg;
+          int tagselbg;
+     } colors;
      /* layout */
      char *symlayout[3];
      /* tag */
      int ntag;
      char *taglist[MAXTAG];
+     /* keybind */
+     int nkeybind;
 } Conf;
 
 enum { CurNormal, CurResize, CurMove, CurInput, CurLast };
 enum { WMState, WMProtocols, WMName, WMDelete, WMLast };
 enum { NetSupported, NetWMName, NetLast };
+enum { Free, Tile, Max };
 
 /* wmfs.c */
 void attach(Client *c);
@@ -124,6 +126,7 @@ void moveresize(Client *c, int x, int y, int w, int h);
 void raiseclient(Client *c);
 void scan(void);
 void setborder(Window win, int color);
+void setsizehints(Client *c);
 void spawn(char *cmd);
 void tag(char *cmd);
 void tagn(int tag);
@@ -142,7 +145,6 @@ void wswitch(char *cmd);
 #define BUTH         (conf.ttbarheight - 6)
 
 GC gc;
-Key keys[1024];
 XEvent event;
 Display *dpy;
 XFontStruct* font;
@@ -151,6 +153,7 @@ int screen;
 Window root;
 Window bar;
 fd_set fd;
+Key keys[256];
 Atom wm_atom[WMLast];
 Atom net_atom[NetLast];
 Cursor cursor[CurLast];

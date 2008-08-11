@@ -83,8 +83,8 @@ void
 focus(Client *c) {
      if(sel && sel != c) {
           grabbuttons(sel, False);
-          setborder(sel->win, conf.bordernormal);
-          setborder(sel->tbar, conf.bordernormal);
+          setborder(sel->win, conf.colors.bordernormal);
+          setborder(sel->tbar, conf.colors.bordernormal);
      }
 
      if(c) grabbuttons(c, True);
@@ -92,8 +92,8 @@ focus(Client *c) {
      sel = c;
 
      if(c) {
-          setborder(c->win, conf.borderfocus);
-          setborder(sel->tbar, conf.borderfocus);
+          setborder(c->win, conf.colors.borderfocus);
+          setborder(sel->tbar, conf.colors.borderfocus);
           if(conf.raisefocus)
                raiseclient(c);
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
@@ -133,6 +133,7 @@ void
 getevent(void) {
      XEvent event;
      XWindowAttributes at;
+     XWindowChanges wc;
      Client *c;
      int i;
      struct timeval tv;
@@ -182,8 +183,21 @@ getevent(void) {
                          c->title = NULL;
                          updatetitle(c);
                     }
+                    if(event.xproperty.atom == XA_WM_NORMAL_HINTS)
+                         setsizehints(c);
                }
           }
+          break;
+     case ConfigureRequest:
+          wc.x = event.xconfigurerequest.x;
+          wc.y = event.xconfigurerequest.y;
+          wc.width = event.xconfigurerequest.width;
+          wc.height = event.xconfigurerequest.height;
+          wc.border_width = event.xconfigurerequest.border_width;
+          wc.sibling = event.xconfigurerequest.above;
+          wc.stack_mode = event.xconfigurerequest.detail;
+          XConfigureWindow(dpy, event.xconfigurerequest.window,
+          event.xconfigurerequest.value_mask, &wc);
           break;
 
      case UnmapNotify:
@@ -281,7 +295,7 @@ grabkeys(void) {
      unsigned int i;
      KeyCode code;
      XUngrabKey(dpy, AnyKey, AnyModifier, root);
-     for(i = 0; i < LEN(keys); i++) {
+     for(i = 0; i < conf.nkeybind; i++) {
           code = XKeysymToKeycode(dpy, keys[i].keysym);
           XGrabKey(dpy, code, keys[i].mod, root, True, GrabModeAsync, GrabModeAsync);
           XGrabKey(dpy, code, keys[i].mod|numlockmask, root, True, GrabModeAsync, GrabModeAsync);
@@ -299,9 +313,6 @@ hide(Client *c) {
           XMoveWindow(dpy,c->button,c->x,c->y+mh*2);
      }
 }
-
-
-
 
 void
 init(void) {
@@ -367,7 +378,7 @@ init(void) {
      bar = XCreateWindow(dpy, root, 0, 0, mw, barheight, 0, DefaultDepth(dpy, screen),
                          CopyFromParent, DefaultVisual(dpy, screen),
                          CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
-     XSetWindowBackground(dpy, bar, conf.barcolor);
+     XSetWindowBackground(dpy, bar, conf.colors.bar);
      XMapWindow(dpy, bar);
 
      /* INIT STUFF */
@@ -413,7 +424,7 @@ keypress(XEvent *e) {
      XKeyEvent *ev;
      ev = &e->xkey;
      keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
-     for(i = 0; i < LEN(keys); i++)
+     for(i = 0; i < conf.nkeybind; i++)
           if(keysym == keys[i].keysym
              && (keys[i].mod & ~(numlockmask | LockMask)) ==
              (ev->state & ~(numlockmask | LockMask))
@@ -474,6 +485,7 @@ manage(Window w, XWindowAttributes *wa) {
      Client *c, *t = NULL;
      Window trans;
      Status rettrans;
+     XWindowChanges winc;
 
      c = emallocz(sizeof(Client));
      c->win = w;
@@ -485,7 +497,9 @@ manage(Window w, XWindowAttributes *wa) {
      c->tag = seltag;
      c->layout = Free;
 
-     setborder(w, conf.bordernormal);
+     setborder(w, conf.colors.bordernormal);
+
+     XConfigureWindow(dpy, w, CWBorderWidth, &winc);
 
      XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask |
                   PropertyChangeMask | StructureNotifyMask);
@@ -498,8 +512,8 @@ manage(Window w, XWindowAttributes *wa) {
                                    c->w,
                                    conf.ttbarheight,
                                    conf.borderheight,
-                                   conf.bordernormal,
-                                   conf.barcolor);
+                                   conf.colors.bordernormal,
+                                   conf.colors.bar);
      XSelectInput(dpy, c->tbar, ExposureMask | EnterWindowMask);
 
      c->button = XCreateSimpleWindow(dpy,root,
@@ -508,16 +522,18 @@ manage(Window w, XWindowAttributes *wa) {
                                      5,
                                      BUTH,
                                      1,
-                                     conf.buttoncolor,
-                                     conf.buttoncolor);
+                                     conf.colors.button,
+                                     conf.colors.button);
      XSelectInput(dpy, c->button, ExposureMask | EnterWindowMask);
-
+     //   confrequest(c);
      grabbuttons(c, False);
+     setsizehints(c);
      attach(c);
      XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
+     moveresize(c, c->x, c->y, c->w, c->h);
      mapclient(c);
      updatetitle(c);
-     setborder(c->tbar, conf.bordernormal);
+     setborder(c->tbar, conf.colors.bordernormal);
      focus(c);
      return;
 }
@@ -570,8 +586,23 @@ mouseaction(Client *c, int x, int y, int type) {
 void
 moveresize(Client *c, int x, int y, int w, int h) {
      if(c) {
-          if(w <= 0 || h <= 0)
-               return;
+          /* Resize hints {{{ */
+
+          if (w < 1) w = 1;
+          if (h < 1) h = 1;
+          w -= c->basew;
+          h -= c->baseh;
+          if(c->incw) w -= w % c->incw;
+          if(c->inch) h -= h % c->inch;
+          w += c->basew;
+          h += c->baseh;
+          if(c->minw > 0 && w < c->minw) w = c->minw;
+          if(c->minh > 0 && h < c->minh) h = c->minh;
+          if(c->maxw > 0 && w > c->maxw) w = c->maxw;
+          if(c->maxh > 0 && h > c->maxh) h = c->maxh;
+          if(w <= 0 || h <= 0) return;
+
+          /* }}} */
           c->layout = Free;
           c->max = False;
           if(c->x != x || c->y != y || c->w != w || c->h != h) {
@@ -630,6 +661,37 @@ setborder(Window win, int color) {
      XSetWindowBorder(dpy, win, color);
      XSetWindowBorderWidth(dpy, win, conf.borderheight);
      return;
+}
+
+void
+setsizehints(Client *c) {
+	long msize;
+	XSizeHints size;
+
+	if(!XGetWMNormalHints(dpy, c->win, &size, &msize) || !size.flags)
+             size.flags = PSize;
+	if(size.flags & PBaseSize) {
+             c->basew = size.base_width; c->baseh = size.base_height;
+        }
+	else if(size.flags & PMinSize) {
+             c->basew = size.min_width; c->baseh = size.min_height;
+	}
+	else c->basew = c->baseh = 0;
+	if(size.flags & PResizeInc) {
+             c->incw = size.width_inc; c->inch = size.height_inc;
+	}
+	else c->incw = c->inch = 0;
+	if(size.flags & PMaxSize) {
+             c->maxw = size.max_width; c->maxh = size.max_height;
+	}
+	else c->maxw = c->maxh = 0;
+	if(size.flags & PMinSize) {
+             c->minw = size.min_width; c->minh = size.min_height;
+	}
+	else if(size.flags & PBaseSize) {
+             c->minw = size.base_width; c->minh = size.base_height;
+	}
+	else c->minw = c->minh = 0;
 }
 
 void
@@ -730,14 +792,16 @@ tile(char *cmd) {
           for(i=0, c = clients; c; c = c->next, ++i) {
                if(c != sel && !ishide(c)) {
                     moveresize(c, x, y, w, h);
-                    if(i < i + 1)
+                    if(i < i + 1) {
                          y = c->y + c->h + bord + conf.ttbarheight;
-                   c->layout = Tile;
+                         c->layout = Tile;
+                    }
                }
+               return;
           }
      }
-     return;
 }
+
 
 void
 togglemax(char *cmd) {
@@ -811,7 +875,7 @@ updatebar(void) {
      lt = time(NULL);
 
      XClearWindow(dpy, bar);
-     XSetForeground(dpy, gc, conf.textcolor);
+     XSetForeground(dpy, gc, conf.colors.text);
 
      for(i=0;i< conf.ntag;++i) {
           /* Make the tag string */
@@ -821,23 +885,23 @@ updatebar(void) {
                sprintf(buf[i], "%s() ", conf.taglist[i]);
           taglen[i+1] = taglen[i] + 6*(strlen(conf.taglist[i]) + ((clientpertag(i+1) >= 10) ? 5 : 4));
           /* Rectangle for the tag background */
-          if(i+1 == seltag) XSetForeground(dpy, gc, conf.tagselbg);
+          if(i+1 == seltag) XSetForeground(dpy, gc, conf.colors.tagselbg);
           else XSetForeground(dpy, gc, 0x090909);
           XFillRectangle(dpy, bar, gc, taglen[i]-4, 0, strlen(buf[i])*6, barheight);
           /* Draw tag */
-          if(i+1 == seltag) XSetForeground(dpy, gc, conf.tagselfg);
-          else XSetForeground(dpy, gc, conf.textcolor);
+          if(i+1 == seltag) XSetForeground(dpy, gc, conf.colors.tagselfg);
+          else XSetForeground(dpy, gc, conf.colors.text);
           XDrawString(dpy, bar, gc, taglen[i], fonth-1, buf[i], strlen(buf[i]));
      }
 
      /* Draw layout symbol */
-     XSetForeground(dpy, gc, conf.tagselfg);
+     XSetForeground(dpy, gc, conf.colors.tagselfg);
      XDrawString(dpy, bar, gc, taglen[conf.ntag],
                  fonth-1,
                  (sel) ? conf.symlayout[sel->layout] : conf.symlayout[Free],
                  (sel) ? strlen(conf.symlayout[sel->layout]) :strlen(conf.symlayout[Free]) );
 
-     XSetForeground(dpy, gc, conf.textcolor);
+     XSetForeground(dpy, gc, conf.colors.text);
      XDrawLine(dpy, bar, gc, mw-slen*6-5, 0 , mw-slen*6-5 , barheight);
      return;
 }
@@ -858,7 +922,7 @@ updatetitle(Client *c) {
      if(!c->title)
           c->title = strdup("WMFS");
      XClearWindow(dpy, c->tbar);
-     XSetForeground(dpy, gc, conf.textcolor);
+     XSetForeground(dpy, gc, conf.colors.text);
      XDrawString(dpy, c->tbar, gc, 5, 10, c->title, strlen(c->title));
      return;
 }
