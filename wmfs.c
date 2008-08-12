@@ -190,6 +190,7 @@ getevent(void) {
           }
           break;
      case ConfigureRequest:
+          /* configure size and window position */
           wc.x = event.xconfigurerequest.x;
           wc.y = event.xconfigurerequest.y;
           wc.width = event.xconfigurerequest.width;
@@ -197,8 +198,9 @@ getevent(void) {
           wc.border_width = event.xconfigurerequest.border_width;
           wc.sibling = event.xconfigurerequest.above;
           wc.stack_mode = event.xconfigurerequest.detail;
+
           XConfigureWindow(dpy, event.xconfigurerequest.window,
-          event.xconfigurerequest.value_mask, &wc);
+                           event.xconfigurerequest.value_mask, &wc);
           break;
 
      case UnmapNotify:
@@ -245,6 +247,10 @@ getevent(void) {
                     if(event.xbutton.x > taglen[i-1]
                        && event.xbutton.x < taglen[i]) {
                          if(event.xbutton.button == Button1) {
+                              if(event.xbutton.state & ALT) {
+                                   tagtransfertn(i);
+                                   updateall();
+                              }
                               tagn(i);
                               updateall();
                          }
@@ -527,6 +533,7 @@ manage(Window w, XWindowAttributes *wa) {
 
      XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask |
                   PropertyChangeMask | StructureNotifyMask);
+
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
           for(t = clients; t && t->win != trans; t = t->next);
 
@@ -549,11 +556,12 @@ manage(Window w, XWindowAttributes *wa) {
                                      conf.colors.button,
                                      conf.colors.button);
      XSelectInput(dpy, c->button, ExposureMask | EnterWindowMask);
+
      grabbuttons(c, False);
      setsizehints(c);
      attach(c);
-     XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
      moveresize(c, c->x, c->y, c->w, c->h);
+     XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
      mapclient(c);
      updatetitle(c);
      setborder(c->tbar, conf.colors.bordernormal);
@@ -589,7 +597,6 @@ mouseaction(Client *c, int x, int y, int type) {
                return;
           } else if(ev.type == MotionNotify) {
 
-               if(c->y <= barheight + conf.ttbarheight) updatebar();
                XSync(dpy, 0);
 
                if(type)  /* Resize */
@@ -611,14 +618,6 @@ moveresize(Client *c, int x, int y, int w, int h) {
      if(c) {
           /* Resize hints {{{ */
 
-          if (w < 1) w = 1;
-          if (h < 1) h = 1;
-          w -= c->basew;
-          h -= c->baseh;
-          if(c->incw) w -= w % c->incw;
-          if(c->inch) h -= h % c->inch;
-          w += c->basew;
-          h += c->baseh;
           if(c->minw > 0 && w < c->minw) w = c->minw;
           if(c->minh > 0 && h < c->minh) h = c->minh;
           if(c->maxw > 0 && w > c->maxw) w = c->maxw;
@@ -634,6 +633,11 @@ moveresize(Client *c, int x, int y, int w, int h) {
                c->y = y;
                c->w = w;
                c->h = h;
+
+               if(conf.clientbarblock)
+                    if((y-conf.ttbarheight) <= barheight)
+                         y = barheight+conf.ttbarheight;
+
           XMoveResizeWindow(dpy, c->win, x, y, w ,h);
           XMoveResizeWindow(dpy, c->tbar, x, y - conf.ttbarheight, w, conf.ttbarheight);
           XMoveResizeWindow(dpy, c->button,
@@ -784,6 +788,29 @@ tagswitch(char *cmd) {
 }
 
 void
+tagtransfert(char *cmd) {
+     int n = atoi(cmd);
+     if(!sel)
+          return;
+     sel->tag = n;
+     if(n != seltag)
+          hide(sel);
+     if(n == seltag)
+          unhide(sel);
+}
+
+void
+tagtransfertn(int n) {
+     if(!sel)
+          return;
+     sel->tag = n;
+     if(n != seltag)
+          hide(sel);
+     if(n == seltag)
+          unhide(sel);
+}
+
+void
 tile(char *cmd) {
      if(sel) {
           Client *c;
@@ -842,6 +869,7 @@ togglemax(char *cmd) {
                sel->max = True;
                sel->layout = Max;
           } else if(sel->max) {
+               raiseclient(sel);
                moveresize(sel, sel->ox, sel->oy, sel->ow, sel->oh);
                sel->max = False;
                sel->layout = Free;
@@ -894,8 +922,8 @@ updatebar(void) {
      char buf[conf.ntag][100];
      tm = localtime(&lt);
      lt = time(NULL);
-
-     XRaiseWindow(dpy, bar);
+     if(!conf.clientbarblock)
+          XRaiseWindow(dpy, bar);
      XClearWindow(dpy, bar);
      XSetForeground(dpy, gc, conf.colors.text);
 
@@ -923,6 +951,7 @@ updatebar(void) {
                  (sel) ? conf.symlayout[sel->layout] : conf.symlayout[Free],
                  (sel) ? strlen(conf.symlayout[sel->layout]) :strlen(conf.symlayout[Free]) );
 
+     /* Draw date */
      sprintf(status, "%02d:%02d WMFS", tm->tm_hour, tm->tm_min);
      j = strlen(status);
      XSetForeground(dpy, gc, conf.colors.text);

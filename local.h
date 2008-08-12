@@ -72,6 +72,7 @@ typedef struct {
      char *font;
      bool raisefocus;
      bool raiseswitch;
+     bool clientbarblock;
      int borderheight;
      int ttbarheight;
      struct {
@@ -132,6 +133,8 @@ void spawn(char *cmd);
 void tag(char *cmd);
 void tagn(int tag);
 void tagswitch(char *cmd);
+void tagtransfert(char *cmd);
+void tagtransfertn(int n);
 void tile(char *cmd);
 void togglemax(char *cmd);
 void unhide(Client *c);

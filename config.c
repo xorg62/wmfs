@@ -22,7 +22,8 @@ func_name_list_t func_list[] = {
      {"keymovey", keymovey},
      {"keyresize", keyresize},
      {"layoutswitch",layoutswitch},
-     {"tag", tag}
+     {"tag", tag},
+     {"tagtransfert", tagtransfert}
 };
 
 key_name_list_t key_list[] = {
@@ -64,11 +65,12 @@ init_conf(void) {
 
      static cfg_opt_t misc_opts[] = {
 
-          CFG_STR("font",            "*-fixed-medium-*-12-*", CFGF_NONE),
-          CFG_BOOL("raisefocus",     cfg_false,               CFGF_NONE),
-          CFG_BOOL("raiseswitch",    cfg_true,                CFGF_NONE),
-          CFG_INT("border_height",   1,                       CFGF_NONE),
-          CFG_INT("titlebar_height", 12,                      CFGF_NONE),
+          CFG_STR("font",              "*-fixed-medium-*-12-*",  CFGF_NONE),
+          CFG_BOOL("raisefocus",        cfg_false,               CFGF_NONE),
+          CFG_BOOL("raiseswitch",       cfg_true,                CFGF_NONE),
+          CFG_INT("border_height",      1,                       CFGF_NONE),
+          CFG_INT("titlebar_height",    12,                      CFGF_NONE),
+          CFG_BOOL("clients_bar_block", cfg_true,                CFGF_NONE),
           CFG_END()
      };
 
@@ -152,11 +154,12 @@ init_conf(void) {
      cfg_keys   = cfg_getsec(cfg, "keys");
 
      /* misc */
-     conf.font         = strdup(cfg_getstr(cfg_misc, "font"));
-     conf.raisefocus   = cfg_getbool(cfg_misc,       "raisefocus");
-     conf.raiseswitch  = cfg_getbool(cfg_misc,       "raiseswitch");
-     conf.borderheight = cfg_getint(cfg_misc,        "border_height");
-     conf.ttbarheight  = cfg_getint(cfg_misc,        "titlebar_height");
+     conf.font           = strdup(cfg_getstr(cfg_misc, "font"));
+     conf.raisefocus     = cfg_getbool(cfg_misc,       "raisefocus");
+     conf.raiseswitch    = cfg_getbool(cfg_misc,       "raiseswitch");
+     conf.borderheight   = cfg_getint(cfg_misc,        "border_height");
+     conf.ttbarheight    = cfg_getint(cfg_misc,        "titlebar_height");
+     conf.clientbarblock = cfg_getbool(cfg_misc,       "clients_bar_block");
 
      /* colors */
      conf.colors.bordernormal = cfg_getint(cfg_colors, "border_normal");
