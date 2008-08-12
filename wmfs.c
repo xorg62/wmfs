@@ -198,10 +198,8 @@ getevent(void) {
           wc.border_width = event.xconfigurerequest.border_width;
           wc.sibling = event.xconfigurerequest.above;
           wc.stack_mode = event.xconfigurerequest.detail;
-
           XConfigureWindow(dpy, event.xconfigurerequest.window,
                            event.xconfigurerequest.value_mask, &wc);
-          XMoveResizeWindow(dpy, c->tbar, c->x, c->y-conf.ttbarheight, c->w, conf.ttbarheight);
           break;
 
      case UnmapNotify:
