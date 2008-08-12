@@ -201,6 +201,7 @@ getevent(void) {
 
           XConfigureWindow(dpy, event.xconfigurerequest.window,
                            event.xconfigurerequest.value_mask, &wc);
+          XMoveResizeWindow(dpy, c->tbar, c->x, c->y-conf.ttbarheight, c->w, conf.ttbarheight);
           break;
 
      case UnmapNotify:
@@ -417,7 +418,7 @@ ishide(Client *c) {
 
 void
 keymovex(char *cmd) {
-     if(sel && cmd && !ishide(sel) && !sel->max) {
+     if(sel && cmd && !ishide(sel) && !sel->max && sel->layout != Tile) {
           int tmp;
           tmp = sel->x + atoi(cmd);
           moveresize(sel,tmp, sel->y, sel->w, sel->h);
@@ -427,7 +428,7 @@ keymovex(char *cmd) {
 
 void
 keymovey(char *cmd) {
-     if(sel && cmd && !ishide(sel) && !sel->max) {
+     if(sel && cmd && !ishide(sel) && !sel->max && sel->layout != Tile) {
           int tmp;
           tmp = sel->y + atoi(cmd);
           moveresize(sel, sel->x, tmp, sel->w, sel->h);
@@ -456,7 +457,7 @@ keypress(XEvent *e) {
 
 void
 keyresize(char *cmd) {
-     if(sel && !ishide(sel) && !sel->max) {
+     if(sel && !ishide(sel) && !sel->max && sel->layout != Tile) {
           int temph=0, tempw=0, modh=0, modw=0,
                tmp=0;
 
@@ -578,7 +579,7 @@ mouseaction(Client *c, int x, int y, int type) {
      int  ocx, ocy;
      XEvent ev;
 
-     if(c->max)
+     if(c->max || c->layout == Tile)
           return;
 
      ocx = c->x;
@@ -609,7 +610,6 @@ mouseaction(Client *c, int x, int y, int type) {
                                (ocx + (ev.xmotion.x - x)),
                                (ocy + (ev.xmotion.y - y)),
                                c->w, c->h);
-
                if(conf.clientbarblock) {
                     if(c->y  < barheight + conf.ttbarheight - 5) {
                          moveresize(c, c->x, barheight+conf.ttbarheight, c->w, c->h);
@@ -617,6 +617,7 @@ mouseaction(Client *c, int x, int y, int type) {
                          return;
                     }
                }
+
           }
      }
      return;
