@@ -138,6 +138,7 @@ getevent(void) {
      int i;
      char s[6];
      struct timeval tv;
+
      if(QLength(dpy) > 0) {
           XNextEvent(dpy, &event);
      } else {
@@ -185,8 +186,6 @@ getevent(void) {
                          c->title = NULL;
                          updatetitle(c);
                     }
-                    if(event.xproperty.atom == XA_WM_NORMAL_HINTS)
-                         setsizehints(c);
                }
           }
           break;
@@ -327,9 +326,9 @@ grabkeys(void) {
 void
 hide(Client *c) {
      if(c) {
-          XMoveWindow(dpy,c->win,c->x,c->y+mh*2);
-          XMoveWindow(dpy,c->tbar,c->x,c->y+mh*2);
-          XMoveWindow(dpy,c->button,c->x,c->y+mh*2);
+          XMoveWindow(dpy, c->win, c->x, c->y+mh*2);
+          XMoveWindow(dpy, c->tbar, c->x, c->y+mh*2);
+          XMoveWindow(dpy, c->button, c->x, c->y+mh*2);
      }
 }
 
@@ -398,7 +397,7 @@ init(void) {
                          CopyFromParent, DefaultVisual(dpy, screen),
                          CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
      XSetWindowBackground(dpy, bar, conf.colors.bar);
-     XMapWindow(dpy, bar);
+     XMapRaised(dpy, bar);
 
      /* INIT STUFF */
      XSetErrorHandler(errorhandler);
@@ -610,6 +609,14 @@ mouseaction(Client *c, int x, int y, int type) {
                                (ocx + (ev.xmotion.x - x)),
                                (ocy + (ev.xmotion.y - y)),
                                c->w, c->h);
+
+               if(conf.clientbarblock) {
+                    if(c->y  < barheight + conf.ttbarheight - 5) {
+                         moveresize(c, c->x, barheight+conf.ttbarheight, c->w, c->h);
+                         XUngrabPointer(dpy, CurrentTime);
+                         return;
+                    }
+               }
           }
      }
      return;
@@ -636,9 +643,10 @@ moveresize(Client *c, int x, int y, int w, int h) {
                c->w = w;
                c->h = h;
 
-               if(conf.clientbarblock)
+               if(conf.clientbarblock) {
                     if((y-conf.ttbarheight) <= barheight)
                          y = barheight+conf.ttbarheight;
+               } else updatebar();
 
           XMoveResizeWindow(dpy, c->win, x, y, w ,h);
           XMoveResizeWindow(dpy, c->tbar, x, y - conf.ttbarheight, w, conf.ttbarheight);
@@ -746,6 +754,7 @@ tag(char *cmd) {
           if(c->tag == tmp)
                unhide(c);
      }
+
      seltag = tmp;
      sel = NULL;
      return;
@@ -765,9 +774,8 @@ tagswitch(char *cmd) {
      for(c = clients; c; c = c->next) {
           if(c->tag == seltag - tmp)
                hide(c);
-          if(c->tag == seltag) {
+          if(c->tag == seltag)
                unhide(c);
-          }
      }
      sel = NULL;
      return;
@@ -862,6 +870,9 @@ unhide(Client *c) {
           XMoveWindow(dpy,c->button,
                       (c->x + c->w -10),
                       (c->y - 9));
+          if(conf.clientbarblock)
+               if(c->y+conf.ttbarheight <= barheight)
+                    moveresize(c, c->x, barheight + conf.ttbarheight, c->w, c->h);
      }
 }
 
@@ -932,6 +943,7 @@ updatebar(void) {
      XSetForeground(dpy, gc, conf.colors.text);
      XDrawString(dpy, bar, gc, mw- j*6, fonth -1 , status, j);
      XDrawLine(dpy, bar, gc, mw-j*6-5, 0 , mw-j*6-5, barheight);
+     XSync(dpy, False);
      return;
 }
 

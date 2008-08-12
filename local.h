@@ -32,7 +32,7 @@
 #define ALT          Mod1Mask
 #define SHIFT        ShiftMask
 #define LEN(x)       (sizeof x / sizeof x[0])
-#define ITOA(p,n)     sprintf(p,"%i",n)
+#define ITOA(p,n)    sprintf(p,"%i",n)
 #define Move         0
 #define Resize       1
 #define MAXTAG       36
