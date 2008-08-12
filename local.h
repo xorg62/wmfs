@@ -32,6 +32,7 @@
 #define ALT          Mod1Mask
 #define SHIFT        ShiftMask
 #define LEN(x)       (sizeof x / sizeof x[0])
+#define ITOA(p,n)     sprintf(p,"%i",n)
 #define Move         0
 #define Resize       1
 #define MAXTAG       36
@@ -131,10 +132,8 @@ void setborder(Window win, int color);
 void setsizehints(Client *c);
 void spawn(char *cmd);
 void tag(char *cmd);
-void tagn(int tag);
 void tagswitch(char *cmd);
 void tagtransfert(char *cmd);
-void tagtransfertn(int n);
 void tile(char *cmd);
 void togglemax(char *cmd);
 void unhide(Client *c);

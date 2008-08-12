@@ -136,6 +136,7 @@ getevent(void) {
      XWindowChanges wc;
      Client *c;
      int i;
+     char s[6];
      struct timeval tv;
      if(QLength(dpy) > 0) {
           XNextEvent(dpy, &event);
@@ -247,11 +248,12 @@ getevent(void) {
                     if(event.xbutton.x > taglen[i-1]
                        && event.xbutton.x < taglen[i]) {
                          if(event.xbutton.button == Button1) {
+                              ITOA(s, i);
                               if(event.xbutton.state & ALT) {
-                                   tagtransfertn(i);
+                                   tagtransfert(s);
                                    updateall();
                               }
-                              tagn(i);
+                              tag(s);
                               updateall();
                          }
                     }
@@ -750,22 +752,6 @@ tag(char *cmd) {
 }
 
 void
-tagn(int tag) {
-     Client *c;
-     if(tag > conf.ntag || tag < 1 || tag == seltag)
-          return;
-     for(c = clients; c; c = c->next) {
-          if(!ishide(c))
-               hide(c);
-          if(c->tag == tag)
-               unhide(c);
-     }
-     seltag = tag;
-     sel = NULL;
-     return;
-}
-
-void
 tagswitch(char *cmd) {
      Client *c;
      int tmp;
@@ -790,17 +776,6 @@ tagswitch(char *cmd) {
 void
 tagtransfert(char *cmd) {
      int n = atoi(cmd);
-     if(!sel)
-          return;
-     sel->tag = n;
-     if(n != seltag)
-          hide(sel);
-     if(n == seltag)
-          unhide(sel);
-}
-
-void
-tagtransfertn(int n) {
      if(!sel)
           return;
      sel->tag = n;
