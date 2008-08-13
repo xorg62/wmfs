@@ -125,7 +125,7 @@ void layoutswitch(char *cmd);
 void mapclient(Client *c);
 void manage(Window w, XWindowAttributes *wa);
 void mouseaction(Client *c, int x, int y, int type);
-void moveresize(Client *c, int x, int y, int w, int h);
+void moveresize(Client *c, int x, int y, int w, int h, bool r);
 void raiseclient(Client *c);
 void scan(void);
 void setborder(Window win, int color);
@@ -169,4 +169,5 @@ Client *clients;                     /* Fisrt Client */
 Client *sel;                         /* selected client */
 int seltag;
 char status[16];
+float mwfact[MAXTAG];
 #endif /* LOCAL_H */
