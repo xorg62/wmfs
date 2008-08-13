@@ -39,7 +39,6 @@ include(FindPkgConfig)
 # Use pkgconfig to get required libraries
 pkg_check_modules(wmfs_required
   x11
-  xcb
   libconfuse)
 # Find exterbal programs
 find_program(GIT_EXECUTABLE git)
