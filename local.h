@@ -51,7 +51,6 @@ struct Client {
      Window tbar;          /* Titlebar? */
      Window button;        /* Close Button */
      Bool max, tile;       /* client info */
-     int layout;
      Client *next;         /* next client */
      Client *prev;         /* previous client */
 };
@@ -106,6 +105,7 @@ void detach(Client *c);
 void *emallocz(unsigned int size);
 int errorhandler(Display *d, XErrorEvent *event);
 void focus(Client *c);
+void freelayout(void);
 Client* getbutton(Window w);
 Client* getclient(Window w);
 Client* getnext(Client *c);
@@ -139,6 +139,7 @@ void togglemax(char *cmd);
 void unhide(Client *c);
 void unmanage(Client *c);
 void updatebar(void);
+void updatelayout(void);
 void unmapclient(Client *c);
 void updateall(void);
 void updatetitle(Client *c);
@@ -170,4 +171,5 @@ Client *sel;                         /* selected client */
 int seltag;
 char status[16];
 float mwfact[MAXTAG];
+int layout[MAXTAG];
 #endif /* LOCAL_H */
