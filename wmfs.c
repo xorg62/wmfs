@@ -108,9 +108,9 @@ freelayout(void) {
      for(c = clients; c; c = c->next){
           if(!ishide(c)) {
                if(c->max) {
-                    c->max == False;
                     moveresize(c, c->ox, c->oy, c->ow, c->oh, 0);
                }
+               c->max = False;
           }
      }
      layout[seltag] = Free;
@@ -205,7 +205,7 @@ getevent(void) {
           }
           break;
      case ConfigureRequest:
-          /* configure size and window position required */
+          /* configure size and window position required (only if the layout is Free)*/
           if(layout[seltag] != Free)
                return;
           wc.x = event.xconfigurerequest.x;
