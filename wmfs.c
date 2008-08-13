@@ -858,9 +858,9 @@ togglemax(char *cmd) {
                moveresize(sel, sel->ox, sel->oy, sel->ow, sel->oh,0);
                sel->max = False;
                sel->layout = Free;
-               raiseclient(c);
+               raiseclient(sel);
           }
-          raiseclient(c);
+          raiseclient(sel);
      }
      return;
 }
