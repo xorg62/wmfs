@@ -14,7 +14,6 @@ typedef struct  {
 func_name_list_t func_list[] = {
      {"spawn", spawn},
      {"killclient", killclient},
-     {"togglemax", togglemax},
      {"wswitch", wswitch},
      {"tagswitch", tagswitch},
      {"togglemax", togglemax},
