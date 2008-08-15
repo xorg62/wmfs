@@ -1,2 +1,7 @@
   · Configure CPack to generate archive package
   · Install and Uninstall
+  · Add XPM support
+  · Add colors gradation for bar and titlebar maybe
+  · Better tile layout
+  · Fix all the bug \o/
+  · XCB ?
