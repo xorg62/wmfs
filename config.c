@@ -15,9 +15,9 @@ func_name_list_t func_list[] = {
      {"spawn", spawn},
      {"killclient", killclient},
      {"togglemax", togglemax},
-     {"tile", tile},
      {"wswitch", wswitch},
      {"tagswitch", tagswitch},
+     {"togglemax", togglemax},
      {"keymovex", keymovex},
      {"keymovey", keymovey},
      {"keyresize", keyresize},
@@ -88,7 +88,9 @@ init_conf(void) {
 
      static cfg_opt_t layout_opts[] = {
 
-          CFG_STR_LIST("layout_symbol", "{Symbol}", CFGF_NONE),
+          CFG_STR_LIST("free","[Free]", CFGF_NONE),
+          CFG_STR_LIST("tile","[Tile]", CFGF_NONE),
+          CFG_STR_LIST("max","[Max]", CFGF_NONE),
           CFG_END()
      };
 
@@ -171,8 +173,9 @@ init_conf(void) {
      conf.colors.tagselbg     = cfg_getint(cfg_colors, "tag_sel_bg");
 
      /* layout */
-     for(i=0; i < 3; ++i)
-          conf.symlayout[i] = strdup(cfg_getnstr(cfg_layout, "layout_symbol",i));
+     conf.layouts.free = strdup(cfg_getstr(cfg_layout,"free"));
+     conf.layouts.tile = strdup(cfg_getstr(cfg_layout,"tile"));
+     conf.layouts.max  = strdup(cfg_getstr(cfg_layout,"max"));
 
      /* tag */
      conf.ntag = cfg_size(cfg_tag, "tag");
@@ -181,22 +184,21 @@ init_conf(void) {
 
      /* keybind ('tention ça rigole plus) */
      conf.nkeybind = cfg_size(cfg_keys, "key");
-          for(j = 0; j <  cfg_size(cfg_keys, "key"); ++j) {
-               cfgtmp = cfg_getnsec(cfg_keys, "key", j);
+     for(j = 0; j <  cfg_size(cfg_keys, "key"); ++j) {
+          cfgtmp = cfg_getnsec(cfg_keys, "key", j);
 
-               for(l = 0; l < cfg_size(cfgtmp, "mod"); ++l)
-                    keys[j].mod |= char_to_modkey(cfg_getnstr(cfgtmp, "mod", l));
+          for(l = 0; l < cfg_size(cfgtmp, "mod"); ++l)
+               keys[j].mod |= char_to_modkey(cfg_getnstr(cfgtmp, "mod", l));
 
-               keys[j].keysym = XStringToKeysym(cfg_getstr(cfgtmp, "key"));
-               keys[j].func = name_to_func (cfg_getstr(cfgtmp, "func"));
-               if(!keys[j].func) {
-                    printf("WMFS Configuration: Unknow Function %s",cfg_getstr(cfgtmp,"func"));
-                    return;
-               }
-               keys[j].cmd = strdup(strdup(cfg_getstr(cfgtmp, "cmd")));
+          keys[j].keysym = XStringToKeysym(cfg_getstr(cfgtmp, "key"));
+          keys[j].func = name_to_func (cfg_getstr(cfgtmp, "func"));
+          if(!keys[j].func) {
+               printf("WMFS Configuration: Unknow Function %s",cfg_getstr(cfgtmp,"func"));
+               return;
           }
-
-          cfg_free(cfg);
+          keys[j].cmd = strdup(strdup(cfg_getstr(cfgtmp, "cmd")));
+     }
+     cfg_free(cfg);
 }
 
 

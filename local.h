@@ -50,7 +50,7 @@ struct Client {
      Window win;           /* window */
      Window tbar;          /* Titlebar? */
      Window button;        /* Close Button */
-     Bool max, tile;       /* client info */
+     Bool max, tile, hint; /* client info */
      Client *next;         /* next client */
      Client *prev;         /* previous client */
 };
@@ -84,8 +84,11 @@ typedef struct {
           int tagselfg;
           int tagselbg;
      } colors;
-     /* layout */
-     char *symlayout[3];
+     struct {
+          char *free;
+          char *tile;
+          char *max;
+     } layouts;
      /* tag */
      int ntag;
      char *taglist[MAXTAG];
@@ -100,7 +103,10 @@ enum { Free=0, Tile, Max};
 
 /* wmfs.c */
 void attach(Client *c);
+void buttonpress(XEvent *event);
+int clienthintpertag(int tag);
 int clientpertag(int tag);
+void configurerequest(XEvent event);
 void detach(Client *c);
 void *emallocz(unsigned int size);
 int errorhandler(Display *d, XErrorEvent *event);
@@ -109,6 +115,7 @@ void freelayout(void);
 Client* getbutton(Window w);
 Client* getclient(Window w);
 Client* getnext(Client *c);
+char* getlayoutsym(int l);
 Client* gettbar(Window w);
 void getevent(void);
 void grabbuttons(Client *c, Bool focused);
@@ -124,6 +131,7 @@ void killclient(char *cmd);
 void layoutswitch(char *cmd);
 void mapclient(Client *c);
 void manage(Window w, XWindowAttributes *wa);
+void maxlayout(void);
 void mouseaction(Client *c, int x, int y, int type);
 void moveresize(Client *c, int x, int y, int w, int h, bool r);
 void raiseclient(Client *c);
@@ -134,7 +142,7 @@ void spawn(char *cmd);
 void tag(char *cmd);
 void tagswitch(char *cmd);
 void tagtransfert(char *cmd);
-void tile(char *cmd);
+void tile(void);
 void togglemax(char *cmd);
 void unhide(Client *c);
 void unmanage(Client *c);

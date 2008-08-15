@@ -23,7 +23,9 @@ colors
 
 layout
 {
-        layout_symbol = { "[Free]", "[Tile]", "[Max]" }
+       free = "[Free]"
+       tile = "[Tile]"
+       max  = "[Max]"
 }
 
 tag
@@ -37,12 +39,13 @@ keys
 
         key { mod = {"Control"} key = "Return" func = "spawn" cmd = "urxvt" }
         key { mod = {"Alt"} key = "q" func = "killclient" cmd = NULL }
-        key { mod = {"Control"} key = "t" func = "togglemax" cmd = NULL }
-        key { mod = {"Control"} key = "o" func = "tile" cmd = NULL }
+        key { mod = {"Control"} key = "m" func = "togglemax" cmd = NULL }
         key { mod = {"Alt"} key = "Tab" func = "wswitch" cmd = "+" }
         key { mod = {"Alt","Shift"} key = "Tab" func = "wswitch" cmd = "-" }
         key { mod = {"Control"} key = "Right" func = "tagswitch" cmd = "+1" }
         key { mod = {"Control"} key = "Left" func = "tagswitch" cmd = "-1" }
+        key { mod = {"Control"} key = "l" func = "layoutswitch" cmd = "+" }
+        key { mod = {"Control", "Shift"} key = "l" func = "layoutswitch" cmd = "-" }
 
 # moving client keybind
 
