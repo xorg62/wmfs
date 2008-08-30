@@ -195,19 +195,19 @@ errorhandler(Display *d, XErrorEvent *event) {
 
 void
 focus(Client *c) {
-     if(sel && sel != c) {
-          grabbuttons(sel, False);
-          setborder(sel->win, conf.colors.bordernormal);
-          setborder(sel->tbar, conf.colors.bordernormal);
+     if(sel[seltag] && sel[seltag] != c) {
+          grabbuttons(sel[seltag], False);
+          setborder(sel[seltag]->win, conf.colors.bordernormal);
+          setborder(sel[seltag]->tbar, conf.colors.bordernormal);
      }
 
      if(c) grabbuttons(c, True);
 
-     sel = c;
+     sel[seltag] = c;
 
      if(c) {
           setborder(c->win, conf.colors.borderfocus);
-          setborder(sel->tbar, conf.colors.borderfocus);
+          setborder(sel[seltag]->tbar, conf.colors.borderfocus);
           if(conf.raisefocus)
                raiseclient(c);
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
@@ -339,11 +339,11 @@ getevent(void) {
           break;
 
      case FocusIn:
-          if(sel && event.xfocus.window != sel->win)
-               XSetInputFocus(dpy, sel->win, RevertToPointerRoot, CurrentTime);
+          if(sel[seltag] && event.xfocus.window != sel[seltag]->win)
+               XSetInputFocus(dpy, sel[seltag]->win, RevertToPointerRoot, CurrentTime);
           break;
 
-     case KeyPress: keypress(&event); break;
+     case KeyPress:    keypress(&event);    break;
      case ButtonPress: buttonpress(&event); break;
      }
      return;
@@ -492,24 +492,24 @@ ishide(Client *c) {
 
 void
 keymovex(char *cmd) {
-     if(sel && cmd && !ishide(sel) && !sel->max) {
-          if(layout[seltag] == Tile && !sel->hint)
+     if(sel[seltag] && cmd && !ishide(sel[seltag]) && !sel[seltag]->max) {
+          if(layout[seltag] == Tile && !sel[seltag]->hint)
                return;
           int tmp;
-          tmp = sel->x + atoi(cmd);
-          moveresize(sel,tmp, sel->y, sel->w, sel->h, 1);
+          tmp = sel[seltag]->x + atoi(cmd);
+          moveresize(sel[seltag], tmp, sel[seltag]->y, sel[seltag]->w, sel[seltag]->h, 1);
      }
      return;
 }
 
 void
 keymovey(char *cmd) {
-     if(sel && cmd && !ishide(sel) && !sel->max) {
-          if(layout[seltag] == Tile && !sel->hint)
+     if(sel[seltag] && cmd && !ishide(sel[seltag]) && !sel[seltag]->max) {
+          if(layout[seltag] == Tile && !sel[seltag]->hint)
                return;
           int tmp;
-          tmp = sel->y + atoi(cmd);
-          moveresize(sel, sel->x, tmp, sel->w, sel->h, 1);
+          tmp = sel[seltag]->y + atoi(cmd);
+          moveresize(sel[seltag], sel[seltag]->x, tmp, sel[seltag]->w, sel[seltag]->h, 1);
      }
      return;
 }
@@ -535,35 +535,38 @@ keypress(XEvent *e) {
 
 void
 keyresize(char *cmd) {
-     if(sel && !ishide(sel) && !sel->max && layout[seltag] != Tile) {
-          int temph=0, tempw=0, modh=0, modw=0,
-               tmp=0;
+     if(sel[seltag]
+        && !ishide(sel[seltag])
+        && !sel[seltag]->max
+        && layout[seltag] != Tile)
+     {
+          unsigned int temph, tempw, modh, modw, tmp;
 
           switch(cmd[1]) {
                case 'h': tmp = (cmd[0] == '+') ? 5 : -5; modh = tmp; break;
                case 'w': tmp = (cmd[0] == '+') ? 5 : -5; modw = tmp; break;
           }
 
-          temph = sel->h + modh;
-          tempw = sel->w + modw;
+          temph = sel[seltag]->h + modh;
+          tempw = sel[seltag]->w + modw;
           temph = (temph < 10) ? 10 : temph;
           tempw = (tempw < 10) ? 10 : tempw;
-          moveresize(sel, sel->x, sel->y, tempw, temph, 1);
+          moveresize(sel[seltag], sel[seltag]->x, sel[seltag]->y, tempw, temph, 1);
      }
      return;
 }
 
 void
 killclient(char *cmd) {
-     if(sel && !ishide(sel)) {
+     if(sel[seltag] && !ishide(sel[seltag])) {
           XEvent ev;
           ev.type = ClientMessage;
-          ev.xclient.window = sel->win;
+          ev.xclient.window = sel[seltag]->win;
           ev.xclient.message_type = wm_atom[WMProtocols];
           ev.xclient.format = 32;
           ev.xclient.data.l[0] = wm_atom[WMDelete];
           ev.xclient.data.l[1] = CurrentTime;
-          XSendEvent(dpy, sel->win, False, NoEventMask, &ev);
+          XSendEvent(dpy, sel[seltag]->win, False, NoEventMask, &ev);
      }
      updatelayout();
      return;
@@ -660,7 +663,7 @@ manage(Window w, XWindowAttributes *wa) {
 void
 maxlayout(void) {
      layout[seltag] = Max;
-     if(sel && !ishide(sel) && !sel->hint) {
+     if(sel[seltag] && !ishide(sel[seltag]) && !sel[seltag]->hint) {
           Client *c;
           for(c = clients; c; c = c->next) {
                if(!ishide(c)) {
@@ -668,12 +671,12 @@ maxlayout(void) {
                c->oy = c->y;
                c->ow = c->w;
                c->oh = c->h;
-               moveresize(sel, 0,
+               moveresize(sel[seltag], 0,
                           conf.ttbarheight + barheight,
                           (mw-(conf.borderheight * 2)),
-                          (mh-(conf.borderheight * 2)- conf.ttbarheight - barheight),1);
+                          (mh-(conf.borderheight * 2)- conf.ttbarheight - barheight), 1);
                c->max = True;
-               raiseclient(sel);
+               raiseclient(sel[seltag]);
                }
           }
      }
@@ -868,7 +871,8 @@ tag(char *cmd) {
      }
 
      seltag = tmp;
-     sel = NULL;
+     if(sel[tmp])
+          focus(sel[tmp]);
      updatelayout();
      return;
 }
@@ -890,7 +894,8 @@ tagswitch(char *cmd) {
           if(c->tag == seltag)
                unhide(c);
      }
-     sel = NULL;
+     if(sel[seltag])
+          focus(sel[seltag]);
      updatelayout();
      return;
 }
@@ -898,20 +903,20 @@ tagswitch(char *cmd) {
 void
 tagtransfert(char *cmd) {
      int n = atoi(cmd);
-     if(!sel)
+     if(!sel[seltag])
           return;
-     sel->tag = n;
+     sel[seltag]->tag = n;
      if(n != seltag)
-          hide(sel);
+          hide(sel[seltag]);
      if(n == seltag)
-          unhide(sel);
+          unhide(sel[seltag]);
      updatelayout();
 }
 
 void
 tile(void) {
      layout[seltag] = Tile;
-     if(sel) {
+     if(sel[seltag]) {
           Client *c;
           int i;
           unsigned int n, nh, h, w, bord;
@@ -946,21 +951,21 @@ tile(void) {
 
 void
 togglemax(char *cmd) {
-     if(sel && !ishide(sel) && !sel->hint) {
-          if(!sel->max) {
-               sel->ox = sel->x;
-               sel->oy = sel->y;
-               sel->ow = sel->w;
-               sel->oh = sel->h;
-               moveresize(sel, 0,
+     if(sel[seltag] && !ishide(sel[seltag]) && !sel[seltag]->hint) {
+          if(!sel[seltag]->max) {
+               sel[seltag]->ox = sel[seltag]->x;
+               sel[seltag]->oy = sel[seltag]->y;
+               sel[seltag]->ow = sel[seltag]->w;
+               sel[seltag]->oh = sel[seltag]->h;
+               moveresize(sel[seltag], 0,
                           conf.ttbarheight + barheight,
                           (mw-(conf.borderheight * 2)),
                           (mh-(conf.borderheight * 2)- conf.ttbarheight - barheight), 0);
-               raiseclient(sel);
-               sel->max = True;
-          } else if(sel->max) {
-               moveresize(sel, sel->ox, sel->oy, sel->ow, sel->oh, 1);
-               sel->max = False;
+               raiseclient(sel[seltag]);
+               sel[seltag]->max = True;
+          } else if(sel[seltag]->max) {
+               moveresize(sel[seltag], sel[seltag]->ox, sel[seltag]->oy, sel[seltag]->ow, sel[seltag]->oh, 1);
+               sel[seltag]->max = False;
           }
      }
      return;
@@ -983,10 +988,10 @@ unhide(Client *c) {
 void
 unmanage(Client *c) {
      XSetErrorHandler(errorhandler);
-     if(sel == c)
-          sel = c->next;
+     if(sel[seltag] == c)
+          sel[seltag] = c->next;
      else
-          sel = NULL;
+          sel[seltag] = NULL;
      XUnmapWindow(dpy, c->tbar);
      XDestroyWindow(dpy, c->tbar);
      XUnmapWindow(dpy, c->button);
@@ -1086,10 +1091,10 @@ updatetitle(Client *c) {
 
 void
 wswitch(char *cmd) {
-     if(sel && !ishide(sel)) {
+     if(sel[seltag] && !ishide(sel[seltag])) {
           Client *c;
           if(cmd[0] == '+') {
-               for(c = sel->next; c && ishide(c); c = c->next);
+               for(c = sel[seltag]->next; c && ishide(c); c = c->next);
                if(!c)
                     for(c = clients; c && ishide(c); c = c->next);
                if(c) {
@@ -1097,7 +1102,7 @@ wswitch(char *cmd) {
                     raiseclient(c);
                }
           } else if(cmd[0] == '-') {
-               for(c = sel->prev; c && ishide(c); c = c->prev);
+               for(c = sel[seltag]->prev; c && ishide(c); c = c->prev);
                if(!c) {
                     for(c = clients; c && c->next; c = c->next);
                     for(; c && ishide(c); c = c->prev);

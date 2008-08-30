@@ -174,9 +174,9 @@ Cursor cursor[CurLast];
 int mw, mh;
 int fonth;
 int barheight;
-Client *clients;                     /* Fisrt Client */
-Client *sel;                         /* selected client */
-int seltag;
+Client *clients;                     /* First Client */
+Client *sel[MAXTAG];                 /* selected client */
+int seltag;                          /* selected tag */
 char status[16];
 float mwfact[MAXTAG];
 int layout[MAXTAG];
