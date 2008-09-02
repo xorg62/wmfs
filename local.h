@@ -8,6 +8,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <signal.h>
+#include <errno.h>
 #include <time.h>
 #include <getopt.h>
 #include <confuse.h>
@@ -19,7 +20,6 @@
 #include <X11/keysym.h>
 #include <X11/cursorfont.h>
 #include <X11/Xutil.h>
-
 #include "config.h"
 
 /* DEFINE TYPES */
@@ -33,6 +33,7 @@
 #define SHIFT        ShiftMask
 #define LEN(x)       (sizeof x / sizeof x[0])
 #define ITOA(p,n)    sprintf(p,"%i",n)
+#define debug(p)     printf("debug: %d\n", p)
 #define Move         0
 #define Resize       1
 #define MAXTAG       36
@@ -50,8 +51,9 @@ struct Client {
      Window win;           /* window */
      Window tbar;          /* Titlebar? */
      Window button;        /* Close Button */
-     Bool max, tile, hint; /* client info */
-     Client *next;         /* next client */
+     Bool max, tile, free; /* Client Info */
+     Bool hint, hide;      /* Client Info² */
+     Client *next;         /* next  client */
      Client *prev;         /* previous client */
 };
 
@@ -66,6 +68,15 @@ typedef struct {
      char *name;
      void *func;
 } func_name_list_t;
+
+typedef struct {
+     char *text;
+     Window win;
+     void (*func)(char *cmd);
+     char *cmd;
+     int fg_color;
+     int bg_color;
+} BarButton;
 
 typedef struct {
      /* bool and size */
@@ -94,6 +105,8 @@ typedef struct {
      char *taglist[MAXTAG];
      /* keybind */
      int nkeybind;
+     BarButton barbutton[64];
+     int nbutton;
 } Conf;
 
 enum { CurNormal, CurResize, CurMove, CurInput, CurLast };
@@ -118,6 +131,7 @@ Client* getnext(Client *c);
 char* getlayoutsym(int l);
 Client* gettbar(Window w);
 void getevent(void);
+void getstdin(void);
 void grabbuttons(Client *c, Bool focused);
 void grabkeys(void);
 void hide(Client *c);
@@ -147,6 +161,7 @@ void togglemax(char *cmd);
 void unhide(Client *c);
 void unmanage(Client *c);
 void updatebar(void);
+void updatebutton(void);
 void updatelayout(void);
 void unmapclient(Client *c);
 void updateall(void);
@@ -173,11 +188,19 @@ Atom net_atom[NetLast];
 Cursor cursor[CurLast];
 int mw, mh;
 int fonth;
+int fonty;
 int barheight;
 Client *clients;                     /* First Client */
-Client *sel[MAXTAG];                 /* selected client */
+Client *sel;                         /* selected client */
 int seltag;                          /* selected tag */
+Client *selbytag[MAXTAG];
 char status[16];
 float mwfact[MAXTAG];
 int layout[MAXTAG];
+char bartext[256];
+char *ptrb, bufbt[sizeof bartext];
+int readp;
+Bool readin;
+unsigned int offset, len;
+
 #endif /* LOCAL_H */

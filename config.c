@@ -114,22 +114,41 @@ init_conf(void) {
           CFG_END()
      };
 
-     static cfg_opt_t opts[] = {
+     static cfg_opt_t button_opts[] = {
 
-          CFG_SEC("misc",   misc_opts,   CFGF_NONE),
-          CFG_SEC("colors", colors_opts, CFGF_NONE),
-          CFG_SEC("layout", layout_opts, CFGF_NONE),
-          CFG_SEC("tag",    tag_opts,    CFGF_NONE),
-          CFG_SEC("keys",   keys_opts,   CFGF_NONE),
+          CFG_STR("text", "", CFGF_NONE),
+          CFG_STR("func", "", CFGF_NONE),
+          CFG_STR("cmd", NULL, CFGF_NONE),
+          CFG_INT("fg_color", 0x000000, CFGF_NONE),
+          CFG_INT("bg_color",   0xFFFFFF, CFGF_NONE),
           CFG_END()
      };
+
+     static cfg_opt_t buttons_opts[] = {
+
+          CFG_SEC("button", button_opts, CFGF_MULTI),
+          CFG_END()
+     };
+
+     static cfg_opt_t opts[] = {
+
+          CFG_SEC("misc",    misc_opts,    CFGF_NONE),
+          CFG_SEC("colors",  colors_opts,  CFGF_NONE),
+          CFG_SEC("layout",  layout_opts,  CFGF_NONE),
+          CFG_SEC("tag",     tag_opts,     CFGF_NONE),
+          CFG_SEC("keys",    keys_opts,    CFGF_NONE),
+          CFG_SEC("buttons", buttons_opts, CFGF_NONE),
+          CFG_END()
+     };
+
      cfg_t *cfg;
      cfg_t *cfg_misc;
      cfg_t *cfg_colors;
      cfg_t *cfg_layout;
      cfg_t *cfg_tag;
      cfg_t *cfg_keys;
-     cfg_t *cfgtmp;
+     cfg_t *cfg_buttons;
+     cfg_t *cfgtmp, *cfgtmp2;
      char final_path[100];
      int ret, i, j, l;
 
@@ -148,11 +167,12 @@ init_conf(void) {
           exit(1);
      }
 
-     cfg_misc   = cfg_getsec(cfg, "misc");
-     cfg_colors = cfg_getsec(cfg, "colors");
-     cfg_layout = cfg_getsec(cfg, "layout");
-     cfg_tag    = cfg_getsec(cfg, "tag");
-     cfg_keys   = cfg_getsec(cfg, "keys");
+     cfg_misc    = cfg_getsec(cfg, "misc");
+     cfg_colors  = cfg_getsec(cfg, "colors");
+     cfg_layout  = cfg_getsec(cfg, "layout");
+     cfg_tag     = cfg_getsec(cfg, "tag");
+     cfg_keys    = cfg_getsec(cfg, "keys");
+     cfg_buttons = cfg_getsec(cfg, "buttons");
 
      /* misc */
      conf.font           = strdup(cfg_getstr(cfg_misc, "font"));
@@ -179,7 +199,7 @@ init_conf(void) {
      /* tag */
      conf.ntag = cfg_size(cfg_tag, "tag");
      for(i=0; i < cfg_size(cfg_tag, "tag"); ++i)
-          conf.taglist[i] = strdup(cfg_getnstr(cfg_tag,"tag",i));
+          conf.taglist[i] = strdup(cfg_getnstr(cfg_tag, "tag",i));
 
      /* keybind ('tention ça rigole plus) */
      conf.nkeybind = cfg_size(cfg_keys, "key");
@@ -190,12 +210,23 @@ init_conf(void) {
                keys[j].mod |= char_to_modkey(cfg_getnstr(cfgtmp, "mod", l));
 
           keys[j].keysym = XStringToKeysym(cfg_getstr(cfgtmp, "key"));
-          keys[j].func = name_to_func (cfg_getstr(cfgtmp, "func"));
+          keys[j].func = name_to_func(cfg_getstr(cfgtmp, "func"));
           if(!keys[j].func) {
                printf("WMFS Configuration: Unknow Function %s",cfg_getstr(cfgtmp,"func"));
                return;
           }
           keys[j].cmd = strdup(strdup(cfg_getstr(cfgtmp, "cmd")));
+     }
+
+     /* button */
+     conf.nbutton = cfg_size(cfg_buttons, "button");
+     for(i = 0; i < conf.nbutton; ++i) {
+          cfgtmp2 = cfg_getnsec(cfg_buttons, "button", i);
+          conf.barbutton[i].text = strdup(cfg_getstr(cfgtmp2, "text"));
+          conf.barbutton[i].func = name_to_func(cfg_getstr(cfgtmp2, "func"));
+          conf.barbutton[i].cmd = strdup(cfg_getstr(cfgtmp2, "cmd"));
+          conf.barbutton[i].fg_color = cfg_getint(cfgtmp2, "fg_color");
+          conf.barbutton[i].bg_color = cfg_getint(cfgtmp2, "bg_color");
      }
      cfg_free(cfg);
 }

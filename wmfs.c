@@ -27,7 +27,6 @@
 #include "local.h"
 
 unsigned int numlockmask = 0;
-
 int taglen[MAXTAG] = {3};
 
 void
@@ -72,15 +71,11 @@ buttonpress(XEvent *event) {
           for(i = 0; i < conf.ntag + 1; ++i) {
                if(ev->x > taglen[i-1]
                   && ev->x < taglen[i]) {
-                    if(ev->button == Button1) {
-                         ITOA(s, i);
-                         if(ev->state & ALT) {
-                              tagtransfert(s);
-                              updateall();
-                         }
+                    ITOA(s, i);
+                    if(ev->button == Button1)
                          tag(s);
-                         updateall();
-                    }
+                    else if(ev->button == Button3)
+                         tagtransfert(s);
                }
           }
           /* tag switch with scroll */
@@ -92,7 +87,8 @@ buttonpress(XEvent *event) {
           }
           /* layout switch */
           if(ev->x >= taglen[conf.ntag]
-             && ev->x < taglen[conf.ntag] + (strlen((getlayoutsym(layout[seltag])))*6)) {
+             && ev->x < taglen[conf.ntag] +
+             (strlen((getlayoutsym(layout[seltag])))*fonty+3)) {
                if(ev->button == Button1
                   || ev->button == Button4) {
                     layoutswitch("+");
@@ -112,6 +108,13 @@ buttonpress(XEvent *event) {
                tagswitch("-1");
      }
 
+     /* Bar Button */
+     for(i=0; i<conf.nbutton ; ++i) {
+          if(ev->window == conf.barbutton[i].win
+             && ev->button == Button1) {
+               conf.barbutton[i].func(conf.barbutton[i].cmd);
+          }
+     }
 }
 
 int
@@ -195,19 +198,21 @@ errorhandler(Display *d, XErrorEvent *event) {
 
 void
 focus(Client *c) {
-     if(sel[seltag] && sel[seltag] != c) {
-          grabbuttons(sel[seltag], False);
-          setborder(sel[seltag]->win, conf.colors.bordernormal);
-          setborder(sel[seltag]->tbar, conf.colors.bordernormal);
+     if(sel && sel != c) {
+          grabbuttons(sel, False);
+          setborder(sel->win, conf.colors.bordernormal);
+          setborder(sel->tbar, conf.colors.bordernormal);
      }
 
-     if(c) grabbuttons(c, True);
+     if(c)
+          grabbuttons(c, True);
 
-     sel[seltag] = c;
+     sel = c;
+     selbytag[seltag] = c;
 
      if(c) {
           setborder(c->win, conf.colors.borderfocus);
-          setborder(sel[seltag]->tbar, conf.colors.borderfocus);
+          setborder(sel->tbar, conf.colors.borderfocus);
           if(conf.raisefocus)
                raiseclient(c);
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
@@ -218,16 +223,15 @@ focus(Client *c) {
 
 void
 freelayout(void) {
+     layout[seltag] = Free;
      Client *c;
      for(c = clients; c; c = c->next){
           if(!ishide(c)) {
-               if(c->max) {
+               if(c->max)
                     moveresize(c, c->ox, c->oy, c->ow, c->oh, 1);
-               }
                c->max = False;
           }
      }
-     layout[seltag] = Free;
      return;
 }
 
@@ -271,23 +275,21 @@ gettbar(Window w) {
 
 void
 getevent(void) {
-     XEvent event;
      XWindowAttributes at;
      Client *c;
      struct timeval tv;
 
-     if(QLength(dpy) > 0) {
+     if(QLength(dpy) > 0)
           XNextEvent(dpy, &event);
-     } else {
+     else {
           XFlush(dpy);
           FD_ZERO(&fd);
           FD_SET(ConnectionNumber(dpy), &fd);
           event.type = LASTEvent;
-          tv.tv_sec = 2;
+          tv.tv_sec = 1;
           tv.tv_usec = 0;
-          if(select(FD_SETSIZE, &fd, NULL, NULL, &tv) > 0) {
+          if(select(FD_SETSIZE, &fd, NULL, NULL, &tv) > 0)
                XNextEvent(dpy, &event);
-          }
      }
 
      switch (event.type) {
@@ -307,10 +309,7 @@ getevent(void) {
                manage(event.xmaprequest.window, &at);
           break;
 
-     case MappingNotify:
-          if(event.xmapping.request == MappingKeyboard)
-               grabkeys();
-          break;
+     case MappingNotify: if(event.xmapping.request == MappingKeyboard) grabkeys();  break;
 
      case PropertyNotify:
           if(event.xproperty.state == PropertyDelete)
@@ -326,11 +325,13 @@ getevent(void) {
                }
           }
           break;
+
      case ConfigureRequest: configurerequest(event); break;
 
      case UnmapNotify:
           if((c = getclient(event.xunmap.window)))
-               unmanage(c);
+               if(!c->hide)
+                    unmanage(c);
           break;
 
      case DestroyNotify:
@@ -339,8 +340,8 @@ getevent(void) {
           break;
 
      case FocusIn:
-          if(sel[seltag] && event.xfocus.window != sel[seltag]->win)
-               XSetInputFocus(dpy, sel[seltag]->win, RevertToPointerRoot, CurrentTime);
+          if(sel && event.xfocus.window != sel->win)
+               XSetInputFocus(dpy, sel->win, RevertToPointerRoot, CurrentTime);
           break;
 
      case KeyPress:    keypress(&event);    break;
@@ -349,8 +350,30 @@ getevent(void) {
      return;
 }
 
+/* Not finish, testing */
+void
+getstdin(void) {
+     if(isatty(STDIN_FILENO))
+          return;
+     debug(354);
+     readp = read(STDIN_FILENO, bufbt + offset, len - offset);
+     for(ptrb = bufbt + offset; readp > 0; ptrb++, readp--, offset++)
+          if(*ptrb == '\n' || *ptrb == '\0') {
+               *ptrb = '\0';
+               strncpy(bartext, bufbt, len);
+               ptrb += readp - 1;
+               for(readp = 0; *(ptrb - readp) && *(ptrb - readp) != '\n'; readp++);
+               offset = readp;
+               if(readp)
+                    memmove(bufbt, ptrb - readp + 1, readp);
+               break;
+          }
+     return;
+}
+
 void
 grabbuttons(Client *c, Bool focused) {
+     int i;
      XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
      XUngrabButton(dpy, AnyButton, AnyModifier, c->tbar);
      XUngrabButton(dpy, AnyButton, AnyModifier, c->button);
@@ -367,14 +390,15 @@ grabbuttons(Client *c, Bool focused) {
           XGrabButton(dpy, Button1, AnyModifier, c->tbar, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
           XGrabButton(dpy, Button2, AnyModifier, c->tbar, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
           XGrabButton(dpy, Button3, AnyModifier, c->tbar, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
-          /* Button */
+          /* Titlebar Button */
           XGrabButton(dpy, Button1, AnyModifier, c->button, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
           XGrabButton(dpy, Button3, AnyModifier, c->button, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+          /* Bar Button */
+          for(i=0; i< conf.nbutton; ++i)
+               XGrabButton(dpy, Button1, AnyModifier, conf.barbutton[i].win, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
      } else {
           XGrabButton(dpy, AnyButton, AnyModifier, c->win, 0, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
           XGrabButton(dpy, AnyButton, AnyModifier, c->tbar, 0, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-
-
           XGrabButton(dpy, AnyButton, AnyModifier, c->button, 0, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
      }
 }
@@ -396,11 +420,19 @@ grabkeys(void) {
 
 void
 hide(Client *c) {
-     if(c) {
-          XMoveWindow(dpy, c->win, c->x, c->y+mh*2);
-          XMoveWindow(dpy, c->tbar, c->x, c->y+mh*2);
-          XMoveWindow(dpy, c->button, c->x, c->y+mh*2);
-    }
+     if(!c || c->hide) return;
+     long data[] = { IconicState, None };
+
+     /* unmapclient(c); */
+     /* Just hide for now... */
+     XMoveWindow(dpy, c->win, c->x, c->y+mh*2);
+     XMoveWindow(dpy, c->tbar, c->x, c->y+mh*2);
+     XMoveWindow(dpy, c->button, c->x, c->y+mh*2);
+
+     XChangeProperty(dpy, c->win, XInternAtom(dpy, "WM_STATE", False),
+                     XInternAtom(dpy, "WM_STATE", False),  32,
+                     PropModeReplace, (unsigned char *) data, 2);
+     c->hide = True;
 }
 
 void
@@ -430,8 +462,9 @@ init(void) {
 
      }
      XSetFont(dpy, gc, font->fid);
-     fonth = font->ascent + font->descent;
+     fonth = (font->ascent + font->descent) - 1;
      barheight = fonth + 3;
+     fonty = (font->ascent + font->descent) / 2;
 
      /* INIT CURSOR */
      cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
@@ -441,7 +474,7 @@ init(void) {
      /* INIT MODIFIER */
      modmap = XGetModifierMapping(dpy);
      for(i = 0; i < 8; i++)
-          for(j = 0; j < modmap->max_keypermod; j++) {
+          for(j = 0; j < modmap->max_keypermod; ++j) {
                if(modmap->modifiermap[i * modmap->max_keypermod + j]
                   == XKeysymToKeycode(dpy, XK_Num_Lock))
                     numlockmask = (1 << i);
@@ -473,10 +506,17 @@ init(void) {
                          CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
      XSetWindowBackground(dpy, bar, conf.colors.bar);
      XMapRaised(dpy, bar);
+     strncpy(bartext, "WMFS-devel", strlen("WMFS-devel"));
+     updatebar();
+     updatebutton();
 
      /* INIT STUFF */
      XSetErrorHandler(errorhandler);
      grabkeys();
+     readin = True;
+     offset = 0;
+     len = sizeof bartext - 1;
+     bufbt[len] = bartext[len] = '\0';
 
     return;
 }
@@ -492,24 +532,24 @@ ishide(Client *c) {
 
 void
 keymovex(char *cmd) {
-     if(sel[seltag] && cmd && !ishide(sel[seltag]) && !sel[seltag]->max) {
-          if(layout[seltag] == Tile && !sel[seltag]->hint)
+     if(sel && cmd && !ishide(sel) && !sel->max) {
+          if(layout[seltag] == Tile && !sel->hint)
                return;
           int tmp;
-          tmp = sel[seltag]->x + atoi(cmd);
-          moveresize(sel[seltag], tmp, sel[seltag]->y, sel[seltag]->w, sel[seltag]->h, 1);
+          tmp = sel->x + atoi(cmd);
+          moveresize(sel, tmp, sel->y, sel->w, sel->h, 1);
      }
      return;
 }
 
 void
 keymovey(char *cmd) {
-     if(sel[seltag] && cmd && !ishide(sel[seltag]) && !sel[seltag]->max) {
-          if(layout[seltag] == Tile && !sel[seltag]->hint)
+     if(sel && cmd && !ishide(sel) && !sel->max) {
+          if(layout[seltag] == Tile && !sel->hint)
                return;
           int tmp;
-          tmp = sel[seltag]->y + atoi(cmd);
-          moveresize(sel[seltag], sel[seltag]->x, tmp, sel[seltag]->w, sel[seltag]->h, 1);
+          tmp = sel->y + atoi(cmd);
+          moveresize(sel, sel->x, tmp, sel->w, sel->h, 1);
      }
      return;
 }
@@ -535,38 +575,34 @@ keypress(XEvent *e) {
 
 void
 keyresize(char *cmd) {
-     if(sel[seltag]
-        && !ishide(sel[seltag])
-        && !sel[seltag]->max
-        && layout[seltag] != Tile)
-     {
-          unsigned int temph, tempw, modh, modw, tmp;
+     if(sel && !ishide(sel) && !sel->max && layout[seltag] != Tile) {
+          int temph = 0, tempw = 0, modh = 0, modw = 0, tmp = 0;
 
           switch(cmd[1]) {
-               case 'h': tmp = (cmd[0] == '+') ? 5 : -5; modh = tmp; break;
-               case 'w': tmp = (cmd[0] == '+') ? 5 : -5; modw = tmp; break;
+          case 'h': tmp = (cmd[0] == '+') ? 5 : -5; modh = tmp; break;
+          case 'w': tmp = (cmd[0] == '+') ? 5 : -5; modw = tmp; break;
           }
 
-          temph = sel[seltag]->h + modh;
-          tempw = sel[seltag]->w + modw;
+          temph = sel->h + modh;
+          tempw = sel->w + modw;
           temph = (temph < 10) ? 10 : temph;
           tempw = (tempw < 10) ? 10 : tempw;
-          moveresize(sel[seltag], sel[seltag]->x, sel[seltag]->y, tempw, temph, 1);
+          moveresize(sel, sel->x, sel->y, tempw, temph, 1);
      }
      return;
 }
 
 void
 killclient(char *cmd) {
-     if(sel[seltag] && !ishide(sel[seltag])) {
+     if(sel && !ishide(sel)) {
           XEvent ev;
           ev.type = ClientMessage;
-          ev.xclient.window = sel[seltag]->win;
+          ev.xclient.window = sel->win;
           ev.xclient.message_type = wm_atom[WMProtocols];
           ev.xclient.format = 32;
           ev.xclient.data.l[0] = wm_atom[WMDelete];
           ev.xclient.data.l[1] = CurrentTime;
-          XSendEvent(dpy, sel[seltag]->win, False, NoEventMask, &ev);
+          XSendEvent(dpy, sel->win, False, NoEventMask, &ev);
      }
      updatelayout();
      return;
@@ -576,9 +612,9 @@ void
 layoutswitch(char *cmd) {
      if(cmd[0] == '+') {
           switch(layout[seltag]) {
-          case Free: tile();      break;
-          case Tile: maxlayout();     break;
-          case Max:  freelayout();    break;
+          case Free: tile();       break;
+          case Tile: maxlayout();  break;
+          case Max:  freelayout(); break;
           }
      }
      else if(cmd[0] == '-') {
@@ -593,11 +629,12 @@ layoutswitch(char *cmd) {
 
 void
 mapclient(Client *c) {
-     if(c) {
-          XMapWindow(dpy, c->win);
-          XMapWindow(dpy, c->tbar);
-          XMapWindow(dpy, c->button);
-     }
+     if(!c)
+          return;
+     XMapWindow(dpy, c->win);
+     XMapWindow(dpy, c->tbar);
+     XMapWindow(dpy, c->button);
+     XMapSubwindows(dpy, c->win);
      return;
 }
 
@@ -663,21 +700,22 @@ manage(Window w, XWindowAttributes *wa) {
 void
 maxlayout(void) {
      layout[seltag] = Max;
-     if(sel[seltag] && !ishide(sel[seltag]) && !sel[seltag]->hint) {
-          Client *c;
-          for(c = clients; c; c = c->next) {
-               if(!ishide(c)) {
+     if(!sel || ishide(sel) || sel->hint)
+          return;
+     printf("PWOUTE\n");
+     Client *c;
+     for(c = clients; c; c = c->next) {
+          if(!ishide(c) && !c->free) {
                c->ox = c->x;
                c->oy = c->y;
                c->ow = c->w;
                c->oh = c->h;
-               moveresize(sel[seltag], 0,
+               moveresize(c, 0,
                           conf.ttbarheight + barheight,
                           (mw-(conf.borderheight * 2)),
                           (mh-(conf.borderheight * 2)- conf.ttbarheight - barheight), 1);
+               raiseclient(sel);
                c->max = True;
-               raiseclient(sel[seltag]);
-               }
           }
      }
      return;
@@ -745,7 +783,8 @@ moveresize(Client *c, int x, int y, int w, int h, bool r) {
                if(c->minh > 0 && h < c->minh){ h = c->minh; c->hint = 1; };
                if(c->maxw > 0 && w > c->maxw){ w = c->maxw; c->hint = 1; };
                if(c->maxh > 0 && h > c->maxh){ h = c->maxh; c->hint = 1; };
-               if(w <= 0 || h <= 0) return;
+               if(w <= 0 || h <= 0)
+                    return;
           }
           /* }}} */
 
@@ -759,7 +798,8 @@ moveresize(Client *c, int x, int y, int w, int h, bool r) {
                if(conf.clientbarblock) {
                     if((y-conf.ttbarheight) <= barheight)
                          y = barheight+conf.ttbarheight;
-               } else updatebar();
+               } else
+                    updatebar();
 
           XMoveResizeWindow(dpy, c->win, x, y, w ,h);
           XMoveResizeWindow(dpy, c->tbar, x, y - conf.ttbarheight, w, conf.ttbarheight);
@@ -863,17 +903,22 @@ tag(char *cmd) {
 
      if(tmp > conf.ntag || tmp < 1 || tmp == seltag)
           return;
+
      for(c = clients; c; c = c->next) {
-          if(!ishide(c))
-               hide(c);
-          if(c->tag == tmp)
-               unhide(c);
+          if(c->win && c->tbar && c->button) {
+               if(!ishide(c))
+                    hide(c);
+               if(c->tag == tmp)
+                    unhide(c);
+          }
      }
 
      seltag = tmp;
-     if(sel[tmp])
-          focus(sel[tmp]);
-     updatelayout();
+
+     if(selbytag[seltag])
+          focus(selbytag[seltag]);
+
+     updateall();
      return;
 }
 
@@ -887,63 +932,68 @@ tagswitch(char *cmd) {
      if(seltag + tmp > conf.ntag || seltag + tmp < 1)
           return;
 
-     seltag += tmp;
      for(c = clients; c; c = c->next) {
-          if(c->tag == seltag - tmp)
-               hide(c);
           if(c->tag == seltag)
+               hide(c);
+          if(c && c->tag == seltag + tmp)
                unhide(c);
      }
-     if(sel[seltag])
-          focus(sel[seltag]);
-     updatelayout();
+
+     seltag += tmp;
+
+     if(selbytag[seltag])
+          focus(selbytag[seltag]);
+
      return;
 }
 
 void
 tagtransfert(char *cmd) {
      int n = atoi(cmd);
-     if(!sel[seltag])
+     if(!sel)
           return;
-     sel[seltag]->tag = n;
+     sel->tag = n;
      if(n != seltag)
-          hide(sel[seltag]);
+          hide(sel);
      if(n == seltag)
-          unhide(sel[seltag]);
-     updatelayout();
+          unhide(sel);
+     updateall();
 }
 
+/* Testing for now */
 void
 tile(void) {
      layout[seltag] = Tile;
-     if(sel[seltag]) {
-          Client *c;
-          int i;
-          unsigned int n, nh, h, w, bord;
-          unsigned int barto;
-          float mwf;
+     if(!sel)
+          return;
+     Client *c;
+     int i;
+     unsigned int n, nh, h, w, bord;
+     unsigned int barto;
+     float mwf;
 
-          barto = conf.ttbarheight + barheight;
-          bord =  conf.borderheight * 2;
+     barto = conf.ttbarheight + barheight;
+     bord =  conf.borderheight * 2;
+     mwf = mw*mwfact[seltag];
+     n = clientpertag(seltag);
+     nh = clienthintpertag(seltag);
+     w = mw - mwf - bord;
 
-          mwf = mw*mwfact[seltag];
-          n = clientpertag(seltag);
-          nh = clienthintpertag(seltag);
-          w = mw - mwf - bord;
+     if((n-nh) > 1) h = (mh - barheight) / ((n-nh) - 1);
+     else h = mh - barheight;
 
-          if((n-nh) > 1) h = (mh - barheight) / ((n-nh) - 1);
-          else h = mh - barheight;
+     moveresize(sel, 0, barto,
+                ((n > 1) ? mwf-bord : mw-bord),
+                ((mh-bord) - conf.ttbarheight - barheight), 0);
 
-          for(i = 0, c = clients; c && !c->hint; c = c->next, ++i) {
-               if(!ishide(c)) {
-                    if((n-nh) == 1)
-                         moveresize(c, 0, barto, mw-bord, mh-(bord+barto), 0);
-                    else if(i == 0)
-                         moveresize(c, 0, barto, mwf-bord, mh-(bord+barto), 0);
-                    else
-                         moveresize(c, mwf, (i-1)*h + barto, w, h - (conf.ttbarheight + bord), 0);
-
-               }
+     for(i = 0, c = clients; c && !c->hint; c = c->next, ++i) {
+          if(!ishide(c) && c != sel) {/*
+                                        if((n-nh) == 1)
+                                        moveresize(c, 0, barto, mw-bord, mh-(bord+barto), 0);
+                                        else if(i == 0)
+                                        moveresize(c, 0, barto, mwf-bord, mh-(bord+barto), 0);
+                                        else */
+               moveresize(c, mwf, (i-1)*h + barto, w, h - (conf.ttbarheight + bord), 0);
           }
      }
      return;
@@ -951,55 +1001,67 @@ tile(void) {
 
 void
 togglemax(char *cmd) {
-     if(sel[seltag] && !ishide(sel[seltag]) && !sel[seltag]->hint) {
-          if(!sel[seltag]->max) {
-               sel[seltag]->ox = sel[seltag]->x;
-               sel[seltag]->oy = sel[seltag]->y;
-               sel[seltag]->ow = sel[seltag]->w;
-               sel[seltag]->oh = sel[seltag]->h;
-               moveresize(sel[seltag], 0,
+     if(sel && !ishide(sel) && !sel->hint)  {
+          if(!sel->max) {
+               sel->ox = sel->x;
+               sel->oy = sel->y;
+               sel->ow = sel->w;
+               sel->oh = sel->h;
+               moveresize(sel, 0,
                           conf.ttbarheight + barheight,
                           (mw-(conf.borderheight * 2)),
                           (mh-(conf.borderheight * 2)- conf.ttbarheight - barheight), 0);
-               raiseclient(sel[seltag]);
-               sel[seltag]->max = True;
-          } else if(sel[seltag]->max) {
-               moveresize(sel[seltag], sel[seltag]->ox, sel[seltag]->oy, sel[seltag]->ow, sel[seltag]->oh, 1);
-               sel[seltag]->max = False;
+               raiseclient(sel);
+               sel->max = True;
+          } else if(sel->max) {
+               moveresize(sel,
+                          sel->ox,
+                          sel->oy,
+                          sel->ow,
+                          sel->oh, 1);
+               sel->max = False;
+               sel->free = True;
           }
      }
      return;
 }
+
 void
 unhide(Client *c) {
-     if(c) {
-          XMoveWindow(dpy,c->win,c->x,c->y);
-          XMoveWindow(dpy,c->tbar,c->x,
-                      (c->y - conf.ttbarheight));
-          XMoveWindow(dpy,c->button,
-                      (c->x + c->w -10),
-                      (c->y - 9));
-          if(conf.clientbarblock)
-               if(c->y+conf.ttbarheight <= barheight)
-                    moveresize(c, c->x, barheight + conf.ttbarheight, c->w, c->h,1);
-                    }
+     if(!c || !c->hide)
+          return;
+     long data[] = { NormalState, None };
+
+     /* mapclient(c); */
+     XMoveWindow(dpy,c->win,c->x,c->y);
+     XMoveWindow(dpy,c->tbar,c->x, (c->y - conf.ttbarheight));
+     XMoveWindow(dpy,c->button, (c->x + c->w -10), (c->y - 9));
+     XChangeProperty(dpy, c->win, XInternAtom(dpy, "WM_STATE", False),
+                     XInternAtom(dpy, "WM_STATE", False),  32,
+                     PropModeReplace, (unsigned char *) data, 2);
+     c->hide = False;
 }
 
 void
 unmanage(Client *c) {
      XSetErrorHandler(errorhandler);
-     if(sel[seltag] == c)
-          sel[seltag] = c->next;
-     else
-          sel[seltag] = NULL;
+     int i;
+     c->hide = True;
+
+     sel = (sel == c) ? c->next : NULL;
+     for(i = 0; i < conf.ntag; ++i)
+          selbytag[i] = (selbytag[i] == c) ? c->next : NULL;
+
      XUnmapWindow(dpy, c->tbar);
      XDestroyWindow(dpy, c->tbar);
      XUnmapWindow(dpy, c->button);
      XDestroyWindow(dpy, c->button);
+
      detach(c);
      free(c);
-     XSync(dpy, False);
      updatelayout();
+     updateall();
+     XSync(dpy, False);
      return;
 }
 
@@ -1014,67 +1076,102 @@ updateall(void) {
 
 void
 updatebar(void) {
-   int  i,j;
+     int  i ,j, x;
      char buf[conf.ntag][100];
+     char p[3];
+
      tm = localtime(&lt);
      lt = time(NULL);
+
      if(!conf.clientbarblock)
           XRaiseWindow(dpy, bar);
-     XClearWindow(dpy, bar);
+     else
+          XClearWindow(dpy, bar);
+
      XSetForeground(dpy, gc, conf.colors.text);
 
-     for(i=0;i< conf.ntag;++i) {
-          /* Make the tag string */
-          if(clientpertag(i+1))
-               sprintf(buf[i], "%s(%d) ", conf.taglist[i], clientpertag(i+1));
-          else
-               sprintf(buf[i], "%s() ", conf.taglist[i]);
-          taglen[i+1] = taglen[i] + 6*(strlen(conf.taglist[i]) + ((clientpertag(i+1) >= 10) ? 5 : 4));
+     for(i=0; i<conf.ntag; ++i) {
+          ITOA(p, clientpertag(i+1));
+          sprintf(buf[i], "%s<%s> ", conf.taglist[i], (clientpertag(i+1)) ? p : "");
+          taglen[i+1] =  taglen[i] + fonty * ( strlen(conf.taglist[i]) + strlen(buf[i]) - strlen(conf.taglist[i]) ) + fonty-4;
           /* Rectangle for the tag background */
-          if(i+1 == seltag) XSetForeground(dpy, gc, conf.colors.tagselbg);
-          else XSetForeground(dpy, gc, 0x090909);
-          XFillRectangle(dpy, bar, gc, taglen[i]-4, 0, strlen(buf[i])*6, barheight);
+          XSetForeground(dpy, gc, (i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar);
+          XFillRectangle(dpy, bar, gc, taglen[i] - 4, 0, (strlen(buf[i])*fonty), barheight);
           /* Draw tag */
-          if(i+1 == seltag) XSetForeground(dpy, gc, conf.colors.tagselfg);
-          else XSetForeground(dpy, gc, conf.colors.text);
-          XDrawString(dpy, bar, gc, taglen[i], fonth-1, buf[i], strlen(buf[i]));
+          XSetForeground(dpy, gc, (i+1 == seltag) ? conf.colors.tagselfg : conf.colors.text);
+          XDrawString(dpy, bar, gc, taglen[i], fonth, buf[i], strlen(buf[i]));
+     }
+
+     j = taglen[conf.ntag] + ((strlen(getlayoutsym(layout[seltag]))*fonty) + 10);
+     for(i=0; i<conf.nbutton; ++i) {
+          x = (!i) ? j : j + strlen(conf.barbutton[i-1].text)*fonty + 10;
+          if(conf.barbutton[i].win)
+               XMoveWindow(dpy, conf.barbutton[i].win, x, 0);
      }
 
      /* Draw layout symbol */
      XSetForeground(dpy, gc, conf.colors.tagselfg);
-     XDrawString(dpy, bar, gc, taglen[conf.ntag],
+     XDrawString(dpy, bar, gc, taglen[conf.ntag] + 4,
                  fonth-1,
                  getlayoutsym(layout[seltag]),
                  strlen(getlayoutsym(layout[seltag])));
 
-     /* Draw date */
-     sprintf(status, "%02d:%02d WMFS", tm->tm_hour, tm->tm_min);
-     j = strlen(status);
+     /* Draw stdin */
+     j = strlen(bartext);
      XSetForeground(dpy, gc, conf.colors.text);
-     XDrawString(dpy, bar, gc, mw- j*6, fonth -1 , status, j);
-     XDrawLine(dpy, bar, gc, mw-j*6-5, 0 , mw-j*6-5, barheight);
+     XDrawString(dpy, bar, gc, mw - j * fonty, fonth-1 , bartext ,j);
+     XDrawLine(dpy, bar, gc, mw- j * fonty-5 , 0 , mw - j * fonty-5, barheight);
+
      XSync(dpy, False);
      return;
 }
 
 void
+updatebutton(void) {
+     int i, j, p, x;
+     XSetWindowAttributes at;
+
+     at.override_redirect = 1;
+     at.background_pixmap = ParentRelative;
+     at.event_mask = ButtonPressMask | ExposureMask;
+
+     j = taglen[conf.ntag] + ((strlen(getlayoutsym(layout[seltag]))*fonty) + 10);
+
+     for(i = 0; i < conf.nbutton; ++i) {
+          p = strlen(conf.barbutton[i].text);
+          x = (!i) ? j :  j + strlen(conf.barbutton[i-1].text)*fonty + 10;
+          conf.barbutton[i].win = XCreateWindow(dpy, root, x, 0, p*fonty+4, barheight,
+                                                0, DefaultDepth(dpy, screen),
+                                                CopyFromParent, DefaultVisual(dpy, screen),
+                                                CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
+
+          XSetWindowBackground(dpy, conf.barbutton[i].win, conf.barbutton[i].bg_color);
+          XMapRaised(dpy, conf.barbutton[i].win);
+          XSetForeground(dpy, gc, conf.barbutton[i].fg_color);
+          XDrawString(dpy, conf.barbutton[i].win, gc, 2, fonth, conf.barbutton[i].text, p);
+     }
+
+     return;
+}
+
+void
 updatelayout(void) {
-     if(layout[seltag] == Tile)
-          tile();
-     if(layout[seltag] == Max)
-          togglemax(NULL);
-     if(layout[seltag] == Free)
-          freelayout();
+     switch(layout[seltag]) {
+     case Tile: tile();       break;
+     case Max:  maxlayout();  break;
+     case Free: freelayout(); break;
+     }
      return;
 }
 
 void
 unmapclient(Client *c) {
-     if(c) {
-          XUnmapWindow(dpy, c->win);
-          XUnmapWindow(dpy, c->tbar);
-          XUnmapWindow(dpy, c->button);
-     }
+     if(!c)
+          return;
+     XUnmapWindow(dpy, c->win);
+     XUnmapWindow(dpy, c->tbar);
+     XUnmapWindow(dpy, c->button);
+     XUnmapSubwindows(dpy, c->win);
      return;
 }
 
@@ -1091,28 +1188,29 @@ updatetitle(Client *c) {
 
 void
 wswitch(char *cmd) {
-     if(sel[seltag] && !ishide(sel[seltag])) {
-          Client *c;
-          if(cmd[0] == '+') {
-               for(c = sel[seltag]->next; c && ishide(c); c = c->next);
-               if(!c)
-                    for(c = clients; c && ishide(c); c = c->next);
-               if(c) {
-                    focus(c);
-                    raiseclient(c);
-               }
+     if(!sel || ishide(sel))
+          return;
+     Client *c;
+     if(cmd[0] == '+') {
+          for(c = sel->next; c && ishide(c); c = c->next);
+          if(!c)
+               for(c = clients; c && ishide(c); c = c->next);
+          if(c) {
+               focus(c);
+               raiseclient(c);
+          }
           } else if(cmd[0] == '-') {
-               for(c = sel[seltag]->prev; c && ishide(c); c = c->prev);
-               if(!c) {
-                    for(c = clients; c && c->next; c = c->next);
-                    for(; c && ishide(c); c = c->prev);
-               }
-               if(c) {
-                    focus(c);
-                    raiseclient(c);
-               }
+          for(c = sel->prev; c && ishide(c); c = c->prev);
+          if(!c) {
+               for(c = clients; c && c->next; c = c->next);
+               for(; c && ishide(c); c = c->prev);
+          }
+          if(c) {
+               focus(c);
+               raiseclient(c);
           }
      }
+     updateall();
      return;
 }
 
@@ -1159,11 +1257,12 @@ main(int argc,char **argv) {
 
      init();
      scan();
-
      for(;;) {
-          getevent();
+          /* Not finish */
+          /* getstdin(); */
           updatebar();
-     }
+          getevent();
+      }
 
      XCloseDisplay(dpy);
      return 0;

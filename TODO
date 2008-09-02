@@ -3,5 +3,6 @@
   · Add XPM support
   · Add colors gradation for bar and titlebar maybe
   · Better tile layout
+  · Multi-Head support
   · Fix all the bug \o/
   · XCB ?
