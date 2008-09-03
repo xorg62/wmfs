@@ -117,9 +117,9 @@ init_conf(void) {
 
           CFG_STR("text", "", CFGF_NONE),
           CFG_STR("func", "", CFGF_NONE),
-          CFG_STR("cmd", NULL, CFGF_NONE),
+          CFG_STR("cmd",  "", CFGF_NONE),
           CFG_INT("fg_color", 0x000000, CFGF_NONE),
-          CFG_INT("bg_color",   0xFFFFFF, CFGF_NONE),
+          CFG_INT("bg_color", 0xFFFFFF, CFGF_NONE),
           CFG_END()
      };
 

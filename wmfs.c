@@ -112,7 +112,8 @@ buttonpress(XEvent *event) {
      for(i=0; i<conf.nbutton ; ++i) {
           if(ev->window == conf.barbutton[i].win
              && ev->button == Button1) {
-               conf.barbutton[i].func(conf.barbutton[i].cmd);
+               if(conf.barbutton[i].func)
+                    conf.barbutton[i].func(conf.barbutton[i].cmd);
           }
      }
 }
@@ -510,7 +511,7 @@ init(void) {
      XMapRaised(dpy, bar);
      strncpy(bartext, "WMFS-devel", strlen("WMFS-devel"));
      updatebar();
-     updatebutton();
+     updatebutton(0);
 
      /* INIT STUFF */
      XSetErrorHandler(errorhandler);
@@ -1069,7 +1070,7 @@ updateall(void) {
 
 void
 updatebar(void) {
-     int  i ,j, x;
+     int  i ,j;
      char buf[conf.ntag][100];
      char p[3];
 
@@ -1092,15 +1093,7 @@ updatebar(void) {
           XDrawString(dpy, bar, gc, taglen[i], fonth, buf[i], strlen(buf[i]));
      }
 
-     j = taglen[conf.ntag] + ((strlen(getlayoutsym(layout[seltag]))*fonty) + 10);
-     for(i=0; i<conf.nbutton; ++i) {
-          x = (!i) ? j : j + strlen(conf.barbutton[i-1].text)*fonty + 10;
-          if(conf.barbutton[i].win) {
-               XMoveWindow(dpy, conf.barbutton[i].win, x, 0);
-               XSetForeground(dpy, gc, conf.barbutton[i].fg_color);
-               XDrawString(dpy, conf.barbutton[i].win, gc, 2, fonth, conf.barbutton[i].text, strlen(conf.barbutton[i].text));
-          }
-     }
+     updatebutton(1);
 
      /* Draw layout symbol */
      XSetForeground(dpy, gc, conf.colors.tagselfg);
@@ -1119,9 +1112,11 @@ updatebar(void) {
      return;
 }
 
+/* if c is 0, you can execute this function for the first time
+ * else the button is just updated */
 void
-updatebutton(void) {
-     int i, j, p, x;
+updatebutton(Bool c) {
+     int i, j, p, x, pm = 0;
      XSetWindowAttributes at;
 
      at.override_redirect = 1;
@@ -1132,16 +1127,28 @@ updatebutton(void) {
 
      for(i = 0; i < conf.nbutton; ++i) {
           p = strlen(conf.barbutton[i].text);
-          x = (!i) ? j :  j + strlen(conf.barbutton[i-1].text)*fonty + 10;
-          conf.barbutton[i].win = XCreateWindow(dpy, root, x, 0, p*fonty+4, barheight,
-                                                0, DefaultDepth(dpy, screen),
-                                                CopyFromParent, DefaultVisual(dpy, screen),
-                                                CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
 
-          XSetWindowBackground(dpy, conf.barbutton[i].win, conf.barbutton[i].bg_color);
-          XMapRaised(dpy, conf.barbutton[i].win);
-          XSetForeground(dpy, gc, conf.barbutton[i].fg_color);
-          XDrawString(dpy, conf.barbutton[i].win, gc, 2, fonth, conf.barbutton[i].text, p);
+          if(i)
+               pm += strlen(conf.barbutton[i-1].text) * fonty;
+          x = (!i) ? j : j + pm;
+
+          if(!c) {
+               conf.barbutton[i].win = XCreateWindow(dpy, root, x, 0, p*fonty+2, barheight,
+                                                     0, DefaultDepth(dpy, screen),
+                                                     CopyFromParent, DefaultVisual(dpy, screen),
+                                                     CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
+               XSetWindowBackground(dpy, conf.barbutton[i].win, conf.barbutton[i].bg_color);
+               XMapRaised(dpy, conf.barbutton[i].win);
+               XSetForeground(dpy, gc, conf.barbutton[i].fg_color);
+               XDrawString(dpy, conf.barbutton[i].win, gc, 1, fonth, conf.barbutton[i].text, p);
+          } else {
+               if(!conf.barbutton[i].win)
+                    return;
+               XSetForeground(dpy, gc, conf.barbutton[i].fg_color);
+               XMoveWindow(dpy, conf.barbutton[i].win, x, 0);
+               XDrawString(dpy, conf.barbutton[i].win, gc, 1, fonth,
+                           conf.barbutton[i].text, strlen(conf.barbutton[i].text));
+          }
      }
 
      return;

@@ -76,6 +76,8 @@ typedef struct {
      char *cmd;
      int fg_color;
      int bg_color;
+     unsigned int x;
+     unsigned int button;
 } BarButton;
 
 typedef struct {
@@ -160,7 +162,7 @@ void togglemax(char *cmd);
 void unhide(Client *c);
 void unmanage(Client *c);
 void updatebar(void);
-void updatebutton(void);
+void updatebutton(Bool c);
 void updatelayout(void);
 void unmapclient(Client *c);
 void updateall(void);
