@@ -69,7 +69,6 @@ init_conf(void) {
           CFG_BOOL("raiseswitch",       cfg_true,                CFGF_NONE),
           CFG_INT("border_height",      1,                       CFGF_NONE),
           CFG_INT("titlebar_height",    12,                      CFGF_NONE),
-          CFG_BOOL("clients_bar_block", cfg_true,                CFGF_NONE),
           CFG_END()
      };
 
@@ -180,7 +179,6 @@ init_conf(void) {
      conf.raiseswitch    = cfg_getbool(cfg_misc,       "raiseswitch");
      conf.borderheight   = cfg_getint(cfg_misc,        "border_height");
      conf.ttbarheight    = cfg_getint(cfg_misc,        "titlebar_height");
-     conf.clientbarblock = cfg_getbool(cfg_misc,       "clients_bar_block");
 
      /* colors */
      conf.colors.bordernormal = cfg_getint(cfg_colors, "border_normal");

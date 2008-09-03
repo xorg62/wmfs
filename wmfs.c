@@ -363,7 +363,7 @@ getstdin(void) {
                strncpy(bartext, bufbt, len);
                ptrb += readp - 1;
                for(readp = 0; *(ptrb - readp) && *(ptrb - readp) != '\n'; readp++);
-               offset = readp;
+              offset = readp;
                if(readp)
                     memmove(bufbt, ptrb - readp + 1, readp);
                break;
@@ -535,7 +535,7 @@ ishide(Client *c) {
 void
 keymovex(char *cmd) {
      if(sel && cmd && !ishide(sel) && !sel->max) {
-          if(layout[seltag] == Tile && !sel->hint)
+          if((layout[seltag] == Tile && !sel->hint) || layout[seltag] == Max)
                return;
           int tmp;
           tmp = sel->x + atoi(cmd);
@@ -547,7 +547,7 @@ keymovex(char *cmd) {
 void
 keymovey(char *cmd) {
      if(sel && cmd && !ishide(sel) && !sel->max) {
-          if(layout[seltag] == Tile && !sel->hint)
+          if((layout[seltag] == Tile && !sel->hint) || layout[seltag] == Max)
                return;
           int tmp;
           tmp = sel->y + atoi(cmd);
@@ -577,7 +577,7 @@ keypress(XEvent *e) {
 
 void
 keyresize(char *cmd) {
-     if(sel && !ishide(sel) && !sel->max && layout[seltag] != Tile) {
+     if(sel && !ishide(sel) && !sel->max && layout[seltag] != Tile && layout[seltag] != Max) {
           int temph = 0, tempw = 0, modh = 0, modw = 0, tmp = 0;
 
           switch(cmd[1]) {
@@ -704,7 +704,6 @@ maxlayout(void) {
      layout[seltag] = Max;
      if(!sel || ishide(sel) || sel->hint)
           return;
-     printf("PWOUTE\n");
      Client *c;
      for(c = clients; c; c = c->next) {
           if(!ishide(c) && !c->free) {
@@ -763,14 +762,11 @@ mouseaction(Client *c, int x, int y, int type) {
                                (ocx + (ev.xmotion.x - x)),
                                (ocy + (ev.xmotion.y - y)),
                                c->w, c->h,0);
-               if(conf.clientbarblock) {
-                    if(c->y  < barheight + conf.ttbarheight - 5) {
-                         moveresize(c, c->x, barheight+conf.ttbarheight, c->w, c->h, 1);
-                         XUngrabPointer(dpy, CurrentTime);
-                         return;
-                    }
+               if(c->y  < barheight + conf.ttbarheight - 5) {
+                    moveresize(c, c->x, barheight+conf.ttbarheight, c->w, c->h, 1);
+                    XUngrabPointer(dpy, CurrentTime);
+                    return;
                }
-
           }
      }
      return;
@@ -797,11 +793,8 @@ moveresize(Client *c, int x, int y, int w, int h, bool r) {
                c->w = w;
                c->h = h;
 
-               if(conf.clientbarblock) {
-                    if((y-conf.ttbarheight) <= barheight)
-                         y = barheight+conf.ttbarheight;
-               } else
-                    updatebar();
+               if((y-conf.ttbarheight) <= barheight)
+                    y = barheight+conf.ttbarheight;
 
           XMoveResizeWindow(dpy, c->win, x, y, w ,h);
           XMoveResizeWindow(dpy, c->tbar, x, y - conf.ttbarheight, w, conf.ttbarheight);
@@ -907,12 +900,10 @@ tag(char *cmd) {
           return;
 
      for(c = clients; c; c = c->next) {
-          if(c->win && c->tbar && c->button) {
-               if(!ishide(c))
-                    hide(c);
-               if(c->tag == tmp)
-                    unhide(c);
-          }
+          if(!ishide(c))
+               hide(c);
+          if(c->tag == tmp)
+               unhide(c);
      }
 
      seltag = tmp;
@@ -1085,10 +1076,7 @@ updatebar(void) {
      tm = localtime(&lt);
      lt = time(NULL);
 
-     if(!conf.clientbarblock)
-          XRaiseWindow(dpy, bar);
-     else
-          XClearWindow(dpy, bar);
+     XClearWindow(dpy, bar);
 
      XSetForeground(dpy, gc, conf.colors.text);
 
@@ -1107,8 +1095,11 @@ updatebar(void) {
      j = taglen[conf.ntag] + ((strlen(getlayoutsym(layout[seltag]))*fonty) + 10);
      for(i=0; i<conf.nbutton; ++i) {
           x = (!i) ? j : j + strlen(conf.barbutton[i-1].text)*fonty + 10;
-          if(conf.barbutton[i].win)
+          if(conf.barbutton[i].win) {
                XMoveWindow(dpy, conf.barbutton[i].win, x, 0);
+               XSetForeground(dpy, gc, conf.barbutton[i].fg_color);
+               XDrawString(dpy, conf.barbutton[i].win, gc, 2, fonth, conf.barbutton[i].text, strlen(conf.barbutton[i].text));
+          }
      }
 
      /* Draw layout symbol */

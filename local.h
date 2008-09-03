@@ -83,7 +83,6 @@ typedef struct {
      char *font;
      bool raisefocus;
      bool raiseswitch;
-     bool clientbarblock;
      int borderheight;
      int ttbarheight;
      struct {

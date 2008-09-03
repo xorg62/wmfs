@@ -7,7 +7,6 @@ misc
         raiseswitch =     true
         border_height =   1
         titlebar_height = 12
-        clients_bar_block = true
 }
 
 colors
