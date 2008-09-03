@@ -22,9 +22,9 @@ colors
 
 layout
 {
-       free = "[Free]"
-       tile = "[Tile]"
-       max  = "[Max]"
+        free = "[Free]"
+        tile = "[Tile]"
+        max  = "[Max]"
 }
 
 tag
@@ -34,7 +34,13 @@ tag
 
 buttons
 {
-        button { text = "Terminal" func = "spawn" cmd = "urxvt" fg_color = 0xFFFFFF bg_color = 0x3E3E3E }
+        button
+        {
+              text = "Terminal"
+              mouse { button = "Button1" func = "spawn" cmd = "urxvt" }
+              mouse { button = "Button3" func = "spawn" cmd = "xterm" }
+              fg_color = 0xFFFFFF bg_color = 0x3E3E3E
+        }
 }
 
 keys
@@ -42,8 +48,8 @@ keys
 # general keybind
 
         key { mod = {"Control"} key = "Return" func = "spawn" cmd = "urxvt" }
-        key { mod = {"Alt"} key = "q" func = "killclient" cmd = NULL }
-        key { mod = {"Control"} key = "m" func = "togglemax" cmd = NULL }
+        key { mod = {"Alt"} key = "q" func = "killclient" }
+        key { mod = {"Control"} key = "m" func = "togglemax" }
         key { mod = {"Alt"} key = "Tab" func = "wswitch" cmd = "+" }
         key { mod = {"Alt","Shift"} key = "Tab" func = "wswitch" cmd = "-" }
         key { mod = {"Control"} key = "Right" func = "tagswitch" cmd = "+1" }

@@ -7,11 +7,8 @@
 #include <stdarg.h>
 #include <string.h>
 #include <unistd.h>
-#include <signal.h>
-#include <errno.h>
 #include <time.h>
 #include <getopt.h>
-#include <confuse.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <X11/Xlib.h>
@@ -72,12 +69,13 @@ typedef struct {
 typedef struct {
      char *text;
      Window win;
-     void (*func)(char *cmd);
-     char *cmd;
+     void (*func[5])(char *cmd);
+     char *cmd[5];
      int fg_color;
      int bg_color;
      unsigned int x;
-     unsigned int button;
+     unsigned int mouse[5];
+     int nmousesec;
 } BarButton;
 
 typedef struct {

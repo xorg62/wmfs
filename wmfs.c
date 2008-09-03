@@ -41,7 +41,7 @@ attach(Client *c) {
 void
 buttonpress(XEvent *event) {
      Client *c;
-     int i;
+     int i, j;
      char s[6];
      XButtonPressedEvent *ev = &event->xbutton;
 
@@ -110,10 +110,12 @@ buttonpress(XEvent *event) {
 
      /* Bar Button */
      for(i=0; i<conf.nbutton ; ++i) {
-          if(ev->window == conf.barbutton[i].win
-             && ev->button == Button1) {
-               if(conf.barbutton[i].func)
-                    conf.barbutton[i].func(conf.barbutton[i].cmd);
+          for(j=0; j<conf.barbutton[i].nmousesec; ++j) {
+               if(ev->window == conf.barbutton[i].win
+                  && ev->button == conf.barbutton[i].mouse[j]) {
+                    if(conf.barbutton[i].func[j])
+                         conf.barbutton[i].func[j](conf.barbutton[i].cmd[j]);
+               }
           }
      }
 }
@@ -535,7 +537,11 @@ ishide(Client *c) {
 
 void
 keymovex(char *cmd) {
-     if(sel && cmd && !ishide(sel) && !sel->max) {
+     if(sel
+        && cmd
+        && !ishide(sel)
+        && !sel->max)
+     {
           if((layout[seltag] == Tile && !sel->hint) || layout[seltag] == Max)
                return;
           int tmp;
@@ -547,7 +553,11 @@ keymovex(char *cmd) {
 
 void
 keymovey(char *cmd) {
-     if(sel && cmd && !ishide(sel) && !sel->max) {
+     if(sel
+        && cmd
+        && !ishide(sel)
+        && !sel->max)
+     {
           if((layout[seltag] == Tile && !sel->hint) || layout[seltag] == Max)
                return;
           int tmp;
@@ -578,7 +588,11 @@ keypress(XEvent *e) {
 
 void
 keyresize(char *cmd) {
-     if(sel && !ishide(sel) && !sel->max && layout[seltag] != Tile && layout[seltag] != Max) {
+     if(sel && !ishide(sel)
+        && !sel->max
+        && layout[seltag] != Tile
+        && layout[seltag] != Max)
+     {
           int temph = 0, tempw = 0, modh = 0, modw = 0, tmp = 0;
 
           switch(cmd[1]) {
@@ -667,7 +681,7 @@ manage(Window w, XWindowAttributes *wa) {
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
           for(t = clients; t && t->win != trans; t = t->next);
 
-     c->tbar = XCreateSimpleWindow(dpy,root,
+     c->tbar = XCreateSimpleWindow(dpy, root,
                                    c->x,
                                    c->y - conf.ttbarheight,
                                    c->w,
@@ -677,7 +691,7 @@ manage(Window w, XWindowAttributes *wa) {
                                    conf.colors.bar);
      XSelectInput(dpy, c->tbar, ExposureMask | EnterWindowMask);
 
-     c->button = XCreateSimpleWindow(dpy,root,
+     c->button = XCreateSimpleWindow(dpy, root,
                                      c->x + c->w - 10,
                                      BUTY(c->y),
                                      5,
