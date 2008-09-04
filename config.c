@@ -140,6 +140,7 @@ init_conf(void) {
           CFG_SEC("mouse",    mouse_button_opts, CFGF_MULTI),
           CFG_INT("fg_color", 0x000000, CFGF_NONE),
           CFG_INT("bg_color", 0xFFFFFF, CFGF_NONE),
+          CFG_INT("x", 0, CFGF_NONE),
           CFG_END()
      };
 
@@ -253,6 +254,7 @@ init_conf(void) {
           conf.barbutton[i].text = strdup(cfg_getstr(cfgtmp2, "text"));
           conf.barbutton[i].fg_color = cfg_getint(cfgtmp2, "fg_color");
           conf.barbutton[i].bg_color = cfg_getint(cfgtmp2, "bg_color");
+          conf.barbutton[i].x = cfg_getint(cfgtmp2, "x");
      }
      cfg_free(cfg);
 }

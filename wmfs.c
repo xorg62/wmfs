@@ -542,7 +542,7 @@ keymovex(char *cmd) {
         && !ishide(sel)
         && !sel->max)
      {
-          if((layout[seltag] == Tile && !sel->hint) || layout[seltag] == Max)
+          if(layout[seltag] == Tile && !sel->hint)
                return;
           int tmp;
           tmp = sel->x + atoi(cmd);
@@ -558,7 +558,7 @@ keymovey(char *cmd) {
         && !ishide(sel)
         && !sel->max)
      {
-          if((layout[seltag] == Tile && !sel->hint) || layout[seltag] == Max)
+          if(layout[seltag] == Tile && !sel->hint)
                return;
           int tmp;
           tmp = sel->y + atoi(cmd);
@@ -590,8 +590,7 @@ void
 keyresize(char *cmd) {
      if(sel && !ishide(sel)
         && !sel->max
-        && layout[seltag] != Tile
-        && layout[seltag] != Max)
+        && layout[seltag] != Tile)
      {
           int temph = 0, tempw = 0, modh = 0, modw = 0, tmp = 0;
 
@@ -1141,10 +1140,12 @@ updatebutton(Bool c) {
 
      for(i = 0; i < conf.nbutton; ++i) {
           p = strlen(conf.barbutton[i].text);
-
-          if(i)
-               pm += strlen(conf.barbutton[i-1].text) * fonty;
-          x = (!i) ? j : j + pm;
+          if(!conf.barbutton[i].x) {
+               if(i)
+                    pm += strlen(conf.barbutton[i-1].text) * fonty;
+               x = (!i) ? j : j + pm;
+          } else
+               x = conf.barbutton[i].x;
 
           if(!c) {
                conf.barbutton[i].win = XCreateWindow(dpy, root, x, 0, p*fonty+2, barheight,
