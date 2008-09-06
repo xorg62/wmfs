@@ -953,7 +953,6 @@ tag(char *cmd) {
      if(selbytag[seltag])
           focus(selbytag[seltag]);
 
-     updatelayout();
      updateall();
      return;
 }
@@ -980,7 +979,6 @@ tagswitch(char *cmd) {
      if(selbytag[seltag])
           focus(selbytag[seltag]);
 
-     updatelayout();
      updateall();
      return;
 }
