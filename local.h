@@ -30,10 +30,11 @@
 #define SHIFT        ShiftMask
 #define LEN(x)       (sizeof x / sizeof x[0])
 #define ITOA(p,n)    sprintf(p,"%i",n)
-#define debug(p)     printf("debug: %d\n", p)
+#define debug(p)     printf("debug: %i\n", p)
 #define Move         0
 #define Resize       1
 #define MAXTAG       36
+#define NBUTTON      5
 
 typedef struct Client Client;
 struct Client {
@@ -69,13 +70,13 @@ typedef struct {
 typedef struct {
      char *text;
      Window win;
-     void (*func[5])(char *cmd);
-     char *cmd[5];
      int fg_color;
      int bg_color;
      unsigned int x;
-     unsigned int mouse[5];
      int nmousesec;
+     void (*func[NBUTTON])(char *cmd);
+     char *cmd[NBUTTON];
+     unsigned int mouse[NBUTTON];
 } BarButton;
 
 typedef struct {
@@ -89,7 +90,6 @@ typedef struct {
           int bordernormal;
           int borderfocus;
           int bar;
-          int button;
           int text;
           int tagselfg;
           int tagselbg;
@@ -104,8 +104,10 @@ typedef struct {
      char *taglist[MAXTAG];
      /* keybind */
      int nkeybind;
+     /* button */
      BarButton barbutton[64];
      int nbutton;
+     char *buttonfont;
 } Conf;
 
 enum { CurNormal, CurResize, CurMove, CurInput, CurLast };
@@ -150,6 +152,7 @@ void moveresize(Client *c, int x, int y, int w, int h, bool r);
 void raiseclient(Client *c);
 void scan(void);
 void setborder(Window win, int color);
+void set_mwfact(char *cmd);
 void setsizehints(Client *c);
 void spawn(char *cmd);
 void tag(char *cmd);
@@ -173,7 +176,7 @@ void wswitch(char *cmd);
 GC gc;
 XEvent event;
 Display *dpy;
-XFontStruct* font;
+XFontStruct* font, *font_b;
 Conf conf;
 int screen;
 Window root;
@@ -192,6 +195,7 @@ int barheight;
 Client *clients;                     /* First Client */
 Client *sel;                         /* selected client */
 int seltag;                          /* selected tag */
+
 Client *selbytag[MAXTAG];
 char status[16];
 float mwfact[MAXTAG];

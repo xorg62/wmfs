@@ -23,7 +23,7 @@ set(VERSION wmfs-devel)
 set(CFLAGS "-g -Wall")
 set(CMAKE_C_FLAGS ${CFLAGS})
 # Link Libraries
-set(LIBRARIES_TO_LINK 
+set(LIBRARIES_TO_LINK
   X11
   confuse)
 target_link_libraries(wmfs ${LIBRARIES_TO_LINK})

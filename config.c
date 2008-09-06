@@ -6,6 +6,16 @@
 
 #define FILE_NAME   ".wmfsrc"
 
+typedef struct  {
+      char *name;
+      KeySym keysym;
+} key_name_list_t;
+
+typedef struct {
+     char *name;
+     unsigned int button;
+} mouse_button_list_t;
+
 func_name_list_t func_list[] = {
      {"spawn", spawn},
      {"killclient", killclient},
@@ -17,7 +27,8 @@ func_name_list_t func_list[] = {
      {"keyresize", keyresize},
      {"layoutswitch",layoutswitch},
      {"tag", tag},
-     {"tagtransfert", tagtransfert}
+     {"tagtransfert", tagtransfert},
+     {"set_mwfact", set_mwfact}
 };
 
 key_name_list_t key_list[] = {
@@ -90,7 +101,6 @@ init_conf(void) {
           CFG_INT("border_normal", 0x354B5C,  CFGF_NONE),
           CFG_INT("border_focus",  0x6286A1,  CFGF_NONE),
           CFG_INT("bar",           0x090909,  CFGF_NONE),
-          CFG_INT("button",        0x354B5C,  CFGF_NONE),
           CFG_INT("text",          0x6289A1,  CFGF_NONE),
           CFG_INT("tag_sel_fg",    0xFFFFFF,  CFGF_NONE),
           CFG_INT("tag_sel_bg",    0x354B5C,  CFGF_NONE),
@@ -146,6 +156,7 @@ init_conf(void) {
 
      static cfg_opt_t buttons_opts[] = {
 
+          CFG_STR("buttons_font", "*-*-medium-*-10-*", CFGF_NONE),
           CFG_SEC("button", button_opts, CFGF_MULTI),
           CFG_END()
      };
@@ -205,7 +216,6 @@ init_conf(void) {
      conf.colors.bordernormal = cfg_getint(cfg_colors, "border_normal");
      conf.colors.borderfocus  = cfg_getint(cfg_colors, "border_focus");
      conf.colors.bar          = cfg_getint(cfg_colors, "bar");
-     conf.colors.button       = cfg_getint(cfg_colors, "button");
      conf.colors.text         = cfg_getint(cfg_colors, "text");
      conf.colors.tagselfg     = cfg_getint(cfg_colors, "tag_sel_fg");
      conf.colors.tagselbg     = cfg_getint(cfg_colors, "tag_sel_bg");
@@ -234,16 +244,14 @@ init_conf(void) {
                printf("WMFS Configuration: Unknow Function %s",cfg_getstr(cfgtmp, "func"));
                return;
           }
-          if(!strdup(strdup(cfg_getstr(cfgtmp, "cmd"))))
-               keys[j].cmd = NULL;
-          else
-               keys[j].cmd = strdup(strdup(cfg_getstr(cfgtmp, "cmd")));
+          keys[j].cmd = (!strdup(strdup(cfg_getstr(cfgtmp, "cmd")))) ? NULL : strdup(strdup(cfg_getstr(cfgtmp, "cmd")));
      }
 
      /* button */
      conf.nbutton = cfg_size(cfg_buttons, "button");
      for(i = 0; i < conf.nbutton; ++i) {
           cfgtmp2 = cfg_getnsec(cfg_buttons, "button", i);
+          conf.buttonfont = strdup(cfg_getstr(cfg_buttons, "buttons_font"));
           for(j = 0; j < cfg_size(cfgtmp2, "mouse");  ++j) {
                cfgtmp3 = cfg_getnsec(cfgtmp2, "mouse", j);
                conf.barbutton[i].func[j] = name_to_func(cfg_getstr(cfgtmp3, "func"));
@@ -256,6 +264,7 @@ init_conf(void) {
           conf.barbutton[i].bg_color = cfg_getint(cfgtmp2, "bg_color");
           conf.barbutton[i].x = cfg_getint(cfgtmp2, "x");
      }
+
      cfg_free(cfg);
 }
 
