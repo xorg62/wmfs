@@ -100,7 +100,7 @@ init_conf(void) {
           CFG_BOOL("raisefocus",        cfg_false,               CFGF_NONE),
           CFG_BOOL("raiseswitch",       cfg_true,                CFGF_NONE),
           CFG_INT("border_height",      1,                       CFGF_NONE),
-          CFG_INT("titlebar_height",    12,                      CFGF_NONE),
+          CFG_INT("titlebar_height",    0,                       CFGF_NONE),
           CFG_END()
      };
 

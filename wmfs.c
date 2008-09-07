@@ -156,9 +156,12 @@ configurerequest(XEvent event) {
                c->free = True;
                c->hint = True;
                c->max = False;
-               XMoveWindow(dpy, c->tbar, wc.x, wc.y - conf.ttbarheight);
-               XResizeWindow(dpy, c->tbar, wc.width, conf.ttbarheight);
-               XMoveWindow(dpy, c->button, wc.x + wc.width - 10, BUTY(wc.y));
+
+               if(conf.ttbarheight) {
+                    XMoveWindow(dpy, c->tbar, wc.x, wc.y - conf.ttbarheight);
+                    XResizeWindow(dpy, c->tbar, wc.width, conf.ttbarheight);
+                    XMoveWindow(dpy, c->button, wc.x + wc.width - 10, BUTY(wc.y));
+               }
                updatetitle(c);
                c->y = wc.y;
                c->x = wc.x;
@@ -202,7 +205,8 @@ focus(Client *c) {
      if(sel && sel != c) {
           grabbuttons(sel, False);
           setborder(sel->win, conf.colors.bordernormal);
-          setborder(sel->tbar, conf.colors.bordernormal);
+          if(conf.ttbarheight)
+               setborder(sel->tbar, conf.colors.bordernormal);
      }
 
      if(c)
@@ -213,7 +217,8 @@ focus(Client *c) {
 
      if(c) {
           setborder(c->win, conf.colors.borderfocus);
-          setborder(sel->tbar, conf.colors.borderfocus);
+          if(conf.ttbarheight)
+               setborder(sel->tbar, conf.colors.borderfocus);
           if(conf.raisefocus)
                raiseclient(c);
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
@@ -239,7 +244,8 @@ freelayout(void) {
 Client*
 getbutton(Window w) {
      Client *c;
-     for(c = clients; c && c->button != w; c = c->next);
+     if(conf.ttbarheight)
+          for(c = clients; c && c->button != w; c = c->next);
      return c;
 }
 
@@ -270,7 +276,8 @@ getlayoutsym(int l) {
 Client*
 gettbar(Window w) {
      Client *c;
-     for(c = clients; c && c->tbar != w; c = c->next);
+     if(conf.ttbarheight)
+        for(c = clients; c && c->tbar != w; c = c->next);
      return c;
 }
 
@@ -375,8 +382,10 @@ void
 grabbuttons(Client *c, Bool focused) {
      int i;
      XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
-     XUngrabButton(dpy, AnyButton, AnyModifier, c->tbar);
-     XUngrabButton(dpy, AnyButton, AnyModifier, c->button);
+     if(conf.ttbarheight) {
+          XUngrabButton(dpy, AnyButton, AnyModifier, c->tbar);
+          XUngrabButton(dpy, AnyButton, AnyModifier, c->button);
+     }
 
      if(focused) {
           /* Window */
@@ -386,20 +395,24 @@ grabbuttons(Client *c, Bool focused) {
           XGrabButton(dpy, Button2, ALT|LockMask, c->win, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
           XGrabButton(dpy, Button3, ALT, c->win, 0, ButtonMask,GrabModeAsync,GrabModeSync, None, None);
           XGrabButton(dpy, Button3, ALT|LockMask, c->win, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
-          /* Titlebar */
-          XGrabButton(dpy, Button1, AnyModifier, c->tbar, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, Button2, AnyModifier, c->tbar, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, Button3, AnyModifier, c->tbar, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
-          /* Titlebar Button */
-          XGrabButton(dpy, Button1, AnyModifier, c->button, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, Button3, AnyModifier, c->button, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+          if(conf.ttbarheight) {
+               /* Titlebar */
+               XGrabButton(dpy, Button1, AnyModifier, c->tbar, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, Button2, AnyModifier, c->tbar, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, Button3, AnyModifier, c->tbar, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+               /* Titlebar Button */
+               XGrabButton(dpy, Button1, AnyModifier, c->button, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, Button3, AnyModifier, c->button, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+          }
           /* Bar Button */
           for(i=0; i< conf.nbutton; ++i)
                XGrabButton(dpy, Button1, AnyModifier, conf.barbutton[i].win, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
      } else {
           XGrabButton(dpy, AnyButton, AnyModifier, c->win, 0, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, AnyButton, AnyModifier, c->tbar, 0, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, AnyButton, AnyModifier, c->button, 0, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          if(conf.ttbarheight) {
+               XGrabButton(dpy, AnyButton, AnyModifier, c->tbar, 0, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, AnyButton, AnyModifier, c->button, 0, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          }
           for(i=0; i< conf.nbutton; ++i)
                XGrabButton(dpy, Button1, AnyModifier, conf.barbutton[i].win, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
      }
@@ -427,8 +440,11 @@ hide(Client *c) {
      /* unmapclient(c); */
       /* Just hide for now... */
      XMoveWindow(dpy, c->win, c->x, c->y+mh*2);
-     XMoveWindow(dpy, c->tbar, c->x, c->y+mh*2);
-     XMoveWindow(dpy, c->button, c->x, c->y+mh*2);
+
+     if(conf.ttbarheight) {
+          XMoveWindow(dpy, c->tbar, c->x, c->y+mh*2);
+          XMoveWindow(dpy, c->button, c->x, c->y+mh*2);
+     }
 
      XChangeProperty(dpy, c->win, XInternAtom(dpy, "WM_STATE", False),
                      XInternAtom(dpy, "WM_STATE", False),  32,
@@ -649,8 +665,10 @@ mapclient(Client *c) {
      if(!c)
           return;
      XMapWindow(dpy, c->win);
-     XMapWindow(dpy, c->tbar);
-     XMapWindow(dpy, c->button);
+     if(conf.ttbarheight) {
+          XMapWindow(dpy, c->tbar);
+          XMapWindow(dpy, c->button);
+     }
      XMapSubwindows(dpy, c->win);
      return;
 }
@@ -681,30 +699,32 @@ manage(Window w, XWindowAttributes *wa) {
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
           for(t = clients; t && t->win != trans; t = t->next);
 
-     c->tbar = XCreateSimpleWindow(dpy, root,
-                                   c->x,
-                                   c->y - conf.ttbarheight,
-                                   c->w,
-                                   conf.ttbarheight,
-                                   conf.borderheight,
-                                   conf.colors.bordernormal,
-                                   conf.colors.bar);
-     XSelectInput(dpy, c->tbar, ExposureMask | EnterWindowMask);
-     setborder(c->tbar, conf.colors.bordernormal);
+     if(conf.ttbarheight) {
+          c->tbar = XCreateSimpleWindow(dpy, root,
+                                        c->x,
+                                        c->y - conf.ttbarheight,
+                                        c->w,
+                                        conf.ttbarheight,
+                                        conf.borderheight,
+                                        conf.colors.bordernormal,
+                                        conf.colors.bar);
+          XSelectInput(dpy, c->tbar, ExposureMask | EnterWindowMask);
+          setborder(c->tbar, conf.colors.bordernormal);
 
-     c->button = XCreateSimpleWindow(dpy, root,
-                                     c->x + c->w - 10,
-                                     BUTY(c->y),
-                                     5,
-                                     BUTH,
-                                     1,
-                                     conf.colors.bordernormal,
-                                     conf.colors.borderfocus);
+          c->button = XCreateSimpleWindow(dpy, root,
+                                          c->x + c->w - 10,
+                                          BUTY(c->y),
+                                          5,
+                                          BUTH,
+                                          1,
+                                          conf.colors.bordernormal,
+                                          conf.colors.borderfocus);
+     }
 
      grabbuttons(c, False);
      setsizehints(c);
      attach(c);
-     moveresize( c, c->x, c->y, c->w, c->h, 1);
+     moveresize(c, c->x, c->y, c->w, c->h, 1);
      XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
      mapclient(c);
      updatetitle(c);
@@ -826,13 +846,15 @@ moveresize(Client *c, int x, int y, int w, int h, bool r) {
                if((y-conf.ttbarheight) <= barheight)
                     y = barheight+conf.ttbarheight;
 
-          XMoveResizeWindow(dpy, c->win, x, y, w ,h);
-          XMoveResizeWindow(dpy, c->tbar, x, y - conf.ttbarheight, w, conf.ttbarheight);
-          XMoveResizeWindow(dpy, c->button,
-                            (x + w - 10),
-                            BUTY(y),
-                            5,
-                            BUTH);
+               XMoveResizeWindow(dpy, c->win, x, y, w ,h);
+               if(conf.ttbarheight) {
+                    XMoveResizeWindow(dpy, c->tbar, x, y - conf.ttbarheight, w, conf.ttbarheight);
+                    XMoveResizeWindow(dpy, c->button,
+                                      (x + w - 10),
+                                      BUTY(y),
+                                      5,
+                                      BUTH);
+               }
           updateall();
           XSync(dpy, False);
           }
@@ -844,8 +866,11 @@ void
 raiseclient(Client *c) {
      if(c) {
           XRaiseWindow(dpy,c->win);
-          XRaiseWindow(dpy,c->tbar);
-          XRaiseWindow(dpy,c->button);
+
+          if(conf.ttbarheight) {
+               XRaiseWindow(dpy,c->tbar);
+               XRaiseWindow(dpy,c->button);
+          }
      }
      return;
 }
@@ -1037,7 +1062,7 @@ tile(void) {
                }
                /* other clients */
                else {
-                    moveresize(c, (mwf+conf.borderheight), y, (mw-mwf-bord), h, 0);
+                    moveresize(c, (mwf+conf.borderheight), y, (mw-mwf-bord-conf.borderheight), h, 0);
                     if(i < i + 1)
                          y += h + bord + conf.ttbarheight;
                }
@@ -1113,8 +1138,10 @@ unhide(Client *c) {
 
      /* mapclient(c); */
      XMoveWindow(dpy,c->win,c->x,c->y);
-     XMoveWindow(dpy,c->tbar,c->x, (c->y - conf.ttbarheight));
-     XMoveWindow(dpy,c->button, (c->x + c->w -10), (c->y - 9));
+     if(conf.ttbarheight) {
+          XMoveWindow(dpy,c->tbar,c->x, (c->y - conf.ttbarheight));
+          XMoveWindow(dpy,c->button, (c->x + c->w -10), (c->y - 9));
+     }
      XChangeProperty(dpy, c->win, XInternAtom(dpy, "WM_STATE", False),
                      XInternAtom(dpy, "WM_STATE", False),  32,
                      PropModeReplace, (unsigned char *) data, 2);
@@ -1130,11 +1157,12 @@ unmanage(Client *c) {
      sel = (sel == c) ? c->next : NULL;
      for(i = 0; i < conf.ntag; ++i)
           selbytag[i] = (selbytag[i] == c) ? c->next : NULL;
-
-     XUnmapWindow(dpy, c->tbar);
-     XDestroyWindow(dpy, c->tbar);
-     XUnmapWindow(dpy, c->button);
-     XDestroyWindow(dpy, c->button);
+     if(conf.ttbarheight) {
+          XUnmapWindow(dpy, c->tbar);
+          XDestroyWindow(dpy, c->tbar);
+          XUnmapWindow(dpy, c->button);
+          XDestroyWindow(dpy, c->button);
+     }
 
      detach(c);
      free(c);
@@ -1263,8 +1291,10 @@ unmapclient(Client *c) {
      if(!c)
           return;
      XUnmapWindow(dpy, c->win);
-     XUnmapWindow(dpy, c->tbar);
-     XUnmapWindow(dpy, c->button);
+     if(conf.ttbarheight) {
+          XUnmapWindow(dpy, c->tbar);
+          XUnmapWindow(dpy, c->button);
+     }
      XUnmapSubwindows(dpy, c->win);
      return;
 }
@@ -1274,9 +1304,11 @@ updatetitle(Client *c) {
      XFetchName(dpy, c->win, &(c->title));
      if(!c->title)
           c->title = strdup("WMFS");
-     XClearWindow(dpy, c->tbar);
-     XSetForeground(dpy, gc, conf.colors.text);
-     XDrawString(dpy, c->tbar, gc, 5, fonth-1, c->title, strlen(c->title));
+     if(conf.ttbarheight) {
+          XClearWindow(dpy, c->tbar);
+          XSetForeground(dpy, gc, conf.colors.text);
+          XDrawString(dpy, c->tbar, gc, 5, fonth-1, c->title, strlen(c->title));
+     }
      return;
 }
 
