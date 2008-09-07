@@ -53,7 +53,7 @@ buttonpress(XEvent *event) {
           if(ev->button == Button1)
                mouseaction(c, ev->x_root, ev->y_root, Move);   /* type 0 for move */
           else if(ev->button == Button2)
-               togglemax(NULL);
+               tile_switch(NULL);
           else if(ev->button == Button3)
                mouseaction(c, ev->x_root, ev->y_root, Resize); /* type 1 for resize */
      }
@@ -154,7 +154,9 @@ configurerequest(XEvent event) {
      if((c = getclient(event.xconfigurerequest.window))) {
           if(wc.y < mw && wc.x < mh) {
                c->free = True;
-               c->tile = c->max = False;
+               c->hint = True;
+               c->max = False;
+               XMoveWindow(dpy, c->tbar, wc.x, wc.y - conf.ttbarheight);
                XResizeWindow(dpy, c->tbar, wc.width, conf.ttbarheight);
                XMoveWindow(dpy, c->button, wc.x + wc.width - 10, BUTY(wc.y));
                updatetitle(c);
@@ -162,7 +164,6 @@ configurerequest(XEvent event) {
                c->x = wc.x;
                c->w = wc.width;
                c->h = wc.height;
-               updatelayout();
           }
      }
 }
@@ -355,7 +356,6 @@ void
 getstdin(void) {
      if(isatty(STDIN_FILENO))
           return;
-     debug(354);
      readp = read(STDIN_FILENO, bufbt + offset, len - offset);
      for(ptrb = bufbt + offset; readp > 0; ptrb++, readp--, offset++)
           if(*ptrb == '\n' || *ptrb == '\0') {
@@ -450,9 +450,9 @@ init(void) {
      mh = DisplayHeight (dpy, screen);
      seltag = 1;
      init_conf();
-     for(i=0;i<MAXTAG;++i) {
-          mwfact[i] = 0.65;
-          layout[i] = Tile;
+     for(i = 0; i< conf.ntag; ++i) {
+          mwfact[i] = conf.tag[i-1].mwfact;
+          layout[i] = conf.tag[i-1].layout;
      }
 
      /* INIT FONT */
@@ -704,6 +704,7 @@ manage(Window w, XWindowAttributes *wa) {
      grabbuttons(c, False);
      setsizehints(c);
      attach(c);
+     moveresize( c, c->x, c->y, c->w, c->h, 1);
      XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
      mapclient(c);
      updatetitle(c);
@@ -986,13 +987,16 @@ tagswitch(char *cmd) {
 void
 tagtransfert(char *cmd) {
      int n = atoi(cmd);
+
      if(!sel)
           return;
      sel->tag = n;
      if(n != seltag)
           hide(sel);
+
      if(n == seltag)
           unhide(sel);
+
      updatelayout();
      updateall();
 }
@@ -1003,49 +1007,76 @@ tile(void) {
      layout[seltag] = Tile;
      Client *c;
      int i;
-     unsigned int x, y, w, h, n, nh, mwf, bord;
-     unsigned int barto;
+     unsigned int y, h, wm, n;
+     unsigned int barto, mwf, bord;
 
-     barto =  conf.ttbarheight + barheight; /* title bar heigt + bar height */
-     bord  =  conf.borderheight * 2;        /* border * 2 */
-     mwf   =  mw*mwfact[seltag];            /* mwfact */
-     n     =  clientpertag(seltag);
-     nh    =  clienthintpertag(seltag);
-
-     x     =  mwf + conf.borderheight;
+     barto =  conf.ttbarheight + barheight;
+     bord  =  conf.borderheight * 2;
+     mwf   =  mw*mwfact[seltag];
+     n     =  clientpertag(seltag) - clienthintpertag(seltag);
      y     =  barto;
-     w     =  (mw - mwf - bord);
+     wm    =  (mh-bord) - conf.ttbarheight - barheight;
 
-     if((n-nh)-1)
-          h = ((mh - barheight) / ((n-nh) - 1)) - (conf.ttbarheight + bord);
+     if(n-1)
+          h = (mh - barheight) / (n - 1) - (conf.ttbarheight + bord);
 
-     /* tiling */
-     for(i=0, c = clients; c; c = c->next, ++i) {
+     for(i = 0, c = clients; c; c = c->next, ++i) {
           if(!ishide(c)) {
                c->max = c->free = False;
                c->tile = True;
                c->ox = c->x; c->oy = c->y;
                c->ow = c->w; c->oh = c->h;
 
-               if((n-nh) == 1)
-                    moveresize(c, 0, barto, (mw-bord),
-                               ((mh-bord) - conf.ttbarheight - barheight), 0);
-               else if(i == 0)
-                    moveresize(c, 0, barto, mwf - conf.borderheight,
-                               ((mh-bord) - conf.ttbarheight - barheight), 0);
-               else {
-                    moveresize(c, x, y, w, h, 0);
-                    if(i < i + 1)
-                         y = c->y + c->h + bord + conf.ttbarheight;
+               /* 1 clients, maximize it */
+               if(n == 1)
+                    moveresize(c, 0, barto, mw-bord, wm, 0);
+               /* 2 and more... , master client */
+               else if(i == 0) {
+                    moveresize(c, 0, barto, mwf-conf.borderheight, wm, 0);
+                    master[seltag] = c;
                }
-               if(c->y > mh)
-                    moveresize(c, 0, barto, mwf - conf.borderheight,
-                    ((mh-bord) - conf.ttbarheight - barheight), 0);
-               updatetitle(c);
+               /* other clients */
+               else {
+                    moveresize(c, (mwf+conf.borderheight), y, (mw-mwf-bord), h, 0);
+                    if(i < i + 1)
+                         y += h + bord + conf.ttbarheight;
+               }
+               /* when a client is out of screen */
+               if(c->y > mh) {
+                    moveresize(c, 0, barto, mwf - conf.borderheight, wm, 0);
+                    master[seltag] = c;
+               }
           }
      }
-
      return;
+}
+
+void
+tile_switch(char *cmd) {
+     if(layout[seltag] != Tile)
+          return;
+     Client *tmp;
+     int sx, sy, sw, sh;
+
+     if(sel == master[seltag]
+        || !master[seltag])
+          return;
+
+     sx = sel->x;
+     sy = sel->y;
+     sw = sel->w;
+     sh = sel->h;
+
+     moveresize(sel,
+                master[seltag]->x,
+                master[seltag]->y,
+                master[seltag]->w,
+                master[seltag]->h, 0);
+
+     moveresize(master[seltag], sx, sy, sw, sh, 0);
+     tmp = master[seltag];
+     master[seltag] = sel;
+     focus(tmp);
 }
 
 void
@@ -1116,10 +1147,9 @@ unmanage(Client *c) {
 void
 updateall(void) {
      Client *c;
-     for(c = clients; c; c = c->next) {
+     for(c = clients; c; c = c->next)
           if(!ishide(c))
-             updatetitle(c);
-     }
+               updatetitle(c);
 }
 
 void
@@ -1137,8 +1167,8 @@ updatebar(void) {
 
      for(i=0; i<conf.ntag; ++i) {
           ITOA(p, clientpertag(i+1));
-          sprintf(buf[i], "%s<%s> ", conf.taglist[i], (clientpertag(i+1)) ? p : "");
-          taglen[i+1] =  taglen[i] + fonty * ( strlen(conf.taglist[i]) + strlen(buf[i]) - strlen(conf.taglist[i]) ) + fonty-4;
+          sprintf(buf[i], "%s<%s> ", conf.tag[i].name, (clientpertag(i+1)) ? p : "");
+          taglen[i+1] =  taglen[i] + fonty * ( strlen(conf.tag[i].name) + strlen(buf[i]) - strlen(conf.tag[i].name) ) + fonty-4;
           /* Rectangle for the tag background */
           XSetForeground(dpy, gc, (i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar);
           XFillRectangle(dpy, bar, gc, taglen[i] - 4, 0, (strlen(buf[i])*fonty), barheight);

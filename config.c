@@ -2,19 +2,10 @@
 #include <confuse.h>
 #include <string.h>
 
+#include "local.h"
 #include "config.h"
 
 #define FILE_NAME   ".wmfsrc"
-
-typedef struct  {
-      char *name;
-      KeySym keysym;
-} key_name_list_t;
-
-typedef struct {
-     char *name;
-     unsigned int button;
-} mouse_button_list_t;
 
 func_name_list_t func_list[] = {
      {"spawn", spawn},
@@ -28,7 +19,8 @@ func_name_list_t func_list[] = {
      {"layoutswitch",layoutswitch},
      {"tag", tag},
      {"tagtransfert", tagtransfert},
-     {"set_mwfact", set_mwfact}
+     {"set_mwfact", set_mwfact},
+     {"tile_switch", tile_switch}
 };
 
 key_name_list_t key_list[] = {
@@ -44,12 +36,18 @@ key_name_list_t key_list[] = {
      {NULL, NoSymbol}
 };
 
-mouse_button_list_t mouse_button_list[] = {
+name_to_uint_t mouse_button_list[] = {
      {"Button1", Button1},
      {"Button2", Button2},
      {"Button3", Button3},
      {"Button4", Button4},
      {"Button5", Button5}
+};
+
+name_to_uint_t layout_list[] = {
+     {"tile", Tile},
+     {"max", Max},
+     {"free", Free}
 };
 
 void*
@@ -80,6 +78,16 @@ char_to_button(char *name) {
           for(i=0; mouse_button_list[i].name; ++i)
                if(!strcmp(name, mouse_button_list[i].name))
                     return mouse_button_list[i].button;
+     return 0;
+}
+
+unsigned int
+layout_name_to_layout(char *name) {
+     int i;
+     if(name)
+          for(i=0; layout_list[i].name; ++i)
+               if(!strcmp(name, layout_list[i].name))
+                    return layout_list[i].button;
      return 0;
 }
 
@@ -116,8 +124,15 @@ init_conf(void) {
      };
 
      static cfg_opt_t tag_opts[] = {
+          CFG_STR("name", "", CFGF_NONE),
+          CFG_FLOAT("mwfact", 0.65, CFGF_NONE),
+          CFG_STR("layout", "tile", CFGF_NONE),
+          CFG_END()
+     };
 
-          CFG_STR_LIST("tag", "{Tag}", CFGF_NONE),
+     static cfg_opt_t tags_opts[] = {
+
+          CFG_SEC("tag", tag_opts, CFGF_MULTI),
           CFG_END()
      };
 
@@ -166,7 +181,7 @@ init_conf(void) {
           CFG_SEC("misc",    misc_opts,    CFGF_NONE),
           CFG_SEC("colors",  colors_opts,  CFGF_NONE),
           CFG_SEC("layout",  layout_opts,  CFGF_NONE),
-          CFG_SEC("tag",     tag_opts,     CFGF_NONE),
+          CFG_SEC("tags",    tags_opts,    CFGF_NONE),
           CFG_SEC("keys",    keys_opts,    CFGF_NONE),
           CFG_SEC("buttons", buttons_opts, CFGF_NONE),
           CFG_END()
@@ -176,7 +191,7 @@ init_conf(void) {
      cfg_t *cfg_misc;
      cfg_t *cfg_colors;
      cfg_t *cfg_layout;
-     cfg_t *cfg_tag;
+     cfg_t *cfg_tags;
      cfg_t *cfg_keys;
      cfg_t *cfg_buttons;
      cfg_t *cfgtmp, *cfgtmp2, *cfgtmp3;
@@ -201,7 +216,7 @@ init_conf(void) {
      cfg_misc    = cfg_getsec(cfg, "misc");
      cfg_colors  = cfg_getsec(cfg, "colors");
      cfg_layout  = cfg_getsec(cfg, "layout");
-     cfg_tag     = cfg_getsec(cfg, "tag");
+     cfg_tags    = cfg_getsec(cfg, "tags");
      cfg_keys    = cfg_getsec(cfg, "keys");
      cfg_buttons = cfg_getsec(cfg, "buttons");
 
@@ -226,9 +241,13 @@ init_conf(void) {
      conf.layouts.max  = strdup(cfg_getstr(cfg_layout, "max"));
 
      /* tag */
-     conf.ntag = cfg_size(cfg_tag, "tag");
-     for(i=0; i < cfg_size(cfg_tag, "tag"); ++i)
-          conf.taglist[i] = strdup(cfg_getnstr(cfg_tag, "tag",i));
+     conf.ntag = cfg_size(cfg_tags, "tag");
+     for(i=0; i < cfg_size(cfg_tags, "tag"); ++i) {
+          cfgtmp = cfg_getnsec(cfg_tags, "tag", i);
+          conf.tag[i].name = strdup(cfg_getstr(cfgtmp, "name"));
+          conf.tag[i].mwfact = cfg_getfloat(cfgtmp, "mwfact");
+          conf.tag[i].layout = layout_name_to_layout(cfg_getstr(cfgtmp, "layout"));
+     }
 
      /* keybind ('tention ça rigole plus) */
      conf.nkeybind = cfg_size(cfg_keys, "key");
@@ -251,7 +270,8 @@ init_conf(void) {
      conf.nbutton = cfg_size(cfg_buttons, "button");
      for(i = 0; i < conf.nbutton; ++i) {
           cfgtmp2 = cfg_getnsec(cfg_buttons, "button", i);
-          conf.buttonfont = strdup(cfg_getstr(cfg_buttons, "buttons_font"));
+          if(cfg_getstr(cfg_buttons, "buttons_font"))
+               conf.buttonfont = strdup(cfg_getstr(cfg_buttons, "buttons_font"));
           for(j = 0; j < cfg_size(cfgtmp2, "mouse");  ++j) {
                cfgtmp3 = cfg_getnsec(cfgtmp2, "mouse", j);
                conf.barbutton[i].func[j] = name_to_func(cfg_getstr(cfgtmp3, "func"));

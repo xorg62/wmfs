@@ -63,11 +63,6 @@ typedef struct {
 } Key;
 
 typedef struct {
-     char *name;
-     void *func;
-} func_name_list_t;
-
-typedef struct {
      char *text;
      Window win;
      int fg_color;
@@ -78,6 +73,12 @@ typedef struct {
      char *cmd[NBUTTON];
      unsigned int mouse[NBUTTON];
 } BarButton;
+
+typedef struct {
+     char *name;
+     float mwfact;
+     int layout;
+} Tag;
 
 typedef struct {
      /* bool and size */
@@ -99,13 +100,10 @@ typedef struct {
           char *tile;
           char *max;
      } layouts;
-     /* tag */
-     int ntag;
-     char *taglist[MAXTAG];
-     /* keybind */
-     int nkeybind;
-     /* button */
+     Tag tag[MAXTAG];
      BarButton barbutton[64];
+     int ntag;
+     int nkeybind;
      int nbutton;
      char *buttonfont;
 } Conf;
@@ -159,6 +157,7 @@ void tag(char *cmd);
 void tagswitch(char *cmd);
 void tagtransfert(char *cmd);
 void tile(void);
+void tile_switch(char *cmd);
 void togglemax(char *cmd);
 void unhide(Client *c);
 void unmanage(Client *c);
@@ -192,6 +191,7 @@ int mw, mh;
 int fonth;
 int fonty;
 int barheight;
+Client *master[MAXTAG];              /* Master client by tag */
 Client *clients;                     /* First Client */
 Client *sel;                         /* selected client */
 int seltag;                          /* selected tag */

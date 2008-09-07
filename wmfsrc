@@ -26,9 +26,17 @@ layout
         max  = "[Max]"
 }
 
-tag
+tags
 {
-        tag = { "1", "2", "3", "4", "5", "6", "7", "8", "9" }
+        tag { name = "one" mwfact = 0.65 layout = "tile"}
+        tag { name = "two" }
+        tag { name = "three" }
+        tag { name = "four" }
+        tag { name = "five" }
+        tag { name = "six" }
+        tag { name = "seven" }
+        tag { name = "eight" }
+        tag { name = "nine" }
 }
 
 buttons
@@ -59,6 +67,7 @@ keys
         key { mod = {"Control"} key = "Down" func = "layoutswitch" cmd = "-" }
         key { mod = {"Alt", "Shift"} key = "l" func = "set_mwfact" cmd = "+0.025" }
         key { mod = {"Alt", "Shift"} key = "h" func = "set_mwfact" cmd = "-0.025" }
+        key { mod = {"Alt"} key = "d" func = "tile_switch" }
 
 # moving client keybind
 
