@@ -45,10 +45,24 @@ buttonpress(XEvent *event) {
      char s[6];
      XButtonPressedEvent *ev = &event->xbutton;
 
-     /* Window and Tbar */
-     /* move, resize and toggle max */
-     if((c = gettbar(ev->window))
-        || (c = getclient(ev->window))) {
+     /* Tbar'n'Button */
+     if(conf.ttbarheight) {
+          if((c = gettbar(ev->window))) {
+               if(ev->button == Button1)
+                    mouseaction(c, ev->x_root, ev->y_root, Move);   /* type 0 for move */
+               else if(ev->button == Button2)
+                    tile_switch(NULL);
+               else if(ev->button == Button3)
+                    mouseaction(c, ev->x_root, ev->y_root, Resize); /* type 1 for resize */
+          } else if((c = getbutton(ev->window))) {
+               if(ev->button == Button1)
+                    killclient(NULL);
+               else if(ev->button == Button3)
+                    togglemax(NULL);
+          }
+     }
+     /* Window */
+     if((c = getclient(ev->window))) {
           raiseclient(c);
           if(ev->button == Button1)
                mouseaction(c, ev->x_root, ev->y_root, Move);   /* type 0 for move */
@@ -58,13 +72,13 @@ buttonpress(XEvent *event) {
                mouseaction(c, ev->x_root, ev->y_root, Resize); /* type 1 for resize */
      }
      /* Button */
-     /* for kill and togglemax the sel client */
+     /* for kill and togglemax the sel client
      else if((c = getbutton(ev->window))) {
           if(ev->button == Button1)
                killclient(NULL);
           else if(ev->button == Button3)
                togglemax(NULL);
-     }
+     } */
      /* Bar */
      /* for tag click */
      else if(ev->window == bar) {
