@@ -61,6 +61,7 @@ buttonpress(XEvent *event) {
                     togglemax(NULL);
           }
      }
+
      /* Window */
      if((c = getclient(ev->window))) {
           raiseclient(c);
@@ -71,14 +72,6 @@ buttonpress(XEvent *event) {
           else if(ev->button == Button3)
                mouseaction(c, ev->x_root, ev->y_root, Resize); /* type 1 for resize */
      }
-     /* Button */
-     /* for kill and togglemax the sel client
-     else if((c = getbutton(ev->window))) {
-          if(ev->button == Button1)
-               killclient(NULL);
-          else if(ev->button == Button3)
-               togglemax(NULL);
-     } */
      /* Bar */
      /* for tag click */
      else if(ev->window == bar) {
