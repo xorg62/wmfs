@@ -56,7 +56,7 @@ macro(a_configure_file file)
     string(REGEX REPLACE ".in\$" "" outfile ${file})
     message(STATUS "Configuring ${outfile}")
     configure_file(${SOURCE_DIR}/${file}
-                   ${BUILD_DIR}/${outfile}
+                   ${SOURCE_DIR}/${outfile}
                    ESCAPE_QUOTE
                    @ONLY)
 endmacro()
