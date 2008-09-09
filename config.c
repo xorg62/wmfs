@@ -20,7 +20,7 @@ func_name_list_t func_list[] = {
      {"tag", tag},
      {"tagtransfert", tagtransfert},
      {"set_mwfact", set_mwfact},
-     {"tile_switch", tile_switch}
+     {"set_nmaster", set_nmaster}
 };
 
 key_name_list_t key_list[] = {
@@ -115,17 +115,18 @@ init_conf(void) {
           CFG_END()
      };
 
-     static cfg_opt_t layout_opts[] = {
+     static cfg_opt_t layouts_opts[] = {
 
-          CFG_STR_LIST("free","[Free]", CFGF_NONE),
-          CFG_STR_LIST("tile","[Tile]", CFGF_NONE),
-          CFG_STR_LIST("max","[Max]", CFGF_NONE),
+          CFG_STR_LIST("free", "[Free]", CFGF_NONE),
+          CFG_STR_LIST("tile", "[Tile]", CFGF_NONE),
+          CFG_STR_LIST("max", "[Max]", CFGF_NONE),
           CFG_END()
      };
 
      static cfg_opt_t tag_opts[] = {
           CFG_STR("name", "", CFGF_NONE),
           CFG_FLOAT("mwfact", 0.65, CFGF_NONE),
+          CFG_INT("nmaster", 1, CFGF_NONE),
           CFG_STR("layout", "tile", CFGF_NONE),
           CFG_END()
      };
@@ -180,7 +181,7 @@ init_conf(void) {
 
           CFG_SEC("misc",    misc_opts,    CFGF_NONE),
           CFG_SEC("colors",  colors_opts,  CFGF_NONE),
-          CFG_SEC("layout",  layout_opts,  CFGF_NONE),
+          CFG_SEC("layouts", layouts_opts,  CFGF_NONE),
           CFG_SEC("tags",    tags_opts,    CFGF_NONE),
           CFG_SEC("keys",    keys_opts,    CFGF_NONE),
           CFG_SEC("buttons", buttons_opts, CFGF_NONE),
@@ -190,7 +191,7 @@ init_conf(void) {
      cfg_t *cfg;
      cfg_t *cfg_misc;
      cfg_t *cfg_colors;
-     cfg_t *cfg_layout;
+     cfg_t *cfg_layouts;
      cfg_t *cfg_tags;
      cfg_t *cfg_keys;
      cfg_t *cfg_buttons;
@@ -215,7 +216,7 @@ init_conf(void) {
 
      cfg_misc    = cfg_getsec(cfg, "misc");
      cfg_colors  = cfg_getsec(cfg, "colors");
-     cfg_layout  = cfg_getsec(cfg, "layout");
+     cfg_layouts = cfg_getsec(cfg, "layouts");
      cfg_tags    = cfg_getsec(cfg, "tags");
      cfg_keys    = cfg_getsec(cfg, "keys");
      cfg_buttons = cfg_getsec(cfg, "buttons");
@@ -236,9 +237,9 @@ init_conf(void) {
      conf.colors.tagselbg     = cfg_getint(cfg_colors, "tag_sel_bg");
 
      /* layout */
-     conf.layouts.free = strdup(cfg_getstr(cfg_layout, "free"));
-     conf.layouts.tile = strdup(cfg_getstr(cfg_layout, "tile"));
-     conf.layouts.max  = strdup(cfg_getstr(cfg_layout, "max"));
+     conf.layouts.free = strdup(cfg_getstr(cfg_layouts, "free"));
+     conf.layouts.tile = strdup(cfg_getstr(cfg_layouts, "tile"));
+     conf.layouts.max  = strdup(cfg_getstr(cfg_layouts, "max"));
 
      /* tag */
      conf.ntag = cfg_size(cfg_tags, "tag");
@@ -246,6 +247,7 @@ init_conf(void) {
           cfgtmp = cfg_getnsec(cfg_tags, "tag", i);
           conf.tag[i].name = strdup(cfg_getstr(cfgtmp, "name"));
           conf.tag[i].mwfact = cfg_getfloat(cfgtmp, "mwfact");
+          conf.tag[i].nmaster = cfg_getint(cfgtmp, "nmaster");
           conf.tag[i].layout = layout_name_to_layout(cfg_getstr(cfgtmp, "layout"));
      }
 

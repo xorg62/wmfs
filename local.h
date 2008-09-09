@@ -77,11 +77,11 @@ typedef struct {
 typedef struct {
      char *name;
      float mwfact;
+     int nmaster;
      int layout;
 } Tag;
 
 typedef struct {
-     /* bool and size */
      char *font;
      bool raisefocus;
      bool raiseswitch;
@@ -114,6 +114,7 @@ enum { NetSupported, NetWMName, NetLast };
 enum { Free=0, Tile, Max};
 
 /* wmfs.c */
+void arrange(void);
 void attach(Client *c);
 void buttonpress(XEvent *event);
 int clienthintpertag(int tag);
@@ -137,27 +138,30 @@ void hide(Client *c);
 void init(void);
 Bool ishide(Client *c);
 void keymovex(char *cmd);
+
 void keymovey(char *cmd);
 void keypress(XEvent *e);
 void keyresize(char *cmd);
 void killclient(char *cmd);
 void layoutswitch(char *cmd);
+void lowerclient(Client *c);
 void mapclient(Client *c);
 void manage(Window w, XWindowAttributes *wa);
 void maxlayout(void);
 void mouseaction(Client *c, int x, int y, int type);
 void moveresize(Client *c, int x, int y, int w, int h, bool r);
+Client *nexttiled(Client *c);
 void raiseclient(Client *c);
 void scan(void);
 void setborder(Window win, int color);
 void set_mwfact(char *cmd);
+void set_nmaster(char *cmd);
 void setsizehints(Client *c);
 void spawn(char *cmd);
 void tag(char *cmd);
 void tagswitch(char *cmd);
 void tagtransfert(char *cmd);
 void tile(void);
-void tile_switch(char *cmd);
 void togglemax(char *cmd);
 void unhide(Client *c);
 void unmanage(Client *c);
@@ -191,15 +195,17 @@ int mw, mh;
 int fonth;
 int fonty;
 int barheight;
-Client *master[MAXTAG];              /* Master client by tag */
+int seltag;
 Client *clients;                     /* First Client */
 Client *sel;                         /* selected client */
-int seltag;                          /* selected tag */
-
 Client *selbytag[MAXTAG];
 char status[16];
+
+/* layout */
 float mwfact[MAXTAG];
+int nmaster[MAXTAG];
 int layout[MAXTAG];
+/**/
 char bartext[256];
 char *ptrb, bufbt[sizeof bartext];
 int readp;

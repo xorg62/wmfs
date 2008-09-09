@@ -30,6 +30,19 @@ unsigned int numlockmask = 0;
 int taglen[MAXTAG] = {3};
 
 void
+arrange(void) {
+     Client *c;
+     for(c = clients; c; c = c->next)
+          if(!ishide(c))
+               unhide(c);
+          else
+               hide(c);
+     updatelayout();
+     updateall();
+     focus(NULL);
+}
+
+void
 attach(Client *c) {
      if(clients)
           clients->prev = c;
@@ -48,10 +61,11 @@ buttonpress(XEvent *event) {
      /* Tbar'n'Button */
      if(conf.ttbarheight) {
           if((c = gettbar(ev->window))) {
+               focus(c);
                if(ev->button == Button1)
                     mouseaction(c, ev->x_root, ev->y_root, Move);   /* type 0 for move */
                else if(ev->button == Button2)
-                    tile_switch(NULL);
+                    togglemax(NULL);
                else if(ev->button == Button3)
                     mouseaction(c, ev->x_root, ev->y_root, Resize); /* type 1 for resize */
           } else if((c = getbutton(ev->window))) {
@@ -68,7 +82,7 @@ buttonpress(XEvent *event) {
           if(ev->button == Button1)
                mouseaction(c, ev->x_root, ev->y_root, Move);   /* type 0 for move */
           else if(ev->button == Button2)
-               tile_switch(NULL);
+               togglemax(NULL);
           else if(ev->button == Button3)
                mouseaction(c, ev->x_root, ev->y_root, Resize); /* type 1 for resize */
      }
@@ -125,10 +139,9 @@ int
 clienthintpertag(int tag) {
      Client *c;
      int i = 0;
-     for(c = clients; c; c = c->next) {
+     for(c = clients; c; c = c->next)
           if(c->tag == tag && c->hint)
                ++i;
-     }
      return i;
 }
 
@@ -136,10 +149,9 @@ int
 clientpertag(int tag) {
      Client *c;
      int i = 0;
-     for(c = clients; c; c = c->next) {
+     for(c = clients; c; c = c->next)
           if(c->tag == tag)
                ++i;
-     }
      return i;
 }
 
@@ -169,6 +181,7 @@ configurerequest(XEvent event) {
                     XResizeWindow(dpy, c->tbar, wc.width, conf.ttbarheight);
                     XMoveWindow(dpy, c->button, wc.x + wc.width - 10, BUTY(wc.y));
                }
+
                updatetitle(c);
                c->y = wc.y;
                c->x = wc.x;
@@ -251,8 +264,7 @@ freelayout(void) {
 Client*
 getbutton(Window w) {
      Client *c;
-     if(conf.ttbarheight)
-          for(c = clients; c && c->button != w; c = c->next);
+     for(c = clients; c && c->button != w; c = c->next);
      return c;
 }
 
@@ -283,8 +295,7 @@ getlayoutsym(int l) {
 Client*
 gettbar(Window w) {
      Client *c;
-     if(conf.ttbarheight)
-        for(c = clients; c && c->tbar != w; c = c->next);
+     for(c = clients; c && c->tbar != w; c = c->next);
      return c;
 }
 
@@ -310,7 +321,8 @@ getevent(void) {
      switch (event.type) {
      case EnterNotify:
           if(event.xcrossing.mode != NotifyNormal
-             || event.xcrossing.detail == NotifyInferior) return;
+             || event.xcrossing.detail == NotifyInferior)
+               return;
           if((c = getclient(event.xcrossing.window))
              || (c = gettbar(event.xcrossing.window)))
                if(c->win != bar)
@@ -444,19 +456,19 @@ hide(Client *c) {
      if(!c || c->hide) return;
      long data[] = { IconicState, None };
 
-     /* unmapclient(c); */
-      /* Just hide for now... */
-     XMoveWindow(dpy, c->win, c->x, c->y+mh*2);
+     /*  unmapclient(c); */
+     /* Just hide for now... */
 
+     XMoveWindow(dpy, c->win, c->x, c->y+mh*2);
      if(conf.ttbarheight) {
           XMoveWindow(dpy, c->tbar, c->x, c->y+mh*2);
           XMoveWindow(dpy, c->button, c->x, c->y+mh*2);
      }
 
+     c->hide = True;
      XChangeProperty(dpy, c->win, XInternAtom(dpy, "WM_STATE", False),
                      XInternAtom(dpy, "WM_STATE", False),  32,
                      PropModeReplace, (unsigned char *) data, 2);
-     c->hide = True;
 }
 
 void
@@ -472,10 +484,10 @@ init(void) {
      mw = DisplayWidth (dpy, screen);
      mh = DisplayHeight (dpy, screen);
      seltag = 1;
-     init_conf();
-     for(i = 0; i< conf.ntag; ++i) {
+     for(i = 0; i< conf.ntag+1; ++i) {
           mwfact[i] = conf.tag[i-1].mwfact;
           layout[i] = conf.tag[i-1].layout;
+          nmaster[i] = conf.tag[i-1].nmaster;
      }
 
      /* INIT FONT */
@@ -644,7 +656,7 @@ killclient(char *cmd) {
           ev.xclient.data.l[1] = CurrentTime;
           XSendEvent(dpy, sel->win, False, NoEventMask, &ev);
      }
-     updatelayout();
+     arrange();
      return;
 }
 
@@ -661,9 +673,21 @@ layoutswitch(char *cmd) {
           switch(layout[seltag]) {
           case Free: maxlayout();  break;
           case Tile: freelayout(); break;
-          case Max:  tile();       break;
+          case Max:  tile(); break;
           }
      }
+     return;
+}
+
+void
+lowerclient(Client *c) {
+     if(!c)
+          return;
+     if(conf.ttbarheight) {
+          XLowerWindow(dpy,c->button);
+          XLowerWindow(dpy,c->tbar);
+     }
+     XLowerWindow(dpy,c->win);
      return;
 }
 
@@ -672,11 +696,11 @@ mapclient(Client *c) {
      if(!c)
           return;
      XMapWindow(dpy, c->win);
+     XMapSubwindows(dpy, c->win);
      if(conf.ttbarheight) {
           XMapWindow(dpy, c->tbar);
           XMapWindow(dpy, c->button);
      }
-     XMapSubwindows(dpy, c->win);
      return;
 }
 
@@ -695,47 +719,54 @@ manage(Window w, XWindowAttributes *wa) {
      c->h = wa->height;
      c->border = wa->border_width;
      c->tag = seltag;
+     switch(layout[seltag]) {
+     case Tile: c->tile = True; break;
+     case Max:  c->max  = True; break;
+     }
 
-     setborder(w, conf.colors.bordernormal);
+     if(conf.ttbarheight) {
+          c->tbar =
+               XCreateSimpleWindow(dpy, root,
+                                   c->x,
+                                   c->y - conf.ttbarheight,
+                                   c->w,
+                                   conf.ttbarheight,
+                                   conf.borderheight,
+                                   conf.colors.bordernormal,
+                                   conf.colors.bar);
+          c->button =
+               XCreateSimpleWindow(dpy, root,
+                                   c->x + c->w - 10,
+                                   BUTY(c->y),
+                                   5,
+                                   BUTH,
+                                   1,
+                                   conf.colors.bordernormal,
+                                   conf.colors.borderfocus);
+     }
 
      XConfigureWindow(dpy, w, CWBorderWidth, &winc);
-
+     setborder(w, conf.colors.bordernormal);
+     grabbuttons(c, False);
      XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask |
                   PropertyChangeMask | StructureNotifyMask);
+     setsizehints(c);
+     updatetitle(c);
 
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
           for(t = clients; t && t->win != trans; t = t->next);
-
-     if(conf.ttbarheight) {
-          c->tbar = XCreateSimpleWindow(dpy, root,
-                                        c->x,
-                                        c->y - conf.ttbarheight,
-                                        c->w,
-                                        conf.ttbarheight,
-                                        conf.borderheight,
-                                        conf.colors.bordernormal,
-                                        conf.colors.bar);
-          XSelectInput(dpy, c->tbar, ExposureMask | EnterWindowMask);
-          setborder(c->tbar, conf.colors.bordernormal);
-
-          c->button = XCreateSimpleWindow(dpy, root,
-                                          c->x + c->w - 10,
-                                          BUTY(c->y),
-                                          5,
-                                          BUTH,
-                                          1,
-                                          conf.colors.bordernormal,
-                                          conf.colors.borderfocus);
-     }
-
-     grabbuttons(c, False);
-     setsizehints(c);
+     if(t)
+          c->tag = t->tag;
      attach(c);
      moveresize(c, c->x, c->y, c->w, c->h, 1);
+
+     /* for when there are a free client
+        over the tiled client */
+     //if(c->tile)
+     //     lowerclient(c);
+
      XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
      mapclient(c);
-     updatetitle(c);
-     focus(c);
      updatelayout();
      return;
 }
@@ -773,7 +804,8 @@ mouseaction(Client *c, int x, int y, int type) {
      int  ocx, ocy;
      XEvent ev;
 
-     if((c->max && !c->hint) || (layout[seltag] == Tile && !c->hint))
+     if((c->max && !c->hint)
+        || (layout[seltag] == Tile && !c->hint))
           return;
      ocx = c->x;
      ocy = c->y;
@@ -821,21 +853,25 @@ moveresize(Client *c, int x, int y, int w, int h, bool r) {
                if(c->minw > 0 && w < c->minw) {
                     w = c->minw;
                     c->hint = c->free = True;
+                    c->tile = False;
                }
 
                if(c->minh > 0 && h < c->minh) {
                     h = c->minh;
                     c->hint = c->free = True;
+                    c->tile = False;
                }
 
                if(c->maxw > 0 && w > c->maxw) {
                     w = c->maxw;
                     c->hint = c->free = True;
+                    c->tile = False;
                }
 
                if(c->maxh > 0 && h > c->maxh) {
                     h = c->maxh;
                     c->hint = c-> free = True;
+                    c->tile = False;
                }
 
                if(w <= 0 || h <= 0)
@@ -854,6 +890,7 @@ moveresize(Client *c, int x, int y, int w, int h, bool r) {
                     y = barheight+conf.ttbarheight;
 
                XMoveResizeWindow(dpy, c->win, x, y, w ,h);
+
                if(conf.ttbarheight) {
                     XMoveResizeWindow(dpy, c->tbar, x, y - conf.ttbarheight, w, conf.ttbarheight);
                     XMoveResizeWindow(dpy, c->button,
@@ -869,15 +906,21 @@ moveresize(Client *c, int x, int y, int w, int h, bool r) {
      return;
 }
 
+Client *
+nexttiled(Client *c) {
+	for(; c && (c->hint || ishide(c)); c = c->next);
+	return c;
+}
+
 void
 raiseclient(Client *c) {
-     if(c) {
-          XRaiseWindow(dpy,c->win);
+     if(!c)
+          return;
+     XRaiseWindow(dpy,c->win);
 
-          if(conf.ttbarheight) {
-               XRaiseWindow(dpy,c->tbar);
-               XRaiseWindow(dpy,c->button);
-          }
+     if(conf.ttbarheight) {
+          XRaiseWindow(dpy,c->tbar);
+          XRaiseWindow(dpy,c->button);
      }
      return;
 }
@@ -901,7 +944,7 @@ scan(void) {
      }
      if(wins)
           XFree(wins);
-     updatelayout();
+     arrange();
 
      return;
 }
@@ -918,12 +961,23 @@ set_mwfact(char *cmd) {
      double c;
      if(!(sscanf(cmd, "%lf", &c)))
         return;
-     if(mwfact[seltag] + c > 0.9
-        || mwfact[seltag] + c < 0.1
+     if(mwfact[seltag] + c > 0.95
+        || mwfact[seltag] + c < 0.05
         || layout[seltag] != Tile)
           return;
      mwfact[seltag] += c;
-     tile();
+     arrange();
+     return;
+}
+
+void
+set_nmaster(char *cmd) {
+     int n = atoi(cmd);
+     if(nmaster[seltag] + n == 0)
+          return;
+     nmaster[seltag] += n;
+     arrange();
+     return;
 }
 
 void
@@ -959,60 +1013,49 @@ setsizehints(Client *c) {
 
 void
 spawn(char *cmd) {
-     if(strlen(cmd) > 0 && !fork()) {
-          execl(getenv("SHELL"), "sh", "-c", cmd, NULL);
-          exit(1);
+     if(!strlen(cmd))
+          return;
+     if(fork() == 0) {
+          if(fork() == 0) {
+               if(dpy)
+                    close(ConnectionNumber(dpy));
+               setsid();
+               execl(getenv("SHELL"), getenv("SHELL"), "-c", cmd, (char*)NULL);
+               exit(1);
+          }
+          exit(0);
      }
-     return;
+      return;
 }
 
 void
 tag(char *cmd) {
-     Client *c;
      int tmp = atoi(cmd);
 
      if(tmp > conf.ntag || tmp < 1 || tmp == seltag)
           return;
 
-     for(c = clients; c; c = c->next) {
-          if(!ishide(c))
-               hide(c);
-          if(c->tag == tmp)
-               unhide(c);
-     }
-
      seltag = tmp;
-
      if(selbytag[seltag])
           focus(selbytag[seltag]);
 
-     updateall();
+     arrange();
      return;
 }
 
 void
 tagswitch(char *cmd) {
-     Client *c;
      int tmp;
 
      tmp = atoi(cmd);
-
      if(seltag + tmp > conf.ntag || seltag + tmp < 1)
           return;
 
-     for(c = clients; c; c = c->next) {
-          if(c->tag == seltag)
-               hide(c);
-          if(c && c->tag == seltag + tmp)
-               unhide(c);
-     }
-
      seltag += tmp;
-
      if(selbytag[seltag])
           focus(selbytag[seltag]);
 
-     updateall();
+     arrange();
      return;
 }
 
@@ -1023,93 +1066,68 @@ tagtransfert(char *cmd) {
      if(!sel)
           return;
      sel->tag = n;
-     if(n != seltag)
-          hide(sel);
-
-     if(n == seltag)
-          unhide(sel);
-
-     updatelayout();
-     updateall();
+     arrange();
 }
 
-/* Testing for now */
 void
 tile(void) {
-     layout[seltag] = Tile;
+     unsigned int i, n, x, y, w, h, ww, hh, th;
+     unsigned int barto, bord, mwf, nm;
      Client *c;
-     int i;
-     unsigned int y, h, wm, n;
-     unsigned int barto, mwf, bord;
 
-     barto =  conf.ttbarheight + barheight;
-     bord  =  conf.borderheight * 2;
-     mwf   =  mw*mwfact[seltag];
-     n     =  clientpertag(seltag) - clienthintpertag(seltag);
-     y     =  barto;
-     wm    =  (mh-bord) - conf.ttbarheight - barheight;
+     n       =  clientpertag(seltag) - clienthintpertag(seltag);
+     bord    =  conf.borderheight * 2;
+     barto   =  conf.ttbarheight + barheight;
+     mwf     =  mwfact[seltag] * mw;
+     nm      =  nmaster[seltag];
 
-     if(n-1)
-          h = (mh - barheight) / (n - 1) - (conf.ttbarheight + bord);
+     layout[seltag] = Tile;
 
-     for(i = 0, c = clients; c; c = c->next, ++i) {
-          if(!ishide(c)) {
-               c->max = c->free = False;
-               c->tile = True;
-               c->ox = c->x; c->oy = c->y;
-               c->ow = c->w; c->oh = c->h;
+     /* window geoms */
+     hh = ((n <= nm) ? mh / (n > 0 ? n : 1) : mh / nm) - bord*2;
+     ww = (n  <= nm) ? mw : mwf;
+     th = (n  >  nm) ? mh / (n - nm) : 0;
+     if(n > nm && th < barheight)
+          th = mh;
 
-               /* 1 clients, maximize it */
-               if(n == 1)
-                    moveresize(c, 0, barto, mw-bord, wm, 0);
-               /* 2 and more... , master client */
-               else if(i == 0) {
-                    moveresize(c, 0, barto, mwf-conf.borderheight, wm, 0);
-                    master[seltag] = c;
-               }
-               /* other clients */
-               else {
-                    moveresize(c, (mwf+conf.borderheight), y, (mw-mwf-bord-conf.borderheight), h, 0);
-                    if(i < i + 1)
-                         y += h + bord + conf.ttbarheight;
-               }
-               /* when a client is out of screen */
-               if(c->y > mh) {
-                    moveresize(c, 0, barto, mwf - conf.borderheight, wm, 0);
-                    master[seltag] = c;
-               }
+     x = 0;
+     y = barto;
+
+     for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), i++) {
+          c->max = c->free = False;
+          c->tile = True;
+          c->ox = c->x; c->oy = c->y;
+          c->ow = c->w; c->oh = c->h;
+          /* MASTER CLIENT */
+          if(i < nm) {
+               y = barto + i * hh;
+               w = ww - bord;
+               h = hh;
+               /* remainder */
+               if(i + 1 == (n < nm ? n : nm))
+                    h = (mh - hh*i) - barheight ;
+               h -= bord + conf.ttbarheight;
           }
+          /* TILE CLIENT */
+          else {
+               if(i == nm) {
+                    y = barto;
+                    x += ww;
+               }
+               w = mw - ww - bord;
+               /* remainder */
+               if(i + 1 == n)
+                    h = (barto + mh) - y - (bord + barto);
+               else
+                    h = th - (bord + conf.ttbarheight) - bord*2;
+          }
+          moveresize(c, x, y, w, h, 0);
+          if(n > nm && th != mh)
+               y = c->y + c->h + bord + conf.ttbarheight;
      }
      return;
 }
 
-void
-tile_switch(char *cmd) {
-     if(layout[seltag] != Tile)
-          return;
-     Client *tmp;
-     int sx, sy, sw, sh;
-
-     if(sel == master[seltag]
-        || !master[seltag])
-          return;
-
-     sx = sel->x;
-     sy = sel->y;
-     sw = sel->w;
-     sh = sel->h;
-
-     moveresize(sel,
-                master[seltag]->x,
-                master[seltag]->y,
-                master[seltag]->w,
-                master[seltag]->h, 0);
-
-     moveresize(master[seltag], sx, sy, sw, sh, 0);
-     tmp = master[seltag];
-     master[seltag] = sel;
-     focus(tmp);
-}
 
 void
 togglemax(char *cmd) {
@@ -1144,22 +1162,23 @@ unhide(Client *c) {
      long data[] = { NormalState, None };
 
      /* mapclient(c); */
+
      XMoveWindow(dpy,c->win,c->x,c->y);
      if(conf.ttbarheight) {
           XMoveWindow(dpy,c->tbar,c->x, (c->y - conf.ttbarheight));
           XMoveWindow(dpy,c->button, (c->x + c->w -10), (c->y - 9));
      }
+
+     c->hide = False;
      XChangeProperty(dpy, c->win, XInternAtom(dpy, "WM_STATE", False),
                      XInternAtom(dpy, "WM_STATE", False),  32,
                      PropModeReplace, (unsigned char *) data, 2);
-     c->hide = False;
 }
 
 void
 unmanage(Client *c) {
      XSetErrorHandler(errorhandler);
      int i;
-     c->hide = True;
 
      sel = (sel == c) ? c->next : NULL;
      for(i = 0; i < conf.ntag; ++i)
@@ -1173,8 +1192,7 @@ unmanage(Client *c) {
 
      detach(c);
      free(c);
-     updatelayout();
-     updateall();
+     arrange();
      XSync(dpy, False);
      return;
 }
@@ -1192,6 +1210,7 @@ updatebar(void) {
      int  i ,j;
      char buf[conf.ntag][100];
      char p[3];
+
 
      tm = localtime(&lt);
      lt = time(NULL);
@@ -1222,13 +1241,20 @@ updatebar(void) {
                  strlen(getlayoutsym(layout[seltag])));
 
     /* Draw stdin */
-    j = strlen(bartext);
-    XSetForeground(dpy, gc, conf.colors.text);
-    XDrawString(dpy, bar, gc, mw - j * fonty, fonth-1 , bartext ,j);
-    XDrawLine(dpy, bar, gc, mw- j * fonty-5 , 0 , mw - j * fonty-5, barheight);
 
-    XSync(dpy, False);
-    return;
+     sprintf(bartext,"mwfact: %.2f  nmaster: %i - %02i:%02i",
+             mwfact[seltag],
+             nmaster[seltag],
+             tm->tm_hour,
+             tm->tm_min);
+
+     j = strlen(bartext);
+     XSetForeground(dpy, gc, conf.colors.text);
+     XDrawString(dpy, bar, gc, mw - j * fonty, fonth-1 , bartext ,j);
+     XDrawLine(dpy, bar, gc, mw- j * fonty-5 , 0 , mw - j * fonty-5, barheight);
+
+     XSync(dpy, False);
+     return;
 }
 
 /* if c is 0, you can execute this function for the first time
@@ -1390,6 +1416,7 @@ main(int argc,char **argv) {
 
      if(!dpy) { printf("wmfs: cannot open X server\n"); exit(1); }
 
+     init_conf();
      init();
      scan();
      for(;;) {
@@ -1397,6 +1424,7 @@ main(int argc,char **argv) {
           /* getstdin(); */
           updatebar();
           getevent();
+          updateall();
       }
 
      XCloseDisplay(dpy);

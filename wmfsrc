@@ -19,7 +19,7 @@ colors
         tag_sel_bg    = 0x354B5C
 }
 
-layout
+layouts
 {
         free = "[Free]"
         tile = "[Tile]"
@@ -28,7 +28,7 @@ layout
 
 tags
 {
-        tag { name = "one" mwfact = 0.65 layout = "tile"}
+        tag { name = "one" mwfact = 0.65 nmaster = 2 layout = "tile"}
         tag { name = "two" }
         tag { name = "three" }
         tag { name = "four" }
@@ -42,6 +42,47 @@ tags
 buttons
 {
         buttons_font = "*-*-medium-*-10-*"
+
+        # MWFACT BUTTON {{{
+        button
+        {
+                text = "[-]"
+                mouse { button = "Button1" func = "set_mwfact" cmd = "-0.01"}
+                fg_color = 0xFFFFFF
+                bg_color = 0x090909
+        }
+        button
+        {
+               text = "Mwfact" fg_color = 0xFFFFFF bg_color = 0x3E3E3E
+               mouse { button = "Button4" func = "set_mwfact" cmd = "+0.01"}
+               mouse { button = "Button5" func = "set_mwfact" cmd = "-0.01"}
+        }
+        button
+        {
+                text = "[+] "
+                mouse { button = "Button1" func = "set_mwfact" cmd = "+0.01"}
+                fg_color = 0xFFFFFF
+                bg_color = 0x090909
+        }
+        # }}}
+
+        # NMASTER BUTTON {{{
+        button
+        {
+                text = "[-]"
+                mouse { button = "Button1" func = "set_nmaster" cmd = "-1"}
+                fg_color = 0xFFFFFF
+                bg_color = 0x090909
+        }
+        button { text = "Nmaster" fg_color = 0xFFFFFF bg_color = 0x3E3E3E }
+        button
+        {
+                text = "[+] "
+                mouse { button = "Button1" func = "set_nmaster" cmd = "+1"}
+                fg_color = 0xFFFFFF
+                bg_color = 0x090909
+        }
+        # }}}
 
         button
         {
@@ -67,7 +108,6 @@ keys
         key { mod = {"Control"} key = "Down" func = "layoutswitch" cmd = "-" }
         key { mod = {"Alt", "Shift"} key = "l" func = "set_mwfact" cmd = "+0.025" }
         key { mod = {"Alt", "Shift"} key = "h" func = "set_mwfact" cmd = "-0.025" }
-        key { mod = {"Alt"} key = "d" func = "tile_switch" }
 
 # moving client keybind
 
