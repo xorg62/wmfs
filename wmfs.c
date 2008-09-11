@@ -1308,11 +1308,6 @@ updatebar(void) {
              tm->tm_hour,
              tm->tm_min);
 
-     /*
-          getstatuscmd("/home/martin/status.sh", status, sizeof status);
-          sprintf(bartext, "%s", status);
-     */
-     debug(89);
      j = strlen(bartext);
      XSetForeground(dpy, gc, conf.colors.text);
      XDrawString(dpy, bar, gc, mw - j * fonty, fonth-1 , bartext ,j);
