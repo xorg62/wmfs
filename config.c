@@ -59,7 +59,6 @@ name_to_func(char *name) {
      return NULL;
 }
 
-
 unsigned long
 char_to_modkey(char *name) {
      int i;
@@ -180,7 +179,7 @@ init_conf(void) {
 
           CFG_SEC("misc",    misc_opts,    CFGF_NONE),
           CFG_SEC("colors",  colors_opts,  CFGF_NONE),
-          CFG_SEC("layouts", layouts_opts,  CFGF_NONE),
+          CFG_SEC("layouts", layouts_opts, CFGF_NONE),
           CFG_SEC("tags",    tags_opts,    CFGF_NONE),
           CFG_SEC("keys",    keys_opts,    CFGF_NONE),
           CFG_SEC("buttons", buttons_opts, CFGF_NONE),
@@ -195,7 +194,7 @@ init_conf(void) {
      cfg_t *cfg_keys;
      cfg_t *cfg_buttons;
      cfg_t *cfgtmp, *cfgtmp2, *cfgtmp3;
-     char final_path[100];
+     char final_path[128];
      int ret, i, j, l;
 
      sprintf(final_path,"%s/%s",strdup(getenv("HOME")),strdup(FILE_NAME));

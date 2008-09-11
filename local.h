@@ -7,7 +7,6 @@
 #include <stdarg.h>
 #include <string.h>
 #include <unistd.h>
-#include <errno.h>
 #include <time.h>
 #include <getopt.h>
 #include <sys/time.h>
@@ -21,15 +20,12 @@
 #include "config.h"
 
 /* DEFINE TYPES */
-#define FALSE        0
-#define TRUE         (!FALSE)
 #define ButtonMask   (ButtonPressMask | ButtonReleaseMask)
 #define MouseMask    (ButtonMask | PointerMotionMask)
 #define KeyMask      (KeyPressMask | KeyReleaseMask)
 #define CONTROL      ControlMask
 #define ALT          Mod1Mask
 #define SHIFT        ShiftMask
-#define LEN(x)       (sizeof x / sizeof x[0])
 #define ITOA(p,n)    sprintf(p,"%i",n)
 #define debug(p)     printf("debug: %i\n", p)
 #define Move         0
@@ -39,22 +35,23 @@
 
 typedef struct Client Client;
 struct Client {
-     char *title;          /* client title */
-     int tag;              /* tag num */
-     int x, y, w, h;       /* window attribute */
-     int ox, oy, ow, oh;   /* old window attribute */
+     char *title;          /* Client title */
+     int tag;              /* Tag num */
+     int x, y, w, h;       /* Window attribute */
+     int ox, oy, ow, oh;   /* Old window attribute */
+     /* For resizehint usage { */
      int basew, baseh, incw, inch;
      int maxw, maxh, minw, minh;
      int minax, maxax, minay, maxay;
+     /* } */
      int border;           /* border height */
-     Window win;           /* window */
+     Window win;           /* Window */
      Window tbar;          /* Titlebar */
      Window button;        /* Close Button */
      Bool max, tile, free; /* Client Info */
      Bool hint, hide;      /* Client Info² */
-     Bool fixed;           /* Client info³ */
-     Client *next;         /* next  client */
-     Client *prev;         /* previous client */
+     Client *next;         /* Next client */
+     Client *prev;         /* Previous client */
 };
 
 typedef struct {
@@ -85,6 +82,7 @@ typedef struct {
 
 typedef struct {
      char *font;
+     char *buttonfont;
      bool raisefocus;
      bool raiseswitch;
      int borderheight;
@@ -107,7 +105,6 @@ typedef struct {
      int ntag;
      int nkeybind;
      int nbutton;
-     char *buttonfont;
 } Conf;
 
 enum { CurNormal, CurResize, CurMove, CurInput, CurLast };
@@ -134,7 +131,6 @@ Client* getnext(Client *c);
 char* getlayoutsym(int l);
 Client* gettbar(Window w);
 void getevent(void);
-void getstdin(void);
 void grabbuttons(Client *c, Bool focused);
 void grabkeys(void);
 void hide(Client *c);
@@ -169,7 +165,6 @@ void unhide(Client *c);
 void unmanage(Client *c);
 void updatebar(void);
 void updatebutton(Bool c);
-void updatelayout(void);
 void unmapclient(Client *c);
 void updateall(void);
 void updatetitle(Client *c);
@@ -178,10 +173,10 @@ void wswitch(char *cmd);
 #define BUTY(y)      (y - conf.ttbarheight + 3)
 #define BUTH         (conf.ttbarheight - 6)
 
+Display *dpy;
 GC gc;
 XEvent event;
-Display *dpy;
-XFontStruct* font, *font_b;
+XFontStruct *font, *font_b;
 Conf conf;
 int screen;
 Window root;
@@ -189,7 +184,7 @@ Window bar;
 fd_set fd;
 struct tm *tm;
 time_t lt;
-Key keys[256];
+Key keys[512];
 Atom wm_atom[WMLast];
 Atom net_atom[NetLast];
 Cursor cursor[CurLast];
@@ -206,11 +201,9 @@ Client *selbytag[MAXTAG];
 float mwfact[MAXTAG];
 int nmaster[MAXTAG];
 int layout[MAXTAG];
+void (*layoutfunc)(void);
 /**/
 
 char bartext[1024];
-char *ptrb, bufbt[sizeof bartext];
-int readp;
-unsigned int offset, len;
 
 #endif /* LOCAL_H */
