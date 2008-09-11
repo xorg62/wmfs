@@ -7,6 +7,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 #include <time.h>
 #include <getopt.h>
 #include <sys/time.h>
@@ -42,15 +43,16 @@ struct Client {
      int tag;              /* tag num */
      int x, y, w, h;       /* window attribute */
      int ox, oy, ow, oh;   /* old window attribute */
-     int basew, baseh;
-     int incw, inch;
+     int basew, baseh, incw, inch;
      int maxw, maxh, minw, minh;
+     int minax, maxax, minay, maxay;
      int border;           /* border height */
      Window win;           /* window */
-     Window tbar;          /* Titlebar? */
+     Window tbar;          /* Titlebar */
      Window button;        /* Close Button */
      Bool max, tile, free; /* Client Info */
      Bool hint, hide;      /* Client Info² */
+     Bool fixed;           /* Client info³ */
      Client *next;         /* next  client */
      Client *prev;         /* previous client */
 };
@@ -123,6 +125,7 @@ void configurerequest(XEvent event);
 void detach(Client *c);
 void *emallocz(unsigned int size);
 int errorhandler(Display *d, XErrorEvent *event);
+int errorhandlerdummy(Display *d, XErrorEvent *event);
 void focus(Client *c);
 void freelayout(void);
 Client* getbutton(Window w);
@@ -138,7 +141,6 @@ void hide(Client *c);
 void init(void);
 Bool ishide(Client *c);
 void keymovex(char *cmd);
-
 void keymovey(char *cmd);
 void keypress(XEvent *e);
 void keyresize(char *cmd);
@@ -159,9 +161,9 @@ void set_nmaster(char *cmd);
 void setsizehints(Client *c);
 void spawn(char *cmd);
 void tag(char *cmd);
-void tagswitch(char *cmd);
 void tagtransfert(char *cmd);
 void tile(void);
+void tile_switch(char *cmd);
 void togglemax(char *cmd);
 void unhide(Client *c);
 void unmanage(Client *c);
@@ -199,17 +201,16 @@ int seltag;
 Client *clients;                     /* First Client */
 Client *sel;                         /* selected client */
 Client *selbytag[MAXTAG];
-char status[16];
 
 /* layout */
 float mwfact[MAXTAG];
 int nmaster[MAXTAG];
 int layout[MAXTAG];
 /**/
-char bartext[256];
+
+char bartext[1024];
 char *ptrb, bufbt[sizeof bartext];
 int readp;
-Bool readin;
 unsigned int offset, len;
 
 #endif /* LOCAL_H */
