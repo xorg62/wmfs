@@ -49,7 +49,7 @@ struct Client {
      Window tbar;          /* Titlebar */
      Window button;        /* Close Button */
      Bool max, tile, free; /* Client Info */
-     Bool hint, hide;      /* Client Info² */
+     Bool hint, hide;      /* Client InfoÂ² */
      Client *next;         /* Next client */
      Client *prev;         /* Previous client */
 };
@@ -201,7 +201,7 @@ Client *selbytag[MAXTAG];
 float mwfact[MAXTAG];
 int nmaster[MAXTAG];
 int layout[MAXTAG];
-void (*layoutfunc)(void);
+void (*layoutfunc[MAXTAG])(void);
 /**/
 
 char bartext[1024];

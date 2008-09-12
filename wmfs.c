@@ -40,7 +40,7 @@ arrange(void) {
                hide(c);
 
      focus(selbytag[seltag]);
-     layoutfunc();
+     layoutfunc[seltag]();
      updateall();
 }
 
@@ -250,7 +250,7 @@ freelayout(void) {
      Client *c;
 
      layout[seltag] = Free;
-     layoutfunc = freelayout;
+     layoutfunc[seltag] = freelayout;
 
      for(c = clients; c; c = c->next){
           if(!ishide(c)) {
@@ -492,14 +492,14 @@ init(void) {
           mwfact[i] = conf.tag[i-1].mwfact;
           layout[i] = conf.tag[i-1].layout;
           nmaster[i] = conf.tag[i-1].nmaster;
-     }
-     if(layout[seltag] == Tile)
-          layoutfunc = tile;
-     else if(layout[seltag] == Max)
-          layoutfunc = maxlayout;
-     else
-          layoutfunc = freelayout;
 
+          if(layout[i] == Tile)
+               layoutfunc[i] = tile;
+          else if(layout[i] == Max)
+               layoutfunc[i] = maxlayout;
+          else
+               layoutfunc[i] = freelayout;
+     }
      /* INIT FONT */
      font = XLoadQueryFont(dpy, conf.font);
      if(!font){
@@ -770,7 +770,7 @@ manage(Window w, XWindowAttributes *wa) {
      attach(c);
      moveresize(c, c->x, c->y, c->w, c->h, 1);
 
-     if(!c->hint)
+     if(c->free)
           raiseclient(c);
 
      XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
@@ -781,25 +781,22 @@ manage(Window w, XWindowAttributes *wa) {
 
 void
 maxlayout(void) {
-     layout[seltag] = Max;
-     layoutfunc = maxlayout;
-     if(!sel || ishide(sel) || sel->hint)
-          return;
      Client *c;
-     for(c = clients; c; c = c->next) {
+
+     layout[seltag] = Max;
+     layoutfunc[seltag] = maxlayout;
+
+     for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
           c->tile = False;
-          if(!ishide(c) && !c->free) {
-               c->ox = c->x;
-               c->oy = c->y;
-               c->ow = c->w;
-               c->oh = c->h;
-               moveresize(c, 0,
-                          conf.ttbarheight + barheight,
-                          (mw-(conf.borderheight * 2)),
-                          (mh-(conf.borderheight * 2)- conf.ttbarheight - barheight), 1);
-               raiseclient(sel);
-               c->max = True;
-          }
+          c->ox = c->x;
+          c->oy = c->y;
+          c->ow = c->w;
+          c->oh = c->h;
+          moveresize(c, 0,
+                     conf.ttbarheight + barheight,
+                     (mw-(conf.borderheight * 2)),
+                     (mh-(conf.borderheight * 2)- conf.ttbarheight - barheight), 0);
+          c->max = True;
      }
      return;
 }
@@ -1110,7 +1107,7 @@ tile(void) {
      nm      =  nmaster[seltag];
 
      layout[seltag] = Tile;
-     layoutfunc = tile;
+     layoutfunc[seltag] = tile;
 
      /* count all the "can-be-tiled" client */
      for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), n++);
