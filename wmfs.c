@@ -1,27 +1,33 @@
-/* Copyright (c) 1998, Regents of the University of California
-* All rights reserved.
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
+/*
+*      wmfs.c
+*      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.con>
+*      All rights reserved.
 *
-*     * Redistributions of source code must retain the above copyright
-*       notice, this list of conditions and the following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright
-*       notice, this list of conditions and the following disclaimer in the
-*       documentation and/or other materials provided with the distribution.
-*     * Neither the name of the University of California, Berkeley nor the
-*       names of its contributors may be used to endorse or promote products
-*       derived from this software without specific prior written permission.
+*      Redistribution and use in source and binary forms, with or without
+*      modification, are permitted provided that the following conditions are
+*      met:
 *
-* THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL THE REGENTS AND CONTRIBUTORS BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*      * Redistributions of source code must retain the above copyright
+*        notice, this list of conditions and the following disclaimer.
+*      * Redistributions in binary form must reproduce the above
+*        copyright notice, this list of conditions and the following disclaimer
+*        in the documentation and/or other materials provided with the
+*        distribution.
+*      * Neither the name of the  nor the names of its
+*        contributors may be used to endorse or promote products derived from
+*        this software without specific prior written permission.
+*
+*      THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+*      "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+*      LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+*      A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+*      OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+*      SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+*      LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*      DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*      THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+*      (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*      OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "wmfs.h"
@@ -68,14 +74,6 @@ detach(Client *c) {
      if(c == clients) clients = c->next;
      c->next = c->prev = NULL;
      return;
-}
-
-void *
-emallocz(unsigned int size) {
-     void *res = calloc(1, size);
-     if(!res)
-          fprintf(stderr,"fatal: could not malloc() %u bytes\n", size);
-     return res;
 }
 
 int
@@ -267,7 +265,6 @@ init(void) {
           mwfact[i] = conf.tag[i-1].mwfact;
           layout[i] = conf.tag[i-1].layout;
           nmaster[i] = conf.tag[i-1].nmaster;
-
           if(layout[i] == Tile)
                layoutfunc[i] = tile;
           else if(layout[i] == Max)
@@ -275,6 +272,7 @@ init(void) {
           else
                layoutfunc[i] = freelayout;
      }
+
      /* INIT FONT */
      font = XLoadQueryFont(dpy, conf.font);
      if(!font){
@@ -409,7 +407,6 @@ killclient(char *cmd) {
           for(i = 0; !r && i < n; i++)
                if(a[i] == wm_atom[WMDelete])
                     r = True;
-
      if(r) {
           ev.type = ClientMessage;
           ev.xclient.window = sel->win;
@@ -781,23 +778,6 @@ setsizehints(Client *c) {
                    && c->maxw == c->minw && c->maxh == c->minh);
 }
 
-void
-spawn(char *cmd) {
-     if(!strlen(cmd))
-          return;
-     if(fork() == 0) {
-          if(fork() == 0) {
-               if(dpy)
-                    close(ConnectionNumber(dpy));
-               setsid();
-               execl(getenv("SHELL"), getenv("SHELL"), "-c", cmd, (char*)NULL);
-               exit(1);
-          }
-          exit(0);
-     }
-     return;
-}
-
 /* if cmd is +X or -X, this is just switch
    else {1, 2.. 9} it's go to the wanted tag. */
 void
@@ -1091,7 +1071,7 @@ updatetitle(Client *c) {
      XFetchName(dpy, c->win, &(c->title));
      if(!c->title)
           c->title = strdup("WMFS");
-     if(conf.ttbarheight) {
+     if(conf.ttbarheight > 10) {
           XClearWindow(dpy, c->tbar);
           XSetForeground(dpy, gc, conf.colors.text);
           XDrawString(dpy, c->tbar, gc, 5, fonth-1, c->title, strlen(c->title));

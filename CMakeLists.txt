@@ -19,7 +19,8 @@ project(${PROJECT_NAME} C)
 set(wmfs_src
   wmfs.c
   config.c
-  event.c)
+  event.c
+  util.c)
 
 # Set the executable from the wmfs_src
 add_executable(wmfs ${wmfs_src})

@@ -1,5 +1,5 @@
 /*
-*      config.h
+*      util.c
 *      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.con>
 *      All rights reserved.
 *
@@ -30,32 +30,29 @@
 *      OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef CONFIG_H
-#define CONFIG_H
-
 #include "wmfs.h"
 
-#define WMFS_VERSION            "@WMFS_VERSION@"
-#define WMFS_COMPILE_MACHINE    "@WMFS_COMPILE_MACHINE@"
-#define WMFS_COMPILE_BY         "@WMFS_COMPILE_BY@"
-#define WMFS_COMPILE_FLAGS      "@WMFS_COMPILE_FLAGS@"
-#define WMFS_LINKED_LIBS        "@WMFS_LINKED_LIBS@"
+void*
+emallocz(unsigned int size) {
+     void *res = calloc(1, size);
+     if(!res)
+          fprintf(stderr,"fatal: could not malloc() %u bytes\n", size);
+     return res;
+}
 
-typedef struct {
-     char *name;
-     void *func;
-} func_name_list_t;
-
-typedef struct  {
-      char *name;
-      KeySym keysym;
-} key_name_list_t;
-
-typedef struct {
-     char *name;
-     unsigned int button;
-} name_to_uint_t;
-
-void init_conf(void);
-
-#endif /* CONFIG_H */
+void
+spawn(char *cmd) {
+     if(!strlen(cmd))
+          return;
+     if(fork() == 0) {
+          if(fork() == 0) {
+               if(dpy)
+                    close(ConnectionNumber(dpy));
+               setsid();
+               execl(getenv("SHELL"), getenv("SHELL"), "-c", cmd, (char*)NULL);
+               exit(1);
+          }
+          exit(0);
+     }
+     return;
+}
