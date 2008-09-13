@@ -9,13 +9,13 @@ wmfs - Windows Manager From Scratch
 SYNOPSIS
 --------
 
-*wmfs* [*-v* | *--version*] [*-h* | *--help*]
+*wmfs* [*-v* | *--version*] [*-h* | *--help*] [ *-i* | *--info*]
 
 DESCRIPTION
 -----------
 
-*Wmfs* is a windows manager for X. You can use Floating and Tiling apps.
-blahblahblah...
+*Wmfs* is a very basic, lightweight, and dynamic tiling windows manager for X.
+
 
 OPTIONS
 -------
@@ -23,38 +23,57 @@ OPTIONS
   Print version information to standard output, then exit.
 *-h*, *--help*::
   Print help information, then exit.
-
-DEFAULT MOUSE BINDINGS
-----------------------
-
-Type de bind.
-~~~~~~~~~~~~~
-
-*touche + truc* on XYZ::
-  Description.
-
-
-Autre type de bind.
-~~~~~~~~~~~~~~~~~~~
-
-*truc + machin*::
-  Desc.
+*-i*, *--info*::
+  Print wmfs information
 
 DEFAULT KEY BINDINGS
 ---------------------
 
-Type de bind.
-~~~~~~~~~~~~~
+*Control + Return*::
+         Run a terminal
+*Alt + q*::
+         Quit the selected client
+*Control + m *::
+         Toggle maximize the selected client
+*Alt + Tab*::
+         Give the focus to the next client
+*Alt-Shift + Tab*::
+         Give the focus to the previous client
+*Control + Right*::
+         Next tag
+*Control + Left*::
+         Previous tag
+*Control + Up*::
+         Next layout
+*Control + Down*::
+         Previous layout
+*Alt-Shift + l*::
+         Increase the mwfact (+0.025)
+*Alt-Shift + h*::
+         Decrease the mwfact (-0.025)
 
-*touche + truc* on XYZ::
-  Description.
+*Control-Alt + Left*::
+         Move the selected client to the left
+*Control-Alt + Right*::
+         Move the selected client to the right
+*Control-Alt + Up*::
+         Up the selected client
+*Control-Alt + Down*::
+         Down the selected client
 
-Autre type de bind.
-~~~~~~~~~~~~~~~~~~~
+*Shift+Alt + Left*::
+         Decrease the selected client size (horizontally)
+*Shift+Alt + Right*::
+         Increase the selected client size (horizontally)
+*Shift+Alt + Up*::
+         Decrease the selected client size (vertically)
+*Shift+Alt + Down*::
+         Increase the selected client size (vertically)
 
-*truc + machin*::
-  Desc.
-
+*Alt + F[1..9]*::
+         Change tag view
+*Control-Shift +F[1..9]*::
+         Transfert the selected client to the wanted tag
 
 CONFIGURATION
 -------------
@@ -68,7 +87,7 @@ AUTHORS
 -------
 Marc Lagrange <markocpc@gmail.com> for the build system and Gentoo ebuilds.
 
-Martin Duquesnoy <tonmail> for the code.
+Martin Duquesnoy <xorg62@gmail.com> for the code.
 
 WWW
 ---
