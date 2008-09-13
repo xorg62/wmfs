@@ -2,7 +2,7 @@
 #include <confuse.h>
 #include <string.h>
 
-#include "local.h"
+#include "wmfs.h"
 #include "config.h"
 
 #define FILE_NAME   ".wmfsrc"
@@ -287,5 +287,3 @@ init_conf(void) {
 
      cfg_free(cfg);
 }
-
-

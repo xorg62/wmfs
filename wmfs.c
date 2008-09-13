@@ -24,10 +24,7 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "local.h"
-
-unsigned int numlockmask = 0;
-int taglen[MAXTAG] = {3};
+#include "wmfs.h"
 
 void
 arrange(void) {
@@ -53,99 +50,6 @@ attach(Client *c) {
      return;
 }
 
-/* will be ameliorated (with conf) */
-void
-buttonpress(XEvent *event) {
-     Client *c;
-     int i, j;
-     char s[6];
-     XButtonPressedEvent *ev = &event->xbutton;
-
-     /* Tbar'n'Button */
-     if(conf.ttbarheight) {
-          if((c = gettbar(ev->window))) {
-               raiseclient(c);
-               if(ev->button == Button1)
-                    mouseaction(c, ev->x_root, ev->y_root, Move);   /* type 0 for move */
-               else if(ev->button == Button2)
-                    tile_switch(NULL);
-               else if(ev->button == Button3)
-                    mouseaction(c, ev->x_root, ev->y_root, Resize); /* type 1 for resize */
-          } else if((c = getbutton(ev->window))) {
-               if(ev->button == Button1)
-                    killclient(NULL);
-               else if(ev->button == Button3)
-                    togglemax(NULL);
-          }
-     }
-     /* Window */
-     if((c = getclient(ev->window))) {
-          raiseclient(c);
-          if(ev->button == Button1)
-               mouseaction(c, ev->x_root, ev->y_root, Move);   /* type 0 for move */
-          else if(ev->button == Button2)
-               togglemax(NULL);
-          else if(ev->button == Button3)
-               mouseaction(c, ev->x_root, ev->y_root, Resize); /* type 1 for resize */
-     }
-     /* Bar */
-     /* for tag click */
-     else if(ev->window == bar) {
-          for(i = 0; i < conf.ntag + 1; ++i) {
-               if(ev->x > taglen[i-1]
-                  && ev->x < taglen[i]) {
-                    ITOA(s, i);
-                    if(ev->button == Button1)
-                         tag(s);
-                    else if(ev->button == Button3)
-                         tagtransfert(s);
-               }
-          }
-          /* tag switch with scroll */
-          if(ev->x < taglen[conf.ntag]) {
-                    if(ev->button == Button4)
-                         tag("+1");
-                    else if(ev->button == Button5)
-                         tag("-1");
-          }
-          /* layout switch */
-          if(ev->x >= taglen[conf.ntag]
-             && ev->x < taglen[conf.ntag] +
-             (strlen((getlayoutsym(layout[seltag])))*fonty+3)) {
-               if(ev->button == Button1
-                  || ev->button == Button4)
-                    layoutswitch("+");
-               else if(ev->button == Button3
-                       || ev->button == Button5)
-                    layoutswitch("-");
-          }
-     }
-     /* Root */
-     /* tag switch */
-     else if(ev->window == root) {
-          if(ev->button == Button4)
-               tag("+1");
-          else if(ev->button == Button5)
-               tag("-1");
-     }
-     /* Bar Button */
-     for(i=0; i<conf.nbutton ; ++i)
-          for(j=0; j<conf.barbutton[i].nmousesec; ++j)
-               if(ev->window == conf.barbutton[i].win
-                  && ev->button == conf.barbutton[i].mouse[j])
-                    if(conf.barbutton[i].func[j])
-                         conf.barbutton[i].func[j](conf.barbutton[i].cmd[j]);
-}
-
-int
-clienthintpertag(int tag) {
-     Client *c;
-     int i = 0;
-     for(c = clients; c; c = c->next)
-          if(c->tag == tag && c->hint)
-               ++i;
-     return i;
-}
 
 int
 clientpertag(int tag) {
@@ -155,33 +59,6 @@ clientpertag(int tag) {
           if(c->tag == tag)
                ++i;
      return i;
-}
-
-void
-configurerequest(XEvent event) {
-     Client *c;
-     XWindowChanges wc;
-     if((c = getclient(event.xconfigurerequest.window)))
-          if(c->tile)
-               return;
-     wc.x = event.xconfigurerequest.x;
-     wc.y = event.xconfigurerequest.y;
-     wc.width = event.xconfigurerequest.width;
-     wc.height = event.xconfigurerequest.height;
-     wc.border_width = event.xconfigurerequest.border_width;
-     wc.sibling = event.xconfigurerequest.above;
-     wc.stack_mode = event.xconfigurerequest.detail;
-     XConfigureWindow(dpy, event.xconfigurerequest.window,
-                      event.xconfigurerequest.value_mask, &wc);
-     if((c = getclient(event.xconfigurerequest.window))) {
-          if(wc.y < mw && wc.x < mh) {
-               c->free = True;
-               c->max = False;
-               c->tile = False;
-               moveresize(c, wc.x, wc.y, wc.width, wc.height, 1);
-               arrange();
-          }
-     }
 }
 
 void
@@ -213,6 +90,7 @@ errorhandler(Display *d, XErrorEvent *event) {
      return(1);
 }
 
+/* for no-important error */
 int
 errorhandlerdummy(Display *d, XErrorEvent *event) {
      return 0;
@@ -293,112 +171,11 @@ getlayoutsym(int l) {
      return t;
 }
 
-void
-getstatuscmd(char *cmd, char *buf, size_t bufsize) {
-     int i;
-     if(!cmd || !buf || !bufsize)
-          return;
-
-     FILE *f = popen(cmd, "r");
-     fgets(buf, bufsize, f);
-     for(i = 0; i< bufsize; ++i)
-          if(buf[i] == '\n')
-               buf[i] = '\0';
-     fclose(f);
-     return;
-}
-
 Client*
 gettbar(Window w) {
      Client *c;
      for(c = clients; c && c->tbar != w; c = c->next);
      return c;
-}
-
-void
-getevent(void) {
-     XWindowAttributes at;
-     Window trans;
-     Client *c;
-
-     struct timeval tv;
-
-     if(QLength(dpy) > 0)
-          XNextEvent(dpy, &event);
-     else {
-          XFlush(dpy);
-          FD_ZERO(&fd);
-          FD_SET(ConnectionNumber(dpy), &fd);
-          event.type = LASTEvent;
-          tv.tv_sec = 1;
-          tv.tv_usec = 0;
-          if(select(FD_SETSIZE, &fd, NULL, NULL, &tv) > 0)
-               XNextEvent(dpy, &event);
-     }
-
-     switch (event.type) {
-     case EnterNotify:
-          if(event.xcrossing.mode != NotifyNormal
-             || event.xcrossing.detail == NotifyInferior)
-               return;
-          if((c = getclient(event.xcrossing.window))
-             || (c = gettbar(event.xcrossing.window)))
-               if(c->win != bar)
-                    focus(c);
-          break;
-
-     case MapRequest:
-          if(!XGetWindowAttributes(dpy, event.xmaprequest.window, &at))  return;
-          if(at.override_redirect) return;
-          if(!getclient(event.xmaprequest.window))
-               manage(event.xmaprequest.window, &at);
-          break;
-
-     case MappingNotify: if(event.xmapping.request == MappingKeyboard) grabkeys();  break;
-
-     case PropertyNotify:
-          if(event.xproperty.state == PropertyDelete)
-               return;
-          if((c = getclient(event.xproperty.window))) {
-               switch(event.xproperty.atom) {
-               default: break;
-               case XA_WM_TRANSIENT_FOR:
-                    XGetTransientForHint(dpy, c->win, &trans);
-                    if((c->tile || c->max) && (c->hint = (getclient(trans) != NULL)))
-                         arrange();
-                    break;
-               case XA_WM_NORMAL_HINTS:
-                    setsizehints(c);
-                    break;
-               }
-               if(event.xproperty.atom == XA_WM_NAME
-                  || event.xproperty.atom == net_atom[NetWMName])
-                    updateall();
-          }
-          break;
-
-     case ConfigureRequest: configurerequest(event); break;
-
-     case UnmapNotify:
-          if((c = getclient(event.xunmap.window)))
-               if(!c->hide)
-                    unmanage(c);
-          break;
-
-     case DestroyNotify:
-          if((c = getclient(event.xdestroywindow.window)))
-               unmanage(c);
-          break;
-
-     case FocusIn:
-          if(sel && event.xfocus.window != sel->win)
-               XSetInputFocus(dpy, sel->win, RevertToPointerRoot, CurrentTime);
-          break;
-
-     case KeyPress:    keypress(&event); break;
-     case ButtonPress: buttonpress(&event); break;
-     }
-     return;
 }
 
 void
@@ -547,7 +324,7 @@ init(void) {
      at.cursor = cursor[CurNormal];
      XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &at);
 
-     /* INIT BAR */
+     /* INIT BAR / BUTTON */
      at.override_redirect = 1;
      at.background_pixmap = ParentRelative;
      at.event_mask = ButtonPressMask | ExposureMask;
@@ -556,7 +333,6 @@ init(void) {
                          CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
      XSetWindowBackground(dpy, bar, conf.colors.bar);
      XMapRaised(dpy, bar);
-     strncpy(bartext, "WMFS-devel", strlen("WMFS-devel"));
      updatebar();
      updatebutton(0);
 
@@ -577,9 +353,9 @@ ishide(Client *c) {
 
 void
 keymovex(char *cmd) {
+     int tmp;
      if(sel && cmd && !ishide(sel) && !sel->max && !sel->tile)
      {
-          int tmp;
           tmp = sel->x + atoi(cmd);
           moveresize(sel, tmp, sel->y, sel->w, sel->h, 1);
      }
@@ -588,9 +364,9 @@ keymovex(char *cmd) {
 
 void
 keymovey(char *cmd) {
+     int tmp;
      if(sel && cmd && !ishide(sel) && !sel->max && !sel->tile)
      {
-          int tmp;
           tmp = sel->y + atoi(cmd);
           moveresize(sel, sel->x, tmp, sel->w, sel->h, 1);
      }
@@ -598,29 +374,11 @@ keymovey(char *cmd) {
 }
 
 void
-keypress(XEvent *e) {
-     unsigned int i;
-     KeySym keysym;
-     XKeyEvent *ev;
-     ev = &e->xkey;
-     keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
-     for(i = 0; i < conf.nkeybind; i++)
-          if(keysym == keys[i].keysym
-             && (keys[i].mod & ~(numlockmask | LockMask)) ==
-             (ev->state & ~(numlockmask | LockMask))
-             && keys[i].func)
-          {
-               keys[i].func(keys[i].cmd);
-               updateall();
-          }
-     return;
-}
-
-void
 keyresize(char *cmd) {
      if(sel && !ishide(sel) && !sel->max && !sel->tile)
      {
-          int temph = 0, tempw = 0, modh = 0, modw = 0, tmp = 0;
+          int temph = 0, tempw = 0,
+               modh = 0, modw = 0, tmp = 0;
 
           switch(cmd[1]) {
           case 'h': tmp = (cmd[0] == '+') ? 5 : -5; modh = tmp; break;
@@ -647,7 +405,7 @@ killclient(char *cmd) {
           return;
 
      /* check is the client can be close
-        correctly, else i kill with XKillClient */
+        correctly, else it will be kill with XKillClient */
      if(XGetWMProtocols(dpy, sel->win, &a, &n))
           for(i = 0; !r && i < n; i++)
                if(a[i] == wm_atom[WMDelete])
@@ -718,6 +476,7 @@ manage(Window w, XWindowAttributes *wa) {
      Window trans;
      Status rettrans;
      XWindowChanges winc;
+     XSetWindowAttributes at;
 
      c = emallocz(sizeof(Client));
      c->win = w;
@@ -729,25 +488,24 @@ manage(Window w, XWindowAttributes *wa) {
      c->tag = seltag;
 
      if(conf.ttbarheight) {
-          c->tbar =
-               XCreateSimpleWindow(dpy, root,
-                                   c->x,
-                                   c->y - conf.ttbarheight,
-                                   c->w,
-                                   conf.ttbarheight,
-                                   conf.borderheight,
-                                   conf.colors.bordernormal,
-                                   conf.colors.bar);
-          XSelectInput(dpy, c->tbar, ExposureMask | EnterWindowMask);
-          c->button =
-               XCreateSimpleWindow(dpy, root,
-                                   c->x + c->w - 10,
-                                   BUTY(c->y),
-                                   5,
-                                   BUTH,
-                                   1,
-                                   conf.colors.bordernormal,
-                                   conf.colors.borderfocus);
+          at.override_redirect = 1;
+          at.background_pixmap = ParentRelative;
+          at.event_mask = ButtonPressMask | ExposureMask;
+
+          c->tbar = XCreateWindow(dpy, root, c->x, c->y - conf.ttbarheight,
+                              c->w, conf.ttbarheight, 0, DefaultDepth(dpy, screen),
+                              CopyFromParent, DefaultVisual(dpy, screen),
+                              CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
+          XSetWindowBackground(dpy, c->tbar, conf.colors.bar);
+          setborder(c->tbar, conf.colors.bordernormal);
+
+          c->button = XCreateWindow(dpy, root, c->x + c->w - 10, BUTY(c->y),
+                              5, BUTH, 0, DefaultDepth(dpy, screen),
+                              CopyFromParent, DefaultVisual(dpy, screen),
+                              CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
+          XSetWindowBackground(dpy, c->button, conf.colors.borderfocus);
+          XSetWindowBorder(dpy, c->button, conf.colors.bordernormal);
+          XSetWindowBorderWidth(dpy, c->button, 1);
      }
 
      XConfigureWindow(dpy, w, CWBorderWidth, &winc);
@@ -768,14 +526,13 @@ manage(Window w, XWindowAttributes *wa) {
           raiseclient(c);
 
      attach(c);
-     moveresize(c, c->x, c->y, c->w, c->h, 1);
 
      if(c->free)
           raiseclient(c);
 
      XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
      mapclient(c);
-     arrange();
+     layoutfunc[seltag]();
      return;
 }
 
@@ -1246,12 +1003,10 @@ updatebar(void) {
      char buf[conf.ntag][100];
      char p[3];
 
-
      tm = localtime(&lt);
      lt = time(NULL);
 
      XClearWindow(dpy, bar);
-
      XSetForeground(dpy, gc, conf.colors.text);
 
      for(i=0; i<conf.ntag; ++i) {
@@ -1266,7 +1021,6 @@ updatebar(void) {
           XSetForeground(dpy, gc, (i+1 == seltag) ? conf.colors.tagselfg : conf.colors.text);
           XDrawString(dpy, bar, gc, taglen[i], fonth, buf[i], strlen(buf[i]));
      }
-     updatebutton(1);
 
      /* Draw layout symbol */
      XSetForeground(dpy, gc, conf.colors.tagselfg);
@@ -1276,7 +1030,6 @@ updatebar(void) {
                  strlen(getlayoutsym(layout[seltag])));
 
     /* Draw status */
-
      sprintf(bartext,"mwfact: %.2f  nmaster: %i - %02i:%02i",
              mwfact[seltag],
              nmaster[seltag],
@@ -1287,8 +1040,11 @@ updatebar(void) {
      XSetForeground(dpy, gc, conf.colors.text);
      XDrawString(dpy, bar, gc, mw - j * fonty, fonth-1 , bartext ,j);
      XDrawLine(dpy, bar, gc, mw- j * fonty-5 , 0 , mw - j * fonty-5, barheight);
-
      XSync(dpy, False);
+
+     /* Update Bar Buttons */
+     updatebutton(1);
+
      return;
 }
 
@@ -1325,9 +1081,7 @@ updatebutton(Bool c) {
                                                      0, DefaultDepth(dpy, screen),
                                                      CopyFromParent, DefaultVisual(dpy, screen),
                                                      CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
-
                XSetWindowBackground(dpy, conf.barbutton[i].win, conf.barbutton[i].bg_color);
-
                XMapRaised(dpy, conf.barbutton[i].win);
                XSetForeground(dpy, gc, conf.barbutton[i].fg_color);
                XDrawString(dpy, conf.barbutton[i].win, gc, 1, fonth_l, conf.barbutton[i].text, p);
@@ -1439,12 +1193,19 @@ main(int argc,char **argv) {
           }
      }
 
-     if(!dpy) { printf("wmfs: cannot open X server\n"); exit(1); }
+     if(!dpy) {
+          printf("WMFS: cannot open X server\n");
+          exit(1);
+     }
+
+
+     /* Let's Go ! */
 
      init_conf();
      init();
      scan();
-     for(;;) {
+
+     while(1) {
           updatebar();
           getevent();
           updateall();

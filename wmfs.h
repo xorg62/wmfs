@@ -19,7 +19,7 @@
 #include <X11/Xutil.h>
 #include "config.h"
 
-/* DEFINE TYPES */
+/* Defines */
 #define ButtonMask   (ButtonPressMask | ButtonReleaseMask)
 #define MouseMask    (ButtonMask | PointerMotionMask)
 #define KeyMask      (KeyPressMask | KeyReleaseMask)
@@ -32,7 +32,10 @@
 #define Resize       1
 #define MAXTAG       36
 #define NBUTTON      5
+#define BUTY(y)      (y - conf.ttbarheight + 3 + conf.borderheight-1)
+#define BUTH         (conf.ttbarheight - 6)
 
+/* Client Structure */
 typedef struct Client Client;
 struct Client {
      char *title;          /* Client title */
@@ -49,11 +52,12 @@ struct Client {
      Window tbar;          /* Titlebar */
      Window button;        /* Close Button */
      Bool max, tile, free; /* Client Info */
-     Bool hint, hide;      /* Client InfoÂ² */
+     Bool hint, hide;      /* Client Info² */
      Client *next;         /* Next client */
      Client *prev;         /* Previous client */
 };
 
+/* Keybind Structure */
 typedef struct {
      unsigned long mod;
      KeySym keysym;
@@ -61,6 +65,7 @@ typedef struct {
      char *cmd;
 } Key;
 
+/* Bar Button */
 typedef struct {
      char *text;
      Window win;
@@ -73,6 +78,7 @@ typedef struct {
      unsigned int mouse[NBUTTON];
 } BarButton;
 
+/* Tag Structure */
 typedef struct {
      char *name;
      float mwfact;
@@ -80,6 +86,7 @@ typedef struct {
      int layout;
 } Tag;
 
+/* Configuration structure */
 typedef struct {
      char *font;
      char *buttonfont;
@@ -107,18 +114,31 @@ typedef struct {
      int nbutton;
 } Conf;
 
+/* Enum */
 enum { CurNormal, CurResize, CurMove, CurInput, CurLast };
 enum { WMState, WMProtocols, WMName, WMDelete, WMLast };
 enum { NetSupported, NetWMName, NetLast };
-enum { Free=0, Tile, Max};
+enum { Free = 0, Tile, Max};
+
+/* Functions Prototypes */
+
+/* event.c */
+void buttonpress(XEvent ev);
+void configurerequest(XEvent ev);
+void destroynotify(XEvent ev);
+void enternotify(XEvent ev);
+void focusin(XEvent ev);
+void keypress(XEvent ev);
+void mapnotify(XEvent ev);
+void maprequest(XEvent ev);
+void propertynotify(XEvent ev);
+void unmapnotify(XEvent ev);
+void getevent(void);
 
 /* wmfs.c */
 void arrange(void);
 void attach(Client *c);
-void buttonpress(XEvent *event);
-int clienthintpertag(int tag);
 int clientpertag(int tag);
-void configurerequest(XEvent event);
 void detach(Client *c);
 void *emallocz(unsigned int size);
 int errorhandler(Display *d, XErrorEvent *event);
@@ -130,7 +150,6 @@ Client* getclient(Window w);
 Client* getnext(Client *c);
 char* getlayoutsym(int l);
 Client* gettbar(Window w);
-void getevent(void);
 void grabbuttons(Client *c, Bool focused);
 void grabkeys(void);
 void hide(Client *c);
@@ -138,7 +157,6 @@ void init(void);
 Bool ishide(Client *c);
 void keymovex(char *cmd);
 void keymovey(char *cmd);
-void keypress(XEvent *e);
 void keyresize(char *cmd);
 void killclient(char *cmd);
 void layoutswitch(char *cmd);
@@ -170,40 +188,50 @@ void updateall(void);
 void updatetitle(Client *c);
 void wswitch(char *cmd);
 
-#define BUTY(y)      (y - conf.ttbarheight + 3)
-#define BUTH         (conf.ttbarheight - 6)
+/* Variables */
 
+/* Principal */
 Display *dpy;
-GC gc;
 XEvent event;
-XFontStruct *font, *font_b;
-Conf conf;
-int screen;
+GC gc;
 Window root;
 Window bar;
-fd_set fd;
-struct tm *tm;
-time_t lt;
+int screen;
+int mw, mh;
+Conf conf;
 Key keys[512];
+
+/* Atoms / Cursors */
 Atom wm_atom[WMLast];
 Atom net_atom[NetLast];
 Cursor cursor[CurLast];
-int mw, mh;
-int fonth;
-int fonty;
+
+/* Fonts */
+XFontStruct *font, *font_b;
+int fonth, fonty;
+
+/* Bar / Tags */
+Window bar;
 int barheight;
+char bartext[1024];
 int seltag;
-Client *clients;                     /* First Client */
-Client *sel;                         /* selected client */
+int taglen[MAXTAG];
+
+/* Important Client */
+Client *clients;
+Client *sel;
 Client *selbytag[MAXTAG];
 
-/* layout */
+/* Layout/Tile Important variables */
 float mwfact[MAXTAG];
 int nmaster[MAXTAG];
 int layout[MAXTAG];
 void (*layoutfunc[MAXTAG])(void);
-/**/
 
-char bartext[1024];
+/* Other */
+unsigned int numlockmask;
+fd_set fd;
+struct tm *tm;
+time_t lt;
 
 #endif /* LOCAL_H */

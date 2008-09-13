@@ -16,7 +16,8 @@ project(${PROJECT_NAME} C)
 # Definition of the wmfs source
 set(wmfs_src
   wmfs.c
-  config.c)
+  config.c
+  event.c)
 
 # Set the executable from the wmfs_src
 add_executable(wmfs ${wmfs_src})
