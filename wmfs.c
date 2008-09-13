@@ -162,13 +162,12 @@ getnext(Client *c) {
 
 char*
 getlayoutsym(int l) {
-     char *t;
      switch(layout[seltag]) {
-     case Free: t = conf.layouts.free; break;
-     case Tile: t = conf.layouts.tile; break;
-     case Max:  t = conf.layouts.max;  break;
+     case Free: return conf.layouts.free; break;
+     case Tile: return conf.layouts.tile; break;
+     case Max:  return conf.layouts.max;  break;
      }
-     return t;
+     return NULL;
 }
 
 Client*
