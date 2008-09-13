@@ -67,8 +67,14 @@ Know bug list here.
 AUTHORS
 -------
 Marc Lagrange <markocpc@gmail.com> for the build system and Gentoo ebuilds.
+
 Martin Duquesnoy <tonmail> for the code.
 
 WWW
 ---
 http://wmfs.sangor.net/
+
+COPYING
+-------
+Wmfs is under the BSD license. See COPYING for more informations.
+
