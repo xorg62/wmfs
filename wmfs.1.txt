@@ -4,7 +4,7 @@ wmfs(1)
 NAME
 ----
 
-wmfs - Windows Manager From Scratch
+WMFS - Windows Manager From Scratch
 
 SYNOPSIS
 --------
@@ -81,7 +81,7 @@ CONFIGURATION
 
 BUGS
 ----
-Know bug list here.
+WMFS isn't stable for now.
 
 AUTHORS
 -------

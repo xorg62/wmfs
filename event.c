@@ -12,11 +12,11 @@ buttonpress(XEvent ev) {
           if((c = gettbar(ev.xbutton.window))) {
                raiseclient(c);
                if(ev.xbutton.button == Button1)
-                    mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Move);   /* type 0 for move */
+                    mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Move);
                else if(ev.xbutton.button == Button2)
                     tile_switch(NULL);
                else if(ev.xbutton.button == Button3)
-                    mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Resize); /* type 1 for resize */
+                    mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Resize);
           } else if((c = getbutton(ev.xbutton.window))) {
                if(ev.xbutton.button == Button1)
                     killclient(NULL);
@@ -28,11 +28,11 @@ buttonpress(XEvent ev) {
      if((c = getclient(ev.xbutton.window))) {
           raiseclient(c);
           if(ev.xbutton.button == Button1)
-               mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Move);   /* type 0 for move */
+               mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Move);
           else if(ev.xbutton.button == Button2)
                togglemax(NULL);
           else if(ev.xbutton.button == Button3)
-               mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Resize); /* type 1 for resize */
+               mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Resize);
      }
      /* Bar */
      /* for tag click */
@@ -101,15 +101,9 @@ configurerequest(XEvent ev) {
      wc.stack_mode = ev.xconfigurerequest.detail;
      XConfigureWindow(dpy, ev.xconfigurerequest.window,
                       ev.xconfigurerequest.value_mask, &wc);
-     if((c = getclient(ev.xconfigurerequest.window))) {
-          if(wc.y < mw && wc.x < mh) {
-               c->free = True;
-               c->max = False;
-               c->tile = False;
+     if((c = getclient(ev.xconfigurerequest.window)))
+          if(wc.y < mw && wc.x < mh)
                moveresize(c, wc.x, wc.y, wc.width, wc.height, 1);
-               arrange();
-          }
-     }
      return;
 }
 
@@ -131,8 +125,9 @@ enternotify(XEvent ev) {
           return;
      if((c = getclient(ev.xcrossing.window))
         || (c = gettbar(ev.xcrossing.window)))
-          if(c->win != bar)
-               focus(c);
+          focus(c);
+     else
+          focus(NULL);
      return;
 }
 
@@ -206,7 +201,7 @@ propertynotify(XEvent ev) {
           }
           if(ev.xproperty.atom == XA_WM_NAME
              || ev.xproperty.atom == net_atom[NetWMName])
-               updateall();
+               updatetitle(c);
      }
      return;
 }

@@ -47,7 +47,6 @@ struct Client {
      int maxw, maxh, minw, minh;
      int minax, maxax, minay, maxay;
      /* } */
-     int border;           /* border height */
      Window win;           /* Window */
      Window tbar;          /* Titlebar */
      Window button;        /* Close Button */

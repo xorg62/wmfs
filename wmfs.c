@@ -234,11 +234,10 @@ grabkeys(void) {
 
 void
 hide(Client *c) {
-     if(!c || c->hide) return;
+     if(!c)
+          return;
      long data[] = { IconicState, None };
 
-     /* unmapclient(c); */
-     /* Just hide for now... */
      XMoveWindow(dpy, c->win, c->x, c->y+mh*2);
      if(conf.ttbarheight) {
           XMoveWindow(dpy, c->tbar, c->x, c->y+mh*2);
@@ -332,6 +331,7 @@ init(void) {
                          CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
      XSetWindowBackground(dpy, bar, conf.colors.bar);
      XMapRaised(dpy, bar);
+     taglen[0] = 3;
      updatebar();
      updatebutton(0);
 
@@ -400,7 +400,7 @@ killclient(char *cmd) {
      Atom *a;
      XEvent ev;
 
-     if(!sel && ishide(sel))
+     if(!sel || ishide(sel))
           return;
 
      /* check is the client can be close
@@ -475,7 +475,6 @@ manage(Window w, XWindowAttributes *wa) {
      Window trans;
      Status rettrans;
      XWindowChanges winc;
-     XSetWindowAttributes at;
 
      c = emallocz(sizeof(Client));
      c->win = w;
@@ -483,55 +482,35 @@ manage(Window w, XWindowAttributes *wa) {
      c->y = wa->y + conf.ttbarheight + barheight;
      c->w = wa->width;
      c->h = wa->height;
-     c->border = wa->border_width;
      c->tag = seltag;
 
      if(conf.ttbarheight) {
-          at.override_redirect = 1;
-          at.background_pixmap = ParentRelative;
-          at.event_mask = ButtonPressMask | ExposureMask;
-
-          c->tbar = XCreateWindow(dpy, root, c->x, c->y - conf.ttbarheight,
-                              c->w, conf.ttbarheight, 0, DefaultDepth(dpy, screen),
-                              CopyFromParent, DefaultVisual(dpy, screen),
-                              CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
-          XSetWindowBackground(dpy, c->tbar, conf.colors.bar);
-          setborder(c->tbar, conf.colors.bordernormal);
-
-          c->button = XCreateWindow(dpy, root, c->x + c->w - 10, BUTY(c->y),
-                              5, BUTH, 0, DefaultDepth(dpy, screen),
-                              CopyFromParent, DefaultVisual(dpy, screen),
-                              CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
-          XSetWindowBackground(dpy, c->button, conf.colors.borderfocus);
-          XSetWindowBorder(dpy, c->button, conf.colors.bordernormal);
-          XSetWindowBorderWidth(dpy, c->button, 1);
+          c->tbar = XCreateSimpleWindow(dpy, root, c->x, c->y - conf.ttbarheight,
+                                        c->w, conf.ttbarheight, conf.borderheight,
+                                        conf.colors.bordernormal, conf.colors.bar);
+          XSelectInput(dpy, c->tbar, ExposureMask | EnterWindowMask);
+          c->button = XCreateSimpleWindow(dpy, root, c->x + c->w - 10, BUTY(c->y),
+                                          5, BUTH, 1, conf.colors.bordernormal,
+                                          conf.colors.borderfocus);
      }
 
      XConfigureWindow(dpy, w, CWBorderWidth, &winc);
      setborder(w, conf.colors.bordernormal);
      grabbuttons(c, False);
-     XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask
-                  | PropertyChangeMask | StructureNotifyMask);
+     XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask | PropertyChangeMask | StructureNotifyMask);
      setsizehints(c);
      updatetitle(c);
-
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
           for(t = clients; t && t->win != trans; t = t->next);
      if(t)
           c->tag = t->tag;
      if(!c->free)
           c->free = (rettrans == Success) || c->hint;
-     if(c->free)
-          raiseclient(c);
 
      attach(c);
-
-     if(c->free)
-          raiseclient(c);
-
      XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
      mapclient(c);
-     layoutfunc[seltag]();
+     arrange();
      return;
 }
 
@@ -551,7 +530,7 @@ maxlayout(void) {
           moveresize(c, 0,
                      conf.ttbarheight + barheight,
                      (mw-(conf.borderheight * 2)),
-                     (mh-(conf.borderheight * 2)- conf.ttbarheight - barheight), 0);
+                     (mh-(conf.borderheight * 2) - conf.ttbarheight - barheight), 0);
           c->max = True;
      }
      return;
@@ -565,12 +544,11 @@ mouseaction(Client *c, int x, int y, int type) {
      int  ocx, ocy;
      XEvent ev;
 
-     if((c->max && !c->hint)
-        || c->tile)
+     if(c->max || c->tile)
           return;
+
      ocx = c->x;
      ocy = c->y;
-
      if(XGrabPointer(dpy, root, 0, MouseMask, GrabModeAsync, GrabModeAsync,
                      None, cursor[((type) ?CurResize:CurMove)], CurrentTime) != GrabSuccess) return;
      if(type)
@@ -584,18 +562,19 @@ mouseaction(Client *c, int x, int y, int type) {
                XUngrabPointer(dpy, CurrentTime);
                return;
           } else if(ev.type == MotionNotify) {
-               XSync(dpy, 0);
-
-               if(type)  /* Resize */
+               XSync(dpy, False);
+               /* Resize */
+               if(type)
                     moveresize(c, c->x, c->y,
                                ((ev.xmotion.x - ocx <= 0) ? 1 : ev.xmotion.x - ocx),
                                ((ev.xmotion.y - ocy <= 0) ? 1 : ev.xmotion.y - ocy), 1);
-               else     /* Move */
+               /* Move */
+               else
                     moveresize(c,
                                (ocx + (ev.xmotion.x - x)),
                                (ocy + (ev.xmotion.y - y)),
-                               c->w, c->h, 0);
-               if(c->y  < barheight + conf.ttbarheight - 5) {
+                               c->w, c->h, 1);
+               if(c->y < barheight + conf.ttbarheight - 5) {
                     moveresize(c, c->x, barheight+conf.ttbarheight, c->w, c->h, 1);
                     XUngrabPointer(dpy, CurrentTime);
                     return;
@@ -621,7 +600,8 @@ moveresize(Client *c, int x, int y, int w, int h, bool r) {
           h -= c->baseh;
           /* aspect */
           if (c->minay > 0 && c->maxay > 0
-              && c->minax > 0 && c->maxax > 0) {
+              && c->minax > 0 && c->maxax > 0)
+          {
                if (w * c->maxay > h * c->maxax)
                     w = h * c->maxax / c->maxay;
                else if (w * c->minay < h * c->minax)
@@ -672,7 +652,7 @@ moveresize(Client *c, int x, int y, int w, int h, bool r) {
 
 Client*
 nexttiled(Client *c) {
-     for(; c && (c->free || c->hint || ishide(c)); c = c->next);
+     for(; c && (c->free || ishide(c)); c = c->next);
      return c;
 }
 
@@ -880,7 +860,8 @@ tile(void) {
      x = 0;
      y = barto;
 
-     for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), i++) {
+     for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), i++)
+     {
           c->max = False;
           c->tile = True;
           c->ox = c->x; c->oy = c->y;
@@ -934,10 +915,8 @@ togglemax(char *cmd) {
      if(!sel || ishide(sel) || sel->hint)
           return;
      if(!sel->max) {
-          sel->ox = sel->x;
-          sel->oy = sel->y;
-          sel->ow = sel->w;
-          sel->oh = sel->h;
+          sel->ox = sel->x; sel->oy = sel->y;
+          sel->ow = sel->w; sel->oh = sel->h;
           moveresize(sel, 0,
                      conf.ttbarheight + barheight,
                      (mw-(conf.borderheight * 2)),
@@ -953,10 +932,9 @@ togglemax(char *cmd) {
 
 void
 unhide(Client *c) {
-     if(!c || !c->hide) return;
+     if(!c)
+          return;
      long data[] = { NormalState, None };
-
-     /* mapclient(c); */
 
      XMoveWindow(dpy,c->win,c->x,c->y);
      if(conf.ttbarheight) {
@@ -1006,7 +984,6 @@ updatebar(void) {
      lt = time(NULL);
 
      XClearWindow(dpy, bar);
-     XSetForeground(dpy, gc, conf.colors.text);
 
      for(i=0; i<conf.ntag; ++i) {
           ITOA(p, clientpertag(i+1));
@@ -1039,7 +1016,6 @@ updatebar(void) {
      XSetForeground(dpy, gc, conf.colors.text);
      XDrawString(dpy, bar, gc, mw - j * fonty, fonth-1 , bartext ,j);
      XDrawLine(dpy, bar, gc, mw- j * fonty-5 , 0 , mw - j * fonty-5, barheight);
-     XSync(dpy, False);
 
      /* Update Bar Buttons */
      updatebutton(1);
