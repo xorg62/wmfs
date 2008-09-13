@@ -4,7 +4,7 @@ wmfs(1)
 NAME
 ----
 
-WMFS - Windows Manager From Scratch
+WMFS - Window Manager From Scratch
 
 SYNOPSIS
 --------
@@ -14,7 +14,7 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-*Wmfs* is a very basic, lightweight, and dynamic tiling windows manager for X.
+*Wmfs* is a very lightweight and dynamic tiling windows manager for X.
 
 
 OPTIONS
