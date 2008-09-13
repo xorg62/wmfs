@@ -9,7 +9,7 @@ wmfs - Windows Manager From Scratch
 SYNOPSIS
 --------
 
-*wmfs* [*-v* | *--version*] [*-h* | *--help*] [*-c* | *--config* 'FILE']
+*wmfs* [*-v* | *--version*] [*-h* | *--help*]
 
 DESCRIPTION
 -----------
@@ -23,8 +23,6 @@ OPTIONS
   Print version information to standard output, then exit.
 *-h*, *--help*::
   Print help information, then exit.
-*-c*, *--config*::
-  Use an alternate configuration file instead of '$HOME/.wmfsrc'.
 
 DEFAULT MOUSE BINDINGS
 ----------------------
