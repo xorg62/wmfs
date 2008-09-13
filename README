@@ -1,10 +1,23 @@
+ABOUT :
 WMFS for GNU/Linux
   * Window Manager From Scratch
 
 Un WM tout bete, crée a partir de 0.
 
-Auteurs:
+AUTHORS :
   * Code : Martin Duquesnoy <xorg62@gmail.com>
   * Build System & other : Marc Lagrange <markocpc@gmail.com>
 
-License: BSD
+LICENSE : BSD
+
+INSTALL :
+  · mkdir build
+  · cd build
+  · cmake ..
+  · make
+  · sudo make install
+
+By default, wmfs logos are'nt installed. You can install it with : cmake -DWITH_LOGOS=ON ..
+
+DISTROS :
+  · wmfs ebuild for Gentoo is available in the Sangor's overlay. More infos at http://wmfs.sangor.net/view/download/
