@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "local.h"
+#include "wmfs.h"
 
 #define WMFS_VERSION            "@WMFS_VERSION@"
 #define WMFS_COMPILE_MACHINE    "@WMFS_COMPILE_MACHINE@"
