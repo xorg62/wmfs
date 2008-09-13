@@ -11,6 +11,7 @@ set(BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR})
 # Other
 #set(CMAKE_BUILD_TYPE RELEASE)
 option(WITH_LOGOS "install wmfs logos")
+option(GENERATE_MANPAGES "generate manpages" ON)
 # Project name - wmfs
 set(PROJECT_NAME wmfs)
 project(${PROJECT_NAME} C)
@@ -46,7 +47,24 @@ pkg_check_modules(wmfs_required
   x11
   libconfuse)
 # Find exterbal programs
+macro(a_find_program var prg req)
+    set(required ${req})
+    find_program(${var} ${prg})
+    if(NOT ${var})
+        message(STATUS "${prg} not found.")
+        if(required)
+            message(FATAL_ERROR "${prg} is required to build wmfs")
+        endif()
+    else()
+        message(STATUS "${prg} -> ${${var}}")
+    endif()
+endmacro()
 find_program(GIT_EXECUTABLE git)
+# programs needed for man pages
+a_find_program(ASCIIDOC_EXECUTABLE asciidoc FALSE)
+a_find_program(XMLTO_EXECUTABLE xmlto FALSE)
+a_find_program(GZIP_EXECUTABLE gzip FALSE)
+a_find_program(CAT_EXECUTABLE cat TRUE)
 # Remplace strings in configs
 set(WMFS_VERSION ${VERSION})
 set(WMFS_COMPILE_MACHINE ${CMAKE_SYSTEM_PROCESSOR})
@@ -84,19 +102,98 @@ set(CHANGELOG_FILE ${SOURCE_DIR}/CHANGELOG)
 file(WRITE ${CHANGELOG_FILE} ${WMFS_CHANGELOG})
 endif()
 
+# {{{ Check if documentation can be build
+if(GENERATE_MANPAGES)
+    if(NOT ASCIIDOC_EXECUTABLE OR NOT XMLTO_EXECUTABLE OR NOT GZIP_EXECUTABLE)
+        if(NOT ASCIIDOC_EXECUTABLE)
+            SET(missing "asciidoc")
+        endif()
+        if(NOT XMLTO_EXECUTABLE)
+            SET(missing ${missing} " xmlto")
+        endif()
+        if(NOT GZIP_EXECUTABLE)
+            SET(missing ${missing} " gzip")
+        endif()
+
+        message(STATUS "Not generating manpages. Missing: " ${missing})
+        set(GENERATE_MANPAGES OFF)
+    endif()
+endif()
+
+# sets
+# {{{ Install path and configuration variables
+if(DEFINED PREFIX)
+    set(PREFIX ${PREFIX} CACHE PATH "install prefix")
+    set(CMAKE_INSTALL_PREFIX ${PREFIX})
+else()
+    set(PREFIX ${CMAKE_INSTALL_PREFIX} CACHE PATH "install prefix")
+endif()
+
+# set man path
+set(WMFS_MAN_SRCS
+  ${SOURCE_DIR}/wmfs.1.txt)
+
+if(DEFINED WMFS_MAN_PATH)
+   set(WMFS_MAN_PATH ${WMFS_MAN_PATH} CACHE PATH "wmfs manpage directory")
+else()
+   set(WMFS_MAN_PATH ${PREFIX}/share/man CACHE PATH "wmfs manpage directory")
+endif()
+
+# {{{ Manpages
+if(GENERATE_MANPAGES)
+    foreach(txtfile ${WMFS_MAN_SRCS})
+        string(REGEX REPLACE ".txt\$" ".xml" xmlfile ${txtfile})
+        string(REPLACE ${SOURCE_DIR}
+                       ${BUILD_DIR} xmlfile ${xmlfile})
+        string(REGEX REPLACE ".xml\$" ".gz" gzfile ${xmlfile})
+        string(REGEX REPLACE ".gz\$" "" manfile ${gzfile})
+
+        add_custom_command(
+            COMMAND ${CAT_EXECUTABLE} ${txtfile}
+                    | ${ASCIIDOC_EXECUTABLE} -d manpage -b docbook -o ${xmlfile} -
+            WORKING_DIRECTORY ${BUILD_DIR}
+            OUTPUT  ${xmlfile}
+            DEPENDS ${txtfile}
+            VERBATIM)
+        add_custom_command(
+            COMMAND ${XMLTO_EXECUTABLE} man ${xmlfile}
+            OUTPUT  ${manfile}
+            DEPENDS ${xmlfile})
+        add_custom_command(
+            COMMAND ${CAT_EXECUTABLE} ${manfile}
+                    | ${GZIP_EXECUTABLE}
+                    > ${gzfile}
+            OUTPUT  ${gzfile}
+            DEPENDS ${manfile}
+            VERBATIM)
+
+        set(MAN_FILES ${MAN_FILES} ${gzfile})
+
+        # figure out in what section to install to from filename
+        string(REGEX REPLACE "^.*\\.([0-9])\\.gz\$" "\\1" section ${gzfile})
+        set(WMFS_MAN${section}_FILES ${WMFS_MAN${section}_FILES} ${gzfile})
+    endforeach()
+
+    add_custom_target(man ALL DEPENDS ${MAN_FILES})
+endif()
+# }}}
+
 set(PROJECT_DATA_PATH share/${PROJECT_NAME})
 set(PROJECT_TODO ${SOURCE_DIR}/TODO)
 set(PROJECT_README ${SOURCE_DIR}/README)
 set(PROJECT_CHANGELOG ${SOURCE_DIR}/CHANGELOG)
 set(PROJECT_DEFAULT_CONF ${SOURCE_DIR}/wmfsrc)
-install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 
+# installs
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 if(WITH_LOGOS)
   set(PROJECT_LOGOS ${PROJECT_DATA_PATH}/logos)
   set(PROJECT_LOGOS_DIR ${SOURCE_DIR}/logos)
   install(DIRECTORY ${PROJECT_LOGOS_DIR} DESTINATION ${PROJECT_DATA_PATH})
   message("Install With logos")
 endif()
-
+if(GENERATE_MANPAGES)
+      install(FILES ${WMFS_MAN1_FILES} DESTINATION ${WMFS_MAN_PATH}/man1)
+endif()
 install(FILES ${PROJECT_TODO} ${PROJECT_README} ${PROJECT_CHANGELOG}
   ${PROJECT_DEFAULT_CONF} DESTINATION ${PROJECT_DATA_PATH})
