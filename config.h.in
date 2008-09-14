@@ -41,21 +41,4 @@
 #define WMFS_COMPILE_FLAGS      "@WMFS_COMPILE_FLAGS@"
 #define WMFS_LINKED_LIBS        "@WMFS_LINKED_LIBS@"
 
-typedef struct {
-     char *name;
-     void *func;
-} func_name_list_t;
-
-typedef struct  {
-      char *name;
-      KeySym keysym;
-} key_name_list_t;
-
-typedef struct {
-     char *name;
-     unsigned int button;
-} name_to_uint_t;
-
-void init_conf(void);
-
 #endif /* CONFIG_H */
