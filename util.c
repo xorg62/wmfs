@@ -33,19 +33,24 @@
 #include "wmfs.h"
 
 void*
-emallocz(unsigned int size) {
+emallocz(unsigned int size)
+{
      void *res = calloc(1, size);
+
      if(!res)
           fprintf(stderr,"fatal: could not malloc() %u bytes\n", size);
      return res;
 }
 
 void
-spawn(char *cmd) {
+spawn(char *cmd)
+{
      if(!strlen(cmd))
           return;
-     if(fork() == 0) {
-          if(fork() == 0) {
+     if(fork() == 0)
+     {
+          if(fork() == 0)
+          {
                if(dpy)
                     close(ConnectionNumber(dpy));
                setsid();

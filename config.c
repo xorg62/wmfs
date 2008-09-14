@@ -31,11 +31,11 @@
 */
 
 #include "wmfs.h"
-#include "config.h"
 
 #define FILE_NAME   ".wmfsrc"
 
-func_name_list_t func_list[] = {
+func_name_list_t func_list[] =
+{
      {"spawn", spawn},
      {"killclient", killclient},
      {"wswitch", wswitch},
@@ -50,7 +50,8 @@ func_name_list_t func_list[] = {
      {"set_nmaster", set_nmaster}
 };
 
-key_name_list_t key_list[] = {
+key_name_list_t key_list[] =
+{
      {"Control", ControlMask},
      {"Shift", ShiftMask},
      {"Lock", LockMask},
@@ -63,7 +64,8 @@ key_name_list_t key_list[] = {
      {NULL, NoSymbol}
 };
 
-name_to_uint_t mouse_button_list[] = {
+name_to_uint_t mouse_button_list[] =
+{
      {"Button1", Button1},
      {"Button2", Button2},
      {"Button3", Button3},
@@ -71,15 +73,18 @@ name_to_uint_t mouse_button_list[] = {
      {"Button5", Button5}
 };
 
-name_to_uint_t layout_list[] = {
+name_to_uint_t layout_list[] =
+{
      {"tile", Tile},
      {"max", Max},
      {"free", Free}
 };
 
 void*
-name_to_func(char *name) {
+name_to_func(char *name)
+{
      int i;
+
      if(name)
           for(i=0; func_list[i].name ; ++i)
                if(!strcmp(name, func_list[i].name))
@@ -88,8 +93,10 @@ name_to_func(char *name) {
 }
 
 unsigned long
-char_to_modkey(char *name) {
+char_to_modkey(char *name)
+{
      int i;
+
      if(name)
           for(i=0; key_list[i].name; ++i)
                if(!strcmp(name, key_list[i].name))
@@ -98,8 +105,10 @@ char_to_modkey(char *name) {
 }
 
 unsigned int
-char_to_button(char *name) {
+char_to_button(char *name)
+{
      int i;
+
      if(name)
           for(i=0; mouse_button_list[i].name; ++i)
                if(!strcmp(name, mouse_button_list[i].name))
@@ -108,8 +117,10 @@ char_to_button(char *name) {
 }
 
 unsigned int
-layout_name_to_layout(char *name) {
+layout_name_to_layout(char *name)
+{
      int i;
+
      if(name)
           for(i=0; layout_list[i].name; ++i)
                if(!strcmp(name, layout_list[i].name))
@@ -118,101 +129,104 @@ layout_name_to_layout(char *name) {
 }
 
 void
-init_conf(void) {
+init_conf(void)
+{
 
-     static cfg_opt_t misc_opts[] = {
+     static cfg_opt_t misc_opts[] =
+          {
+               CFG_STR("font",              "*-fixed-medium-*-12-*",  CFGF_NONE),
+               CFG_BOOL("raisefocus",        cfg_false,               CFGF_NONE),
+               CFG_BOOL("raiseswitch",       cfg_true,                CFGF_NONE),
+               CFG_INT("border_height",      1,                       CFGF_NONE),
+               CFG_INT("titlebar_height",    0,                       CFGF_NONE),
+               CFG_END()
+          };
 
-          CFG_STR("font",              "*-fixed-medium-*-12-*",  CFGF_NONE),
-          CFG_BOOL("raisefocus",        cfg_false,               CFGF_NONE),
-          CFG_BOOL("raiseswitch",       cfg_true,                CFGF_NONE),
-          CFG_INT("border_height",      1,                       CFGF_NONE),
-          CFG_INT("titlebar_height",    0,                       CFGF_NONE),
-          CFG_END()
-     };
+     static cfg_opt_t colors_opts[] =
+          {
+               CFG_INT("border_normal", 0x354B5C,  CFGF_NONE),
+               CFG_INT("border_focus",  0x6286A1,  CFGF_NONE),
+               CFG_INT("bar",           0x090909,  CFGF_NONE),
+               CFG_INT("text",          0x6289A1,  CFGF_NONE),
+               CFG_INT("tag_sel_fg",    0xFFFFFF,  CFGF_NONE),
+               CFG_INT("tag_sel_bg",    0x354B5C,  CFGF_NONE),
+               CFG_END()
+          };
 
-     static cfg_opt_t colors_opts[] = {
+     static cfg_opt_t layouts_opts[] =
+          {
+               CFG_STR_LIST("free", "[Free]", CFGF_NONE),
+               CFG_STR_LIST("tile", "[Tile]", CFGF_NONE),
+               CFG_STR_LIST("max", "[Max]", CFGF_NONE),
+               CFG_END()
+          };
 
-          CFG_INT("border_normal", 0x354B5C,  CFGF_NONE),
-          CFG_INT("border_focus",  0x6286A1,  CFGF_NONE),
-          CFG_INT("bar",           0x090909,  CFGF_NONE),
-          CFG_INT("text",          0x6289A1,  CFGF_NONE),
-          CFG_INT("tag_sel_fg",    0xFFFFFF,  CFGF_NONE),
-          CFG_INT("tag_sel_bg",    0x354B5C,  CFGF_NONE),
-          CFG_END()
-     };
+     static cfg_opt_t tag_opts[] =
+          {
+               CFG_STR("name", "", CFGF_NONE),
+               CFG_FLOAT("mwfact", 0.65, CFGF_NONE),
+               CFG_INT("nmaster", 1, CFGF_NONE),
+               CFG_STR("layout", "tile", CFGF_NONE),
+               CFG_END()
+          };
 
-     static cfg_opt_t layouts_opts[] = {
+     static cfg_opt_t tags_opts[] =
+          {
+               CFG_SEC("tag", tag_opts, CFGF_MULTI),
+               CFG_END()
+          };
 
-          CFG_STR_LIST("free", "[Free]", CFGF_NONE),
-          CFG_STR_LIST("tile", "[Tile]", CFGF_NONE),
-          CFG_STR_LIST("max", "[Max]", CFGF_NONE),
-          CFG_END()
-     };
+     static cfg_opt_t key_opts[] =
+          {
+               CFG_STR_LIST("mod","{Control}", CFGF_NONE),
+               CFG_STR("key", "None", CFGF_NONE),
+               CFG_STR("func", "", CFGF_NONE),
+               CFG_STR("cmd",  "", CFGF_NONE),
+               CFG_END()
+          };
 
-     static cfg_opt_t tag_opts[] = {
-          CFG_STR("name", "", CFGF_NONE),
-          CFG_FLOAT("mwfact", 0.65, CFGF_NONE),
-          CFG_INT("nmaster", 1, CFGF_NONE),
-          CFG_STR("layout", "tile", CFGF_NONE),
-          CFG_END()
-     };
+     static cfg_opt_t keys_opts[] =
+          {
+               CFG_SEC("key", key_opts, CFGF_MULTI),
+               CFG_END()
+          };
 
-     static cfg_opt_t tags_opts[] = {
+     static cfg_opt_t mouse_button_opts[] =
+          {
+               CFG_STR("button", "Button1", CFGF_NONE),
+               CFG_STR("func",   "",        CFGF_NONE),
+               CFG_STR("cmd",    "",        CFGF_NONE),
+               CFG_END()
+          };
 
-          CFG_SEC("tag", tag_opts, CFGF_MULTI),
-          CFG_END()
-     };
+     static cfg_opt_t button_opts[] =
+          {
+               CFG_STR("text", "", CFGF_NONE),
+               CFG_SEC("mouse",    mouse_button_opts, CFGF_MULTI),
+               CFG_INT("fg_color", 0x000000, CFGF_NONE),
+               CFG_INT("bg_color", 0xFFFFFF, CFGF_NONE),
+               CFG_INT("x", 0, CFGF_NONE),
+               CFG_END()
+          };
 
-     static cfg_opt_t key_opts[] = {
+     static cfg_opt_t buttons_opts[] =
+          {
 
-          CFG_STR_LIST("mod","{Control}", CFGF_NONE),
-          CFG_STR("key", "None", CFGF_NONE),
-          CFG_STR("func", "", CFGF_NONE),
-          CFG_STR("cmd",  "", CFGF_NONE),
-          CFG_END()
-     };
+               CFG_STR("buttons_font", "*-*-medium-*-10-*", CFGF_NONE),
+               CFG_SEC("button", button_opts, CFGF_MULTI),
+               CFG_END()
+          };
 
-     static cfg_opt_t keys_opts[] = {
-
-          CFG_SEC("key", key_opts, CFGF_MULTI),
-          CFG_END()
-     };
-
-     static cfg_opt_t mouse_button_opts[] = {
-
-          CFG_STR("button", "Button1", CFGF_NONE),
-          CFG_STR("func",   "",        CFGF_NONE),
-          CFG_STR("cmd",    "",        CFGF_NONE),
-          CFG_END()
-     };
-
-     static cfg_opt_t button_opts[] = {
-
-          CFG_STR("text", "", CFGF_NONE),
-          CFG_SEC("mouse",    mouse_button_opts, CFGF_MULTI),
-          CFG_INT("fg_color", 0x000000, CFGF_NONE),
-          CFG_INT("bg_color", 0xFFFFFF, CFGF_NONE),
-          CFG_INT("x", 0, CFGF_NONE),
-          CFG_END()
-     };
-
-     static cfg_opt_t buttons_opts[] = {
-
-          CFG_STR("buttons_font", "*-*-medium-*-10-*", CFGF_NONE),
-          CFG_SEC("button", button_opts, CFGF_MULTI),
-          CFG_END()
-     };
-
-     static cfg_opt_t opts[] = {
-
-          CFG_SEC("misc",    misc_opts,    CFGF_NONE),
-          CFG_SEC("colors",  colors_opts,  CFGF_NONE),
-          CFG_SEC("layouts", layouts_opts, CFGF_NONE),
-          CFG_SEC("tags",    tags_opts,    CFGF_NONE),
-          CFG_SEC("keys",    keys_opts,    CFGF_NONE),
-          CFG_SEC("buttons", buttons_opts, CFGF_NONE),
-          CFG_END()
-     };
+     static cfg_opt_t opts[] =
+          {
+               CFG_SEC("misc",    misc_opts,    CFGF_NONE),
+               CFG_SEC("colors",  colors_opts,  CFGF_NONE),
+               CFG_SEC("layouts", layouts_opts, CFGF_NONE),
+               CFG_SEC("tags",    tags_opts,    CFGF_NONE),
+               CFG_SEC("keys",    keys_opts,    CFGF_NONE),
+               CFG_SEC("buttons", buttons_opts, CFGF_NONE),
+               CFG_END()
+          };
 
      cfg_t *cfg;
      cfg_t *cfg_misc;
@@ -231,11 +245,13 @@ init_conf(void) {
 
      ret = cfg_parse(cfg, final_path);
 
-     if(ret == CFG_FILE_ERROR) {
+     if(ret == CFG_FILE_ERROR)
+     {
           printf("WMFS: parsing configuration file failed\n");
           exit(1);
      }
-     else if(ret == CFG_PARSE_ERROR) {
+     else if(ret == CFG_PARSE_ERROR)
+     {
           cfg_error(cfg, "WMFS: parsing configuration file %s failed.\n", final_path);
           exit(1);
      }
@@ -269,7 +285,8 @@ init_conf(void) {
 
      /* tag */
      conf.ntag = cfg_size(cfg_tags, "tag");
-     for(i=0; i < cfg_size(cfg_tags, "tag"); ++i) {
+     for(i=0; i < cfg_size(cfg_tags, "tag"); ++i)
+     {
           cfgtmp = cfg_getnsec(cfg_tags, "tag", i);
           conf.tag[i].name = strdup(cfg_getstr(cfgtmp, "name"));
           conf.tag[i].mwfact = cfg_getfloat(cfgtmp, "mwfact");
@@ -279,7 +296,8 @@ init_conf(void) {
 
      /* keybind ('tention ça rigole plus) */
      conf.nkeybind = cfg_size(cfg_keys, "key");
-     for(j = 0; j <  cfg_size(cfg_keys, "key"); ++j) {
+     for(j = 0; j <  cfg_size(cfg_keys, "key"); ++j)
+     {
           cfgtmp = cfg_getnsec(cfg_keys, "key", j);
 
           for(l = 0; l < cfg_size(cfgtmp, "mod"); ++l)
@@ -287,7 +305,8 @@ init_conf(void) {
 
           keys[j].keysym = XStringToKeysym(cfg_getstr(cfgtmp, "key"));
           keys[j].func = name_to_func(cfg_getstr(cfgtmp, "func"));
-          if(!keys[j].func) {
+          if(!keys[j].func)
+          {
                printf("WMFS Configuration: Unknow Function %s",cfg_getstr(cfgtmp, "func"));
                return;
           }
@@ -296,11 +315,13 @@ init_conf(void) {
 
      /* button */
      conf.nbutton = cfg_size(cfg_buttons, "button");
-     for(i = 0; i < conf.nbutton; ++i) {
+     for(i = 0; i < conf.nbutton; ++i)
+     {
           cfgtmp2 = cfg_getnsec(cfg_buttons, "button", i);
           if(cfg_getstr(cfg_buttons, "buttons_font"))
                conf.buttonfont = strdup(cfg_getstr(cfg_buttons, "buttons_font"));
-          for(j = 0; j < cfg_size(cfgtmp2, "mouse");  ++j) {
+          for(j = 0; j < cfg_size(cfgtmp2, "mouse");  ++j)
+          {
                cfgtmp3 = cfg_getnsec(cfgtmp2, "mouse", j);
                conf.barbutton[i].func[j] = name_to_func(cfg_getstr(cfgtmp3, "func"));
                conf.barbutton[i].cmd[j] = strdup(cfg_getstr(cfgtmp3, "cmd"));

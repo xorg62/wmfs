@@ -34,14 +34,17 @@
 
 /* BUTTONPRESS */
 void
-buttonpress(XEvent ev) {
+buttonpress(XEvent ev)
+{
      Client *c;
      int i, j;
      char s[6];
 
      /* Tbar'n'Button */
-     if(conf.ttbarheight) {
-          if((c = gettbar(ev.xbutton.window))) {
+     if(conf.ttbarheight)
+     {
+          if((c = gettbar(ev.xbutton.window)))
+          {
                raiseclient(c);
                if(ev.xbutton.button == Button1)
                     mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Move);
@@ -49,7 +52,9 @@ buttonpress(XEvent ev) {
                     tile_switch(NULL);
                else if(ev.xbutton.button == Button3)
                     mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Resize);
-          } else if((c = getbutton(ev.xbutton.window))) {
+          }
+          else if((c = getbutton(ev.xbutton.window)))
+          {
                if(ev.xbutton.button == Button1)
                     killclient(NULL);
                else if(ev.xbutton.button == Button3)
@@ -57,7 +62,8 @@ buttonpress(XEvent ev) {
           }
      }
      /* Window */
-     if((c = getclient(ev.xbutton.window))) {
+     if((c = getclient(ev.xbutton.window)))
+     {
           raiseclient(c);
           if(ev.xbutton.button == Button1)
                mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Move);
@@ -68,10 +74,13 @@ buttonpress(XEvent ev) {
      }
      /* Bar */
      /* for tag click */
-     else if(ev.xbutton.window == bar) {
-          for(i = 0; i < conf.ntag + 1; ++i) {
+     else if(ev.xbutton.window == bar)
+     {
+          for(i = 0; i < conf.ntag + 1; ++i)
+          {
                if(ev.xbutton.x > taglen[i-1]
-                  && ev.xbutton.x < taglen[i]) {
+                  && ev.xbutton.x < taglen[i])
+               {
                     ITOA(s, i);
                     if(ev.xbutton.button == Button1)
                          tag(s);
@@ -80,7 +89,8 @@ buttonpress(XEvent ev) {
                }
           }
           /* tag switch with scroll */
-          if(ev.xbutton.x < taglen[conf.ntag]) {
+          if(ev.xbutton.x < taglen[conf.ntag])
+          {
                if(ev.xbutton.button == Button4)
                     tag("+1");
                else if(ev.xbutton.button == Button5)
@@ -89,7 +99,8 @@ buttonpress(XEvent ev) {
           /* layout switch */
           if(ev.xbutton.x >= taglen[conf.ntag]
              && ev.xbutton.x < taglen[conf.ntag] +
-             (strlen((getlayoutsym(layout[seltag])))*fonty+3)) {
+             (strlen((getlayoutsym(layout[seltag])))*fonty+3))
+          {
                if(ev.xbutton.button == Button1
                   || ev.xbutton.button == Button4)
                     layoutswitch("+");
@@ -100,7 +111,8 @@ buttonpress(XEvent ev) {
      }
      /* Root */
      /* tag switch */
-     else if(ev.xbutton.window == root) {
+     else if(ev.xbutton.window == root)
+     {
           if(ev.xbutton.button == Button4)
                tag("+1");
           else if(ev.xbutton.button == Button5)
@@ -118,7 +130,8 @@ buttonpress(XEvent ev) {
 
 /* CONFIGUREREQUEST */
 void
-configurerequest(XEvent ev) {
+configurerequest(XEvent ev)
+{
      Client *c;
      XWindowChanges wc;
      if((c = getclient(ev.xconfigurerequest.window)))
@@ -141,15 +154,18 @@ configurerequest(XEvent ev) {
 
 /* DESTROYNOTIFY */
 void
-destroynotify(XEvent ev) {
+destroynotify(XEvent ev)
+{
      Client *c;
+
      if((c = getclient(ev.xdestroywindow.window)))
           unmanage(c);
 }
 
 /* ENTERNOTIFY */
 void
-enternotify(XEvent ev) {
+enternotify(XEvent ev)
+{
      Client *c;
 
      if(ev.xcrossing.mode != NotifyNormal
@@ -165,7 +181,8 @@ enternotify(XEvent ev) {
 
 /* FOCUSIN */
 void
-focusin(XEvent ev) {
+focusin(XEvent ev)
+{
      if(sel && ev.xfocus.window != sel->win)
           XSetInputFocus(dpy, sel->win, RevertToPointerRoot, CurrentTime);
      return;
@@ -173,7 +190,8 @@ focusin(XEvent ev) {
 
 /* KEYPRESS */
 void
-keypress(XEvent ev) {
+keypress(XEvent ev)
+{
      unsigned int i;
      KeySym keysym;
 
@@ -192,7 +210,8 @@ keypress(XEvent ev) {
 
 /* MAPPINGNOTIFY */
 void
-mapnotify(XEvent ev) {
+mapnotify(XEvent ev)
+{
      if(ev.xmapping.request == MappingKeyboard)
           grabkeys();
      return;
@@ -201,14 +220,16 @@ mapnotify(XEvent ev) {
 
 /* MAPREQUEST */
 void
-maprequest(XEvent ev) {
+maprequest(XEvent ev)
+{
      XWindowAttributes at;
 
      if(!XGetWindowAttributes(dpy, ev.xmaprequest.window, &at))
           return;
      if(at.override_redirect)
           return;
-     if(!getclient(ev.xmaprequest.window)) {
+     if(!getclient(ev.xmaprequest.window))
+     {
           focus(NULL);
           manage(ev.xmaprequest.window, &at);
      }
@@ -217,14 +238,17 @@ maprequest(XEvent ev) {
 
 /* PROPERTYNOTIFY */
 void
-propertynotify(XEvent ev) {
+propertynotify(XEvent ev)
+{
      Client *c;
      Window trans;
 
      if(event.xproperty.state == PropertyDelete)
           return;
-     if((c = getclient(event.xproperty.window))) {
-          switch(event.xproperty.atom) {
+     if((c = getclient(event.xproperty.window)))
+     {
+          switch(event.xproperty.atom)
+          {
           default: break;
           case XA_WM_TRANSIENT_FOR:
                XGetTransientForHint(dpy, c->win, &trans);
@@ -244,7 +268,8 @@ propertynotify(XEvent ev) {
 
 /* UNMAPNOTIFY */
 void
-unmapnotify(XEvent ev) {
+unmapnotify(XEvent ev)
+{
      Client *c;
 
      if((c = getclient(ev.xunmap.window)))
@@ -255,12 +280,14 @@ unmapnotify(XEvent ev) {
 
 /* Handle */
 void
-getevent(void) {
+getevent(void)
+{
      struct timeval tv;
 
      if(QLength(dpy) > 0)
           XNextEvent(dpy, &event);
-     else {
+     else
+     {
           XFlush(dpy);
           FD_ZERO(&fd);
           FD_SET(ConnectionNumber(dpy), &fd);

@@ -56,21 +56,20 @@
 #define ButtonMask   (ButtonPressMask | ButtonReleaseMask)
 #define MouseMask    (ButtonMask | PointerMotionMask)
 #define KeyMask      (KeyPressMask | KeyReleaseMask)
-#define CONTROL      ControlMask
 #define ALT          Mod1Mask
-#define SHIFT        ShiftMask
-#define ITOA(p,n)    sprintf(p,"%i",n)
+#define ITOA(p,n)    sprintf(p, "%i", n)
 #define debug(p)     printf("debug: %i\n", p)
 #define Move         0
 #define Resize       1
 #define MAXTAG       36
 #define NBUTTON      5
-#define BUTY(y)      (y - conf.ttbarheight + 3 + conf.borderheight-1)
+#define BUTY(y)      (y - conf.ttbarheight + 3)
 #define BUTH         (conf.ttbarheight - 6)
 
 /* Client Structure */
 typedef struct Client Client;
-struct Client {
+struct Client
+{
      char *title;          /* Client title */
      int tag;              /* Tag num */
      int x, y, w, h;       /* Window attribute */
@@ -90,7 +89,8 @@ struct Client {
 };
 
 /* Keybind Structure */
-typedef struct {
+typedef struct
+{
      unsigned long mod;
      KeySym keysym;
      void (*func)(char *cmd);
@@ -98,7 +98,8 @@ typedef struct {
 } Key;
 
 /* Bar Button */
-typedef struct {
+typedef struct
+{
      char *text;
      Window win;
      int fg_color;
@@ -111,7 +112,8 @@ typedef struct {
 } BarButton;
 
 /* Tag Structure */
-typedef struct {
+typedef struct
+{
      char *name;
      float mwfact;
      int nmaster;
@@ -119,14 +121,16 @@ typedef struct {
 } Tag;
 
 /* Configuration structure */
-typedef struct {
+typedef struct
+{
      char *font;
      char *buttonfont;
      bool raisefocus;
      bool raiseswitch;
      int borderheight;
      int ttbarheight;
-     struct {
+     struct
+     {
           int bordernormal;
           int borderfocus;
           int bar;
@@ -134,7 +138,8 @@ typedef struct {
           int tagselfg;
           int tagselbg;
      } colors;
-     struct {
+     struct
+     {
           char *free;
           char *tile;
           char *max;
@@ -146,6 +151,26 @@ typedef struct {
      int nbutton;
 } Conf;
 
+/* Config.c struct */
+typedef struct
+{
+     char *name;
+     void *func;
+} func_name_list_t;
+
+typedef struct
+{
+      char *name;
+      KeySym keysym;
+} key_name_list_t;
+
+typedef struct
+{
+     char *name;
+     unsigned int button;
+} name_to_uint_t;
+
+
 /* Enum */
 enum { CurNormal, CurResize, CurMove, CurInput, CurLast };
 enum { WMState, WMProtocols, WMName, WMDelete, WMLast };
@@ -153,6 +178,9 @@ enum { NetSupported, NetWMName, NetLast };
 enum { Free = 0, Tile, Max};
 
 /* Functions Prototypes */
+
+/* config.c */
+void init_conf(void);
 
 /* event.c */
 void buttonpress(XEvent ev);
