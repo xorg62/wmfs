@@ -1311,10 +1311,6 @@ main(int argc,char **argv)
           updatebar();
           getevent();
           updateall();
-          printf("X :");
-          debug(event.xbutton.x);
-          printf("T :");
-          debug(seltag);
      }
 
      XCloseDisplay(dpy);
