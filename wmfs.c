@@ -879,6 +879,9 @@ tag(char *cmd)
 {
      int tmp = atoi(cmd);
 
+     if(!tmp)
+          tmp = 1;
+
      if(cmd[0] == '+' || cmd[0] == '-')
      {
           if(tmp + seltag < 1
@@ -906,6 +909,10 @@ tagtransfert(char *cmd)
 
      if(!sel)
           return;
+
+     if(!n)
+          n = 1;
+
      sel->tag = n;
      arrange();
 }
@@ -1304,6 +1311,10 @@ main(int argc,char **argv)
           updatebar();
           getevent();
           updateall();
+          printf("X :");
+          debug(event.xbutton.x);
+          printf("T :");
+          debug(seltag);
      }
 
      XCloseDisplay(dpy);
