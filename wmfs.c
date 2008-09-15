@@ -45,8 +45,7 @@ arrange(void)
 
      focus(selbytag[seltag]);
      layoutfunc[seltag]();
-     updateall();
-}
+ }
 
 void
 attach(Client *c)
@@ -299,6 +298,7 @@ init(void)
      mw = DisplayWidth (dpy, screen);
      mh = DisplayHeight (dpy, screen);
      seltag = 1;
+     taglen[0] = 3;
      for(i = 0; i < conf.ntag+1; ++i)
      {
           mwfact[i] = conf.tag[i-1].mwfact;
@@ -368,9 +368,7 @@ init(void)
      bar = XCreateWindow(dpy, root, 0, 0, mw, barheight, 0, DefaultDepth(dpy, screen),
                          CopyFromParent, DefaultVisual(dpy, screen),
                          CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
-     XSetWindowBackground(dpy, bar, conf.colors.bar);
      XMapRaised(dpy, bar);
-     taglen[0] = 3;
      updatebar();
      updatebutton(0);
 
@@ -549,15 +547,17 @@ manage(Window w, XWindowAttributes *wa)
                                         conf.colors.bordernormal, conf.colors.bar);
           XSelectInput(dpy, c->tbar, ExposureMask | EnterWindowMask);
 
-          c->button = XCreateSimpleWindow(dpy, root, c->x + c->w - 10, BUTY(c->y),
-                                          5, BUTH, 1, conf.colors.bordernormal,
+          c->button = XCreateSimpleWindow(dpy, root, BUTX(c->x, c->w),
+                                          BUTY(c->y), BUTH, BUTH,
+                                          1, conf.colors.bordernormal,
                                           conf.colors.borderfocus);
      }
 
      XConfigureWindow(dpy, w, CWBorderWidth, &winc);
      setborder(w, conf.colors.bordernormal);
      grabbuttons(c, False);
-     XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask | PropertyChangeMask | StructureNotifyMask);
+     XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask
+                  | PropertyChangeMask | StructureNotifyMask);
      setsizehints(c);
      updatetitle(c);
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
@@ -643,6 +643,8 @@ mouseaction(Client *c, int x, int y, int type)
                                (ocx + (ev.xmotion.x - x)),
                                (ocy + (ev.xmotion.y - y)),
                                c->w, c->h, 1);
+
+               /* for don't pass on the bar */
                if(c->y < barheight + conf.ttbarheight - 5)
                {
                     moveresize(c, c->x, barheight+conf.ttbarheight, c->w, c->h, 1);
@@ -708,15 +710,16 @@ moveresize(Client *c, int x, int y, int w, int h, bool r)
           c->x = x; c->y = y;
           c->w = w; c->h = h;
 
+
           if((y-conf.ttbarheight) <= barheight)
-               y = barheight+conf.ttbarheight;
+          y = barheight+conf.ttbarheight;
 
           XMoveResizeWindow(dpy, c->win, x, y, w ,h);
 
           if(conf.ttbarheight)
           {
                XMoveResizeWindow(dpy, c->tbar, x, y - conf.ttbarheight, w, conf.ttbarheight);
-               XMoveResizeWindow(dpy, c->button, (x + w - 10), BUTY(y), 5, BUTH);
+               XMoveWindow(dpy, c->button, BUTX(x, w),  BUTY(y));
           }
           updateall();
           XSync(dpy, False);
@@ -1039,7 +1042,7 @@ unhide(Client *c)
      if(conf.ttbarheight)
      {
           XMoveWindow(dpy, c->tbar, c->x, (c->y - conf.ttbarheight));
-          XMoveWindow(dpy, c->button, (c->x + c->w -10), (c->y - 9));
+          XMoveWindow(dpy, c->button, BUTX(c->x, c->w), BUTY(c->y));
      }
 
      c->hide = False;
@@ -1082,23 +1085,25 @@ void
 updatebar(void)
 {
      int  i ,j;
-     char buf[conf.ntag][100];
-     char p[3];
-
+     char buf[conf.ntag][sizeof(char)];
+     char *p = malloc(sizeof(char));
      tm = localtime(&lt);
      lt = time(NULL);
 
-     XClearWindow(dpy, bar);
+     XSetForeground(dpy, gc, conf.colors.bar);
+     XFillRectangle(dpy, bar, gc, 0, 0, mw, barheight);
 
      for(i = 0; i < conf.ntag; ++i)
      {
+          /* Make the tags string */
           ITOA(p, clientpertag(i+1));
           sprintf(buf[i], "%s<%s> ", conf.tag[i].name, (clientpertag(i+1)) ? p : "");
-          taglen[i+1] = taglen[i] + fonty *
-               (strlen(conf.tag[i].name) + strlen(buf[i]) - strlen(conf.tag[i].name)) + fonty-4;
+          taglen[i+1] = (taglen[i] + fonty * (strlen(conf.tag[i].name) +
+                                              strlen(buf[i]) - strlen(conf.tag[i].name)) + fonty) - 2;
           /* Rectangle for the tag background */
           XSetForeground(dpy, gc, (i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar);
-          XFillRectangle(dpy, bar, gc, taglen[i] - 4, 0, (strlen(buf[i])*fonty), barheight);
+          XFillRectangle(dpy, bar, gc, taglen[i] - 3, 0, (strlen(buf[i])*fonty) -2, barheight);
+
           /* Draw tag */
           XSetForeground(dpy, gc, (i+1 == seltag) ? conf.colors.tagselfg : conf.colors.text);
           XDrawString(dpy, bar, gc, taglen[i], fonth, buf[i], strlen(buf[i]));
@@ -1114,7 +1119,7 @@ updatebar(void)
                  getlayoutsym(layout[seltag]),
                  strlen(getlayoutsym(layout[seltag])));
 
-    /* Draw status */
+     /* Draw status */
      sprintf(bartext,"mwfact: %.2f  nmaster: %i - %02i:%02i",
              mwfact[seltag],
              nmaster[seltag],
@@ -1129,8 +1134,11 @@ updatebar(void)
      /* Update Bar Buttons */
      updatebutton(1);
 
-     return;
+     free(p);
+     XSync(dpy, False);
+
 }
+
 
 /* if c is 0, you can execute this function for the first time
  * else the button is just updated */
@@ -1213,7 +1221,7 @@ updatetitle(Client *c)
      {
           XClearWindow(dpy, c->tbar);
           XSetForeground(dpy, gc, conf.colors.text);
-          XDrawString(dpy, c->tbar, gc, 5, fonth-1, c->title, strlen(c->title));
+          XDrawString(dpy, c->tbar, gc, 5, fonth-2, c->title, strlen(c->title));
      }
      return;
 }
@@ -1304,7 +1312,6 @@ main(int argc,char **argv)
           printf("WMFS: cannot open X server\n");
           exit(1);
      }
-
 
      /* Let's Go ! */
      init_conf();

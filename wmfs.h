@@ -50,6 +50,7 @@
 #include <X11/cursorfont.h>
 #include <X11/Xutil.h>
 #include <confuse.h>
+#include <pthread.h>
 #include "config.h"
 
 /* Defines */
@@ -63,8 +64,9 @@
 #define Resize       1
 #define MAXTAG       36
 #define NBUTTON      5
-#define BUTY(y)      (y - conf.ttbarheight + 3)
-#define BUTH         (conf.ttbarheight - 6)
+#define BUTY(y)      y - conf.ttbarheight + 3
+#define BUTH         conf.ttbarheight - 6
+#define BUTX(x, w)   x + w - BUTH/400
 
 /* Client Structure */
 typedef struct Client Client;
