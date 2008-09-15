@@ -11,19 +11,21 @@ misc
 
 colors
 {
-        border_normal = 0x354B5C
-        border_focus  = 0x6286A1
-        bar           = 0x090909
-        text          = 0x6289A1
-        tag_sel_fg    = 0xFFFFFF
-        tag_sel_bg    = 0x354B5C
+        border_normal = 0x3F485E
+        border_focus  = 0x7E89A2
+        bar           = 0x191919
+        text          = 0xD4D4D4
+        tag_sel_fg    = 0x000000
+        tag_sel_bg    = 0x7E89A2
+        layout_fg     = 0x000000
+        layout_bg     = 0x7E89A2
 }
 
 layouts
 {
-        free = "[Free]"
-        tile = "[Tile]"
-        max  = "[Max]"
+        free = "FREE"
+        tile = "TILE"
+        max  = "MAX"
 }
 
 tags
@@ -49,7 +51,7 @@ buttons
                 text = "[-]"
                 mouse { button = "Button1" func = "set_mwfact" cmd = "-0.01"}
                 fg_color = 0xFFFFFF
-                bg_color = 0x090909
+                bg_color = 0x191919
         }
         button
         {
@@ -62,7 +64,7 @@ buttons
                 text = "[+] "
                 mouse { button = "Button1" func = "set_mwfact" cmd = "+0.01"}
                 fg_color = 0xFFFFFF
-                bg_color = 0x090909
+                bg_color = 0x191919
         }
         # }}}
 
@@ -72,7 +74,7 @@ buttons
                 text = "[-]"
                 mouse { button = "Button1" func = "set_nmaster" cmd = "-1"}
                 fg_color = 0xFFFFFF
-                bg_color = 0x090909
+                bg_color = 0x191919
         }
         button { text = "Nmaster" fg_color = 0xFFFFFF bg_color = 0x3E3E3E }
         button
@@ -80,17 +82,9 @@ buttons
                 text = "[+] "
                 mouse { button = "Button1" func = "set_nmaster" cmd = "+1"}
                 fg_color = 0xFFFFFF
-                bg_color = 0x090909
+                bg_color = 0x191919
         }
         # }}}
-
-        button
-        {
-              text = "Terminal"
-              mouse { button = "Button1" func = "spawn" cmd = "urxvt" }
-              mouse { button = "Button3" func = "spawn" cmd = "xterm" }
-              fg_color = 0xFFFFFF bg_color = 0x3E3E3E
-        }
 }
 
 keys

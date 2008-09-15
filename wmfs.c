@@ -566,6 +566,8 @@ manage(Window w, XWindowAttributes *wa)
           c->tag = t->tag;
      if(!c->free)
           c->free = (rettrans == Success) || c->hint;
+     if(c->free)
+          raiseclient(c);
 
      attach(c);
      XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
@@ -734,12 +736,12 @@ raiseclient(Client *c)
 {
      if(!c)
           return;
-     XRaiseWindow(dpy,c->win);
+     XRaiseWindow(dpy, c->win);
 
      if(conf.ttbarheight)
      {
-          XRaiseWindow(dpy,c->tbar);
-          XRaiseWindow(dpy,c->button);
+          XRaiseWindow(dpy, c->tbar);
+          XRaiseWindow(dpy, c->button);
      }
      return;
 }
@@ -1033,11 +1035,11 @@ unhide(Client *c)
 
      if(!c)
           return;
-     XMoveWindow(dpy,c->win,c->x,c->y);
+     XMoveWindow(dpy, c->win, c->x, c->y);
      if(conf.ttbarheight)
      {
-          XMoveWindow(dpy,c->tbar,c->x, (c->y - conf.ttbarheight));
-          XMoveWindow(dpy,c->button, (c->x + c->w -10), (c->y - 9));
+          XMoveWindow(dpy, c->tbar, c->x, (c->y - conf.ttbarheight));
+          XMoveWindow(dpy, c->button, (c->x + c->w -10), (c->y - 9));
      }
 
      c->hide = False;
@@ -1088,7 +1090,7 @@ updatebar(void)
 
      XClearWindow(dpy, bar);
 
-     for(i=0; i<conf.ntag; ++i)
+     for(i = 0; i < conf.ntag; ++i)
      {
           ITOA(p, clientpertag(i+1));
           sprintf(buf[i], "%s<%s> ", conf.tag[i].name, (clientpertag(i+1)) ? p : "");
@@ -1103,9 +1105,12 @@ updatebar(void)
      }
 
      /* Draw layout symbol */
-     XSetForeground(dpy, gc, conf.colors.tagselfg);
-     XDrawString(dpy, bar, gc, taglen[conf.ntag] + 4,
-                 fonth-1,
+     XSetForeground(dpy, gc, conf.colors.layout_bg);
+     XFillRectangle(dpy, bar, gc, taglen[conf.ntag] - 5, 0,
+                    (strlen(getlayoutsym(layout[seltag]))*fonty) + 1, barheight);
+     XSetForeground(dpy, gc, conf.colors.layout_fg);
+     XDrawString(dpy, bar, gc, taglen[conf.ntag] - 4,
+                 fonth,
                  getlayoutsym(layout[seltag]),
                  strlen(getlayoutsym(layout[seltag])));
 
@@ -1118,8 +1123,8 @@ updatebar(void)
 
      j = strlen(bartext);
      XSetForeground(dpy, gc, conf.colors.text);
-     XDrawString(dpy, bar, gc, mw - j * fonty, fonth-1 , bartext ,j);
-     XDrawLine(dpy, bar, gc, mw- j * fonty-5 , 0 , mw - j * fonty-5, barheight);
+     XDrawString(dpy, bar, gc, mw - j * fonty, fonth-1, bartext ,j);
+     XDrawLine(dpy, bar, gc, mw- j * fonty-5, 0, mw - j * fonty-5, barheight);
 
      /* Update Bar Buttons */
      updatebutton(1);
@@ -1142,7 +1147,7 @@ updatebutton(Bool c)
      at.background_pixmap = ParentRelative;
      at.event_mask = ButtonPressMask | ExposureMask;
 
-     j = taglen[conf.ntag] + ((strlen(getlayoutsym(layout[seltag]))*fonty) + 10);
+     j = taglen[conf.ntag] + ((strlen(getlayoutsym(layout[seltag]))*fonty) + 2);
 
      XSetFont(dpy, gc, font_b->fid);
 

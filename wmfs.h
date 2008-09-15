@@ -137,6 +137,8 @@ typedef struct
           int text;
           int tagselfg;
           int tagselbg;
+          int layout_fg;
+          int layout_bg;
      } colors;
      struct
      {

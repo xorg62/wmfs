@@ -150,7 +150,8 @@ init_conf(void)
                CFG_INT("text",          0x6289A1,  CFGF_NONE),
                CFG_INT("tag_sel_fg",    0xFFFFFF,  CFGF_NONE),
                CFG_INT("tag_sel_bg",    0x354B5C,  CFGF_NONE),
-               CFG_END()
+               CFG_INT("layout_fg",     0xFFFFFF,  CFGF_NONE),
+               CFG_INT("layout_bg",     0x292929,  CFGF_NONE),            CFG_END()
           };
 
      static cfg_opt_t layouts_opts[] =
@@ -277,6 +278,8 @@ init_conf(void)
      conf.colors.text         = cfg_getint(cfg_colors, "text");
      conf.colors.tagselfg     = cfg_getint(cfg_colors, "tag_sel_fg");
      conf.colors.tagselbg     = cfg_getint(cfg_colors, "tag_sel_bg");
+     conf.colors.layout_fg    = cfg_getint(cfg_colors, "layout_fg");
+     conf.colors.layout_bg    = cfg_getint(cfg_colors, "layout_bg");
 
      /* layout */
      conf.layouts.free = strdup(cfg_getstr(cfg_layouts, "free"));
@@ -310,7 +313,8 @@ init_conf(void)
                printf("WMFS Configuration: Unknow Function %s",cfg_getstr(cfgtmp, "func"));
                return;
           }
-          keys[j].cmd = (!strdup(strdup(cfg_getstr(cfgtmp, "cmd")))) ? NULL : strdup(strdup(cfg_getstr(cfgtmp, "cmd")));
+          keys[j].cmd = (!strdup(strdup(cfg_getstr(cfgtmp, "cmd"))))
+               ?  NULL : strdup(strdup(cfg_getstr(cfgtmp, "cmd")));
      }
 
      /* button */
