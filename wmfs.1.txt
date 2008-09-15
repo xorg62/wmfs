@@ -4,7 +4,7 @@ wmfs(1)
 NAME
 ----
 
-WMFS - Window Manager From Scratch
+wmfs - Window Manager From Scratch
 
 SYNOPSIS
 --------
