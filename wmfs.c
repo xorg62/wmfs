@@ -1060,9 +1060,9 @@ unmanage(Client *c)
      sel = (sel == c) ? c->next : NULL;
      if(conf.ttbarheight)
      {
-          XUnmapWindow(dpy, c->tbar);
+          //    XUnmapWindow(dpy, c->tbar);
           XDestroyWindow(dpy, c->tbar);
-          XUnmapWindow(dpy, c->button);
+          // XUnmapWindow(dpy, c->button);
           XDestroyWindow(dpy, c->button);
      }
      detach(c);
