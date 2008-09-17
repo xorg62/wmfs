@@ -237,6 +237,7 @@ Client *nexttiled(Client *c);
 void raiseclient(Client *c);
 void scan(void);
 void setborder(Window win, int color);
+void setwinstate(Window win, long state);
 void set_mwfact(char *cmd);
 void set_nmaster(char *cmd);
 void setsizehints(Client *c);

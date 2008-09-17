@@ -267,8 +267,6 @@ grabkeys(void)
 void
 hide(Client *c)
 {
-     long data[] = { IconicState, None };
-
      if(!c)
           return;
 
@@ -278,11 +276,8 @@ hide(Client *c)
           XMoveWindow(dpy, c->tbar, c->x, c->y+mh*2);
           XMoveWindow(dpy, c->button, c->x, c->y+mh*2);
      }
-
+     setwinstate(c->win, IconicState);
      c->hide = True;
-     XChangeProperty(dpy, c->win, XInternAtom(dpy, "WM_STATE", False),
-                     XInternAtom(dpy, "WM_STATE", False),  32,
-                     PropModeReplace, (unsigned char *) data, 2);
 }
 
 void
@@ -442,33 +437,19 @@ keyresize(char *cmd)
 void
 killclient(char *cmd)
 {
-     int i, n;
-     Bool r = False;
-     Atom *a;
      XEvent ev;
 
-     if(!sel || ishide(sel))
+     if(!sel)
           return;
 
-     /* check is the client can be close
-        correctly, else it will be kill with XKillClient */
-     if(XGetWMProtocols(dpy, sel->win, &a, &n))
-          for(i = 0; !r && i < n; i++)
-               if(a[i] == wm_atom[WMDelete])
-                    r = True;
-     if(r)
-     {
-          ev.type = ClientMessage;
-          ev.xclient.window = sel->win;
-          ev.xclient.message_type = wm_atom[WMProtocols];
-          ev.xclient.format = 32;
-          ev.xclient.data.l[0] = wm_atom[WMDelete];
-          ev.xclient.data.l[1] = CurrentTime;
-          XSendEvent(dpy, sel->win, False, NoEventMask, &ev);
-     }
-     else
-          XKillClient(dpy, sel->win);
-     XFree(a);
+     ev.type = ClientMessage;
+     ev.xclient.window = sel->win;
+     ev.xclient.message_type = wm_atom[WMProtocols];
+     ev.xclient.format = 32;
+     ev.xclient.data.l[0] = wm_atom[WMDelete];
+     ev.xclient.data.l[1] = CurrentTime;
+     XSendEvent(dpy, sel->win, False, NoEventMask, &ev);
+
      return;
 }
 
@@ -573,6 +554,7 @@ manage(Window w, XWindowAttributes *wa)
      attach(c);
      XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
      mapclient(c);
+     setwinstate(c->win, NormalState);
      arrange();
      return;
 }
@@ -589,7 +571,8 @@ maxlayout(void)
      {
           c->tile = False;
           c->ox = c->x;
-          c->oy = c->y;
+
+         c->oy = c->y;
           c->ow = c->w;
           c->oh = c->h;
           moveresize(c, 0,
@@ -784,6 +767,14 @@ setborder(Window win, int color)
      XSetWindowBorder(dpy, win, color);
      XSetWindowBorderWidth(dpy, win, conf.borderheight);
      return;
+}
+
+void
+setwinstate(Window win, long state) {
+     long data[] = {state, None};
+
+     XChangeProperty(dpy, win, wm_atom[WMState], wm_atom[WMState], 32,
+                     PropModeReplace, (unsigned char *)data, 2);
 }
 
 void
@@ -1033,8 +1024,6 @@ togglemax(char *cmd)
 void
 unhide(Client *c)
 {
-     long data[] = { NormalState, None };
-
      if(!c)
           return;
      XMoveWindow(dpy, c->win, c->x, c->y);
@@ -1043,32 +1032,29 @@ unhide(Client *c)
           XMoveWindow(dpy, c->tbar, c->x, (c->y - conf.ttbarheight));
           XMoveWindow(dpy, c->button, BUTX(c->x, c->w), BUTY(c->y));
      }
-
+     setwinstate(c->win, NormalState);
      c->hide = False;
-     XChangeProperty(dpy, c->win, XInternAtom(dpy, "WM_STATE", False),
-                     XInternAtom(dpy, "WM_STATE", False),  32,
-                     PropModeReplace, (unsigned char *) data, 2);
 }
 
 void
 unmanage(Client *c)
 {
-     if(ishide(c))
-          return;
-
+     XGrabServer(dpy);
      XSetErrorHandler(errorhandlerdummy);
-     sel = (sel == c) ? c->next : NULL;
+     sel = ((sel == c) ? ((c->next) ? c->next : NULL) : NULL);
+     detach(c);
      if(conf.ttbarheight)
      {
-          //    XUnmapWindow(dpy, c->tbar);
+          XUnmapWindow(dpy, c->tbar);
           XDestroyWindow(dpy, c->tbar);
-          // XUnmapWindow(dpy, c->button);
+          XUnmapWindow(dpy, c->button);
           XDestroyWindow(dpy, c->button);
      }
-     detach(c);
+     setwinstate(c->win, WithdrawnState);
      free(c);
-     arrange();
      XSync(dpy, False);
+     XUngrabServer(dpy);
+     arrange();
      return;
 }
 
@@ -1221,7 +1207,9 @@ updatetitle(Client *c)
      {
           XClearWindow(dpy, c->tbar);
           XSetForeground(dpy, gc, conf.colors.text);
-          XDrawString(dpy, c->tbar, gc, 5, fonth-2, c->title, strlen(c->title));
+          XDrawString(dpy, c->tbar, gc, 3,
+                      ((fonth-2) + ((conf.ttbarheight - fonth) / 2)),
+                      c->title, strlen(c->title));
      }
      return;
 }
