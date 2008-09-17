@@ -265,7 +265,7 @@ Window bar;
 int screen;
 int mw, mh;
 Conf conf;
-Key keys[512];
+Key keys[1024];
 
 /* Atoms / Cursors */
 Atom wm_atom[WMLast];
@@ -286,7 +286,6 @@ int taglen[MAXTAG];
 /* Important Client */
 Client *clients;
 Client *sel;
-Client *selbytag[MAXTAG];
 
 /* Layout/Tile Important variables */
 float mwfact[MAXTAG];

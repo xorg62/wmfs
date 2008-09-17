@@ -33,6 +33,7 @@ set(CMAKE_C_FLAGS ${CFLAGS})
 set(LIBRARIES_TO_LINK
   X11
   confuse)
+
 target_link_libraries(wmfs ${LIBRARIES_TO_LINK})
 
 # Messages

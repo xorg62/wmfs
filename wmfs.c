@@ -43,7 +43,7 @@ arrange(void)
           else
                hide(c);
 
-     focus(selbytag[seltag]);
+     focus(NULL);
      layoutfunc[seltag]();
  }
 
@@ -116,7 +116,6 @@ focus(Client *c)
           grabbuttons(c, True);
 
      sel = c;
-     selbytag[seltag] = c;
 
      if(c)
      {
@@ -128,6 +127,8 @@ focus(Client *c)
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
           updatetitle(c);
      }
+     else
+          XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
      return;
 }
 
@@ -900,8 +901,6 @@ tag(char *cmd)
                return;
           seltag = tmp;
      }
-     if(selbytag[seltag])
-          focus(selbytag[seltag]);
 
      arrange();
      return;
@@ -1054,9 +1053,11 @@ unhide(Client *c)
 void
 unmanage(Client *c)
 {
+     if(ishide(c))
+          return;
+
      XSetErrorHandler(errorhandlerdummy);
      sel = (sel == c) ? c->next : NULL;
-     selbytag[seltag] = (selbytag[seltag] == c) ? c->next : NULL;
      if(conf.ttbarheight)
      {
           XUnmapWindow(dpy, c->tbar);
@@ -1138,7 +1139,6 @@ updatebar(void)
      XSync(dpy, False);
 
 }
-
 
 /* if c is 0, you can execute this function for the first time
  * else the button is just updated */

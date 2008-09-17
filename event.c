@@ -78,7 +78,7 @@ buttonpress(XEvent ev)
      {
           for(i = 0; i < conf.ntag + 1; ++i)
           {
-               if(ev.xbutton.x > taglen[i-1]
+               if(ev.xbutton.x > taglen[i-1] - 3
                   && ev.xbutton.x < taglen[i])
                {
                     ITOA(s, i);
@@ -99,7 +99,7 @@ buttonpress(XEvent ev)
           /* layout switch */
           if(ev.xbutton.x >= taglen[conf.ntag] - 3
              && ev.xbutton.x < taglen[conf.ntag] +
-             (strlen((getlayoutsym(layout[seltag])))*fonty+3)-3)
+             (strlen((getlayoutsym(layout[seltag])))*fonty+3) - 3)
           {
                if(ev.xbutton.button == Button1
                   || ev.xbutton.button == Button4)
