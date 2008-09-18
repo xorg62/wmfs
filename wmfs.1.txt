@@ -33,6 +33,8 @@ DEFAULT KEY BINDINGS
          Run a terminal
 *Alt + q*::
          Quit the selected client
+*Control-Alt-Shift + q*::
+         Exit WMFS
 *Control + m *::
          Toggle maximize the selected client
 *Alt + Tab*::

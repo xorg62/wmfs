@@ -191,6 +191,7 @@ void buttonpress(XEvent ev);
 void configurerequest(XEvent ev);
 void destroynotify(XEvent ev);
 void enternotify(XEvent ev);
+void expose(XEvent ev);
 void focusin(XEvent ev);
 void keypress(XEvent ev);
 void mapnotify(XEvent ev);
@@ -234,6 +235,7 @@ void maxlayout(void);
 void mouseaction(Client *c, int x, int y, int type);
 void moveresize(Client *c, int x, int y, int w, int h, bool r);
 Client *nexttiled(Client *c);
+void quit(char *cmd);
 void raiseclient(Client *c);
 void scan(void);
 void setborder(Window win, int color);
@@ -267,6 +269,7 @@ int screen;
 int mw, mh;
 Conf conf;
 Key keys[1024];
+Bool exiting;
 
 /* Atoms / Cursors */
 Atom wm_atom[WMLast];
@@ -283,6 +286,7 @@ int barheight;
 char bartext[1024];
 int seltag;
 int taglen[MAXTAG];
+Drawable dr;
 
 /* Important Client */
 Client *clients;

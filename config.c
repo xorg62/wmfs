@@ -47,7 +47,8 @@ func_name_list_t func_list[] =
      {"tag", tag},
      {"tagtransfert", tagtransfert},
      {"set_mwfact", set_mwfact},
-     {"set_nmaster", set_nmaster}
+     {"set_nmaster", set_nmaster},
+     {"quit", quit}
 };
 
 key_name_list_t key_list[] =

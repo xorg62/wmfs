@@ -45,6 +45,7 @@ arrange(void)
 
      focus(NULL);
      layoutfunc[seltag]();
+     updatebar();
  }
 
 void
@@ -358,6 +359,7 @@ init(void)
      XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &at);
 
      /* INIT BAR / BUTTON */
+     dr = XCreatePixmap(dpy, root, DisplayWidth(dpy, screen), barheight, DefaultDepth(dpy, screen));
      at.override_redirect = 1;
      at.background_pixmap = ParentRelative;
      at.event_mask = ButtonPressMask | ExposureMask;
@@ -460,20 +462,21 @@ layoutswitch(char *cmd)
      {
           switch(layout[seltag])
           {
-          case Free: tile();       break;
-          case Tile: maxlayout();  break;
-          case Max:  freelayout(); break;
+          case Free: layoutfunc[seltag] = tile; break;
+          case Tile: layoutfunc[seltag] = maxlayout;  break;
+          case Max:  layoutfunc[seltag] = freelayout; break;
           }
      }
      else if(cmd[0] == '-')
      {
           switch(layout[seltag])
           {
-          case Free: maxlayout();  break;
-          case Tile: freelayout(); break;
-          case Max:  tile(); break;
+          case Free: layoutfunc[seltag] = maxlayout;  break;
+          case Tile: layoutfunc[seltag] = freelayout; break;
+          case Max: layoutfunc[seltag] = tile; break;
           }
      }
+     arrange();
      return;
 }
 
@@ -694,9 +697,8 @@ moveresize(Client *c, int x, int y, int w, int h, bool r)
           c->x = x; c->y = y;
           c->w = w; c->h = h;
 
-
-          if((y-conf.ttbarheight) <= barheight)
-          y = barheight+conf.ttbarheight;
+          if((y - conf.ttbarheight) <= barheight)
+               y = barheight+conf.ttbarheight;
 
           XMoveResizeWindow(dpy, c->win, x, y, w ,h);
 
@@ -716,6 +718,12 @@ nexttiled(Client *c)
 {
      for(; c && (c->free || ishide(c)); c = c->next);
      return c;
+}
+
+void
+quit(char *cmd) {
+     exiting = True;
+     return;
 }
 
 void
@@ -1078,7 +1086,7 @@ updatebar(void)
      lt = time(NULL);
 
      XSetForeground(dpy, gc, conf.colors.bar);
-     XFillRectangle(dpy, bar, gc, 0, 0, mw, barheight);
+     XFillRectangle(dpy, dr, gc, 0, 0, mw, barheight);
 
      for(i = 0; i < conf.ntag; ++i)
      {
@@ -1089,19 +1097,19 @@ updatebar(void)
                                               strlen(buf[i]) - strlen(conf.tag[i].name)) + fonty) - 2;
           /* Rectangle for the tag background */
           XSetForeground(dpy, gc, (i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar);
-          XFillRectangle(dpy, bar, gc, taglen[i] - 3, 0, (strlen(buf[i])*fonty) -2, barheight);
+          XFillRectangle(dpy, dr, gc, taglen[i] - 3, 0, (strlen(buf[i])*fonty) -2, barheight);
 
           /* Draw tag */
           XSetForeground(dpy, gc, (i+1 == seltag) ? conf.colors.tagselfg : conf.colors.text);
-          XDrawString(dpy, bar, gc, taglen[i], fonth, buf[i], strlen(buf[i]));
+          XDrawString(dpy, dr, gc, taglen[i], fonth, buf[i], strlen(buf[i]));
      }
 
      /* Draw layout symbol */
      XSetForeground(dpy, gc, conf.colors.layout_bg);
-     XFillRectangle(dpy, bar, gc, taglen[conf.ntag] - 5, 0,
+     XFillRectangle(dpy, dr, gc, taglen[conf.ntag] - 5, 0,
                     (strlen(getlayoutsym(layout[seltag]))*fonty) + 1, barheight);
      XSetForeground(dpy, gc, conf.colors.layout_fg);
-     XDrawString(dpy, bar, gc, taglen[conf.ntag] - 4,
+     XDrawString(dpy, dr, gc, taglen[conf.ntag] - 4,
                  fonth,
                  getlayoutsym(layout[seltag]),
                  strlen(getlayoutsym(layout[seltag])));
@@ -1115,15 +1123,14 @@ updatebar(void)
 
      j = strlen(bartext);
      XSetForeground(dpy, gc, conf.colors.text);
-     XDrawString(dpy, bar, gc, mw - j * fonty, fonth-1, bartext ,j);
-     XDrawLine(dpy, bar, gc, mw- j * fonty-5, 0, mw - j * fonty-5, barheight);
+     XDrawString(dpy, dr, gc, mw - j * fonty, fonth-1, bartext ,j);
+     XDrawLine(dpy, dr, gc, mw- j * fonty-5, 0, mw - j * fonty-5, barheight);
 
+     XCopyArea(dpy, dr, bar, gc, 0, 0, mw, barheight, 0, 0);
+     XSync(dpy, False);
      /* Update Bar Buttons */
      updatebutton(1);
-
      free(p);
-     XSync(dpy, False);
-
 }
 
 /* if c is 0, you can execute this function for the first time
@@ -1305,13 +1312,24 @@ main(int argc,char **argv)
      init_conf();
      init();
      scan();
-
-     while(1)
+     updatebar();
+     while(!exiting)
      {
-          updatebar();
+          //    updatebar();
           getevent();
           updateall();
      }
+
+     /* exiting WMFS :'( */
+     XFreeFont(dpy, font);
+     XFreeFont(dpy, font_b);
+     XUngrabKey(dpy, AnyKey, AnyModifier, root);
+     XFreeCursor(dpy, cursor[CurNormal]);
+     XFreeCursor(dpy, cursor[CurMove]);
+     XFreeCursor(dpy, cursor[CurResize]);
+     XDestroyWindow(dpy, bar);
+     XSync(dpy, False);
+     XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 
      XCloseDisplay(dpy);
      return 0;

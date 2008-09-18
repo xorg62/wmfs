@@ -179,6 +179,16 @@ enternotify(XEvent ev)
      return;
 }
 
+/* EXPOSE */
+void
+expose(XEvent ev)
+{
+     if(ev.xexpose.count == 0
+        && (ev.xexpose.window == bar))
+          updatebar();
+     return;
+}
+
 /* FOCUSIN */
 void
 focusin(XEvent ev)
@@ -303,6 +313,7 @@ getevent(void)
      case ConfigureRequest:  configurerequest(event);  break;
      case DestroyNotify:     destroynotify(event);     break;
      case EnterNotify:       enternotify(event);       break;
+     case Expose:            expose(event);            break;
      case FocusIn:           focusin(event);           break;
      case KeyPress:          keypress(event);          break;
      case MapRequest:        maprequest(event);        break;
