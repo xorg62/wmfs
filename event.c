@@ -99,7 +99,7 @@ buttonpress(XEvent ev)
           /* layout switch */
           if(ev.xbutton.x >= taglen[conf.ntag] - 3
              && ev.xbutton.x < taglen[conf.ntag] +
-             (strlen((getlayoutsym(layout[seltag])))*fonty+3) - 3)
+             (strlen((getlayoutsym(seltag)))*fonty+3) - 3)
           {
                if(ev.xbutton.button == Button1
                   || ev.xbutton.button == Button4)
@@ -183,9 +183,16 @@ enternotify(XEvent ev)
 void
 expose(XEvent ev)
 {
+     Client *c;
+
      if(ev.xexpose.count == 0
         && (ev.xexpose.window == bar))
           updatebar();
+     for(c = clients; c; c = c->next)
+          if(conf.ttbarheight > 10
+             && ev.xexpose.window == c->tbar)
+               updatetitle(c);
+
      return;
 }
 

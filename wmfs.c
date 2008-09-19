@@ -44,7 +44,7 @@ arrange(void)
                hide(c);
 
      focus(NULL);
-     layoutfunc[seltag]();
+     tags[seltag].layout.func();
      updatebar();
  }
 
@@ -138,8 +138,7 @@ freelayout(void)
 {
      Client *c;
 
-     layout[seltag] = Free;
-     layoutfunc[seltag] = freelayout;
+     tags[seltag].layout.func = freelayout;
 
      for(c = clients; c; c = c->next)
      {
@@ -179,14 +178,15 @@ getnext(Client *c)
 }
 
 char*
-getlayoutsym(int l)
+getlayoutsym(int tag)
 {
-     switch(layout[seltag])
-     {
-     case Free: return conf.layouts.free; break;
-     case Tile: return conf.layouts.tile; break;
-     case Max:  return conf.layouts.max;  break;
-     }
+     if(tags[tag].layout.func == freelayout)
+          return conf.layouts.free;
+     else if(tags[tag].layout.func == tile)
+          return conf.layouts.tile;
+     else if(tags[tag].layout.func == maxlayout)
+          return conf.layouts.max;
+
      return NULL;
 }
 
@@ -296,18 +296,6 @@ init(void)
      mh = DisplayHeight (dpy, screen);
      seltag = 1;
      taglen[0] = 3;
-     for(i = 0; i < conf.ntag+1; ++i)
-     {
-          mwfact[i] = conf.tag[i-1].mwfact;
-          layout[i] = conf.tag[i-1].layout;
-          nmaster[i] = conf.tag[i-1].nmaster;
-          if(layout[i] == Tile)
-               layoutfunc[i] = tile;
-          else if(layout[i] == Max)
-               layoutfunc[i] = maxlayout;
-          else
-               layoutfunc[i] = freelayout;
-     }
 
      /* INIT FONT */
      font = XLoadQueryFont(dpy, conf.font);
@@ -458,24 +446,28 @@ killclient(char *cmd)
 void
 layoutswitch(char *cmd)
 {
+     void (*tmpfunc)(void);
+
      if(cmd[0] == '+')
      {
-          switch(layout[seltag])
-          {
-          case Free: layoutfunc[seltag] = tile; break;
-          case Tile: layoutfunc[seltag] = maxlayout;  break;
-          case Max:  layoutfunc[seltag] = freelayout; break;
-          }
+          if(tags[seltag].layout.func == freelayout)
+               tmpfunc = tile;
+          else if(tags[seltag].layout.func == tile)
+               tmpfunc = maxlayout;
+          else if(tags[seltag].layout.func == maxlayout)
+               tmpfunc = freelayout;
      }
      else if(cmd[0] == '-')
      {
-          switch(layout[seltag])
-          {
-          case Free: layoutfunc[seltag] = maxlayout;  break;
-          case Tile: layoutfunc[seltag] = freelayout; break;
-          case Max: layoutfunc[seltag] = tile; break;
-          }
+          if(tags[seltag].layout.func == freelayout)
+               tmpfunc = maxlayout;
+          else if(tags[seltag].layout.func == tile)
+               tmpfunc = freelayout;
+          else if(tags[seltag].layout.func == maxlayout)
+               tmpfunc = tile;
      }
+
+     tags[seltag].layout.func = tmpfunc;
      arrange();
      return;
 }
@@ -567,15 +559,14 @@ maxlayout(void)
 {
      Client *c;
 
-     layout[seltag] = Max;
-     layoutfunc[seltag] = maxlayout;
+     tags[seltag].layout.func = maxlayout;
 
      for(c = nexttiled(clients); c; c = nexttiled(c->next))
      {
           c->tile = False;
           c->ox = c->x;
 
-         c->oy = c->y;
+          c->oy = c->y;
           c->ow = c->w;
           c->oh = c->h;
           moveresize(c, 0,
@@ -792,11 +783,11 @@ set_mwfact(char *cmd)
 
      if(!(sscanf(cmd, "%lf", &c)))
         return;
-     if(mwfact[seltag] + c > 0.95
-        || mwfact[seltag] + c < 0.05
-        || layout[seltag] != Tile)
+     if(tags[seltag].mwfact + c > 0.95
+        || tags[seltag].mwfact + c < 0.05
+        || tags[seltag].layout.func != tile)
           return;
-     mwfact[seltag] += c;
+     tags[seltag].mwfact += c;
      arrange();
      return;
 }
@@ -806,9 +797,9 @@ set_nmaster(char *cmd)
 {
      int n = atoi(cmd);
 
-     if(nmaster[seltag] + n == 0)
+     if(tags[seltag].nmaster + n == 0)
           return;
-     nmaster[seltag] += n;
+     tags[seltag].nmaster += n;
      arrange();
      return;
 }
@@ -929,11 +920,10 @@ tile(void)
 
      bord    =  conf.borderheight * 2;
      barto   =  conf.ttbarheight + barheight;
-     mwf     =  mwfact[seltag] * mw;
-     nm      =  nmaster[seltag];
+     mwf     =  tags[seltag].mwfact * mw;
+     nm      =  tags[seltag].nmaster;
 
-     layout[seltag] = Tile;
-     layoutfunc[seltag] = tile;
+     tags[seltag].layout.func = tile;
 
      /* count all the "can-be-tiled" client */
      for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), n++);
@@ -1092,9 +1082,9 @@ updatebar(void)
      {
           /* Make the tags string */
           ITOA(p, clientpertag(i+1));
-          sprintf(buf[i], "%s<%s> ", conf.tag[i].name, (clientpertag(i+1)) ? p : "");
-          taglen[i+1] = (taglen[i] + fonty * (strlen(conf.tag[i].name) +
-                                              strlen(buf[i]) - strlen(conf.tag[i].name)) + fonty) - 2;
+          sprintf(buf[i], "%s<%s> ", tags[i].name, (clientpertag(i+1)) ? p : "");
+          taglen[i+1] = (taglen[i] + fonty * (strlen(tags[i].name) +
+                                              strlen(buf[i]) - strlen(tags[i].name)) + fonty) - 2;
           /* Rectangle for the tag background */
           XSetForeground(dpy, gc, (i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar);
           XFillRectangle(dpy, dr, gc, taglen[i] - 3, 0, (strlen(buf[i])*fonty) -2, barheight);
@@ -1107,17 +1097,17 @@ updatebar(void)
      /* Draw layout symbol */
      XSetForeground(dpy, gc, conf.colors.layout_bg);
      XFillRectangle(dpy, dr, gc, taglen[conf.ntag] - 5, 0,
-                    (strlen(getlayoutsym(layout[seltag]))*fonty) + 1, barheight);
+                    (strlen(getlayoutsym(seltag))*fonty) + 1, barheight);
      XSetForeground(dpy, gc, conf.colors.layout_fg);
      XDrawString(dpy, dr, gc, taglen[conf.ntag] - 4,
                  fonth,
-                 getlayoutsym(layout[seltag]),
-                 strlen(getlayoutsym(layout[seltag])));
+                 getlayoutsym(seltag),
+                 strlen(getlayoutsym(seltag)));
 
      /* Draw status */
      sprintf(bartext,"mwfact: %.2f  nmaster: %i - %02i:%02i",
-             mwfact[seltag],
-             nmaster[seltag],
+             tags[seltag].mwfact,
+             tags[seltag].nmaster,
              tm->tm_hour,
              tm->tm_min);
 
@@ -1128,6 +1118,7 @@ updatebar(void)
 
      XCopyArea(dpy, dr, bar, gc, 0, 0, mw, barheight, 0, 0);
      XSync(dpy, False);
+
      /* Update Bar Buttons */
      updatebutton(1);
      free(p);
@@ -1148,7 +1139,7 @@ updatebutton(Bool c)
      at.background_pixmap = ParentRelative;
      at.event_mask = ButtonPressMask | ExposureMask;
 
-     j = taglen[conf.ntag] + ((strlen(getlayoutsym(layout[seltag]))*fonty) + 2);
+     j = taglen[conf.ntag] + ((strlen(getlayoutsym(seltag))*fonty) + 2);
 
      XSetFont(dpy, gc, font_b->fid);
 
@@ -1186,6 +1177,7 @@ updatebutton(Bool c)
           }
      }
      XSetFont(dpy, gc, font->fid);
+     XSync(dpy, False);
      return;
 }
 
@@ -1313,9 +1305,9 @@ main(int argc,char **argv)
      init();
      scan();
      updatebar();
+
      while(!exiting)
      {
-          //    updatebar();
           getevent();
           updateall();
      }

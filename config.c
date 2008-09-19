@@ -51,6 +51,13 @@ func_name_list_t func_list[] =
      {"quit", quit}
 };
 
+func_name_list_t layout_list[] =
+{
+     {"tile", tile},
+     {"max", maxlayout},
+     {"free", freelayout}
+};
+
 key_name_list_t key_list[] =
 {
      {"Control", ControlMask},
@@ -72,13 +79,6 @@ name_to_uint_t mouse_button_list[] =
      {"Button3", Button3},
      {"Button4", Button4},
      {"Button5", Button5}
-};
-
-name_to_uint_t layout_list[] =
-{
-     {"tile", Tile},
-     {"max", Max},
-     {"free", Free}
 };
 
 void*
@@ -117,7 +117,7 @@ char_to_button(char *name)
      return 0;
 }
 
-unsigned int
+void*
 layout_name_to_layout(char *name)
 {
      int i;
@@ -125,7 +125,7 @@ layout_name_to_layout(char *name)
      if(name)
           for(i=0; layout_list[i].name; ++i)
                if(!strcmp(name, layout_list[i].name))
-                    return layout_list[i].button;
+                    return layout_list[i].func;
      return 0;
 }
 
@@ -289,13 +289,13 @@ init_conf(void)
 
      /* tag */
      conf.ntag = cfg_size(cfg_tags, "tag");
-     for(i=0; i < cfg_size(cfg_tags, "tag"); ++i)
+     for(i = 0; i < conf.ntag + 1; ++i)
      {
-          cfgtmp = cfg_getnsec(cfg_tags, "tag", i);
-          conf.tag[i].name = strdup(cfg_getstr(cfgtmp, "name"));
-          conf.tag[i].mwfact = cfg_getfloat(cfgtmp, "mwfact");
-          conf.tag[i].nmaster = cfg_getint(cfgtmp, "nmaster");
-          conf.tag[i].layout = layout_name_to_layout(cfg_getstr(cfgtmp, "layout"));
+          cfgtmp = cfg_getnsec(cfg_tags, "tag", ((i > 0) ? i - 1 : i));
+          tags[i].name = strdup(cfg_getstr(cfgtmp, "name"));
+          tags[i].mwfact = cfg_getfloat(cfgtmp, "mwfact");
+          tags[i].nmaster = cfg_getint(cfgtmp, "nmaster");
+          tags[i].layout.func = layout_name_to_layout(cfg_getstr(cfgtmp, "layout"));
      }
 
      /* keybind ('tention ça rigole plus) */

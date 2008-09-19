@@ -113,13 +113,20 @@ typedef struct
      unsigned int mouse[NBUTTON];
 } BarButton;
 
+/* Layout Structure */
+typedef struct
+{
+     char *symbol;
+     void (*func)(void);
+} Layout;
+
 /* Tag Structure */
 typedef struct
 {
      char *name;
      float mwfact;
      int nmaster;
-     int layout;
+     Layout layout;
 } Tag;
 
 /* Configuration structure */
@@ -148,7 +155,6 @@ typedef struct
           char *tile;
           char *max;
      } layouts;
-     Tag tag[MAXTAG];
      BarButton barbutton[64];
      int ntag;
      int nkeybind;
@@ -176,10 +182,9 @@ typedef struct
 
 
 /* Enum */
-enum { CurNormal, CurResize, CurMove, CurInput, CurLast };
+enum { CurNormal, CurResize, CurMove, CurLast };
 enum { WMState, WMProtocols, WMName, WMDelete, WMLast };
 enum { NetSupported, NetWMName, NetLast };
-enum { Free = 0, Tile, Max};
 
 /* Functions Prototypes */
 
@@ -216,7 +221,7 @@ void freelayout(void);
 Client* getbutton(Window w);
 Client* getclient(Window w);
 Client* getnext(Client *c);
-char* getlayoutsym(int l);
+char* getlayoutsym(int tag);
 Client* gettbar(Window w);
 void grabbuttons(Client *c, Bool focused);
 void grabkeys(void);
@@ -282,6 +287,7 @@ int fonth, fonty;
 
 /* Bar / Tags */
 Window bar;
+Tag tags[MAXTAG];
 int barheight;
 char bartext[1024];
 int seltag;
@@ -291,12 +297,6 @@ Drawable dr;
 /* Important Client */
 Client *clients;
 Client *sel;
-
-/* Layout/Tile Important variables */
-float mwfact[MAXTAG];
-int nmaster[MAXTAG];
-int layout[MAXTAG];
-void (*layoutfunc[MAXTAG])(void);
 
 /* Other */
 unsigned int numlockmask;
