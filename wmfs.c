@@ -350,7 +350,7 @@ init(void)
      if(conf.bartop)
           bary = 0;
      else
-          bary = mh-barheight;
+          bary = mh - barheight;
      dr = XCreatePixmap(dpy, root, DisplayWidth(dpy, screen), barheight, DefaultDepth(dpy, screen));
      at.override_redirect = 1;
      at.background_pixmap = ParentRelative;
@@ -919,7 +919,7 @@ void
 tile(void)
 {
      unsigned int i, n, x, y, yt, w, h, ww, hh, th;
-     unsigned int barto, bord, mwf, nm, mht, bordbottom;
+     unsigned int barto, bord, mwf, nm, mht;
      Client *c;
 
      bord    =  conf.borderheight * 2;
@@ -946,10 +946,7 @@ tile(void)
      y = yt = barto;
 
      if(!conf.bartop)
-     {
-          bordbottom = ((conf.borderheight < 2) ? conf.borderheight : 0);
-          y = yt = conf.ttbarheight + bordbottom;
-     }
+          y = yt = conf.ttbarheight;
 
      for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), i++)
      {
@@ -966,7 +963,7 @@ tile(void)
                /* remainder */
                if(i + 1 == (n < nm ? n : nm))
                     h = (mht - hh*i) -
-                         ((conf.bartop) ? barheight : bordbottom);
+                         ((conf.bartop) ? barheight : 0);
                h -= bord + conf.ttbarheight;
           }
           /* TILE CLIENT */

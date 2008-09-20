@@ -298,7 +298,7 @@ init_conf(void)
      conf.ntag = cfg_size(cfg_tags, "tag");
      for(i = 0; i < conf.ntag + 1; ++i)
      {
-          cfgtmp = cfg_getnsec(cfg_tags, "tag", ((i > 0) ? i - 1 : i));
+          cfgtmp = cfg_getnsec(cfg_tags, "tag", ((i == conf.ntag) ? conf.ntag - 1 : i));
           tags[i].name = strdup(cfg_getstr(cfgtmp, "name"));
           tags[i].mwfact = cfg_getfloat(cfgtmp, "mwfact");
           tags[i].nmaster = cfg_getint(cfgtmp, "nmaster");
