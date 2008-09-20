@@ -459,28 +459,25 @@ killclient(char *cmd)
 void
 layoutswitch(char *cmd)
 {
-     void (*tmpfunc)(void);
-
      if(cmd[0] == '+')
      {
           if(tags[seltag].layout.func == freelayout)
-               tmpfunc = tile;
+               tags[seltag].layout.func = tile;
           else if(tags[seltag].layout.func == tile)
-               tmpfunc = maxlayout;
+               tags[seltag].layout.func = maxlayout;
           else if(tags[seltag].layout.func == maxlayout)
-               tmpfunc = freelayout;
+               tags[seltag].layout.func = freelayout;
      }
      else if(cmd[0] == '-')
      {
           if(tags[seltag].layout.func == freelayout)
-               tmpfunc = maxlayout;
+               tags[seltag].layout.func = maxlayout;
           else if(tags[seltag].layout.func == tile)
-               tmpfunc = freelayout;
+               tags[seltag].layout.func = freelayout;
           else if(tags[seltag].layout.func == maxlayout)
-               tmpfunc = tile;
+               tags[seltag].layout.func = tile;
      }
 
-     tags[seltag].layout.func = tmpfunc;
      arrange();
      return;
 }
