@@ -294,8 +294,17 @@ init(void)
      root = RootWindow (dpy, screen);
      mw = DisplayWidth (dpy, screen);
      mh = DisplayHeight (dpy, screen);
-     seltag = 1;
      taglen[0] = 3;
+
+     /* INIT TAG / LAYOUT ATTRIBUTE */
+     seltag = 1;
+     for(i = 0; i < conf.ntag + 1; ++i)
+     {
+          tags[i].nmaster     =  conf.tag[i-1].nmaster;
+          tags[i].mwfact      =  conf.tag[i-1].mwfact;
+          tags[i].name        =  conf.tag[i-1].name;
+          tags[i].layout.func =  conf.tag[i-1].layout.func;
+     }
 
      /* INIT FONT */
      font = XLoadQueryFont(dpy, conf.font);
@@ -954,6 +963,7 @@ tile(void)
           c->tile = True;
           c->ox = c->x; c->oy = c->y;
           c->ow = c->w; c->oh = c->h;
+
           /* MASTER CLIENT */
           if(i < nm)
           {
@@ -1115,9 +1125,9 @@ updatebar(void)
      {
           /* Make the tags string */
           ITOA(p, clientpertag(i+1));
-          sprintf(buf[i], "%s<%s> ", tags[i].name, (clientpertag(i+1)) ? p : "");
-          taglen[i+1] = (taglen[i] + fonty * (strlen(tags[i].name) +
-                                              strlen(buf[i]) - strlen(tags[i].name)) + fonty) - 2;
+          sprintf(buf[i], "%s<%s> ", tags[i+1].name , (clientpertag(i+1)) ? p : "");
+          taglen[i+1] = (taglen[i] + fonty * (strlen( tags[i+1].name ) +
+                                              strlen(buf[i]) - strlen(tags[i+1].name)) + fonty) - 2;
           /* Rectangle for the tag background */
           XSetForeground(dpy, gc, (i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar);
           XFillRectangle(dpy, dr, gc, taglen[i] - 3, 0, (strlen(buf[i])*fonty) -2, barheight);

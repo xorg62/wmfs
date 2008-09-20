@@ -156,6 +156,7 @@ typedef struct
           char *tile;
           char *max;
      } layouts;
+     Tag tag[MAXTAG];
      BarButton barbutton[64];
      int ntag;
      int nkeybind;

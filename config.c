@@ -32,7 +32,7 @@
 
 #include "wmfs.h"
 
-#define FILE_NAME   ".wmfsrc"
+#define FILE_NAME   ".config/wmfs/wmfsrc"
 
 func_name_list_t func_list[] =
 {
@@ -241,23 +241,19 @@ init_conf(void)
      cfg_t *cfg_buttons;
      cfg_t *cfgtmp, *cfgtmp2, *cfgtmp3;
      char final_path[128];
+     char sfinal_path[128];
      int ret, i, j, l;
 
      sprintf(final_path,"%s/%s",strdup(getenv("HOME")),strdup(FILE_NAME));
 
      cfg = cfg_init(opts, CFGF_NONE);
-
      ret = cfg_parse(cfg, final_path);
 
-     if(ret == CFG_FILE_ERROR)
+     if(ret == CFG_FILE_ERROR || ret == CFG_PARSE_ERROR)
      {
-          printf("WMFS: parsing configuration file failed\n");
-          exit(1);
-     }
-     else if(ret == CFG_PARSE_ERROR)
-     {
-          cfg_error(cfg, "WMFS: parsing configuration file %s failed.\n", final_path);
-          exit(1);
+          printf("WMFS: parsing configuration file (%s) failed\n", final_path);
+          sprintf(sfinal_path, "%s/wmfs/wmfsrc", XDG_CONFIG_DIR);
+          ret = cfg_parse(cfg, sfinal_path);
      }
 
      cfg_misc    = cfg_getsec(cfg, "misc");
@@ -296,14 +292,16 @@ init_conf(void)
 
      /* tag */
      conf.ntag = cfg_size(cfg_tags, "tag");
-     for(i = 0; i < conf.ntag + 1; ++i)
+     for(i = 0; i < cfg_size(cfg_tags, "tag"); ++i)
      {
-          cfgtmp = cfg_getnsec(cfg_tags, "tag", ((i == conf.ntag) ? conf.ntag - 1 : i));
-          tags[i].name = strdup(cfg_getstr(cfgtmp, "name"));
-          tags[i].mwfact = cfg_getfloat(cfgtmp, "mwfact");
-          tags[i].nmaster = cfg_getint(cfgtmp, "nmaster");
-          tags[i].layout.func = layout_name_to_layout(cfg_getstr(cfgtmp, "layout"));
+          cfgtmp = cfg_getnsec(cfg_tags, "tag", i);
+          conf.tag[i].name = strdup(cfg_getstr(cfgtmp, "name"));
+          conf.tag[i].mwfact = cfg_getfloat(cfgtmp, "mwfact");
+          conf.tag[i].nmaster = cfg_getint(cfgtmp, "nmaster");
+          conf.tag[i].layout.func = layout_name_to_layout(cfg_getstr(cfgtmp, "layout"));
      }
+
+     debug(tags[1].mwfact);
 
      /* keybind ('tention ça rigole plus) */
      conf.nkeybind = cfg_size(cfg_keys, "key");
