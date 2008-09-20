@@ -1,6 +1,5 @@
-  · Configure CPack to generate archive package
-  · Add XPM support
-  · Add colors gradation for bar and titlebar maybe
+  · Can change client position in the tile grid
+  · Add images support
   · Multi-Head support
   · Fix all the bug \o/
   · XCB ?
