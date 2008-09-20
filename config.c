@@ -48,7 +48,8 @@ func_name_list_t func_list[] =
      {"tagtransfert", tagtransfert},
      {"set_mwfact", set_mwfact},
      {"set_nmaster", set_nmaster},
-     {"quit", quit}
+     {"quit", quit},
+     {"togglebarpos", togglebarpos},
 };
 
 func_name_list_t layout_list[] =
@@ -135,7 +136,8 @@ init_conf(void)
 
      static cfg_opt_t misc_opts[] =
           {
-               CFG_STR("font",              "*-fixed-medium-*-12-*",  CFGF_NONE),
+               CFG_STR("font",               "*-fixed-medium-*-12-*", CFGF_NONE),
+               CFG_STR("bar_position",       "top",                   CFGF_NONE),
                CFG_BOOL("raisefocus",        cfg_false,               CFGF_NONE),
                CFG_BOOL("raiseswitch",       cfg_true,                CFGF_NONE),
                CFG_INT("border_height",      1,                       CFGF_NONE),
@@ -271,6 +273,11 @@ init_conf(void)
      conf.raiseswitch    = cfg_getbool(cfg_misc,       "raiseswitch");
      conf.borderheight   = cfg_getint(cfg_misc,        "border_height");
      conf.ttbarheight    = cfg_getint(cfg_misc,        "titlebar_height");
+
+     if( strcmp( strdup(cfg_getstr(cfg_misc, "bar_position")) ,"top" ) == 0)
+          conf.bartop = True;
+     else
+          conf.bartop = False;
 
      /* colors */
      conf.colors.bordernormal = cfg_getint(cfg_colors, "border_normal");

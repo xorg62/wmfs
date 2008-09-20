@@ -136,6 +136,7 @@ typedef struct
      char *buttonfont;
      bool raisefocus;
      bool raiseswitch;
+     bool bartop;
      int borderheight;
      int ttbarheight;
      struct
@@ -252,6 +253,7 @@ void tag(char *cmd);
 void tagtransfert(char *cmd);
 void tile(void);
 void tile_switch(char *cmd);
+void togglebarpos(char *cmd);
 void togglemax(char *cmd);
 void unhide(Client *c);
 void unmanage(Client *c);
@@ -293,6 +295,7 @@ char bartext[1024];
 int seltag;
 int taglen[MAXTAG];
 Drawable dr;
+int bary;
 
 /* Important Client */
 Client *clients;

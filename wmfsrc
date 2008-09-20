@@ -3,6 +3,7 @@
 misc
 {
         font =            "*-fixed-medium-*-12-*"
+        bar_position =    "top"
         raisefocus =      false
         raiseswitch =     true
         border_height =   1
@@ -94,6 +95,7 @@ keys
         key { mod = {"Control"} key = "Return" func = "spawn" cmd = "urxvt" }
         key { mod = {"Alt"} key = "q" func = "killclient" }
         key { mod = {"Control"} key = "m" func = "togglemax" }
+        key { mod = {"Control"} key = "b" func = "togglebarpos" }
         key { mod = {"Alt"} key = "Tab" func = "wswitch" cmd = "+" }
         key { mod = {"Alt","Shift"} key = "Tab" func = "wswitch" cmd = "-" }
         key { mod = {"Control"} key = "Right" func = "tag" cmd = "+1" }

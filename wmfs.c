@@ -347,11 +347,15 @@ init(void)
      XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &at);
 
      /* INIT BAR / BUTTON */
+     if(conf.bartop)
+          bary = 0;
+     else
+          bary = mh-barheight;
      dr = XCreatePixmap(dpy, root, DisplayWidth(dpy, screen), barheight, DefaultDepth(dpy, screen));
      at.override_redirect = 1;
      at.background_pixmap = ParentRelative;
      at.event_mask = ButtonPressMask | ExposureMask;
-     bar = XCreateWindow(dpy, root, 0, 0, mw, barheight, 0, DefaultDepth(dpy, screen),
+     bar = XCreateWindow(dpy, root, 0, bary, mw, barheight, 0, DefaultDepth(dpy, screen),
                          CopyFromParent, DefaultVisual(dpy, screen),
                          CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
      XMapRaised(dpy, bar);
@@ -565,12 +569,11 @@ maxlayout(void)
      {
           c->tile = False;
           c->ox = c->x;
-
           c->oy = c->y;
           c->ow = c->w;
           c->oh = c->h;
-          moveresize(c, 0,
-                     conf.ttbarheight + barheight,
+
+          moveresize(c, 0, (conf.ttbarheight + ((conf.bartop) ? barheight : 0)),
                      (mw-(conf.borderheight * 2)),
                      (mh-(conf.borderheight * 2) - conf.ttbarheight - barheight), 0);
           c->max = True;
@@ -623,7 +626,7 @@ mouseaction(Client *c, int x, int y, int type)
                                c->w, c->h, 1);
 
                /* for don't pass on the bar */
-               if(c->y < barheight + conf.ttbarheight - 5)
+               if(conf.bartop && c->y < barheight + conf.ttbarheight - 5)
                {
                     moveresize(c, c->x, barheight+conf.ttbarheight, c->w, c->h, 1);
                     XUngrabPointer(dpy, CurrentTime);
@@ -688,8 +691,9 @@ moveresize(Client *c, int x, int y, int w, int h, bool r)
           c->x = x; c->y = y;
           c->w = w; c->h = h;
 
-          if((y - conf.ttbarheight) <= barheight)
-               y = barheight+conf.ttbarheight;
+          if(conf.bartop)
+               if((y - conf.ttbarheight) <= barheight)
+                    y = barheight+conf.ttbarheight;
 
           XMoveResizeWindow(dpy, c->win, x, y, w ,h);
 
@@ -914,14 +918,15 @@ tagtransfert(char *cmd)
 void
 tile(void)
 {
-     unsigned int i, n, x, y, w, h, ww, hh, th;
-     unsigned int barto, bord, mwf, nm;
+     unsigned int i, n, x, y, yt, w, h, ww, hh, th;
+     unsigned int barto, bord, mwf, nm, mht, bordbottom;
      Client *c;
 
      bord    =  conf.borderheight * 2;
      barto   =  conf.ttbarheight + barheight;
      mwf     =  tags[seltag].mwfact * mw;
      nm      =  tags[seltag].nmaster;
+     mht     =  mh - ((conf.bartop) ? 0 : barheight);
 
      tags[seltag].layout.func = tile;
 
@@ -931,14 +936,20 @@ tile(void)
           return;
 
      /* window geoms */
-     hh = ((n <= nm) ? mh / (n > 0 ? n : 1) : mh / nm) - bord*2;
+     hh = ((n <= nm) ? mht / (n > 0 ? n : 1) : mht / nm) - bord*2;
      ww = (n  <= nm) ? mw : mwf;
-     th = (n  >  nm) ? mh / (n - nm) : 0;
+     th = (n  >  nm) ? mht / (n - nm) : 0;
      if(n > nm && th < barheight)
-          th = mh;
+          th = mht;
 
      x = 0;
-     y = barto;
+     y = yt = barto;
+
+     if(!conf.bartop)
+     {
+          bordbottom = ((conf.borderheight < 2) ? conf.borderheight : 0);
+          y = yt = conf.ttbarheight + bordbottom;
+     }
 
      for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), i++)
      {
@@ -949,12 +960,13 @@ tile(void)
           /* MASTER CLIENT */
           if(i < nm)
           {
-               y = barto + i * hh;
+               y = yt + i * hh;
                w = ww - bord;
                h = hh;
                /* remainder */
                if(i + 1 == (n < nm ? n : nm))
-                    h = (mh - hh*i) - barheight ;
+                    h = (mht - hh*i) -
+                         ((conf.bartop) ? barheight : bordbottom);
                h -= bord + conf.ttbarheight;
           }
           /* TILE CLIENT */
@@ -962,18 +974,18 @@ tile(void)
           {
                if(i == nm)
                {
-                    y = barto;
+                    y = yt;
                     x += ww;
                }
                w = mw - ww - bord;
                /* remainder */
                if(i + 1 == n)
-                    h = (barto + mh) - y - (bord + barto);
+                    h = (barto + mht) - y - (bord + barto);
                else
                     h = th - (bord + conf.ttbarheight) - bord*2;
           }
           moveresize(c, x, y, w, h, 0);
-          if(n > nm && th != mh)
+          if(n > nm && th != mht)
                y = c->y + c->h + bord + conf.ttbarheight;
      }
      return;
@@ -993,7 +1005,32 @@ tile_switch(char *cmd)
      attach(c);
      focus(c);
      arrange();
+
+     return;
 }
+
+void
+togglebarpos(char *cmd)
+{
+     int i;
+
+     conf.bartop = !conf.bartop;
+     if(conf.bartop)
+          bary = 0;
+     else
+          bary = mh - barheight;
+     XMoveWindow(dpy, bar, 0, bary);
+     updatebar();
+     for(i = 0; i < conf.nbutton; ++i)
+          XUnmapWindow(dpy, conf.barbutton[i].win);
+     updatebutton(0);
+     for(i = 0; i < conf.nbutton; ++i)
+          XMapWindow(dpy, conf.barbutton[i].win);
+     arrange();
+
+     return;
+}
+
 
 void
 togglemax(char *cmd)
@@ -1004,8 +1041,7 @@ togglemax(char *cmd)
      {
           sel->ox = sel->x; sel->oy = sel->y;
           sel->ow = sel->w; sel->oh = sel->h;
-          moveresize(sel, 0,
-                     conf.ttbarheight + barheight,
+          moveresize(sel, 0, (conf.ttbarheight + ((conf.bartop) ? barheight : 0)),
                      (mw-(conf.borderheight * 2)),
                      (mh-(conf.borderheight * 2)- conf.ttbarheight - barheight), 0);
           raiseclient(sel);
@@ -1140,6 +1176,9 @@ updatebutton(Bool c)
      at.event_mask = ButtonPressMask | ExposureMask;
 
      j = taglen[conf.ntag] + ((strlen(getlayoutsym(seltag))*fonty) + 2);
+
+     if(!conf.bartop)
+          y = bary + 3;
 
      XSetFont(dpy, gc, font_b->fid);
 
@@ -1312,7 +1351,7 @@ main(int argc,char **argv)
           updateall();
      }
 
-     /* exiting WMFS :'( */
+     /* Exiting WMFS :'( */
      XFreeFont(dpy, font);
      XFreeFont(dpy, font_b);
      XUngrabKey(dpy, AnyKey, AnyModifier, root);
