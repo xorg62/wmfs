@@ -40,5 +40,6 @@
 #define WMFS_COMPILE_BY         "@WMFS_COMPILE_BY@"
 #define WMFS_COMPILE_FLAGS      "@WMFS_COMPILE_FLAGS@"
 #define WMFS_LINKED_LIBS        "@WMFS_LINKED_LIBS@"
+#define XDG_CONFIG_DIR          "@XDG_CONFIG_DIR@"
 
 #endif /* CONFIG_H */

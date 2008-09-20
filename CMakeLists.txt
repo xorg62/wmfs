@@ -67,28 +67,6 @@ a_find_program(ASCIIDOC_EXECUTABLE asciidoc FALSE)
 a_find_program(XMLTO_EXECUTABLE xmlto FALSE)
 a_find_program(GZIP_EXECUTABLE gzip FALSE)
 a_find_program(CAT_EXECUTABLE cat TRUE)
-# Remplace strings in configs
-set(WMFS_VERSION ${VERSION})
-set(WMFS_COMPILE_MACHINE ${CMAKE_SYSTEM_PROCESSOR})
-set(WMFS_COMPILE_BY $ENV{USER})
-set(WMFS_COMPILE_FLAGS ${CFLAGS})
-set(WMFS_LINKED_LIBS ${LIBRARIES_TO_LINK})
-# Configure files
-set(wmfs_configure_files
-  config.h.in)
-
-macro(a_configure_file file)
-    string(REGEX REPLACE ".in\$" "" outfile ${file})
-    message(STATUS "Configuring ${outfile}")
-    configure_file(${SOURCE_DIR}/${file}
-                   ${SOURCE_DIR}/${outfile}
-                   ESCAPE_QUOTE
-                   @ONLY)
-endmacro()
-
-foreach(file ${wmfs_configure_files})
-    a_configure_file(${file})
-endforeach()
 
 # Generating CHANGELOG
 
@@ -120,6 +98,22 @@ if(GENERATE_MANPAGES)
         message(STATUS "Not generating manpages. Missing: " ${missing})
         set(GENERATE_MANPAGES OFF)
     endif()
+endif()
+
+#If a sysconfdir is specified, use it instead
+#of the default configuration dir.
+if(DEFINED SYSCONFDIR)
+    set(SYSCONFDIR ${SYSCONFDIR} CACHE PATH "config directory")
+else()
+    set(SYSCONFDIR /etc CACHE PATH "config directory")
+endif()
+
+#If an XDG Config Dir is specificed, use it instead
+#of the default XDG configuration dir.
+if(DEFINED XDG_CONFIG_DIR)
+    set(XDG_CONFIG_DIR ${XDG_CONFIG_SYS} CACHE PATH "xdg config directory")
+else()
+    set(XDG_CONFIG_DIR ${SYSCONFDIR}/xdg CACHE PATH "xdg config directory")
 endif()
 
 # sets
@@ -199,3 +193,30 @@ if(GENERATE_MANPAGES)
 endif()
 install(FILES ${PROJECT_TODO} ${PROJECT_README} ${PROJECT_CHANGELOG}
   ${PROJECT_DEFAULT_CONF} DESTINATION ${PROJECT_DATA_PATH})
+
+
+# Remplace strings in configs
+set(WMFS_VERSION ${VERSION})
+set(WMFS_COMPILE_MACHINE ${CMAKE_SYSTEM_PROCESSOR})
+set(WMFS_COMPILE_BY $ENV{USER})
+set(WMFS_COMPILE_FLAGS ${CFLAGS})
+set(WMFS_LINKED_LIBS ${LIBRARIES_TO_LINK})
+set(WMFS_SYSCONFDIR ${XDG_CONFIG_DIR}/${PROJECT_NAME})
+
+# Configure files
+set(wmfs_configure_files
+  config.h.in)
+
+macro(a_configure_file file)
+    string(REGEX REPLACE ".in\$" "" outfile ${file})
+    message(STATUS "Configuring ${outfile}")
+    configure_file(${SOURCE_DIR}/${file}
+                   ${SOURCE_DIR}/${outfile}
+                   ESCAPE_QUOTE
+                   @ONLY)
+endmacro()
+
+foreach(file ${wmfs_configure_files})
+    a_configure_file(${file})
+endforeach()
+
