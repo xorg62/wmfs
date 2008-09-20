@@ -301,8 +301,6 @@ init_conf(void)
           conf.tag[i].layout.func = layout_name_to_layout(cfg_getstr(cfgtmp, "layout"));
      }
 
-     debug(tags[1].mwfact);
-
      /* keybind ('tention ça rigole plus) */
      conf.nkeybind = cfg_size(cfg_keys, "key");
      for(j = 0; j <  cfg_size(cfg_keys, "key"); ++j)
