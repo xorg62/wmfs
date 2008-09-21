@@ -294,17 +294,12 @@ init(void)
      root = RootWindow (dpy, screen);
      mw = DisplayWidth (dpy, screen);
      mh = DisplayHeight (dpy, screen);
-     taglen[0] = 3;
 
      /* INIT TAG / LAYOUT ATTRIBUTE */
+     taglen[0] = 3;
      seltag = 1;
      for(i = 0; i < conf.ntag + 1; ++i)
-     {
-          tags[i].nmaster     =  conf.tag[i-1].nmaster;
-          tags[i].mwfact      =  conf.tag[i-1].mwfact;
-          tags[i].name        =  conf.tag[i-1].name;
-          tags[i].layout.func =  conf.tag[i-1].layout.func;
-     }
+          tags[i] = conf.tag[i-1];
 
      /* INIT FONT */
      font = XLoadQueryFont(dpy, conf.font);
@@ -638,6 +633,12 @@ mouseaction(Client *c, int x, int y, int type)
                     XUngrabPointer(dpy, CurrentTime);
                     return;
                }
+               else if(!conf.bartop && c->y + c->h > bary + 3)
+               {
+                    moveresize(c, c->x, bary - c->h, c->w, c->h, 1);
+                    XUngrabPointer(dpy, CurrentTime);
+                    return;
+               }
           }
      }
      return;
@@ -698,8 +699,12 @@ moveresize(Client *c, int x, int y, int w, int h, bool r)
           c->w = w; c->h = h;
 
           if(conf.bartop)
+          {
                if((y - conf.ttbarheight) <= barheight)
                     y = barheight+conf.ttbarheight;
+          } else
+               if(y - h >= bary)
+                    y = bary - h;
 
           XMoveResizeWindow(dpy, c->win, x, y, w ,h);
 
@@ -779,7 +784,8 @@ setborder(Window win, int color)
 }
 
 void
-setwinstate(Window win, long state) {
+setwinstate(Window win, long state)
+{
      long data[] = {state, None};
 
      XChangeProperty(dpy, win, wm_atom[WMState], wm_atom[WMState], 32,
@@ -1145,11 +1151,6 @@ updatebar(void)
                  strlen(getlayoutsym(seltag)));
 
      /* Draw status */
-     sprintf(bartext,"mwfact: %.2f  nmaster: %i - %02i:%02i",
-             tags[seltag].mwfact,
-             tags[seltag].nmaster,
-             tm->tm_hour,
-             tm->tm_min);
 
      j = strlen(bartext);
      XSetForeground(dpy, gc, conf.colors.text);
@@ -1298,7 +1299,12 @@ int
 main(int argc,char **argv)
 {
      dpy = XOpenDisplay(NULL);
-     int i;
+     char *p;
+     char sbuf[sizeof bartext];
+     fd_set rd;
+     int i, r;
+     Bool readstdin;
+     uint len, offset = 0;
 
      static struct option long_options[] = {
 
@@ -1349,10 +1355,50 @@ main(int argc,char **argv)
      scan();
      updatebar();
 
+     readstdin = True;
+     len = sizeof bartext - 1;
+     sbuf[len] = bartext[len] = '\0';
+
      while(!exiting)
      {
-          getevent();
-          updateall();
+          FD_ZERO(&rd);
+          if(readstdin)
+               FD_SET(STDIN_FILENO, &rd);
+          FD_SET(ConnectionNumber(dpy), &rd);
+          if(select(ConnectionNumber(dpy) + 1, &rd, NULL, NULL, NULL) == -1)
+               printf("WARNING: Select failed\n");
+          if(FD_ISSET(STDIN_FILENO, &rd)) {
+               switch((r = read(STDIN_FILENO, sbuf + offset, len - offset)))
+               {
+               case -1:
+               case 0:
+                    strncpy(bartext, sbuf, strlen(sbuf));
+                    readstdin = False;
+                    break;
+               default:
+                    for(p = sbuf + offset; r > 0; ++p, --r, ++offset)
+                    {
+                         if(*p == '\n' || *p == '\0')
+                         {
+                              *p = '\0';
+                              strncpy(bartext, sbuf, len);
+                              p += r - 1;
+                              for(r = 0; *(p - r) && *(p - r) != '\n'; ++r);
+                              offset = r;
+                              if(r)
+                                   memmove(sbuf, p - r + 1, r);
+                              break;
+                         }
+                    }
+                    break;
+               }
+               updatebar();
+          }
+          while(XPending(dpy))
+          {
+               XNextEvent(dpy, &event);
+               getevent();
+          }
      }
 
      /* Exiting WMFS :'( */

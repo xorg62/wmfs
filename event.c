@@ -298,22 +298,6 @@ unmapnotify(XEvent ev)
 void
 getevent(void)
 {
-     struct timeval tv;
-
-     if(QLength(dpy) > 0)
-          XNextEvent(dpy, &event);
-     else
-     {
-          XFlush(dpy);
-          FD_ZERO(&fd);
-          FD_SET(ConnectionNumber(dpy), &fd);
-          event.type = LASTEvent;
-          tv.tv_sec = 60;
-          tv.tv_usec = 0;
-          if(select(FD_SETSIZE, &fd, NULL, NULL, &tv) > 0)
-               XNextEvent(dpy, &event);
-     }
-
      switch (event.type)
      {
      case ButtonPress:       buttonpress(event);       break;

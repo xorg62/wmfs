@@ -154,7 +154,8 @@ init_conf(void)
                CFG_INT("tag_sel_fg",    0xFFFFFF,  CFGF_NONE),
                CFG_INT("tag_sel_bg",    0x354B5C,  CFGF_NONE),
                CFG_INT("layout_fg",     0xFFFFFF,  CFGF_NONE),
-               CFG_INT("layout_bg",     0x292929,  CFGF_NONE),            CFG_END()
+               CFG_INT("layout_bg",     0x292929,  CFGF_NONE),
+               CFG_END()
           };
 
      static cfg_opt_t layouts_opts[] =
@@ -301,7 +302,7 @@ init_conf(void)
           conf.tag[i].layout.func = layout_name_to_layout(cfg_getstr(cfgtmp, "layout"));
      }
 
-     /* keybind ('tention ça rigole plus) */
+      /* keybind ('tention ça rigole plus) */
      conf.nkeybind = cfg_size(cfg_keys, "key");
      for(j = 0; j <  cfg_size(cfg_keys, "key"); ++j)
      {
