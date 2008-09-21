@@ -363,6 +363,7 @@ init(void)
                          CopyFromParent, DefaultVisual(dpy, screen),
                          CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
      XMapRaised(dpy, bar);
+     strcpy(bartext, "WMFS-Devel");
      updatebar();
      updatebutton(0);
 
