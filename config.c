@@ -216,8 +216,6 @@ init_conf(void)
 
      static cfg_opt_t buttons_opts[] =
           {
-
-               CFG_STR("buttons_font", "*-*-medium-*-10-*", CFGF_NONE),
                CFG_SEC("button", button_opts, CFGF_MULTI),
                CFG_END()
           };
@@ -327,8 +325,6 @@ init_conf(void)
      for(i = 0; i < conf.nbutton; ++i)
      {
           cfgtmp2 = cfg_getnsec(cfg_buttons, "button", i);
-          if(cfg_getstr(cfg_buttons, "buttons_font"))
-               conf.buttonfont = strdup(cfg_getstr(cfg_buttons, "buttons_font"));
           for(j = 0; j < cfg_size(cfgtmp2, "mouse");  ++j)
           {
                cfgtmp3 = cfg_getnsec(cfgtmp2, "mouse", j);

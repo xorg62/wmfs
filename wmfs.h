@@ -58,7 +58,7 @@
 #define MouseMask    (ButtonMask | PointerMotionMask)
 #define KeyMask      (KeyPressMask | KeyReleaseMask)
 #define ALT          Mod1Mask
-#define ITOA(p,n)    sprintf(p, "%i", n)
+#define ITOA(p ,n)   sprintf(p, "%i", n)
 #define debug(p)     printf("debug: %i\n", p)
 #define Move         0
 #define Resize       1
@@ -67,6 +67,7 @@
 #define BUTY(y)      y - conf.ttbarheight + 3
 #define BUTH         conf.ttbarheight - 6
 #define BUTX(x, w)   x + w - BUTH/400
+#define TEXTW(x)     XTextWidth(font, x, strlen(x)) + (fonth / 10)
 
 /* Client Structure */
 typedef struct Client Client;
@@ -133,7 +134,6 @@ typedef struct
 typedef struct
 {
      char *font;
-     char *buttonfont;
      bool raisefocus;
      bool raiseswitch;
      bool bartop;
@@ -236,12 +236,13 @@ void keyresize(char *cmd);
 void killclient(char *cmd);
 void layoutswitch(char *cmd);
 void lowerclient(Client *c);
+void mainloop(void);
 void mapclient(Client *c);
 void manage(Window w, XWindowAttributes *wa);
 void maxlayout(void);
 void mouseaction(Client *c, int x, int y, int type);
 void moveresize(Client *c, int x, int y, int w, int h, bool r);
-Client *nexttiled(Client *c);
+Client* nexttiled(Client *c);
 void quit(char *cmd);
 void raiseclient(Client *c);
 void scan(void);
@@ -285,8 +286,8 @@ Atom net_atom[NetLast];
 Cursor cursor[CurLast];
 
 /* Fonts */
-XFontStruct *font, *font_b;
-int fonth, fonty;
+XFontStruct *font;
+int fonth;
 
 /* Bar / Tags */
 Window bar;

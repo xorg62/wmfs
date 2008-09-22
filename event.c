@@ -98,8 +98,7 @@ buttonpress(XEvent ev)
           }
           /* layout switch */
           if(ev.xbutton.x >= taglen[conf.ntag] - 3
-             && ev.xbutton.x < taglen[conf.ntag] +
-             (strlen((getlayoutsym(seltag)))*fonty+3) - 3)
+             && ev.xbutton.x < taglen[conf.ntag] + TEXTW(getlayoutsym(seltag)))
           {
                if(ev.xbutton.button == Button1
                   || ev.xbutton.button == Button4)

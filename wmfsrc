@@ -44,8 +44,6 @@ tags
 
 buttons
 {
-        buttons_font = "*-*-medium-*-10-*"
-
         # MWFACT BUTTON {{{
         button
         {
