@@ -68,6 +68,7 @@
 #define BUTH         conf.ttbarheight - 6
 #define BUTX(x, w)   x + w - BUTH/400
 #define TEXTW(x)     XTextWidth(font, x, strlen(x)) + (fonth / 10)
+#define NLAYOUT      3
 
 /* Client Structure */
 typedef struct Client Client;
@@ -208,7 +209,7 @@ void unmapnotify(XEvent ev);
 void getevent(void);
 
 /* util.c */
-void *emallocz(unsigned int size);
+void *emalloc(unsigned int size);
 void spawn(char *cmd);
 
 /* wmfs.c */

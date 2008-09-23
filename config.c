@@ -269,7 +269,7 @@ init_conf(void)
      conf.borderheight   = cfg_getint(cfg_misc,        "border_height");
      conf.ttbarheight    = cfg_getint(cfg_misc,        "titlebar_height");
 
-     if( strcmp( strdup(cfg_getstr(cfg_misc, "bar_position")) ,"top" ) == 0)
+     if(strcmp(strdup(cfg_getstr(cfg_misc, "bar_position")) ,"top" ) == 0)
           conf.bartop = True;
      else
           conf.bartop = False;

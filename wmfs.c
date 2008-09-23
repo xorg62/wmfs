@@ -115,12 +115,9 @@ focus(Client *c)
           if(conf.ttbarheight)
                setborder(sel->tbar, conf.colors.bordernormal);
      }
-
      if(c)
           grabbuttons(c, True);
-
      sel = c;
-
      if(c)
      {
           setborder(c->win, conf.colors.borderfocus);
@@ -315,7 +312,7 @@ init(void)
      if(!font)
      {
           fprintf(stderr, "XLoadQueryFont: failed loading font '%s'\n", conf.font);
-           exit(0);
+          exit(0);
      }
      XSetFont(dpy, gc, font->fid);
      fonth = (font->ascent + font->descent) - 1;
@@ -494,7 +491,7 @@ lowerclient(Client *c)
 void
 mainloop(void)
 {
-     fd_set rd;
+     fd_set fd;
      char sbuf[sizeof bartext], *p;
      int len, r, offset = 0;
      Bool readstdin = True;
@@ -504,13 +501,13 @@ mainloop(void)
 
      while(!exiting)
      {
-          FD_ZERO(&rd);
+          FD_ZERO(&fd);
           if(readstdin)
-               FD_SET(STDIN_FILENO, &rd);
-          FD_SET(ConnectionNumber(dpy), &rd);
-          if(select(ConnectionNumber(dpy) + 1, &rd, NULL, NULL, NULL) == -1)
+               FD_SET(STDIN_FILENO, &fd);
+          FD_SET(ConnectionNumber(dpy), &fd);
+          if(select(ConnectionNumber(dpy) + 1, &fd, NULL, NULL, NULL) == -1)
                printf("WARNING: Select failed\n");
-          if(FD_ISSET(STDIN_FILENO, &rd)) {
+          if(FD_ISSET(STDIN_FILENO, &fd)) {
                if((r = read(STDIN_FILENO, sbuf + offset, len - offset)))
                {
                     for(p = sbuf + offset; r > 0; ++p, --r, ++offset)
@@ -567,7 +564,7 @@ manage(Window w, XWindowAttributes *wa)
      Status rettrans;
      XWindowChanges winc;
 
-     c = emallocz(sizeof(Client));
+     c = emalloc(sizeof(Client));
      c->win = w;
      c->x = wa->x;
      c->y = wa->y + conf.ttbarheight + barheight;
@@ -782,7 +779,8 @@ nexttiled(Client *c)
 }
 
 void
-quit(char *cmd) {
+quit(char *cmd)
+{
      exiting = True;
      return;
 }
@@ -1177,13 +1175,12 @@ updatebar(void)
 {
      int  i , k;
      char buf[conf.ntag][sizeof(char)];
-     char *p = malloc(sizeof(char));
+     char p[4];
      tm = localtime(&lt);
      lt = time(NULL);
 
      XSetForeground(dpy, gc, conf.colors.bar);
      XFillRectangle(dpy, dr, gc, 0, 0, mw, barheight);
-
      for(i = 0; i < conf.ntag; ++i)
      {
           /* Make the tags string */
@@ -1202,7 +1199,7 @@ updatebar(void)
 
      /* Draw layout symbol */
      XSetForeground(dpy, gc, conf.colors.layout_bg);
-     XFillRectangle(dpy, dr, gc, taglen[conf.ntag] - 5, 0, TEXTW(getlayoutsym(seltag)) + 2, barheight);
+     XFillRectangle(dpy, dr, gc, taglen[conf.ntag] - 5, 0, TEXTW(getlayoutsym(seltag)), barheight);
      XSetForeground(dpy, gc, conf.colors.layout_fg);
      XDrawString(dpy, dr, gc, taglen[conf.ntag] - 4,
                  fonth,
@@ -1210,21 +1207,19 @@ updatebar(void)
                  strlen(getlayoutsym(seltag)));
 
      /* Draw status */
-
      k = TEXTW(bartext);
      XSetForeground(dpy, gc, conf.colors.text);
-     XDrawString(dpy, dr, gc, mw - k, fonth-1, bartext, k);
+     XDrawString(dpy, dr, gc, mw - k, fonth-1, bartext, strlen(bartext));
      XDrawLine(dpy, dr, gc, mw-k-5, 0, mw-k-5, barheight);
 
      XCopyArea(dpy, dr, bar, gc, 0, 0, mw, barheight, 0, 0);
      XSync(dpy, False);
 
      /* Update Bar Buttons */
-     updatebutton(1);
-     free(p);
+     updatebutton(True);
 }
 
-/* if c is 0, you can execute this function for the first time
+/* if c is False, you can execute this function for the first time
  * else the button is just updated */
 void
 updatebutton(Bool c)
@@ -1243,8 +1238,6 @@ updatebutton(Bool c)
 
      if(!conf.bartop)
           y = bary + 3;
-
-     //XSetFont(dpy, gc, font_b->fid);
 
      for(i = 0; i < conf.nbutton; ++i)
      {
@@ -1279,7 +1272,6 @@ updatebutton(Bool c)
                            conf.barbutton[i].text, strlen(conf.barbutton[i].text));
           }
      }
-     XSetFont(dpy, gc, font->fid);
      XSync(dpy, False);
      return;
 }
@@ -1408,7 +1400,6 @@ main(int argc,char **argv)
      init_conf();
      init();
      scan();
-     updatebar();
      mainloop();
 
      /* Exiting WMFS :'( */
