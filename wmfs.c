@@ -144,9 +144,9 @@ freelayout(void)
      {
           if(!ishide(c))
           {
-               if(c->max || c->tile)
+               if(c->tile)
                     moveresize(c, c->ox, c->oy, c->ow, c->oh, 1);
-               c->max = c->tile = False;
+               c->tile = False;
           }
      }
      return;
@@ -628,14 +628,13 @@ maxlayout(void)
           moveresize(c, 0, (conf.ttbarheight + ((conf.bartop) ? barheight : 0)),
                      (mw-(conf.borderheight * 2)),
                      (mh-(conf.borderheight * 2) - conf.ttbarheight - barheight), 0);
-          c->max = True;
      }
      return;
 }
 
 
 /* If the type is 0, this function will move, else,
-   this will resize */
+ * this will resize */
 void
 mouseaction(Client *c, int x, int y, int type)
 {
@@ -647,7 +646,7 @@ mouseaction(Client *c, int x, int y, int type)
 
      ocx = c->x;
      ocy = c->y;
-     if(XGrabPointer(dpy, root, 0, MouseMask, GrabModeAsync, GrabModeAsync,
+     if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
                      None, cursor[((type) ?CurResize:CurMove)], CurrentTime) != GrabSuccess) return;
      if(type)
           XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
@@ -771,10 +770,12 @@ moveresize(Client *c, int x, int y, int w, int h, bool r)
      return;
 }
 
+/* To use in a for, select only the
+ * client who can be tiled */
 Client*
 nexttiled(Client *c)
 {
-     for(; c && (c->free || ishide(c)); c = c->next);
+     for(; c && (c->max || c->free || ishide(c)); c = c->next);
      return c;
 }
 
@@ -939,7 +940,7 @@ setsizehints(Client *c)
 }
 
 /* if cmd is +X or -X, this is just switch
-   else {1, 2.. 9} it's go to the wanted tag. */
+ * else {1, 2.. 9} it's go to the wanted tag. */
 void
 tag(char *cmd)
 {
@@ -1116,6 +1117,8 @@ togglemax(char *cmd)
           moveresize(sel, sel->ox, sel->oy, sel->ow, sel->oh, 0);
           sel->max = False;
      }
+
+     arrange();
      return;
 }
 
@@ -1273,6 +1276,7 @@ updatebutton(Bool c)
           }
      }
      XSync(dpy, False);
+
      return;
 }
 
