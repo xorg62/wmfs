@@ -100,8 +100,8 @@ keys
         key { mod = {"Control"} key = "Left" func = "tag" cmd = "-1" }
         key { mod = {"Control"} key = "Up" func = "layoutswitch" cmd = "+" }
         key { mod = {"Control"} key = "Down" func = "layoutswitch" cmd = "-" }
-        key { mod = {"Alt", "Shift"} key = "l" func = "set_mwfact" cmd = "+0.025" }
-        key { mod = {"Alt", "Shift"} key = "h" func = "set_mwfact" cmd = "-0.025" }
+        key { mod = {"Alt"} key = "l" func = "set_mwfact" cmd = "+0.025" }
+        key { mod = {"Alt"} key = "h" func = "set_mwfact" cmd = "-0.025" }
 
 # moving client keybind
 

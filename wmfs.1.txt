@@ -14,7 +14,7 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-*Wmfs* is a very lightweight and dynamic tiling windows manager for X.
+*WMFS* is a (not so) basic, lightweight and dynamic tiling windows manager for X.
 
 
 OPTIONS
@@ -24,19 +24,21 @@ OPTIONS
 *-h*, *--help*::
   Print help information, then exit.
 *-i*, *--info*::
-  Print wmfs information
+  Print WMFS information
 
 DEFAULT KEY BINDINGS
 ---------------------
 
 *Control + Return*::
-         Run a terminal
+         Run a terminal (urxvt by default)
 *Alt + q*::
          Quit the selected client
 *Control-Alt-Shift + q*::
          Exit WMFS
 *Control + m *::
          Toggle maximize the selected client
+*Control + b *::
+         Toggle the bar position between top and bottom
 *Alt + Tab*::
          Give the focus to the next client
 *Alt-Shift + Tab*::
@@ -49,10 +51,11 @@ DEFAULT KEY BINDINGS
          Next layout
 *Control + Down*::
          Previous layout
-*Alt-Shift + l*::
+*Alt + l*::
          Increase the mwfact (+0.025)
-*Alt-Shift + h*::
+*Alt + h*::
          Decrease the mwfact (-0.025)
+
 
 *Control-Alt + Left*::
          Move the selected client to the left
@@ -62,6 +65,7 @@ DEFAULT KEY BINDINGS
          Up the selected client
 *Control-Alt + Down*::
          Down the selected client
+
 
 *Shift+Alt + Left*::
          Decrease the selected client size (horizontally)
@@ -79,11 +83,11 @@ DEFAULT KEY BINDINGS
 
 CONFIGURATION
 -------------
-*Wmfs* is configured by '$HOME/.wmfsrc'
+WMFS is configured by '~/.config/wmfs/wmfsrc'.
 
 BUGS
 ----
-WMFS isn't stable for now.
+WMFS isn't stable for now. So it certainly contains some bugs.
 
 AUTHORS
 -------
@@ -91,11 +95,13 @@ Marc Lagrange <markocpc@gmail.com> for the build system and Gentoo ebuilds.
 
 Martin Duquesnoy <xorg62@gmail.com> for the code.
 
+Youssef Bocus <ydb.feu@gmail.com> for hard testing.
+
 WWW
 ---
 http://wmfs.sangor.net/
 
 COPYING
 -------
-Wmfs is under the BSD license. See COPYING for more informations.
+WMFS is under the BSD license. See COPYING for more informations.
 
