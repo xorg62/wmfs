@@ -24,7 +24,7 @@ OPTIONS
 *-h*, *--help*::
   Print help information, then exit.
 *-i*, *--info*::
-  Print WMFS information
+  Print WMFS informations
 
 DEFAULT KEY BINDINGS
 ---------------------
@@ -83,7 +83,7 @@ DEFAULT KEY BINDINGS
 
 CONFIGURATION
 -------------
-WMFS is configured by '~/.config/wmfs/wmfsrc'.
+WMFS is configured by '$HOME/.config/wmfs/wmfsrc'.
 
 BUGS
 ----
