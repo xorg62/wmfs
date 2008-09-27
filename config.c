@@ -38,7 +38,7 @@ func_name_list_t func_list[] =
 {
      {"spawn", spawn},
      {"killclient", killclient},
-     {"wswitch", wswitch},
+     {"client_switch", wswitch},
      {"togglemax", togglemax},
      {"keymovex", keymovex},
      {"keymovey", keymovey},

@@ -94,8 +94,8 @@ keys
         key { mod = {"Alt"} key = "q" func = "killclient" }
         key { mod = {"Control"} key = "m" func = "togglemax" }
         key { mod = {"Control"} key = "b" func = "togglebarpos" }
-        key { mod = {"Alt"} key = "Tab" func = "wswitch" cmd = "+" }
-        key { mod = {"Alt","Shift"} key = "Tab" func = "wswitch" cmd = "-" }
+        key { mod = {"Alt"} key = "Tab" func = "client_switch" cmd = "+" }
+        key { mod = {"Alt","Shift"} key = "Tab" func = "client_switch" cmd = "-" }
         key { mod = {"Control"} key = "Right" func = "tag" cmd = "+1" }
         key { mod = {"Control"} key = "Left" func = "tag" cmd = "-1" }
         key { mod = {"Control"} key = "Up" func = "layoutswitch" cmd = "+" }
