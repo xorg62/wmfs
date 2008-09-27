@@ -1415,10 +1415,13 @@ main(int argc,char **argv)
      XFreeCursor(dpy, cursor[CurMove]);
      XFreeCursor(dpy, cursor[CurResize]);
      XDestroyWindow(dpy, bar);
+     if(conf.nbutton)
+          for(i = 0; i < conf.nbutton; ++i)
+               XDestroyWindow(dpy, conf.barbutton[i].win);
      XSync(dpy, False);
      XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
-
      XCloseDisplay(dpy);
-     return 0;
+
+     exit(EXIT_SUCCESS);
 }
 
