@@ -127,6 +127,7 @@ buttonpress(XEvent ev)
                   && ev.xbutton.button == conf.barbutton[i].mouse[j])
                     if(conf.barbutton[i].func[j])
                          conf.barbutton[i].func[j](conf.barbutton[i].cmd[j]);
+
      return;
 }
 
@@ -151,6 +152,7 @@ configurerequest(XEvent ev)
      if((c = getclient(ev.xconfigurerequest.window)))
           if(wc.y < mw && wc.x < mh)
                moveresize(c, wc.x, wc.y, wc.width, wc.height, True);
+
      return;
 }
 
@@ -162,6 +164,8 @@ destroynotify(XEvent ev)
 
      if((c = getclient(ev.xdestroywindow.window)))
           unmanage(c);
+
+     return;
 }
 
 /* ENTERNOTIFY */
@@ -178,6 +182,7 @@ enternotify(XEvent ev)
           focus(c);
      else
           focus(NULL);
+
      return;
 }
 
@@ -204,6 +209,7 @@ focusin(XEvent ev)
 {
      if(sel && ev.xfocus.window != sel->win)
           XSetInputFocus(dpy, sel->win, RevertToPointerRoot, CurrentTime);
+
      return;
 }
 
@@ -224,6 +230,7 @@ keypress(XEvent ev)
                keys[i].func(keys[i].cmd);
                updateall();
           }
+
      return;
 }
 
@@ -233,6 +240,7 @@ mapnotify(XEvent ev)
 {
      if(ev.xmapping.request == MappingKeyboard)
           grabkeys();
+
      return;
 }
 
@@ -252,6 +260,7 @@ maprequest(XEvent ev)
           focus(NULL);
           manage(ev.xmaprequest.window, &at);
      }
+
      return;
 }
 
@@ -282,6 +291,7 @@ propertynotify(XEvent ev)
              || ev.xproperty.atom == net_atom[NetWMName])
                updatetitle(c);
      }
+
      return;
 }
 
@@ -293,6 +303,7 @@ unmapnotify(XEvent ev)
 
      if((c = getclient(ev.xunmap.window)))
          unmanage(c);
+
      return;
 }
 

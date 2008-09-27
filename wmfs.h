@@ -308,7 +308,5 @@ Client *sel;
 /* Other */
 unsigned int numlockmask;
 fd_set fd;
-struct tm *tm;
-time_t lt;
 
 #endif /* LOCAL_H */

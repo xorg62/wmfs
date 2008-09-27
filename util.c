@@ -39,6 +39,7 @@ emalloc(unsigned int size)
 
      if(!res)
           fprintf(stderr,"WMFS Error: could not malloc() %u bytes\n", size);
+
      return res;
 }
 
@@ -55,9 +56,10 @@ spawn(char *cmd)
                     close(ConnectionNumber(dpy));
                setsid();
                execl(getenv("SHELL"), getenv("SHELL"), "-c", cmd, (char*)NULL);
-               exit(1);
+               exit(EXIT_FAILURE);
           }
-          exit(0);
+          exit(EXIT_SUCCESS);
      }
+
      return;
 }
