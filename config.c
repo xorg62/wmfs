@@ -316,6 +316,7 @@ init_conf(void)
                printf("WMFS Configuration: Unknow Function %s",cfg_getstr(cfgtmp, "func"));
                return;
           }
+
           keys[j].cmd = (!strdup(strdup(cfg_getstr(cfgtmp, "cmd"))))
                ?  NULL : strdup(strdup(cfg_getstr(cfgtmp, "cmd")));
      }

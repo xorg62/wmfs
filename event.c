@@ -32,7 +32,9 @@
 
 #include "wmfs.h"
 
-/* BUTTONPRESS */
+/* BUTTONPRESS
+* will be improve with the
+* maybe configration file */
 void
 buttonpress(XEvent ev)
 {
@@ -148,7 +150,7 @@ configurerequest(XEvent ev)
                       ev.xconfigurerequest.value_mask, &wc);
      if((c = getclient(ev.xconfigurerequest.window)))
           if(wc.y < mw && wc.x < mh)
-               moveresize(c, wc.x, wc.y, wc.width, wc.height, 1);
+               moveresize(c, wc.x, wc.y, wc.width, wc.height, True);
      return;
 }
 

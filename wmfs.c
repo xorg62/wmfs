@@ -145,7 +145,7 @@ freelayout(void)
           if(!ishide(c))
           {
                if(c->tile)
-                    moveresize(c, c->ox, c->oy, c->ow, c->oh, 1);
+                    moveresize(c, c->ox, c->oy, c->ow, c->oh, True);
                c->tile = False;
           }
      }
@@ -177,6 +177,7 @@ getnext(Client *c)
      return c;
 }
 
+/* Will be replace */
 char*
 getlayoutsym(int tag)
 {
@@ -215,40 +216,40 @@ grabbuttons(Client *c, Bool focused)
      if(focused)
      {
           /* Window */
-          XGrabButton(dpy, Button1, ALT, c->win, 0, ButtonMask,GrabModeAsync,GrabModeSync, None, None);
-          XGrabButton(dpy, Button1, ALT|LockMask, c->win, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, Button2, ALT, c->win, 0, ButtonMask,GrabModeAsync,GrabModeSync, None, None);
-          XGrabButton(dpy, Button2, ALT|LockMask, c->win, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, Button3, ALT, c->win, 0, ButtonMask,GrabModeAsync,GrabModeSync, None, None);
+          XGrabButton(dpy, Button1, ALT, c->win, False, ButtonMask,GrabModeAsync,GrabModeSync, None, None);
+          XGrabButton(dpy, Button1, ALT|LockMask, c->win, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button2, ALT, c->win, False, ButtonMask,GrabModeAsync,GrabModeSync, None, None);
+          XGrabButton(dpy, Button2, ALT|LockMask, c->win, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button3, ALT, c->win, False, ButtonMask,GrabModeAsync,GrabModeSync, None, None);
           XGrabButton(dpy, Button3, ALT|LockMask, c->win, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
           if(conf.ttbarheight)
           {
                /* Titlebar */
-               XGrabButton(dpy, Button1, AnyModifier, c->tbar, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
-               XGrabButton(dpy, Button2, AnyModifier, c->tbar, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
-               XGrabButton(dpy, Button3, AnyModifier, c->tbar, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, Button1, AnyModifier, c->tbar, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, Button2, AnyModifier, c->tbar, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, Button3, AnyModifier, c->tbar, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
                /* Titlebar Button */
                if(conf.ttbarheight > 5)
                {
-                    XGrabButton(dpy, Button1, AnyModifier, c->button, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
-                    XGrabButton(dpy, Button3, AnyModifier, c->button, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+                    XGrabButton(dpy, Button1, AnyModifier, c->button, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+                    XGrabButton(dpy, Button3, AnyModifier, c->button, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
                }
           }
           /* Bar Button */
           for(i=0; i< conf.nbutton; ++i)
-               XGrabButton(dpy, Button1, AnyModifier, conf.barbutton[i].win, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, Button1, AnyModifier, conf.barbutton[i].win, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
      }
      else
      {
-          XGrabButton(dpy, AnyButton, AnyModifier, c->win, 0, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, AnyButton, AnyModifier, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
           if(conf.ttbarheight)
           {
-               XGrabButton(dpy, AnyButton, AnyModifier, c->tbar, 0, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, AnyButton, AnyModifier, c->tbar, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
                if(conf.ttbarheight > 5)
-                    XGrabButton(dpy, AnyButton, AnyModifier, c->button, 0, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+                    XGrabButton(dpy, AnyButton, AnyModifier, c->button, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
           }
           for(i=0; i< conf.nbutton; ++i)
-               XGrabButton(dpy, Button1, AnyModifier, conf.barbutton[i].win, 0, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, Button1, AnyModifier, conf.barbutton[i].win, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
      }
 }
 
@@ -359,8 +360,8 @@ init(void)
                          CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
      XMapRaised(dpy, bar);
      strcpy(bartext, "WMFS-Devel");
+     updatebutton(False);
      updatebar();
-     updatebutton(0);
 
      /* INIT STUFF */
      XSetErrorHandler(errorhandler);
@@ -388,7 +389,7 @@ keymovex(char *cmd)
      if(sel && cmd && !ishide(sel) && !sel->max && !sel->tile)
      {
           tmp = sel->x + atoi(cmd);
-          moveresize(sel, tmp, sel->y, sel->w, sel->h, 1);
+          moveresize(sel, tmp, sel->y, sel->w, sel->h, True);
      }
      return;
 }
@@ -401,7 +402,7 @@ keymovey(char *cmd)
      if(sel && cmd && !ishide(sel) && !sel->max && !sel->tile)
      {
           tmp = sel->y + atoi(cmd);
-          moveresize(sel, sel->x, tmp, sel->w, sel->h, 1);
+          moveresize(sel, sel->x, tmp, sel->w, sel->h, True);
      }
      return;
 }
@@ -423,7 +424,7 @@ keyresize(char *cmd)
           tempw = sel->w + modw;
           temph = (temph < 10) ? 10 : temph;
           tempw = (tempw < 10) ? 10 : tempw;
-          moveresize(sel, sel->x, sel->y, tempw, temph, 1);
+          moveresize(sel, sel->x, sel->y, tempw, temph, True);
      }
      return;
 }
@@ -447,6 +448,7 @@ killclient(char *cmd)
      return;
 }
 
+/* Will be improve... */
 void
 layoutswitch(char *cmd)
 {
@@ -627,7 +629,7 @@ maxlayout(void)
 
           moveresize(c, 0, (conf.ttbarheight + ((conf.bartop) ? barheight : 0)),
                      (mw-(conf.borderheight * 2)),
-                     (mh-(conf.borderheight * 2) - conf.ttbarheight - barheight), 0);
+                     (mh-(conf.borderheight * 2) - conf.ttbarheight - barheight), False);
      }
      return;
 }
@@ -668,7 +670,7 @@ mouseaction(Client *c, int x, int y, int type)
                if(type)
                     moveresize(c, c->x, c->y,
                                ((ev.xmotion.x - ocx <= 0) ? 1 : ev.xmotion.x - ocx),
-                               ((ev.xmotion.y - ocy <= 0) ? 1 : ev.xmotion.y - ocy), 1);
+                               ((ev.xmotion.y - ocy <= 0) ? 1 : ev.xmotion.y - ocy), True);
                /* Move */
                else
                     moveresize(c,
@@ -679,13 +681,13 @@ mouseaction(Client *c, int x, int y, int type)
                /* for don't pass on the bar */
                if(conf.bartop && c->y < barheight + conf.ttbarheight - 5)
                {
-                    moveresize(c, c->x, barheight+conf.ttbarheight, c->w, c->h, 1);
+                    moveresize(c, c->x, barheight+conf.ttbarheight, c->w, c->h, True);
                     XUngrabPointer(dpy, CurrentTime);
                     return;
                }
                else if(!conf.bartop && c->y + c->h > bary + 3)
                {
-                    moveresize(c, c->x, bary - c->h, c->w, c->h, 1);
+                    moveresize(c, c->x, bary - c->h, c->w, c->h, True);
                     XUngrabPointer(dpy, CurrentTime);
                     return;
                }
@@ -1049,7 +1051,7 @@ tile(void)
                else
                     h = th - (bord + conf.ttbarheight) - bord*2;
           }
-          moveresize(c, x, y, w, h, 0);
+          moveresize(c, x, y, w, h, False);
           if(n > nm && th != mht)
                y = c->y + c->h + bord + conf.ttbarheight;
      }
@@ -1108,13 +1110,13 @@ togglemax(char *cmd)
           sel->ow = sel->w; sel->oh = sel->h;
           moveresize(sel, 0, (conf.ttbarheight + ((conf.bartop) ? barheight : 0)),
                      (mw-(conf.borderheight * 2)),
-                     (mh-(conf.borderheight * 2)- conf.ttbarheight - barheight), 0);
+                     (mh-(conf.borderheight * 2)- conf.ttbarheight - barheight), False);
           raiseclient(sel);
           sel->max = True;
      }
      else if(sel->max)
      {
-          moveresize(sel, sel->ox, sel->oy, sel->ow, sel->oh, 0);
+          moveresize(sel, sel->ox, sel->oy, sel->ow, sel->oh, False);
           sel->max = False;
      }
 
@@ -1177,7 +1179,7 @@ void
 updatebar(void)
 {
      int  i , k;
-     char buf[conf.ntag][sizeof(char)];
+     char buf[conf.ntag][256];
      char p[4];
      tm = localtime(&lt);
      lt = time(NULL);
@@ -1189,7 +1191,7 @@ updatebar(void)
           /* Make the tags string */
           ITOA(p, clientpertag(i+1));
           sprintf(buf[i], "%s<%s> ", tags[i+1].name, (clientpertag(i+1)) ? p : "");
-          taglen[i+1] = (taglen[i] + TEXTW(buf[i]));
+          taglen[i+1] = taglen[i] + TEXTW(buf[i]);
 
           /* Rectangle for the tag background */
           XSetForeground(dpy, gc, (i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar);
@@ -1379,7 +1381,7 @@ main(int argc,char **argv)
                break;
           case 'i':
                printf("WMFS - Window Manager From Scratch. By :\n"
-                      "   - Martun Duquesnoy (code)\n"
+                      "   - Martin Duquesnoy (code)\n"
                       "   - Marc Lagrange (build system)\n");
                exit(EXIT_SUCCESS);
                break;
