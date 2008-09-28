@@ -24,9 +24,9 @@ colors
 
 layouts
 {
-        free = "FREE"
-        tile = "TILE"
-        max  = "MAX"
+        layout { type = "tile" symbol = "TILE" }
+        layout { type = "max"  symbol = "MAX" }
+        layout { type = "free" symbol = "FREE" }
 }
 
 tags

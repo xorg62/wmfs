@@ -49,7 +49,7 @@ func_name_list_t func_list[] =
      {"set_mwfact", set_mwfact},
      {"set_nmaster", set_nmaster},
      {"quit", quit},
-     {"togglebarpos", togglebarpos},
+     {"togglebarpos", togglebarpos}
 };
 
 func_name_list_t layout_list[] =
@@ -83,14 +83,14 @@ name_to_uint_t mouse_button_list[] =
 };
 
 void*
-name_to_func(char *name)
+name_to_func(char *name, func_name_list_t l[])
 {
      int i;
 
      if(name)
-          for(i = 0; func_list[i].name ; ++i)
-               if(!strcmp(name, func_list[i].name))
-                    return func_list[i].func;
+          for(i = 0; l[i].name ; ++i)
+               if(!strcmp(name, l[i].name))
+                    return l[i].func;
      return NULL;
 }
 
@@ -122,16 +122,10 @@ Layout
 layout_name_to_struct(Layout lt[], char *name)
 {
      int i;
-     void *f = NULL;
 
-     if(name)
-          for(i=0; layout_list[i].name; ++i)
-               if(!strcmp(name, layout_list[i].name))
-                    f = layout_list[i].func;
-     if(f)
-          for(i = 0; i < NLAYOUT; ++i)
-               if(lt[i].func == f)
-                    return lt[i];
+     for(i = 0; i < MAXLAYOUT; ++i)
+          if(lt[i].func == name_to_func(name, layout_list))
+               return lt[i];
      return lt[Tile];
 }
 
@@ -163,11 +157,16 @@ init_conf(void)
                CFG_END()
           };
 
+     static cfg_opt_t layout_opts[] =
+          {
+               CFG_STR("type", "", CFGF_NONE),
+               CFG_STR("symbol", "", CFGF_NONE),
+               CFG_END()
+          };
+
      static cfg_opt_t layouts_opts[] =
           {
-               CFG_STR_LIST("free", "[Free]", CFGF_NONE),
-               CFG_STR_LIST("tile", "[Tile]", CFGF_NONE),
-               CFG_STR_LIST("max", "[Max]", CFGF_NONE),
+               CFG_SEC("layout", layout_opts, CFGF_MULTI),
                CFG_END()
           };
 
@@ -275,8 +274,7 @@ init_conf(void)
      conf.raiseswitch   = cfg_getbool(cfg_misc,       "raiseswitch");
      conf.borderheight  = cfg_getint(cfg_misc,        "border_height");
      conf.ttbarheight   = cfg_getint(cfg_misc,        "titlebar_height");
-
-     conf.bartop = (strcmp(strdup(cfg_getstr(cfg_misc, "bar_position")), "top") == 0) ? True : False;
+     conf.bartop        = (strcmp(strdup(cfg_getstr(cfg_misc, "bar_position")), "top") == 0) ? True : False;
 
      /* colors */
      conf.colors.bordernormal = cfg_getint(cfg_colors, "border_normal");
@@ -289,28 +287,49 @@ init_conf(void)
      conf.colors.layout_bg    = cfg_getint(cfg_colors, "layout_bg");
 
      /* layout */
-     /* lyt is the base structure for all layouts */
-     lyt[Tile].symbol = strdup(cfg_getstr(cfg_layouts, "tile"));
-     lyt[Tile].func = tile;
-     lyt[Max].symbol = strdup(cfg_getstr(cfg_layouts, "max"));
-     lyt[Max].func = maxlayout;
-     lyt[Free].symbol = strdup(cfg_getstr(cfg_layouts, "free"));
-     lyt[Free].func = freelayout;
+     conf.nlayout = cfg_size(cfg_layouts, "layout");
+
+     if(conf.nlayout > 3)
+     {
+          printf("WMFS Configuration: Too much of layouts\n");
+          exit(EXIT_FAILURE);
+     }
+     for(i = 0; i < conf.nlayout; ++i)
+     {
+          cfgtmp = cfg_getnsec(cfg_layouts, "layout", i);
+          if(!name_to_func(strdup(cfg_getstr(cfgtmp, "type")), layout_list))
+          {
+               printf("WMFS Configuration: Unknow Layout type: \"%s\"\n",
+                      strdup(cfg_getstr(cfgtmp, "type")));
+               exit(EXIT_FAILURE);
+          }
+          else
+          {
+               conf.layout[i].symbol = strdup(cfg_getstr(cfgtmp, "symbol"));
+               conf.layout[i].func = name_to_func(strdup(cfg_getstr(cfgtmp, "type")), layout_list);
+          }
+     }
+     if(!conf.nlayout)
+     {
+          conf.nlayout = 1;
+          conf.layout[0].symbol = strdup("TILE");
+          conf.layout[0].func = tile;
+     }
 
      /* tag */
      conf.ntag = cfg_size(cfg_tags, "tag");
-     for(i = 0; i < cfg_size(cfg_tags, "tag"); ++i)
+     for(i = 0; i < conf.ntag; ++i)
      {
           cfgtmp = cfg_getnsec(cfg_tags, "tag", i);
           conf.tag[i].name = strdup(cfg_getstr(cfgtmp, "name"));
           conf.tag[i].mwfact = cfg_getfloat(cfgtmp, "mwfact");
           conf.tag[i].nmaster = cfg_getint(cfgtmp, "nmaster");
-          conf.tag[i].layout = layout_name_to_struct(lyt, cfg_getstr(cfgtmp, "layout"));
+          conf.tag[i].layout = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"));
      }
 
-      /* keybind ('tention ça rigole plus) */
+     /* keybind */
      conf.nkeybind = cfg_size(cfg_keys, "key");
-     for(j = 0; j <  cfg_size(cfg_keys, "key"); ++j)
+     for(j = 0; j <  conf.nkeybind; ++j)
      {
           cfgtmp = cfg_getnsec(cfg_keys, "key", j);
 
@@ -318,7 +337,7 @@ init_conf(void)
                keys[j].mod |= char_to_modkey(cfg_getnstr(cfgtmp, "mod", l));
 
           keys[j].keysym = XStringToKeysym(cfg_getstr(cfgtmp, "key"));
-          keys[j].func = name_to_func(cfg_getstr(cfgtmp, "func"));
+          keys[j].func = name_to_func(cfg_getstr(cfgtmp, "func"), func_list);
           if(keys[j].func == NULL)
           {
                printf("WMFS Configuration: Unknow Function %s", cfg_getstr(cfgtmp, "func"));
@@ -337,7 +356,7 @@ init_conf(void)
           for(j = 0; j < cfg_size(cfgtmp2, "mouse");  ++j)
           {
                cfgtmp3 = cfg_getnsec(cfgtmp2, "mouse", j);
-               conf.barbutton[i].func[j] = name_to_func(cfg_getstr(cfgtmp3, "func"));
+               conf.barbutton[i].func[j] = name_to_func(cfg_getstr(cfgtmp3, "func"), func_list);
                conf.barbutton[i].cmd[j] = strdup(cfg_getstr(cfgtmp3, "cmd"));
                conf.barbutton[i].mouse[j] = char_to_button(cfg_getstr(cfgtmp3, "button"));
           }
@@ -352,4 +371,3 @@ init_conf(void)
 
      return;
 }
-

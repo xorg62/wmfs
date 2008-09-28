@@ -458,15 +458,15 @@ layoutswitch(char *cmd)
 {
      int i;
 
-     for(i = 0; i < NLAYOUT; ++i)
+     for(i = 0; i < conf.nlayout; ++i)
      {
-          if(tags[seltag].layout.symbol == lyt[i].symbol
-             && tags[seltag].layout.func == lyt[i].func)
+          if(tags[seltag].layout.symbol == conf.layout[i].symbol
+             && tags[seltag].layout.func == conf.layout[i].func)
           {
                if(cmd[0] == '+')
-                    tags[seltag].layout = lyt[(i + 1) % NLAYOUT];
+                    tags[seltag].layout = conf.layout[(i + 1) % conf.nlayout];
                else if(cmd[0] == '-')
-                    tags[seltag].layout = lyt[(i + NLAYOUT - 1) % NLAYOUT];
+                    tags[seltag].layout = conf.layout[(i + conf.nlayout - 1) % conf.nlayout];
                break;
           }
      }
@@ -553,6 +553,7 @@ manage(Window w, XWindowAttributes *wa)
      Window trans;
      Status rettrans;
      XWindowChanges winc;
+     XSetWindowAttributes at;
 
      c = emalloc(sizeof(Client));
      c->win = w;
@@ -561,6 +562,10 @@ manage(Window w, XWindowAttributes *wa)
      c->w = wa->width;
      c->h = wa->height;
      c->tag = seltag;
+
+     at.override_redirect = 1;
+     at.background_pixmap = ParentRelative;
+     at.event_mask = ButtonPressMask | ExposureMask;
 
      /* Create titlebar & button */
      if(conf.ttbarheight)
@@ -1009,7 +1014,7 @@ tile(void)
      tags[seltag].layout.func = tile;
 
      /* count all the "can-be-tiled" client */
-     for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), n++);
+     for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++n);
      if(n == 0)
           return;
 
@@ -1423,12 +1428,13 @@ main(int argc,char **argv)
      }
 
      /* Let's Go ! */
+
      init_conf();
      init();
      scan();
      mainloop();
 
-     /* Exiting WMFS :'( */
+      /* Exiting WMFS :'( */
      XFreeFont(dpy, font);
      XUngrabKey(dpy, AnyKey, AnyModifier, root);
      XFreeCursor(dpy, cursor[CurNormal]);
@@ -1440,6 +1446,7 @@ main(int argc,char **argv)
                XDestroyWindow(dpy, conf.barbutton[i].win);
      XSync(dpy, False);
      XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
+
      XCloseDisplay(dpy);
 
      exit(EXIT_SUCCESS);

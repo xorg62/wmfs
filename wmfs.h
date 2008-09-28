@@ -68,7 +68,7 @@
 #define BUTH         conf.ttbarheight - 6
 #define BUTX(x, w)   x + w - BUTH/400
 #define TEXTW(x)     XTextWidth(font, x, strlen(x)) + (fonth / 10)
-#define NLAYOUT      3
+#define MAXLAYOUT      3
 
 /* Client Structure */
 typedef struct Client Client;
@@ -153,10 +153,12 @@ typedef struct
           int layout_bg;
      } colors;
      Tag tag[MAXTAG];
+     Layout layout[MAXLAYOUT];
      BarButton barbutton[64];
      int ntag;
      int nkeybind;
      int nbutton;
+     int nlayout;
 } Conf;
 
 /* Config.c struct */
@@ -293,7 +295,6 @@ int seltag;
 int taglen[MAXTAG];
 Drawable dr;
 int bary;
-Layout lyt[NLAYOUT];
 
 /* Important Client */
 Client *clients;
