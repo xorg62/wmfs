@@ -553,7 +553,6 @@ manage(Window w, XWindowAttributes *wa)
      Window trans;
      Status rettrans;
      XWindowChanges winc;
-     XSetWindowAttributes at;
 
      c = emalloc(sizeof(Client));
      c->win = w;
@@ -562,10 +561,6 @@ manage(Window w, XWindowAttributes *wa)
      c->w = wa->width;
      c->h = wa->height;
      c->tag = seltag;
-
-     at.override_redirect = 1;
-     at.background_pixmap = ParentRelative;
-     at.event_mask = ButtonPressMask | ExposureMask;
 
      /* Create titlebar & button */
      if(conf.ttbarheight)
@@ -1434,7 +1429,7 @@ main(int argc,char **argv)
      scan();
      mainloop();
 
-      /* Exiting WMFS :'( */
+     /* Exiting WMFS :'( */
      XFreeFont(dpy, font);
      XUngrabKey(dpy, AnyKey, AnyModifier, root);
      XFreeCursor(dpy, cursor[CurNormal]);

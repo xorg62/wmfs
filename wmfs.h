@@ -68,7 +68,7 @@
 #define BUTH         conf.ttbarheight - 6
 #define BUTX(x, w)   x + w - BUTH/400
 #define TEXTW(x)     XTextWidth(font, x, strlen(x)) + (fonth / 10)
-#define MAXLAYOUT      3
+#define MAXLAYOUT    3
 
 /* Client Structure */
 typedef struct Client Client;
