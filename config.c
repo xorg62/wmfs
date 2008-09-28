@@ -122,7 +122,7 @@ Layout
 layout_name_to_struct(Layout lt[], char *name)
 {
      int i;
-     void *f;
+     void *f = NULL;
 
      if(name)
           for(i=0; layout_list[i].name; ++i)
