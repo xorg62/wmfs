@@ -231,7 +231,6 @@ void keymovey(char *cmd);
 void keyresize(char *cmd);
 void killclient(char *cmd);
 void layoutswitch(char *cmd);
-void lowerclient(Client *c);
 void mainloop(void);
 void mapclient(Client *c);
 void manage(Window w, XWindowAttributes *wa);

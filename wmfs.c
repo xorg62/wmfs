@@ -148,8 +148,10 @@ freelayout(void)
           if(!ishide(c))
           {
                if(c->tile)
+               {
                     moveresize(c, c->ox, c->oy, c->ow, c->oh, True);
-               c->tile = False;
+                    c->tile = False;
+               }
           }
      }
 
@@ -450,6 +452,7 @@ killclient(char *cmd)
      return;
 }
 
+/* Improved ! :) */
 void
 layoutswitch(char *cmd)
 {
@@ -457,32 +460,17 @@ layoutswitch(char *cmd)
 
      for(i = 0; i < NLAYOUT; ++i)
      {
-          if(!memcmp(&tags[seltag].layout, &lyt[i], sizeof(Layout)))
+          if(tags[seltag].layout.symbol == lyt[i].symbol
+             && tags[seltag].layout.func == lyt[i].func)
           {
                if(cmd[0] == '+')
-                    tags[seltag].layout = lyt[((i + 1 < NLAYOUT) ? i + 1 : 0)];
+                    tags[seltag].layout = lyt[(i + 1) % NLAYOUT];
                else if(cmd[0] == '-')
-                    tags[seltag].layout = lyt[((i - 1 > -1) ? i - 1 : NLAYOUT-1)];
+                    tags[seltag].layout = lyt[(i + NLAYOUT - 1) % NLAYOUT];
                break;
           }
      }
      arrange();
-
-     return;
-}
-
-void
-lowerclient(Client *c)
-{
-     if(!c)
-          return;
-     if(conf.ttbarheight)
-     {
-          if(conf.ttbarheight > 5)
-               XLowerWindow(dpy,c->button);
-          XLowerWindow(dpy,c->tbar);
-     }
-     XLowerWindow(dpy,c->win);
 
      return;
 }
@@ -584,7 +572,9 @@ manage(Window w, XWindowAttributes *wa)
 
           if(conf.ttbarheight > 5)
                c->button = XCreateSimpleWindow(dpy, root, BUTX(c->x, c->w),
-                                               BUTY(c->y), (BUTH) ? BUTH : 1, (BUTH) ? BUTH : 1,
+                                               BUTY(c->y),
+                                               ((BUTH) ? BUTH : 1),
+                                               ((BUTH) ? BUTH : 1),
                                                1, conf.colors.bordernormal,
                                                conf.colors.borderfocus);
      }
