@@ -968,7 +968,8 @@ tag(char *cmd)
      }
      else
      {
-          if(tmp == seltag)
+          if(tmp == seltag
+             || tmp > conf.ntag)
                return;
           seltag = tmp;
      }

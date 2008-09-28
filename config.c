@@ -187,7 +187,7 @@ init_conf(void)
 
      static cfg_opt_t key_opts[] =
           {
-               CFG_STR_LIST("mod","{Control}", CFGF_NONE),
+               CFG_STR_LIST("mod", "{Control}", CFGF_NONE),
                CFG_STR("key", "None", CFGF_NONE),
                CFG_STR("func", "", CFGF_NONE),
                CFG_STR("cmd",  "", CFGF_NONE),
@@ -318,6 +318,13 @@ init_conf(void)
 
      /* tag */
      conf.ntag = cfg_size(cfg_tags, "tag");
+
+     if(!conf.ntag)
+     {
+          printf("WMFS Configuration: There is no tags in the configuration file\n");
+          exit(EXIT_FAILURE);
+     }
+
      for(i = 0; i < conf.ntag; ++i)
      {
           cfgtmp = cfg_getnsec(cfg_tags, "tag", i);
