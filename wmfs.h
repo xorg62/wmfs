@@ -1,6 +1,6 @@
 /*
 *      wmfs.h
-*      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.con>
+*      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.com>
 *      All rights reserved.
 *
 *      Redistribution and use in source and binary forms, with or without
@@ -152,12 +152,6 @@ typedef struct
           int layout_fg;
           int layout_bg;
      } colors;
-     struct
-     {
-          char *free;
-          char *tile;
-          char *max;
-     } layouts;
      Tag tag[MAXTAG];
      BarButton barbutton[64];
      int ntag;
@@ -189,6 +183,7 @@ typedef struct
 enum { CurNormal, CurResize, CurMove, CurLast };
 enum { WMState, WMProtocols, WMName, WMDelete, WMLast };
 enum { NetSupported, NetWMName, NetLast };
+enum { Tile = 0, Max = 1, Free = 2};
 
 /* Functions Prototypes */
 
@@ -225,7 +220,6 @@ void freelayout(void);
 Client* getbutton(Window w);
 Client* getclient(Window w);
 Client* getnext(Client *c);
-char* getlayoutsym(int tag);
 Client* gettbar(Window w);
 void grabbuttons(Client *c, Bool focused);
 void grabkeys(void);
@@ -300,6 +294,7 @@ int seltag;
 int taglen[MAXTAG];
 Drawable dr;
 int bary;
+Layout lyt[NLAYOUT];
 
 /* Important Client */
 Client *clients;
@@ -310,3 +305,4 @@ unsigned int numlockmask;
 fd_set fd;
 
 #endif /* LOCAL_H */
+

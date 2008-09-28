@@ -1,6 +1,6 @@
 /*
 *      config.c
-*      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.con>
+*      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.com>
 *      All rights reserved.
 *
 *      Redistribution and use in source and binary forms, with or without
@@ -88,7 +88,7 @@ name_to_func(char *name)
      int i;
 
      if(name)
-          for(i=0; func_list[i].name ; ++i)
+          for(i = 0; func_list[i].name ; ++i)
                if(!strcmp(name, func_list[i].name))
                     return func_list[i].func;
      return NULL;
@@ -100,7 +100,7 @@ char_to_modkey(char *name)
      int i;
 
      if(name)
-          for(i=0; key_list[i].name; ++i)
+          for(i = 0; key_list[i].name; ++i)
                if(!strcmp(name, key_list[i].name))
                     return key_list[i].keysym;
      return NoSymbol;
@@ -112,22 +112,27 @@ char_to_button(char *name)
      int i;
 
      if(name)
-          for(i=0; mouse_button_list[i].name; ++i)
+          for(i = 0; mouse_button_list[i].name; ++i)
                if(!strcmp(name, mouse_button_list[i].name))
                     return mouse_button_list[i].button;
      return 0;
 }
 
-void*
-layout_name_to_layout(char *name)
+Layout
+layout_name_to_struct(Layout lt[], char *name)
 {
      int i;
+     void *f;
 
      if(name)
           for(i=0; layout_list[i].name; ++i)
                if(!strcmp(name, layout_list[i].name))
-                    return layout_list[i].func;
-     return 0;
+                    f = layout_list[i].func;
+     if(f)
+          for(i = 0; i < NLAYOUT; ++i)
+               if(lt[i].func == f)
+                    return lt[i];
+     return lt[Tile];
 }
 
 void
@@ -284,9 +289,13 @@ init_conf(void)
      conf.colors.layout_bg    = cfg_getint(cfg_colors, "layout_bg");
 
      /* layout */
-     conf.layouts.free = strdup(cfg_getstr(cfg_layouts, "free"));
-     conf.layouts.tile = strdup(cfg_getstr(cfg_layouts, "tile"));
-     conf.layouts.max  = strdup(cfg_getstr(cfg_layouts, "max"));
+     /* lyt is the base structure for all layouts */
+     lyt[Tile].symbol = strdup(cfg_getstr(cfg_layouts, "tile"));
+     lyt[Tile].func = tile;
+     lyt[Max].symbol = strdup(cfg_getstr(cfg_layouts, "max"));
+     lyt[Max].func = maxlayout;
+     lyt[Free].symbol = strdup(cfg_getstr(cfg_layouts, "free"));
+     lyt[Free].func = freelayout;
 
      /* tag */
      conf.ntag = cfg_size(cfg_tags, "tag");
@@ -296,7 +305,7 @@ init_conf(void)
           conf.tag[i].name = strdup(cfg_getstr(cfgtmp, "name"));
           conf.tag[i].mwfact = cfg_getfloat(cfgtmp, "mwfact");
           conf.tag[i].nmaster = cfg_getint(cfgtmp, "nmaster");
-          conf.tag[i].layout.func = layout_name_to_layout(cfg_getstr(cfgtmp, "layout"));
+          conf.tag[i].layout = layout_name_to_struct(lyt, cfg_getstr(cfgtmp, "layout"));
      }
 
       /* keybind ('tention ça rigole plus) */

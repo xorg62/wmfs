@@ -1,6 +1,6 @@
 /*
 *      event.c
-*      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.con>
+*      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.com>
 *      All rights reserved.
 *
 *      Redistribution and use in source and binary forms, with or without
@@ -81,7 +81,7 @@ buttonpress(XEvent ev)
           for(i = 0; i < conf.ntag + 1; ++i)
           {
                if(ev.xbutton.x > taglen[i-1] - 3
-                  && ev.xbutton.x < taglen[i])
+                  && ev.xbutton.x < (taglen[i] - 3))
                {
                     ITOA(s, i);
                     if(ev.xbutton.button == Button1)
@@ -101,7 +101,7 @@ buttonpress(XEvent ev)
           /* layout switch */
           if(ev.xbutton.x >= taglen[conf.ntag] - 3
              && ev.xbutton.x < taglen[conf.ntag] +
-             TEXTW(getlayoutsym(seltag)) - 3)
+             TEXTW(tags[seltag].layout.symbol) - 3)
           {
                if(ev.xbutton.button == Button1
                   || ev.xbutton.button == Button4)

@@ -1,6 +1,6 @@
 /*
 *      util.c
-*      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.con>
+*      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.com>
 *      All rights reserved.
 *
 *      Redistribution and use in source and binary forms, with or without
@@ -58,8 +58,7 @@ spawn(char *cmd)
                execl(getenv("SHELL"), getenv("SHELL"), "-c", cmd, (char*)NULL);
                exit(EXIT_FAILURE);
           }
-          exit(EXIT_SUCCESS);
-     }
+          exit(EXIT_SUCCESS);}
 
      return;
 }

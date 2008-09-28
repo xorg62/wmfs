@@ -1,6 +1,6 @@
 /*
 *      wmfs.c
-*      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.con>
+*      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.com>
 *      All rights reserved.
 *
 *      Redistribution and use in source and binary forms, with or without
@@ -77,13 +77,10 @@ clientpertag(int tag)
 void
 detach(Client *c)
 {
-     if(c->prev)
-          c->prev->next = c->next;
-     if(c->next)
-          c->next->prev = c->prev;
-     if(c == clients)
-          clients = c->next;
-     c->next = c->prev = NULL;
+     Client **cc;
+
+     for(cc = &clients; *cc && *cc != c; cc = &(*cc)->next);
+     *cc = c->next;
 
      return;
 }
@@ -185,20 +182,6 @@ getnext(Client *c)
      for(; c; c = c->prev);
 
      return c;
-}
-
-/* Will be replace */
-char*
-getlayoutsym(int tag)
-{
-     if(tags[tag].layout.func == freelayout)
-          return conf.layouts.free;
-     else if(tags[tag].layout.func == tile)
-          return conf.layouts.tile;
-     else if(tags[tag].layout.func == maxlayout)
-          return conf.layouts.max;
-
-     return NULL;
 }
 
 Client*
@@ -467,27 +450,21 @@ killclient(char *cmd)
      return;
 }
 
-/* Will be improve... */
 void
 layoutswitch(char *cmd)
 {
-     if(cmd[0] == '+')
+     int i;
+
+     for(i = 0; i < NLAYOUT; ++i)
      {
-          if(tags[seltag].layout.func == freelayout)
-               tags[seltag].layout.func = tile;
-          else if(tags[seltag].layout.func == tile)
-               tags[seltag].layout.func = maxlayout;
-          else if(tags[seltag].layout.func == maxlayout)
-               tags[seltag].layout.func = freelayout;
-     }
-     else if(cmd[0] == '-')
-     {
-          if(tags[seltag].layout.func == freelayout)
-               tags[seltag].layout.func = maxlayout;
-          else if(tags[seltag].layout.func == tile)
-               tags[seltag].layout.func = freelayout;
-          else if(tags[seltag].layout.func == maxlayout)
-               tags[seltag].layout.func = tile;
+          if(!memcmp(&tags[seltag].layout, &lyt[i], sizeof(Layout)))
+          {
+               if(cmd[0] == '+')
+                    tags[seltag].layout = lyt[((i + 1 < NLAYOUT) ? i + 1 : 0)];
+               else if(cmd[0] == '-')
+                    tags[seltag].layout = lyt[((i - 1 > -1) ? i - 1 : NLAYOUT-1)];
+               break;
+          }
      }
      arrange();
 
@@ -945,7 +922,7 @@ setsizehints(Client *c)
 	}
 	else
              c->incw = c->inch = 0;
-        /* nax */
+        /* max */
 	if(size.flags & PMaxSize)
         {
              c->maxw = size.max_width;
@@ -1250,12 +1227,14 @@ updatebar(void)
 
      /* Draw layout symbol */
      XSetForeground(dpy, gc, conf.colors.layout_bg);
-     XFillRectangle(dpy, dr, gc, taglen[conf.ntag] - 5, 0, TEXTW(getlayoutsym(seltag)), barheight);
+     XFillRectangle(dpy, dr, gc, taglen[conf.ntag] - 5, 0,
+                    TEXTW(strdup(tags[seltag].layout.symbol)),
+                    barheight);
      XSetForeground(dpy, gc, conf.colors.layout_fg);
      XDrawString(dpy, dr, gc, taglen[conf.ntag] - 4,
                  fonth,
-                 getlayoutsym(seltag),
-                 strlen(getlayoutsym(seltag)));
+                 tags[seltag].layout.symbol,
+                 strlen(tags[seltag].layout.symbol));
 
      /* Draw status */
      k = TEXTW(bartext);
@@ -1287,7 +1266,7 @@ updatebutton(Bool c)
      at.background_pixmap = ParentRelative;
      at.event_mask = ButtonPressMask | ExposureMask;
 
-     j = taglen[conf.ntag] + TEXTW(getlayoutsym(seltag));
+     j = taglen[conf.ntag] + TEXTW(tags[seltag].layout.symbol);
 
      if(!conf.bartop)
           y = bary + 3;
