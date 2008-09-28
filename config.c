@@ -126,7 +126,7 @@ layout_name_to_struct(Layout lt[], char *name)
      for(i = 0; i < MAXLAYOUT; ++i)
           if(lt[i].func == name_to_func(name, layout_list))
                return lt[i];
-     return lt[Tile];
+     return lt[0];
 }
 
 void

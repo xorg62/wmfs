@@ -185,7 +185,6 @@ typedef struct
 enum { CurNormal, CurResize, CurMove, CurLast };
 enum { WMState, WMProtocols, WMName, WMDelete, WMLast };
 enum { NetSupported, NetWMName, NetLast };
-enum { Tile = 0, Max = 1, Free = 2};
 
 /* Functions Prototypes */
 
