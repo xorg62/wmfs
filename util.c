@@ -58,7 +58,8 @@ spawn(char *cmd)
                execl(getenv("SHELL"), getenv("SHELL"), "-c", cmd, (char*)NULL);
                exit(EXIT_FAILURE);
           }
-          exit(EXIT_SUCCESS);}
+          exit(EXIT_SUCCESS);
+     }
 
      return;
 }

@@ -256,7 +256,7 @@ init_conf(void)
 
      if(ret == CFG_FILE_ERROR || ret == CFG_PARSE_ERROR)
      {
-          printf("WMFS: parsing configuration file (%s) failed\n", final_path);
+          printf("WMFS: parsing configuration file (%s) failed\n Use the default configuration.\n", final_path);
           sprintf(sfinal_path, "%s/wmfs/wmfsrc", XDG_CONFIG_DIR);
           ret = cfg_parse(cfg, sfinal_path);
      }

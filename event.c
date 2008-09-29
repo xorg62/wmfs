@@ -33,8 +33,9 @@
 #include "wmfs.h"
 
 /* BUTTONPRESS
-* will be improve with the
-* maybe configration file */
+*  For make a code cleaner, i put
+*  more {} (useless sometimes)
+*  and BIG comment.*/
 void
 buttonpress(XEvent ev)
 {
@@ -42,92 +43,159 @@ buttonpress(XEvent ev)
      int i, j;
      char s[6];
 
-     /* Tbar'n'Button */
      if(conf.ttbarheight)
      {
-          if((c = gettbar(ev.xbutton.window)))
+          /* ******** */
+          /* TITLEBAR */
+          /* ******** */
+               if((c = gettbar(ev.xbutton.window)))
+               {
+                    raiseclient(c);
+                    /* BUTTON 1 */
+                         if(ev.xbutton.button == Button1)
+                              mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Move);
+                    /* BUTTON 2 */
+                        else if(ev.xbutton.button == Button2)
+                        {
+                             if(tags[seltag].layout.func == tile)
+                                  tile_switch(NULL);
+                             else
+                                  togglemax(NULL);
+                        }
+                    /* BUTTON 3 */
+                        else if(ev.xbutton.button == Button3)
+                             mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Resize);
+               }
+
+          /* ***************** */
+          /* TITLEBAR'S BUTTON */
+          /* ***************** */
+               else if((c = getbutton(ev.xbutton.window)))
+               {
+                    /* BUTTON 1 */
+                         if(ev.xbutton.button == Button1)
+                              killclient(NULL);
+                    /* BUTTON 2 AND 3 */
+                         else if(ev.xbutton.button == Button2
+                                 || ev.xbutton.button == Button3)
+                         {
+                              if(tags[seltag].layout.func == tile)
+                                   tile_switch(NULL);
+                              else
+                                   togglemax(NULL);
+                         }
+               }
+     }
+
+     /* ****** */
+     /* CLIENT */
+     /* ****** */
+          if((c = getclient(ev.xbutton.window)))
           {
                raiseclient(c);
-               if(ev.xbutton.button == Button1)
-                    mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Move);
-               else if(ev.xbutton.button == Button2)
-                    tile_switch(NULL);
-               else if(ev.xbutton.button == Button3)
-                    mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Resize);
-          }
-          else if((c = getbutton(ev.xbutton.window)))
-          {
-               if(ev.xbutton.button == Button1)
-                    killclient(NULL);
-               else if(ev.xbutton.button == Button3)
-                    togglemax(NULL);
-          }
-     }
-     /* Window */
-     if((c = getclient(ev.xbutton.window)))
-     {
-          raiseclient(c);
-          if(ev.xbutton.button == Button1)
-               mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Move);
-          else if(ev.xbutton.button == Button2)
-               togglemax(NULL);
-          else if(ev.xbutton.button == Button3)
-               mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Resize);
-     }
-     /* Bar */
-     /* for tag click */
-     else if(ev.xbutton.window == bar)
-     {
-          for(i = 0; i < conf.ntag + 1; ++i)
-          {
-               if(ev.xbutton.x > taglen[i-1] - 3
-                  && ev.xbutton.x < (taglen[i] - 3))
-               {
-                    ITOA(s, i);
+               /* BUTTON 1 */
                     if(ev.xbutton.button == Button1)
-                         tag(s);
-                    else if(ev.xbutton.button == Button3)
-                         tagtransfert(s);
+                         mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Move);
+               /* BUTTON 2 */
+                   else if(ev.xbutton.button == Button2)
+                   {
+                        if(tags[seltag].layout.func == tile)
+                             tile_switch(NULL);
+                        else
+                             togglemax(NULL);
+                   }
+               /* BUTTON 3 */
+                  else if(ev.xbutton.button == Button3)
+                       mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Resize);
+          }
+
+     /* *** */
+     /* BAR */
+     /* *** */
+     {
+          if(ev.xbutton.window == bar)
+          {
+               /* *** */
+               /* TAG */
+               /* *** */
+               {
+                    /* CLICK */
+                    {
+                         for(i = 0; i < conf.ntag + 1; ++i)
+                         {
+                              if(ev.xbutton.x > taglen[i-1] - 3
+                                 && ev.xbutton.x < (taglen[i] - 3))
+                              {
+                                   ITOA(s, i);
+                                   /* BUTTON 1 */
+                                        if(ev.xbutton.button == Button1)
+                                             tag(s);
+                                   /* BUTTON 2 */
+                                        else if(ev.xbutton.button == Button3)
+                                             tagtransfert(s);
+                              }
+                         }
+                    }
+
+                    /* SCROLL */
+                    {
+                         if(ev.xbutton.x < taglen[conf.ntag])
+                         {
+                              /* BUTTON 4 (UP) */
+                                   if(ev.xbutton.button == Button4)
+                                        tag("+1");
+                              /* BUTTON 5 (UP) */
+                                   else if (ev.xbutton.button == Button5)
+                                        tag("-1");
+                         }
+                    }
+               }
+
+               /* ****** */
+               /* LAYOUT */
+               /* ****** */
+               {
+                    if(ev.xbutton.x >= taglen[conf.ntag] - 3
+                       && ev.xbutton.x < taglen[conf.ntag] +
+                       TEXTW(tags[seltag].layout.symbol) - 3)
+                    {
+                         /* BUTTON 1 / 4 */
+                              if(ev.xbutton.button == Button1
+                                 || ev.xbutton.button == Button4)
+                                   layoutswitch("+");
+                         /* BUTTON 3 / 5 */
+                              else if(ev.xbutton.button == Button3
+                                      || ev.xbutton.button == Button5)
+                                   layoutswitch("-");
+                    }
                }
           }
-          /* tag switch with scroll */
-          if(ev.xbutton.x < taglen[conf.ntag])
+     }
+
+     /* **** */
+     /* Root */
+     /* **** */
+     {
+          if(ev.xbutton.window == root)
           {
                if(ev.xbutton.button == Button4)
                     tag("+1");
                else if(ev.xbutton.button == Button5)
                     tag("-1");
           }
-          /* layout switch */
-          if(ev.xbutton.x >= taglen[conf.ntag] - 3
-             && ev.xbutton.x < taglen[conf.ntag] +
-             TEXTW(tags[seltag].layout.symbol) - 3)
-          {
-               if(ev.xbutton.button == Button1
-                  || ev.xbutton.button == Button4)
-                    layoutswitch("+");
-               else if(ev.xbutton.button == Button3
-                       || ev.xbutton.button == Button5)
-                    layoutswitch("-");
-          }
      }
-     /* Root */
-     /* tag switch */
-     else if(ev.xbutton.window == root)
-     {
-          if(ev.xbutton.button == Button4)
-               tag("+1");
-          else if(ev.xbutton.button == Button5)
-               tag("-1");
-     }
-     /* Bar Button */
-     for(i=0; i<conf.nbutton ; ++i)
-          for(j=0; j<conf.barbutton[i].nmousesec; ++j)
-               if(ev.xbutton.window == conf.barbutton[i].win
-                  && ev.xbutton.button == conf.barbutton[i].mouse[j])
-                    if(conf.barbutton[i].func[j])
-                         conf.barbutton[i].func[j](conf.barbutton[i].cmd[j]);
 
+     /* ********** */
+     /* Bar Button */
+     /* ********** */
+     {
+          for(i=0; i<conf.nbutton ; ++i)
+               for(j=0; j<conf.barbutton[i].nmousesec; ++j)
+                    if(ev.xbutton.window == conf.barbutton[i].win
+                       && ev.xbutton.button == conf.barbutton[i].mouse[j])
+                         if(conf.barbutton[i].func[j])
+                              conf.barbutton[i].func[j](conf.barbutton[i].cmd[j]);
+     }
      return;
 }
 

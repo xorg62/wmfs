@@ -494,7 +494,8 @@ mainloop(void)
           FD_SET(ConnectionNumber(dpy), &fd);
           if(select(ConnectionNumber(dpy) + 1, &fd, NULL, NULL, NULL) == -1)
                printf("WMFS Warning: Select failed\n");
-          if(FD_ISSET(STDIN_FILENO, &fd)) {
+          if(FD_ISSET(STDIN_FILENO, &fd))
+          {
                if((r = read(STDIN_FILENO, sbuf + offset, len - offset)))
                {
                     for(p = sbuf + offset; r > 0; ++p, --r, ++offset)
