@@ -48,35 +48,47 @@ buttonpress(XEvent ev)
           /* ******** */
           /* TITLEBAR */
           /* ******** */
+          {
                if((c = gettbar(ev.xbutton.window)))
                {
                     raiseclient(c);
                     /* BUTTON 1 */
+                    {
                          if(ev.xbutton.button == Button1)
                               mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Move);
+                    }
                     /* BUTTON 2 */
-                        else if(ev.xbutton.button == Button2)
-                        {
-                             if(tags[seltag].layout.func == tile)
-                                  tile_switch(NULL);
-                             else
-                                  togglemax(NULL);
-                        }
+                    {
+                         if(ev.xbutton.button == Button2)
+                         {
+                              if(tags[seltag].layout.func == tile)
+                                   tile_switch(NULL);
+                              else
+                                   togglemax(NULL);
+                         }
+                    }
                     /* BUTTON 3 */
-                        else if(ev.xbutton.button == Button3)
-                             mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Resize);
+                    {
+                         if(ev.xbutton.button == Button3)
+                              mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Resize);
+                    }
                }
+          }
 
           /* ***************** */
           /* TITLEBAR'S BUTTON */
           /* ***************** */
-               else if((c = getbutton(ev.xbutton.window)))
+          {
+               if((c = getbutton(ev.xbutton.window)))
                {
                     /* BUTTON 1 */
+                    {
                          if(ev.xbutton.button == Button1)
                               killclient(NULL);
+                    }
                     /* BUTTON 2 AND 3 */
-                         else if(ev.xbutton.button == Button2
+                    {
+                         if(ev.xbutton.button == Button2
                                  || ev.xbutton.button == Button3)
                          {
                               if(tags[seltag].layout.func == tile)
@@ -84,30 +96,41 @@ buttonpress(XEvent ev)
                               else
                                    togglemax(NULL);
                          }
+                    }
                }
+          }
+
      }
 
      /* ****** */
      /* CLIENT */
      /* ****** */
+     {
           if((c = getclient(ev.xbutton.window)))
           {
                raiseclient(c);
                /* BUTTON 1 */
+               {
                     if(ev.xbutton.button == Button1)
                          mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Move);
+               }
                /* BUTTON 2 */
-                   else if(ev.xbutton.button == Button2)
-                   {
-                        if(tags[seltag].layout.func == tile)
-                             tile_switch(NULL);
-                        else
-                             togglemax(NULL);
-                   }
+               {
+                    if(ev.xbutton.button == Button2)
+                    {
+                         if(tags[seltag].layout.func == tile)
+                              tile_switch(NULL);
+                         else
+                              togglemax(NULL);
+                    }
+               }
                /* BUTTON 3 */
-                  else if(ev.xbutton.button == Button3)
-                       mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Resize);
+               {
+                    if(ev.xbutton.button == Button3)
+                         mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Resize);
+               }
           }
+     }
 
      /* *** */
      /* BAR */
@@ -128,11 +151,15 @@ buttonpress(XEvent ev)
                               {
                                    ITOA(s, i);
                                    /* BUTTON 1 */
+                                   {
                                         if(ev.xbutton.button == Button1)
                                              tag(s);
+                                   }
                                    /* BUTTON 2 */
-                                        else if(ev.xbutton.button == Button3)
+                                   {
+                                        if(ev.xbutton.button == Button3)
                                              tagtransfert(s);
+                                   }
                               }
                          }
                     }
@@ -142,11 +169,15 @@ buttonpress(XEvent ev)
                          if(ev.xbutton.x < taglen[conf.ntag])
                          {
                               /* BUTTON 4 (UP) */
+                              {
                                    if(ev.xbutton.button == Button4)
                                         tag("+1");
+                              }
                               /* BUTTON 5 (UP) */
-                                   else if (ev.xbutton.button == Button5)
+                              {
+                                   if (ev.xbutton.button == Button5)
                                         tag("-1");
+                              }
                          }
                     }
                }
@@ -160,13 +191,17 @@ buttonpress(XEvent ev)
                        TEXTW(tags[seltag].layout.symbol) - 3)
                     {
                          /* BUTTON 1 / 4 */
+                         {
                               if(ev.xbutton.button == Button1
                                  || ev.xbutton.button == Button4)
                                    layoutswitch("+");
+                         }
                          /* BUTTON 3 / 5 */
-                              else if(ev.xbutton.button == Button3
-                                      || ev.xbutton.button == Button5)
+                         {
+                              if(ev.xbutton.button == Button3
+                                 || ev.xbutton.button == Button5)
                                    layoutswitch("-");
+                         }
                     }
                }
           }
@@ -178,10 +213,16 @@ buttonpress(XEvent ev)
      {
           if(ev.xbutton.window == root)
           {
-               if(ev.xbutton.button == Button4)
-                    tag("+1");
-               else if(ev.xbutton.button == Button5)
+               /* BUTTON 4 */
+               {
+                    if(ev.xbutton.button == Button4)
+                         tag("+1");
+               }
+               /* BUTTON 5 */
+               {
+                    if(ev.xbutton.button == Button5)
                     tag("-1");
+               }
           }
      }
 
@@ -381,17 +422,17 @@ getevent(void)
 {
      switch (event.type)
      {
-     case ButtonPress:       buttonpress(event);       break;
-     case ConfigureRequest:  configurerequest(event);  break;
-     case DestroyNotify:     destroynotify(event);     break;
-     case EnterNotify:       enternotify(event);       break;
-     case Expose:            expose(event);            break;
-     case FocusIn:           focusin(event);           break;
-     case KeyPress:          keypress(event);          break;
-     case MapRequest:        maprequest(event);        break;
-     case MappingNotify:     mapnotify(event);         break;
-     case PropertyNotify:    propertynotify(event);    break;
-     case UnmapNotify:       unmapnotify(event);       break;
+      case ButtonPress:       buttonpress(event);       break;
+      case ConfigureRequest:  configurerequest(event);  break;
+      case DestroyNotify:     destroynotify(event);     break;
+      case EnterNotify:       enternotify(event);       break;
+      case Expose:            expose(event);            break;
+      case FocusIn:           focusin(event);           break;
+      case KeyPress:          keypress(event);          break;
+      case MapRequest:        maprequest(event);        break;
+      case MappingNotify:     mapnotify(event);         break;
+      case PropertyNotify:    propertynotify(event);    break;
+      case UnmapNotify:       unmapnotify(event);       break;
      }
 
      return;
