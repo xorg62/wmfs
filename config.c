@@ -135,12 +135,19 @@ init_conf(void)
 
      static cfg_opt_t misc_opts[] =
           {
-               CFG_STR("font",               "*-fixed-medium-*-12-*", CFGF_NONE),
                CFG_STR("bar_position",       "top",                   CFGF_NONE),
                CFG_BOOL("raisefocus",        cfg_false,               CFGF_NONE),
                CFG_BOOL("raiseswitch",       cfg_true,                CFGF_NONE),
                CFG_INT("border_height",      1,                       CFGF_NONE),
                CFG_INT("titlebar_height",    0,                       CFGF_NONE),
+               CFG_END()
+          };
+
+     static cfg_opt_t font_opts[] =
+          {
+               CFG_STR("face", "fixed", CFGF_NONE),
+               CFG_STR("style", "medium", CFGF_NONE),
+               CFG_INT("size", 12, CFGF_NONE),
                CFG_END()
           };
 
@@ -227,6 +234,7 @@ init_conf(void)
      static cfg_opt_t opts[] =
           {
                CFG_SEC("misc",    misc_opts,    CFGF_NONE),
+               CFG_SEC("font",    font_opts,    CFGF_NONE),
                CFG_SEC("colors",  colors_opts,  CFGF_NONE),
                CFG_SEC("layouts", layouts_opts, CFGF_NONE),
                CFG_SEC("tags",    tags_opts,    CFGF_NONE),
@@ -237,6 +245,7 @@ init_conf(void)
 
      cfg_t *cfg;
      cfg_t *cfg_misc;
+     cfg_t *cfg_font;
      cfg_t *cfg_colors;
      cfg_t *cfg_layouts;
      cfg_t *cfg_tags;
@@ -263,6 +272,7 @@ init_conf(void)
      }
 
      cfg_misc    = cfg_getsec(cfg, "misc");
+     cfg_font    = cfg_getsec(cfg, "font");
      cfg_colors  = cfg_getsec(cfg, "colors");
      cfg_layouts = cfg_getsec(cfg, "layouts");
      cfg_tags    = cfg_getsec(cfg, "tags");
@@ -270,12 +280,16 @@ init_conf(void)
      cfg_buttons = cfg_getsec(cfg, "buttons");
 
      /* misc */
-     conf.font          = strdup(cfg_getstr(cfg_misc, "font"));
      conf.raisefocus    = cfg_getbool(cfg_misc,       "raisefocus");
      conf.raiseswitch   = cfg_getbool(cfg_misc,       "raiseswitch");
      conf.borderheight  = cfg_getint(cfg_misc,        "border_height");
      conf.ttbarheight   = cfg_getint(cfg_misc,        "titlebar_height");
      conf.bartop        = (strcmp(strdup(cfg_getstr(cfg_misc, "bar_position")), "top") == 0) ? True : False;
+
+     /* font */
+     conf.font.face  = strdup(cfg_getstr(cfg_font, "face"));
+     conf.font.style = strdup(cfg_getstr(cfg_font, "style"));
+     conf.font.size  = cfg_getint(cfg_font, "size");
 
      /* colors */
      conf.colors.bordernormal = cfg_getint(cfg_colors, "border_normal");

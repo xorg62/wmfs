@@ -60,8 +60,6 @@
 #define ALT          Mod1Mask
 #define ITOA(p ,n)   sprintf(p, "%i", n)
 #define debug(p)     printf("debug: %i\n", p)
-#define Move         0
-#define Resize       1
 #define MAXTAG       36
 #define NBUTTON      5
 #define BUTY(y)      y - conf.ttbarheight + 3
@@ -135,12 +133,17 @@ typedef struct
 /* Configuration structure */
 typedef struct
 {
-     char *font;
      bool raisefocus;
      bool raiseswitch;
      bool bartop;
      int borderheight;
      int ttbarheight;
+     struct
+     {
+          char *face;
+          char *style;
+          int size;
+     } font;
      struct
      {
           int bordernormal;
@@ -269,7 +272,6 @@ Display *dpy;
 XEvent event;
 GC gc;
 Window root;
-Window bar;
 int screen;
 int mw, mh;
 Conf conf;
@@ -301,7 +303,6 @@ Client *sel;
 
 /* Other */
 unsigned int numlockmask;
-fd_set fd;
 
 #endif /* LOCAL_H */
 

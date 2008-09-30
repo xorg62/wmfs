@@ -36,7 +36,6 @@ void
 arrange(void)
 {
      Client *c;
-
      for(c = clients; c; c = c->next)
           if(!ishide(c))
                unhide(c);
@@ -46,7 +45,6 @@ arrange(void)
      focus(NULL);
      tags[seltag].layout.func();
      updatebar();
-
      return;
  }
 
@@ -212,28 +210,28 @@ grabbuttons(Client *c, Bool focused)
      if(focused)
      {
           /* Window */
-          XGrabButton(dpy, Button1, ALT, c->win, False, ButtonMask,GrabModeAsync,GrabModeSync, None, None);
-          XGrabButton(dpy, Button1, ALT|LockMask, c->win, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, Button2, ALT, c->win, False, ButtonMask,GrabModeAsync,GrabModeSync, None, None);
-          XGrabButton(dpy, Button2, ALT|LockMask, c->win, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, Button3, ALT, c->win, False, ButtonMask,GrabModeAsync,GrabModeSync, None, None);
-          XGrabButton(dpy, Button3, ALT|LockMask, c->win, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button1, ALT, c->win, False, ButtonMask, GrabModeAsync,GrabModeSync, None, None);
+          XGrabButton(dpy, Button1, ALT|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button2, ALT, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button2, ALT|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button3, ALT, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button3, ALT|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
           if(conf.ttbarheight)
           {
                /* Titlebar */
-               XGrabButton(dpy, Button1, AnyModifier, c->tbar, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
-               XGrabButton(dpy, Button2, AnyModifier, c->tbar, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
-               XGrabButton(dpy, Button3, AnyModifier, c->tbar, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, Button1, AnyModifier, c->tbar, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, Button2, AnyModifier, c->tbar, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, Button3, AnyModifier, c->tbar, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
                /* Titlebar Button */
                if(conf.ttbarheight > 5)
                {
-                    XGrabButton(dpy, Button1, AnyModifier, c->button, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
-                    XGrabButton(dpy, Button3, AnyModifier, c->button, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+                    XGrabButton(dpy, Button1, AnyModifier, c->button, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+                    XGrabButton(dpy, Button3, AnyModifier, c->button, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
                }
           }
           /* Bar Button */
           for(i=0; i< conf.nbutton; ++i)
-               XGrabButton(dpy, Button1, AnyModifier, conf.barbutton[i].win, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, Button1, AnyModifier, conf.barbutton[i].win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
      }
      else
      {
@@ -245,7 +243,7 @@ grabbuttons(Client *c, Bool focused)
                     XGrabButton(dpy, AnyButton, AnyModifier, c->button, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
           }
           for(i=0; i< conf.nbutton; ++i)
-               XGrabButton(dpy, Button1, AnyModifier, conf.barbutton[i].win, False, ButtonMask,GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, Button1, AnyModifier, conf.barbutton[i].win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
      }
 
      return;
@@ -295,6 +293,7 @@ init(void)
      XSetWindowAttributes at;
      XModifierKeymap *modmap;
      int i, j;
+     char fontbuf[128];
 
      /* FIRST INIT */
      gc = DefaultGC (dpy, screen);
@@ -307,14 +306,18 @@ init(void)
      taglen[0] = 3;
      seltag = 1;
      for(i = 0; i < conf.ntag + 1; ++i)
-          tags[i] = conf.tag[i-1];
+          tags[i] = conf.tag[i - 1];
 
      /* INIT FONT */
-     font = XLoadQueryFont(dpy, conf.font);
+     sprintf(fontbuf, "*-%s-%s-*-%d-*",
+             conf.font.face,
+             conf.font.style,
+             conf.font.size);
+     font = XLoadQueryFont(dpy, fontbuf);
      if(!font)
      {
-          fprintf(stderr, "XLoadQueryFont: failed loading font '%s'\n", conf.font);
-          exit(0);
+          fprintf(stderr, "XLoadQueryFont: failed loading font '%s'\n", fontbuf);
+          exit(EXIT_FAILURE);
      }
      XSetFont(dpy, gc, font->fid);
      fonth = (font->ascent + font->descent) - 1;
@@ -1421,11 +1424,10 @@ main(int argc,char **argv)
      if(!dpy)
      {
           printf("WMFS: cannot open X server.\n");
-          exit(1);
+          exit(EXIT_FAILURE);
      }
 
      /* Let's Go ! */
-
      init_conf();
      init();
      scan();

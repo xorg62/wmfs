@@ -55,7 +55,7 @@ buttonpress(XEvent ev)
                     /* BUTTON 1 */
                     {
                          if(ev.xbutton.button == Button1)
-                              mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Move);
+                              mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, False);
                     }
                     /* BUTTON 2 */
                     {
@@ -70,14 +70,15 @@ buttonpress(XEvent ev)
                     /* BUTTON 3 */
                     {
                          if(ev.xbutton.button == Button3)
-                              mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Resize);
+                              mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, True);
                     }
                }
+
           }
 
-          /* ***************** */
-          /* TITLEBAR'S BUTTON */
-          /* ***************** */
+          /* ****** */
+          /* BUTTON */
+          /* ****** */
           {
                if((c = getbutton(ev.xbutton.window)))
                {
@@ -98,6 +99,7 @@ buttonpress(XEvent ev)
                          }
                     }
                }
+
           }
 
      }
@@ -112,7 +114,7 @@ buttonpress(XEvent ev)
                /* BUTTON 1 */
                {
                     if(ev.xbutton.button == Button1)
-                         mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Move);
+                         mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, False);
                }
                /* BUTTON 2 */
                {
@@ -127,9 +129,10 @@ buttonpress(XEvent ev)
                /* BUTTON 3 */
                {
                     if(ev.xbutton.button == Button3)
-                         mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, Resize);
+                         mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, True);
                }
           }
+
      }
 
      /* *** */
@@ -142,6 +145,7 @@ buttonpress(XEvent ev)
                /* TAG */
                /* *** */
                {
+
                     /* CLICK */
                     {
                          for(i = 0; i < conf.ntag + 1; ++i)
@@ -162,6 +166,7 @@ buttonpress(XEvent ev)
                                    }
                               }
                          }
+
                     }
 
                     /* SCROLL */
@@ -179,13 +184,17 @@ buttonpress(XEvent ev)
                                         tag("-1");
                               }
                          }
+
                     }
+
+
                }
 
                /* ****** */
                /* LAYOUT */
                /* ****** */
                {
+
                     if(ev.xbutton.x >= taglen[conf.ntag] - 3
                        && ev.xbutton.x < taglen[conf.ntag] +
                        TEXTW(tags[seltag].layout.symbol) - 3)
@@ -203,12 +212,15 @@ buttonpress(XEvent ev)
                                    layoutswitch("-");
                          }
                     }
+
                }
+
+
           }
      }
 
      /* **** */
-     /* Root */
+     /* ROOT */
      /* **** */
      {
           if(ev.xbutton.window == root)
@@ -221,14 +233,15 @@ buttonpress(XEvent ev)
                /* BUTTON 5 */
                {
                     if(ev.xbutton.button == Button5)
-                    tag("-1");
+                         tag("-1");
                }
           }
+
      }
 
-     /* ********** */
-     /* Bar Button */
-     /* ********** */
+     /* *********** */
+     /* BAR BUTTONS */
+     /* *********** */
      {
           for(i=0; i<conf.nbutton ; ++i)
                for(j=0; j<conf.barbutton[i].nmousesec; ++j)
