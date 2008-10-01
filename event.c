@@ -287,7 +287,7 @@ destroynotify(XEvent ev)
      if((c = getclient(ev.xdestroywindow.window)))
           unmanage(c);
 
-     return;
+  return;
 }
 
 /* ENTERNOTIFY */
