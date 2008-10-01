@@ -209,7 +209,7 @@ void unmapnotify(XEvent ev);
 void getevent(void);
 
 /* util.c */
-void *emalloc(unsigned int elemet, size_t size);
+void *emalloc(unsigned int elemet, unsigned int size);
 void spawn(char *cmd);
 
 /* layout.c */

@@ -33,7 +33,7 @@
 #include "wmfs.h"
 
 void*
-emalloc(unsigned int element, size_t size)
+emalloc(unsigned int element, unsigned int size)
 {
      void *ret = calloc(element, size);
 
