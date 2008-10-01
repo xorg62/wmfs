@@ -43,6 +43,17 @@ emalloc(unsigned int element, unsigned int size)
      return ret;
 }
 
+unsigned long
+getcolor(char *color)
+{
+     Colormap cmap = DefaultColormap(dpy, screen);
+     XColor xcolor;
+
+     if(!XAllocNamedColor(dpy, cmap, color, &xcolor, &xcolor))
+          fprintf(stderr,"WMFS Error: cannot allocate color \"%s\"\n", color);
+     return xcolor.pixel;
+}
+
 void
 uicb_spawn(char *cmd)
 {

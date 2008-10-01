@@ -209,6 +209,7 @@ void getevent(void);
 
 /* util.c */
 void *emalloc(unsigned int elemet, unsigned int size);
+unsigned long getcolor(char *color);
 void uicb_spawn(char *cmd);
 
 /* tag.c */

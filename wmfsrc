@@ -18,14 +18,14 @@ font
 
 colors
 {
-        border_normal = 0x3F485E
-        border_focus  = 0x7E89A2
-        bar           = 0x191919
-        text          = 0xD4D4D4
-        tag_sel_fg    = 0x000000
-        tag_sel_bg    = 0x7E89A2
-        layout_fg     = 0x000000
-        layout_bg     = 0x7E89A2
+        border_normal = "#3F485E"
+        border_focus  = "#7E89A2"
+        bar           = "#191919"
+        text          = "#D4D4D4"
+        tag_sel_fg    = "#000000"
+        tag_sel_bg    = "#7E89A2"
+        layout_fg     = "#000000"
+        layout_bg     = "#7E89A2"
 }
 
 layouts
@@ -55,12 +55,12 @@ buttons
         {
                 text = "[-]"
                 mouse { button = "Button1" func = "set_mwfact" cmd = "-0.01"}
-                fg_color = 0xFFFFFF
-                bg_color = 0x191919
+                fg_color = "#FFFFFF"
+                bg_color = "#191919"
         }
         button
         {
-               text = "Mwfact" fg_color = 0xFFFFFF bg_color = 0x3E3E3E
+               text = "Mwfact" fg_color = "#FFFFFF" bg_color = "#3E3E3E"
                mouse { button = "Button4" func = "set_mwfact" cmd = "+0.01"}
                mouse { button = "Button5" func = "set_mwfact" cmd = "-0.01"}
         }
@@ -68,8 +68,8 @@ buttons
         {
                 text = "[+] "
                 mouse { button = "Button1" func = "set_mwfact" cmd = "+0.01"}
-                fg_color = 0xFFFFFF
-                bg_color = 0x191919
+                fg_color = "#FFFFFF"
+                bg_color = "#191919"
         }
         # }}}
 
@@ -78,16 +78,16 @@ buttons
         {
                 text = "[-]"
                 mouse { button = "Button1" func = "set_nmaster" cmd = "-1"}
-                fg_color = 0xFFFFFF
-                bg_color = 0x191919
+                fg_color = "#FFFFFF"
+                bg_color = "#191919"
         }
-        button { text = "Nmaster" fg_color = 0xFFFFFF bg_color = 0x3E3E3E }
+        button { text = "Nmaster" fg_color = "#FFFFFF" bg_color = "#3E3E3E" }
         button
         {
                 text = "[+] "
                 mouse { button = "Button1" func = "set_nmaster" cmd = "+1"}
-                fg_color = 0xFFFFFF
-                bg_color = 0x191919
+                fg_color = "#FFFFFF"
+                bg_color = "#191919"
         }
         # }}}
 }

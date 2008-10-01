@@ -154,14 +154,14 @@ init_conf(void)
 
      static cfg_opt_t colors_opts[] =
           {
-               CFG_INT("border_normal", 0x354B5C,  CFGF_NONE),
-               CFG_INT("border_focus",  0x6286A1,  CFGF_NONE),
-               CFG_INT("bar",           0x090909,  CFGF_NONE),
-               CFG_INT("text",          0x6289A1,  CFGF_NONE),
-               CFG_INT("tag_sel_fg",    0xFFFFFF,  CFGF_NONE),
-               CFG_INT("tag_sel_bg",    0x354B5C,  CFGF_NONE),
-               CFG_INT("layout_fg",     0xFFFFFF,  CFGF_NONE),
-               CFG_INT("layout_bg",     0x292929,  CFGF_NONE),
+               CFG_STR("border_normal", "#354B5C",  CFGF_NONE),
+               CFG_STR("border_focus",  "#6286A1",  CFGF_NONE),
+               CFG_STR("bar",           "#090909",  CFGF_NONE),
+               CFG_STR("text",          "#6289A1",  CFGF_NONE),
+               CFG_STR("tag_sel_fg",    "#FFFFFF",  CFGF_NONE),
+               CFG_STR("tag_sel_bg",    "#354B5C",  CFGF_NONE),
+               CFG_STR("layout_fg",     "#FFFFFF",  CFGF_NONE),
+               CFG_STR("layout_bg",     "#292929",  CFGF_NONE),
                CFG_END()
           };
 
@@ -220,8 +220,8 @@ init_conf(void)
           {
                CFG_STR("text", "", CFGF_NONE),
                CFG_SEC("mouse",    mouse_button_opts, CFGF_MULTI),
-               CFG_INT("fg_color", 0x000000, CFGF_NONE),
-               CFG_INT("bg_color", 0xFFFFFF, CFGF_NONE),
+               CFG_STR("fg_color", "#000000", CFGF_NONE),
+               CFG_STR("bg_color", "#FFFFFF", CFGF_NONE),
                CFG_INT("x", 0, CFGF_NONE),
                CFG_END()
           };
@@ -269,7 +269,7 @@ init_conf(void)
           sprintf(sfinal_path, "%s/wmfs/wmfsrc", XDG_CONFIG_DIR);
           printf("WMFS: parsing configuration file (%s) failed\n"
                  "Use the default configuration (%s).\n", final_path, sfinal_path);
-          ret = cfg_parse(cfg, sfinal_path);
+            ret = cfg_parse(cfg, sfinal_path);
      }
 
      cfg_misc    = cfg_getsec(cfg, "misc");
@@ -293,19 +293,19 @@ init_conf(void)
      conf.font.size  = cfg_getint(cfg_font, "size");
 
      /* colors */
-     conf.colors.bordernormal = cfg_getint(cfg_colors, "border_normal");
-     conf.colors.borderfocus  = cfg_getint(cfg_colors, "border_focus");
-     conf.colors.bar          = cfg_getint(cfg_colors, "bar");
-     conf.colors.text         = cfg_getint(cfg_colors, "text");
-     conf.colors.tagselfg     = cfg_getint(cfg_colors, "tag_sel_fg");
-     conf.colors.tagselbg     = cfg_getint(cfg_colors, "tag_sel_bg");
-     conf.colors.layout_fg    = cfg_getint(cfg_colors, "layout_fg");
-     conf.colors.layout_bg    = cfg_getint(cfg_colors, "layout_bg");
+     conf.colors.bordernormal = getcolor(strdup(cfg_getstr(cfg_colors, "border_normal")));
+     conf.colors.borderfocus  = getcolor(strdup(cfg_getstr(cfg_colors, "border_focus")));
+     conf.colors.bar          = getcolor(strdup(cfg_getstr(cfg_colors, "bar")));
+     conf.colors.text         = getcolor(strdup(cfg_getstr(cfg_colors, "text")));
+     conf.colors.tagselfg     = getcolor(strdup(cfg_getstr(cfg_colors, "tag_sel_fg")));
+     conf.colors.tagselbg     = getcolor(strdup(cfg_getstr(cfg_colors, "tag_sel_bg")));
+     conf.colors.layout_fg    = getcolor(strdup(cfg_getstr(cfg_colors, "layout_fg")));
+     conf.colors.layout_bg    = getcolor(strdup(cfg_getstr(cfg_colors, "layout_bg")));
 
      /* layout */
      conf.nlayout = cfg_size(cfg_layouts, "layout");
 
-     if(conf.nlayout > 3)
+     if(conf.nlayout > )
      {
           printf("WMFS Configuration: Too much of layouts\n");
           exit(EXIT_FAILURE);
@@ -395,8 +395,8 @@ init_conf(void)
           }
           conf.barbutton[i].nmousesec = cfg_size(cfgtmp2, "mouse");
           conf.barbutton[i].text = strdup(cfg_getstr(cfgtmp2, "text"));
-          conf.barbutton[i].fg_color = cfg_getint(cfgtmp2, "fg_color");
-          conf.barbutton[i].bg_color = cfg_getint(cfgtmp2, "bg_color");
+          conf.barbutton[i].fg_color = getcolor(strdup(cfg_getstr(cfgtmp2, "fg_color")));
+          conf.barbutton[i].bg_color = getcolor(strdup(cfg_getstr(cfgtmp2, "bg_color")));
           conf.barbutton[i].x = cfg_getint(cfgtmp2, "x");
      }
 
