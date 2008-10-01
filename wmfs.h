@@ -50,8 +50,8 @@
 #include <X11/cursorfont.h>
 #include <X11/Xutil.h>
 #include <confuse.h>
-#include <pthread.h>
 #include "config.h"
+
 
 /* Defines */
 #define ButtonMask   (ButtonPressMask | ButtonReleaseMask)
@@ -157,7 +157,7 @@ typedef struct
      } colors;
      Tag tag[MAXTAG];
      Layout layout[MAXLAYOUT];
-     BarButton barbutton[64];
+     BarButton *barbutton;
      int ntag;
      int nkeybind;
      int nbutton;
@@ -209,7 +209,7 @@ void unmapnotify(XEvent ev);
 void getevent(void);
 
 /* util.c */
-void *emalloc(unsigned int size);
+void *emalloc(unsigned int elemet, size_t size);
 void spawn(char *cmd);
 
 /* wmfs.c */
@@ -275,7 +275,7 @@ Window root;
 int screen;
 int mw, mh;
 Conf conf;
-Key keys[1024];
+Key *keys;
 Bool exiting;
 
 /* Atoms / Cursors */

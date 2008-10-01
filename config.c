@@ -324,6 +324,7 @@ init_conf(void)
                conf.layout[i].func = name_to_func(strdup(cfg_getstr(cfgtmp, "type")), layout_list);
           }
      }
+     /* If there is no layout in the conf, add only the Tile */
      if(!conf.nlayout)
      {
           conf.nlayout = 1;
@@ -339,6 +340,11 @@ init_conf(void)
           printf("WMFS Configuration: There is no tags in the configuration file\n");
           exit(EXIT_FAILURE);
      }
+     if(conf.ntag > MAXTAG)
+     {
+          printf("WMFS Error: Too much of tag in the configuration file\n");
+          exit(EXIT_FAILURE);
+     }
 
      for(i = 0; i < conf.ntag; ++i)
      {
@@ -351,6 +357,8 @@ init_conf(void)
 
      /* keybind */
      conf.nkeybind = cfg_size(cfg_keys, "key");
+     keys = emalloc(conf.nkeybind, sizeof(Key));
+
      for(j = 0; j <  conf.nkeybind; ++j)
      {
           cfgtmp = cfg_getnsec(cfg_keys, "key", j);
@@ -372,6 +380,8 @@ init_conf(void)
 
      /* button */
      conf.nbutton = cfg_size(cfg_buttons, "button");
+     conf.barbutton = emalloc(conf.nbutton, sizeof(BarButton));
+
      for(i = 0; i < conf.nbutton; ++i)
      {
           cfgtmp2 = cfg_getnsec(cfg_buttons, "button", i);

@@ -33,14 +33,14 @@
 #include "wmfs.h"
 
 void*
-emalloc(unsigned int size)
+emalloc(unsigned int element, size_t size)
 {
-     void *res = calloc(1, size);
+     void *ret = calloc(element, size);
 
-     if(!res)
+     if(!ret)
           fprintf(stderr,"WMFS Error: could not malloc() %u bytes\n", size);
 
-     return res;
+     return ret;
 }
 
 void

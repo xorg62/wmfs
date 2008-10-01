@@ -36,6 +36,7 @@ void
 arrange(void)
 {
      Client *c;
+
      for(c = clients; c; c = c->next)
           if(!ishide(c))
                unhide(c);
@@ -45,6 +46,7 @@ arrange(void)
      focus(NULL);
      tags[seltag].layout.func();
      updatebar();
+
      return;
  }
 
@@ -309,6 +311,8 @@ init(void)
           tags[i] = conf.tag[i - 1];
 
      /* INIT FONT */
+     /* make the font string with
+      * the configuration information  */
      sprintf(fontbuf, "*-%s-%s-*-%d-*",
              conf.font.face,
              conf.font.style,
@@ -316,8 +320,9 @@ init(void)
      font = XLoadQueryFont(dpy, fontbuf);
      if(!font)
      {
-          fprintf(stderr, "XLoadQueryFont: failed loading font '%s'\n", fontbuf);
-          exit(EXIT_FAILURE);
+          fprintf(stderr, "XLoadQueryFont: failed loading font '%s'\n"
+                  "Load the default font.\n", fontbuf);
+          font = XLoadQueryFont(dpy, "*-*-*-*-12-*");
      }
      XSetFont(dpy, gc, font->fid);
      fonth = (font->ascent + font->descent) - 1;
@@ -558,7 +563,7 @@ manage(Window w, XWindowAttributes *wa)
      Status rettrans;
      XWindowChanges winc;
 
-     c = emalloc(sizeof(Client));
+     c = emalloc(1, sizeof(Client));
      c->win = w;
      c->x = wa->x;
      c->y = wa->y + conf.ttbarheight + barheight;
@@ -1379,7 +1384,7 @@ wswitch(char *cmd)
 }
 
 int
-main(int argc,char **argv)
+main(int argc, char **argv)
 {
      dpy = XOpenDisplay(NULL);
      int i;
