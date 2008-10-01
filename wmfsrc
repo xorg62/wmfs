@@ -95,54 +95,37 @@ buttons
 keys
 {
 # general keybind
-
         key { mod = {"Control"} key = "Return" func = "spawn" cmd = "urxvt" }
         key { mod = {"Alt"} key = "q" func = "killclient" }
         key { mod = {"Control"} key = "m" func = "togglemax" }
         key { mod = {"Control"} key = "b" func = "togglebarpos" }
-        key { mod = {"Alt"} key = "Tab" func = "client_switch" cmd = "+" }
-        key { mod = {"Alt","Shift"} key = "Tab" func = "client_switch" cmd = "-" }
-        key { mod = {"Control"} key = "Right" func = "tag" cmd = "+1" }
-        key { mod = {"Control"} key = "Left" func = "tag" cmd = "-1" }
-        key { mod = {"Control"} key = "Up" func = "layoutswitch" cmd = "+" }
-        key { mod = {"Control"} key = "Down" func = "layoutswitch" cmd = "-" }
+        key { mod = {"Alt"} key = "Tab" func = "client_next" }
+        key { mod = {"Alt","Shift"} key = "Tab" func = "client_prev" }
+        key { mod = {"Control"} key = "Right" func = "tag_next" }
+        key { mod = {"Control"} key = "Left" func = "tag_prev" }
+        key { mod = {"Control"} key = "Up" func = "layout_next" }
+        key { mod = {"Control"} key = "Down" func = "layout_prev" }
         key { mod = {"Alt"} key = "l" func = "set_mwfact" cmd = "+0.025" }
         key { mod = {"Alt"} key = "h" func = "set_mwfact" cmd = "-0.025" }
 
-# moving client keybind
-
-        key { mod = {"Control","Alt"} key = "Left" func = "keymovex" cmd = "-10" }
-        key { mod = {"Control","Alt"} key = "Right" func = "keymovex" cmd = "+10" }
-        key { mod = {"Control","Alt"} key = "Up" func = "keymovey" cmd = "-10" }
-        key { mod = {"Control","Alt"} key = "Down" func = "keymovey" cmd = "+10" }
-
-# resize client keybind
-
-        key { mod = {"Shift","Alt"} key = "Down" func = "keyresize" cmd = "+h" }
-        key { mod = {"Shift","Alt"} key = "Right" func = "keyresize" cmd = "+w" }
-        key { mod = {"Shift","Alt"} key = "Up" func = "keyresize" cmd = "-h" }
-        key { mod = {"Shift","Alt"} key = "Left" func = "keyresize" cmd = "-w" }
-
 # tag manipulation keybind
+        key { mod = {"Alt"} key = "F1" func = "tag" cmd = "1" }
+        key { mod = {"Alt"} key = "F2" func = "tag" cmd = "2" }
+        key { mod = {"Alt"} key = "F3" func = "tag" cmd = "3" }
+        key { mod = {"Alt"} key = "F4" func = "tag" cmd = "4" }
+        key { mod = {"Alt"} key = "F5" func = "tag" cmd = "5" }
+        key { mod = {"Alt"} key = "F6" func = "tag" cmd = "6" }
+        key { mod = {"Alt"} key = "F7" func = "tag" cmd = "7" }
+        key { mod = {"Alt"} key = "F8" func = "tag" cmd = "8" }
+        key { mod = {"Alt"} key = "F9" func = "tag" cmd = "9" }
 
-       key { mod = {"Alt"} key = "F1" func = "tag" cmd = "1" }
-       key { mod = {"Alt"} key = "F2" func = "tag" cmd = "2" }
-       key { mod = {"Alt"} key = "F3" func = "tag" cmd = "3" }
-       key { mod = {"Alt"} key = "F4" func = "tag" cmd = "4" }
-       key { mod = {"Alt"} key = "F5" func = "tag" cmd = "5" }
-       key { mod = {"Alt"} key = "F6" func = "tag" cmd = "6" }
-       key { mod = {"Alt"} key = "F7" func = "tag" cmd = "7" }
-       key { mod = {"Alt"} key = "F8" func = "tag" cmd = "8" }
-       key { mod = {"Alt"} key = "F9" func = "tag" cmd = "9" }
-
-       key { mod = {"Control", "Shift"} key = "F1" func = "tagtransfert" cmd ="1" }
-       key { mod = {"Control", "Shift"} key = "F2" func = "tagtransfert" cmd ="2" }
-       key { mod = {"Control", "Shift"} key = "F3" func = "tagtransfert" cmd ="3" }
-       key { mod = {"Control", "Shift"} key = "F4" func = "tagtransfert" cmd ="4" }
-       key { mod = {"Control", "Shift"} key = "F5" func = "tagtransfert" cmd ="5" }
-       key { mod = {"Control", "Shift"} key = "F6" func = "tagtransfert" cmd ="6" }
-       key { mod = {"Control", "Shift"} key = "F7" func = "tagtransfert" cmd ="7" }
-       key { mod = {"Control", "Shift"} key = "F8" func = "tagtransfert" cmd ="8" }
-       key { mod = {"Control", "Shift"} key = "F9" func = "tagtransfert" cmd ="9" }
-
+        key { mod = {"Control", "Shift"} key = "F1" func = "tagtransfert" cmd ="1" }
+        key { mod = {"Control", "Shift"} key = "F2" func = "tagtransfert" cmd ="2" }
+        key { mod = {"Control", "Shift"} key = "F3" func = "tagtransfert" cmd ="3" }
+        key { mod = {"Control", "Shift"} key = "F4" func = "tagtransfert" cmd ="4" }
+        key { mod = {"Control", "Shift"} key = "F5" func = "tagtransfert" cmd ="5" }
+        key { mod = {"Control", "Shift"} key = "F6" func = "tagtransfert" cmd ="6" }
+        key { mod = {"Control", "Shift"} key = "F7" func = "tagtransfert" cmd ="7" }
+        key { mod = {"Control", "Shift"} key = "F8" func = "tagtransfert" cmd ="8" }
+        key { mod = {"Control", "Shift"} key = "F9" func = "tagtransfert" cmd ="9" }
 }

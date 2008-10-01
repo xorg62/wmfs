@@ -183,7 +183,6 @@ typedef struct
      unsigned int button;
 } name_to_uint_t;
 
-
 /* Enum */
 enum { CurNormal, CurResize, CurMove, CurLast };
 enum { WMState, WMProtocols, WMName, WMDelete, WMLast };
@@ -210,23 +209,32 @@ void getevent(void);
 
 /* util.c */
 void *emalloc(unsigned int elemet, unsigned int size);
-void spawn(char *cmd);
+void uicb_spawn(char *cmd);
+
+/* tag.c */
+void uicb_tag(char *cmd);
+void uicb_tag_next(char *cmd);
+void uicb_tag_prev(char *cmd);
+void uicb_tagtransfert(char *cmd);
 
 /* layout.c */
 void freelayout(void);
-void layoutswitch(char *cmd);
+void layoutswitch(Bool b);
 void maxlayout(void);
 Client* nexttiled(Client *c);
-void set_mwfact(char *cmd);
-void set_nmaster(char *cmd);
 void tile(void);
-void tile_switch(char *cmd);
-void togglemax(char *cmd);
+void uicb_tile_switch(char *cmd);
+void uicb_togglemax(char *cmd);
+void uicb_layout_prev(char *cmd);
+void uicb_layout_next(char *cmd);
+void uicb_set_mwfact(char *cmd);
+void uicb_set_nmaster(char *cmd);
 
 /* wmfs.c */
 void arrange(void);
 void attach(Client *c);
 int clientpertag(int tag);
+void client_switch(Bool c);
 void detach(Client *c);
 int errorhandler(Display *d, XErrorEvent *event);
 int errorhandlerdummy(Display *d, XErrorEvent *event);
@@ -240,24 +248,16 @@ void grabkeys(void);
 void hide(Client *c);
 void init(void);
 Bool ishide(Client *c);
-void keymovex(char *cmd);
-void keymovey(char *cmd);
-void keyresize(char *cmd);
-void killclient(char *cmd);
 void mainloop(void);
 void mapclient(Client *c);
 void manage(Window w, XWindowAttributes *wa);
 void mouseaction(Client *c, int x, int y, int type);
 void moveresize(Client *c, int x, int y, int w, int h, bool r);
-void quit(char *cmd);
 void raiseclient(Client *c);
 void scan(void);
 void setborder(Window win, int color);
 void setwinstate(Window win, long state);
 void setsizehints(Client *c);
-void tag(char *cmd);
-void tagtransfert(char *cmd);
-void togglebarpos(char *cmd);
 void unhide(Client *c);
 void unmanage(Client *c);
 void updatebar(void);
@@ -265,7 +265,11 @@ void updatebutton(Bool c);
 void unmapclient(Client *c);
 void updateall(void);
 void updatetitle(Client *c);
-void wswitch(char *cmd);
+void uicb_client_prev(char *cmd);
+void uicb_client_next(char *cmd);
+void uicb_killclient(char *cmd);
+void uicb_quit(char *cmd);
+void uicb_togglebarpos(char *cmd);
 
 /* Variables */
 

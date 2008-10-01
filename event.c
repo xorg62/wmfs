@@ -62,9 +62,9 @@ buttonpress(XEvent ev)
                          if(ev.xbutton.button == Button2)
                          {
                               if(tags[seltag].layout.func == tile)
-                                   tile_switch(NULL);
+                                   uicb_tile_switch(NULL);
                               else
-                                   togglemax(NULL);
+                                   uicb_togglemax(NULL);
                          }
                     }
                     /* BUTTON 3 */
@@ -85,7 +85,7 @@ buttonpress(XEvent ev)
                     /* BUTTON 1 */
                     {
                          if(ev.xbutton.button == Button1)
-                              killclient(NULL);
+                              uicb_killclient(NULL);
                     }
                     /* BUTTON 2 AND 3 */
                     {
@@ -93,9 +93,9 @@ buttonpress(XEvent ev)
                                  || ev.xbutton.button == Button3)
                          {
                               if(tags[seltag].layout.func == tile)
-                                   tile_switch(NULL);
+                                   uicb_tile_switch(NULL);
                               else
-                                   togglemax(NULL);
+                                   uicb_togglemax(NULL);
                          }
                     }
                }
@@ -121,9 +121,9 @@ buttonpress(XEvent ev)
                     if(ev.xbutton.button == Button2)
                     {
                          if(tags[seltag].layout.func == tile)
-                              tile_switch(NULL);
+                              uicb_tile_switch(NULL);
                          else
-                              togglemax(NULL);
+                              uicb_togglemax(NULL);
                     }
                }
                /* BUTTON 3 */
@@ -157,12 +157,12 @@ buttonpress(XEvent ev)
                                    /* BUTTON 1 */
                                    {
                                         if(ev.xbutton.button == Button1)
-                                             tag(s);
+                                             uicb_tag(s);
                                    }
                                    /* BUTTON 2 */
                                    {
                                         if(ev.xbutton.button == Button3)
-                                             tagtransfert(s);
+                                             uicb_tagtransfert(s);
                                    }
                               }
                          }
@@ -176,12 +176,12 @@ buttonpress(XEvent ev)
                               /* BUTTON 4 (UP) */
                               {
                                    if(ev.xbutton.button == Button4)
-                                        tag("+1");
+                                        uicb_tag("+1");
                               }
                               /* BUTTON 5 (UP) */
                               {
                                    if (ev.xbutton.button == Button5)
-                                        tag("-1");
+                                        uicb_tag("-1");
                               }
                          }
 
@@ -203,13 +203,13 @@ buttonpress(XEvent ev)
                          {
                               if(ev.xbutton.button == Button1
                                  || ev.xbutton.button == Button4)
-                                   layoutswitch("+");
+                                   layoutswitch(True);
                          }
                          /* BUTTON 3 / 5 */
                          {
                               if(ev.xbutton.button == Button3
                                  || ev.xbutton.button == Button5)
-                                   layoutswitch("-");
+                                   layoutswitch(False);
                          }
                     }
 
@@ -228,12 +228,12 @@ buttonpress(XEvent ev)
                /* BUTTON 4 */
                {
                     if(ev.xbutton.button == Button4)
-                         tag("+1");
+                         uicb_tag("+1");
                }
                /* BUTTON 5 */
                {
                     if(ev.xbutton.button == Button5)
-                         tag("-1");
+                         uicb_tag("-1");
                }
           }
 

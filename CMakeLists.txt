@@ -29,7 +29,8 @@ set(wmfs_src
   config.c
   event.c
   util.c
-  layout.c)
+  layout.c
+  tag.c)
 
 # Set the executable from the wmfs_src
 add_executable(wmfs ${wmfs_src})

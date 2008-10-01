@@ -56,7 +56,7 @@ freelayout(void)
 
 /* Improved ! :) */
 void
-layoutswitch(char *cmd)
+layoutswitch(Bool b)
 {
      int i;
 
@@ -65,14 +65,30 @@ layoutswitch(char *cmd)
           if(tags[seltag].layout.symbol == conf.layout[i].symbol
              && tags[seltag].layout.func == conf.layout[i].func)
           {
-               if(cmd[0] == '+')
+               if(b)
                     tags[seltag].layout = conf.layout[(i + 1) % conf.nlayout];
-               else if(cmd[0] == '-')
+               else
                     tags[seltag].layout = conf.layout[(i + conf.nlayout - 1) % conf.nlayout];
                break;
           }
      }
      arrange();
+
+     return;
+}
+
+void
+uicb_layout_next(char *cmd)
+{
+     layoutswitch(True);
+
+     return;
+}
+
+void
+uicb_layout_prev(char *cmd)
+{
+     layoutswitch(False);
 
      return;
 }
@@ -111,7 +127,7 @@ nexttiled(Client *c)
 }
 
 void
-set_mwfact(char *cmd)
+uicb_set_mwfact(char *cmd)
 {
      double c;
 
@@ -128,7 +144,7 @@ set_mwfact(char *cmd)
 }
 
 void
-set_nmaster(char *cmd)
+uicb_set_nmaster(char *cmd)
 {
      int n = atoi(cmd);
 
@@ -216,7 +232,7 @@ tile(void)
 }
 
 void
-tile_switch(char *cmd)
+uicb_tile_switch(char *cmd)
 {
      Client *c;
 
@@ -234,7 +250,7 @@ tile_switch(char *cmd)
 }
 
 void
-togglemax(char *cmd)
+uicb_togglemax(char *cmd)
 {
      if(!sel || ishide(sel) || sel->hint)
           return;

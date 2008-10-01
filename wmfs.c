@@ -74,6 +74,64 @@ clientpertag(int tag)
      return i;
 }
 
+/* True : next
+ * False : prev */
+void
+client_switch(Bool b)
+{
+     Client *c;
+
+     if(!sel || ishide(sel))
+          return;
+     if(b)
+     {
+          for(c = sel->next; c && ishide(c); c = c->next);
+          if(!c)
+               for(c = clients; c && ishide(c); c = c->next);
+          if(c)
+          {
+               focus(c);
+               if(!c->tile)
+                    raiseclient(c);
+          }
+     }
+     else
+     {
+          for(c = sel->prev; c && ishide(c); c = c->prev);
+          if(!c)
+          {
+               for(c = clients; c && c->next; c = c->next);
+               for(; c && ishide(c); c = c->prev);
+          }
+          if(c)
+          {
+               focus(c);
+               if(!c->tile)
+                    raiseclient(c);
+          }
+     }
+     updateall();
+
+     return;
+}
+
+void
+uicb_client_prev(char *cmd)
+{
+     client_switch(False);
+
+     return;
+}
+
+void
+uicb_client_next(char *cmd)
+{
+     client_switch(True);
+
+     return;
+}
+
+
 void
 detach(Client *c)
 {
@@ -369,58 +427,7 @@ ishide(Client *c)
 }
 
 void
-keymovex(char *cmd)
-{
-     int tmp;
-
-     if(sel && cmd && !ishide(sel) && !sel->max && !sel->tile)
-     {
-          tmp = sel->x + atoi(cmd);
-          moveresize(sel, tmp, sel->y, sel->w, sel->h, True);
-     }
-
-     return;
-}
-
-void
-keymovey(char *cmd)
-{
-     int tmp;
-
-     if(sel && cmd && !ishide(sel) && !sel->max && !sel->tile)
-     {
-          tmp = sel->y + atoi(cmd);
-          moveresize(sel, sel->x, tmp, sel->w, sel->h, True);
-     }
-
-     return;
-}
-
-void
-keyresize(char *cmd)
-{
-     int temph = 0, tempw = 0,
-          modh = 0, modw = 0, tmp = 0;
-
-     if(sel && !ishide(sel) && !sel->max && !sel->tile)
-     {
-          switch(cmd[1])
-          {
-          case 'h': tmp = (cmd[0] == '+') ? 5 : -5; modh = tmp; break;
-          case 'w': tmp = (cmd[0] == '+') ? 5 : -5; modw = tmp; break;
-          }
-          temph = sel->h + modh;
-          tempw = sel->w + modw;
-          temph = (temph < 10) ? 10 : temph;
-          tempw = (tempw < 10) ? 10 : tempw;
-          moveresize(sel, sel->x, sel->y, tempw, temph, True);
-     }
-
-     return;
-}
-
-void
-killclient(char *cmd)
+uicb_killclient(char *cmd)
 {
      XEvent ev;
 
@@ -710,7 +717,7 @@ moveresize(Client *c, int x, int y, int w, int h, bool r)
 }
 
 void
-quit(char *cmd)
+uicb_quit(char *cmd)
 {
      exiting = True;
 
@@ -849,53 +856,8 @@ setsizehints(Client *c)
         return;
 }
 
-/* if cmd is +X or -X, this is just switch
- * else {1, 2.. 9} it's go to the wanted tag. */
 void
-tag(char *cmd)
-{
-     int tmp = atoi(cmd);
-
-     if(!tmp)
-          tmp = 1;
-
-     if(cmd[0] == '+' || cmd[0] == '-')
-     {
-          if(tmp + seltag < 1
-             || tmp + seltag > conf.ntag)
-               return;
-          seltag += tmp;
-     }
-     else
-     {
-          if(tmp == seltag
-             || tmp > conf.ntag)
-               return;
-          seltag = tmp;
-     }
-     arrange();
-
-     return;
-}
-
-void
-tagtransfert(char *cmd)
-{
-     int n = atoi(cmd);
-
-     if(!sel)
-          return;
-     if(!n)
-          n = 1;
-
-     sel->tag = n;
-     arrange();
-
-     return;
-}
-
-void
-togglebarpos(char *cmd)
+uicb_togglebarpos(char *cmd)
 {
      int i;
 
@@ -1112,45 +1074,6 @@ updatetitle(Client *c)
                       ((fonth-2) + ((conf.ttbarheight - fonth) / 2)),
                       c->title, strlen(c->title));
      }
-
-     return;
-}
-
-void
-wswitch(char *cmd)
-{
-     Client *c;
-
-     if(!sel || ishide(sel))
-          return;
-     if(cmd[0] == '+')
-     {
-          for(c = sel->next; c && ishide(c); c = c->next);
-          if(!c)
-               for(c = clients; c && ishide(c); c = c->next);
-          if(c)
-          {
-               focus(c);
-               if(!c->tile)
-                    raiseclient(c);
-          }
-     }
-     else if(cmd[0] == '-')
-     {
-          for(c = sel->prev; c && ishide(c); c = c->prev);
-          if(!c)
-          {
-               for(c = clients; c && c->next; c = c->next);
-               for(; c && ishide(c); c = c->prev);
-          }
-          if(c)
-          {
-               focus(c);
-               if(!c->tile)
-                    raiseclient(c);
-          }
-     }
-     updateall();
 
      return;
 }

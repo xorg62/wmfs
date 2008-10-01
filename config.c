@@ -36,20 +36,21 @@
 
 func_name_list_t func_list[] =
 {
-     {"spawn", spawn},
-     {"killclient", killclient},
-     {"client_switch", wswitch},
-     {"togglemax", togglemax},
-     {"keymovex", keymovex},
-     {"keymovey", keymovey},
-     {"keyresize", keyresize},
-     {"layoutswitch",layoutswitch},
-     {"tag", tag},
-     {"tagtransfert", tagtransfert},
-     {"set_mwfact", set_mwfact},
-     {"set_nmaster", set_nmaster},
-     {"quit", quit},
-     {"togglebarpos", togglebarpos}
+     {"spawn",        uicb_spawn },
+     {"killclient",   uicb_killclient },
+     {"client_prev",  uicb_client_prev },
+     {"client_next",  uicb_client_next },
+     {"togglemax",    uicb_togglemax },
+     {"layout_next",  uicb_layout_next },
+     {"layout_prev",  uicb_layout_prev },
+     {"tag",          uicb_tag },
+     {"tag_next",     uicb_tag_next },
+     {"tag_prev",     uicb_tag_prev },
+     {"tagtransfert", uicb_tagtransfert },
+     {"set_mwfact",   uicb_set_mwfact },
+     {"set_nmaster",  uicb_set_nmaster },
+     {"quit",         uicb_quit },
+     {"togglebarpos", uicb_togglebarpos }
 };
 
 func_name_list_t layout_list[] =

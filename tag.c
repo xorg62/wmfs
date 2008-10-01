@@ -1,5 +1,5 @@
 /*
-*      util.c
+*      tag.c
 *      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.com>
 *      All rights reserved.
 *
@@ -32,34 +32,64 @@
 
 #include "wmfs.h"
 
-void*
-emalloc(unsigned int element, unsigned int size)
+
+/* if cmd is +X or -X, this is just switch
+ * else {1, 2.. 9} it's go to the wanted tag. */
+void
+uicb_tag(char *cmd)
 {
-     void *ret = calloc(element, size);
+     int tmp = atoi(cmd);
 
-     if(!ret)
-          fprintf(stderr,"WMFS Error: could not malloc() %u bytes\n", size);
+     if(!tmp)
+          tmp = 1;
 
-     return ret;
+     if(cmd[0] == '+' || cmd[0] == '-')
+     {
+          if(tmp + seltag < 1
+             || tmp + seltag > conf.ntag)
+               return;
+          seltag += tmp;
+     }
+     else
+     {
+          if(tmp == seltag
+             || tmp > conf.ntag)
+               return;
+          seltag = tmp;
+     }
+     arrange();
+
+     return;
 }
 
 void
-uicb_spawn(char *cmd)
+uicb_tag_next(char *cmd)
 {
-     if(!strlen(cmd))
+     uicb_tag("+1");
+
+     return;
+}
+
+void
+uicb_tag_prev(char *cmd)
+{
+     uicb_tag("-1");
+
+     return;
+}
+
+void
+uicb_tagtransfert(char *cmd)
+{
+     int n = atoi(cmd);
+
+     if(!sel)
           return;
-     if(fork() == 0)
-     {
-          if(fork() == 0)
-          {
-               if(dpy)
-                    close(ConnectionNumber(dpy));
-               setsid();
-               execl(getenv("SHELL"), getenv("SHELL"), "-c", cmd, (char*)NULL);
-               exit(EXIT_FAILURE);
-          }
-          exit(EXIT_SUCCESS);
-     }
+     if(!n)
+          n = 1;
+
+     sel->tag = n;
+     arrange();
 
      return;
 }
