@@ -37,8 +37,6 @@ freelayout(void)
 {
      Client *c;
 
-     tags[seltag].layout.func = freelayout;
-
      for(c = clients; c; c = c->next)
      {
           if(!ishide(c))
@@ -98,8 +96,6 @@ void
 maxlayout(void)
 {
      Client *c;
-
-     tags[seltag].layout.func = maxlayout;
 
      for(c = nexttiled(clients); c; c = nexttiled(c->next))
      {
@@ -170,8 +166,6 @@ tile(void)
      mwf    =  tags[seltag].mwfact * mw;
      nm     =  tags[seltag].nmaster;
      mht    =  mh - ((conf.bartop) ? 0 : barheight);
-
-     tags[seltag].layout.func = tile;
 
      /* count all the "can-be-tiled" client */
      for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++n);

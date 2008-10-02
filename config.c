@@ -281,10 +281,10 @@ init_conf(void)
      cfg_buttons = cfg_getsec(cfg, "buttons");
 
      /* misc */
-     conf.raisefocus    = cfg_getbool(cfg_misc,       "raisefocus");
-     conf.raiseswitch   = cfg_getbool(cfg_misc,       "raiseswitch");
-     conf.borderheight  = cfg_getint(cfg_misc,        "border_height");
-     conf.ttbarheight   = cfg_getint(cfg_misc,        "titlebar_height");
+     conf.raisefocus    = cfg_getbool(cfg_misc, "raisefocus");
+     conf.raiseswitch   = cfg_getbool(cfg_misc, "raiseswitch");
+     conf.borderheight  = cfg_getint(cfg_misc, "border_height");
+     conf.ttbarheight   = cfg_getint(cfg_misc, "titlebar_height");
      conf.bartop        = (strcmp(strdup(cfg_getstr(cfg_misc, "bar_position")), "top") == 0) ? True : False;
 
      /* font */
