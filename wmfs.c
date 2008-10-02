@@ -870,7 +870,7 @@ uicb_togglebarpos(char *cmd)
      updatebar();
      for(i = 0; i < conf.nbutton; ++i)
           XUnmapWindow(dpy, conf.barbutton[i].win);
-     updatebutton(0);
+     updatebutton(False);
      for(i = 0; i < conf.nbutton; ++i)
           XMapWindow(dpy, conf.barbutton[i].win);
      arrange();

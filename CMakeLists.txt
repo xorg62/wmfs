@@ -35,7 +35,7 @@ set(wmfs_src
 # Set the executable from the wmfs_src
 add_executable(wmfs ${wmfs_src})
 # Set the version - NOT USED AT THE MOMENT
-set(VERSION "0.1rc1 (Sweaty pool)")
+set(VERSION "0.1rc2 (Brain Damage)")
 # CFLAGS
 set(CFLAGS "-g -Wall")
 set(CMAKE_C_FLAGS ${CFLAGS})
