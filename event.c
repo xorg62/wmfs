@@ -260,7 +260,7 @@ configurerequest(XEvent ev)
      Client *c;
      XWindowChanges wc;
      if((c = getclient(ev.xconfigurerequest.window)))
-          if(c->tile)
+          if(c->tile || c->lmax)
                return;
      wc.x = ev.xconfigurerequest.x;
      wc.y = ev.xconfigurerequest.y;

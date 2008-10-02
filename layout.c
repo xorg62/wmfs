@@ -43,10 +43,11 @@ freelayout(void)
      {
           if(!ishide(c))
           {
-               if(c->tile)
+               if(c->tile || c->lmax)
                {
                     moveresize(c, c->ox, c->oy, c->ow, c->oh, True);
                     c->tile = False;
+                    c->lmax = False;
                }
           }
      }
@@ -103,6 +104,7 @@ maxlayout(void)
      for(c = nexttiled(clients); c; c = nexttiled(c->next))
      {
           c->tile = False;
+          c->lmax = True;
           c->ox = c->x;
           c->oy = c->y;
           c->ow = c->w;
@@ -192,6 +194,7 @@ tile(void)
      for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), i++)
      {
           c->max = False;
+          c->lmax = False;
           c->tile = True;
           c->ox = c->x; c->oy = c->y;
           c->ow = c->w; c->oh = c->h;

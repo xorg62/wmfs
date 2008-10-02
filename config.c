@@ -305,7 +305,7 @@ init_conf(void)
      /* layout */
      conf.nlayout = cfg_size(cfg_layouts, "layout");
 
-     if(conf.nlayout > )
+     if(conf.nlayout > 3)
      {
           printf("WMFS Configuration: Too much of layouts\n");
           exit(EXIT_FAILURE);

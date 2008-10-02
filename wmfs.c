@@ -583,7 +583,7 @@ mouseaction(Client *c, int x, int y, int type)
      int  ocx, ocy;
      XEvent ev;
 
-     if(c->max || c->tile)
+     if(c->max || c->tile || c->lmax)
           return;
 
      ocx = c->x;

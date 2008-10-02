@@ -85,7 +85,7 @@ struct Client
      Window tbar;          /* Titlebar */
      Window button;        /* Close Button */
      Bool max, tile, free; /* Client Info */
-     Bool hint, hide;      /* Client Info² */
+     Bool hint, hide, lmax;/* Client Info² */
      /* Struct in chains */
      Client *next;         /* Next client */
      Client *prev;         /* Previous client */
