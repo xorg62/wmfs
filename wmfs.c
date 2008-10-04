@@ -623,9 +623,16 @@ mouseaction(Client *c, int x, int y, int type)
                                (ocx + (ev.xmotion.x - x)),
                                (ocy + (ev.xmotion.y - y)),
                                c->w, c->h, True);
+
+               /* for don't pass on the bar */
+               if(conf.bartop && c->y < barheight + conf.ttbarheight - 5)
+                    moveresize(c, c->x, barheight + conf.ttbarheight, c->w, c->h, True);
+               else if(!conf.bartop && c->y + c->h > bary - conf.borderheight*2)
+                    moveresize(c, c->x, bary - c->h - conf.borderheight*2, c->w, c->h, True);
           }
      }
 
+     updatebar();
      return;
 }
 
@@ -683,7 +690,6 @@ moveresize(Client *c, int x, int y, int w, int h, bool r)
           c->x = x; c->y = y;
           c->w = w; c->h = h;
 
-          /* can't pass on the bar */
           if(conf.bartop && (y - conf.ttbarheight) <= barheight)
                y = barheight + conf.ttbarheight;
           else if(!conf.bartop && (y + h) >= bary - conf.borderheight*2)
