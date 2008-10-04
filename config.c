@@ -55,32 +55,32 @@ func_name_list_t func_list[] =
 
 func_name_list_t layout_list[] =
 {
-     {"tile", tile},
-     {"max",  maxlayout},
-     {"free", freelayout}
+     {"tile", tile },
+     {"max",  maxlayout },
+     {"free", freelayout }
 };
 
 key_name_list_t key_list[] =
 {
-     {"Control", ControlMask},
-     {"Shift",   ShiftMask},
-     {"Lock",    LockMask},
-     {"Control", ControlMask},
-     {"Alt",     Mod1Mask},
-     {"Mod2",    Mod2Mask},
-     {"Mod3",    Mod3Mask},
-     {"Mod4",    Mod4Mask},
-     {"Mod5",    Mod5Mask},
-     {NULL,      NoSymbol}
+     {"Control", ControlMask },
+     {"Shift",   ShiftMask },
+     {"Lock",    LockMask },
+     {"Control", ControlMask },
+     {"Alt",     Mod1Mask },
+     {"Mod2",    Mod2Mask },
+     {"Mod3",    Mod3Mask },
+     {"Mod4",    Mod4Mask },
+     {"Mod5",    Mod5Mask },
+     {NULL,      NoSymbol }
 };
 
 name_to_uint_t mouse_button_list[] =
 {
-     {"Button1", Button1},
-     {"Button2", Button2},
-     {"Button3", Button3},
-     {"Button4", Button4},
-     {"Button5", Button5}
+     {"Button1", Button1 },
+     {"Button2", Button2 },
+     {"Button3", Button3 },
+     {"Button4", Button4 },
+     {"Button5", Button5 }
 };
 
 void*

@@ -177,8 +177,10 @@ focus(Client *c)
      }
      if(c)
           grabbuttons(c, True);
+
      sel = c;
      selbytag[seltag] = sel;
+
      if(c)
      {
           setborder(c->win, conf.colors.borderfocus);
@@ -571,6 +573,7 @@ manage(Window w, XWindowAttributes *wa)
      XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
      mapclient(c);
      setwinstate(c->win, NormalState);
+     focus(c);
      arrange();
 
      return;
@@ -603,6 +606,7 @@ mouseaction(Client *c, int x, int y, int type)
                if(type)
                     XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
                XUngrabPointer(dpy, CurrentTime);
+               updatebar();
                return;
           }
           else if(ev.type == MotionNotify)
@@ -619,20 +623,6 @@ mouseaction(Client *c, int x, int y, int type)
                                (ocx + (ev.xmotion.x - x)),
                                (ocy + (ev.xmotion.y - y)),
                                c->w, c->h, True);
-
-               /* for don't pass on the bar */
-               if(conf.bartop && c->y < barheight + conf.ttbarheight - 5)
-               {
-                    moveresize(c, c->x, barheight + conf.ttbarheight, c->w, c->h, True);
-                    XUngrabPointer(dpy, CurrentTime);
-                    return;
-               }
-               else if(!conf.bartop && c->y + c->h > bary + 3)
-               {
-                    moveresize(c, c->x, bary - c->h, c->w, c->h, True);
-                    XUngrabPointer(dpy, CurrentTime);
-                    return;
-               }
           }
      }
 
@@ -693,14 +683,11 @@ moveresize(Client *c, int x, int y, int w, int h, bool r)
           c->x = x; c->y = y;
           c->w = w; c->h = h;
 
-          if(conf.bartop)
-          {
-               if((y - conf.ttbarheight) <= barheight)
-                    y = barheight+conf.ttbarheight;
-          }
-          else
-               if(y - h >= bary)
-                    y = bary - h;
+          /* can't pass on the bar */
+          if(conf.bartop && (y - conf.ttbarheight) <= barheight)
+               y = barheight + conf.ttbarheight;
+          else if(!conf.bartop && (y + h) >= bary - conf.borderheight*2)
+               y = bary - c->h - conf.borderheight*2;
 
           XMoveResizeWindow(dpy, c->win, x, y, w ,h);
 
