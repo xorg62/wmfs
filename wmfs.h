@@ -306,9 +306,11 @@ int bary;
 /* Important Client */
 Client *clients;
 Client *sel;
+Client *selbytag[MAXTAG];
 
 /* Other */
 unsigned int numlockmask;
 
 #endif /* LOCAL_H */
+
 

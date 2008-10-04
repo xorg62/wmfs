@@ -56,22 +56,22 @@ func_name_list_t func_list[] =
 func_name_list_t layout_list[] =
 {
      {"tile", tile},
-     {"max", maxlayout},
+     {"max",  maxlayout},
      {"free", freelayout}
 };
 
 key_name_list_t key_list[] =
 {
      {"Control", ControlMask},
-     {"Shift", ShiftMask},
-     {"Lock", LockMask},
+     {"Shift",   ShiftMask},
+     {"Lock",    LockMask},
      {"Control", ControlMask},
-     {"Alt", Mod1Mask},
-     {"Mod2", Mod2Mask},
-     {"Mod3", Mod3Mask},
-     {"Mod4", Mod4Mask},
-     {"Mod5", Mod5Mask},
-     {NULL, NoSymbol}
+     {"Alt",     Mod1Mask},
+     {"Mod2",    Mod2Mask},
+     {"Mod3",    Mod3Mask},
+     {"Mod4",    Mod4Mask},
+     {"Mod5",    Mod5Mask},
+     {NULL,      NoSymbol}
 };
 
 name_to_uint_t mouse_button_list[] =
@@ -257,6 +257,7 @@ init_conf(void)
      char sfinal_path[128];
      int ret, i, j, l;
 
+
      sprintf(final_path,"%s/%s",
              strdup(getenv("HOME")),
              strdup(FILE_NAME));
@@ -267,9 +268,9 @@ init_conf(void)
      if(ret == CFG_FILE_ERROR || ret == CFG_PARSE_ERROR)
      {
           sprintf(sfinal_path, "%s/wmfs/wmfsrc", XDG_CONFIG_DIR);
-          printf("WMFS: parsing configuration file (%s) failed\n"
+          fprintf(stderr, "WMFS: parsing configuration file (%s) failed\n"
                  "Use the default configuration (%s).\n", final_path, sfinal_path);
-            ret = cfg_parse(cfg, sfinal_path);
+          ret = cfg_parse(cfg, sfinal_path);
      }
 
      cfg_misc    = cfg_getsec(cfg, "misc");
@@ -303,58 +304,69 @@ init_conf(void)
      conf.colors.layout_bg    = getcolor(strdup(cfg_getstr(cfg_colors, "layout_bg")));
 
      /* layout */
-     conf.nlayout = cfg_size(cfg_layouts, "layout");
-
-     if(conf.nlayout > 3)
+     if((conf.nlayout = cfg_size(cfg_layouts, "layout")) > MAXLAYOUT
+          || !(conf.nlayout = cfg_size(cfg_layouts, "layout")))
      {
-          printf("WMFS Configuration: Too much of layouts\n");
-          exit(EXIT_FAILURE);
-     }
-     for(i = 0; i < conf.nlayout; ++i)
-     {
-          cfgtmp = cfg_getnsec(cfg_layouts, "layout", i);
-          if(!name_to_func(strdup(cfg_getstr(cfgtmp, "type")), layout_list))
-          {
-               printf("WMFS Configuration: Unknow Layout type: \"%s\"\n",
-                      strdup(cfg_getstr(cfgtmp, "type")));
-               exit(EXIT_FAILURE);
-          }
-          else
-          {
-               conf.layout[i].symbol = strdup(cfg_getstr(cfgtmp, "symbol"));
-               conf.layout[i].func = name_to_func(strdup(cfg_getstr(cfgtmp, "type")), layout_list);
-          }
-     }
-     /* If there is no layout in the conf, add only the Tile */
-     if(!conf.nlayout)
-     {
+          fprintf(stderr, "WMFS Configuration: Too much or no layouts\n");
           conf.nlayout = 1;
           conf.layout[0].symbol = strdup("TILE");
           conf.layout[0].func = tile;
      }
 
+     if(!conf.layout[0].symbol
+          && !conf.layout[0].func)
+     {
+          for(i = 0; i < conf.nlayout; ++i)
+          {
+               cfgtmp = cfg_getnsec(cfg_layouts, "layout", i);
+               if(!name_to_func(strdup(cfg_getstr(cfgtmp, "type")), layout_list))
+               {
+                    fprintf(stderr, "WMFS Configuration: Unknow Layout type: \"%s\"\n",
+                           strdup(cfg_getstr(cfgtmp, "type")));
+                    exit(EXIT_FAILURE);
+               }
+               else
+               {
+                    conf.layout[i].symbol = strdup(cfg_getstr(cfgtmp, "symbol"));
+                    conf.layout[i].func = name_to_func(strdup(cfg_getstr(cfgtmp, "type")), layout_list);
+               }
+          }
+     }
+
+
      /* tag */
+
+     /* if there is no tag in the conf or more than
+      * MAXTAG (32) print an error and create only one. */
      conf.ntag = cfg_size(cfg_tags, "tag");
-
-     if(!conf.ntag)
+     if(!conf.ntag  || conf.ntag > MAXTAG)
      {
-          printf("WMFS Configuration: There is no tags in the configuration file\n");
-          exit(EXIT_FAILURE);
+          fprintf(stderr, "WMFS Configuration: Too much or no tag (%d) in the configration file\n", conf.ntag);
+          conf.ntag = 1;
+          conf.tag[0].name = strdup("WMFS");
+          conf.tag[0].mwfact = 0.65;
+          conf.tag[0].nmaster = 1;
+          conf.tag[0].layout = layout_name_to_struct(conf.layout, "tile");
      }
-     if(conf.ntag > MAXTAG)
+     else
      {
-          printf("WMFS Error: Too much of tag in the configuration file\n");
-          exit(EXIT_FAILURE);
+          for(i = 0; i < conf.ntag; ++i)
+          {
+               cfgtmp = cfg_getnsec(cfg_tags, "tag", i);
+               conf.tag[i].name = strdup(cfg_getstr(cfgtmp, "name"));
+               conf.tag[i].mwfact = cfg_getfloat(cfgtmp, "mwfact");
+               conf.tag[i].nmaster = cfg_getint(cfgtmp, "nmaster");
+               conf.tag[i].layout = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"));
+          }
      }
 
+     /* Check if the tag name is already used */
      for(i = 0; i < conf.ntag; ++i)
-     {
-          cfgtmp = cfg_getnsec(cfg_tags, "tag", i);
-          conf.tag[i].name = strdup(cfg_getstr(cfgtmp, "name"));
-          conf.tag[i].mwfact = cfg_getfloat(cfgtmp, "mwfact");
-          conf.tag[i].nmaster = cfg_getint(cfgtmp, "nmaster");
-          conf.tag[i].layout = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"));
-     }
+          for(j = 0; j < conf.ntag ; ++j)
+               if(j != i && strcmp(conf.tag[i].name,conf.tag[j].name) == 0)
+                    fprintf(stderr, "WMFS Configuration: Warning! "
+                            "tag \"%s\" is already defined\n", conf.tag[j].name);
+
 
      /* keybind */
      conf.nkeybind = cfg_size(cfg_keys, "key");
@@ -371,7 +383,7 @@ init_conf(void)
           keys[j].func = name_to_func(cfg_getstr(cfgtmp, "func"), func_list);
           if(keys[j].func == NULL)
           {
-               printf("WMFS Configuration: Unknow Function %s", cfg_getstr(cfgtmp, "func"));
+               fprintf(stderr, "WMFS Configuration: Unknow Function %s", cfg_getstr(cfgtmp, "func"));
                return;
           }
 

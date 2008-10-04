@@ -43,8 +43,8 @@ arrange(void)
           else
                hide(c);
 
-     focus(NULL);
      tags[seltag].layout.func();
+     focus(selbytag[seltag]);
      updatebar();
 
      return;
@@ -178,6 +178,7 @@ focus(Client *c)
      if(c)
           grabbuttons(c, True);
      sel = c;
+     selbytag[seltag] = sel;
      if(c)
      {
           setborder(c->win, conf.colors.borderfocus);
@@ -902,6 +903,10 @@ unmanage(Client *c)
      XGrabServer(dpy);
      XSetErrorHandler(errorhandlerdummy);
      sel = ((sel == c) ? ((c->next) ? c->next : NULL) : NULL);
+     if(sel && sel->tag == seltag)
+          selbytag[seltag] = sel;
+     else
+          selbytag[seltag] = NULL;
      detach(c);
      if(conf.ttbarheight)
      {
@@ -1143,6 +1148,8 @@ main(int argc, char **argv)
      if(conf.nbutton)
           for(i = 0; i < conf.nbutton; ++i)
                XDestroyWindow(dpy, conf.barbutton[i].win);
+     free(conf.barbutton);
+     free(keys);
      XSync(dpy, False);
      XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 
