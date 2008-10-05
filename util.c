@@ -33,7 +33,7 @@
 #include "wmfs.h"
 
 void*
-emalloc(unsigned int element, unsigned int size)
+emalloc(uint element, uint size)
 {
      void *ret = calloc(element, size);
 
@@ -43,7 +43,7 @@ emalloc(unsigned int element, unsigned int size)
      return ret;
 }
 
-unsigned long
+ulong
 getcolor(char *color)
 {
      Colormap cmap = DefaultColormap(dpy, screen);

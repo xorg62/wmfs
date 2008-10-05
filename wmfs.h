@@ -94,7 +94,7 @@ struct Client
 /* Keybind Structure */
 typedef struct
 {
-     unsigned long mod;
+     uint mod;
      KeySym keysym;
      void (*func)(uicb_t);
      char *cmd;
@@ -107,11 +107,11 @@ typedef struct
      Window win;
      int fg_color;
      int bg_color;
-     unsigned int x;
+     uint x;
      int nmousesec;
      void (*func[NBUTTON])(uicb_t);
      char *cmd[NBUTTON];
-     unsigned int mouse[NBUTTON];
+     uint mouse[NBUTTON];
 } BarButton;
 
 /* Layout Structure */
@@ -136,6 +136,7 @@ typedef struct
      bool raisefocus;
      bool raiseswitch;
      bool bartop;
+     bool barborder;
      int borderheight;
      int ttbarheight;
      struct
@@ -146,14 +147,14 @@ typedef struct
      } font;
      struct
      {
-          int bordernormal;
-          int borderfocus;
-          int bar;
-          int text;
-          int tagselfg;
-          int tagselbg;
-          int layout_fg;
-          int layout_bg;
+          uint bordernormal;
+          uint borderfocus;
+          uint bar;
+          uint text;
+          uint tagselfg;
+          uint tagselbg;
+          uint layout_fg;
+          uint layout_bg;
      } colors;
      Tag tag[MAXTAG];
      Layout layout[MAXLAYOUT];
@@ -180,7 +181,7 @@ typedef struct
 typedef struct
 {
      char *name;
-     unsigned int button;
+     uint button;
 } name_to_uint_t;
 
 /* Enum */
@@ -208,8 +209,8 @@ void unmapnotify(XEvent ev);
 void getevent(void);
 
 /* util.c */
-void *emalloc(unsigned int elemet, unsigned int size);
-unsigned long getcolor(char *color);
+void *emalloc(uint elemet, uint size);
+ulong getcolor(char *color);
 void xprint(Drawable d, int x, int y,
             uint fg, uint bg,
             int d1, int d2, char* str);

@@ -58,7 +58,7 @@ buttonpress(XEvent ev)
                               mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, False);
                     }
                     /* BUTTON 2 */
-                    {
+{
                          if(ev.xbutton.button == Button2)
                          {
                               if(tags[seltag].layout.func == tile)
@@ -339,7 +339,7 @@ focusin(XEvent ev)
 void
 keypress(XEvent ev)
 {
-     unsigned int i;
+     uint i;
      KeySym keysym;
 
      keysym = XKeycodeToKeysym(dpy, (KeyCode)ev.xkey.keycode, 0);

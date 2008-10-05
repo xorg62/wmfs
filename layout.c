@@ -53,7 +53,6 @@ freelayout(void)
      return;
 }
 
-/* Improved ! :) */
 void
 layoutswitch(Bool b)
 {
@@ -157,8 +156,8 @@ uicb_set_nmaster(uicb_t cmd)
 void
 tile(void)
 {
-     unsigned int i, n, x, y, yt, w, h, ww, hh, th;
-     unsigned int barto, bord, mwf, nm, mht;
+     uint i, n, x, y, yt, w, h, ww, hh, th;
+     uint barto, bord, mwf, nm, mht;
      Client *c;
 
      bord   =  conf.borderheight * 2;
@@ -169,7 +168,7 @@ tile(void)
 
      /* count all the "can-be-tiled" client */
      for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++n);
-     if(n == 0)
+     if(!n)
           return;
 
      /* window geoms */
