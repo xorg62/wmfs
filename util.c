@@ -57,6 +57,10 @@ getcolor(char *color)
 void
 uicb_spawn(uicb_t cmd)
 {
+     char *sh = NULL;
+
+     if(!(sh = getenv("SHELL")))
+          sh = "/bin/sh";
      if(!strlen(cmd))
           return;
      if(fork() == 0)
@@ -66,7 +70,7 @@ uicb_spawn(uicb_t cmd)
                if(dpy)
                     close(ConnectionNumber(dpy));
                setsid();
-               execl(getenv("SHELL"), getenv("SHELL"), "-c", cmd, (char*)NULL);
+               execl(sh, sh, "-c", cmd, (char*)NULL);
                exit(EXIT_FAILURE);
           }
           exit(EXIT_SUCCESS);
@@ -76,12 +80,12 @@ uicb_spawn(uicb_t cmd)
 }
 
 void
-xprint(Drawable d, int x, int y, char *str,
-       unsigned int fg,unsigned int bg,
-       int dec1,int dec2)
+xprint(Drawable d, int x, int y,
+       uint fg, uint bg,
+       int d1, int d2, char *str)
 {
      XSetForeground(dpy, gc, bg);
-     XFillRectangle(dpy, d, gc, x - dec1, 0, TEXTW(str) - dec2, barheight);
+     XFillRectangle(dpy, d, gc, x - d1, 0, TEXTW(str) - d2, barheight);
      XSetForeground(dpy, gc, fg);
      XDrawString(dpy, d, gc, x, y, str, strlen(str));
 

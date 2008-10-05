@@ -210,16 +210,16 @@ void getevent(void);
 /* util.c */
 void *emalloc(unsigned int elemet, unsigned int size);
 unsigned long getcolor(char *color);
-void uicb_spawn(uicb_t cmd);
-void xprint(Drawable d, int x, int y, char *str,
-            unsigned int fg, unsigned int bg,
-            int dec1, int dec2);
+void xprint(Drawable d, int x, int y,
+            uint fg, uint bg,
+            int d1, int d2, char* str);
+void uicb_spawn(uicb_t);
 
 /* tag.c */
-void uicb_tag(uicb_t cmd);
-void uicb_tag_next(uicb_t cmd);
-void uicb_tag_prev(uicb_t cmd);
-void uicb_tagtransfert(uicb_t cmd);
+void uicb_tag(uicb_t);
+void uicb_tag_next(uicb_t);
+void uicb_tag_prev(uicb_t);
+void uicb_tagtransfert(uicb_t);
 
 /* layout.c */
 void freelayout(void);
@@ -227,12 +227,12 @@ void layoutswitch(Bool b);
 void maxlayout(void);
 Client* nexttiled(Client *c);
 void tile(void);
-void uicb_tile_switch(uicb_t cmd);
-void uicb_togglemax(uicb_t cmd);
-void uicb_layout_prev(uicb_t cmd);
-void uicb_layout_next(uicb_t cmd);
-void uicb_set_mwfact(uicb_t cmd);
-void uicb_set_nmaster(uicb_t cmd);
+void uicb_tile_switch(uicb_t);
+void uicb_togglemax(uicb_t);
+void uicb_layout_prev(uicb_t);
+void uicb_layout_next(uicb_t);
+void uicb_set_mwfact(uicb_t);
+void uicb_set_nmaster(uicb_t);
 
 /* wmfs.c */
 void arrange(void);
@@ -269,11 +269,11 @@ void updatebutton(Bool c);
 void unmapclient(Client *c);
 void updateall(void);
 void updatetitle(Client *c);
-void uicb_client_prev(uicb_t cmd);
-void uicb_client_next(uicb_t cmd);
-void uicb_killclient(uicb_t cmd);
-void uicb_quit(uicb_t cmd);
-void uicb_togglebarpos(uicb_t cmd);
+void uicb_client_prev(uicb_t);
+void uicb_client_next(uicb_t);
+void uicb_killclient(uicb_t);
+void uicb_quit(uicb_t);
+void uicb_togglebarpos(uicb_t);
 
 /* Variables */
 
@@ -313,7 +313,7 @@ Client *sel;
 Client *selbytag[MAXTAG];
 
 /* Other */
-unsigned int numlockmask;
+uint numlockmask;
 
 #endif /* LOCAL_H */
 

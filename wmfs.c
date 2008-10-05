@@ -950,20 +950,19 @@ updatebar(void)
           taglen[i+1] = taglen[i] + TEXTW(buf[i]);
 
           /* Draw tags */
-          xprint(dr, taglen[i], fonth, buf[i],
+          xprint(dr, taglen[i], fonth,
                  ((i+1 == seltag) ? conf.colors.tagselfg : conf.colors.text),
-                 ((i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar), 3, 3);
+                 ((i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar), 3, 3, buf[i]);
      }
 
      /* Layout symbol */
      xprint(dr, taglen[conf.ntag] - 4,
-            fonth, tags[seltag].layout.symbol,
-            conf.colors.layout_fg, conf.colors.layout_bg, 1, -1);
+            fonth, conf.colors.layout_fg, conf.colors.layout_bg,
+            1, -1, tags[seltag].layout.symbol);
 
      /* Draw status text */
      k = TEXTW(bartext);
-     xprint(dr, mw-k, fonth - 1, bartext,
-            conf.colors.text, conf.colors.bar, 0, 0);
+     xprint(dr, mw-k, fonth - 1, conf.colors.text, conf.colors.bar, 0, 0, bartext);
      XDrawLine(dpy, dr, gc, mw-k-5, 0, mw-k-5, barheight);
 
      XCopyArea(dpy, dr, bar, gc, 0, 0, mw, barheight, 0, 0);
@@ -1015,16 +1014,16 @@ updatebutton(Bool c)
                                                      CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
                XSetWindowBackground(dpy, conf.barbutton[i].win, conf.barbutton[i].bg_color);
                XMapRaised(dpy, conf.barbutton[i].win);
-               xprint(conf.barbutton[i].win, 1, fonth_l, conf.barbutton[i].text,
-                      conf.barbutton[i].fg_color, conf.barbutton[i].bg_color, 0, 0);
+               xprint(conf.barbutton[i].win, 1, fonth_l, conf.barbutton[i].fg_color,
+                      conf.barbutton[i].bg_color, 0, 0, conf.barbutton[i].text);
           }
           else
           {
                if(!conf.barbutton[i].win)
                     return;
                XMoveWindow(dpy, conf.barbutton[i].win, x, y);
-               xprint(conf.barbutton[i].win, 1, fonth_l, conf.barbutton[i].text,
-                      conf.barbutton[i].fg_color, conf.barbutton[i].bg_color, 0, 0);
+               xprint(conf.barbutton[i].win, 1, fonth_l,  conf.barbutton[i].fg_color,
+                      conf.barbutton[i].bg_color, 0, 0, conf.barbutton[i].text);
           }
      }
      XSync(dpy, False);
@@ -1059,7 +1058,7 @@ updatetitle(Client *c)
      {
           XClearWindow(dpy, c->tbar);
           xprint(c->tbar, 3, ((fonth-2) + ((conf.ttbarheight - fonth) / 2)),
-                 c->title, conf.colors.text, conf.colors.bar, 0, 0);
+                 conf.colors.text, conf.colors.bar, 0, 0, c->title);
      }
      return;
 }
