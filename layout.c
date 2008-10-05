@@ -77,7 +77,7 @@ layoutswitch(Bool b)
 }
 
 void
-uicb_layout_next(char *cmd)
+uicb_layout_next(uicb_t cmd)
 {
      layoutswitch(True);
 
@@ -85,7 +85,7 @@ uicb_layout_next(char *cmd)
 }
 
 void
-uicb_layout_prev(char *cmd)
+uicb_layout_prev(uicb_t cmd)
 {
      layoutswitch(False);
 
@@ -125,7 +125,7 @@ nexttiled(Client *c)
 }
 
 void
-uicb_set_mwfact(char *cmd)
+uicb_set_mwfact(uicb_t cmd)
 {
      double c;
 
@@ -142,7 +142,7 @@ uicb_set_mwfact(char *cmd)
 }
 
 void
-uicb_set_nmaster(char *cmd)
+uicb_set_nmaster(uicb_t cmd)
 {
      int n = atoi(cmd);
 
@@ -229,7 +229,7 @@ tile(void)
 }
 
 void
-uicb_tile_switch(char *cmd)
+uicb_tile_switch(uicb_t cmd)
 {
      Client *c;
 
@@ -247,7 +247,7 @@ uicb_tile_switch(char *cmd)
 }
 
 void
-uicb_togglemax(char *cmd)
+uicb_togglemax(uicb_t cmd)
 {
      if(!sel || ishide(sel) || sel->hint)
           return;

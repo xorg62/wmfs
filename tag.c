@@ -36,7 +36,7 @@
 /* if cmd is +X or -X, this is just switch
  * else {1, 2.. 9} it's go to the wanted tag. */
 void
-uicb_tag(char *cmd)
+uicb_tag(uicb_t cmd)
 {
      int tmp = atoi(cmd);
 
@@ -63,7 +63,7 @@ uicb_tag(char *cmd)
 }
 
 void
-uicb_tag_next(char *cmd)
+uicb_tag_next(uicb_t cmd)
 {
      uicb_tag("+1");
 
@@ -71,7 +71,7 @@ uicb_tag_next(char *cmd)
 }
 
 void
-uicb_tag_prev(char *cmd)
+uicb_tag_prev(uicb_t cmd)
 {
      uicb_tag("-1");
 
@@ -79,7 +79,7 @@ uicb_tag_prev(char *cmd)
 }
 
 void
-uicb_tagtransfert(char *cmd)
+uicb_tagtransfert(uicb_t cmd)
 {
      int n = atoi(cmd);
 

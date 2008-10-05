@@ -55,7 +55,7 @@ getcolor(char *color)
 }
 
 void
-uicb_spawn(char *cmd)
+uicb_spawn(uicb_t cmd)
 {
      if(!strlen(cmd))
           return;
@@ -71,6 +71,19 @@ uicb_spawn(char *cmd)
           }
           exit(EXIT_SUCCESS);
      }
+
+     return;
+}
+
+void
+xprint(Drawable d, int x, int y, char *str,
+       unsigned int fg,unsigned int bg,
+       int dec1,int dec2)
+{
+     XSetForeground(dpy, gc, bg);
+     XFillRectangle(dpy, d, gc, x - dec1, 0, TEXTW(str) - dec2, barheight);
+     XSetForeground(dpy, gc, fg);
+     XDrawString(dpy, d, gc, x, y, str, strlen(str));
 
      return;
 }

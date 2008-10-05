@@ -58,7 +58,7 @@
 #define KeyMask      (KeyPressMask | KeyReleaseMask)
 #define ALT          Mod1Mask
 #define ITOA(p ,n)   sprintf(p, "%i", n)
-#define debug(p)     printf("debug: %i\n", p)
+#define debug(p)     fprintf(stderr, "debug: %i\n", p)
 #define MAXTAG       36
 #define NBUTTON      5
 #define BUTY(y)      y - conf.ttbarheight + 3
@@ -67,7 +67,8 @@
 #define TEXTW(x)     XTextWidth(font, x, strlen(x)) + (fonth / 10)
 #define MAXLAYOUT    3
 
-/* Client Structure */
+/* Client Structure  & Typedef */
+typedef const char* uicb_t;
 typedef struct Client Client;
 struct Client
 {
@@ -95,7 +96,7 @@ typedef struct
 {
      unsigned long mod;
      KeySym keysym;
-     void (*func)(char *cmd);
+     void (*func)(uicb_t);
      char *cmd;
 } Key;
 
@@ -108,7 +109,7 @@ typedef struct
      int bg_color;
      unsigned int x;
      int nmousesec;
-     void (*func[NBUTTON])(char *cmd);
+     void (*func[NBUTTON])(uicb_t);
      char *cmd[NBUTTON];
      unsigned int mouse[NBUTTON];
 } BarButton;
@@ -209,13 +210,16 @@ void getevent(void);
 /* util.c */
 void *emalloc(unsigned int elemet, unsigned int size);
 unsigned long getcolor(char *color);
-void uicb_spawn(char *cmd);
+void uicb_spawn(uicb_t cmd);
+void xprint(Drawable d, int x, int y, char *str,
+            unsigned int fg, unsigned int bg,
+            int dec1, int dec2);
 
 /* tag.c */
-void uicb_tag(char *cmd);
-void uicb_tag_next(char *cmd);
-void uicb_tag_prev(char *cmd);
-void uicb_tagtransfert(char *cmd);
+void uicb_tag(uicb_t cmd);
+void uicb_tag_next(uicb_t cmd);
+void uicb_tag_prev(uicb_t cmd);
+void uicb_tagtransfert(uicb_t cmd);
 
 /* layout.c */
 void freelayout(void);
@@ -223,12 +227,12 @@ void layoutswitch(Bool b);
 void maxlayout(void);
 Client* nexttiled(Client *c);
 void tile(void);
-void uicb_tile_switch(char *cmd);
-void uicb_togglemax(char *cmd);
-void uicb_layout_prev(char *cmd);
-void uicb_layout_next(char *cmd);
-void uicb_set_mwfact(char *cmd);
-void uicb_set_nmaster(char *cmd);
+void uicb_tile_switch(uicb_t cmd);
+void uicb_togglemax(uicb_t cmd);
+void uicb_layout_prev(uicb_t cmd);
+void uicb_layout_next(uicb_t cmd);
+void uicb_set_mwfact(uicb_t cmd);
+void uicb_set_nmaster(uicb_t cmd);
 
 /* wmfs.c */
 void arrange(void);
@@ -265,11 +269,11 @@ void updatebutton(Bool c);
 void unmapclient(Client *c);
 void updateall(void);
 void updatetitle(Client *c);
-void uicb_client_prev(char *cmd);
-void uicb_client_next(char *cmd);
-void uicb_killclient(char *cmd);
-void uicb_quit(char *cmd);
-void uicb_togglebarpos(char *cmd);
+void uicb_client_prev(uicb_t cmd);
+void uicb_client_next(uicb_t cmd);
+void uicb_killclient(uicb_t cmd);
+void uicb_quit(uicb_t cmd);
+void uicb_togglebarpos(uicb_t cmd);
 
 /* Variables */
 

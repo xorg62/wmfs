@@ -116,7 +116,7 @@ client_switch(Bool b)
 }
 
 void
-uicb_client_prev(char *cmd)
+uicb_client_prev(uicb_t cmd)
 {
      client_switch(False);
 
@@ -124,7 +124,7 @@ uicb_client_prev(char *cmd)
 }
 
 void
-uicb_client_next(char *cmd)
+uicb_client_next(uicb_t cmd)
 {
      client_switch(True);
 
@@ -194,7 +194,7 @@ focus(Client *c)
      else
           XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 
-     return;
+      return;
 }
 
 Client*
@@ -430,7 +430,7 @@ ishide(Client *c)
 }
 
 void
-uicb_killclient(char *cmd)
+uicb_killclient(uicb_t cmd)
 {
      XEvent ev;
 
@@ -466,7 +466,7 @@ mainloop(void)
                FD_SET(STDIN_FILENO, &fd);
           FD_SET(ConnectionNumber(dpy), &fd);
           if(select(ConnectionNumber(dpy) + 1, &fd, NULL, NULL, NULL) == -1)
-               printf("WMFS Warning: Select failed\n");
+               fprintf(stderr, "WMFS Warning: Select failed\n");
           if(FD_ISSET(STDIN_FILENO, &fd))
           {
                if((r = read(STDIN_FILENO, sbuf + offset, len - offset)))
@@ -711,7 +711,7 @@ moveresize(Client *c, int x, int y, int w, int h, bool r)
 }
 
 void
-uicb_quit(char *cmd)
+uicb_quit(uicb_t cmd)
 {
      exiting = True;
 
@@ -851,7 +851,7 @@ setsizehints(Client *c)
 }
 
 void
-uicb_togglebarpos(char *cmd)
+uicb_togglebarpos(uicb_t cmd)
 {
      int i;
 
@@ -867,6 +867,7 @@ uicb_togglebarpos(char *cmd)
      updatebutton(False);
      for(i = 0; i < conf.nbutton; ++i)
           XMapWindow(dpy, conf.barbutton[i].win);
+
      arrange();
 
      return;
@@ -948,30 +949,21 @@ updatebar(void)
           sprintf(buf[i], "%s<%s> ", tags[i+1].name, (clientpertag(i+1)) ? p : "");
           taglen[i+1] = taglen[i] + TEXTW(buf[i]);
 
-          /* Rectangle for the tag background */
-          XSetForeground(dpy, gc, (i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar);
-          XFillRectangle(dpy, dr, gc, taglen[i] - 3, 0, TEXTW(buf[i]) - 3, barheight);
-
-          /* Draw tag */
-          XSetForeground(dpy, gc, (i+1 == seltag) ? conf.colors.tagselfg : conf.colors.text);
-          XDrawString(dpy, dr, gc, taglen[i], fonth, buf[i], strlen(buf[i]));
+          /* Draw tags */
+          xprint(dr, taglen[i], fonth, buf[i],
+                 ((i+1 == seltag) ? conf.colors.tagselfg : conf.colors.text),
+                 ((i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar), 3, 3);
      }
 
-     /* Draw layout symbol */
-     XSetForeground(dpy, gc, conf.colors.layout_bg);
-     XFillRectangle(dpy, dr, gc, taglen[conf.ntag] - 5, 0,
-                    TEXTW(strdup(tags[seltag].layout.symbol)),
-                    barheight);
-     XSetForeground(dpy, gc, conf.colors.layout_fg);
-     XDrawString(dpy, dr, gc, taglen[conf.ntag] - 4,
-                 fonth,
-                 tags[seltag].layout.symbol,
-                 strlen(tags[seltag].layout.symbol));
+     /* Layout symbol */
+     xprint(dr, taglen[conf.ntag] - 4,
+            fonth, tags[seltag].layout.symbol,
+            conf.colors.layout_fg, conf.colors.layout_bg, 1, -1);
 
-     /* Draw status */
+     /* Draw status text */
      k = TEXTW(bartext);
-     XSetForeground(dpy, gc, conf.colors.text);
-     XDrawString(dpy, dr, gc, mw - k, fonth-1, bartext, strlen(bartext));
+     xprint(dr, mw-k, fonth - 1, bartext,
+            conf.colors.text, conf.colors.bar, 0, 0);
      XDrawLine(dpy, dr, gc, mw-k-5, 0, mw-k-5, barheight);
 
      XCopyArea(dpy, dr, bar, gc, 0, 0, mw, barheight, 0, 0);
@@ -1023,17 +1015,16 @@ updatebutton(Bool c)
                                                      CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
                XSetWindowBackground(dpy, conf.barbutton[i].win, conf.barbutton[i].bg_color);
                XMapRaised(dpy, conf.barbutton[i].win);
-               XSetForeground(dpy, gc, conf.barbutton[i].fg_color);
-               XDrawString(dpy, conf.barbutton[i].win, gc, 1, fonth_l, conf.barbutton[i].text, p);
+               xprint(conf.barbutton[i].win, 1, fonth_l, conf.barbutton[i].text,
+                      conf.barbutton[i].fg_color, conf.barbutton[i].bg_color, 0, 0);
           }
           else
           {
                if(!conf.barbutton[i].win)
                     return;
-               XSetForeground(dpy, gc, conf.barbutton[i].fg_color);
                XMoveWindow(dpy, conf.barbutton[i].win, x, y);
-               XDrawString(dpy, conf.barbutton[i].win, gc, 1, fonth_l,
-                           conf.barbutton[i].text, strlen(conf.barbutton[i].text));
+               xprint(conf.barbutton[i].win, 1, fonth_l, conf.barbutton[i].text,
+                      conf.barbutton[i].fg_color, conf.barbutton[i].bg_color, 0, 0);
           }
      }
      XSync(dpy, False);
@@ -1067,19 +1058,15 @@ updatetitle(Client *c)
      if(conf.ttbarheight > 10)
      {
           XClearWindow(dpy, c->tbar);
-          XSetForeground(dpy, gc, conf.colors.text);
-          XDrawString(dpy, c->tbar, gc, 3,
-                      ((fonth-2) + ((conf.ttbarheight - fonth) / 2)),
-                      c->title, strlen(c->title));
+          xprint(c->tbar, 3, ((fonth-2) + ((conf.ttbarheight - fonth) / 2)),
+                 c->title, conf.colors.text, conf.colors.bar, 0, 0);
      }
-
      return;
 }
 
 int
 main(int argc, char **argv)
 {
-     dpy = XOpenDisplay(NULL);
      int i;
 
      static struct option long_options[] = {
@@ -1090,7 +1077,7 @@ main(int argc, char **argv)
           {NULL,		0, NULL, 0}
      };
 
-     while ((i = getopt_long (argc, argv, "hvi", long_options, NULL)) != -1)
+     while ((i = getopt_long(argc, argv, "hvi", long_options, NULL)) != -1)
      {
           switch (i)
           {
@@ -1119,9 +1106,9 @@ main(int argc, char **argv)
           }
      }
 
-     if(!dpy)
+     if(!(dpy = XOpenDisplay(NULL)))
      {
-          printf("WMFS: cannot open X server.\n");
+          fprintf(stderr, "WMFS: cannot open X server.\n");
           exit(EXIT_FAILURE);
      }
 
