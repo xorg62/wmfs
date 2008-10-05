@@ -106,8 +106,8 @@ maxlayout(void)
           c->oh = c->h;
 
           moveresize(c, 0, (conf.ttbarheight + ((conf.bartop) ? barheight : 0)),
-                     (mw-(conf.borderheight * 2)),
-                     (mh-(conf.borderheight * 2) - conf.ttbarheight - barheight), False);
+                     (mw - (conf.borderheight * 2)),
+                     (mh - (conf.borderheight * 2) - conf.ttbarheight - barheight), False);
      }
 
      return;
@@ -201,7 +201,7 @@ tile(void)
                /* remainder */
                if(i + 1 == (n < nm ? n : nm))
                     h = (mht - hh*i) -
-                         ((conf.bartop) ? barheight : 0);
+                         ((conf.bartop) ? barheight: 0);
                h -= bord + conf.ttbarheight;
           }
           /* TILE CLIENT */
@@ -254,9 +254,9 @@ uicb_togglemax(uicb_t cmd)
      {
           sel->ox = sel->x; sel->oy = sel->y;
           sel->ow = sel->w; sel->oh = sel->h;
-          moveresize(sel, 0, (conf.ttbarheight + ((conf.bartop) ? barheight : 0)),
-                     (mw-(conf.borderheight * 2)),
-                     (mh-(conf.borderheight * 2)- conf.ttbarheight - barheight), False);
+          moveresize(sel, 0, (conf.ttbarheight + ((conf.bartop) ? barheight: 0)),
+                     (mw - (conf.borderheight * 2)),
+                     (mh - (conf.borderheight * 2)- conf.ttbarheight - barheight), False);
           raiseclient(sel);
           sel->max = True;
      }

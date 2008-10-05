@@ -398,20 +398,15 @@ init(void)
      XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &at);
 
      /* INIT BAR / BUTTON */
-     bary = (conf.bartop) ? 0 : mh - barheight - conf.barborder;
+     bary = (conf.bartop) ? 0 : mh - barheight;
      dr = XCreatePixmap(dpy, root, DisplayWidth(dpy, screen), barheight, DefaultDepth(dpy, screen));
      at.override_redirect = 1;
      at.background_pixmap = ParentRelative;
      at.event_mask = ButtonPressMask | ExposureMask;
-     bar = XCreateWindow(dpy, root, 0, bary, mw - conf.barborder*2, barheight, 0, DefaultDepth(dpy, screen),
+     bar = XCreateWindow(dpy, root, 0, bary, mw, barheight, 0, DefaultDepth(dpy, screen),
                          CopyFromParent, DefaultVisual(dpy, screen),
                          CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
      XMapRaised(dpy, bar);
-     if(conf.barborder)
-     {
-          XSetWindowBorder(dpy, bar, conf.colors.borderfocus);
-          XSetWindowBorderWidth(dpy, bar, 1);
-     }
      strcpy(bartext, WMFS_VERSION);
      updatebutton(False);
      updatebar();
@@ -864,7 +859,7 @@ uicb_togglebarpos(uicb_t cmd)
      if(conf.bartop)
           bary = 0;
      else
-          bary = mh - barheight - conf.barborder;
+          bary = mh - barheight;
      XMoveWindow(dpy, bar, 0, bary);
      updatebar();
      for(i = 0; i < conf.nbutton; ++i)

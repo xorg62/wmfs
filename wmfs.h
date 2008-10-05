@@ -136,7 +136,6 @@ typedef struct
      bool raisefocus;
      bool raiseswitch;
      bool bartop;
-     bool barborder;
      int borderheight;
      int ttbarheight;
      struct

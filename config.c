@@ -137,7 +137,6 @@ init_conf(void)
      static cfg_opt_t misc_opts[] =
           {
                CFG_STR("bar_position",       "top",                   CFGF_NONE),
-               CFG_BOOL("barborder",         cfg_false,               CFGF_NONE),
                CFG_BOOL("raisefocus",        cfg_false,               CFGF_NONE),
                CFG_BOOL("raiseswitch",       cfg_true,                CFGF_NONE),
                CFG_INT("border_height",      1,                       CFGF_NONE),
@@ -284,7 +283,6 @@ init_conf(void)
 
      /* misc */
      conf.raisefocus    = cfg_getbool(cfg_misc, "raisefocus");
-     conf.barborder     = cfg_getbool(cfg_misc, "barborder");
      conf.raiseswitch   = cfg_getbool(cfg_misc, "raiseswitch");
      conf.borderheight  = cfg_getint(cfg_misc, "border_height");
      conf.ttbarheight   = cfg_getint(cfg_misc, "titlebar_height");
