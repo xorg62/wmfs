@@ -1,5 +1,5 @@
 :man source: wmfs @WMFS_VERSION@
-:man manual: wmfs manual
+:man manual: manual of wmfs @WMFS_VERSION@
 wmfs(1)
 =======
 
