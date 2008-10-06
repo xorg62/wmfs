@@ -174,6 +174,7 @@ focus(Client *c)
           setborder(sel->win, conf.colors.bordernormal);
           if(conf.ttbarheight)
                setborder(sel->tbar, conf.colors.bordernormal);
+
      }
      if(c)
           grabbuttons(c, True);
@@ -194,7 +195,8 @@ focus(Client *c)
      else
           XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 
-      return;
+     updateall();
+     return;
 }
 
 Client*
@@ -396,6 +398,7 @@ init(void)
           EnterWindowMask | LeaveWindowMask | StructureNotifyMask ;
      at.cursor = cursor[CurNormal];
      XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &at);
+     XSetWindowBackground(dpy, root, conf.colors.background);
 
      /* INIT BAR / BUTTON */
      bary = (conf.bartop) ? 0 : mh - barheight;
@@ -407,7 +410,7 @@ init(void)
                          CopyFromParent, DefaultVisual(dpy, screen),
                          CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
      XMapRaised(dpy, bar);
-     strcpy(bartext, WMFS_VERSION);
+     strcpy(bartext, "WMFS-" WMFS_VERSION);
      updatebutton(False);
      updatebar();
 
@@ -549,8 +552,8 @@ manage(Window w, XWindowAttributes *wa)
                                                BUTY(c->y),
                                                ((BUTH) ? BUTH : 1),
                                                ((BUTH) ? BUTH : 1),
-                                               1, conf.colors.bordernormal,
-                                               conf.colors.borderfocus);
+                                               1, conf.colors.button_border,
+                                               conf.colors.button);
      }
 
      XConfigureWindow(dpy, w, CWBorderWidth, &winc);
@@ -936,7 +939,7 @@ updateall(void)
 void
 updatebar(void)
 {
-     int  i , k;
+     int  i , k, sp = 4;
      char buf[conf.ntag][256];
      char p[4];
 
@@ -946,19 +949,19 @@ updatebar(void)
      {
           /* Make the tags string */
           ITOA(p, clientpertag(i+1));
-          sprintf(buf[i], "%s<%s> ", tags[i+1].name, (clientpertag(i+1)) ? p : "");
-          taglen[i+1] = taglen[i] + TEXTW(buf[i]);
+          sprintf(buf[i], "%s<%s>", tags[i+1].name, (clientpertag(i+1)) ? p : "");
+          taglen[i+1] = taglen[i] + TEXTW(buf[i]) + sp;
 
           /* Draw tags */
           xprint(dr, taglen[i], fonth,
                  ((i+1 == seltag) ? conf.colors.tagselfg : conf.colors.text),
-                 ((i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar), 3, 3, buf[i]);
+                 ((i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar), 3, -3, buf[i]);
      }
 
      /* Layout symbol */
-     xprint(dr, taglen[conf.ntag] - 4,
+     xprint(dr, taglen[conf.ntag] - sp/2,
             fonth, conf.colors.layout_fg, conf.colors.layout_bg,
-            1, -1, tags[seltag].layout.symbol);
+            1, 0, tags[seltag].layout.symbol);
 
      /* Draw status text */
      k = TEXTW(bartext);
@@ -1058,7 +1061,8 @@ updatetitle(Client *c)
      {
           XClearWindow(dpy, c->tbar);
           xprint(c->tbar, 3, ((fonth-2) + ((conf.ttbarheight - fonth) / 2)),
-                 conf.colors.text, conf.colors.bar, 0, 0, c->title);
+                 ((c == sel) ? conf.colors.ttbar_text_focus : conf.colors.ttbar_text_normal),
+                 conf.colors.bar, 0, 0, c->title);
      }
      return;
 }

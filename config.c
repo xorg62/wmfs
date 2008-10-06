@@ -154,14 +154,19 @@ init_conf(void)
 
      static cfg_opt_t colors_opts[] =
           {
-               CFG_STR("border_normal", "#354B5C",  CFGF_NONE),
-               CFG_STR("border_focus",  "#6286A1",  CFGF_NONE),
-               CFG_STR("bar",           "#090909",  CFGF_NONE),
-               CFG_STR("text",          "#6289A1",  CFGF_NONE),
-               CFG_STR("tag_sel_fg",    "#FFFFFF",  CFGF_NONE),
-               CFG_STR("tag_sel_bg",    "#354B5C",  CFGF_NONE),
-               CFG_STR("layout_fg",     "#FFFFFF",  CFGF_NONE),
-               CFG_STR("layout_bg",     "#292929",  CFGF_NONE),
+               CFG_STR("background",           "#090909", CFGF_NONE),
+               CFG_STR("border_normal",        "#354B5C", CFGF_NONE),
+               CFG_STR("border_focus",         "#6286A1", CFGF_NONE),
+               CFG_STR("bar_bg",               "#090909", CFGF_NONE),
+               CFG_STR("bar_fg",               "#6289A1", CFGF_NONE),
+               CFG_STR("tag_sel_fg",           "#FFFFFF", CFGF_NONE),
+               CFG_STR("tag_sel_bg",           "#354B5C", CFGF_NONE),
+               CFG_STR("layout_fg",            "#FFFFFF", CFGF_NONE),
+               CFG_STR("layout_bg",            "#292929", CFGF_NONE),
+               CFG_STR("titlebar_text_focus",  "#FFFFFF", CFGF_NONE),
+               CFG_STR("titlebar_text_normal", "#FFFFFF", CFGF_NONE),
+               CFG_STR("button",               "#6286A1", CFGF_NONE),
+               CFG_STR("button_border",        "#354B5C", CFGF_NONE),
                CFG_END()
           };
 
@@ -294,14 +299,19 @@ init_conf(void)
      conf.font.size  = cfg_getint(cfg_font, "size");
 
      /* colors */
-     conf.colors.bordernormal = getcolor(strdup(cfg_getstr(cfg_colors, "border_normal")));
-     conf.colors.borderfocus  = getcolor(strdup(cfg_getstr(cfg_colors, "border_focus")));
-     conf.colors.bar          = getcolor(strdup(cfg_getstr(cfg_colors, "bar")));
-     conf.colors.text         = getcolor(strdup(cfg_getstr(cfg_colors, "text")));
-     conf.colors.tagselfg     = getcolor(strdup(cfg_getstr(cfg_colors, "tag_sel_fg")));
-     conf.colors.tagselbg     = getcolor(strdup(cfg_getstr(cfg_colors, "tag_sel_bg")));
-     conf.colors.layout_fg    = getcolor(strdup(cfg_getstr(cfg_colors, "layout_fg")));
-     conf.colors.layout_bg    = getcolor(strdup(cfg_getstr(cfg_colors, "layout_bg")));
+     conf.colors.background        = getcolor(strdup(cfg_getstr(cfg_colors, "background")));
+     conf.colors.bordernormal      = getcolor(strdup(cfg_getstr(cfg_colors, "border_normal")));
+     conf.colors.borderfocus       = getcolor(strdup(cfg_getstr(cfg_colors, "border_focus")));
+     conf.colors.bar               = getcolor(strdup(cfg_getstr(cfg_colors, "bar_bg")));
+     conf.colors.text              = getcolor(strdup(cfg_getstr(cfg_colors, "bar_fg")));
+     conf.colors.tagselfg          = getcolor(strdup(cfg_getstr(cfg_colors, "tag_sel_fg")));
+     conf.colors.tagselbg          = getcolor(strdup(cfg_getstr(cfg_colors, "tag_sel_bg")));
+     conf.colors.layout_fg         = getcolor(strdup(cfg_getstr(cfg_colors, "layout_fg")));
+     conf.colors.layout_bg         = getcolor(strdup(cfg_getstr(cfg_colors, "layout_bg")));
+     conf.colors.ttbar_text_focus  = getcolor(strdup(cfg_getstr(cfg_colors, "titlebar_text_focus")));
+     conf.colors.ttbar_text_normal = getcolor(strdup(cfg_getstr(cfg_colors, "titlebar_text_normal")));
+     conf.colors.button            = getcolor(strdup(cfg_getstr(cfg_colors, "button")));
+     conf.colors.button_border     = getcolor(strdup(cfg_getstr(cfg_colors, "button_border")));
 
      /* layout */
      if((conf.nlayout = cfg_size(cfg_layouts, "layout")) > MAXLAYOUT

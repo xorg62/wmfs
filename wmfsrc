@@ -18,14 +18,32 @@ font
 
 colors
 {
-        border_normal = "#3F485E"
-        border_focus  = "#7E89A2"
-        bar           = "#191919"
-        text          = "#D4D4D4"
-        tag_sel_fg    = "#000000"
-        tag_sel_bg    = "#7E89A2"
-        layout_fg     = "#000000"
-        layout_bg     = "#7E89A2"
+        #Desktop
+          background           = "#090909"
+
+        #Border
+          border_normal        = "#3F485E"
+          border_focus         = "#7E89A2"
+
+        #Bar
+          bar_bg               = "#191919"
+          bar_fg               = "#D4D4D4"
+
+        #Tag
+          tag_sel_fg           = "#191919"
+          tag_sel_bg           = "#7E89A2"
+
+        #Layout
+          layout_fg            = "#191919"
+          layout_bg            = "#7E89A2"
+
+        #Titlebar
+          titlebar_text_focus  = "#D4D4D4"
+          titlebar_text_normal = "#D4D4D4"
+
+        #Button
+          button               = "#7E89A2"
+          button_border        = "#3F485E"
 }
 
 layouts

@@ -146,6 +146,7 @@ typedef struct
      } font;
      struct
      {
+          uint background;
           uint bordernormal;
           uint borderfocus;
           uint bar;
@@ -154,6 +155,10 @@ typedef struct
           uint tagselbg;
           uint layout_fg;
           uint layout_bg;
+          uint ttbar_text_focus;
+          uint ttbar_text_normal;
+          uint button;
+          uint button_border;
      } colors;
      Tag tag[MAXTAG];
      Layout layout[MAXLAYOUT];
