@@ -188,6 +188,12 @@ typedef struct
      uint button;
 } name_to_uint_t;
 
+typedef struct
+{
+     char *name;
+     char *content;
+} Variable;
+
 /* Enum */
 enum { CurNormal, CurResize, CurMove, CurLast };
 enum { WMState, WMProtocols, WMName, WMDelete, WMLast };
@@ -319,6 +325,7 @@ Client *selbytag[MAXTAG];
 
 /* Other */
 uint numlockmask;
+Variable confvar[256];
 
 #endif /* LOCAL_H */
 

@@ -1,5 +1,10 @@
 # WMFS config file
 
+variables
+{
+        var term { content = "urxvt" }
+}
+
 misc
 {
         bar_position =    "top"
@@ -113,7 +118,7 @@ buttons
 keys
 {
 # general keybind
-        key { mod = {"Control"} key = "Return" func = "spawn" cmd = "urxvt" }
+        key { mod = {"Control"} key = "Return" func = "spawn" cmd = term }
         key { mod = {"Alt"} key = "q" func = "killclient" }
         key { mod = {"Control"} key = "m" func = "togglemax" }
         key { mod = {"Control"} key = "b" func = "togglebarpos" }

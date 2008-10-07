@@ -130,6 +130,31 @@ layout_name_to_struct(Layout lt[], char *name)
      return lt[0];
 }
 
+char*
+get_variable(char *name)
+{
+     int i;
+
+     if(name)
+          for(i = 0; confvar[i].name; ++i)
+               if(!strcmp(name, confvar[i].name))
+                    return confvar[i].content;
+     return NULL;
+}
+
+char*
+var_to_str(char *conf_choice)
+{
+     if(!conf_choice)
+          return 0;
+
+     if(get_variable(conf_choice))
+          return strdup(get_variable(conf_choice));
+     else
+          return strdup(conf_choice);
+}
+
+
 void
 init_conf(void)
 {
@@ -237,15 +262,28 @@ init_conf(void)
                CFG_END()
           };
 
+     static cfg_opt_t variable_opts[] =
+          {
+               CFG_STR("content", "", CFGF_NONE),
+               CFG_END()
+          };
+
+     static cfg_opt_t variables_opts[] =
+          {
+               CFG_SEC("var", variable_opts, CFGF_TITLE | CFGF_MULTI),
+               CFG_END()
+          };
+
      static cfg_opt_t opts[] =
           {
-               CFG_SEC("misc",    misc_opts,    CFGF_NONE),
-               CFG_SEC("font",    font_opts,    CFGF_NONE),
-               CFG_SEC("colors",  colors_opts,  CFGF_NONE),
-               CFG_SEC("layouts", layouts_opts, CFGF_NONE),
-               CFG_SEC("tags",    tags_opts,    CFGF_NONE),
-               CFG_SEC("keys",    keys_opts,    CFGF_NONE),
-               CFG_SEC("buttons", buttons_opts, CFGF_NONE),
+               CFG_SEC("misc",      misc_opts,      CFGF_NONE),
+               CFG_SEC("font",      font_opts,      CFGF_NONE),
+               CFG_SEC("variables", variables_opts, CFGF_NONE),
+               CFG_SEC("colors",    colors_opts,    CFGF_NONE),
+               CFG_SEC("layouts",   layouts_opts,   CFGF_NONE),
+               CFG_SEC("tags",      tags_opts,      CFGF_NONE),
+               CFG_SEC("keys",      keys_opts,      CFGF_NONE),
+               CFG_SEC("buttons",   buttons_opts,   CFGF_NONE),
                CFG_END()
           };
 
@@ -253,6 +291,7 @@ init_conf(void)
      cfg_t *cfg_misc;
      cfg_t *cfg_font;
      cfg_t *cfg_colors;
+     cfg_t *cfg_variables;
      cfg_t *cfg_layouts;
      cfg_t *cfg_tags;
      cfg_t *cfg_keys;
@@ -278,13 +317,30 @@ init_conf(void)
           ret = cfg_parse(cfg, sfinal_path);
      }
 
-     cfg_misc    = cfg_getsec(cfg, "misc");
-     cfg_font    = cfg_getsec(cfg, "font");
-     cfg_colors  = cfg_getsec(cfg, "colors");
-     cfg_layouts = cfg_getsec(cfg, "layouts");
-     cfg_tags    = cfg_getsec(cfg, "tags");
-     cfg_keys    = cfg_getsec(cfg, "keys");
-     cfg_buttons = cfg_getsec(cfg, "buttons");
+     cfg_misc      = cfg_getsec(cfg, "misc");
+     cfg_font      = cfg_getsec(cfg, "font");
+     cfg_variables = cfg_getsec(cfg, "variables");
+     cfg_colors    = cfg_getsec(cfg, "colors");
+     cfg_layouts   = cfg_getsec(cfg, "layouts");
+     cfg_tags      = cfg_getsec(cfg, "tags");
+     cfg_keys      = cfg_getsec(cfg, "keys");
+     cfg_buttons   = cfg_getsec(cfg, "buttons");
+
+
+     debug(cfg_size(cfg_variables, "var"));
+
+     if((cfg_size(cfg_variables, "var")) > 256)
+     {
+          fprintf(stderr,"WMFS Configuration: Too much of variables !\n");
+          exit(EXIT_FAILURE);
+     }
+
+     for(i = 0; i < cfg_size(cfg_variables, "var"); ++i)
+     {
+          cfgtmp = cfg_getnsec(cfg_variables, "var", i);
+          confvar[i].name = strdup(cfg_title(cfgtmp));
+          confvar[i].content = strdup(cfg_getstr(cfgtmp, "content"));
+     }
 
      /* misc */
      conf.raisefocus    = cfg_getbool(cfg_misc, "raisefocus");
@@ -294,24 +350,26 @@ init_conf(void)
      conf.bartop        = (strcmp(strdup(cfg_getstr(cfg_misc, "bar_position")), "top") == 0) ? True : False;
 
      /* font */
-     conf.font.face  = strdup(cfg_getstr(cfg_font, "face"));
-     conf.font.style = strdup(cfg_getstr(cfg_font, "style"));
+     conf.font.face  = strdup(var_to_str(cfg_getstr(cfg_font, "face")));
+     conf.font.style = strdup(var_to_str(cfg_getstr(cfg_font, "style")));
      conf.font.size  = cfg_getint(cfg_font, "size");
 
      /* colors */
-     conf.colors.background        = getcolor(strdup(cfg_getstr(cfg_colors, "background")));
-     conf.colors.bordernormal      = getcolor(strdup(cfg_getstr(cfg_colors, "border_normal")));
-     conf.colors.borderfocus       = getcolor(strdup(cfg_getstr(cfg_colors, "border_focus")));
-     conf.colors.bar               = getcolor(strdup(cfg_getstr(cfg_colors, "bar_bg")));
-     conf.colors.text              = getcolor(strdup(cfg_getstr(cfg_colors, "bar_fg")));
-     conf.colors.tagselfg          = getcolor(strdup(cfg_getstr(cfg_colors, "tag_sel_fg")));
-     conf.colors.tagselbg          = getcolor(strdup(cfg_getstr(cfg_colors, "tag_sel_bg")));
-     conf.colors.layout_fg         = getcolor(strdup(cfg_getstr(cfg_colors, "layout_fg")));
-     conf.colors.layout_bg         = getcolor(strdup(cfg_getstr(cfg_colors, "layout_bg")));
-     conf.colors.ttbar_text_focus  = getcolor(strdup(cfg_getstr(cfg_colors, "titlebar_text_focus")));
-     conf.colors.ttbar_text_normal = getcolor(strdup(cfg_getstr(cfg_colors, "titlebar_text_normal")));
-     conf.colors.button            = getcolor(strdup(cfg_getstr(cfg_colors, "button")));
-     conf.colors.button_border     = getcolor(strdup(cfg_getstr(cfg_colors, "button_border")));
+
+     conf.colors.background = getcolor(var_to_str(cfg_getstr(cfg_colors, "background")));
+     conf.colors.bordernormal = getcolor(var_to_str(cfg_getstr(cfg_colors, "border_normal")));
+     conf.colors.borderfocus = getcolor(var_to_str(cfg_getstr(cfg_colors, "border_focus")));
+     conf.colors.bar = getcolor(var_to_str(cfg_getstr(cfg_colors, "bar_bg")));
+     conf.colors.text = getcolor(var_to_str(cfg_getstr(cfg_colors, "bar_fg")));
+     conf.colors.tagselfg = getcolor(var_to_str(cfg_getstr(cfg_colors, "tag_sel_fg")));
+     conf.colors.tagselbg = getcolor(var_to_str(cfg_getstr(cfg_colors, "tag_sel_bg")));
+     conf.colors.layout_fg = getcolor(var_to_str(cfg_getstr(cfg_colors, "layout_fg")));
+     conf.colors.layout_bg = getcolor(var_to_str(cfg_getstr(cfg_colors, "layout_bg")));
+     conf.colors.ttbar_text_focus = getcolor(var_to_str(cfg_getstr(cfg_colors, "titlebar_text_focus")));
+     conf.colors.ttbar_text_normal = getcolor(var_to_str(cfg_getstr(cfg_colors, "titlebar_text_normal")));
+     conf.colors.button = getcolor(var_to_str(cfg_getstr(cfg_colors, "button")));
+     conf.colors.button_border = getcolor(var_to_str(cfg_getstr(cfg_colors, "button_border")));
+
 
      /* layout */
      if((conf.nlayout = cfg_size(cfg_layouts, "layout")) > MAXLAYOUT
@@ -337,7 +395,7 @@ init_conf(void)
                }
                else
                {
-                    conf.layout[i].symbol = strdup(cfg_getstr(cfgtmp, "symbol"));
+                    conf.layout[i].symbol = strdup(var_to_str(cfg_getstr(cfgtmp, "symbol")));
                     conf.layout[i].func = name_to_func(strdup(cfg_getstr(cfgtmp, "type")), layout_list);
                }
           }
@@ -397,8 +455,8 @@ init_conf(void)
                return;
           }
 
-          keys[j].cmd = (!strdup(strdup(cfg_getstr(cfgtmp, "cmd"))))
-               ?  NULL : strdup(strdup(cfg_getstr(cfgtmp, "cmd")));
+          keys[j].cmd = (!strdup(var_to_str((cfg_getstr(cfgtmp, "cmd"))))
+                                 ?  NULL : strdup(var_to_str(cfg_getstr(cfgtmp, "cmd"))));
      }
 
      /* button */
@@ -412,13 +470,13 @@ init_conf(void)
           {
                cfgtmp3 = cfg_getnsec(cfgtmp2, "mouse", j);
                conf.barbutton[i].func[j] = name_to_func(cfg_getstr(cfgtmp3, "func"), func_list);
-               conf.barbutton[i].cmd[j] = strdup(cfg_getstr(cfgtmp3, "cmd"));
+               conf.barbutton[i].cmd[j] = strdup(var_to_str(cfg_getstr(cfgtmp3, "cmd")));
                conf.barbutton[i].mouse[j] = char_to_button(cfg_getstr(cfgtmp3, "button"));
           }
           conf.barbutton[i].nmousesec = cfg_size(cfgtmp2, "mouse");
-          conf.barbutton[i].text = strdup(cfg_getstr(cfgtmp2, "text"));
-          conf.barbutton[i].fg_color = getcolor(strdup(cfg_getstr(cfgtmp2, "fg_color")));
-          conf.barbutton[i].bg_color = getcolor(strdup(cfg_getstr(cfgtmp2, "bg_color")));
+          conf.barbutton[i].text = strdup(var_to_str(cfg_getstr(cfgtmp2, "text")));
+          conf.barbutton[i].fg_color = getcolor(strdup(var_to_str(cfg_getstr(cfgtmp2, "fg_color"))));
+          conf.barbutton[i].bg_color = getcolor(strdup(var_to_str(cfg_getstr(cfgtmp2, "bg_color"))));
           conf.barbutton[i].x = cfg_getint(cfgtmp2, "x");
      }
 
