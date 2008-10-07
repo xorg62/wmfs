@@ -131,25 +131,19 @@ layout_name_to_struct(Layout lt[], char *name)
 }
 
 char*
-get_variable(char *name)
-{
-     int i;
-
-     if(name)
-          for(i = 0; confvar[i].name; ++i)
-               if(!strcmp(name, confvar[i].name))
-                    return confvar[i].content;
-     return NULL;
-}
-
-char*
 var_to_str(char *conf_choice)
 {
+     int i;
+     char *tmpchar = NULL;
+
      if(!conf_choice)
           return 0;
 
-     if(get_variable(conf_choice))
-          return strdup(get_variable(conf_choice));
+     for(i = 0; confvar[i].name; i++)
+          if(!strcmp(conf_choice, confvar[i].name))
+               tmpchar = confvar[i].content;
+     if(tmpchar)
+          return strdup(tmpchar);
      else
           return strdup(conf_choice);
 }
@@ -161,19 +155,19 @@ init_conf(void)
 
      static cfg_opt_t misc_opts[] =
           {
-               CFG_STR("bar_position",       "top",                   CFGF_NONE),
-               CFG_BOOL("raisefocus",        cfg_false,               CFGF_NONE),
-               CFG_BOOL("raiseswitch",       cfg_true,                CFGF_NONE),
-               CFG_INT("border_height",      1,                       CFGF_NONE),
-               CFG_INT("titlebar_height",    0,                       CFGF_NONE),
+               CFG_STR("bar_position",       "top",     CFGF_NONE),
+               CFG_BOOL("raisefocus",        cfg_false, CFGF_NONE),
+               CFG_BOOL("raiseswitch",       cfg_true,  CFGF_NONE),
+               CFG_INT("border_height",      1,         CFGF_NONE),
+               CFG_INT("titlebar_height",    0,         CFGF_NONE),
                CFG_END()
           };
 
      static cfg_opt_t font_opts[] =
           {
-               CFG_STR("face", "fixed", CFGF_NONE),
+               CFG_STR("face",  "fixed",  CFGF_NONE),
                CFG_STR("style", "medium", CFGF_NONE),
-               CFG_INT("size", 12, CFGF_NONE),
+               CFG_INT("size",  12,       CFGF_NONE),
                CFG_END()
           };
 
@@ -197,7 +191,7 @@ init_conf(void)
 
      static cfg_opt_t layout_opts[] =
           {
-               CFG_STR("type", "", CFGF_NONE),
+               CFG_STR("type",   "", CFGF_NONE),
                CFG_STR("symbol", "", CFGF_NONE),
                CFG_END()
           };
@@ -210,10 +204,10 @@ init_conf(void)
 
      static cfg_opt_t tag_opts[] =
           {
-               CFG_STR("name", "", CFGF_NONE),
-               CFG_FLOAT("mwfact", 0.65, CFGF_NONE),
-               CFG_INT("nmaster", 1, CFGF_NONE),
-               CFG_STR("layout", "tile", CFGF_NONE),
+               CFG_STR("name",     "",     CFGF_NONE),
+               CFG_FLOAT("mwfact", 0.65,   CFGF_NONE),
+               CFG_INT("nmaster",  1,      CFGF_NONE),
+               CFG_STR("layout",   "tile", CFGF_NONE),
                CFG_END()
           };
 
@@ -226,9 +220,9 @@ init_conf(void)
      static cfg_opt_t key_opts[] =
           {
                CFG_STR_LIST("mod", "{Control}", CFGF_NONE),
-               CFG_STR("key", "None", CFGF_NONE),
-               CFG_STR("func", "", CFGF_NONE),
-               CFG_STR("cmd",  "", CFGF_NONE),
+               CFG_STR("key",      "None",      CFGF_NONE),
+               CFG_STR("func",     "",          CFGF_NONE),
+               CFG_STR("cmd",      "",          CFGF_NONE),
                CFG_END()
           };
 
@@ -248,11 +242,11 @@ init_conf(void)
 
      static cfg_opt_t button_opts[] =
           {
-               CFG_STR("text", "", CFGF_NONE),
+               CFG_STR("text",     "",                CFGF_NONE),
                CFG_SEC("mouse",    mouse_button_opts, CFGF_MULTI),
-               CFG_STR("fg_color", "#000000", CFGF_NONE),
-               CFG_STR("bg_color", "#FFFFFF", CFGF_NONE),
-               CFG_INT("x", 0, CFGF_NONE),
+               CFG_STR("fg_color", "#000000",         CFGF_NONE),
+               CFG_STR("bg_color", "#FFFFFF",         CFGF_NONE),
+               CFG_INT("x",        0,                 CFGF_NONE),
                CFG_END()
           };
 
@@ -337,8 +331,8 @@ init_conf(void)
 
      for(i = 0; i < cfg_size(cfg_variables, "var"); ++i)
      {
-          cfgtmp = cfg_getnsec(cfg_variables, "var", i);
-          confvar[i].name = strdup(cfg_title(cfgtmp));
+          cfgtmp             = cfg_getnsec(cfg_variables, "var", i);
+          confvar[i].name    = strdup(cfg_title(cfgtmp));
           confvar[i].content = strdup(cfg_getstr(cfgtmp, "content"));
      }
 
@@ -356,19 +350,19 @@ init_conf(void)
 
      /* colors */
 
-     conf.colors.background = getcolor(var_to_str(cfg_getstr(cfg_colors, "background")));
-     conf.colors.bordernormal = getcolor(var_to_str(cfg_getstr(cfg_colors, "border_normal")));
-     conf.colors.borderfocus = getcolor(var_to_str(cfg_getstr(cfg_colors, "border_focus")));
-     conf.colors.bar = getcolor(var_to_str(cfg_getstr(cfg_colors, "bar_bg")));
-     conf.colors.text = getcolor(var_to_str(cfg_getstr(cfg_colors, "bar_fg")));
-     conf.colors.tagselfg = getcolor(var_to_str(cfg_getstr(cfg_colors, "tag_sel_fg")));
-     conf.colors.tagselbg = getcolor(var_to_str(cfg_getstr(cfg_colors, "tag_sel_bg")));
-     conf.colors.layout_fg = getcolor(var_to_str(cfg_getstr(cfg_colors, "layout_fg")));
-     conf.colors.layout_bg = getcolor(var_to_str(cfg_getstr(cfg_colors, "layout_bg")));
-     conf.colors.ttbar_text_focus = getcolor(var_to_str(cfg_getstr(cfg_colors, "titlebar_text_focus")));
+     conf.colors.background        = getcolor(var_to_str(cfg_getstr(cfg_colors, "background")));
+     conf.colors.bordernormal      = getcolor(var_to_str(cfg_getstr(cfg_colors, "border_normal")));
+     conf.colors.borderfocus       = getcolor(var_to_str(cfg_getstr(cfg_colors, "border_focus")));
+     conf.colors.bar               = getcolor(var_to_str(cfg_getstr(cfg_colors, "bar_bg")));
+     conf.colors.text              = getcolor(var_to_str(cfg_getstr(cfg_colors, "bar_fg")));
+     conf.colors.tagselfg          = getcolor(var_to_str(cfg_getstr(cfg_colors, "tag_sel_fg")));
+     conf.colors.tagselbg          = getcolor(var_to_str(cfg_getstr(cfg_colors, "tag_sel_bg")));
+     conf.colors.layout_fg         = getcolor(var_to_str(cfg_getstr(cfg_colors, "layout_fg")));
+     conf.colors.layout_bg         = getcolor(var_to_str(cfg_getstr(cfg_colors, "layout_bg")));
+     conf.colors.ttbar_text_focus  = getcolor(var_to_str(cfg_getstr(cfg_colors, "titlebar_text_focus")));
      conf.colors.ttbar_text_normal = getcolor(var_to_str(cfg_getstr(cfg_colors, "titlebar_text_normal")));
-     conf.colors.button = getcolor(var_to_str(cfg_getstr(cfg_colors, "button")));
-     conf.colors.button_border = getcolor(var_to_str(cfg_getstr(cfg_colors, "button_border")));
+     conf.colors.button            = getcolor(var_to_str(cfg_getstr(cfg_colors, "button")));
+     conf.colors.button_border     = getcolor(var_to_str(cfg_getstr(cfg_colors, "button_border")));
 
 
      /* layout */
@@ -376,9 +370,9 @@ init_conf(void)
           || !(conf.nlayout = cfg_size(cfg_layouts, "layout")))
      {
           fprintf(stderr, "WMFS Configuration: Too much or no layouts\n");
-          conf.nlayout = 1;
+          conf.nlayout          = 1;
           conf.layout[0].symbol = strdup("TILE");
-          conf.layout[0].func = tile;
+          conf.layout[0].func   = tile;
      }
 
      if(!conf.layout[0].symbol
@@ -409,29 +403,30 @@ init_conf(void)
      conf.ntag = cfg_size(cfg_tags, "tag");
      if(!conf.ntag  || conf.ntag > MAXTAG)
      {
-          fprintf(stderr, "WMFS Configuration: Too much or no tag (%d) in the configration file\n", conf.ntag);
+          fprintf(stderr, "WMFS Configuration: Too much or no tag"
+                  " (%d) in the configration file\n", conf.ntag);
           conf.ntag = 1;
-          conf.tag[0].name = strdup("WMFS");
-          conf.tag[0].mwfact = 0.65;
+          conf.tag[0].name    = strdup("WMFS");
+          conf.tag[0].mwfact  = 0.65;
           conf.tag[0].nmaster = 1;
-          conf.tag[0].layout = layout_name_to_struct(conf.layout, "tile");
+          conf.tag[0].layout  = layout_name_to_struct(conf.layout, "tile");
      }
      else
      {
           for(i = 0; i < conf.ntag; ++i)
           {
                cfgtmp = cfg_getnsec(cfg_tags, "tag", i);
-               conf.tag[i].name = strdup(cfg_getstr(cfgtmp, "name"));
-               conf.tag[i].mwfact = cfg_getfloat(cfgtmp, "mwfact");
-               conf.tag[i].nmaster = cfg_getint(cfgtmp, "nmaster");
-               conf.tag[i].layout = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"));
+               conf.tag[i].name     = strdup(cfg_getstr(cfgtmp, "name"));
+               conf.tag[i].mwfact   = cfg_getfloat(cfgtmp, "mwfact");
+               conf.tag[i].nmaster  = cfg_getint(cfgtmp, "nmaster");
+               conf.tag[i].layout   = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"));
           }
      }
 
      /* Check if the tag name is already used */
      for(i = 0; i < conf.ntag; ++i)
           for(j = 0; j < conf.ntag ; ++j)
-               if(j != i && strcmp(conf.tag[i].name,conf.tag[j].name) == 0)
+               if(j != i && strcmp(conf.tag[i].name, conf.tag[j].name) == 0)
                     fprintf(stderr, "WMFS Configuration: Warning! "
                             "tag \"%s\" is already defined\n", conf.tag[j].name);
 
@@ -469,15 +464,15 @@ init_conf(void)
           for(j = 0; j < cfg_size(cfgtmp2, "mouse");  ++j)
           {
                cfgtmp3 = cfg_getnsec(cfgtmp2, "mouse", j);
-               conf.barbutton[i].func[j] = name_to_func(cfg_getstr(cfgtmp3, "func"), func_list);
-               conf.barbutton[i].cmd[j] = strdup(var_to_str(cfg_getstr(cfgtmp3, "cmd")));
+               conf.barbutton[i].func[j]  = name_to_func(cfg_getstr(cfgtmp3, "func"), func_list);
+               conf.barbutton[i].cmd[j]   = strdup(var_to_str(cfg_getstr(cfgtmp3, "cmd")));
                conf.barbutton[i].mouse[j] = char_to_button(cfg_getstr(cfgtmp3, "button"));
           }
           conf.barbutton[i].nmousesec = cfg_size(cfgtmp2, "mouse");
-          conf.barbutton[i].text = strdup(var_to_str(cfg_getstr(cfgtmp2, "text")));
-          conf.barbutton[i].fg_color = getcolor(strdup(var_to_str(cfg_getstr(cfgtmp2, "fg_color"))));
-          conf.barbutton[i].bg_color = getcolor(strdup(var_to_str(cfg_getstr(cfgtmp2, "bg_color"))));
-          conf.barbutton[i].x = cfg_getint(cfgtmp2, "x");
+          conf.barbutton[i].text      = strdup(var_to_str(cfg_getstr(cfgtmp2, "text")));
+          conf.barbutton[i].fg_color  = getcolor(strdup(var_to_str(cfg_getstr(cfgtmp2, "fg_color"))));
+          conf.barbutton[i].bg_color  = getcolor(strdup(var_to_str(cfg_getstr(cfgtmp2, "bg_color"))));
+          conf.barbutton[i].x         = cfg_getint(cfgtmp2, "x");
      }
 
      cfg_free(cfg);
