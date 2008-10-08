@@ -940,7 +940,7 @@ void
 updatebar(void)
 {
      int  i , k, sp = 3;
-     char *buf[conf.ntag];
+     char buf[conf.ntag][256];
      char p[4];
 
      XSetForeground(dpy, gc, conf.colors.bar);
@@ -949,7 +949,6 @@ updatebar(void)
      {
           /* Make the tags string */
           ITOA(p, clientpertag(i+1));
-          buf[i] = emalloc(strlen(tags[i+1].name + 4), sizeof(char));
           sprintf(buf[i], "%s<%s>", tags[i+1].name, (clientpertag(i+1)) ? p : "");
           taglen[i+1] = taglen[i] + TEXTW(buf[i]) + sp;
 
@@ -960,8 +959,8 @@ updatebar(void)
      }
 
      /* Layout symbol */
-     xprint(dr, taglen[conf.ntag] - sp/2,
-            fonth, conf.colors.layout_fg, conf.colors.layout_bg,
+     xprint(dr, taglen[conf.ntag] - sp/2, fonth,
+            conf.colors.layout_fg, conf.colors.layout_bg,
             1, 0, tags[seltag].layout.symbol);
 
      /* Draw status text */
@@ -974,6 +973,7 @@ updatebar(void)
 
      /* Update Bar Buttons */
      updatebutton(True);
+
 
      return;
 }
