@@ -320,9 +320,6 @@ init_conf(void)
      cfg_keys      = cfg_getsec(cfg, "keys");
      cfg_buttons   = cfg_getsec(cfg, "buttons");
 
-
-     debug(cfg_size(cfg_variables, "var"));
-
      if((cfg_size(cfg_variables, "var")) > 256)
      {
           fprintf(stderr,"WMFS Configuration: Too much of variables !\n");
