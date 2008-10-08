@@ -127,6 +127,7 @@ typedef struct
      char *name;
      float mwfact;
      int nmaster;
+     Bool resizehint;
      Layout layout;
 } Tag;
 

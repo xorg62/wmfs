@@ -219,7 +219,7 @@ tile(void)
                else
                     h = th - (bord + conf.ttbarheight) - bord*2;
           }
-          moveresize(c, x, y, w, h, False);
+          moveresize(c, x, y, w, h, tags[seltag].resizehint);
           if(n > nm && th != mht)
                y = c->y + c->h + bord + conf.ttbarheight;
      }

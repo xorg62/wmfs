@@ -60,7 +60,7 @@ layouts
 
 tags
 {
-        tag { name = "one" mwfact = 0.65 nmaster = 2 layout = "tile" }
+        tag { name = "one" mwfact = 0.65 nmaster = 2 layout = "tile" resizehint = false }
         tag { name = "two"   }
         tag { name = "three" }
         tag { name = "four"  }

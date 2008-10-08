@@ -204,10 +204,11 @@ init_conf(void)
 
      static cfg_opt_t tag_opts[] =
           {
-               CFG_STR("name",     "",     CFGF_NONE),
-               CFG_FLOAT("mwfact", 0.65,   CFGF_NONE),
-               CFG_INT("nmaster",  1,      CFGF_NONE),
-               CFG_STR("layout",   "tile", CFGF_NONE),
+               CFG_STR("name",        "",        CFGF_NONE),
+               CFG_FLOAT("mwfact",    0.65,      CFGF_NONE),
+               CFG_INT("nmaster",     1,         CFGF_NONE),
+               CFG_STR("layout",      "tile",    CFGF_NONE),
+               CFG_BOOL("resizehint", cfg_false, CFGF_NONE),
                CFG_END()
           };
 
@@ -413,10 +414,11 @@ init_conf(void)
           for(i = 0; i < conf.ntag; ++i)
           {
                cfgtmp = cfg_getnsec(cfg_tags, "tag", i);
-               conf.tag[i].name     = strdup(cfg_getstr(cfgtmp, "name"));
-               conf.tag[i].mwfact   = cfg_getfloat(cfgtmp, "mwfact");
-               conf.tag[i].nmaster  = cfg_getint(cfgtmp, "nmaster");
-               conf.tag[i].layout   = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"));
+               conf.tag[i].name        = strdup(cfg_getstr(cfgtmp, "name"));
+               conf.tag[i].mwfact      = cfg_getfloat(cfgtmp, "mwfact");
+               conf.tag[i].nmaster     = cfg_getint(cfgtmp, "nmaster");
+               conf.tag[i].resizehint  = cfg_getbool(cfgtmp, "resizehint");
+               conf.tag[i].layout      = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"));
           }
      }
 
