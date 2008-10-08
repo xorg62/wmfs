@@ -154,6 +154,7 @@ typedef struct
           uint text;
           uint tagselfg;
           uint tagselbg;
+          uint tagsep;
           uint layout_fg;
           uint layout_bg;
           uint ttbar_text_focus;

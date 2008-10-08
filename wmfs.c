@@ -939,12 +939,13 @@ updateall(void)
 void
 updatebar(void)
 {
-     int  i , k, sp = 3;
+     int  i , k, sp = 6;
      char buf[conf.ntag][256];
      char p[4];
 
      XSetForeground(dpy, gc, conf.colors.bar);
      XFillRectangle(dpy, dr, gc, 0, 0, mw, barheight);
+
      for(i = 0; i < conf.ntag; ++i)
      {
           /* Make the tags string */
@@ -955,17 +956,22 @@ updatebar(void)
           /* Draw tags */
           xprint(dr, taglen[i], fonth,
                  ((i+1 == seltag) ? conf.colors.tagselfg : conf.colors.text),
-                 ((i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar), 3, -3, buf[i]);
+                 ((i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar), sp, -sp, buf[i]);
+
+          /* Tags line separation */
+          XSetForeground(dpy, gc, conf.colors.tagsep);
+          if(i > 0)
+               XFillRectangle(dpy, dr, gc, taglen[i]-sp, 0, 2, barheight);
      }
 
      /* Layout symbol */
-     xprint(dr, taglen[conf.ntag] - sp/2, fonth,
+     xprint(dr, taglen[conf.ntag] - sp/2 - 1, fonth,
             conf.colors.layout_fg, conf.colors.layout_bg,
             1, 0, tags[seltag].layout.symbol);
 
      /* Draw status text */
      k = TEXTW(bartext);
-     xprint(dr, mw-k, fonth - 1, conf.colors.text, conf.colors.bar, 0, 0, bartext);
+     xprint(dr, mw-k, fonth, conf.colors.text, conf.colors.bar, 0, 0, bartext);
      XDrawLine(dpy, dr, gc, mw-k-5, 0, mw-k-5, barheight);
 
      XCopyArea(dpy, dr, bar, gc, 0, 0, mw, barheight, 0, 0);
@@ -973,7 +979,6 @@ updatebar(void)
 
      /* Update Bar Buttons */
      updatebutton(True);
-
 
      return;
 }
@@ -983,11 +988,10 @@ updatebar(void)
 void
 updatebutton(Bool c)
 {
-     int i, j, p, x, pm = 0;
-     XSetWindowAttributes at;
-     int y = 3;
-     int h = barheight - 5;
+     int i, j, x, pm = 0;
+     int y = 3, h = barheight - 5;
      int fonth_l = fonth - 3;
+     XSetWindowAttributes at;
 
      at.override_redirect = 1;
      at.background_pixmap = ParentRelative;
@@ -1000,19 +1004,16 @@ updatebutton(Bool c)
 
      for(i = 0; i < conf.nbutton; ++i)
      {
-          p = TEXTW(conf.barbutton[i].text);
-          if(!conf.barbutton[i].x)
+          if(!(x = conf.barbutton[i].x))
           {
                if(i)
                     pm += TEXTW(conf.barbutton[i-1].text);
                x = (!i) ? j : j + pm;
           }
-          else
-               x = conf.barbutton[i].x;
 
           if(!c)
           {
-               conf.barbutton[i].win = XCreateWindow(dpy, root, x, y, p, h,
+               conf.barbutton[i].win = XCreateWindow(dpy, root, x, y, TEXTW(conf.barbutton[i].text), h,
                                                      0, DefaultDepth(dpy, screen),
                                                      CopyFromParent, DefaultVisual(dpy, screen),
                                                      CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);

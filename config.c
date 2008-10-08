@@ -180,6 +180,7 @@ init_conf(void)
                CFG_STR("bar_fg",               "#6289A1", CFGF_NONE),
                CFG_STR("tag_sel_fg",           "#FFFFFF", CFGF_NONE),
                CFG_STR("tag_sel_bg",           "#354B5C", CFGF_NONE),
+               CFG_STR("tag_separation",       "#090909", CFGF_NONE),
                CFG_STR("layout_fg",            "#FFFFFF", CFGF_NONE),
                CFG_STR("layout_bg",            "#292929", CFGF_NONE),
                CFG_STR("titlebar_text_focus",  "#FFFFFF", CFGF_NONE),
@@ -355,6 +356,7 @@ init_conf(void)
      conf.colors.text              = getcolor(var_to_str(cfg_getstr(cfg_colors, "bar_fg")));
      conf.colors.tagselfg          = getcolor(var_to_str(cfg_getstr(cfg_colors, "tag_sel_fg")));
      conf.colors.tagselbg          = getcolor(var_to_str(cfg_getstr(cfg_colors, "tag_sel_bg")));
+     conf.colors.tagsep            = getcolor(var_to_str(cfg_getstr(cfg_colors, "tag_separation")));
      conf.colors.layout_fg         = getcolor(var_to_str(cfg_getstr(cfg_colors, "layout_fg")));
      conf.colors.layout_bg         = getcolor(var_to_str(cfg_getstr(cfg_colors, "layout_bg")));
      conf.colors.ttbar_text_focus  = getcolor(var_to_str(cfg_getstr(cfg_colors, "titlebar_text_focus")));
@@ -404,16 +406,17 @@ init_conf(void)
           fprintf(stderr, "WMFS Configuration: Too much or no tag"
                   " (%d) in the configration file\n", conf.ntag);
           conf.ntag = 1;
-          conf.tag[0].name    = strdup("WMFS");
-          conf.tag[0].mwfact  = 0.65;
-          conf.tag[0].nmaster = 1;
-          conf.tag[0].layout  = layout_name_to_struct(conf.layout, "tile");
+          conf.tag[0].name       = strdup("WMFS");
+          conf.tag[0].mwfact     = 0.65;
+          conf.tag[0].nmaster    = 1;
+          conf.tag[0].resizehint = False;
+          conf.tag[0].layout     = layout_name_to_struct(conf.layout, "tile");
      }
      else
      {
           for(i = 0; i < conf.ntag; ++i)
           {
-               cfgtmp = cfg_getnsec(cfg_tags, "tag", i);
+               cfgtmp                  = cfg_getnsec(cfg_tags, "tag", i);
                conf.tag[i].name        = strdup(cfg_getstr(cfgtmp, "name"));
                conf.tag[i].mwfact      = cfg_getfloat(cfgtmp, "mwfact");
                conf.tag[i].nmaster     = cfg_getint(cfgtmp, "nmaster");

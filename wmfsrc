@@ -37,6 +37,7 @@ colors
         #Tag
           tag_sel_fg           = "#191919"
           tag_sel_bg           = "#7E89A2"
+          tag_separation       = "#191919"
 
         #Layout
           layout_fg            = "#191919"
