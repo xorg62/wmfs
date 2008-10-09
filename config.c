@@ -155,12 +155,12 @@ init_conf(void)
 
      static cfg_opt_t misc_opts[] =
           {
-               CFG_STR("bar_position",         "top",     CFGF_NONE),
-               CFG_BOOL("raisefocus",          cfg_false, CFGF_NONE),
-               CFG_BOOL("raiseswitch",         cfg_true,  CFGF_NONE),
-               CFG_INT("border_height",        1,         CFGF_NONE),
-               CFG_INT("titlebar_height",      0,         CFGF_NONE),
-               CFG_INT("tag_separation_width", 0,         CFGF_NONE),
+               CFG_STR("bar_position",     "top",     CFGF_NONE),
+               CFG_BOOL("raisefocus",      cfg_false, CFGF_NONE),
+               CFG_BOOL("raiseswitch",     cfg_true,  CFGF_NONE),
+               CFG_INT("border_height",    1,         CFGF_NONE),
+               CFG_INT("titlebar_height",  0,         CFGF_NONE),
+               CFG_INT("tag_border_width", 0,         CFGF_NONE),
                CFG_END()
           };
 
@@ -181,7 +181,7 @@ init_conf(void)
                CFG_STR("bar_fg",               "#6289A1", CFGF_NONE),
                CFG_STR("tag_sel_fg",           "#FFFFFF", CFGF_NONE),
                CFG_STR("tag_sel_bg",           "#354B5C", CFGF_NONE),
-               CFG_STR("tag_separation",       "#090909", CFGF_NONE),
+               CFG_STR("tag_border",           "#090909", CFGF_NONE),
                CFG_STR("layout_fg",            "#FFFFFF", CFGF_NONE),
                CFG_STR("layout_bg",            "#292929", CFGF_NONE),
                CFG_STR("titlebar_text_focus",  "#FFFFFF", CFGF_NONE),
@@ -341,7 +341,7 @@ init_conf(void)
      conf.raiseswitch   = cfg_getbool(cfg_misc, "raiseswitch");
      conf.borderheight  = cfg_getint(cfg_misc, "border_height");
      conf.ttbarheight   = cfg_getint(cfg_misc, "titlebar_height");
-     conf.tagsepwidth   = cfg_getint(cfg_misc, "tag_separation_width");
+     conf.tagbordwidth  = cfg_getint(cfg_misc, "tag_border_width");
      conf.bartop        = (strcmp(strdup(cfg_getstr(cfg_misc, "bar_position")), "top") == 0) ? True : False;
 
      /* font */
@@ -357,7 +357,7 @@ init_conf(void)
      conf.colors.text              = getcolor(var_to_str(cfg_getstr(cfg_colors, "bar_fg")));
      conf.colors.tagselfg          = getcolor(var_to_str(cfg_getstr(cfg_colors, "tag_sel_fg")));
      conf.colors.tagselbg          = getcolor(var_to_str(cfg_getstr(cfg_colors, "tag_sel_bg")));
-     conf.colors.tagsep            = getcolor(var_to_str(cfg_getstr(cfg_colors, "tag_separation")));
+     conf.colors.tagbord           = getcolor(var_to_str(cfg_getstr(cfg_colors, "tag_border")));
      conf.colors.layout_fg         = getcolor(var_to_str(cfg_getstr(cfg_colors, "layout_fg")));
      conf.colors.layout_bg         = getcolor(var_to_str(cfg_getstr(cfg_colors, "layout_bg")));
      conf.colors.ttbar_text_focus  = getcolor(var_to_str(cfg_getstr(cfg_colors, "titlebar_text_focus")));
@@ -418,6 +418,8 @@ init_conf(void)
           for(i = 0; i < conf.ntag; ++i)
           {
                cfgtmp                  = cfg_getnsec(cfg_tags, "tag", i);
+               if(strlen(strdup(cfg_getstr(cfgtmp, "name"))) > 256)
+                    fprintf(stderr, "WMFS Configuration: name of tag %d too long !\n", i);
                conf.tag[i].name        = strdup(cfg_getstr(cfgtmp, "name"));
                conf.tag[i].mwfact      = cfg_getfloat(cfgtmp, "mwfact");
                conf.tag[i].nmaster     = cfg_getint(cfgtmp, "nmaster");

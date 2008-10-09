@@ -354,7 +354,8 @@ init(void)
      /* INIT FONT */
      /* make the font string with
       * the configuration information  */
-     sprintf(fontbuf, "*-%s-%s-*-%d-*",
+
+     sprintf(fontbuf, "-*-%s-%s-*-%d-*",
              conf.font.face,
              conf.font.style,
              conf.font.size);
@@ -958,11 +959,18 @@ updatebar(void)
                  ((i+1 == seltag) ? conf.colors.tagselfg : conf.colors.text),
                  ((i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar), sp, -sp, buf[i]);
 
-          /* Tags line separation */
-          XSetForeground(dpy, gc, conf.colors.tagsep);
+          /* Tags border separation */
+          XSetForeground(dpy, gc, conf.colors.tagbord);
           if(i > 0)
-               XFillRectangle(dpy, dr, gc, taglen[i]-sp, 0, conf.tagsepwidth, barheight);
+               XFillRectangle(dpy, dr, gc, taglen[i]-sp, 0, conf.tagbordwidth, barheight);
      }
+
+     /* Under tag border */
+     if(conf.tagbordwidth)
+          XFillRectangle(dpy, dr, gc, 0,
+                         ((conf.bartop) ? barheight-1: 0),
+                         taglen[conf.ntag],
+                         1);
 
      /* Layout symbol */
      xprint(dr, taglen[conf.ntag] - sp/2 - 1, fonth,

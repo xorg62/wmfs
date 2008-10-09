@@ -139,7 +139,7 @@ typedef struct
      bool bartop;
      int borderheight;
      int ttbarheight;
-     int tagsepwidth;
+     int tagbordwidth;
      struct
      {
           char *face;
@@ -155,7 +155,7 @@ typedef struct
           uint text;
           uint tagselfg;
           uint tagselbg;
-          uint tagsep;
+          uint tagbord;
           uint layout_fg;
           uint layout_bg;
           uint ttbar_text_focus;
