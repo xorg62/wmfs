@@ -961,7 +961,7 @@ updatebar(void)
           /* Tags line separation */
           XSetForeground(dpy, gc, conf.colors.tagsep);
           if(i > 0)
-               XFillRectangle(dpy, dr, gc, taglen[i]-sp, 0, 2, barheight);
+               XFillRectangle(dpy, dr, gc, taglen[i]-sp, 0, conf.tagsepwidth, barheight);
      }
 
      /* Layout symbol */

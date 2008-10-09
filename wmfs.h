@@ -139,6 +139,7 @@ typedef struct
      bool bartop;
      int borderheight;
      int ttbarheight;
+     int tagsepwidth;
      struct
      {
           char *face;

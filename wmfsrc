@@ -12,6 +12,7 @@ misc
         raiseswitch =     true
         border_height =   1
         titlebar_height = 12
+        tag_separation_width = 0
 }
 
 font
