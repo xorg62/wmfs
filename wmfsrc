@@ -12,7 +12,7 @@ misc
         raiseswitch =     true
         border_height =   1
         titlebar_height = 12
-        tag_border_width = 0
+        tag_border_width = 1
 }
 
 font
@@ -38,7 +38,7 @@ colors
         #Tag
           tag_sel_fg           = "#191919"
           tag_sel_bg           = "#7E89A2"
-          tag_border           = "#191919"
+          tag_border           = "#3F485E"
 
         #Layout
           layout_fg            = "#191919"
