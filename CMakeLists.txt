@@ -1,4 +1,4 @@
-#CMakeLists.txt
+#Cmakelists.txt
 # Minimum version of CMake
 cmake_minimum_required(VERSION 2.6)
 if(COMMAND cmake_policy)
@@ -39,8 +39,16 @@ set(VERSION "0.1rc2 (Brain Damage)")
 # CFLAGS
 set(CFLAGS "-g -Wall")
 set(CMAKE_C_FLAGS ${CFLAGS})
+find_package(Freetype)
+if(FREETYPE_FOUND)
+  message("Found Freetype: ${FREETYPE_LIBRARIES}")
+  include_directories(${FREETYPE_INCLUDE_DIRS})
+else (FREETYPE_FOUND)
+  message(FATAL_ERROR "Could not find Freetype")
+endif (FREETYPE_FOUND)
 # Link Libraries
 set(LIBRARIES_TO_LINK
+  ${FREETYPE_LIBRARIES}
   X11
   confuse)
 
@@ -57,7 +65,8 @@ include(FindPkgConfig)
 # Use pkgconfig to get required libraries
 pkg_check_modules(wmfs_required
   x11
-  libconfuse)
+  libconfuse
+  freetype2)
 # Find exterbal programs
 macro(a_find_program var prg req)
     set(required ${req})
