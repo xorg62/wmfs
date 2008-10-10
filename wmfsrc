@@ -122,6 +122,7 @@ keys
 # general keybind
         key { mod = {"Control"} key = "Return" func = "spawn" cmd = term }
         key { mod = {"Alt"} key = "q" func = "killclient" }
+        key { mod = {"Control", "Alt", "Shift"} key = "q" func = "quit" }
         key { mod = {"Control"} key = "m" func = "togglemax" }
         key { mod = {"Control"} key = "b" func = "togglebarpos" }
         key { mod = {"Alt"} key = "Tab" func = "client_next" }
