@@ -41,15 +41,21 @@ set(CFLAGS "-g -Wall")
 set(CMAKE_C_FLAGS ${CFLAGS})
 find_package(Freetype)
 if(FREETYPE_FOUND)
-  message("Found Freetype: ${FREETYPE_LIBRARIES}")
   include_directories(${FREETYPE_INCLUDE_DIRS})
 else (FREETYPE_FOUND)
   message(FATAL_ERROR "Could not find Freetype")
 endif (FREETYPE_FOUND)
+
+find_package(X11)
+if(X11_FOUND)
+  include_directories(${X11_INCLUDE_DIR})
+else (X11_FOUND)
+  message(FATAL_ERROR "Could not find X11")
+endif (X11_FOUND)
 # Link Libraries
 set(LIBRARIES_TO_LINK
   ${FREETYPE_LIBRARIES}
-  X11
+  ${X11_LIBRARIES}
   confuse)
 
 target_link_libraries(wmfs ${LIBRARIES_TO_LINK})
