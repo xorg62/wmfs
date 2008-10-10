@@ -570,7 +570,7 @@ manage(Window w, XWindowAttributes *wa)
           c->tag = t->tag;
      if(!c->free)
           c->free = (rettrans == Success) || c->hint;
-     if(c->free)
+     else
           raiseclient(c);
 
      attach(c);

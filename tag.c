@@ -89,6 +89,7 @@ uicb_tagtransfert(uicb_t cmd)
           n = 1;
 
      sel->tag = n;
+     selbytag[n] = sel;
      arrange();
 
      return;
