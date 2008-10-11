@@ -958,7 +958,7 @@ updatebar(void)
      XFillRectangle(dpy, dr, gc, taglen[conf.ntag]-sp+1, 0, conf.tagbordwidth, barheight);
 
      /* Layout symbol */
-     xprint(dr, taglen[conf.ntag] - sp/2, fonth,
+     xprint(dr, taglen[conf.ntag] - sp/3, fonth,
             conf.colors.layout_fg, conf.colors.layout_bg,
             0, 0, tags[seltag].layout.symbol);
 
@@ -990,7 +990,7 @@ void
 updatebutton(Bool c)
 {
      int i, j, x, pm = 0;
-     int y = 3, h = barheight - 6;
+     int y = 0, hi = 0;
      XSetWindowAttributes at;
 
      at.override_redirect = 1;
@@ -1000,7 +1000,10 @@ updatebutton(Bool c)
      j = taglen[conf.ntag] + textw(tags[seltag].layout.symbol);
 
      if(!conf.bartop)
-          y = bary + 4;
+          y = bary + 1;
+
+     if(conf.tagbordwidth)
+          hi = -1;
 
      for(i = 0; i < conf.nbutton; ++i)
      {
@@ -1013,13 +1016,13 @@ updatebutton(Bool c)
 
           if(!c)
           {
-               conf.barbutton[i].win = XCreateWindow(dpy, root, x, y, textw(conf.barbutton[i].text), h,
+               conf.barbutton[i].win = XCreateWindow(dpy, root, x, y, textw(conf.barbutton[i].text), barheight + hi,
                                                      0, DefaultDepth(dpy, screen),
                                                      CopyFromParent, DefaultVisual(dpy, screen),
                                                      CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
                XSetWindowBackground(dpy, conf.barbutton[i].win, conf.barbutton[i].bg_color);
                XMapRaised(dpy, conf.barbutton[i].win);
-               xprint(conf.barbutton[i].win, 1, (fonth - 3), conf.barbutton[i].fg_color,
+               xprint(conf.barbutton[i].win, 1, fonth, conf.barbutton[i].fg_color,
                       conf.barbutton[i].bg_color, 0, 0, conf.barbutton[i].text);
           }
           else
@@ -1027,7 +1030,7 @@ updatebutton(Bool c)
                if(!conf.barbutton[i].win)
                     return;
                XMoveWindow(dpy, conf.barbutton[i].win, x, y);
-               xprint(conf.barbutton[i].win, 1, (fonth - 3),  conf.barbutton[i].fg_color,
+               xprint(conf.barbutton[i].win, 1, fonth, conf.barbutton[i].fg_color,
                       conf.barbutton[i].bg_color, 0, 0, conf.barbutton[i].text);
           }
      }
@@ -1126,6 +1129,7 @@ main(int argc, char **argv)
 
      /* Exiting WMFS :'( */
      XUngrabKey(dpy, AnyKey, AnyModifier, root);
+     XftFontClose(dpy, xftfont);
      XFreeCursor(dpy, cursor[CurNormal]);
      XFreeCursor(dpy, cursor[CurMove]);
      XFreeCursor(dpy, cursor[CurResize]);
