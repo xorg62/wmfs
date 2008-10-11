@@ -134,7 +134,7 @@ updatebar(void)
      {
           xprint(bar->dr, taglen[conf.ntag] - sp/3, fonth,
                  conf.colors.layout_fg, conf.colors.layout_bg,
-                 0, -sp, tags[seltag].layout.symbol);
+                 0, 0, tags[seltag].layout.symbol);
      }
 
      /* Draw status text */

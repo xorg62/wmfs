@@ -196,9 +196,9 @@ focus(Client *c)
      else
           XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 
-     for(cc = clients; c; c = c->next)
-          if(!ishide(c))
-               updatetitle(c);
+     for(cc = clients; cc; cc = cc->next)
+          if(!ishide(cc))
+               updatetitle(cc);
      return;
 }
 
