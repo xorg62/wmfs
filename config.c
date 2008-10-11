@@ -167,7 +167,6 @@ init_conf(void)
 
      static cfg_opt_t colors_opts[] =
           {
-               CFG_STR("background",           "#090909", CFGF_NONE),
                CFG_STR("border_normal",        "#354B5C", CFGF_NONE),
                CFG_STR("border_focus",         "#6286A1", CFGF_NONE),
                CFG_STR("bar_bg",               "#090909", CFGF_NONE),
@@ -336,7 +335,6 @@ init_conf(void)
      conf.bartop        = (strcmp(strdup(cfg_getstr(cfg_misc, "bar_position")), "top") == 0) ? True : False;
 
      /* colors */
-     conf.colors.background        = getcolor(var_to_str(cfg_getstr(cfg_colors, "background")));
      conf.colors.bordernormal      = getcolor(var_to_str(cfg_getstr(cfg_colors, "border_normal")));
      conf.colors.borderfocus       = getcolor(var_to_str(cfg_getstr(cfg_colors, "border_focus")));
      conf.colors.bar               = getcolor(var_to_str(cfg_getstr(cfg_colors, "bar_bg")));

@@ -390,7 +390,6 @@ init(void)
           EnterWindowMask | LeaveWindowMask | StructureNotifyMask ;
      at.cursor = cursor[CurNormal];
      XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &at);
-     XSetWindowBackground(dpy, root, conf.colors.background);
 
      /* INIT BAR / BUTTON */
      bary = (conf.bartop) ? 0 : mh - barheight;
@@ -1032,6 +1031,6 @@ main(int argc, char **argv)
 
      XCloseDisplay(dpy);
 
-     exit(EXIT_SUCCESS);
+     return 0;
 }
 

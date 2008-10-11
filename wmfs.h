@@ -158,7 +158,6 @@ typedef struct
      {
           /* Only the colors will be use for text
            * are 'char*' (for xprint -> XftColorAllocName) */
-          uint background;
           uint bordernormal;
           uint borderfocus;
           uint bar;

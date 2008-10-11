@@ -18,9 +18,6 @@ misc
 
 colors
 {
-        #Desktop
-          background           = "#090909"
-
         #Border
           border_normal        = "#3F485E"
           border_focus         = "#7E89A2"
