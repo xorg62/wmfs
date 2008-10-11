@@ -318,12 +318,8 @@ expose(XEvent ev)
         && (ev.xexpose.window == bar->win))
           updatebar();
      for(c = clients; c; c = c->next)
-     {
           if(ev.xexpose.window == c->tbar->win)
-          {
                updatetitle(c);
-          }
-     }
 
      return;
 }

@@ -298,7 +298,6 @@ void setsizehints(Client *c);
 void unhide(Client *c);
 void unmanage(Client *c);
 void unmapclient(Client *c);
-void updateall(void);
 void updatetitle(Client *c);
 void uicb_client_prev(uicb_t);
 void uicb_client_next(uicb_t);

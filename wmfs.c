@@ -110,7 +110,6 @@ client_switch(Bool b)
                     raiseclient(c);
           }
      }
-     updateall();
 
      return;
 }
@@ -168,6 +167,8 @@ errorhandlerdummy(Display *d, XErrorEvent *event)
 void
 focus(Client *c)
 {
+     Client *cc;
+
      if(sel && sel != c)
      {
           grabbuttons(sel, False);
@@ -195,7 +196,9 @@ focus(Client *c)
      else
           XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 
-     updateall();
+     for(cc = clients; c; c = c->next)
+          if(!ishide(c))
+               updatetitle(c);
      return;
 }
 
@@ -683,7 +686,6 @@ moveresize(Client *c, int x, int y, int w, int h, bool r)
                     XMoveWindow(dpy, c->button, BUTX(x, w), BUTY(y));
           }
           updatetitle(c);
-          expose(event);
           XSync(dpy, False);
      }
 
@@ -899,18 +901,6 @@ unmanage(Client *c)
      XSync(dpy, False);
      XUngrabServer(dpy);
      arrange();
-
-     return;
-}
-
-void
-updateall(void)
-{
-     Client *c;
-
-     for(c = clients; c; c = c->next)
-          if(!ishide(c))
-               updatetitle(c);
 
      return;
 }
