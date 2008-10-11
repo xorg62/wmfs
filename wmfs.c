@@ -173,7 +173,7 @@ focus(Client *c)
           grabbuttons(sel, False);
           setborder(sel->win, conf.colors.bordernormal);
           if(conf.ttbarheight)
-               setborder(sel->tbar, conf.colors.bordernormal);
+               setborder(sel->tbar->win, conf.colors.bordernormal);
 
      }
      if(c)
@@ -186,7 +186,7 @@ focus(Client *c)
      {
           setborder(c->win, conf.colors.borderfocus);
           if(conf.ttbarheight)
-               setborder(sel->tbar, conf.colors.borderfocus);
+               setborder(sel->tbar->win, conf.colors.borderfocus);
           if(conf.raisefocus)
                raiseclient(c);
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
@@ -232,7 +232,7 @@ gettbar(Window w)
 {
      Client *c;
 
-     for(c = clients; c && c->tbar != w; c = c->next);
+     for(c = clients; c && c->tbar->win != w; c = c->next);
 
      return c;
 }
@@ -245,7 +245,7 @@ grabbuttons(Client *c, Bool focused)
      XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
      if(conf.ttbarheight)
      {
-          XUngrabButton(dpy, AnyButton, AnyModifier, c->tbar);
+          XUngrabButton(dpy, AnyButton, AnyModifier, c->tbar->win);
           if(conf.ttbarheight > 5)
                XUngrabButton(dpy, AnyButton, AnyModifier, c->button);
      }
@@ -262,9 +262,9 @@ grabbuttons(Client *c, Bool focused)
           if(conf.ttbarheight)
           {
                /* Titlebar */
-               XGrabButton(dpy, Button1, AnyModifier, c->tbar, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-               XGrabButton(dpy, Button2, AnyModifier, c->tbar, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-               XGrabButton(dpy, Button3, AnyModifier, c->tbar, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, Button1, AnyModifier, c->tbar->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, Button2, AnyModifier, c->tbar->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, Button3, AnyModifier, c->tbar->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
                /* Titlebar Button */
                if(conf.ttbarheight > 5)
                {
@@ -274,19 +274,19 @@ grabbuttons(Client *c, Bool focused)
           }
           /* Bar Button */
           for(i=0; i< conf.nbutton; ++i)
-               XGrabButton(dpy, Button1, AnyModifier, conf.barbutton[i].win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, Button1, AnyModifier, conf.barbutton[i].bw->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
      }
      else
      {
           XGrabButton(dpy, AnyButton, AnyModifier, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
           if(conf.ttbarheight)
           {
-               XGrabButton(dpy, AnyButton, AnyModifier, c->tbar, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, AnyButton, AnyModifier, c->tbar->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
                if(conf.ttbarheight > 5)
                     XGrabButton(dpy, AnyButton, AnyModifier, c->button, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
           }
           for(i=0; i< conf.nbutton; ++i)
-               XGrabButton(dpy, Button1, AnyModifier, conf.barbutton[i].win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, Button1, AnyModifier, conf.barbutton[i].bw->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
      }
 
      return;
@@ -316,14 +316,14 @@ hide(Client *c)
 {
      if(!c)
           return;
-
      XMoveWindow(dpy, c->win, c->x, c->y+mh*2);
      if(conf.ttbarheight)
      {
-          XMoveWindow(dpy, c->tbar, c->x, c->y+mh*2);
+          bar_moveresize(c->tbar, c->x, c->y+mh*2, c->w, c->h);
           if(conf.ttbarheight > 5)
                XMoveWindow(dpy, c->button, c->x, c->y+mh*2);
      }
+     //unmapclient(c);
      setwinstate(c->win, IconicState);
      c->hide = True;
 
@@ -357,8 +357,8 @@ init(void)
           fprintf(stderr, "WMFS Error: Cannot initialize font\n");
           xftfont = XftFontOpenName(dpy, screen, "sans-10");
      }
-     fonth = (xftfont->ascent + xftfont->descent) - 1;
-     barheight = fonth + 5;
+     fonth = (xftfont->ascent + xftfont->descent);
+     barheight = fonth + 4;
 
 
      /* INIT CURSOR */
@@ -394,14 +394,8 @@ init(void)
 
      /* INIT BAR / BUTTON */
      bary = (conf.bartop) ? 0 : mh - barheight;
-     dr = XCreatePixmap(dpy, root, DisplayWidth(dpy, screen), barheight, DefaultDepth(dpy, screen));
-     at.override_redirect = 1;
-     at.background_pixmap = ParentRelative;
-     at.event_mask = ButtonPressMask | ExposureMask;
-     bar = XCreateWindow(dpy, root, 0, bary, mw, barheight, 0, DefaultDepth(dpy, screen),
-                         CopyFromParent, DefaultVisual(dpy, screen),
-                         CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
-     XMapRaised(dpy, bar);
+     bar = bar_create(0, bary, mw, barheight, 0, conf.colors.bar);
+     XMapRaised(dpy, bar->win);
      strcpy(bartext, "WMFS-" WMFS_VERSION);
      updatebutton(False);
      updatebar();
@@ -507,7 +501,8 @@ mapclient(Client *c)
      XMapSubwindows(dpy, c->win);
      if(conf.ttbarheight)
      {
-          XMapWindow(dpy, c->tbar);
+          XMapWindow(dpy, c->tbar->win);
+          bar_refresh(c->tbar);
           if(conf.ttbarheight > 5)
                XMapWindow(dpy, c->button);
      }
@@ -534,16 +529,16 @@ manage(Window w, XWindowAttributes *wa)
      /* Create titlebar & button */
      if(conf.ttbarheight)
      {
-          c->tbar = XCreateSimpleWindow(dpy, root, c->x, c->y - conf.ttbarheight,
-                                        c->w, conf.ttbarheight, conf.borderheight,
-                                        conf.colors.bordernormal, conf.colors.bar);
-          XSelectInput(dpy, c->tbar, ExposureMask | EnterWindowMask);
 
+
+          c->tbar = bar_create(c->x, c->y - conf.ttbarheight,
+                               c->w, c->h,conf.borderheight,
+                               conf.colors.bar);
+
+          /* Basic window for close button... */
           if(conf.ttbarheight > 5)
-               c->button = XCreateSimpleWindow(dpy, root, BUTX(c->x, c->w),
-                                               BUTY(c->y),
-                                               ((BUTH) ? BUTH : 1),
-                                               ((BUTH) ? BUTH : 1),
+               c->button = XCreateSimpleWindow(dpy, root, BUTX(c->x, c->w), BUTY(c->y),
+                                               ((BUTH) ? BUTH : 1), ((BUTH) ? BUTH : 1),
                                                1, conf.colors.button_border,
                                                conf.colors.button);
      }
@@ -694,7 +689,7 @@ moveresize(Client *c, int x, int y, int w, int h, bool r)
 
           if(conf.ttbarheight)
           {
-               XMoveResizeWindow(dpy, c->tbar, x, y - conf.ttbarheight, w, conf.ttbarheight);
+               bar_moveresize(c->tbar, x, y - conf.ttbarheight, w, conf.ttbarheight);
                if(conf.ttbarheight > 5)
                     XMoveWindow(dpy, c->button, BUTX(x, w), BUTY(y));
           }
@@ -722,9 +717,10 @@ raiseclient(Client *c)
 
      if(conf.ttbarheight)
      {
-          XRaiseWindow(dpy, c->tbar);
+          XRaiseWindow(dpy, c->tbar->win);
           if(conf.ttbarheight > 5)
                XRaiseWindow(dpy, c->button);
+          updatetitle(c);
      }
 
      return;
@@ -855,13 +851,13 @@ uicb_togglebarpos(uicb_t cmd)
           bary = 0;
      else
           bary = mh - barheight;
-     XMoveWindow(dpy, bar, 0, bary);
+     bar_moveresize(bar, 0, bary, mw, barheight);
      updatebar();
      for(i = 0; i < conf.nbutton; ++i)
-          XUnmapWindow(dpy, conf.barbutton[i].win);
+          XUnmapWindow(dpy, conf.barbutton[i].bw->win);
      updatebutton(False);
      for(i = 0; i < conf.nbutton; ++i)
-          XMapWindow(dpy, conf.barbutton[i].win);
+          XMapWindow(dpy, conf.barbutton[i].bw->win);
 
      arrange();
 
@@ -876,10 +872,11 @@ unhide(Client *c)
      XMoveWindow(dpy, c->win, c->x, c->y);
      if(conf.ttbarheight)
      {
-          XMoveWindow(dpy, c->tbar, c->x, (c->y - conf.ttbarheight));
+          bar_moveresize(c->tbar, c->x, c->y - conf.ttbarheight, c->w, conf.ttbarheight);
           if(conf.ttbarheight > 5)
                XMoveWindow(dpy, c->button, BUTX(c->x, c->w), BUTY(c->y));
      }
+     //mapclient(c);
      setwinstate(c->win, NormalState);
      c->hide = False;
 
@@ -899,8 +896,7 @@ unmanage(Client *c)
      detach(c);
      if(conf.ttbarheight)
      {
-          XUnmapWindow(dpy, c->tbar);
-          XDestroyWindow(dpy, c->tbar);
+          bar_delete(c->tbar);
           if(conf.ttbarheight > 5)
           {
                XUnmapWindow(dpy, c->button);
@@ -909,6 +905,7 @@ unmanage(Client *c)
      }
      setwinstate(c->win, WithdrawnState);
      free(c);
+     free(c->tbar);
      XSync(dpy, False);
      XUngrabServer(dpy);
      arrange();
@@ -929,117 +926,6 @@ updateall(void)
 }
 
 void
-updatebar(void)
-{
-     int  i , k, sp = 6;
-     char buf[conf.ntag][256];
-     char p[4];
-
-     XSetForeground(dpy, gc, conf.colors.bar);
-     XFillRectangle(dpy, dr, gc, 0, 0, mw, barheight);
-
-     for(i = 0; i < conf.ntag; ++i)
-     {
-          /* Make the tags string */
-          ITOA(p, clientpertag(i+1));
-          sprintf(buf[i], "%s<%s>", tags[i+1].name, (clientpertag(i+1)) ? p : "");
-          taglen[i+1] = taglen[i] + textw(buf[i]) + sp;
-
-          /* Draw tags */
-          xprint(dr, taglen[i], fonth,
-                 ((i+1 == seltag) ? conf.colors.tagselfg : conf.colors.text),
-                 ((i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar), sp-1, -sp, buf[i]);
-
-          /* Tags border separation */
-          XSetForeground(dpy, gc, conf.colors.tagbord);
-          if(i > 0)
-               XFillRectangle(dpy, dr, gc, taglen[i]-sp+1, 0, conf.tagbordwidth, barheight);
-     }
-     XFillRectangle(dpy, dr, gc, taglen[conf.ntag]-sp+1, 0, conf.tagbordwidth, barheight);
-
-     /* Layout symbol */
-     xprint(dr, taglen[conf.ntag] - sp/3, fonth,
-            conf.colors.layout_fg, conf.colors.layout_bg,
-            0, 0, tags[seltag].layout.symbol);
-
-     /* Draw status text */
-     k = textw(bartext);
-     xprint(dr, mw-k, fonth, conf.colors.text, conf.colors.bar, 0, 0, bartext);
-
-     /* Bar border */
-     if(conf.tagbordwidth)
-     {
-          XSetForeground(dpy, gc, conf.colors.tagbord);
-          XFillRectangle(dpy, dr, gc, 0,
-                         ((conf.bartop) ? barheight-1: 0), mw, 1);
-          XFillRectangle(dpy, dr, gc, mw-k-5, 0, 1, barheight);
-     }
-
-     XCopyArea(dpy, dr, bar, gc, 0, 0, mw, barheight, 0, 0);
-     XSync(dpy, False);
-
-     /* Update Bar Buttons */
-     updatebutton(True);
-
-     return;
-}
-
-/* if c is False, you can execute this function for the first time
- * else the button is just updated *TestingButWorking* */
-void
-updatebutton(Bool c)
-{
-     int i, j, x, pm = 0;
-     int y = 0, hi = 0;
-     XSetWindowAttributes at;
-
-     at.override_redirect = 1;
-     at.background_pixmap = ParentRelative;
-     at.event_mask = ButtonPressMask | ExposureMask;
-
-     j = taglen[conf.ntag] + textw(tags[seltag].layout.symbol);
-
-     if(!conf.bartop)
-          y = bary + 1;
-
-     if(conf.tagbordwidth)
-          hi = -1;
-
-     for(i = 0; i < conf.nbutton; ++i)
-     {
-          if(!(x = conf.barbutton[i].x))
-          {
-               if(i)
-                    pm += textw(conf.barbutton[i-1].text);
-               x = (!i) ? j : j + pm;
-          }
-
-          if(!c)
-          {
-               conf.barbutton[i].win = XCreateWindow(dpy, root, x, y, textw(conf.barbutton[i].text), barheight + hi,
-                                                     0, DefaultDepth(dpy, screen),
-                                                     CopyFromParent, DefaultVisual(dpy, screen),
-                                                     CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
-               XSetWindowBackground(dpy, conf.barbutton[i].win, conf.barbutton[i].bg_color);
-               XMapRaised(dpy, conf.barbutton[i].win);
-               xprint(conf.barbutton[i].win, 1, fonth, conf.barbutton[i].fg_color,
-                      conf.barbutton[i].bg_color, 0, 0, conf.barbutton[i].text);
-          }
-          else
-          {
-               if(!conf.barbutton[i].win)
-                    return;
-               XMoveWindow(dpy, conf.barbutton[i].win, x, y);
-               xprint(conf.barbutton[i].win, 1, fonth, conf.barbutton[i].fg_color,
-                      conf.barbutton[i].bg_color, 0, 0, conf.barbutton[i].text);
-          }
-     }
-     XSync(dpy, False);
-
-     return;
-}
-
-void
 unmapclient(Client *c)
 {
      if(!c)
@@ -1047,7 +933,7 @@ unmapclient(Client *c)
      XUnmapWindow(dpy, c->win);
      if(conf.ttbarheight)
      {
-          XUnmapWindow(dpy, c->tbar);
+          XUnmapWindow(dpy, c->tbar->win);
           if(conf.ttbarheight > 5)
                XUnmapWindow(dpy, c->button);
      }
@@ -1062,12 +948,14 @@ updatetitle(Client *c)
      XFetchName(dpy, c->win, &(c->title));
      if(!c->title)
           c->title = strdup("WMFS");
+
      if(conf.ttbarheight > 10)
      {
-          XClearWindow(dpy, c->tbar);
-          xprint(c->tbar, 3, ((fonth - xftfont->descent) + ((conf.ttbarheight - fonth) / 2)),
+          bar_refresh_color(c->tbar);
+          xprint(c->tbar->dr, 3, ((fonth - xftfont->descent) + ((conf.ttbarheight - fonth) / 2)),
                  ((c == sel) ? conf.colors.ttbar_text_focus : conf.colors.ttbar_text_normal),
                  conf.colors.bar, 0, 0, c->title);
+          bar_refresh(c->tbar);
      }
 
      return;
@@ -1133,10 +1021,10 @@ main(int argc, char **argv)
      XFreeCursor(dpy, cursor[CurNormal]);
      XFreeCursor(dpy, cursor[CurMove]);
      XFreeCursor(dpy, cursor[CurResize]);
-     XDestroyWindow(dpy, bar);
+     bar_delete(bar);
      if(conf.nbutton)
           for(i = 0; i < conf.nbutton; ++i)
-               XDestroyWindow(dpy, conf.barbutton[i].win);
+               bar_delete(conf.barbutton[i].bw);
      free(conf.barbutton);
      free(keys);
      XSync(dpy, False);

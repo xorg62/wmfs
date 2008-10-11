@@ -70,6 +70,19 @@
 /* Client Structure  & Typedef */
 typedef const char* uicb_t;
 typedef struct Client Client;
+
+/* Bar Window Structure:
+ * For titlebar or topbar.. */
+typedef struct
+{
+     Window win;
+     Drawable dr;
+     int x, y;
+     uint w ,h;
+     uint color;
+     int bord;
+} BarWindow;
+
 struct Client
 {
      char *title;          /* Client title */
@@ -82,7 +95,7 @@ struct Client
      int minax, maxax, minay, maxay;
      /* } */
      Window win;           /* Window */
-     Window tbar;          /* Titlebar */
+     BarWindow *tbar;      /* Titlebar */
      Window button;        /* Close Button */
      Bool max, tile, free; /* Client Info */
      Bool hint, hide, lmax;/* Client Info² */
@@ -104,7 +117,7 @@ typedef struct
 typedef struct
 {
      char *text;
-     Window win;
+     BarWindow *bw;
      char *fg_color;
      int bg_color;
      uint x;
@@ -201,6 +214,15 @@ enum { NetSupported, NetWMName, NetLast };
 
 /* Functions Prototypes */
 
+/* bar.c */
+BarWindow* bar_create(int x, int y, uint w, uint h, int bord, uint color);
+void bar_delete(BarWindow *bw);
+void bar_moveresize(BarWindow *bw, int x, int y, uint w, uint h);
+void bar_refresh_color(BarWindow *bw);
+void bar_refresh(BarWindow *bw);
+void updatebar(void);
+void updatebutton(Bool c);
+
 /* config.c */
 void init_conf(void);
 
@@ -262,7 +284,6 @@ Client* gettbar(Window w);
 void grabbuttons(Client *c, Bool focused);
 void grabkeys(void);
 void hide(Client *c);
-
 void init(void);
 Bool ishide(Client *c);
 void mainloop(void);
@@ -277,8 +298,6 @@ void setwinstate(Window win, long state);
 void setsizehints(Client *c);
 void unhide(Client *c);
 void unmanage(Client *c);
-void updatebar(void);
-void updatebutton(Bool c);
 void unmapclient(Client *c);
 void updateall(void);
 void updatetitle(Client *c);
@@ -312,13 +331,12 @@ XftFont *xftfont;
 
 
 /* Bar / Tags */
-Window bar;
+BarWindow *bar;
 Tag tags[MAXTAG];
 int barheight;
 char bartext[1024];
 int seltag;
 int taglen[MAXTAG];
-Drawable dr;
 int bary;
 
 /* Important Client */

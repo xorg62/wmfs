@@ -72,7 +72,7 @@ layoutswitch(Bool b)
      }
      arrange();
 
-     ;     return;
+     return;
 }
 
 void

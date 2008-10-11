@@ -139,7 +139,7 @@ buttonpress(XEvent ev)
      /* BAR */
      /* *** */
      {
-          if(ev.xbutton.window == bar)
+          if(ev.xbutton.window == bar->win)
           {
                /* *** */
                /* TAG */
@@ -245,7 +245,7 @@ buttonpress(XEvent ev)
      {
           for(i=0; i<conf.nbutton ; ++i)
                for(j=0; j<conf.barbutton[i].nmousesec; ++j)
-                    if(ev.xbutton.window == conf.barbutton[i].win
+                    if(ev.xbutton.window == conf.barbutton[i].bw->win
                        && ev.xbutton.button == conf.barbutton[i].mouse[j])
                          if(conf.barbutton[i].func[j])
                               conf.barbutton[i].func[j](conf.barbutton[i].cmd[j]);
@@ -315,11 +315,11 @@ expose(XEvent ev)
      Client *c;
 
      if(ev.xexpose.count == 0
-        && (ev.xexpose.window == bar))
+        && (ev.xexpose.window == bar->win))
           updatebar();
      for(c = clients; c; c = c->next)
           if(conf.ttbarheight > 10
-             && ev.xexpose.window == c->tbar)
+             && ev.xexpose.window == c->tbar->win)
                updatetitle(c);
 
      return;
@@ -348,10 +348,7 @@ keypress(XEvent ev)
              && (keys[i].mod & ~(numlockmask | LockMask)) ==
              (ev.xkey.state & ~(numlockmask | LockMask))
              && keys[i].func)
-          {
                keys[i].func(keys[i].cmd);
-               updateall();
-          }
 
      return;
 }
@@ -424,7 +421,8 @@ unmapnotify(XEvent ev)
      Client *c;
 
      if((c = getclient(ev.xunmap.window)))
-         unmanage(c);
+          if(!c->hide)
+               unmanage(c);
 
      return;
 }
