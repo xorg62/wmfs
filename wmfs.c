@@ -358,6 +358,8 @@ init(void)
           xftfont = XftFontOpenName(dpy, screen, "sans-10");
      }
      fonth = (xftfont->ascent + xftfont->descent) - 1;
+     debug(xftfont->ascent);
+     debug(xftfont->descent);
      barheight = fonth + 5;
 
 
@@ -943,26 +945,27 @@ updatebar(void)
           /* Make the tags string */
           ITOA(p, clientpertag(i+1));
           sprintf(buf[i], "%s<%s>", tags[i+1].name, (clientpertag(i+1)) ? p : "");
-          taglen[i+1] = (taglen[i] + textw(buf[i])) + sp*2;
+          taglen[i+1] = taglen[i] + textw(buf[i]) + sp;
 
           /* Draw tags */
           xprint(dr, taglen[i], fonth,
                  ((i+1 == seltag) ? conf.colors.tagselfg : conf.colors.text),
-                 ((i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar), sp, -sp*2, buf[i]);
+                 ((i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar), sp-1, -sp, buf[i]);
 
           /* Tags border separation */
           XSetForeground(dpy, gc, conf.colors.tagbord);
           if(i > 0)
-               XFillRectangle(dpy, dr, gc, taglen[i]-sp, 0, conf.tagbordwidth, barheight);
+               XFillRectangle(dpy, dr, gc, taglen[i]-sp+1, 0, conf.tagbordwidth, barheight);
      }
+     XFillRectangle(dpy, dr, gc, taglen[conf.ntag]-sp+1, 0, conf.tagbordwidth, barheight);
 
      /* Layout symbol */
      xprint(dr, taglen[conf.ntag] - sp/2, fonth,
             conf.colors.layout_fg, conf.colors.layout_bg,
-            2, -4, tags[seltag].layout.symbol);
+            0, 0, tags[seltag].layout.symbol);
 
      /* Draw status text */
-     k = textw(bartext) + 2;
+     k = textw(bartext);
      xprint(dr, mw-k, fonth, conf.colors.text, conf.colors.bar, 0, 0, bartext);
 
      /* Bar border */
@@ -1006,13 +1009,13 @@ updatebutton(Bool c)
           if(!(x = conf.barbutton[i].x))
           {
                if(i)
-                    pm += textw(conf.barbutton[i-1].text) + 4;
+                    pm += textw(conf.barbutton[i-1].text);
                x = (!i) ? j : j + pm;
           }
 
           if(!c)
           {
-               conf.barbutton[i].win = XCreateWindow(dpy, root, x, y, TEXTW(conf.barbutton[i].text) + 4, h,
+               conf.barbutton[i].win = XCreateWindow(dpy, root, x, y, textw(conf.barbutton[i].text), h,
                                                      0, DefaultDepth(dpy, screen),
                                                      CopyFromParent, DefaultVisual(dpy, screen),
                                                      CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
@@ -1061,7 +1064,7 @@ updatetitle(Client *c)
      if(conf.ttbarheight > 10)
      {
           XClearWindow(dpy, c->tbar);
-          xprint(c->tbar, 3, ((fonth - 2) + ((conf.ttbarheight - fonth) / 2)),
+          xprint(c->tbar, 3, ((fonth - xftfont->descent) + ((conf.ttbarheight - fonth) / 2)),
                  ((c == sel) ? conf.colors.ttbar_text_focus : conf.colors.ttbar_text_normal),
                  conf.colors.bar, 0, 0, c->title);
      }

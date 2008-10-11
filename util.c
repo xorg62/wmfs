@@ -85,7 +85,7 @@ textw(const char *text)
 
      XftTextExtentsUtf8(dpy, xftfont, (FcChar8 *)text, strlen(text), &gl);
 
-     return gl.width;
+     return gl.width + xftfont->descent;
 }
 
 void

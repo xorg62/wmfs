@@ -197,7 +197,7 @@ buttonpress(XEvent ev)
 
                     if(ev.xbutton.x >= taglen[conf.ntag] - 3
                        && ev.xbutton.x < taglen[conf.ntag] +
-                       TEXTW(tags[seltag].layout.symbol) - 3)
+                       textw(tags[seltag].layout.symbol) - 3)
                     {
                          /* BUTTON 1 / 4 */
                          {
