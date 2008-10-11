@@ -358,8 +358,6 @@ init(void)
           xftfont = XftFontOpenName(dpy, screen, "sans-10");
      }
      fonth = (xftfont->ascent + xftfont->descent) - 1;
-     debug(xftfont->ascent);
-     debug(xftfont->descent);
      barheight = fonth + 5;
 
 
