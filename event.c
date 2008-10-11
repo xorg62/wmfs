@@ -58,7 +58,7 @@ buttonpress(XEvent ev)
                               mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, False);
                     }
                     /* BUTTON 2 */
-{
+                    {
                          if(ev.xbutton.button == Button2)
                          {
                               if(tags[seltag].layout.func == tile)
@@ -318,9 +318,12 @@ expose(XEvent ev)
         && (ev.xexpose.window == bar->win))
           updatebar();
      for(c = clients; c; c = c->next)
-          if(conf.ttbarheight > 10
-             && ev.xexpose.window == c->tbar->win)
+     {
+          if(ev.xexpose.window == c->tbar->win)
+          {
                updatetitle(c);
+          }
+     }
 
      return;
 }
