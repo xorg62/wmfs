@@ -336,7 +336,6 @@ init(void)
      XSetWindowAttributes at;
      XModifierKeymap *modmap;
      int i, j;
-     char fontbuf[128];
 
      /* FIRST INIT */
      gc = DefaultGC (dpy, screen);
@@ -351,24 +350,16 @@ init(void)
      for(i = 0; i < conf.ntag + 1; ++i)
           tags[i] = conf.tag[i - 1];
 
-     /* INIT FONT
-      * make the font string with
-      * the configuration information  */
-
-     sprintf(fontbuf, "-*-%s-%s-*-%d-*",
-             conf.font.face,
-             conf.font.style,
-             conf.font.size);
-     font = XLoadQueryFont(dpy, fontbuf);
-     if(!font)
+     /* INIT FONT */
+     xftfont = XftFontOpenName(dpy, screen, conf.font);
+     if(!xftfont)
      {
-          fprintf(stderr, "XLoadQueryFont: failed loading font '%s'\n"
-                  "Load the default font.\n", fontbuf);
-          font = XLoadQueryFont(dpy, "*-*-*-*-12-*");
+          fprintf(stderr, "WMFS Error: Cannot initialize font\n");
+          xftfont = XftFontOpenName(dpy, screen, "sans-10");
      }
-     XSetFont(dpy, gc, font->fid);
-     fonth = (font->ascent + font->descent);
-     barheight = fonth + 4;
+     fonth = (xftfont->ascent + xftfont->descent) - 1;
+     barheight = fonth + 5;
+
 
      /* INIT CURSOR */
      cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
@@ -952,12 +943,12 @@ updatebar(void)
           /* Make the tags string */
           ITOA(p, clientpertag(i+1));
           sprintf(buf[i], "%s<%s>", tags[i+1].name, (clientpertag(i+1)) ? p : "");
-          taglen[i+1] = taglen[i] + TEXTW(buf[i]) + sp;
+          taglen[i+1] = (taglen[i] + textw(buf[i])) + sp*2;
 
           /* Draw tags */
           xprint(dr, taglen[i], fonth,
                  ((i+1 == seltag) ? conf.colors.tagselfg : conf.colors.text),
-                 ((i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar), sp, -sp, buf[i]);
+                 ((i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar), sp, -sp*2, buf[i]);
 
           /* Tags border separation */
           XSetForeground(dpy, gc, conf.colors.tagbord);
@@ -966,14 +957,13 @@ updatebar(void)
      }
 
      /* Layout symbol */
-     xprint(dr, taglen[conf.ntag] - sp/2 - 1, fonth,
+     xprint(dr, taglen[conf.ntag] - sp/2, fonth,
             conf.colors.layout_fg, conf.colors.layout_bg,
-            1, 0, tags[seltag].layout.symbol);
+            2, -4, tags[seltag].layout.symbol);
 
      /* Draw status text */
-     k = TEXTW(bartext);
+     k = textw(bartext) + 2;
      xprint(dr, mw-k, fonth, conf.colors.text, conf.colors.bar, 0, 0, bartext);
-     XDrawLine(dpy, dr, gc, mw-k-5, 0, mw-k-5, barheight);
 
      /* Bar border */
      if(conf.tagbordwidth)
@@ -981,6 +971,7 @@ updatebar(void)
           XSetForeground(dpy, gc, conf.colors.tagbord);
           XFillRectangle(dpy, dr, gc, 0,
                          ((conf.bartop) ? barheight-1: 0), mw, 1);
+          XFillRectangle(dpy, dr, gc, mw-k-5, 0, 1, barheight);
      }
 
      XCopyArea(dpy, dr, bar, gc, 0, 0, mw, barheight, 0, 0);
@@ -998,30 +989,30 @@ void
 updatebutton(Bool c)
 {
      int i, j, x, pm = 0;
-     int y = 3, h = barheight - 5;
+     int y = 3, h = barheight - 6;
      XSetWindowAttributes at;
 
      at.override_redirect = 1;
      at.background_pixmap = ParentRelative;
      at.event_mask = ButtonPressMask | ExposureMask;
 
-     j = taglen[conf.ntag] + TEXTW(tags[seltag].layout.symbol);
+     j = taglen[conf.ntag] + textw(tags[seltag].layout.symbol);
 
      if(!conf.bartop)
-          y = bary + 3;
+          y = bary + 4;
 
      for(i = 0; i < conf.nbutton; ++i)
      {
           if(!(x = conf.barbutton[i].x))
           {
                if(i)
-                    pm += TEXTW(conf.barbutton[i-1].text);
+                    pm += textw(conf.barbutton[i-1].text) + 4;
                x = (!i) ? j : j + pm;
           }
 
           if(!c)
           {
-               conf.barbutton[i].win = XCreateWindow(dpy, root, x, y, TEXTW(conf.barbutton[i].text), h,
+               conf.barbutton[i].win = XCreateWindow(dpy, root, x, y, TEXTW(conf.barbutton[i].text) + 4, h,
                                                      0, DefaultDepth(dpy, screen),
                                                      CopyFromParent, DefaultVisual(dpy, screen),
                                                      CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
@@ -1070,7 +1061,7 @@ updatetitle(Client *c)
      if(conf.ttbarheight > 10)
      {
           XClearWindow(dpy, c->tbar);
-          xprint(c->tbar, 3, ((fonth - 3) + ((conf.ttbarheight - fonth) / 2)),
+          xprint(c->tbar, 3, ((fonth - 2) + ((conf.ttbarheight - fonth) / 2)),
                  ((c == sel) ? conf.colors.ttbar_text_focus : conf.colors.ttbar_text_normal),
                  conf.colors.bar, 0, 0, c->title);
      }
@@ -1133,7 +1124,6 @@ main(int argc, char **argv)
      mainloop();
 
      /* Exiting WMFS :'( */
-     XFreeFont(dpy, font);
      XUngrabKey(dpy, AnyKey, AnyModifier, root);
      XFreeCursor(dpy, cursor[CurNormal]);
      XFreeCursor(dpy, cursor[CurMove]);

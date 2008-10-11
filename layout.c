@@ -72,7 +72,7 @@ layoutswitch(Bool b)
      }
      arrange();
 
-     return;
+     ;     return;
 }
 
 void
@@ -100,10 +100,8 @@ maxlayout(void)
      {
           c->tile = False;
           c->lmax = True;
-          c->ox = c->x;
-          c->oy = c->y;
-          c->ow = c->w;
-          c->oh = c->h;
+          c->ox = c->x; c->oy = c->y;
+          c->ow = c->w; c->oh = c->h;
 
           moveresize(c, 0, (conf.ttbarheight + ((conf.bartop) ? barheight : 0)),
                      (mw - (conf.borderheight * 2)),

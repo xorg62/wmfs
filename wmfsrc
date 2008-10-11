@@ -7,19 +7,13 @@ variables
 
 misc
 {
+        font = "sans-9"
         bar_position =    "top"
         raisefocus =      false
         raiseswitch =     true
         border_height =   1
         titlebar_height = 12
         tag_border_width = 1
-}
-
-font
-{
-        face = "fixed"
-        style = "medium"
-        size = 12
 }
 
 colors

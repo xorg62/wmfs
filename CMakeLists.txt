@@ -56,7 +56,8 @@ endif (X11_FOUND)
 set(LIBRARIES_TO_LINK
   ${FREETYPE_LIBRARIES}
   ${X11_LIBRARIES}
-  confuse)
+  confuse
+  Xft)
 
 target_link_libraries(wmfs ${LIBRARIES_TO_LINK})
 

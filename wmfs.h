@@ -48,6 +48,7 @@
 #include <X11/keysym.h>
 #include <X11/cursorfont.h>
 #include <X11/Xutil.h>
+#include <X11/Xft/Xft.h>
 #include <confuse.h>
 #include "config.h"
 
@@ -64,7 +65,7 @@
 #define BUTY(y)      y - conf.ttbarheight + 3
 #define BUTH         conf.ttbarheight - 6
 #define BUTX(x, w)   x + w - BUTH/400
-#define TEXTW(x)     XTextWidth(font, x, strlen(x)) + (fonth / 10)
+#define TEXTW(x)     textw(x)//XTextWidth(font, x, strlen(x)) + (fonth / 10)
 #define MAXLAYOUT    3
 
 /* Client Structure  & Typedef */
@@ -105,7 +106,7 @@ typedef struct
 {
      char *text;
      Window win;
-     int fg_color;
+     char *fg_color;
      int bg_color;
      uint x;
      int nmousesec;
@@ -134,6 +135,7 @@ typedef struct
 /* Configuration structure */
 typedef struct
 {
+     char *font;
      bool raisefocus;
      bool raiseswitch;
      bool bartop;
@@ -142,24 +144,18 @@ typedef struct
      int tagbordwidth;
      struct
      {
-          char *face;
-          char *style;
-          int size;
-     } font;
-     struct
-     {
           uint background;
           uint bordernormal;
           uint borderfocus;
           uint bar;
-          uint text;
-          uint tagselfg;
+          char *text;
+          char *tagselfg;
           uint tagselbg;
           uint tagbord;
-          uint layout_fg;
+          char *layout_fg;
           uint layout_bg;
-          uint ttbar_text_focus;
-          uint ttbar_text_normal;
+          char *ttbar_text_focus;
+          char *ttbar_text_normal;
           uint button;
           uint button_border;
      } colors;
@@ -224,9 +220,10 @@ void getevent(void);
 /* util.c */
 void *emalloc(uint elemet, uint size);
 ulong getcolor(char *color);
+ushort textw(const char *text);
 void xprint(Drawable d, int x, int y,
-            uint fg, uint bg,
-            int d1, int d2, char* str);
+            char* fg, uint bg,
+            int decx, int decw, char* str);
 void uicb_spawn(uicb_t);
 
 /* tag.c */
@@ -264,6 +261,7 @@ Client* gettbar(Window w);
 void grabbuttons(Client *c, Bool focused);
 void grabkeys(void);
 void hide(Client *c);
+
 void init(void);
 Bool ishide(Client *c);
 void mainloop(void);
@@ -308,8 +306,9 @@ Atom net_atom[NetLast];
 Cursor cursor[CurLast];
 
 /* Fonts */
-XFontStruct *font;
 int fonth;
+XftFont *xftfont;
+
 
 /* Bar / Tags */
 Window bar;

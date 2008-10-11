@@ -46,10 +46,9 @@ emalloc(uint element, uint size)
 ulong
 getcolor(char *color)
 {
-     Colormap cmap = DefaultColormap(dpy, screen);
      XColor xcolor;
 
-     if(!XAllocNamedColor(dpy, cmap, color, &xcolor, &xcolor))
+     if(!XAllocNamedColor(dpy,DefaultColormap(dpy, screen), color, &xcolor, &xcolor))
           fprintf(stderr,"WMFS Error: cannot allocate color \"%s\"\n", color);
      return xcolor.pixel;
 }
@@ -79,15 +78,36 @@ uicb_spawn(uicb_t cmd)
      return;
 }
 
-void
-xprint(Drawable d, int x, int y,
-       uint fg, uint bg,
-       int d1, int d2, char *str)
+ushort
+textw(const char *text)
 {
+     XGlyphInfo gl;
+
+     XftTextExtentsUtf8(dpy, xftfont, (FcChar8 *)text, strlen(text), &gl);
+
+     return gl.width;
+}
+
+void
+xprint(Drawable d, int x, int y, char* fg, uint bg, int decx, int decw, char *str)
+{
+     XftColor xftcolor;
+     XftDraw *xftd;
+
+     /* Transform X Drawable -> Xft Drawable */
+     xftd = XftDrawCreate(dpy, d, DefaultVisual(dpy, screen), DefaultColormap(dpy, screen));
+
+     /* Color the text font */
      XSetForeground(dpy, gc, bg);
-     XFillRectangle(dpy, d, gc, x - d1, 0, TEXTW(str) - d2, barheight);
-     XSetForeground(dpy, gc, fg);
-     XDrawString(dpy, d, gc, x, y, str, strlen(str));
+     XFillRectangle(dpy, d, gc, x - decx, 0, textw(str) - decw, barheight);
+
+     /* Alloc text color and draw */
+     XftColorAllocName(dpy,
+                       DefaultVisual(dpy, screen),
+                       DefaultColormap(dpy, screen),
+                       fg, &xftcolor);
+     XftDrawStringUtf8(xftd, &xftcolor, xftfont, x, y, (FcChar8 *)str, strlen(str));
+     XftColorFree(dpy, DefaultVisual(dpy, screen), DefaultColormap(dpy, screen), &xftcolor);
 
      return;
 }

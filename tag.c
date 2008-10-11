@@ -85,6 +85,7 @@ uicb_tagtransfert(uicb_t cmd)
 
      if(!sel)
           return;
+
      if(!n)
           n = 1;
 
