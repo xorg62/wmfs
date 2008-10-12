@@ -42,7 +42,7 @@ bar_create(int x, int y, uint w, uint h, int bord, uint color)
 
      at.override_redirect = 1;
      at.background_pixmap = ParentRelative;
-     at.event_mask = ButtonPressMask | ExposureMask;
+     at.event_mask = ButtonPressMask | ExposureMask | EnterWindowMask;
 
      bw->dr = XCreatePixmap(dpy, root, w, h, DefaultDepth(dpy, screen));
      bw->win = XCreateWindow(dpy, root, x, y, w, h, bord, DefaultDepth(dpy, screen),
