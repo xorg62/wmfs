@@ -310,9 +310,10 @@ expose(XEvent ev)
      if(ev.xexpose.count == 0
         && (ev.xexpose.window == bar->win))
           updatebar();
-     for(c = clients; c; c = c->next)
-          if(ev.xexpose.window == c->tbar->win)
-               updatetitle(c);
+     if(conf.ttbarheight)
+          for(c = clients; c; c = c->next)
+               if(ev.xexpose.window == c->tbar->win)
+                    updatetitle(c);
 
      return;
 }

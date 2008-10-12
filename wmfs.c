@@ -236,6 +236,9 @@ gettbar(Window w)
 {
      Client *c;
 
+     if(!conf.ttbarheight)
+          return NULL;
+
      for(c = clients; c && c->tbar->win != w; c = c->next);
 
      return c;
