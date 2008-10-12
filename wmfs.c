@@ -199,6 +199,7 @@ focus(Client *c)
      for(cc = clients; cc; cc = cc->next)
           if(!ishide(cc))
                updatetitle(cc);
+
      return;
 }
 
@@ -348,7 +349,6 @@ init(void)
      mh = DisplayHeight (dpy, screen);
 
      /* INIT TAG / LAYOUT ATTRIBUTE */
-     taglen[0] = 3;
      seltag = 1;
      for(i = 0; i < conf.ntag + 1; ++i)
           tags[i] = conf.tag[i - 1];
@@ -934,7 +934,7 @@ updatetitle(Client *c)
           bar_refresh_color(c->tbar);
           xprint(c->tbar->dr, 3, ((fonth - xftfont->descent) + ((conf.ttbarheight - fonth) / 2)),
                  ((c == sel) ? conf.colors.ttbar_text_focus : conf.colors.ttbar_text_normal),
-                 conf.colors.bar, 0, 0, c->title);
+                 conf.colors.bar, 0, c->title);
           bar_refresh(c->tbar);
      }
 

@@ -66,6 +66,8 @@
 #define BUTH         conf.ttbarheight - 6
 #define BUTX(x, w)   x + w - BUTH/400
 #define MAXLAYOUT    3
+#define PAD          8
+#define BPAD         2
 
 /* Client Structure  & Typedef */
 typedef const char* uicb_t;
@@ -219,6 +221,8 @@ void bar_delete(BarWindow *bw);
 void bar_moveresize(BarWindow *bw, int x, int y, uint w, uint h);
 void bar_refresh_color(BarWindow *bw);
 void bar_refresh(BarWindow *bw);
+void draw_taglist(Drawable dr);
+void draw_layoutsym(int x, int y);
 void updatebar(void);
 void updatebutton(Bool c);
 
@@ -245,7 +249,7 @@ ulong getcolor(char *color);
 ushort textw(const char *text);
 void xprint(Drawable d, int x, int y,
             char* fg, uint bg,
-            int decx, int decw, char* str);
+            int pad, char* str);
 void uicb_spawn(uicb_t);
 
 /* tag.c */
@@ -330,6 +334,7 @@ XftFont *xftfont;
 
 /* Bar / Tags */
 BarWindow *bar;
+BarWindow *layoutsym;
 Tag tags[MAXTAG];
 int barheight;
 char bartext[1024];
