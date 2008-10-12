@@ -120,7 +120,7 @@ draw_layout(int x, int y)
      bar_moveresize(layoutsym, x, y, get_image_attribute(tags[seltag].layout.image)->width, barheight-1);
 
      draw_image(layoutsym->dr, 0,
-                (barheight)/2 - get_image_attribute(tags[seltag].layout.image)->height/2,
+                (barheight/2 - get_image_attribute(tags[seltag].layout.image)->height/2),
                 tags[seltag].layout.image);
 
      bar_refresh(layoutsym);

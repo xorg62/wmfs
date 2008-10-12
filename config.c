@@ -243,7 +243,8 @@ init_conf(void)
 
      static cfg_opt_t button_opts[] =
           {
-               CFG_STR("text",     "",                CFGF_NONE),
+               CFG_STR("type",     "text",            CFGF_NONE),
+               CFG_STR("content",  "",                CFGF_NONE),
                CFG_SEC("mouse",    mouse_button_opts, CFGF_MULTI),
                CFG_STR("fg_color", "#000000",         CFGF_NONE),
                CFG_STR("bg_color", "#FFFFFF",         CFGF_NONE),
@@ -464,9 +465,16 @@ init_conf(void)
                conf.barbutton[i].mouse[j] = char_to_button(cfg_getstr(cfgtmp3, "button"));
           }
           conf.barbutton[i].nmousesec = cfg_size(cfgtmp2, "mouse");
-          conf.barbutton[i].text      = strdup(var_to_str(cfg_getstr(cfgtmp2, "text")));
-          conf.barbutton[i].fg_color  = strdup(var_to_str(cfg_getstr(cfgtmp2, "fg_color")));
-          conf.barbutton[i].bg_color  = getcolor(strdup(var_to_str(cfg_getstr(cfgtmp2, "bg_color"))));
+          if(strcmp("image", strdup(cfg_getstr(cfgtmp2, "type"))) == 0)
+               conf.barbutton[i].type = True;
+          else
+               conf.barbutton[i].type = False;
+          conf.barbutton[i].content   = strdup(var_to_str(cfg_getstr(cfgtmp2, "content")));
+          if(!conf.barbutton[i].type)
+          {
+               conf.barbutton[i].fg_color  = strdup(var_to_str(cfg_getstr(cfgtmp2, "fg_color")));
+               conf.barbutton[i].bg_color  = getcolor(strdup(var_to_str(cfg_getstr(cfgtmp2, "bg_color"))));
+          }
           conf.barbutton[i].x         = cfg_getint(cfgtmp2, "x");
      }
 

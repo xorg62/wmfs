@@ -147,9 +147,10 @@ updatebar(void)
 void
 updatebutton(Bool c)
 {
-     int i, j, x, pm = 0;
+     int i, j, x, pm = 0, buttonw = 0;
      int y = 0, hi = 0;
 
+     /* Calcul the position of the first button with the layout image size */
      j = taglen[conf.ntag] + get_image_attribute(tags[seltag].layout.image)->width + PAD / 2;
 
      if(!conf.bartop)
@@ -160,29 +161,54 @@ updatebutton(Bool c)
 
      for(i = 0; i < conf.nbutton; ++i)
      {
-          if(!(x = conf.barbutton[i].x))
+
+          /* CALCUL POSITION */
           {
-               if(i)
-                    pm += textw(conf.barbutton[i-1].text) + BPAD;
-               x = (!i) ? j : j + pm;
+               if(!(x = conf.barbutton[i].x))
+               {
+                    if(i)
+                         pm += (conf.barbutton[i-1].type) ?
+                              get_image_attribute(conf.barbutton[i-1].content)->width :
+                              textw(conf.barbutton[i-1].content) + BPAD;
+
+                         x = (!i) ? j : j + pm;
+               }
+
+               buttonw = (conf.barbutton[i].type) ?
+                    get_image_attribute(conf.barbutton[i].content)->width :
+                    textw(conf.barbutton[i].content) + BPAD;
           }
 
-          if(!c)
+
+          /* FIRST TIME */
           {
-               conf.barbutton[i].bw = bar_create(x, y, textw(conf.barbutton[i].text) + BPAD,
-                                                 barheight + hi, 0,
-                                                 conf.barbutton[i].bg_color, False);
-               XMapRaised(dpy, conf.barbutton[i].bw->win);
+               if(!c)
+               {
+                    conf.barbutton[i].bw = bar_create(x, y, buttonw, barheight + hi, 0,
+                                                      conf.barbutton[i].bg_color, False);
+                    XMapRaised(dpy, conf.barbutton[i].bw->win);
+               }
           }
 
-          if(!conf.barbutton[i].bw)
-               return;
+          /* REFRESH/DRAW TEXT/IMAGE */
+          {
+               if(!conf.barbutton[i].bw)
+                    return;
+               if(!conf.barbutton[i].type)
+                    bar_refresh_color(conf.barbutton[i].bw);
+               bar_moveresize(conf.barbutton[i].bw, x, y, buttonw, barheight + hi);
 
-          bar_refresh_color(conf.barbutton[i].bw);
-          bar_moveresize(conf.barbutton[i].bw, x, y, textw(conf.barbutton[i].text) + BPAD, barheight + hi);
-          draw_text(conf.barbutton[i].bw->dr, BPAD/2, fonth, conf.barbutton[i].fg_color,
-                 conf.barbutton[i].bg_color, BPAD, conf.barbutton[i].text);
-          bar_refresh(conf.barbutton[i].bw);
+               /* Check the button type (image/text) */
+               if(conf.barbutton[i].type)
+                    draw_image(conf.barbutton[i].bw->dr, 0, 0,
+                               conf.barbutton[i].content);
+               else
+                    draw_text(conf.barbutton[i].bw->dr, BPAD/2, fonth, conf.barbutton[i].fg_color,
+                              conf.barbutton[i].bg_color, BPAD, conf.barbutton[i].content);
+
+               /* Refresh button */
+               bar_refresh(conf.barbutton[i].bw);
+          }
      }
      XSync(dpy, False);
 
