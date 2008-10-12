@@ -878,7 +878,6 @@ unmanage(Client *c)
      }
      setwinstate(c->win, WithdrawnState);
      free(c);
-     free(c->tbar);
      XSync(dpy, False);
      XUngrabServer(dpy);
      arrange();

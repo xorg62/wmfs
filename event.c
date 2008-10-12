@@ -415,8 +415,7 @@ unmapnotify(XEvent ev)
      Client *c;
 
      if((c = getclient(ev.xunmap.window)))
-          if(!c->hide)
-               unmanage(c);
+          unmanage(c);
 
      return;
 }
