@@ -33,7 +33,7 @@
 #include "wmfs.h"
 
 BarWindow*
-bar_create(int x, int y, uint w, uint h, int bord, uint color)
+bar_create(int x, int y, uint w, uint h, int bord, uint color, Bool entermask)
 {
      XSetWindowAttributes at;
      BarWindow *bw;
@@ -42,7 +42,10 @@ bar_create(int x, int y, uint w, uint h, int bord, uint color)
 
      at.override_redirect = 1;
      at.background_pixmap = ParentRelative;
-     at.event_mask = ButtonPressMask | ExposureMask | EnterWindowMask;
+     if(entermask)
+          at.event_mask = ButtonPressMask | ExposureMask | EnterWindowMask;
+     else
+          at.event_mask = ButtonPressMask | ExposureMask;
 
      bw->dr = XCreatePixmap(dpy, root, w, h, DefaultDepth(dpy, screen));
      bw->win = XCreateWindow(dpy, root, x, y, w, h, bord, DefaultDepth(dpy, screen),
@@ -62,6 +65,7 @@ bar_delete(BarWindow *bw)
 {
      XDestroyWindow(dpy, bw->win);
      XFreePixmap(dpy, bw->dr);
+     free(bw);
 
      return;
 }
@@ -90,8 +94,7 @@ bar_moveresize(BarWindow *bw, int x, int y, uint w, uint h)
 void
 bar_refresh_color(BarWindow *bw)
 {
-     XSetForeground(dpy, gc, bw->color);
-     XFillRectangle(dpy, bw->dr, gc, 0, 0, bw->w, bw->h);
+     draw_rectangle(bw->dr, 0, 0, bw->w, bw->h, bw->color);
 
      return;
 }
@@ -100,61 +103,6 @@ void
 bar_refresh(BarWindow *bw)
 {
      XCopyArea(dpy, bw->dr, bw->win, gc, 0, 0, bw->w, bw->h, 0, 0);
-
-     return;
-}
-
-void
-draw_taglist(Drawable dr)
-{
-     int i;
-     char buf[conf.ntag][256];
-     char p[4];
-     taglen[0] = PAD/2;
-
-     for(i = 0; i < conf.ntag; ++i)
-     {
-          /* Make the tags string */
-          ITOA(p, clientpertag(i+1));
-          sprintf(buf[i], "%s<%s>", tags[i+1].name, (clientpertag(i+1)) ? p : "");
-
-          /* Draw the string */
-          xprint(dr, taglen[i], fonth,
-                 ((i+1 == seltag) ? conf.colors.tagselfg : conf.colors.text),
-                 ((i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar), PAD, buf[i]);
-
-          /* Draw the tag border */
-          XSetForeground(dpy, gc, conf.colors.tagbord);
-          XFillRectangle(dpy, dr, gc,
-                         taglen[i] + textw(buf[i]) + PAD/2,
-                         0, conf.tagbordwidth, barheight);
-
-          /* Edit taglen[i+1] for the next time */
-          taglen[i+1] = taglen[i] + textw(buf[i]) + PAD + conf.tagbordwidth;
-     }
-
-     return;
-}
-
-void
-draw_layoutsym(int x, int y)
-{
-
-     if(!layoutsym)
-     {
-          layoutsym = bar_create(x, y,
-                                 textw(tags[seltag].layout.symbol) + BPAD,
-                                 barheight, 0, conf.colors.layout_bg);
-          XMapRaised(dpy, layoutsym->win);
-     }
-
-     bar_refresh_color(layoutsym);
-     bar_moveresize(layoutsym, x, y, textw(tags[seltag].layout.symbol) + BPAD, barheight);
-
-     xprint(layoutsym->dr, BPAD/2, fonth, conf.colors.layout_fg,
-            conf.colors.layout_bg, BPAD, tags[seltag].layout.symbol);
-
-     bar_refresh(layoutsym);
 
      return;
 }
@@ -170,18 +118,18 @@ updatebar(void)
      draw_taglist(bar->dr);
 
      /* Draw layout symbol */
-     draw_layoutsym(taglen[conf.ntag], bary);
+     draw_layout(taglen[conf.ntag], bary + (!conf.bartop));
 
      /* Draw status text */
-     xprint(bar->dr, mw - textw(bartext), fonth, conf.colors.text, conf.colors.bar, 0, bartext);
+     draw_text(bar->dr, mw - textw(bartext), fonth, conf.colors.text, conf.colors.bar, 0, bartext);
 
      /* Bar border */
      if(conf.tagbordwidth)
      {
-          XSetForeground(dpy, gc, conf.colors.tagbord);
-          XFillRectangle(dpy, bar->dr, gc, 0,
-                         ((conf.bartop) ? barheight-1: 0), mw, 1);
-          XFillRectangle(dpy, bar->dr, gc, mw - textw(bartext) - 5, 0, 1, barheight);
+          draw_rectangle(bar->dr, 0, ((conf.bartop) ? barheight-1: 0),
+                         mw, 1, conf.colors.tagbord);
+          draw_rectangle(bar->dr, mw - textw(bartext) - 5,
+                         0, conf.tagbordwidth, barheight, conf.colors.tagbord);
      }
 
      /* Refresh the bar */
@@ -202,7 +150,7 @@ updatebutton(Bool c)
      int i, j, x, pm = 0;
      int y = 0, hi = 0;
 
-     j = taglen[conf.ntag] + textw(tags[seltag].layout.symbol) + PAD;
+     j = taglen[conf.ntag] + get_image_attribute(tags[seltag].layout.image)->width + PAD / 2;
 
      if(!conf.bartop)
           y = bary + 1;
@@ -223,7 +171,7 @@ updatebutton(Bool c)
           {
                conf.barbutton[i].bw = bar_create(x, y, textw(conf.barbutton[i].text) + BPAD,
                                                  barheight + hi, 0,
-                                                 conf.barbutton[i].bg_color);
+                                                 conf.barbutton[i].bg_color, False);
                XMapRaised(dpy, conf.barbutton[i].bw->win);
           }
 
@@ -232,11 +180,53 @@ updatebutton(Bool c)
 
           bar_refresh_color(conf.barbutton[i].bw);
           bar_moveresize(conf.barbutton[i].bw, x, y, textw(conf.barbutton[i].text) + BPAD, barheight + hi);
-          xprint(conf.barbutton[i].bw->dr, BPAD/2, fonth, conf.barbutton[i].fg_color,
+          draw_text(conf.barbutton[i].bw->dr, BPAD/2, fonth, conf.barbutton[i].fg_color,
                  conf.barbutton[i].bg_color, BPAD, conf.barbutton[i].text);
           bar_refresh(conf.barbutton[i].bw);
      }
      XSync(dpy, False);
+
+     return;
+}
+
+void
+uicb_togglebarpos(uicb_t cmd)
+{
+     int i;
+
+     conf.bartop = !conf.bartop;
+     if(conf.bartop)
+          bary = 0;
+     else
+          bary = mh - barheight;
+     bar_moveresize(bar, 0, bary, mw, barheight);
+     updatebar();
+     for(i = 0; i < conf.nbutton; ++i)
+          XUnmapWindow(dpy, conf.barbutton[i].bw->win);
+     updatebutton(False);
+     for(i = 0; i < conf.nbutton; ++i)
+          XMapWindow(dpy, conf.barbutton[i].bw->win);
+
+     arrange();
+
+     return;
+}
+
+void
+updatetitlebar(Client *c)
+{
+     XFetchName(dpy, c->win, &(c->title));
+     if(!c->title)
+          c->title = strdup("WMFS");
+
+     if(conf.ttbarheight > 10)
+     {
+          bar_refresh_color(c->tbar);
+          draw_text(c->tbar->dr, 3, ((fonth - xftfont->descent) + ((conf.ttbarheight - fonth) / 2)),
+                 ((c == sel) ? conf.colors.ttbar_text_focus : conf.colors.ttbar_text_normal),
+                 conf.colors.bar, 0, c->title);
+          bar_refresh(c->tbar);
+     }
 
      return;
 }

@@ -49,6 +49,7 @@
 #include <X11/cursorfont.h>
 #include <X11/Xutil.h>
 #include <X11/Xft/Xft.h>
+#include <X11/xpm.h>
 #include <confuse.h>
 #include "config.h"
 
@@ -132,7 +133,7 @@ typedef struct
 /* Layout Structure */
 typedef struct
 {
-     char *symbol;
+     char *image;
      void (*func)(void);
 } Layout;
 
@@ -216,15 +217,24 @@ enum { NetSupported, NetWMName, NetLast };
 /* Functions Prototypes */
 
 /* bar.c */
-BarWindow* bar_create(int x, int y, uint w, uint h, int bord, uint color);
+BarWindow* bar_create(int x, int y, uint w, uint h, int bord, uint color, Bool entermask);
 void bar_delete(BarWindow *bw);
 void bar_moveresize(BarWindow *bw, int x, int y, uint w, uint h);
 void bar_refresh_color(BarWindow *bw);
 void bar_refresh(BarWindow *bw);
-void draw_taglist(Drawable dr);
-void draw_layoutsym(int x, int y);
 void updatebar(void);
 void updatebutton(Bool c);
+void updatetitlebar(Client *c);
+void uicb_togglebarpos(uicb_t);
+
+/* draw.c */
+void draw_text(Drawable d, int x, int y, char* fg, uint bg, int pad, char *str);
+void draw_image(Drawable dr, int x, int y, char *file);
+void draw_taglist(Drawable dr);
+void draw_layout(int x, int y);
+void draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color);
+XImage* get_image_attribute(char *file);
+ushort textw(const char *text);
 
 /* config.c */
 void init_conf(void);
@@ -246,10 +256,6 @@ void getevent(void);
 /* util.c */
 void *emalloc(uint elemet, uint size);
 ulong getcolor(char *color);
-ushort textw(const char *text);
-void xprint(Drawable d, int x, int y,
-            char* fg, uint bg,
-            int pad, char* str);
 void uicb_spawn(uicb_t);
 
 /* tag.c */
@@ -302,12 +308,10 @@ void setsizehints(Client *c);
 void unhide(Client *c);
 void unmanage(Client *c);
 void unmapclient(Client *c);
-void updatetitle(Client *c);
 void uicb_client_prev(uicb_t);
 void uicb_client_next(uicb_t);
 void uicb_killclient(uicb_t);
 void uicb_quit(uicb_t);
-void uicb_togglebarpos(uicb_t);
 
 /* Variables */
 
@@ -330,7 +334,6 @@ Cursor cursor[CurLast];
 /* Fonts */
 int fonth;
 XftFont *xftfont;
-
 
 /* Bar / Tags */
 BarWindow *bar;

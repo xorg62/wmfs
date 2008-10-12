@@ -31,7 +31,8 @@ set(wmfs_src
   util.c
   layout.c
   tag.c
-  bar.c)
+  bar.c
+  draw.c)
 
 # Set the executable from the wmfs_src
 add_executable(wmfs ${wmfs_src})

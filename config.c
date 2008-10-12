@@ -92,6 +92,7 @@ name_to_func(char *name, func_name_list_t l[])
           for(i = 0; l[i].name ; ++i)
                if(!strcmp(name, l[i].name))
                     return l[i].func;
+
      return NULL;
 }
 
@@ -104,6 +105,7 @@ char_to_modkey(char *name)
           for(i = 0; key_list[i].name; ++i)
                if(!strcmp(name, key_list[i].name))
                     return key_list[i].keysym;
+
      return NoSymbol;
 }
 
@@ -116,6 +118,7 @@ char_to_button(char *name)
           for(i = 0; mouse_button_list[i].name; ++i)
                if(!strcmp(name, mouse_button_list[i].name))
                     return mouse_button_list[i].button;
+
      return 0;
 }
 
@@ -127,6 +130,7 @@ layout_name_to_struct(Layout lt[], char *name)
      for(i = 0; i < MAXLAYOUT; ++i)
           if(lt[i].func == name_to_func(name, layout_list))
                return lt[i];
+
      return lt[0];
 }
 
@@ -146,6 +150,8 @@ var_to_str(char *conf_choice)
           return strdup(tmpchar);
      else
           return strdup(conf_choice);
+
+     return NULL;
 }
 
 
@@ -186,7 +192,7 @@ init_conf(void)
      static cfg_opt_t layout_opts[] =
           {
                CFG_STR("type",   "", CFGF_NONE),
-               CFG_STR("symbol", "", CFGF_NONE),
+               CFG_STR("image", "", CFGF_NONE),
                CFG_END()
           };
 
@@ -356,11 +362,11 @@ init_conf(void)
      {
           fprintf(stderr, "WMFS Configuration: Too much or no layouts\n");
           conf.nlayout          = 1;
-          conf.layout[0].symbol = strdup("TILE");
+          conf.layout[0].image = strdup("TILE");
           conf.layout[0].func   = tile;
      }
 
-     if(!conf.layout[0].symbol
+     if(!conf.layout[0].image
           && !conf.layout[0].func)
      {
           for(i = 0; i < conf.nlayout; ++i)
@@ -374,7 +380,7 @@ init_conf(void)
                }
                else
                {
-                    conf.layout[i].symbol = strdup(var_to_str(cfg_getstr(cfgtmp, "symbol")));
+                    conf.layout[i].image = strdup(var_to_str(cfg_getstr(cfgtmp, "image")));
                     conf.layout[i].func = name_to_func(strdup(cfg_getstr(cfgtmp, "type")), layout_list);
                }
           }

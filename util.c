@@ -77,39 +77,3 @@ uicb_spawn(uicb_t cmd)
 
      return;
 }
-
-ushort
-textw(const char *text)
-{
-     XGlyphInfo gl;
-
-     XftTextExtentsUtf8(dpy, xftfont, (FcChar8 *)text, strlen(text), &gl);
-
-     return gl.width + xftfont->descent;
-}
-
-void
-xprint(Drawable d, int x, int y, char* fg, uint bg, int pad, char *str)
-{
-     XftColor xftcolor;
-     XftDraw *xftd;
-
-     /* Transform X Drawable -> Xft Drawable */
-     xftd = XftDrawCreate(dpy, d, DefaultVisual(dpy, screen), DefaultColormap(dpy, screen));
-
-     /* Color the text font */
-     XSetForeground(dpy, gc, bg);
-     XFillRectangle(dpy, d, gc, x - pad/2, 0, textw(str) + pad, barheight);
-
-     /* Alloc text color */
-     XftColorAllocName(dpy, DefaultVisual(dpy, screen),
-                       DefaultColormap(dpy, screen), fg, &xftcolor);
-
-     /* Draw the text */
-     XftDrawStringUtf8(xftd, &xftcolor, xftfont, x, y, (FcChar8 *)str, strlen(str));
-
-     /* Free the text color */
-     XftColorFree(dpy, DefaultVisual(dpy, screen), DefaultColormap(dpy, screen), &xftcolor);
-
-     return;
-}

@@ -310,10 +310,11 @@ expose(XEvent ev)
      if(ev.xexpose.count == 0
         && (ev.xexpose.window == bar->win))
           updatebar();
+
      if(conf.ttbarheight)
           for(c = clients; c; c = c->next)
                if(ev.xexpose.window == c->tbar->win)
-                    updatetitle(c);
+                    updatetitlebar(c);
 
      return;
 }
@@ -401,7 +402,7 @@ propertynotify(XEvent ev)
           }
           if(ev.xproperty.atom == XA_WM_NAME
              || ev.xproperty.atom == net_atom[NetWMName])
-               updatetitle(c);
+               updatetitlebar(c);
      }
 
      return;

@@ -60,7 +60,7 @@ layoutswitch(Bool b)
 
      for(i = 0; i < conf.nlayout; ++i)
      {
-          if(tags[seltag].layout.symbol == conf.layout[i].symbol
+          if(tags[seltag].layout.image == conf.layout[i].image
              && tags[seltag].layout.func == conf.layout[i].func)
           {
                if(b)

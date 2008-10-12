@@ -43,7 +43,8 @@ arrange(void)
           else
                hide(c);
 
-     tags[seltag].layout.func();
+     if(sel)
+          tags[seltag].layout.func();
      focus(selbytag[seltag]);
      updatebar();
 
@@ -191,14 +192,14 @@ focus(Client *c)
           if(conf.raisefocus)
                raiseclient(c);
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
-          updatetitle(c);
+          updatetitlebar(c);
      }
      else
           XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 
      for(cc = clients; cc; cc = cc->next)
           if(!ishide(cc))
-               updatetitle(cc);
+               updatetitlebar(cc);
 
      return;
 }
@@ -399,7 +400,7 @@ init(void)
 
      /* INIT BAR / BUTTON */
      bary = (conf.bartop) ? 0 : mh - barheight;
-     bar = bar_create(0, bary, mw, barheight, 0, conf.colors.bar);
+     bar = bar_create(0, bary, mw, barheight, 0, conf.colors.bar, False);
      XMapRaised(dpy, bar->win);
      strcpy(bartext, "WMFS-" WMFS_VERSION);
      updatebutton(False);
@@ -538,7 +539,7 @@ manage(Window w, XWindowAttributes *wa)
 
           c->tbar = bar_create(c->x, c->y - conf.ttbarheight,
                                c->w, c->h,conf.borderheight,
-                               conf.colors.bar);
+                               conf.colors.bar, True);
 
           /* Basic window for close button... */
           if(conf.ttbarheight > 5)
@@ -554,7 +555,7 @@ manage(Window w, XWindowAttributes *wa)
      XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask
                   | PropertyChangeMask | StructureNotifyMask);
      setsizehints(c);
-     updatetitle(c);
+     updatetitlebar(c);
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
           for(t = clients; t && t->win != trans; t = t->next);
      if(t)
@@ -688,7 +689,7 @@ moveresize(Client *c, int x, int y, int w, int h, bool r)
                if(conf.ttbarheight > 5)
                     XMoveWindow(dpy, c->button, BUTX(x, w), BUTY(y));
           }
-          updatetitle(c);
+          updatetitlebar(c);
           XSync(dpy, False);
      }
 
@@ -715,7 +716,7 @@ raiseclient(Client *c)
           XRaiseWindow(dpy, c->tbar->win);
           if(conf.ttbarheight > 5)
                XRaiseWindow(dpy, c->button);
-          updatetitle(c);
+          updatetitlebar(c);
      }
 
      return;
@@ -837,29 +838,6 @@ setsizehints(Client *c)
 }
 
 void
-uicb_togglebarpos(uicb_t cmd)
-{
-     int i;
-
-     conf.bartop = !conf.bartop;
-     if(conf.bartop)
-          bary = 0;
-     else
-          bary = mh - barheight;
-     bar_moveresize(bar, 0, bary, mw, barheight);
-     updatebar();
-     for(i = 0; i < conf.nbutton; ++i)
-          XUnmapWindow(dpy, conf.barbutton[i].bw->win);
-     updatebutton(False);
-     for(i = 0; i < conf.nbutton; ++i)
-          XMapWindow(dpy, conf.barbutton[i].bw->win);
-
-     arrange();
-
-     return;
-}
-
-void
 unhide(Client *c)
 {
      if(!c)
@@ -925,25 +903,6 @@ unmapclient(Client *c)
      return;
 }
 
-void
-updatetitle(Client *c)
-{
-     XFetchName(dpy, c->win, &(c->title));
-     if(!c->title)
-          c->title = strdup("WMFS");
-
-     if(conf.ttbarheight > 10)
-     {
-          bar_refresh_color(c->tbar);
-          xprint(c->tbar->dr, 3, ((fonth - xftfont->descent) + ((conf.ttbarheight - fonth) / 2)),
-                 ((c == sel) ? conf.colors.ttbar_text_focus : conf.colors.ttbar_text_normal),
-                 conf.colors.bar, 0, c->title);
-          bar_refresh(c->tbar);
-     }
-
-     return;
-}
-
 int
 main(int argc, char **argv)
 {
@@ -999,7 +958,6 @@ main(int argc, char **argv)
      mainloop();
 
      /* Exiting WMFS :'( */
-     XUngrabKey(dpy, AnyKey, AnyModifier, root);
      XftFontClose(dpy, xftfont);
      XFreeCursor(dpy, cursor[CurNormal]);
      XFreeCursor(dpy, cursor[CurMove]);

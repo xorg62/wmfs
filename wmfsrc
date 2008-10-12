@@ -46,9 +46,9 @@ colors
 
 layouts
 {
-        layout { type = "tile" symbol = "TILE" }
-        layout { type = "max"  symbol = "MAX"  }
-        layout { type = "free" symbol = "FREE" }
+        layout { type = "tile" image = "/" }
+        layout { type = "max"  image = "/"  }
+        layout { type = "free" image = "/" }
 }
 
 tags
