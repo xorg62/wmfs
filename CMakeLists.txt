@@ -75,7 +75,8 @@ pkg_check_modules(wmfs_required
   x11
   libconfuse
   freetype2
-  xft)
+  xft
+  xpm)
 # Find exterbal programs
 macro(a_find_program var prg req)
     set(required ${req})
