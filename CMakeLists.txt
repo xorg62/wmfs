@@ -58,7 +58,8 @@ set(LIBRARIES_TO_LINK
   ${FREETYPE_LIBRARIES}
   ${X11_LIBRARIES}
   confuse
-  Xft)
+  Xft
+  Xpm)
 
 target_link_libraries(wmfs ${LIBRARIES_TO_LINK})
 
