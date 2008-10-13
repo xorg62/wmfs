@@ -96,17 +96,18 @@ maxlayout(void)
 {
      Client *c;
 
-     for(c = nexttiled(clients); c; c = nexttiled(c->next))
-     {
-          c->tile = False;
-          c->lmax = True;
-          c->ox = c->x; c->oy = c->y;
-          c->ow = c->w; c->oh = c->h;
+     c = nexttiled(sel);// nexttiled(clients);
 
-          moveresize(c, 0, (conf.ttbarheight + ((conf.bartop) ? barheight : 0)),
-                     (mw - (conf.borderheight * 2)),
-                     (mh - (conf.borderheight * 2) - conf.ttbarheight - barheight), False);
-     }
+     c->tile = False;
+     c->lmax = True;
+     c->ox = c->x; c->oy = c->y;
+     c->ow = c->w; c->oh = c->h;
+
+     moveresize(c, 0, (conf.ttbarheight + ((conf.bartop) ? barheight : 0)),
+                (mw - (conf.borderheight * 2)),
+                (mh - (conf.borderheight * 2) - conf.ttbarheight - barheight), False);
+
+     raiseclient(c);
 
      return;
 }

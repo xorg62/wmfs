@@ -116,6 +116,7 @@ client_switch(Bool b)
                     raiseclient(c);
           }
      }
+     arrange();
 
      return;
 }
@@ -193,7 +194,7 @@ focus(Client *c)
      {
           setborder(c->win, conf.colors.borderfocus);
           if(conf.ttbarheight)
-               setborder(sel->tbar->win, conf.colors.borderfocus);
+               setborder(c->tbar->win, conf.colors.borderfocus);
           if(conf.raisefocus)
                raiseclient(c);
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
@@ -296,7 +297,14 @@ hide(Client *c)
      if(!c)
           return;
 
-     unmapclient(c);
+     XMoveWindow(dpy, c->win, c->x, c->y+mh*2);
+     if(conf.ttbarheight)
+     {
+         bar_moveresize(c->tbar, c->x, c->y+mh*2, c->w, c->h);
+         if(conf.ttbarheight > 5)
+              XMoveWindow(dpy, c->button, c->x, c->y+mh*2);
+     }
+     //unmapclient(c);
      setwinstate(c->win, IconicState);
      c->hide = True;
 
@@ -468,8 +476,8 @@ mapclient(Client *c)
 {
      if(!c)
           return;
+
      XMapWindow(dpy, c->win);
-     XMapSubwindows(dpy, c->win);
      if(conf.ttbarheight)
      {
           XMapWindow(dpy, c->tbar->win);
@@ -808,8 +816,14 @@ unhide(Client *c)
 {
      if(!c)
           return;
-
-     mapclient(c);
+     XMoveWindow(dpy, c->win, c->x, c->y);
+     if(conf.ttbarheight)
+     {
+          bar_moveresize(c->tbar, c->x, c->y - conf.ttbarheight, c->w, conf.ttbarheight);
+          if(conf.ttbarheight > 5)
+               XMoveWindow(dpy, c->button, BUTX(c->x, c->w), BUTY(c->y));
+     }
+     //mapclient(c);
      setwinstate(c->win, NormalState);
      c->hide = False;
 
@@ -850,6 +864,7 @@ unmapclient(Client *c)
 {
      if(!c)
           return;
+
      XUnmapWindow(dpy, c->win);
      if(conf.ttbarheight)
      {
@@ -857,7 +872,6 @@ unmapclient(Client *c)
           if(conf.ttbarheight > 5)
                XUnmapWindow(dpy, c->button);
      }
-     XUnmapSubwindows(dpy, c->win);
 
      return;
 }
