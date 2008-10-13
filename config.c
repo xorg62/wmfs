@@ -31,6 +31,7 @@
 */
 
 #include "wmfs.h"
+#include "structs.h"
 
 #define FILE_NAME   ".config/wmfs/wmfsrc"
 

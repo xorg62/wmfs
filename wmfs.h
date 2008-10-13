@@ -30,9 +30,10 @@
 *      OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef LOCAL_H
-#define LOCAL_H
+#ifndef WMFS_H
+#define WMFS_H
 
+/* Lib headers */
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -51,8 +52,10 @@
 #include <X11/Xft/Xft.h>
 #include <X11/xpm.h>
 #include <confuse.h>
-#include "config.h"
 
+/* local headers */
+#include "config.h"
+#include "structs.h"
 
 /* Defines */
 #define ButtonMask   (ButtonPressMask | ButtonReleaseMask)
@@ -61,161 +64,11 @@
 #define ALT          Mod1Mask
 #define ITOA(p ,n)   sprintf(p, "%i", n)
 #define debug(p)     fprintf(stderr, "debug: %i\n", p)
-#define MAXTAG       36
-#define NBUTTON      5
 #define BUTY(y)      y - conf.ttbarheight + 3
 #define BUTH         conf.ttbarheight - 6
 #define BUTX(x, w)   x + w - BUTH/400
-#define MAXLAYOUT    3
 #define PAD          8
 #define BPAD         2
-
-/* Client Structure  & Typedef */
-typedef const char* uicb_t;
-typedef struct Client Client;
-
-/* Bar Window Structure:
- * For titlebar or topbar.. */
-typedef struct
-{
-     Window win;
-     Drawable dr;
-     int x, y;
-     uint w ,h;
-     uint color;
-     int bord;
-} BarWindow;
-
-struct Client
-{
-     char *title;          /* Client title */
-     int tag;              /* Tag num */
-     int x, y, w, h;       /* Window attribute */
-     int ox, oy, ow, oh;   /* Old window attribute */
-     /* For resizehint usage { */
-     int basew, baseh, incw, inch;
-     int maxw, maxh, minw, minh;
-     int minax, maxax, minay, maxay;
-     /* } */
-     Window win;           /* Window */
-     BarWindow *tbar;      /* Titlebar */
-     Window button;        /* Close Button */
-     Bool max, tile, free; /* Client Info */
-     Bool hint, hide, lmax;/* Client Info² */
-     /* Struct in chains */
-     Client *next;         /* Next client */
-     Client *prev;         /* Previous client */
-};
-
-/* Keybind Structure */
-typedef struct
-{
-     uint mod;
-     KeySym keysym;
-     void (*func)(uicb_t);
-     char *cmd;
-} Key;
-
-/* Bar Button */
-typedef struct
-{
-     Bool type; /* False -> text, True -> image. */
-     char *content;
-     BarWindow *bw;
-     char *fg_color;
-     int bg_color;
-     uint x;
-     int nmousesec;
-     void (*func[NBUTTON])(uicb_t);
-     char *cmd[NBUTTON];
-     uint mouse[NBUTTON];
-} BarButton;
-
-/* Layout Structure */
-typedef struct
-{
-     char *image;
-     void (*func)(void);
-} Layout;
-
-/* Tag Structure */
-typedef struct
-{
-     char *name;
-     float mwfact;
-     int nmaster;
-     Bool resizehint;
-     Layout layout;
-} Tag;
-
-/* Configuration structure */
-typedef struct
-{
-     char *font;
-     bool raisefocus;
-     bool raiseswitch;
-     bool bartop;
-     int borderheight;
-     int ttbarheight;
-     int tagbordwidth;
-     struct
-     {
-          /* Only the colors will be use for text
-           * are 'char*' (for xprint -> XftColorAllocName) */
-          uint bordernormal;
-          uint borderfocus;
-          uint bar;
-          char *text;
-          char *tagselfg;
-          uint tagselbg;
-          uint tagbord;
-          char *layout_fg;
-          uint layout_bg;
-          char *ttbar_text_focus;
-          char *ttbar_text_normal;
-          uint button;
-          uint button_border;
-     } colors;
-     Tag tag[MAXTAG];
-     Layout layout[MAXLAYOUT];
-     BarButton *barbutton;
-     int ntag;
-     int nkeybind;
-     int nbutton;
-     int nlayout;
-} Conf;
-
-/* Config.c struct */
-typedef struct
-{
-     char *name;
-     void *func;
-} func_name_list_t;
-
-typedef struct
-{
-      char *name;
-      KeySym keysym;
-} key_name_list_t;
-
-typedef struct
-{
-     char *name;
-     uint button;
-} name_to_uint_t;
-
-typedef struct
-{
-     char *name;
-     char *content;
-} Variable;
-
-/* Enum */
-enum { CurNormal, CurResize, CurMove, CurLast };
-enum { WMState, WMProtocols, WMName, WMDelete, WMLast };
-enum { NetSupported, NetWMName, NetLast };
-
-/* Functions Prototypes */
 
 /* bar.c */
 BarWindow* bar_create(int x, int y, uint w, uint h, int bord, uint color, Bool entermask);
@@ -355,6 +208,6 @@ Client *selbytag[MAXTAG];
 uint numlockmask;
 Variable confvar[256];
 
-#endif /* LOCAL_H */
+#endif /* WMFS_H */
 
 

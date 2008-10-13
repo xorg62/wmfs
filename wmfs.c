@@ -31,6 +31,7 @@
 */
 
 #include "wmfs.h"
+//#include "structs.h"
 
 void
 arrange(void)
