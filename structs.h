@@ -79,8 +79,6 @@ struct Client
      Window win;
      /* Titlebar */
      BarWindow *tbar;
-     /* Titlebar Button */
-     Window button;
      /* Client Layout Information */
      Bool max, tile, free;
      Bool hint, hide, lmax;
@@ -157,8 +155,6 @@ typedef struct
           uint layout_bg;
           char *ttbar_text_focus;
           char *ttbar_text_normal;
-          uint button;
-          uint button_border;
      } colors;
      Tag tag[MAXTAG];
      Layout layout[MAXLAYOUT];

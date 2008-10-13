@@ -64,9 +64,6 @@
 #define ALT          Mod1Mask
 #define ITOA(p ,n)   sprintf(p, "%i", n)
 #define debug(p)     fprintf(stderr, "debug: %i\n", p)
-#define BUTY(y)      y - conf.ttbarheight + 3
-#define BUTH         conf.ttbarheight - 6
-#define BUTX(x, w)   x + w - BUTH/400
 #define PAD          8
 #define BPAD         2
 
@@ -88,7 +85,30 @@ void draw_taglist(Drawable dr);
 void draw_layout(int x, int y);
 void draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color);
 XImage* get_image_attribute(char *file);
+void draw_border(Window win, int color);
 ushort textw(const char *text);
+
+/* client.c */
+int clientpertag(int tag);
+void client_attach(Client *c);
+void client_detach(Client *c);
+void client_switch(Bool c);
+void client_focus(Client *c);
+Client *getclient(Window w);
+Client* client_gettbar(Window w);
+void client_hide(Client *c);
+Bool ishide(Client *c);
+void mapclient(Client *c);
+void client_manage(Window w, XWindowAttributes *wa);
+void client_moveresize(Client *c, int x, int y, int w, int h, bool r);
+void client_size_hints(Client *c);
+void raiseclient(Client *c);
+void client_unhide(Client *c);
+void client_unmanage(Client *c);
+void unmapclient(Client *c);
+void uicb_client_prev(uicb_t);
+void uicb_client_next(uicb_t);
+void uicb_killclient(uicb_t);
 
 /* config.c */
 void init_conf(void);
@@ -100,9 +120,12 @@ void destroynotify(XEvent ev);
 void enternotify(XEvent ev);
 void expose(XEvent ev);
 void focusin(XEvent ev);
+void grabbuttons(Client *c, Bool focused);
+void grabkeys(void);
 void keypress(XEvent ev);
 void mapnotify(XEvent ev);
 void maprequest(XEvent ev);
+void mouseaction(Client *c, int x, int y, int type);
 void propertynotify(XEvent ev);
 void unmapnotify(XEvent ev);
 void getevent(void);
@@ -110,6 +133,7 @@ void getevent(void);
 /* util.c */
 void *emalloc(uint elemet, uint size);
 ulong getcolor(char *color);
+void setwinstate(Window win, long state);
 void uicb_spawn(uicb_t);
 
 /* tag.c */
@@ -119,6 +143,7 @@ void uicb_tag_prev(uicb_t);
 void uicb_tagtransfert(uicb_t);
 
 /* layout.c */
+void arrange(void);
 void freelayout(void);
 void layoutswitch(Bool b);
 void maxlayout(void);
@@ -132,39 +157,11 @@ void uicb_set_mwfact(uicb_t);
 void uicb_set_nmaster(uicb_t);
 
 /* wmfs.c */
-void arrange(void);
-void attach(Client *c);
-int clientpertag(int tag);
-void client_switch(Bool c);
-void detach(Client *c);
 int errorhandler(Display *d, XErrorEvent *event);
 int errorhandlerdummy(Display *d, XErrorEvent *event);
-void focus(Client *c);
-Client* getbutton(Window w);
-Client* getclient(Window w);
-Client* getnext(Client *c);
-Client* gettbar(Window w);
-void grabbuttons(Client *c, Bool focused);
-void grabkeys(void);
-void hide(Client *c);
 void init(void);
-Bool ishide(Client *c);
 void mainloop(void);
-void mapclient(Client *c);
-void manage(Window w, XWindowAttributes *wa);
-void mouseaction(Client *c, int x, int y, int type);
-void moveresize(Client *c, int x, int y, int w, int h, bool r);
-void raiseclient(Client *c);
 void scan(void);
-void setborder(Window win, int color);
-void setwinstate(Window win, long state);
-void setsizehints(Client *c);
-void unhide(Client *c);
-void unmanage(Client *c);
-void unmapclient(Client *c);
-void uicb_client_prev(uicb_t);
-void uicb_client_next(uicb_t);
-void uicb_killclient(uicb_t);
 void uicb_quit(uicb_t);
 
 /* Variables */

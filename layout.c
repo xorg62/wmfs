@@ -33,6 +33,30 @@
 #include "wmfs.h"
 
 void
+arrange(void)
+{
+     Client *c;
+
+     for(c = clients; c; c = c->next)
+          if(!ishide(c))
+               client_unhide(c);
+          else
+               client_hide(c);
+
+     if(sel)
+          tags[seltag].layout.func();
+
+     if(selbytag[seltag])
+          client_focus(selbytag[seltag]);
+     else
+          client_focus(NULL);
+
+     updatebar();
+
+     return;
+}
+
+void
 freelayout(void)
 {
      Client *c;
@@ -43,7 +67,7 @@ freelayout(void)
           {
                if(c->tile || c->lmax)
                {
-                    moveresize(c, c->ox, c->oy, c->ow, c->oh, True);
+                    client_moveresize(c, c->ox, c->oy, c->ow, c->oh, True);
                     c->tile = False;
                     c->lmax = False;
                }
@@ -103,7 +127,7 @@ maxlayout(void)
      c->ox = c->x; c->oy = c->y;
      c->ow = c->w; c->oh = c->h;
 
-     moveresize(c, 0, (conf.ttbarheight + ((conf.bartop) ? barheight : 0)),
+     client_moveresize(c, 0, (conf.ttbarheight + ((conf.bartop) ? barheight : 0)),
                 (mw - (conf.borderheight * 2)),
                 (mh - (conf.borderheight * 2) - conf.ttbarheight - barheight), False);
 
@@ -218,7 +242,7 @@ tile(void)
                else
                     h = th - (bord + conf.ttbarheight) - bord*2;
           }
-          moveresize(c, x, y, w, h, tags[seltag].resizehint);
+          client_moveresize(c, x, y, w, h, tags[seltag].resizehint);
           if(n > nm && th != mht)
                y = c->y + c->h + bord + conf.ttbarheight;
      }
@@ -236,9 +260,9 @@ uicb_tile_switch(uicb_t cmd)
      if((c = sel) == nexttiled(clients))
           if(!(c = nexttiled(c->next)))
                return;
-     detach(c);
-     attach(c);
-     focus(c);
+     client_detach(c);
+     client_attach(c);
+     client_focus(c);
      arrange();
 
      return;
@@ -253,19 +277,20 @@ uicb_togglemax(uicb_t cmd)
      {
           sel->ox = sel->x; sel->oy = sel->y;
           sel->ow = sel->w; sel->oh = sel->h;
-          moveresize(sel, 0, (conf.ttbarheight + ((conf.bartop) ? barheight: 0)),
-                     (mw - (conf.borderheight * 2)),
-                     (mh - (conf.borderheight * 2)- conf.ttbarheight - barheight), False);
+          client_moveresize(sel, 0, (conf.ttbarheight + ((conf.bartop) ? barheight: 0)),
+                            (mw - (conf.borderheight * 2)),
+                            (mh - (conf.borderheight * 2)- conf.ttbarheight - barheight), False);
           raiseclient(sel);
           sel->max = True;
      }
      else if(sel->max)
      {
-          moveresize(sel, sel->ox, sel->oy, sel->ow, sel->oh, False);
+          client_moveresize(sel, sel->ox, sel->oy, sel->ow, sel->oh, False);
           sel->max = False;
      }
      arrange();
 
      return;
 }
+
 

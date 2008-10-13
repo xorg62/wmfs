@@ -31,7 +31,6 @@
 */
 
 #include "wmfs.h"
-#include "structs.h"
 
 #define FILE_NAME   ".config/wmfs/wmfsrc"
 
@@ -185,8 +184,6 @@ init_conf(void)
                CFG_STR("layout_bg",            "#292929", CFGF_NONE),
                CFG_STR("titlebar_text_focus",  "#FFFFFF", CFGF_NONE),
                CFG_STR("titlebar_text_normal", "#FFFFFF", CFGF_NONE),
-               CFG_STR("button",               "#6286A1", CFGF_NONE),
-               CFG_STR("button_border",        "#354B5C", CFGF_NONE),
                CFG_END()
           };
 
@@ -354,9 +351,6 @@ init_conf(void)
      conf.colors.layout_bg         = getcolor(var_to_str(cfg_getstr(cfg_colors, "layout_bg")));
      conf.colors.ttbar_text_focus  = strdup(var_to_str(cfg_getstr(cfg_colors, "titlebar_text_focus")));
      conf.colors.ttbar_text_normal = strdup(var_to_str(cfg_getstr(cfg_colors, "titlebar_text_normal")));
-     conf.colors.button            = getcolor(var_to_str(cfg_getstr(cfg_colors, "button")));
-     conf.colors.button_border     = getcolor(var_to_str(cfg_getstr(cfg_colors, "button_border")));
-
 
      /* layout */
      if((conf.nlayout = cfg_size(cfg_layouts, "layout")) > MAXLAYOUT

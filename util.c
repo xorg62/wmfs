@@ -54,6 +54,17 @@ getcolor(char *color)
 }
 
 void
+setwinstate(Window win, long state)
+{
+     long data[] = {state, None};
+
+     XChangeProperty(dpy, win, wm_atom[WMState], wm_atom[WMState], 32,
+                     PropModeReplace, (unsigned char *)data, 2);
+
+     return;
+}
+
+void
 uicb_spawn(uicb_t cmd)
 {
      char *sh = NULL;

@@ -49,7 +49,7 @@ buttonpress(XEvent ev)
           /* TITLEBAR */
           /* ******** */
           {
-               if((c = gettbar(ev.xbutton.window)))
+               if((c = client_gettbar(ev.xbutton.window)))
                {
                     raiseclient(c);
                     /* BUTTON 1 */
@@ -71,32 +71,6 @@ buttonpress(XEvent ev)
                     {
                          if(ev.xbutton.button == Button3)
                               mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, True);
-                    }
-               }
-
-          }
-
-          /* ****** */
-          /* BUTTON */
-          /* ****** */
-          {
-               if((c = getbutton(ev.xbutton.window)))
-               {
-                    /* BUTTON 1 */
-                    {
-                         if(ev.xbutton.button == Button1)
-                              uicb_killclient(NULL);
-                    }
-                    /* BUTTON 2 AND 3 */
-                    {
-                         if(ev.xbutton.button == Button2
-                                 || ev.xbutton.button == Button3)
-                         {
-                              if(tags[seltag].layout.func == tile)
-                                   uicb_tile_switch(NULL);
-                              else
-                                   uicb_togglemax(NULL);
-                         }
                     }
                }
 
@@ -266,7 +240,7 @@ configurerequest(XEvent ev)
                       ev.xconfigurerequest.value_mask, &wc);
      if((c = getclient(ev.xconfigurerequest.window)))
           if(wc.y < mw && wc.x < mh)
-               moveresize(c, wc.x, wc.y, wc.width, wc.height, True);
+               client_moveresize(c, wc.x, wc.y, wc.width, wc.height, True);
 
      return;
 }
@@ -278,9 +252,9 @@ destroynotify(XEvent ev)
      Client *c;
 
      if((c = getclient(ev.xdestroywindow.window)))
-          unmanage(c);
+          client_unmanage(c);
 
-  return;
+     return;
 }
 
 /* ENTERNOTIFY */
@@ -293,10 +267,10 @@ enternotify(XEvent ev)
         || ev.xcrossing.detail == NotifyInferior)
           return;
      if((c = getclient(ev.xcrossing.window))
-        || (c = gettbar(ev.xcrossing.window)))
-          focus(c);
+        || (c = client_gettbar(ev.xcrossing.window)))
+          client_focus(c);
      else
-          focus(NULL);
+          client_focus(NULL);
 
      return;
 }
@@ -328,6 +302,47 @@ focusin(XEvent ev)
 
      return;
 }
+
+void
+grabbuttons(Client *c, Bool focused)
+{
+     XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
+
+     if(focused)
+     {
+          /* Window */
+          XGrabButton(dpy, Button1, ALT, c->win, False, ButtonMask, GrabModeAsync,GrabModeSync, None, None);
+          XGrabButton(dpy, Button1, ALT|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button2, ALT, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button2, ALT|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button3, ALT, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button3, ALT|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+     }
+     else
+          XGrabButton(dpy, AnyButton, AnyModifier, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+
+     return;
+}
+
+void
+grabkeys(void)
+{
+     uint i;
+     KeyCode code;
+
+     XUngrabKey(dpy, AnyKey, AnyModifier, root);
+     for(i = 0; i < conf.nkeybind; i++)
+     {
+          code = XKeysymToKeycode(dpy, keys[i].keysym);
+          XGrabKey(dpy, code, keys[i].mod, root, True, GrabModeAsync, GrabModeAsync);
+          XGrabKey(dpy, code, keys[i].mod|numlockmask, root, True, GrabModeAsync, GrabModeAsync);
+          XGrabKey(dpy, code, keys[i].mod|LockMask, root, True, GrabModeAsync, GrabModeAsync);
+          XGrabKey(dpy, code, keys[i].mod|LockMask|numlockmask, root, True, GrabModeAsync, GrabModeAsync);
+     }
+
+     return;
+}
+
 
 /* KEYPRESS */
 void
@@ -370,8 +385,59 @@ maprequest(XEvent ev)
           return;
      if(!getclient(ev.xmaprequest.window))
      {
-          focus(NULL);
-          manage(ev.xmaprequest.window, &at);
+          client_focus(NULL);
+          client_manage(ev.xmaprequest.window, &at);
+     }
+
+     return;
+}
+
+/* If the type is 0, this function will move, else,
+ * this will resize */
+void
+mouseaction(Client *c, int x, int y, int type)
+{
+     int  ocx, ocy;
+     XEvent ev;
+
+     if(c->max || c->tile || c->lmax)
+          return;
+
+     ocx = c->x;
+     ocy = c->y;
+     if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
+                     None, cursor[((type) ?CurResize:CurMove)], CurrentTime) != GrabSuccess)
+          return;
+     if(type)
+          XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
+
+     for(;;)
+     {
+          XMaskEvent(dpy, MouseMask | ExposureMask | SubstructureRedirectMask, &ev);
+          if(ev.type == ButtonRelease)
+          {
+               if(type)
+                    XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
+               XUngrabPointer(dpy, CurrentTime);
+               updatebar();
+               return;
+          }
+          else if(ev.type == MotionNotify)
+          {
+               XSync(dpy, False);
+               /* Resize */
+               if(type)
+                    client_moveresize(c, c->x, c->y,
+                                      ((ev.xmotion.x - ocx <= 0) ? 1 : ev.xmotion.x - ocx),
+                                      ((ev.xmotion.y - ocy <= 0) ? 1 : ev.xmotion.y - ocy), True);
+               /* Move */
+               else
+                    client_moveresize(c, (ocx + (ev.xmotion.x - x)),
+                                      (ocy + (ev.xmotion.y - y)),
+                                      c->w, c->h, True);
+          }
+          else if(ev.type == Expose)
+               expose(ev);
      }
 
      return;
@@ -397,7 +463,7 @@ propertynotify(XEvent ev)
                     arrange();
                break;
           case XA_WM_NORMAL_HINTS:
-               setsizehints(c);
+               client_size_hints(c);
                break;
           }
           if(ev.xproperty.atom == XA_WM_NAME
@@ -416,7 +482,7 @@ unmapnotify(XEvent ev)
 
      if((c = getclient(ev.xunmap.window)))
           if(!c->hide)
-               unmanage(c);
+               client_unmanage(c);
 
      return;
 }

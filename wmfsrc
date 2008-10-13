@@ -38,10 +38,6 @@ colors
         #Titlebar
           titlebar_text_focus  = "#D4D4D4"
           titlebar_text_normal = "#D4D4D4"
-
-        #Button
-          button               = "#7E89A2"
-          button_border        = "#3F485E"
 }
 
 layouts

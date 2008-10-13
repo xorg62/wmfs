@@ -152,6 +152,18 @@ get_image_attribute(char *file)
      return ret;
 }
 
+void
+draw_border(Window win, int color)
+{
+     if(!win)
+          return;
+
+     XSetWindowBorder(dpy, win, color);
+     XSetWindowBorderWidth(dpy, win, conf.borderheight);
+
+     return;
+}
+
 ushort
 textw(const char *text)
 {
