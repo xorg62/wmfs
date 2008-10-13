@@ -25,15 +25,15 @@ set(PROJECT_NAME wmfs)
 project(${PROJECT_NAME} C)
 # Definition of the wmfs source
 set(wmfs_src
-  wmfs.c
-  config.c
-  event.c
-  util.c
-  layout.c
-  tag.c
-  bar.c
-  draw.c
-  client.c)
+  src/wmfs.c
+  src/config.c
+  src/event.c
+  src/util.c
+  src/layout.c
+  src/tag.c
+  src/bar.c
+  src/draw.c
+  src/client.c)
 
 # Set the executable from the wmfs_src
 add_executable(wmfs ${wmfs_src})
