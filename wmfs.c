@@ -45,7 +45,12 @@ arrange(void)
 
      if(sel)
           tags[seltag].layout.func();
-     focus(selbytag[seltag]);
+
+     if(selbytag[seltag])
+          focus(selbytag[seltag]);
+     else
+          focus(NULL);
+
      updatebar();
 
      return;
@@ -248,15 +253,7 @@ gettbar(Window w)
 void
 grabbuttons(Client *c, Bool focused)
 {
-     int i;
-
      XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
-     if(conf.ttbarheight)
-     {
-          XUngrabButton(dpy, AnyButton, AnyModifier, c->tbar->win);
-          if(conf.ttbarheight > 5)
-               XUngrabButton(dpy, AnyButton, AnyModifier, c->button);
-     }
 
      if(focused)
      {
@@ -267,35 +264,9 @@ grabbuttons(Client *c, Bool focused)
           XGrabButton(dpy, Button2, ALT|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
           XGrabButton(dpy, Button3, ALT, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
           XGrabButton(dpy, Button3, ALT|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-          if(conf.ttbarheight)
-          {
-               /* Titlebar */
-               XGrabButton(dpy, Button1, AnyModifier, c->tbar->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-               XGrabButton(dpy, Button2, AnyModifier, c->tbar->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-               XGrabButton(dpy, Button3, AnyModifier, c->tbar->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-               /* Titlebar Button */
-               if(conf.ttbarheight > 5)
-               {
-                    XGrabButton(dpy, Button1, AnyModifier, c->button, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-                    XGrabButton(dpy, Button3, AnyModifier, c->button, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-               }
-          }
-          /* Bar Button */
-          for(i=0; i< conf.nbutton; ++i)
-               XGrabButton(dpy, Button1, AnyModifier, conf.barbutton[i].bw->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
      }
      else
-     {
           XGrabButton(dpy, AnyButton, AnyModifier, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-          if(conf.ttbarheight)
-          {
-               XGrabButton(dpy, AnyButton, AnyModifier, c->tbar->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-               if(conf.ttbarheight > 5)
-                    XGrabButton(dpy, AnyButton, AnyModifier, c->button, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-          }
-          for(i=0; i< conf.nbutton; ++i)
-               XGrabButton(dpy, Button1, AnyModifier, conf.barbutton[i].bw->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-     }
 
      return;
 }
@@ -324,14 +295,8 @@ hide(Client *c)
 {
      if(!c)
           return;
-     XMoveWindow(dpy, c->win, c->x, c->y+mh*2);
-     if(conf.ttbarheight)
-     {
-          bar_moveresize(c->tbar, c->x, c->y+mh*2, c->w, c->h);
-          if(conf.ttbarheight > 5)
-               XMoveWindow(dpy, c->button, c->x, c->y+mh*2);
-     }
-     //unmapclient(c);
+
+     unmapclient(c);
      setwinstate(c->win, IconicState);
      c->hide = True;
 
@@ -535,10 +500,8 @@ manage(Window w, XWindowAttributes *wa)
      /* Create titlebar & button */
      if(conf.ttbarheight)
      {
-
-
           c->tbar = bar_create(c->x, c->y - conf.ttbarheight,
-                               c->w, c->h,conf.borderheight,
+                               c->w, conf.ttbarheight, conf.borderheight,
                                conf.colors.bar, True);
 
           /* Basic window for close button... */
@@ -754,6 +717,9 @@ scan(void)
 void
 setborder(Window win, int color)
 {
+     if(!win)
+          return;
+
      XSetWindowBorder(dpy, win, color);
      XSetWindowBorderWidth(dpy, win, conf.borderheight);
 
@@ -842,14 +808,8 @@ unhide(Client *c)
 {
      if(!c)
           return;
-     XMoveWindow(dpy, c->win, c->x, c->y);
-     if(conf.ttbarheight)
-     {
-          bar_moveresize(c->tbar, c->x, c->y - conf.ttbarheight, c->w, conf.ttbarheight);
-          if(conf.ttbarheight > 5)
-               XMoveWindow(dpy, c->button, BUTX(c->x, c->w), BUTY(c->y));
-     }
-     //mapclient(c);
+
+     mapclient(c);
      setwinstate(c->win, NormalState);
      c->hide = False;
 
