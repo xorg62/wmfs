@@ -216,7 +216,7 @@ set(WMFS_SYSCONFDIR ${XDG_CONFIG_DIR}/${PROJECT_NAME})
 
 # Configure files
 set(wmfs_configure_files
-  config.h.in
+  src/config.h.in
   wmfs.1.txt.in)
 
 macro(a_configure_file file)
