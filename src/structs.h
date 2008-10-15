@@ -41,6 +41,9 @@
 
 /* typedef */
 typedef const char* uicb_t;
+typedef unsigned int uint;
+typedef unsigned long ulong;
+typedef unsigned short ushort;
 
 /* Enum */
 enum { CurNormal, CurResize, CurMove, CurLast };

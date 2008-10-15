@@ -131,7 +131,7 @@ void unmapnotify(XEvent ev);
 void getevent(void);
 
 /* util.c */
-void *emalloc(uint elemet, uint size);
+void *emalloc(uint element, uint size);
 ulong getcolor(char *color);
 void setwinstate(Window win, long state);
 void uicb_spawn(uicb_t);

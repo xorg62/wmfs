@@ -114,24 +114,22 @@ uicb_layout_prev(uicb_t cmd)
 
      return;
 }
-
 void
 maxlayout(void)
 {
      Client *c;
 
-     c = nexttiled(sel);// nexttiled(clients);
+     for(c = nexttiled(clients); c; c = nexttiled(c->next))
+     {
+          c->tile = False;
+          c->lmax = True;
+          c->ox = c->x; c->oy = c->y;
+          c->ow = c->w; c->oh = c->h;
 
-     c->tile = False;
-     c->lmax = True;
-     c->ox = c->x; c->oy = c->y;
-     c->ow = c->w; c->oh = c->h;
-
-     client_moveresize(c, 0, (conf.ttbarheight + ((conf.bartop) ? barheight : 0)),
-                (mw - (conf.borderheight * 2)),
-                (mh - (conf.borderheight * 2) - conf.ttbarheight - barheight), False);
-
-     raiseclient(c);
+          client_moveresize(c, 0, (conf.ttbarheight + ((conf.bartop) ? barheight : 0)),
+                     (mw - (conf.borderheight * 2)),
+                     (mh - (conf.borderheight * 2) - conf.ttbarheight - barheight), False);
+     }
 
      return;
 }
