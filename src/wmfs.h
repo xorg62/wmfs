@@ -53,7 +53,7 @@
 #include <X11/xpm.h>
 #include <confuse.h>
 
-/* local headers */
+/* Local headers */
 #include "config.h"
 #include "structs.h"
 

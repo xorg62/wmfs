@@ -39,7 +39,7 @@
 #define MAXTAG       36
 #define MAXLAYOUT    3
 
-/* typedef */
+/* Typedef */
 typedef const char* uicb_t;
 typedef unsigned int uint;
 typedef unsigned long ulong;
