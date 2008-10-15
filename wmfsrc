@@ -42,9 +42,9 @@ colors
 
 layouts
 {
-        layout { type = "tile" image = "icons/tile.xpm" }
-        layout { type = "max"  image = "icons/max.xpm"  }
-        layout { type = "free" image = "icons/free.xpm" }
+        layout { type = "tile" image = "/usr/local/share/wmfs/icons/tile.xpm" }
+        layout { type = "max"  image = "/usr/local/share/wmfs/icons/max.xpm"  }
+        layout { type = "free" image = "/usr/local/share/wmfs/icons/free.xpm" }
 }
 
 tags
