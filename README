@@ -1,5 +1,5 @@
 ABOUT :
-WMFS for GNU/Linux
+WMFS Window Manager.
   * Window Manager From Scratch
 
 Un WM tout bete, crée a partir de 0.
@@ -17,6 +17,10 @@ REQUIREMENT :
   · xft
   · libx11
   · CMake >= 2.6
+
+OS :
+  · GNU/Linux : Supported.
+  · FreeBSD : In the way.
 
 INSTALL :
   · mkdir build
