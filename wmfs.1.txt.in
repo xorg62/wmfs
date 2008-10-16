@@ -90,6 +90,7 @@ WMFS is configured by '$HOME/.config/wmfs/wmfsrc'.
 BUGS
 ----
 WMFS isn't stable for now. So it certainly contains some bugs.
+WMFS doesn't compile in FreeBSD.
 
 AUTHORS
 -------
