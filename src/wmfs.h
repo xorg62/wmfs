@@ -157,6 +157,7 @@ void uicb_set_mwfact(uicb_t);
 void uicb_set_nmaster(uicb_t);
 
 /* wmfs.c */
+void checkotherwm(void);
 int errorhandler(Display *d, XErrorEvent *event);
 int errorhandlerdummy(Display *d, XErrorEvent *event);
 int errorhandlerstart(Display *d, XErrorEvent *event);

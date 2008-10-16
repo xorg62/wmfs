@@ -32,6 +32,28 @@
 
 #include "wmfs.h"
 
+
+void
+checkotherwm(void)
+{
+     owm = False;
+
+     XSetErrorHandler(errorhandlerstart);
+     XSelectInput(dpy, DefaultRootWindow(dpy), SubstructureRedirectMask);
+     XSync(dpy, False);
+
+     if(owm)
+     {
+         fprintf(stderr, "WMFS Error: Another Window Manager is already running.\n");
+         exit(EXIT_FAILURE);
+     }
+
+     XSetErrorHandler(errorhandler);
+     XSync(dpy, False);
+
+     return;
+}
+
 int
 errorhandler(Display *d, XErrorEvent *event)
 {
@@ -301,18 +323,7 @@ main(int argc, char **argv)
      }
 
      /* Check if an other WM is already running */
-     owm = False;
-
-     XSetErrorHandler(errorhandlerstart);
-     XSelectInput(dpy, DefaultRootWindow(dpy), SubstructureRedirectMask);
-     XSync(dpy, False);
-     if(owm)
-     {
-         fprintf(stderr, "WMFS Error: Another Window Manager is already running.\n");
-         exit(EXIT_FAILURE);
-     }
-     XSetErrorHandler(errorhandler);
-     XSync(dpy, False);
+     checkotherwm();
 
      /* Let's Go ! */
      init_conf();
