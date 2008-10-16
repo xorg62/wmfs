@@ -43,8 +43,7 @@ arrange(void)
           else
                client_hide(c);
 
-     if(sel)
-          tags[seltag].layout.func();
+     tags[seltag].layout.func();
 
      if(selbytag[seltag])
           client_focus(selbytag[seltag]);
