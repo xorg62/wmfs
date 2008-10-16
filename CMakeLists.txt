@@ -42,6 +42,8 @@ set(VERSION "0.1rc2 (Brain Damage)")
 # CFLAGS
 set(CFLAGS "-g -Wall")
 set(CMAKE_C_FLAGS ${CFLAGS})
+set(LDFLAGS "-L /usr/local/lib")
+set(CMAKE_SHARED_LINKER_FLAGS ${LDFLAGS})
 find_package(Freetype)
 if(FREETYPE_FOUND)
   include_directories(${FREETYPE_INCLUDE_DIRS})
