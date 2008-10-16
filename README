@@ -10,6 +10,14 @@ AUTHORS :
 
 LICENSE : BSD
 
+REQUIREMENT :
+  · libconfuse
+  · freetype2
+  · xpm
+  · xft
+  · libx11
+  · CMake >= 2.6
+
 INSTALL :
   · mkdir build
   · cd build
