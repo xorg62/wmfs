@@ -54,6 +54,38 @@ errorhandlerdummy(Display *d, XErrorEvent *event)
      return 0;
 }
 
+/* Only for check if another WM is already running */
+int
+errorhandlerstart(Display *d, XErrorEvent *event)
+{
+     owm = True;
+
+     return -1;
+}
+
+void
+quit(void)
+{
+     int i;
+
+     /* Exiting WMFS :'( */
+     XftFontClose(dpy, xftfont);
+     XFreeCursor(dpy, cursor[CurNormal]);
+     XFreeCursor(dpy, cursor[CurMove]);
+     XFreeCursor(dpy, cursor[CurResize]);
+     bar_delete(bar);
+     bar_delete(layoutsym);
+     if(conf.nbutton)
+          for(i = 0; i < conf.nbutton; ++i)
+               bar_delete(conf.barbutton[i].bw);
+     free(conf.barbutton);
+     free(keys);
+     free(clients);
+     XSync(dpy, False);
+
+     return;
+}
+
 void
 init(void)
 {
@@ -81,7 +113,7 @@ init(void)
           xftfont = XftFontOpenName(dpy, screen, "sans-10");
      }
      fonth = (xftfont->ascent + xftfont->descent);
-     barheight = fonth + 4;
+     barheight = fonth + 3;
 
 
      /* INIT CURSOR */
@@ -123,7 +155,6 @@ init(void)
      updatebar();
 
      /* INIT STUFF */
-     XSetErrorHandler(errorhandler);
      grabkeys();
 
      return;
@@ -269,25 +300,26 @@ main(int argc, char **argv)
           exit(EXIT_FAILURE);
      }
 
+     /* Check if an other WM is already running */
+     owm = False;
+
+     XSetErrorHandler(errorhandlerstart);
+     XSelectInput(dpy, DefaultRootWindow(dpy), SubstructureRedirectMask);
+     XSync(dpy, False);
+     if(owm)
+     {
+         fprintf(stderr, "WMFS Error: Another Window Manager is already running.\n");
+         exit(EXIT_FAILURE);
+     }
+     XSetErrorHandler(errorhandler);
+     XSync(dpy, False);
+
      /* Let's Go ! */
      init_conf();
      init();
      scan();
      mainloop();
-
-     /* Exiting WMFS :'( */
-     XftFontClose(dpy, xftfont);
-     XFreeCursor(dpy, cursor[CurNormal]);
-     XFreeCursor(dpy, cursor[CurMove]);
-     XFreeCursor(dpy, cursor[CurResize]);
-     bar_delete(bar);
-     if(conf.nbutton)
-          for(i = 0; i < conf.nbutton; ++i)
-               bar_delete(conf.barbutton[i].bw);
-     free(conf.barbutton);
-     free(keys);
-     XSync(dpy, False);
-     XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
+     quit();
 
      XCloseDisplay(dpy);
 

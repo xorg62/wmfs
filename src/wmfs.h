@@ -159,6 +159,8 @@ void uicb_set_nmaster(uicb_t);
 /* wmfs.c */
 int errorhandler(Display *d, XErrorEvent *event);
 int errorhandlerdummy(Display *d, XErrorEvent *event);
+int errorhandlerstart(Display *d, XErrorEvent *event);
+void quit(void);
 void init(void);
 void mainloop(void);
 void scan(void);
@@ -176,6 +178,7 @@ int mw, mh;
 Conf conf;
 Key *keys;
 Bool exiting;
+Bool owm;
 
 /* Atoms / Cursors */
 Atom wm_atom[WMLast];
