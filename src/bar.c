@@ -118,7 +118,7 @@ updatebar(void)
      draw_taglist(bar->dr);
 
      /* Draw layout symbol */
-     draw_layout(taglen[conf.ntag], bary + (!conf.bartop));
+     draw_layout();
 
      /* Draw status text */
      draw_text(bar->dr, mw - textw(bartext), fonth, conf.colors.text, conf.colors.bar, 0, bartext);
@@ -151,11 +151,10 @@ updatebutton(Bool c)
      int y = 0, hi = 0;
 
      /* Calcul the position of the first button with the layout image size */
-     j = taglen[conf.ntag] + get_image_attribute(tags[seltag].layout.image)->width + PAD / 2;
+     j = taglen[conf.ntag] + textw(tags[seltag].layout.symbol) + PAD*1.5;
 
      if(!conf.bartop)
-          y = bary + 1;
-
+          y = bary + 2;
      if(conf.tagbordwidth)
           hi = -1;
 
@@ -164,21 +163,17 @@ updatebutton(Bool c)
 
           /* CALCUL POSITION */
           {
+               buttonw = textw(conf.barbutton[i].content) + BPAD;
+
                if(!(x = conf.barbutton[i].x))
                {
                     if(i)
-                         pm += (conf.barbutton[i-1].type) ?
-                              get_image_attribute(conf.barbutton[i-1].content)->width :
-                              textw(conf.barbutton[i-1].content) + BPAD;
+                         pm += textw(conf.barbutton[i-1].content) + BPAD;
 
-                         x = (!i) ? j : j + pm;
+                    buttonw = textw(conf.barbutton[i].content) + BPAD;
+                    x = (!i) ? j : j + pm;
                }
-
-               buttonw = (conf.barbutton[i].type) ?
-                    get_image_attribute(conf.barbutton[i].content)->width :
-                    textw(conf.barbutton[i].content) + BPAD;
           }
-
 
           /* FIRST TIME */
           {
@@ -190,21 +185,15 @@ updatebutton(Bool c)
                }
           }
 
-          /* REFRESH/DRAW TEXT/IMAGE */
+          /* REFRESH TEXT */
           {
                if(!conf.barbutton[i].bw)
                     return;
-               if(!conf.barbutton[i].type)
-                    bar_refresh_color(conf.barbutton[i].bw);
-               bar_moveresize(conf.barbutton[i].bw, x, y, buttonw, barheight + hi);
 
-               /* Check the button type (image/text) */
-               if(conf.barbutton[i].type)
-                    draw_image(conf.barbutton[i].bw->dr, 0, 0,
-                               conf.barbutton[i].content);
-               else
-                    draw_text(conf.barbutton[i].bw->dr, BPAD/2, fonth, conf.barbutton[i].fg_color,
-                              conf.barbutton[i].bg_color, BPAD, conf.barbutton[i].content);
+               bar_refresh_color(conf.barbutton[i].bw);
+               bar_moveresize(conf.barbutton[i].bw, x, y, buttonw, barheight + hi);
+               draw_text(conf.barbutton[i].bw->dr, BPAD/2, fonth, conf.barbutton[i].fg_color,
+                         conf.barbutton[i].bg_color, PAD, conf.barbutton[i].content);
 
                /* Refresh button */
                bar_refresh(conf.barbutton[i].bw);

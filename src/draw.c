@@ -57,24 +57,6 @@ draw_text(Drawable d, int x, int y, char* fg, uint bg, int pad, char *str)
      return;
 }
 
-/* Drawing image function :
- * Only *.xpm file for now. */
-void
-draw_image(Drawable dr, int x, int y, char *file)
-{
-     XImage *img;
-
-     if (XpmReadFileToImage(dpy, file, &img, NULL, NULL)) {
-          fprintf(stderr, "WMFS Error: reading xpm file %s\n", file);
-          exit(EXIT_FAILURE);
-     }
-     XPutImage(dpy, dr, gc, img, 0, 0, x, y, img->width, img->height);
-
-     XFree(img);
-
-     return;
-}
-
 void
 draw_taglist(Drawable dr)
 {
@@ -106,24 +88,10 @@ draw_taglist(Drawable dr)
 }
 
 void
-draw_layout(int x, int y)
+draw_layout(void)
 {
-     if(!layoutsym)
-     {
-          layoutsym = bar_create(x, y,
-                                 get_image_attribute(tags[seltag].layout.image)->width,
-                                 barheight-1, 0, conf.colors.bar, False);
-          XMapRaised(dpy, layoutsym->win);
-     }
-
-     bar_refresh_color(layoutsym);
-     bar_moveresize(layoutsym, x, y, get_image_attribute(tags[seltag].layout.image)->width, barheight-1);
-
-     draw_image(layoutsym->dr, 0,
-                (barheight/2 - get_image_attribute(tags[seltag].layout.image)->height/2),
-                tags[seltag].layout.image);
-
-     bar_refresh(layoutsym);
+     draw_text(bar->dr, taglen[conf.ntag] + PAD/2, fonth, conf.colors.layout_fg,
+               conf.colors.layout_bg, PAD, tags[seltag].layout.symbol);
 
      return;
 }
@@ -137,19 +105,6 @@ draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color)
      XFillRectangles(dpy, dr, gc, &r, 1);
 
      return;
-}
-
-XImage*
-get_image_attribute(char *file)
-{
-     XImage *ret;
-
-     if (XpmReadFileToImage(dpy, file, &ret, NULL, NULL)) {
-          fprintf(stderr, "WMFS Error: reading xpm file %s\n", file);
-          exit(EXIT_FAILURE);
-     }
-
-     return ret;
 }
 
 void

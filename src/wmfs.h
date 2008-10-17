@@ -43,6 +43,7 @@
 #include <time.h>
 #include <getopt.h>
 #include <sys/types.h>
+#include <confuse.h>
 #include <X11/Xlib.h>
 #include <X11/Xproto.h>
 #include <X11/Xatom.h>
@@ -50,8 +51,6 @@
 #include <X11/cursorfont.h>
 #include <X11/Xutil.h>
 #include <X11/Xft/Xft.h>
-#include <X11/xpm.h>
-#include <confuse.h>
 
 /* Local headers */
 #include "config.h"
@@ -80,11 +79,9 @@ void uicb_togglebarpos(uicb_t);
 
 /* draw.c */
 void draw_text(Drawable d, int x, int y, char* fg, uint bg, int pad, char *str);
-void draw_image(Drawable dr, int x, int y, char *file);
 void draw_taglist(Drawable dr);
-void draw_layout(int x, int y);
+void draw_layout(void);
 void draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color);
-XImage* get_image_attribute(char *file);
 void draw_border(Window win, int color);
 ushort textw(const char *text);
 
@@ -192,7 +189,6 @@ XftFont *xftfont;
 
 /* Bar / Tags */
 BarWindow *bar;
-BarWindow *layoutsym;
 Tag tags[MAXTAG];
 int barheight;
 char bartext[1024];

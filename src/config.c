@@ -190,7 +190,7 @@ init_conf(void)
      static cfg_opt_t layout_opts[] =
           {
                CFG_STR("type",   "", CFGF_NONE),
-               CFG_STR("image", "", CFGF_NONE),
+               CFG_STR("symbol", "", CFGF_NONE),
                CFG_END()
           };
 
@@ -241,7 +241,6 @@ init_conf(void)
 
      static cfg_opt_t button_opts[] =
           {
-               CFG_STR("type",     "text",            CFGF_NONE),
                CFG_STR("content",  "",                CFGF_NONE),
                CFG_SEC("mouse",    mouse_button_opts, CFGF_MULTI),
                CFG_STR("fg_color", "#000000",         CFGF_NONE),
@@ -358,12 +357,12 @@ init_conf(void)
      {
           fprintf(stderr, "WMFS Configuration: Too much or no layouts\n");
           conf.nlayout          = 1;
-          conf.layout[0].image = strdup("TILE");
+          conf.layout[0].symbol = strdup("TILE");
           conf.layout[0].func   = tile;
      }
 
-     if(!conf.layout[0].image
-          && !conf.layout[0].func)
+     if(!conf.layout[0].symbol
+        && !conf.layout[0].func)
      {
           for(i = 0; i < conf.nlayout; ++i)
           {
@@ -376,7 +375,7 @@ init_conf(void)
                }
                else
                {
-                    conf.layout[i].image = strdup(var_to_str(cfg_getstr(cfgtmp, "image")));
+                    conf.layout[i].symbol = strdup(var_to_str(cfg_getstr(cfgtmp, "symbol")));
                     conf.layout[i].func = name_to_func(strdup(cfg_getstr(cfgtmp, "type")), layout_list);
                }
           }
@@ -460,16 +459,9 @@ init_conf(void)
                conf.barbutton[i].mouse[j] = char_to_button(cfg_getstr(cfgtmp3, "button"));
           }
           conf.barbutton[i].nmousesec = cfg_size(cfgtmp2, "mouse");
-          if(strcmp("image", strdup(cfg_getstr(cfgtmp2, "type"))) == 0)
-               conf.barbutton[i].type = True;
-          else
-               conf.barbutton[i].type = False;
           conf.barbutton[i].content   = strdup(var_to_str(cfg_getstr(cfgtmp2, "content")));
-          if(!conf.barbutton[i].type)
-          {
-               conf.barbutton[i].fg_color  = strdup(var_to_str(cfg_getstr(cfgtmp2, "fg_color")));
-               conf.barbutton[i].bg_color  = getcolor(strdup(var_to_str(cfg_getstr(cfgtmp2, "bg_color"))));
-          }
+          conf.barbutton[i].fg_color  = strdup(var_to_str(cfg_getstr(cfgtmp2, "fg_color")));
+          conf.barbutton[i].bg_color  = getcolor(strdup(var_to_str(cfg_getstr(cfgtmp2, "bg_color"))));
           conf.barbutton[i].x         = cfg_getint(cfgtmp2, "x");
      }
 

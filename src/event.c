@@ -158,32 +158,32 @@ buttonpress(XEvent ev)
                                         uicb_tag("-1");
                               }
                          }
-
                     }
-
-
                }
-          }
 
-          /* ****** */
-          /* LAYOUT */
-          /* ****** */
-          else if(ev.xbutton.window == layoutsym->win)
-          {
-               /* BUTTON 1 / 4 */
+               /* ****** */
+               /* LAYOUT */
+               /* ****** */
                {
-                    if(ev.xbutton.button == Button1
-                       || ev.xbutton.button == Button4)
-                         layoutswitch(True);
+                    if(ev.xbutton.x >= taglen[conf.ntag]
+                       && ev.xbutton.x <=  taglen[conf.ntag] + textw(tags[seltag].layout.symbol) + PAD/2)
+                    {
+                         /* BUTTON 1 / 4 */
+                         {
+                              if(ev.xbutton.button == Button1
+                                 || ev.xbutton.button == Button4)
+                                   layoutswitch(True);
+                         }
+                         /* BUTTON 3 / 5 */
+                         {
+                              if(ev.xbutton.button == Button3
+                                 || ev.xbutton.button == Button5)
+                                   layoutswitch(False);
+                         }
+                    }
                }
-               /* BUTTON 3 / 5 */
-               {
-                    if(ev.xbutton.button == Button3
-                       || ev.xbutton.button == Button5)
-                         layoutswitch(False);
-               }
-          }
 
+          }
      }
 
      /* **** */

@@ -103,7 +103,6 @@ typedef struct
 /* Bar Button */
 typedef struct
 {
-     Bool type; /* False -> text, True -> image. */
      char *content;
      BarWindow *bw;
      char *fg_color;
@@ -118,7 +117,7 @@ typedef struct
 /* Layout Structure */
 typedef struct
 {
-     char *image;
+     char *symbol;
      void (*func)(void);
 } Layout;
 

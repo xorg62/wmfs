@@ -96,7 +96,6 @@ quit(void)
      XFreeCursor(dpy, cursor[CurMove]);
      XFreeCursor(dpy, cursor[CurResize]);
      bar_delete(bar);
-     bar_delete(layoutsym);
      if(conf.nbutton)
           for(i = 0; i < conf.nbutton; ++i)
                bar_delete(conf.barbutton[i].bw);
@@ -134,8 +133,8 @@ init(void)
           fprintf(stderr, "WMFS Error: Cannot initialize font\n");
           xftfont = XftFontOpenName(dpy, screen, "sans-10");
      }
-     fonth = (xftfont->ascent + xftfont->descent);
-     barheight = fonth + 3;
+     fonth = (xftfont->ascent + xftfont->descent) - 1;
+     barheight = fonth + 4;
 
 
      /* INIT CURSOR */
