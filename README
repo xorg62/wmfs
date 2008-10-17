@@ -20,7 +20,7 @@ REQUIREMENT :
 
 OS :
   · GNU/Linux : Supported.
-  · FreeBSD : Build. Test in the way.
+  · FreeBSD : Supported.
 
 INSTALL :
   · mkdir build
