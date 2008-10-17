@@ -16,13 +16,15 @@ ADD_CUSTOM_TARGET(uninstall
 # Source dir
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR})
-# Other
+
 #set(CMAKE_BUILD_TYPE RELEASE)
 option(WITH_LOGOS "install wmfs logos")
 option(GENERATE_MANPAGES "generate manpages" ON)
+
 # Project name - wmfs
 set(PROJECT_NAME wmfs)
 project(${PROJECT_NAME} C)
+
 # Definition of the wmfs source
 set(wmfs_src
   src/wmfs.c
@@ -37,8 +39,10 @@ set(wmfs_src
 
 # Set the executable from the wmfs_src
 add_executable(wmfs ${wmfs_src})
+
 # Set the version - NOT USED AT THE MOMENT
 set(VERSION "0.1rc2 (Brain Damage)")
+
 # FLAGS
 set(CFLAGS "-g -Wall")
 set(CMAKE_C_FLAGS ${CFLAGS})
@@ -77,6 +81,7 @@ message("Linking with theses libraries : ${LIBRARIES_TO_LINK}")
 
 # Includes
 include(FindPkgConfig)
+
 # Use pkgconfig to get required libraries
 pkg_check_modules(wmfs_required
   x11
@@ -84,6 +89,7 @@ pkg_check_modules(wmfs_required
   freetype2
   xft
   xpm)
+
 # Find exterbal programs
 macro(a_find_program var prg req)
     set(required ${req})
@@ -98,6 +104,7 @@ macro(a_find_program var prg req)
     endif()
 endmacro()
 find_program(GIT_EXECUTABLE git)
+
 # programs needed for man pages
 a_find_program(ASCIIDOC_EXECUTABLE asciidoc FALSE)
 a_find_program(XMLTO_EXECUTABLE xmlto FALSE)
@@ -107,11 +114,11 @@ a_find_program(CAT_EXECUTABLE cat TRUE)
 # Generating CHANGELOG
 
 if(EXISTS ${SOURCE_DIR}/.git/HEAD AND GIT_EXECUTABLE)
+
   # generate
 execute_process(
   COMMAND ${GIT_EXECUTABLE} log
   WORKING_DIRECTORY ${SOURCE_DIR}
-  #COMMENT "Generating CHANGELOG"
   OUTPUT_VARIABLE WMFS_CHANGELOG
   )
 set(CHANGELOG_FILE ${SOURCE_DIR}/CHANGELOG)
