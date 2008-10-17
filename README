@@ -28,6 +28,7 @@ INSTALL :
   · cmake ..
   · make
   · sudo make install
+  · sudo make uninstall if you would to remove it.
 
 By default, wmfs logos are'nt installed. You can install it with : cmake -DWITH_LOGOS=ON ..
 
