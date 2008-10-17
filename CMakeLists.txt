@@ -69,8 +69,7 @@ set(LIBRARIES_TO_LINK
   ${FREETYPE_LIBRARIES}
   ${X11_LIBRARIES}
   confuse
-  Xft
-  Xpm)
+  Xft)
 
 target_link_libraries(wmfs ${LIBRARIES_TO_LINK})
 
@@ -87,8 +86,7 @@ pkg_check_modules(wmfs_required
   x11
   libconfuse
   freetype2
-  xft
-  xpm)
+  xft)
 
 # Find exterbal programs
 macro(a_find_program var prg req)
