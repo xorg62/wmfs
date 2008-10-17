@@ -39,11 +39,13 @@ set(wmfs_src
 add_executable(wmfs ${wmfs_src})
 # Set the version - NOT USED AT THE MOMENT
 set(VERSION "0.1rc2 (Brain Damage)")
-# CFLAGS
+# FLAGS
 set(CFLAGS "-g -Wall")
 set(CMAKE_C_FLAGS ${CFLAGS})
 set(LDFLAGS "-L /usr/local/lib")
 set(CMAKE_SHARED_LINKER_FLAGS ${LDFLAGS})
+
+# Package find
 find_package(Freetype)
 if(FREETYPE_FOUND)
   include_directories(${FREETYPE_INCLUDE_DIRS})
@@ -57,6 +59,7 @@ if(X11_FOUND)
 else (X11_FOUND)
   message(FATAL_ERROR "Could not find X11")
 endif (X11_FOUND)
+
 # Link Libraries
 set(LIBRARIES_TO_LINK
   ${FREETYPE_LIBRARIES}
@@ -74,7 +77,6 @@ message("Linking with theses libraries : ${LIBRARIES_TO_LINK}")
 
 # Includes
 include(FindPkgConfig)
-#include(CPack) # need to configure it for packaging
 # Use pkgconfig to get required libraries
 pkg_check_modules(wmfs_required
   x11
