@@ -32,7 +32,6 @@
 
 #include "wmfs.h"
 
-
 void
 checkotherwm(void)
 {
@@ -121,6 +120,7 @@ init(void)
      mw = DisplayWidth (dpy, screen);
      mh = DisplayHeight (dpy, screen);
 
+
      /* INIT TAG / LAYOUT ATTRIBUTE */
      seltag = 1;
      for(i = 0; i < conf.ntag + 1; ++i)
@@ -174,6 +174,13 @@ init(void)
      strcpy(bartext, "WMFS-" WMFS_VERSION);
      updatebutton(False);
      updatebar();
+
+     /* INIT WORKABLE SPACE */
+     sgeo.x = 0;
+     sgeo.y = (conf.bartop) ? barheight+1 : 1;
+     sgeo.width = DisplayWidth(dpy, screen);
+     sgeo.height = DisplayHeight(dpy, screen) - barheight;
+
 
      /* INIT STUFF */
      grabkeys();

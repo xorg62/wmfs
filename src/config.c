@@ -318,7 +318,7 @@ init_conf(void)
 
      if((cfg_size(cfg_variables, "var")) > 256)
      {
-          fprintf(stderr,"WMFS Configuration: Too much of variables !\n");
+          fprintf(stderr,"WMFS Configuration: Too many variables !\n");
           exit(EXIT_FAILURE);
      }
 
@@ -355,7 +355,7 @@ init_conf(void)
      if((conf.nlayout = cfg_size(cfg_layouts, "layout")) > MAXLAYOUT
           || !(conf.nlayout = cfg_size(cfg_layouts, "layout")))
      {
-          fprintf(stderr, "WMFS Configuration: Too much or no layouts\n");
+          fprintf(stderr, "WMFS Configuration: Too many or no layouts\n");
           conf.nlayout          = 1;
           conf.layout[0].symbol = strdup("TILE");
           conf.layout[0].func   = tile;
@@ -389,7 +389,7 @@ init_conf(void)
      conf.ntag = cfg_size(cfg_tags, "tag");
      if(!conf.ntag  || conf.ntag > MAXTAG)
      {
-          fprintf(stderr, "WMFS Configuration: Too much or no tag"
+          fprintf(stderr, "WMFS Configuration: Too many or no tag"
                   " (%d) in the configration file\n", conf.ntag);
           conf.ntag = 1;
           conf.tag[0].name       = strdup("WMFS");

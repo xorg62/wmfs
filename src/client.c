@@ -193,9 +193,8 @@ client_hide(Client *c)
 
      XMoveWindow(dpy, c->win, c->x, c->y+mh*2);
      if(conf.ttbarheight)
-         bar_moveresize(c->tbar, c->x, c->y+mh*2, c->w, c->h);
+          bar_moveresize(c->tbar, c->x, c->y+mh*2, c->w, c->h);
 
-     //unmapclient(c);
      setwinstate(c->win, IconicState);
      c->hide = True;
 
@@ -262,7 +261,7 @@ client_manage(Window w, XWindowAttributes *wa)
      c->x = wa->x;
      c->y = wa->y + conf.ttbarheight + barheight;
      c->w = wa->width;
-     c->h = wa->height;
+     c->h = wa->height - conf.ttbarheight-1;
      c->tag = seltag;
 
      /* Create titlebar */
@@ -288,7 +287,7 @@ client_manage(Window w, XWindowAttributes *wa)
           raiseclient(c);
 
      client_attach(c);
-     XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
+     client_moveresize(c, c->x, c->y, c->w, c->h, True);
      mapclient(c);
      setwinstate(c->win, NormalState);
      client_focus(c);
@@ -351,10 +350,10 @@ client_moveresize(Client *c, int x, int y, int w, int h, bool r)
           c->x = x; c->y = y;
           c->w = w; c->h = h;
 
-          XMoveResizeWindow(dpy, c->win, x, y, w ,h);
+          XMoveResizeWindow(dpy, c->win, x, y + conf.ttbarheight, w, h - conf.ttbarheight - 1);
 
           if(conf.ttbarheight)
-               bar_moveresize(c->tbar, x, y - conf.ttbarheight, w, conf.ttbarheight);
+               bar_moveresize(c->tbar, x, y - 1, w, conf.ttbarheight);
 
           updatetitlebar(c);
           XSync(dpy, False);
@@ -450,11 +449,9 @@ client_unhide(Client *c)
 {
      if(!c)
           return;
-     XMoveWindow(dpy, c->win, c->x, c->y);
+     XMoveWindow(dpy, c->win, c->x, c->y + conf.ttbarheight);
      if(conf.ttbarheight)
-          bar_moveresize(c->tbar, c->x, c->y - conf.ttbarheight, c->w, conf.ttbarheight);
-
-     //mapclient(c);
+          bar_moveresize(c->tbar, c->x, c->y - 1, c->w, conf.ttbarheight);
      setwinstate(c->win, NormalState);
      c->hide = False;
 

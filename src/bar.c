@@ -210,6 +210,8 @@ uicb_togglebarpos(uicb_t cmd)
      int i;
 
      conf.bartop = !conf.bartop;
+     sgeo.y = (conf.bartop) ? barheight : 0;
+
      if(conf.bartop)
           bary = 0;
      else

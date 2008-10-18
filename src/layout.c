@@ -125,9 +125,9 @@ maxlayout(void)
           c->ox = c->x; c->oy = c->y;
           c->ow = c->w; c->oh = c->h;
 
-          client_moveresize(c, 0, (conf.ttbarheight + ((conf.bartop) ? barheight : 0)),
-                     (mw - (conf.borderheight * 2)),
-                     (mh - (conf.borderheight * 2) - conf.ttbarheight - barheight), False);
+          client_moveresize(c, sgeo.x, sgeo.y,
+                            (sgeo.width - (conf.borderheight * 2)),
+                            (sgeo.height - (conf.borderheight * 2)), False);
      }
 
      return;
@@ -176,72 +176,83 @@ uicb_set_nmaster(uicb_t cmd)
 void
 tile(void)
 {
-     uint i, n, x, y, yt, w, h, ww, hh, th;
-     uint barto, bord, mwf, nm, mht;
      Client *c;
+     XRectangle mastergeo = {0, 0, 0, 0};
+     XRectangle cgeo = {sgeo.x, sgeo.y, 0, 0};
+     uint n, mwfact = tags[seltag].mwfact * sgeo.width;
+     uint nmaster = tags[seltag].nmaster;
+     uint tileheight, i, border = conf.borderheight*2;
 
-     bord   =  conf.borderheight * 2;
-     barto  =  conf.ttbarheight + barheight;
-     mwf    =  tags[seltag].mwfact * mw;
-     nm     =  tags[seltag].nmaster;
-     mht    =  mh - ((conf.bartop) ? 0 : barheight);
-
-     /* count all the "can-be-tiled" client */
      for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++n);
      if(!n)
           return;
 
-     /* window geoms */
-     hh = ((n <= nm) ? mht / (n > 0 ? n : 1) : mht / nm) - bord*2;
-     ww = (n  <= nm) ? mw : mwf;
-     th = (n  >  nm) ? mht / (n - nm) : 0;
-     if(n > nm && th < barheight)
-          th = mht;
+     /* Define the master(s) client(s) size */
+     if(n <= nmaster)
+     {
+          mastergeo.height = sgeo.height / (n > 0 ? n : 1);
+          mastergeo.width = sgeo.width;
+     }
+     else
+     {
+          mastergeo.height = sgeo.height / nmaster;
+          mastergeo.width = mwfact;
+     }
 
-     x = 0;
-     y = yt = barto;
+     /* Define the tiled clients size, so if the clients number > nmaster */
+     if(n > nmaster)
+          tileheight = sgeo.height / (n - nmaster);
+     else
+          tileheight = 0;
 
-     if(!conf.bartop)
-          y = yt = conf.ttbarheight;
+     if(n > nmaster && tileheight < barheight)
+          tileheight = sgeo.height;
+
 
      for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), i++)
      {
-          c->max = False;
-          c->lmax = False;
+          /* Set client property */
+          c->max = c->lmax = False;
           c->tile = True;
           c->ox = c->x; c->oy = c->y;
           c->ow = c->w; c->oh = c->h;
 
-          /* MASTER CLIENT */
-          if(i < nm)
+          /* Master Client */
+          if(i < nmaster)
           {
-               y = yt + i * hh;
-               w = ww - bord;
-               h = hh;
-               /* remainder */
-               if(i + 1 == (n < nm ? n : nm))
-                    h = (mht - hh*i) -
-                         ((conf.bartop) ? barheight: 0);
-               h -= bord + conf.ttbarheight;
+               cgeo.y = sgeo.y + (i * mastergeo.height);
+               cgeo.width = mastergeo.width - border;
+               cgeo.height = mastergeo.height;
+
+               /* Remainder */
+               if(i + 1 == (n < nmaster ? n : nmaster))
+                    cgeo.height = (sgeo.height - mastergeo.height * i);
+
+               cgeo.height -= border;
           }
-          /* TILE CLIENT */
+
+          /* Tiled Client */
           else
           {
-               if(i == nm)
+               if(i == nmaster)
                {
-                    y = yt;
-                    x += ww;
+                    cgeo.y = sgeo.y;
+                    cgeo.x += mastergeo.width;
                }
-               w = mw - ww - bord;
-               /* remainder */
+
+               cgeo.width = sgeo.width - mastergeo.width - border;
+
+               /* Remainder */
                if(i + 1 == n)
-                    h = (barto + mht) - y - (bord + barto);
+                    cgeo.height = (sgeo.y + sgeo.height) - cgeo.y - border;
                else
-                    h = th - (bord + conf.ttbarheight) - bord*2;
+                    cgeo.height = tileheight - border;
           }
-          client_moveresize(c, x, y, w, h, tags[seltag].resizehint);
-          if(n > nm && th != mht)
-               y = c->y + c->h + bord + conf.ttbarheight;
+
+          client_moveresize(c, cgeo.x, cgeo.y, cgeo.width, cgeo.height, tags[seltag].resizehint);
+
+          if(n > nmaster && tileheight != sgeo.height)
+               cgeo.y = c->y + c->h + border;
      }
 
      return;

@@ -171,6 +171,7 @@ Display *dpy;
 XEvent event;
 GC gc;
 Window root;
+XRectangle sgeo;
 int screen;
 int mw, mh;
 Conf conf;

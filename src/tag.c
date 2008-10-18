@@ -81,6 +81,7 @@ uicb_tag_prev(uicb_t cmd)
 void
 uicb_tagtransfert(uicb_t cmd)
 {
+     Client *c;
      int n = atoi(cmd);
 
      if(!sel)
@@ -91,6 +92,9 @@ uicb_tagtransfert(uicb_t cmd)
 
      sel->tag = n;
      selbytag[n] = sel;
+     c = (sel->next->tag == seltag) ? sel->next : NULL;
+     client_focus(((c) ? c : NULL));
+
      arrange();
 
      return;
