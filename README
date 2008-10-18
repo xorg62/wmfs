@@ -34,3 +34,4 @@ By default, wmfs logos are'nt installed. You can install it with : cmake -DWITH_
 
 DISTROS :
   · wmfs ebuild for Gentoo is available in the Sangor's overlay. More infos at http://wmfs.sangor.net/view/download/
+  · wmfs port for FreeBSD in the way.
