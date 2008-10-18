@@ -226,13 +226,14 @@ configurerequest(XEvent ev)
 {
      Client *c;
      XWindowChanges wc;
+     XRectangle geo;
      if((c = getclient(ev.xconfigurerequest.window)))
           if(c->tile || c->lmax)
                return;
-     wc.x = ev.xconfigurerequest.x;
-     wc.y = ev.xconfigurerequest.y;
-     wc.width = ev.xconfigurerequest.width;
-     wc.height = ev.xconfigurerequest.height;
+     geo.x = wc.x = ev.xconfigurerequest.x;
+     geo.y = wc.y = ev.xconfigurerequest.y;
+     geo.width = wc.width = ev.xconfigurerequest.width;
+     geo.height = wc.height = ev.xconfigurerequest.height;
      wc.border_width = ev.xconfigurerequest.border_width;
      wc.sibling = ev.xconfigurerequest.above;
      wc.stack_mode = ev.xconfigurerequest.detail;
@@ -240,7 +241,11 @@ configurerequest(XEvent ev)
                       ev.xconfigurerequest.value_mask, &wc);
      if((c = getclient(ev.xconfigurerequest.window)))
           if(wc.y < mw && wc.x < mh)
-               client_moveresize(c, wc.x, wc.y, wc.width, wc.height, True);
+          {
+               geo.y -= conf.ttbarheight;
+               geo.height += conf.ttbarheight;
+               client_moveresize(c, geo, True);
+          }
 
      return;
 }
@@ -398,18 +403,19 @@ void
 mouseaction(Client *c, int x, int y, int type)
 {
      int  ocx, ocy;
+     XRectangle geo;
      XEvent ev;
 
      if(c->max || c->tile || c->lmax)
           return;
 
-     ocx = c->x;
-     ocy = c->y;
+     ocx = c->geo.x;
+     ocy = c->geo.y;
      if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
                      None, cursor[((type) ?CurResize:CurMove)], CurrentTime) != GrabSuccess)
           return;
      if(type)
-          XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
+          XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width, c->geo.height);
 
      for(;;)
      {
@@ -417,7 +423,7 @@ mouseaction(Client *c, int x, int y, int type)
           if(ev.type == ButtonRelease)
           {
                if(type)
-                    XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
+                    XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width, c->geo.height);
                XUngrabPointer(dpy, CurrentTime);
                updatebar();
                return;
@@ -427,14 +433,21 @@ mouseaction(Client *c, int x, int y, int type)
                XSync(dpy, False);
                /* Resize */
                if(type)
-                    client_moveresize(c, c->x, c->y,
-                                      ((ev.xmotion.x - ocx <= 0) ? 1 : ev.xmotion.x - ocx),
-                                      ((ev.xmotion.y - ocy <= 0) ? 1 : ev.xmotion.y - ocy), True);
+               {
+                    geo.x = c->geo.x; geo.y = c->geo.y;
+                    geo.width = ((ev.xmotion.x - ocx <= 0) ? 1 : ev.xmotion.x - ocx);
+                    geo.height = ((ev.xmotion.y - ocy <= 0) ? 1 : ev.xmotion.y - ocy);
+                    client_moveresize(c, geo, True);
+               }
                /* Move */
                else
-                    client_moveresize(c, (ocx + (ev.xmotion.x - x)),
-                                      (ocy + (ev.xmotion.y - y)),
-                                      c->w, c->h, True);
+               {
+                    geo.x = (ocx + (ev.xmotion.x - x));
+                    geo.y = (ocy + (ev.xmotion.y - y));
+                    geo.width = c->geo.width;
+                    geo.height = c->geo.height;
+                    client_moveresize(c, geo, True);
+               }
           }
           else if(ev.type == Expose)
                expose(ev);

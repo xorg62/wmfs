@@ -97,7 +97,7 @@ void client_hide(Client *c);
 Bool ishide(Client *c);
 void mapclient(Client *c);
 void client_manage(Window w, XWindowAttributes *wa);
-void client_moveresize(Client *c, int x, int y, int w, int h, bool r);
+void client_moveresize(Client *c, XRectangle geo, bool r);
 void client_size_hints(Client *c);
 void raiseclient(Client *c);
 void client_unhide(Client *c);

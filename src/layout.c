@@ -59,6 +59,7 @@ void
 freelayout(void)
 {
      Client *c;
+     XRectangle geo;
 
      for(c = clients; c; c = c->next)
      {
@@ -66,9 +67,11 @@ freelayout(void)
           {
                if(c->tile || c->lmax)
                {
-                    client_moveresize(c, c->ox, c->oy, c->ow, c->oh, True);
-                    c->tile = False;
-                    c->lmax = False;
+                    geo.x = c->ogeo.x; geo.y = c->ogeo.y;
+                    geo.width = c->ogeo.width;
+                    geo.height = c->ogeo.height;
+                    client_moveresize(c, geo, True);
+                    c->tile = c->lmax = False;
                }
           }
      }
@@ -117,17 +120,20 @@ void
 maxlayout(void)
 {
      Client *c;
+     XRectangle geo;
 
      for(c = nexttiled(clients); c; c = nexttiled(c->next))
      {
           c->tile = False;
           c->lmax = True;
-          c->ox = c->x; c->oy = c->y;
-          c->ow = c->w; c->oh = c->h;
+          c->ogeo.x = c->geo.x; c->ogeo.y = c->geo.y;
+          c->ogeo.width = c->geo.width; c->ogeo.height = c->geo.height;
 
-          client_moveresize(c, sgeo.x, sgeo.y,
-                            (sgeo.width - (conf.borderheight * 2)),
-                            (sgeo.height - (conf.borderheight * 2)), False);
+          geo.x = sgeo.x; geo.y = sgeo.y;
+          geo.width = sgeo.width - (conf.borderheight * 2);
+          geo.height = sgeo.height - (conf.borderheight * 2);
+
+          client_moveresize(c, geo, False);
      }
 
      return;
@@ -214,8 +220,8 @@ tile(void)
           /* Set client property */
           c->max = c->lmax = False;
           c->tile = True;
-          c->ox = c->x; c->oy = c->y;
-          c->ow = c->w; c->oh = c->h;
+          c->ogeo.x = c->geo.x; c->ogeo.y = c->geo.y;
+          c->ogeo.width = c->geo.width; c->ogeo.height = c->geo.height;
 
           /* Master Client */
           if(i < nmaster)
@@ -249,10 +255,10 @@ tile(void)
                     cgeo.height = tileheight - border;
           }
 
-          client_moveresize(c, cgeo.x, cgeo.y, cgeo.width, cgeo.height, tags[seltag].resizehint);
+          client_moveresize(c, cgeo, tags[seltag].resizehint);
 
           if(n > nmaster && tileheight != sgeo.height)
-               cgeo.y = c->y + c->h + border;
+               cgeo.y = c->geo.y + c->geo.height + border;
      }
 
      return;
@@ -279,21 +285,29 @@ uicb_tile_switch(uicb_t cmd)
 void
 uicb_togglemax(uicb_t cmd)
 {
+     XRectangle geo;
+
      if(!sel || ishide(sel) || sel->hint)
           return;
      if(!sel->max)
      {
-          sel->ox = sel->x; sel->oy = sel->y;
-          sel->ow = sel->w; sel->oh = sel->h;
-          client_moveresize(sel, 0, (conf.ttbarheight + ((conf.bartop) ? barheight: 0)),
-                            (mw - (conf.borderheight * 2)),
-                            (mh - (conf.borderheight * 2)- conf.ttbarheight - barheight), False);
+          sel->ogeo.x = sel->geo.x; sel->ogeo.y = sel->geo.y;
+          sel->ogeo.width = sel->geo.width; sel->ogeo.height = sel->geo.height;
+
+          geo.x = sgeo.x; geo.y = sgeo.y;
+          geo.width = sgeo.width - (conf.borderheight * 2);
+          geo.height = sgeo.height - (conf.borderheight * 2);
+
+          client_moveresize(sel, geo, False);
           raiseclient(sel);
           sel->max = True;
      }
      else if(sel->max)
      {
-          client_moveresize(sel, sel->ox, sel->oy, sel->ow, sel->oh, False);
+          geo.x = sel->ogeo.x; geo.y = sel->ogeo.y;
+          geo.width = sel->ogeo.width; geo.height = sel->ogeo.height;
+
+          client_moveresize(sel, geo, False);
           sel->max = False;
      }
      arrange();

@@ -71,9 +71,9 @@ struct Client
      /* Tag num */
      int tag;
      /* Window attribute */
-     int x, y, w, h;
+     XRectangle geo;
      /* Old window attribute */
-     int ox, oy, ow, oh;
+     XRectangle ogeo;
      /* For resizehint usage */
      int basew, baseh, incw, inch;
      int maxw, maxh, minw, minh;

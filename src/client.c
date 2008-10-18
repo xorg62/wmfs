@@ -191,9 +191,12 @@ client_hide(Client *c)
      if(!c)
           return;
 
-     XMoveWindow(dpy, c->win, c->x, c->y+mh*2);
+     XMoveWindow(dpy, c->win, c->geo.x, c->geo.y + sgeo.height*2);
      if(conf.ttbarheight)
-          bar_moveresize(c->tbar, c->x, c->y+mh*2, c->w, c->h);
+          bar_moveresize(c->tbar,
+                         c->geo.x,
+                         c->geo.y + sgeo.height*2,
+                         c->geo.width, c->geo.height);
 
      setwinstate(c->win, IconicState);
      c->hide = True;
@@ -258,16 +261,16 @@ client_manage(Window w, XWindowAttributes *wa)
 
      c = emalloc(1, sizeof(Client));
      c->win = w;
-     c->x = wa->x;
-     c->y = wa->y + conf.ttbarheight + barheight;
-     c->w = wa->width;
-     c->h = wa->height - conf.ttbarheight-1;
+     c->geo.x = wa->x;
+     c->geo.y = wa->y + conf.ttbarheight + barheight;
+     c->geo.width = wa->width;
+     c->geo.height = wa->height - conf.ttbarheight;
      c->tag = seltag;
 
      /* Create titlebar */
      if(conf.ttbarheight)
-          c->tbar = bar_create(c->x, c->y - conf.ttbarheight,
-                               c->w, conf.ttbarheight, conf.borderheight,
+          c->tbar = bar_create(c->geo.x, c->geo.y - conf.ttbarheight,
+                               c->geo.width, conf.ttbarheight, conf.borderheight,
                                conf.colors.bar, True);
 
      XConfigureWindow(dpy, w, CWBorderWidth, &winc);
@@ -287,7 +290,7 @@ client_manage(Window w, XWindowAttributes *wa)
           raiseclient(c);
 
      client_attach(c);
-     client_moveresize(c, c->x, c->y, c->w, c->h, True);
+     client_moveresize(c, c->geo, True);
      mapclient(c);
      setwinstate(c->win, NormalState);
      client_focus(c);
@@ -297,63 +300,64 @@ client_manage(Window w, XWindowAttributes *wa)
 }
 
 void
-client_moveresize(Client *c, int x, int y, int w, int h, bool r)
+client_moveresize(Client *c, XRectangle geo, bool r)
 {
+     Bool d;
+
      if(!c)
           return;
      /* Resize hints {{{ */
      if(r)
      {
           /* minimum possible */
-          if (w < 1)
-               w = 1;
-          if (h < 1)
-               h = 1;
+          if (geo.width < 1)
+               geo.width = 1;
+          if (geo.height < 1)
+               geo.height = 1;
           /* base */
-          w -= c->basew;
-          h -= c->baseh;
+          geo.width -= c->basew;
+          geo.height -= c->baseh;
           /* aspect */
           if (c->minay > 0 && c->maxay > 0
               && c->minax > 0 && c->maxax > 0)
           {
-               if (w * c->maxay > h * c->maxax)
-                    w = h * c->maxax / c->maxay;
-               else if (w * c->minay < h * c->minax)
-                    h = w * c->minay / c->minax;
+               if (geo.width * c->maxay > geo.height * c->maxax)
+                    geo.width = geo.height * c->maxax / c->maxay;
+               else if (geo.width * c->minay < geo.height * c->minax)
+                    geo.height = geo.width * c->minay / c->minax;
           }
           /* incremental */
           if(c->incw)
-               w -= w % c->incw;
+               geo.width -= geo.width % c->incw;
           if(c->inch)
-               h -= h % c->inch;
+               geo.height -= geo.height % c->inch;
           /* base dimension */
-          w += c->basew;
-          h += c->baseh;
+          geo.width += c->basew;
+          geo.height += c->baseh;
 
-          if(c->minw > 0 && w < c->minw)
-               w = c->minw;
-          if(c->minh > 0 && h < c->minh)
-               h = c->minh;
-          if(c->maxw > 0 && w > c->maxw)
-               w = c->maxw;
-          if(c->maxh > 0 && h > c->maxh)
-               h = c->maxh;
-          if(w <= 0 || h <= 0)
+          if(c->minw > 0 && geo.width < c->minw)
+               geo.width = c->minw;
+          if(c->minh > 0 && geo.height < c->minh)
+               geo.height = c->minh;
+          if(c->maxw > 0 && geo.width > c->maxw)
+               geo.width = c->maxw;
+          if(c->maxh > 0 && geo.height > c->maxh)
+               geo.height = c->maxh;
+          if(geo.width <= 0 || geo.height <= 0)
                return;
      }
      /* }}} */
 
      c->max = False;
-     if(c->x != x || c->y != y
-        || c->w != w || c->h != h)
+     if(c->geo.x != geo.x || c->geo.y != geo.y
+        || c->geo.width != geo.width || c->geo.height != geo.height)
      {
-          c->x = x; c->y = y;
-          c->w = w; c->h = h;
+          c->geo = geo;
 
-          XMoveResizeWindow(dpy, c->win, x, y + conf.ttbarheight, w, h - conf.ttbarheight - 1);
+          XMoveResizeWindow(dpy, c->win, geo.x, geo.y + conf.ttbarheight,                                                           geo.width, geo.height - conf.ttbarheight);
 
           if(conf.ttbarheight)
-               bar_moveresize(c->tbar, x, y - 1, w, conf.ttbarheight);
+               bar_moveresize(c->tbar, geo.x, geo.y, geo.width, conf.ttbarheight);
 
           updatetitlebar(c);
           XSync(dpy, False);
@@ -407,8 +411,7 @@ client_size_hints(Client *c)
 	}
 	else if(size.flags & PBaseSize)
         {
-             c->minw = size.base_width;
-             c->minh = size.base_height;
+             c->minw = size.base_width;             c->minh = size.base_height;
 	}
 	else
              c->minw = c->minh = 0;
@@ -449,9 +452,12 @@ client_unhide(Client *c)
 {
      if(!c)
           return;
-     XMoveWindow(dpy, c->win, c->x, c->y + conf.ttbarheight);
+     XMoveWindow(dpy, c->win, c->geo.x, c->geo.y + conf.ttbarheight);
      if(conf.ttbarheight)
-          bar_moveresize(c->tbar, c->x, c->y - 1, c->w, conf.ttbarheight);
+          bar_moveresize(c->tbar,
+                         c->geo.x,
+                         c->geo.y,
+                         c->geo.width, conf.ttbarheight);
      setwinstate(c->win, NormalState);
      c->hide = False;
 
