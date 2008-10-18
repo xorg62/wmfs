@@ -1,7 +1,7 @@
   · Add Doxygen comment
   · Mouse bindings in the config file
   · Can change client position in the tile grid
-  · Add image support <- *.xpm: OK for now.
+  · Add image support <- *.xpm: Removed because bugs.
   · Multi-Head support
   · Fix all the bug \o/
   · XCB ?
