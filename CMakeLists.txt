@@ -74,8 +74,9 @@ set(LIBRARIES_TO_LINK
 target_link_libraries(wmfs ${LIBRARIES_TO_LINK})
 
 # Messages
-message("Project version : ${VERSION}")
-message("Using these CFLAGS : ${CFLAGS}")
+message("Project version: ${VERSION}")
+message("Using these CFLAGS: ${CFLAGS}")
+message("Using these LDFLAGS: ${LDFLAGS}")
 message("Linking with theses libraries : ${LIBRARIES_TO_LINK}")
 
 # Includes
