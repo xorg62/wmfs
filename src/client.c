@@ -311,8 +311,8 @@ client_moveresize(Client *c, XRectangle geo, bool r)
           /* minimum possible */
           if (geo.width < 1)
                geo.width = 1;
-          if (geo.height < 1)
-               geo.height = 1;
+          if (geo.height < conf.ttbarheight + 1)
+               geo.height = conf.ttbarheight + 1;
 
           /* base */
           geo.width -= c->basew;
@@ -352,12 +352,18 @@ client_moveresize(Client *c, XRectangle geo, bool r)
      /* }}} */
 
      c->max = False;
-     if(c->geo.x != geo.x || c->geo.y != geo.y
-        || c->geo.width != geo.width || c->geo.height != geo.height)
+     if(c->geo.x != geo.x
+        || c->geo.y != geo.y
+        || c->geo.width != geo.width
+        || c->geo.height != geo.height)
      {
           c->geo = geo;
 
-          XMoveResizeWindow(dpy, c->win, geo.x, geo.y + conf.ttbarheight,                                                           geo.width, geo.height - conf.ttbarheight);
+          XMoveResizeWindow(dpy,
+                            c->win,
+                            geo.x,
+                            geo.y + conf.ttbarheight,
+                            geo.width, geo.height - conf.ttbarheight);
 
           if(conf.ttbarheight)
                bar_moveresize(c->tbar, geo.x, geo.y, geo.width, conf.ttbarheight);

@@ -435,8 +435,8 @@ mouseaction(Client *c, int x, int y, int type)
                if(type)
                {
                     geo.x = c->geo.x; geo.y = c->geo.y;
-                    geo.width = ((ev.xmotion.x - ocx <= 0) ? 1 : ev.xmotion.x - ocx);
-                    geo.height = ((ev.xmotion.y - ocy <= 0) ? 1 : ev.xmotion.y - ocy);
+                    geo.width = ((ev.xmotion.x - ocx < 1) ? 1 : ev.xmotion.x - ocx);
+                    geo.height = ((ev.xmotion.y - ocy < 1) ? 1 : ev.xmotion.y - ocy);
                     client_moveresize(c, geo, True);
                }
                /* Move */
