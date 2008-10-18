@@ -115,6 +115,7 @@ a_find_program(CAT_EXECUTABLE cat TRUE)
 if(EXISTS ${SOURCE_DIR}/.git/HEAD AND GIT_EXECUTABLE)
 
   # generate
+message("Generating changelog...")
 execute_process(
   COMMAND ${GIT_EXECUTABLE} log
   WORKING_DIRECTORY ${SOURCE_DIR}
