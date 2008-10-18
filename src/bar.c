@@ -58,7 +58,7 @@ bar_create(int x, int y, uint w, uint h, int bord, uint color, Bool entermask)
      bw->color = color;
 
      return bw;
-}
+ }
 
 void
 bar_delete(BarWindow *bw)
