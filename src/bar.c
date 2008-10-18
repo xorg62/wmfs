@@ -151,7 +151,7 @@ updatebutton(Bool c)
      int y = 0, hi = 0;
 
      /* Calcul the position of the first button with the layout image size */
-     j = taglen[conf.ntag] + textw(tags[seltag].layout.symbol) + PAD*1.5;
+     j = taglen[conf.ntag] + textw(tags[seltag].layout.symbol) + PAD/2;
 
      if(!conf.bartop)
           y = bary + 2;

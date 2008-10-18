@@ -304,6 +304,7 @@ client_moveresize(Client *c, XRectangle geo, bool r)
 {
      if(!c)
           return;
+
      /* Resize hints {{{ */
      if(r)
      {
@@ -312,9 +313,11 @@ client_moveresize(Client *c, XRectangle geo, bool r)
                geo.width = 1;
           if (geo.height < 1)
                geo.height = 1;
+
           /* base */
           geo.width -= c->basew;
           geo.height -= c->baseh;
+
           /* aspect */
           if (c->minay > 0 && c->maxay > 0
               && c->minax > 0 && c->maxax > 0)
@@ -324,11 +327,13 @@ client_moveresize(Client *c, XRectangle geo, bool r)
                else if (geo.width * c->minay < geo.height * c->minax)
                     geo.height = geo.width * c->minay / c->minax;
           }
+
           /* incremental */
           if(c->incw)
                geo.width -= geo.width % c->incw;
           if(c->inch)
                geo.height -= geo.height % c->inch;
+
           /* base dimension */
           geo.width += c->basew;
           geo.height += c->baseh;
@@ -385,6 +390,7 @@ client_size_hints(Client *c)
 	}
 	else
              c->basew = c->baseh = 0;
+
         /* inc */
 	if(size.flags & PResizeInc)
         {
@@ -393,6 +399,7 @@ client_size_hints(Client *c)
 	}
 	else
              c->incw = c->inch = 0;
+
         /* max */
 	if(size.flags & PMaxSize)
         {
@@ -401,6 +408,7 @@ client_size_hints(Client *c)
 	}
 	else
              c->maxw = c->maxh = 0;
+
         /* min */
 	if(size.flags & PMinSize)
         {
@@ -409,10 +417,12 @@ client_size_hints(Client *c)
 	}
 	else if(size.flags & PBaseSize)
         {
-             c->minw = size.base_width;             c->minh = size.base_height;
+             c->minw = size.base_width;
+             c->minh = size.base_height;
 	}
 	else
              c->minw = c->minh = 0;
+
         /* aspect */
 	if(size.flags & PAspect)
         {
@@ -422,6 +432,7 @@ client_size_hints(Client *c)
              c->maxay = size.max_aspect.y;
 	}
 	else
+
              c->minax = c->maxax = c->minay = c->maxay = 0;
         c->hint = (c->maxw && c->minw && c->maxh && c->minh
                    && c->maxw == c->minw && c->maxh == c->minh);
@@ -452,10 +463,8 @@ client_unhide(Client *c)
           return;
      XMoveWindow(dpy, c->win, c->geo.x, c->geo.y + conf.ttbarheight);
      if(conf.ttbarheight)
-          bar_moveresize(c->tbar,
-                         c->geo.x,
-                         c->geo.y,
-                         c->geo.width, conf.ttbarheight);
+          bar_moveresize(c->tbar, c->geo.x,
+                         c->geo.y, c->geo.width, conf.ttbarheight);
      setwinstate(c->win, NormalState);
      c->hide = False;
 
