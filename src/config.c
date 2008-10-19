@@ -65,7 +65,6 @@ key_name_list_t key_list[] =
      {"Control", ControlMask },
      {"Shift",   ShiftMask },
      {"Lock",    LockMask },
-     {"Control", ControlMask },
      {"Alt",     Mod1Mask },
      {"Mod2",    Mod2Mask },
      {"Mod3",    Mod3Mask },
