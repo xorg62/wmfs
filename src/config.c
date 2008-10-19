@@ -80,7 +80,12 @@ name_to_uint_t mouse_button_list[] =
      {"Button2", Button2 },
      {"Button3", Button3 },
      {"Button4", Button4 },
-     {"Button5", Button5 }
+     {"Button5", Button5 },
+     {"1", Button1 },
+     {"2", Button2 },
+     {"3", Button3 },
+     {"4", Button4 },
+     {"5", Button5 },
 };
 
 void*

@@ -66,20 +66,20 @@ buttons
         button
         {
                 content = "[-]"
-                mouse { button = "Button1" func = "set_mwfact" cmd = "-0.01" }
+                mouse { button = "1" func = "set_mwfact" cmd = "-0.01" }
                 fg_color = "#FFFFFF"
                 bg_color = "#191919"
         }
         button
         {
                content = "Mwfact" fg_color = "#FFFFFF" bg_color = "#3E3E3E"
-               mouse { button = "Button4" func = "set_mwfact" cmd = "+0.01" }
-               mouse { button = "Button5" func = "set_mwfact" cmd = "-0.01" }
+               mouse { button = "4" func = "set_mwfact" cmd = "+0.01" }
+               mouse { button = "5" func = "set_mwfact" cmd = "-0.01" }
         }
         button
         {
                content = "[+] "
-               mouse { button = "Button1" func = "set_mwfact" cmd = "+0.01" }
+               mouse { button = "1" func = "set_mwfact" cmd = "+0.01" }
                fg_color = "#FFFFFF"
                bg_color = "#191919"
         }
@@ -89,7 +89,7 @@ buttons
         button
         {
                content = "[-]"
-               mouse { button = "Button1" func = "set_nmaster" cmd = "-1" }
+               mouse { button = "1" func = "set_nmaster" cmd = "-1" }
                fg_color = "#FFFFFF"
                bg_color = "#191919"
         }
@@ -97,7 +97,7 @@ buttons
         button
         {
                content = "[+] "
-               mouse { button = "Button1" func = "set_nmaster" cmd = "+1" }
+               mouse { button = "1" func = "set_nmaster" cmd = "+1" }
                fg_color = "#FFFFFF"
                bg_color = "#191919"
         }
