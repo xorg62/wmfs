@@ -458,7 +458,6 @@ void
 propertynotify(XEvent ev)
 {
      Client *c;
-     Window trans;
 
      if(event.xproperty.state == PropertyDelete)
           return;
@@ -466,12 +465,6 @@ propertynotify(XEvent ev)
      {
           switch(event.xproperty.atom)
           {
-          default: break;
-          case XA_WM_TRANSIENT_FOR:
-               XGetTransientForHint(dpy, c->win, &trans);
-               if((c->tile || c->max) && (c->hint = (getclient(trans) != NULL)))
-                    arrange();
-               break;
           case XA_WM_NORMAL_HINTS:
                client_size_hints(c);
                break;
