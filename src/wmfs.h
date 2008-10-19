@@ -82,26 +82,26 @@ void draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color);
 ushort textw(const char *text);
 
 /* client.c */
-int clientpertag(int tag);
+int client_pertag(int tag);
 void client_attach(Client *c);
 void client_detach(Client *c);
 void client_switch(Bool c);
 void client_focus(Client *c);
-Client *getclient(Window w);
+Client *client_get(Window w);
 Client *client_gettbar(Window w);
 void client_hide(Client *c);
 Bool ishide(Client *c);
-void mapclient(Client *c);
+void client_map(Client *c);
 void client_manage(Window w, XWindowAttributes *wa);
 void client_moveresize(Client *c, XRectangle geo, bool r);
 void client_size_hints(Client *c);
-void raiseclient(Client *c);
+void client_raise(Client *c);
 void client_unhide(Client *c);
 void client_unmanage(Client *c);
-void unmapclient(Client *c);
+void client_unmap(Client *c);
 void uicb_client_prev(uicb_t);
 void uicb_client_next(uicb_t);
-void uicb_killclient(uicb_t);
+void uicb_client_kill(uicb_t);
 
 /* config.c */
 void init_conf(void);

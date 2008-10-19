@@ -51,7 +51,7 @@ buttonpress(XEvent ev)
           {
                if((c = client_gettbar(ev.xbutton.window)))
                {
-                    raiseclient(c);
+                    client_raise(c);
                     /* BUTTON 1 */
                     {
                          if(ev.xbutton.button == Button1)
@@ -82,9 +82,9 @@ buttonpress(XEvent ev)
      /* CLIENT */
      /* ****** */
      {
-          if((c = getclient(ev.xbutton.window)))
+          if((c = client_get(ev.xbutton.window)))
           {
-               raiseclient(c);
+               client_raise(c);
                /* BUTTON 1 */
                {
                     if(ev.xbutton.button == Button1)
@@ -227,7 +227,7 @@ configurerequest(XEvent ev)
      Client *c;
      XWindowChanges wc;
      XRectangle geo;
-     if((c = getclient(ev.xconfigurerequest.window)))
+     if((c = client_get(ev.xconfigurerequest.window)))
           if(c->tile || c->lmax)
                return;
      geo.x = wc.x = ev.xconfigurerequest.x;
@@ -239,7 +239,7 @@ configurerequest(XEvent ev)
      wc.stack_mode = ev.xconfigurerequest.detail;
      XConfigureWindow(dpy, ev.xconfigurerequest.window,
                       ev.xconfigurerequest.value_mask, &wc);
-     if((c = getclient(ev.xconfigurerequest.window)))
+     if((c = client_get(ev.xconfigurerequest.window)))
           if(wc.y < mw && wc.x < mh)
                client_moveresize(c, geo, True);
 
@@ -253,7 +253,7 @@ destroynotify(XEvent ev)
 {
      Client *c;
 
-     if((c = getclient(ev.xdestroywindow.window)))
+     if((c = client_get(ev.xdestroywindow.window)))
           client_unmanage(c);
 
      return;
@@ -268,7 +268,7 @@ enternotify(XEvent ev)
      if(ev.xcrossing.mode != NotifyNormal
         || ev.xcrossing.detail == NotifyInferior)
           return;
-     if((c = getclient(ev.xcrossing.window))
+     if((c = client_get(ev.xcrossing.window))
         || (c = client_gettbar(ev.xcrossing.window)))
           client_focus(c);
      else
@@ -385,7 +385,7 @@ maprequest(XEvent ev)
           return;
      if(at.override_redirect)
           return;
-     if(!getclient(ev.xmaprequest.window))
+     if(!client_get(ev.xmaprequest.window))
      {
           client_focus(NULL);
           client_manage(ev.xmaprequest.window, &at);
@@ -462,14 +462,14 @@ propertynotify(XEvent ev)
 
      if(event.xproperty.state == PropertyDelete)
           return;
-     if((c = getclient(event.xproperty.window)))
+     if((c = client_get(event.xproperty.window)))
      {
           switch(event.xproperty.atom)
           {
           default: break;
           case XA_WM_TRANSIENT_FOR:
                XGetTransientForHint(dpy, c->win, &trans);
-               if((c->tile || c->max) && (c->hint = (getclient(trans) != NULL)))
+               if((c->tile || c->max) && (c->hint = (client_get(trans) != NULL)))
                     arrange();
                break;
           case XA_WM_NORMAL_HINTS:
@@ -490,9 +490,9 @@ unmapnotify(XEvent ev)
 {
      Client *c;
 
-     if((c = getclient(ev.xunmap.window)))
-          if(!c->hide && ev.xunmap.send_event
- && getwinstate(c->win) == NormalState)
+     if((c = client_get(ev.xunmap.window)))
+          if(ev.xunmap.send_event
+             && getwinstate(c->win) == NormalState)
                client_unmanage(c);
 
      return;
@@ -514,7 +514,7 @@ getevent(void)
       case MapRequest:        maprequest(event);        break;
       case MappingNotify:     mapnotify(event);         break;
       case PropertyNotify:    propertynotify(event);    break;
-      case UnmapNotify:       unmapnotify(event);       break;
+//      case UnmapNotify:       unmapnotify(event);       break;
      }
 
      return;

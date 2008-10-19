@@ -37,7 +37,7 @@
 func_name_list_t func_list[] =
 {
      {"spawn",        uicb_spawn },
-     {"killclient",   uicb_killclient },
+     {"killclient",   uicb_client_kill },
      {"client_prev",  uicb_client_prev },
      {"client_next",  uicb_client_next },
      {"togglemax",    uicb_togglemax },
@@ -165,7 +165,7 @@ init_conf(void)
 
      static cfg_opt_t misc_opts[] =
           {
-               CFG_STR("font",              "sans-9", CFGF_NONE),
+               CFG_STR("font",             "sans-9",  CFGF_NONE),
                CFG_STR("bar_position",     "top",     CFGF_NONE),
                CFG_BOOL("raisefocus",      cfg_false, CFGF_NONE),
                CFG_BOOL("raiseswitch",     cfg_true,  CFGF_NONE),

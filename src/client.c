@@ -33,7 +33,7 @@
 #include "wmfs.h"
 
 int
-clientpertag(int tag)
+client_pertag(int tag)
 {
      Client *c;
      int i = 0;
@@ -84,7 +84,7 @@ client_switch(Bool b)
           {
                client_focus(c);
                if(!c->tile)
-                    raiseclient(c);
+                    client_raise(c);
           }
      }
      else
@@ -99,7 +99,7 @@ client_switch(Bool b)
           {
                client_focus(c);
                if(!c->tile)
-                    raiseclient(c);
+                    client_raise(c);
           }
      }
      arrange();
@@ -149,7 +149,7 @@ client_focus(Client *c)
           if(conf.ttbarheight)
                XSetWindowBorder(dpy, c->tbar->win, conf.colors.borderfocus);
           if(conf.raisefocus)
-               raiseclient(c);
+               client_raise(c);
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
           updatetitlebar(c);
      }
@@ -164,7 +164,7 @@ client_focus(Client *c)
 }
 
 Client*
-getclient(Window w)
+client_get(Window w)
 {
      Client *c;
 
@@ -192,9 +192,7 @@ client_hide(Client *c)
      XUnmapWindow(dpy, c->win);
      if(conf.ttbarheight)
           XUnmapWindow(dpy, c->tbar->win);
-
      setwinstate(c->win, IconicState);
-     c->hide = True;
 
      return;
 }
@@ -212,7 +210,7 @@ ishide(Client *c)
 }
 
 void
-uicb_killclient(uicb_t cmd)
+uicb_client_kill(uicb_t cmd)
 {
      XEvent ev;
 
@@ -231,7 +229,7 @@ uicb_killclient(uicb_t cmd)
 }
 
 void
-mapclient(Client *c)
+client_map(Client *c)
 {
      if(!c)
           return;
@@ -257,9 +255,9 @@ client_manage(Window w, XWindowAttributes *wa)
      c = emalloc(1, sizeof(Client));
      c->win = w;
      c->geo.x = wa->x;
-     c->geo.y = wa->y + conf.ttbarheight + barheight;
+     c->geo.y = wa->y + sgeo.y + conf.ttbarheight; /* Default free placement */
      c->geo.width = wa->width;
-     c->geo.height = wa->height - conf.ttbarheight;
+     c->geo.height = wa->height;
      c->tag = seltag;
      c->border = conf.borderheight;
 
@@ -275,6 +273,7 @@ client_manage(Window w, XWindowAttributes *wa)
      grabbuttons(c, False);
      XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask
                   | PropertyChangeMask | StructureNotifyMask);
+
      client_size_hints(c);
      updatetitlebar(c);
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
@@ -284,11 +283,11 @@ client_manage(Window w, XWindowAttributes *wa)
      if(!c->free)
           c->free = (rettrans == Success) || c->hint;
      else
-          raiseclient(c);
+          client_raise(c);
 
      client_attach(c);
-     client_moveresize(c, c->geo, True);
-     mapclient(c);
+     XMoveResizeWindow(dpy, c->win, c->geo.x, c->geo.y, c->geo.width, c->geo.height);
+     client_map(c);
      setwinstate(c->win, NormalState);
      client_focus(c);
      arrange();
@@ -441,7 +440,7 @@ client_size_hints(Client *c)
 }
 
 void
-raiseclient(Client *c)
+client_raise(Client *c)
 {
      if(!c)
           return;
@@ -462,9 +461,7 @@ client_unhide(Client *c)
      XMapWindow(dpy, c->win);
      if(conf.ttbarheight)
           XMapWindow(dpy, c->tbar->win);
-
      setwinstate(c->win, NormalState);
-     c->hide = False;
 
      return;
 }
@@ -493,7 +490,7 @@ client_unmanage(Client *c)
 }
 
 void
-unmapclient(Client *c)
+client_unmap(Client *c)
 {
      if(!c)
           return;

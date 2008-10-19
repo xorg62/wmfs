@@ -68,8 +68,8 @@ draw_taglist(Drawable dr)
      for(i = 0; i < conf.ntag; ++i)
      {
           /* Make the tags string */
-          ITOA(p, clientpertag(i+1));
-          sprintf(buf[i], "%s<%s>", tags[i+1].name, (clientpertag(i+1)) ? p : "");
+          ITOA(p, client_pertag(i+1));
+          sprintf(buf[i], "%s<%s>", tags[i+1].name, (client_pertag(i+1)) ? p : "");
 
           /* Draw the string */
           draw_text(dr, taglen[i], fonth,

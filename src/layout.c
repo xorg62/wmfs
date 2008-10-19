@@ -67,7 +67,8 @@ freelayout(void)
           {
                if(c->tile || c->lmax)
                {
-                    geo.x = c->ogeo.x; geo.y = c->ogeo.y;
+                    geo.x = c->ogeo.x;
+                    geo.y = c->ogeo.y;
                     geo.width = c->ogeo.width;
                     geo.height = c->ogeo.height;
                     client_moveresize(c, geo, True);
@@ -299,7 +300,7 @@ uicb_togglemax(uicb_t cmd)
           geo.height = sgeo.height - (conf.borderheight * 2);
 
           client_moveresize(sel, geo, False);
-          raiseclient(sel);
+          client_raise(sel);
           sel->max = True;
      }
      else if(sel->max)
