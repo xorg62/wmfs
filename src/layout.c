@@ -45,7 +45,7 @@ arrange(void)
 
      tags[seltag].layout.func();
 
-     if(selbytag[seltag])
+     if(selbytag[seltag] && selbytag[seltag]->win)
           client_focus(selbytag[seltag]);
      else
           client_focus(NULL);

@@ -136,6 +136,7 @@ client_focus(Client *c)
                XSetWindowBorder(dpy, sel->tbar->win, conf.colors.bordernormal);
 
      }
+
      if(c)
           grabbuttons(c, True);
 
