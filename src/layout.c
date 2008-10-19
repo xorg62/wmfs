@@ -232,9 +232,9 @@ tile(void)
 
                /* Remainder */
                if(i + 1 == (n < nmaster ? n : nmaster))
-                    cgeo.height = (sgeo.height - mastergeo.height * i);
+                    cgeo.height = (sgeo.height - mastergeo.height * i) + conf.ttbarheight;
 
-               cgeo.height -= border;
+               cgeo.height -= border + conf.ttbarheight;
           }
 
           /* Tiled Client */
