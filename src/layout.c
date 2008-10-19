@@ -255,8 +255,6 @@ tile(void)
                     cgeo.height = tileheight - border;
           }
 
-          //cgeo.height -= conf.ttbarheight;
-
           client_moveresize(c, cgeo, tags[seltag].resizehint);
 
           if(n > nmaster && tileheight != sgeo.height)

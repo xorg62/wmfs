@@ -458,6 +458,7 @@ void
 propertynotify(XEvent ev)
 {
      Client *c;
+     Window trans;
 
      if(event.xproperty.state == PropertyDelete)
           return;
@@ -465,6 +466,12 @@ propertynotify(XEvent ev)
      {
           switch(event.xproperty.atom)
           {
+          default: break;
+          case XA_WM_TRANSIENT_FOR:
+               XGetTransientForHint(dpy, c->win, &trans);
+               if((c->tile || c->max) && (c->hint = (getclient(trans) != NULL)))
+                    arrange();
+               break;
           case XA_WM_NORMAL_HINTS:
                client_size_hints(c);
                break;
@@ -485,7 +492,7 @@ unmapnotify(XEvent ev)
 
      if((c = getclient(ev.xunmap.window)))
           if(!c->hide && ev.xunmap.send_event
-             && getwinstate(c->win) == NormalState)
+ && getwinstate(c->win) == NormalState)
                client_unmanage(c);
 
      return;

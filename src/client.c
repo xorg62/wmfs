@@ -188,12 +188,6 @@ client_gettbar(Window w)
 void
 client_hide(Client *c)
 {
-     //XMoveWindow(dpy, c->win, c->geo.x, c->geo.y + sgeo.height*2);
-     //if(conf.ttbarheight)
-     //     bar_moveresize(c->tbar, c->geo.x,
-     //                   c->geo.y + sgeo.height*2,
-     //c->geo.width, c->geo.height);
-
      XUnmapWindow(dpy, c->win);
      if(conf.ttbarheight)
           XUnmapWindow(dpy, c->tbar->win);
@@ -464,12 +458,6 @@ raiseclient(Client *c)
 void
 client_unhide(Client *c)
 {
-     //XMoveWindow(dpy, c->win, c->geo.x, c->geo.y);
-     //if(conf.ttbarheight)
-     //     bar_moveresize(c->tbar, c->geo.x,
-     //                   c->geo.y - conf.ttbarheight,
-     //                   c->geo.width, conf.ttbarheight);
-
      XMapWindow(dpy, c->win);
      if(conf.ttbarheight)
           XMapWindow(dpy, c->tbar->win);
