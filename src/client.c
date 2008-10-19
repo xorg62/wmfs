@@ -134,7 +134,6 @@ client_focus(Client *c)
           XSetWindowBorder(dpy, sel->win, conf.colors.bordernormal);
           if(conf.ttbarheight)
                XSetWindowBorder(dpy, sel->tbar->win, conf.colors.bordernormal);
-
      }
 
      if(c)
@@ -146,12 +145,11 @@ client_focus(Client *c)
      if(c)
      {
           XSetWindowBorder(dpy, c->win, conf.colors.borderfocus);
-          if(conf.ttbarheight)
+          if(c->tbar->win)
                XSetWindowBorder(dpy, c->tbar->win, conf.colors.borderfocus);
           if(conf.raisefocus)
                client_raise(c);
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
-          updatetitlebar(c);
      }
      else
           XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
@@ -472,14 +470,10 @@ client_unmanage(Client *c)
      XGrabServer(dpy);
      XSetErrorHandler(errorhandlerdummy);
      sel = ((sel == c) ? ((c->next) ? c->next : NULL) : NULL);
-     if(sel && sel->tag == seltag)
-          selbytag[seltag] = sel;
-     else
-          selbytag[seltag] = NULL;
+     selbytag[seltag] = (sel && sel->tag == seltag) ? sel : NULL;
      client_detach(c);
      if(conf.ttbarheight)
           bar_delete(c->tbar);
-
      setwinstate(c->win, WithdrawnState);
      free(c);
      XSync(dpy, False);
