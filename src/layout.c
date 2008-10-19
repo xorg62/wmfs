@@ -252,7 +252,7 @@ tile(void)
                if(i + 1 == n)
                     cgeo.height = (sgeo.y + sgeo.height) - cgeo.y - border;
                else
-                    cgeo.height = tileheight - border;
+                    cgeo.height = tileheight - (border + conf.ttbarheight);
           }
 
           client_moveresize(c, cgeo, tags[seltag].resizehint);
