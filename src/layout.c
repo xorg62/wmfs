@@ -131,7 +131,7 @@ maxlayout(void)
 
           geo.x = sgeo.x; geo.y = sgeo.y;
           geo.width = sgeo.width - (conf.borderheight * 2);
-          geo.height = sgeo.height - (conf.borderheight * 2);
+          geo.height = sgeo.height - (conf.borderheight * 2) - conf.ttbarheight;
 
           client_moveresize(c, geo, False);
      }
@@ -255,10 +255,12 @@ tile(void)
                     cgeo.height = tileheight - border;
           }
 
+          cgeo.height -= conf.ttbarheight;
+
           client_moveresize(c, cgeo, tags[seltag].resizehint);
 
           if(n > nmaster && tileheight != sgeo.height)
-               cgeo.y = c->geo.y + c->geo.height + border;
+               cgeo.y = c->geo.y + c->geo.height + border + conf.ttbarheight;
      }
 
      return;
@@ -296,7 +298,7 @@ uicb_togglemax(uicb_t cmd)
 
           geo.x = sgeo.x; geo.y = sgeo.y;
           geo.width = sgeo.width - (conf.borderheight * 2);
-          geo.height = sgeo.height - (conf.borderheight * 2);
+          geo.height = sgeo.height - (conf.borderheight * 2) - conf.ttbarheight;
 
           client_moveresize(sel, geo, False);
           raiseclient(sel);

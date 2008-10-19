@@ -241,11 +241,8 @@ configurerequest(XEvent ev)
                       ev.xconfigurerequest.value_mask, &wc);
      if((c = getclient(ev.xconfigurerequest.window)))
           if(wc.y < mw && wc.x < mh)
-          {
-               geo.y -= conf.ttbarheight;
-               geo.height += conf.ttbarheight;
                client_moveresize(c, geo, True);
-          }
+
 
      return;
 }
@@ -494,7 +491,8 @@ unmapnotify(XEvent ev)
      Client *c;
 
      if((c = getclient(ev.xunmap.window)))
-          if(!c->hide)
+          if(!c->hide && ev.xunmap.send_event
+             && getwinstate(c->win) == NormalState)
                client_unmanage(c);
 
      return;

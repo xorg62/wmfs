@@ -64,7 +64,7 @@
 #define BPAD         2
 
 /* bar.c */
-BarWindow* bar_create(int x, int y, uint w, uint h, int bord, uint color, Bool entermask);
+BarWindow *bar_create(int x, int y, uint w, uint h, int bord, uint color, Bool entermask);
 void bar_delete(BarWindow *bw);
 void bar_moveresize(BarWindow *bw, int x, int y, uint w, uint h);
 void bar_refresh_color(BarWindow *bw);
@@ -79,7 +79,6 @@ void draw_text(Drawable d, int x, int y, char* fg, uint bg, int pad, char *str);
 void draw_taglist(Drawable dr);
 void draw_layout(void);
 void draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color);
-void draw_border(Window win, int color);
 ushort textw(const char *text);
 
 /* client.c */
@@ -89,7 +88,7 @@ void client_detach(Client *c);
 void client_switch(Bool c);
 void client_focus(Client *c);
 Client *getclient(Window w);
-Client* client_gettbar(Window w);
+Client *client_gettbar(Window w);
 void client_hide(Client *c);
 Bool ishide(Client *c);
 void mapclient(Client *c);
@@ -128,6 +127,7 @@ void getevent(void);
 void *emalloc(uint element, uint size);
 ulong getcolor(char *color);
 void setwinstate(Window win, long state);
+long getwinstate(Window win);
 void uicb_spawn(uicb_t);
 
 /* tag.c */
@@ -141,7 +141,7 @@ void arrange(void);
 void freelayout(void);
 void layoutswitch(Bool b);
 void maxlayout(void);
-Client* nexttiled(Client *c);
+Client *nexttiled(Client *c);
 void tile(void);
 void uicb_tile_switch(uicb_t);
 void uicb_togglemax(uicb_t);

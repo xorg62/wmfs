@@ -131,9 +131,9 @@ client_focus(Client *c)
      if(sel && sel != c)
      {
           grabbuttons(sel, False);
-          draw_border(sel->win, conf.colors.bordernormal);
+          XSetWindowBorder(dpy, sel->win, conf.colors.bordernormal);
           if(conf.ttbarheight)
-               draw_border(sel->tbar->win, conf.colors.bordernormal);
+               XSetWindowBorder(dpy, sel->tbar->win, conf.colors.bordernormal);
 
      }
      if(c)
@@ -144,9 +144,9 @@ client_focus(Client *c)
 
      if(c)
      {
-          draw_border(c->win, conf.colors.borderfocus);
+          XSetWindowBorder(dpy, c->win, conf.colors.borderfocus);
           if(conf.ttbarheight)
-               draw_border(c->tbar->win, conf.colors.borderfocus);
+               XSetWindowBorder(dpy, c->tbar->win, conf.colors.borderfocus);
           if(conf.raisefocus)
                raiseclient(c);
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
@@ -188,15 +188,15 @@ client_gettbar(Window w)
 void
 client_hide(Client *c)
 {
-     if(!c)
-          return;
+     //XMoveWindow(dpy, c->win, c->geo.x, c->geo.y + sgeo.height*2);
+     //if(conf.ttbarheight)
+     //     bar_moveresize(c->tbar, c->geo.x,
+     //                   c->geo.y + sgeo.height*2,
+     //c->geo.width, c->geo.height);
 
-     XMoveWindow(dpy, c->win, c->geo.x, c->geo.y + sgeo.height*2);
+     XUnmapWindow(dpy, c->win);
      if(conf.ttbarheight)
-          bar_moveresize(c->tbar,
-                         c->geo.x,
-                         c->geo.y + sgeo.height*2,
-                         c->geo.width, c->geo.height);
+          XUnmapWindow(dpy, c->tbar->win);
 
      setwinstate(c->win, IconicState);
      c->hide = True;
@@ -266,6 +266,7 @@ client_manage(Window w, XWindowAttributes *wa)
      c->geo.width = wa->width;
      c->geo.height = wa->height - conf.ttbarheight;
      c->tag = seltag;
+     c->border = conf.borderheight;
 
      /* Create titlebar */
      if(conf.ttbarheight)
@@ -273,8 +274,9 @@ client_manage(Window w, XWindowAttributes *wa)
                                c->geo.width, conf.ttbarheight, conf.borderheight,
                                conf.colors.bar, True);
 
+     winc.border_width = c->border;
      XConfigureWindow(dpy, w, CWBorderWidth, &winc);
-     draw_border(w, conf.colors.bordernormal);
+     XSetWindowBorder(dpy, w, conf.colors.bordernormal);
      grabbuttons(c, False);
      XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask
                   | PropertyChangeMask | StructureNotifyMask);
@@ -311,8 +313,8 @@ client_moveresize(Client *c, XRectangle geo, bool r)
           /* minimum possible */
           if (geo.width < 1)
                geo.width = 1;
-          if (geo.height < conf.ttbarheight + 1)
-               geo.height = conf.ttbarheight + 1;
+          if (geo.height < 1)
+               geo.height = 1;
 
           /* base */
           geo.width -= c->basew;
@@ -359,14 +361,11 @@ client_moveresize(Client *c, XRectangle geo, bool r)
      {
           c->geo = geo;
 
-          XMoveResizeWindow(dpy,
-                            c->win,
-                            geo.x,
-                            geo.y + conf.ttbarheight,
-                            geo.width, geo.height - conf.ttbarheight);
+          XMoveResizeWindow(dpy, c->win, geo.x, geo.y,
+                            geo.width, geo.height);
 
           if(conf.ttbarheight)
-               bar_moveresize(c->tbar, geo.x, geo.y, geo.width, conf.ttbarheight);
+               bar_moveresize(c->tbar, geo.x, geo.y - conf.ttbarheight, geo.width, conf.ttbarheight);
 
           updatetitlebar(c);
           XSync(dpy, False);
@@ -465,12 +464,16 @@ raiseclient(Client *c)
 void
 client_unhide(Client *c)
 {
-     if(!c)
-          return;
-     XMoveWindow(dpy, c->win, c->geo.x, c->geo.y + conf.ttbarheight);
+     //XMoveWindow(dpy, c->win, c->geo.x, c->geo.y);
+     //if(conf.ttbarheight)
+     //     bar_moveresize(c->tbar, c->geo.x,
+     //                   c->geo.y - conf.ttbarheight,
+     //                   c->geo.width, conf.ttbarheight);
+
+     XMapWindow(dpy, c->win);
      if(conf.ttbarheight)
-          bar_moveresize(c->tbar, c->geo.x,
-                         c->geo.y, c->geo.width, conf.ttbarheight);
+          XMapWindow(dpy, c->tbar->win);
+
      setwinstate(c->win, NormalState);
      c->hide = False;
 

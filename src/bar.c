@@ -210,7 +210,7 @@ uicb_togglebarpos(uicb_t cmd)
      int i;
 
      conf.bartop = !conf.bartop;
-     sgeo.y = (conf.bartop) ? barheight : 0;
+     sgeo.y = (conf.bartop) ? barheight + conf.ttbarheight : conf.ttbarheight;
 
      if(conf.bartop)
           bary = 0;
@@ -242,6 +242,7 @@ updatetitlebar(Client *c)
           draw_text(c->tbar->dr, 3, ((fonth - xftfont->descent) + ((conf.ttbarheight - fonth) / 2)),
                  ((c == sel) ? conf.colors.ttbar_text_focus : conf.colors.ttbar_text_normal),
                  conf.colors.bar, 0, c->title);
+
           bar_refresh(c->tbar);
      }
 

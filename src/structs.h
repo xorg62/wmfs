@@ -44,6 +44,7 @@ typedef const char* uicb_t;
 typedef unsigned int uint;
 typedef unsigned long ulong;
 typedef unsigned short ushort;
+typedef unsigned char uchar;
 
 /* Enum */
 enum { CurNormal, CurResize, CurMove, CurLast };
@@ -82,6 +83,8 @@ struct Client
      Window win;
      /* Titlebar */
      BarWindow *tbar;
+     /* Border */
+     int border;
      /* Client Layout Information */
      Bool max, tile, free;
      Bool hint, hide, lmax;

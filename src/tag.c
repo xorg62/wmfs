@@ -91,6 +91,7 @@ uicb_tagtransfert(uicb_t cmd)
 
      sel->tag = n;
      selbytag[n] = sel;
+     selbytag[seltag] = NULL;
 
      arrange();
 

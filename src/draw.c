@@ -107,18 +107,6 @@ draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color)
      return;
 }
 
-void
-draw_border(Window win, int color)
-{
-     if(!win)
-          return;
-
-     XSetWindowBorder(dpy, win, color);
-     XSetWindowBorderWidth(dpy, win, conf.borderheight);
-
-     return;
-}
-
 ushort
 textw(const char *text)
 {
