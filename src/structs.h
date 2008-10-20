@@ -148,14 +148,11 @@ typedef struct
      bool raisefocus;
      bool raiseswitch;
      bool bartop;
-     int borderheight;
      int tagbordwidth;
      struct
      {
           /* Only the colors will be use for text
            * are 'char*' (for xprint -> XftColorAllocName) */
-          uint bordernormal;
-          uint borderfocus;
           uint bar;
           char *text;
           char *tagselfg;
@@ -164,6 +161,15 @@ typedef struct
           char *layout_fg;
           uint layout_bg;
      } colors;
+     struct
+     {
+          int borderheight;
+          uint bordernormal;
+          uint borderfocus;
+          uint mod;
+          MouseBinding *mouse;
+          int nmouse;
+     } client;
      struct
      {
           int height;

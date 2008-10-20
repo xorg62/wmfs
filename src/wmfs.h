@@ -57,7 +57,6 @@
 #define ButtonMask   (ButtonPressMask | ButtonReleaseMask)
 #define MouseMask    (ButtonMask | PointerMotionMask)
 #define KeyMask      (KeyPressMask | KeyReleaseMask)
-#define ALT          Mod1Mask
 #define ITOA(p ,n)   sprintf(p, "%i", n)
 #define debug(p)     fprintf(stderr, "debug: %i\n", p)
 #define PAD          8

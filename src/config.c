@@ -37,7 +37,7 @@
 func_name_list_t func_list[] =
 {
      {"spawn",        uicb_spawn },
-     {"killclient",   uicb_client_kill },
+     {"client_kill",   uicb_client_kill },
      {"client_prev",  uicb_client_prev },
      {"client_next",  uicb_client_next },
      {"togglemax",    uicb_togglemax },
@@ -173,15 +173,12 @@ init_conf(void)
                CFG_STR("bar_position",     "top",     CFGF_NONE),
                CFG_BOOL("raisefocus",      cfg_false, CFGF_NONE),
                CFG_BOOL("raiseswitch",     cfg_true,  CFGF_NONE),
-               CFG_INT("border_height",    1,         CFGF_NONE),
                CFG_INT("tag_border_width", 0,         CFGF_NONE),
                CFG_END()
           };
 
      static cfg_opt_t colors_opts[] =
           {
-               CFG_STR("border_normal", "#354B5C", CFGF_NONE),
-               CFG_STR("border_focus",  "#6286A1", CFGF_NONE),
                CFG_STR("bar_bg",        "#090909", CFGF_NONE),
                CFG_STR("bar_fg",        "#6289A1", CFGF_NONE),
                CFG_STR("tag_sel_fg",    "#FFFFFF", CFGF_NONE),
@@ -208,6 +205,15 @@ init_conf(void)
                CFG_STR("fg_normal",  "#FFFFFF",         CFGF_NONE),
                CFG_STR("text_align", "left",            CFGF_NONE),
                CFG_SEC("mouse",      mouse_button_opts, CFGF_MULTI)
+          };
+
+     static cfg_opt_t client_opts[]=
+          {
+               CFG_INT("border_height",  1,                  CFGF_NONE),
+               CFG_STR("border_normal",  "#354B5C",          CFGF_NONE),
+               CFG_STR("border_focus",   "#6286A1",          CFGF_NONE),
+               CFG_STR("modifier",       "Alt",              CFGF_NONE),
+               CFG_SEC("mouse",           mouse_button_opts, CFGF_MULTI)
           };
 
      static cfg_opt_t layout_opts[] =
@@ -287,6 +293,7 @@ init_conf(void)
                CFG_SEC("misc",      misc_opts,      CFGF_NONE),
                CFG_SEC("variables", variables_opts, CFGF_NONE),
                CFG_SEC("titlebar",  titlebar_opts,  CFGF_NONE),
+               CFG_SEC("client",    client_opts,    CFGF_NONE),
                CFG_SEC("colors",    colors_opts,    CFGF_NONE),
                CFG_SEC("layouts",   layouts_opts,   CFGF_NONE),
                CFG_SEC("tags",      tags_opts,      CFGF_NONE),
@@ -300,6 +307,7 @@ init_conf(void)
      cfg_t *cfg_colors;
      cfg_t *cfg_variables;
      cfg_t *cfg_titlebar;
+     cfg_t *cfg_client;
      cfg_t *cfg_layouts;
      cfg_t *cfg_tags;
      cfg_t *cfg_keys;
@@ -328,6 +336,7 @@ init_conf(void)
      cfg_misc      = cfg_getsec(cfg, "misc");
      cfg_variables = cfg_getsec(cfg, "variables");
      cfg_titlebar  = cfg_getsec(cfg, "titlebar");
+     cfg_client    = cfg_getsec(cfg, "client");
      cfg_colors    = cfg_getsec(cfg, "colors");
      cfg_layouts   = cfg_getsec(cfg, "layouts");
      cfg_tags      = cfg_getsec(cfg, "tags");
@@ -351,13 +360,10 @@ init_conf(void)
      conf.font          = var_to_str(strdup(cfg_getstr(cfg_misc, "font")));
      conf.raisefocus    = cfg_getbool(cfg_misc, "raisefocus");
      conf.raiseswitch   = cfg_getbool(cfg_misc, "raiseswitch");
-     conf.borderheight  = cfg_getint(cfg_misc, "border_height");
      conf.tagbordwidth  = cfg_getint(cfg_misc, "tag_border_width");
      conf.bartop        = (strcmp(strdup(cfg_getstr(cfg_misc, "bar_position")), "top") == 0) ? True : False;
 
      /* colors */
-     conf.colors.bordernormal      = getcolor(var_to_str(cfg_getstr(cfg_colors, "border_normal")));
-     conf.colors.borderfocus       = getcolor(var_to_str(cfg_getstr(cfg_colors, "border_focus")));
      conf.colors.bar               = getcolor(var_to_str(cfg_getstr(cfg_colors, "bar_bg")));
      conf.colors.text              = strdup(var_to_str(cfg_getstr(cfg_colors, "bar_fg")));
      conf.colors.tagselfg          = strdup(var_to_str(cfg_getstr(cfg_colors, "tag_sel_fg")));
@@ -389,6 +395,24 @@ init_conf(void)
           conf.titlebar.mouse[i].func   = name_to_func(cfg_getstr(cfgtmp, "func"), func_list);
           conf.titlebar.mouse[i].cmd    = strdup(var_to_str(cfg_getstr(cfgtmp, "cmd")));
      }
+
+     /* client */
+     conf.client.borderheight      =  cfg_getint(cfg_client, "border_height");
+     conf.client.bordernormal      =  getcolor(var_to_str(cfg_getstr(cfg_client, "border_normal")));
+     conf.client.borderfocus       =  getcolor(var_to_str(cfg_getstr(cfg_client, "border_focus")));
+     conf.client.mod               |= char_to_modkey(cfg_getstr(cfg_client, "modifier"));
+
+     conf.client.nmouse = cfg_size(cfg_titlebar, "mouse");
+     conf.client.mouse = emalloc(conf.client.nmouse, sizeof(MouseBinding));
+
+     for(i = 0; i < conf.client.nmouse; ++i)
+     {
+          cfgtmp = cfg_getnsec(cfg_client, "mouse", i);
+          conf.client.mouse[i].button = char_to_button(cfg_getstr(cfgtmp, "button"));
+          conf.client.mouse[i].func   = name_to_func(cfg_getstr(cfgtmp, "func"), func_list);
+          conf.client.mouse[i].cmd    = strdup(var_to_str(cfg_getstr(cfgtmp, "cmd")));
+     }
+
 
      /* layout */
      if((conf.nlayout = cfg_size(cfg_layouts, "layout")) > MAXLAYOUT

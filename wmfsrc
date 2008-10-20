@@ -11,16 +11,11 @@ misc
         bar_position =    "top"
         raisefocus =      false
         raiseswitch =     true
-        border_height =   1
         tag_border_width = 1
 }
 
 colors
 {
-        #Border
-          border_normal        = "#3F485E"
-          border_focus         = "#7E89A2"
-
         #Bar
           bar_bg               = "#191919"
           bar_fg               = "#D4D4D4"
@@ -35,6 +30,40 @@ colors
           layout_bg            = "#7E89A2"
 }
 
+layouts
+{
+        layout { type = "tile" symbol = "TILE" }
+        layout { type = "max"  symbol = "MAX"  }
+        layout { type = "free" symbol = "FREE" }
+}
+
+tags
+{
+        tag { name = "one" mwfact = 0.65 nmaster = 1 layout = "tile" resizehint = false }
+        tag { name = "two"   }
+        tag { name = "three" }
+        tag { name = "four"  }
+        tag { name = "five"  }
+        tag { name = "six"   }
+        tag { name = "seven" }
+        tag { name = "eight" }
+        tag { name = "nine"  }
+}
+
+client
+{
+        border_height  = 1
+        border_normal  = "#3F485E"
+        border_focus   = "#7E89A2"
+        modifier       = "Alt"
+
+        mouse { button = "1" func = "client_raise" }
+        mouse { button = "1" func = "mouse_move" }
+        mouse { button = "2" func = "tile_switch" }
+        mouse { button = "3" func = "client_raise" }
+        mouse { button = "3" func = "mouse_resize" }
+}
+
 titlebar
 {
         height = 12
@@ -45,29 +74,9 @@ titlebar
 
         mouse { button = "1" func = "client_raise" }
         mouse { button = "1" func = "mouse_move" }
-        mouse { button = "2" func = "tile_switch" }
+        mouse { button = "2" func = "client_kill" }
         mouse { button = "3" func = "client_raise" }
         mouse { button = "3" func = "mouse_resize" }
-}
-
-layouts
-{
-        layout { type = "tile" symbol = "TILE" }
-        layout { type = "max"  symbol = "MAX"  }
-        layout { type = "free" symbol = "FREE" }
-}
-
-tags
-{
-        tag { name = "one" mwfact = 0.65 nmaster = 2 layout = "tile" resizehint = false }
-        tag { name = "two"   }
-        tag { name = "three" }
-        tag { name = "four"  }
-        tag { name = "five"  }
-        tag { name = "six"   }
-        tag { name = "seven" }
-        tag { name = "eight" }
-        tag { name = "nine"  }
 }
 
 buttons
@@ -118,7 +127,7 @@ keys
 {
 # general keybind
         key { mod = {"Control"} key = "Return" func = "spawn" cmd = term }
-        key { mod = {"Alt"} key = "q" func = "killclient" }
+        key { mod = {"Alt"} key = "q" func = "client_kill" }
         key { mod = {"Control", "Alt", "Shift"} key = "q" func = "quit" }
         key { mod = {"Control"} key = "m" func = "togglemax" }
         key { mod = {"Control"} key = "b" func = "togglebarpos" }

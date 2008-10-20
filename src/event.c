@@ -48,45 +48,22 @@ buttonpress(XEvent ev)
      /* ******** */
      {
           if(conf.titlebar.height)
-          {
                if((c = client_gettbar(ev.xbutton.window)))
                     for(i = 0; i < conf.titlebar.nmouse; ++i)
                          if(ev.xbutton.button == conf.titlebar.mouse[i].button)
                               if(conf.titlebar.mouse[i].func)
                                    conf.titlebar.mouse[i].func(conf.titlebar.mouse[i].cmd);
-          }
      }
-
 
      /* ****** */
      /* CLIENT */
      /* ****** */
      {
           if((c = client_get(ev.xbutton.window)))
-          {
-               client_raise(c);
-               /* BUTTON 1 */
-               {
-                    if(ev.xbutton.button == Button1)
-                         mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, False);
-               }
-               /* BUTTON 2 */
-               {
-                    if(ev.xbutton.button == Button2)
-                    {
-                         if(tags[seltag].layout.func == tile)
-                              uicb_tile_switch(NULL);
-                         else
-                              uicb_togglemax(NULL);
-                    }
-               }
-               /* BUTTON 3 */
-               {
-                    if(ev.xbutton.button == Button3)
-                         mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, True);
-               }
-          }
-
+               for(i = 0; i < conf.client.nmouse; ++i)
+                    if(ev.xbutton.button == conf.client.mouse[i].button)
+                         if(conf.client.mouse[i].func)
+                              conf.client.mouse[i].func(conf.client.mouse[i].cmd);
      }
 
      /* *** */
@@ -146,7 +123,8 @@ buttonpress(XEvent ev)
                /* ****** */
                {
                     if(ev.xbutton.x >= taglen[conf.ntag]
-                       && ev.xbutton.x <=  taglen[conf.ntag] + textw(tags[seltag].layout.symbol) + PAD/2)
+                       && ev.xbutton.x <=  taglen[conf.ntag]
+                       + textw(tags[seltag].layout.symbol) + PAD/2)
                     {
                          /* BUTTON 1 / 4 */
                          {
@@ -287,17 +265,19 @@ focusin(XEvent ev)
 void
 grabbuttons(Client *c, Bool focused)
 {
+     uint mod = conf.client.mod;
+
      XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 
      if(focused)
      {
           /* Window */
-          XGrabButton(dpy, Button1, ALT, c->win, False, ButtonMask, GrabModeAsync,GrabModeSync, None, None);
-          XGrabButton(dpy, Button1, ALT|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, Button2, ALT, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, Button2, ALT|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, Button3, ALT, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, Button3, ALT|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button1, mod, c->win, False, ButtonMask, GrabModeAsync,GrabModeSync, None, None);
+          XGrabButton(dpy, Button1, mod|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button2, mod, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button2, mod|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button3, mod, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button3, mod|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
      }
      else
           XGrabButton(dpy, AnyButton, AnyModifier, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);

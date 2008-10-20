@@ -131,8 +131,8 @@ maxlayout(void)
           c->ogeo.width = c->geo.width; c->ogeo.height = c->geo.height;
 
           geo.x = sgeo.x; geo.y = sgeo.y;
-          geo.width = sgeo.width - (conf.borderheight * 2);
-          geo.height = sgeo.height - (conf.borderheight * 2);
+          geo.width = sgeo.width - (c->border * 2);
+          geo.height = sgeo.height - (c->border * 2);
 
           client_moveresize(c, geo, False);
      }
@@ -188,7 +188,7 @@ tile(void)
      XRectangle cgeo = {sgeo.x, sgeo.y, 0, 0};
      uint n, mwfact = tags[seltag].mwfact * sgeo.width;
      uint nmaster = tags[seltag].nmaster;
-     uint tileheight, i, border = conf.borderheight*2;
+     uint tileheight, i, border = conf.client.borderheight * 2;
 
      for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++n);
      if(!n)
@@ -296,8 +296,8 @@ uicb_togglemax(uicb_t cmd)
           sel->ogeo.width = sel->geo.width; sel->ogeo.height = sel->geo.height;
 
           geo.x = sgeo.x; geo.y = sgeo.y;
-          geo.width = sgeo.width - (conf.borderheight * 2);
-          geo.height = sgeo.height - (conf.borderheight * 2);
+          geo.width = sgeo.width - (sel->border * 2);
+          geo.height = sgeo.height - (sel->border * 2);
 
           client_moveresize(sel, geo, False);
           client_raise(sel);

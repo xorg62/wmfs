@@ -101,6 +101,8 @@ quit(void)
      free(conf.barbutton);
      free(keys);
      free(clients);
+     free(conf.titlebar.mouse);
+     free(conf.client.mouse);
      XSync(dpy, False);
 
      return;
