@@ -35,7 +35,7 @@
 
 #include "wmfs.h"
 
-#define NBUTTON      5
+#define NBUTTON      8
 #define MAXTAG       36
 #define MAXLAYOUT    3
 
@@ -100,9 +100,16 @@ typedef struct
      uint mod;
      KeySym keysym;
      void (*func)(uicb_t);
-     char *cmd;
+     uicb_t cmd;
 } Key;
 
+/* Mouse Binding Struct */
+typedef struct
+{
+     uint button;
+     void (*func)(uicb_t);
+     uicb_t cmd;
+} MouseBinding;
 
 /* Bar Button */
 typedef struct
@@ -113,9 +120,7 @@ typedef struct
      int bg_color;
      uint x;
      int nmousesec;
-     void (*func[NBUTTON])(uicb_t);
-     char *cmd[NBUTTON];
-     uint mouse[NBUTTON];
+     MouseBinding mouse[NBUTTON];
 } BarButton;
 
 /* Layout Structure */
@@ -166,6 +171,8 @@ typedef struct
           char *fg_focus;
           char *fg_normal;
           int text_align;
+          MouseBinding *mouse;
+          int nmouse;
      } titlebar;
      Tag tag[MAXTAG];
      Layout layout[MAXLAYOUT];

@@ -42,6 +42,12 @@ titlebar
         fg_normal = "#D4D4D4"
         fg_focus = "#D4D4D4"
         text_align = "center"
+
+        mouse { button = "1" func = "client_raise" }
+        mouse { button = "1" func = "mouse_move" }
+        mouse { button = "2" func = "tile_switch" }
+        mouse { button = "3" func = "client_raise" }
+        mouse { button = "3" func = "mouse_resize" }
 }
 
 layouts

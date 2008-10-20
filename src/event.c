@@ -43,40 +43,20 @@ buttonpress(XEvent ev)
      int i, j;
      char s[6];
 
-     if(conf.titlebar.height)
+     /* ******** */
+     /* TITLEBAR */
+     /* ******** */
      {
-          /* ******** */
-          /* TITLEBAR */
-          /* ******** */
+          if(conf.titlebar.height)
           {
                if((c = client_gettbar(ev.xbutton.window)))
-               {
-                    client_raise(c);
-                    /* BUTTON 1 */
-                    {
-                         if(ev.xbutton.button == Button1)
-                              mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, False);
-                    }
-                    /* BUTTON 2 */
-                    {
-                         if(ev.xbutton.button == Button2)
-                         {
-                              if(tags[seltag].layout.func == tile)
-                                   uicb_tile_switch(NULL);
-                              else
-                                   uicb_togglemax(NULL);
-                         }
-                    }
-                    /* BUTTON 3 */
-                    {
-                         if(ev.xbutton.button == Button3)
-                              mouseaction(c, ev.xbutton.x_root, ev.xbutton.y_root, True);
-                    }
-               }
-
+                    for(i = 0; i < conf.titlebar.nmouse; ++i)
+                         if(ev.xbutton.button == conf.titlebar.mouse[i].button)
+                              if(conf.titlebar.mouse[i].func)
+                                   conf.titlebar.mouse[i].func(conf.titlebar.mouse[i].cmd);
           }
-
      }
+
 
      /* ****** */
      /* CLIENT */
@@ -210,12 +190,12 @@ buttonpress(XEvent ev)
      /* BAR BUTTONS */
      /* *********** */
      {
-          for(i=0; i<conf.nbutton ; ++i)
-               for(j=0; j<conf.barbutton[i].nmousesec; ++j)
+          for(i = 0; i < conf.nbutton ; ++i)
+               for(j = 0; j < conf.barbutton[i].nmousesec; ++j)
                     if(ev.xbutton.window == conf.barbutton[i].bw->win
-                       && ev.xbutton.button == conf.barbutton[i].mouse[j])
-                         if(conf.barbutton[i].func[j])
-                              conf.barbutton[i].func[j](conf.barbutton[i].cmd[j]);
+                       && ev.xbutton.button == conf.barbutton[i].mouse[j].button)
+                         if(conf.barbutton[i].mouse[j].func)
+                              conf.barbutton[i].mouse[j].func(conf.barbutton[i].mouse[j].cmd);
      }
      return;
 }
@@ -252,7 +232,6 @@ void
 destroynotify(XEvent ev)
 {
      Client *c;
-
      if((c = client_get(ev.xdestroywindow.window)))
           client_unmanage(c);
 
@@ -453,6 +432,24 @@ mouseaction(Client *c, int x, int y, int type)
      return;
 }
 
+void
+uicb_mousemove(uicb_t cmd)
+{
+
+     mouseaction(sel, event.xbutton.x_root, event.xbutton.y_root, False);
+
+     return;
+}
+
+void
+uicb_resizemouse(uicb_t cmd)
+{
+     mouseaction(sel, event.xbutton.x_root, event.xbutton.y_root, True);
+
+     return;
+}
+
+
 /* PROPERTYNOTIFY */
 void
 propertynotify(XEvent ev)
@@ -492,6 +489,7 @@ unmapnotify(XEvent ev)
 
      if((c = client_get(ev.xunmap.window)))
           if(ev.xunmap.send_event
+             && ev.xunmap.event == RootWindow(ev.xany.display, screen)
              && getwinstate(c->win) == NormalState)
                client_unmanage(c);
 

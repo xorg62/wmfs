@@ -86,7 +86,7 @@ bar_moveresize(BarWindow *bw, int x, int y, uint w, uint h)
           bw->y = y;
      }
 
-     XMoveResizeWindow(dpy, bw->win, x, y, w, h);
+     XMoveResizeWindow(dpy, bw->win, bw->x, bw->y, bw->w, bw->h);
 
      return;
 }
@@ -232,8 +232,9 @@ uicb_togglebarpos(uicb_t cmd)
 void
 updatetitlebar(Client *c)
 {
-
      int pos_y, pos_x;
+     char *tmpcolor = NULL;
+
      XFetchName(dpy, c->win, &(c->title));
      if(!c->title)
           c->title = strdup("WMFS");
@@ -247,18 +248,24 @@ updatetitlebar(Client *c)
           /* Set the text alignement */
           switch(conf.titlebar.text_align)
           {
-           case Center: pos_x = (c->geo.width / 2) - (textw(c->title) / 2); break;
-           case Right: pos_x = c->geo.width - textw(c->title) - 2; break;
-           default: case Left: pos_x = 2; break;
+           case Center:
+                 pos_x = (c->geo.width / 2) - (textw(c->title) / 2);
+                 break;
+           case Right:
+                 pos_x = c->geo.width - textw(c->title) - 2;
+                 break;
+           default:
+           case Left:
+                 pos_x = 2;
+                 break;
           }
 
-          /* Set y text position (always at the middle) */
+          /* Set y text position (always at the middle) and fg color */
           pos_y = (fonth - (xftfont->descent - 1)) + ((conf.titlebar.height - fonth) / 2);
+          tmpcolor = ((c == sel) ? conf.titlebar.fg_focus : conf.titlebar.fg_normal);
 
           /* Draw title */
-          draw_text(c->tbar->dr, pos_x, pos_y,
-                    ((c == sel) ? conf.titlebar.fg_focus : conf.titlebar.fg_normal),
-                    conf.titlebar.bg, 0, c->title);
+          draw_text(c->tbar->dr, pos_x, pos_y, tmpcolor, conf.titlebar.bg, 0, c->title);
 
           bar_refresh(c->tbar);
      }

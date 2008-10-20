@@ -455,6 +455,14 @@ client_raise(Client *c)
 }
 
 void
+uicb_client_raise(uicb_t cmd)
+{
+     client_raise(sel);
+
+     return;
+}
+
+void
 client_unhide(Client *c)
 {
      XMapWindow(dpy, c->win);
@@ -473,12 +481,17 @@ client_unmanage(Client *c)
      sel = ((sel == c) ? ((c->next) ? c->next : NULL) : NULL);
      selbytag[seltag] = (sel && sel->tag == seltag) ? sel : NULL;
      client_detach(c);
-     if(conf.titlebar.height)
-          bar_delete(c->tbar);
+
+     XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
      setwinstate(c->win, WithdrawnState);
-     free(c);
+
      XSync(dpy, False);
      XUngrabServer(dpy);
+
+     if(conf.titlebar.height)
+          bar_delete(c->tbar);
+     free(c);
+
      arrange();
 
      return;

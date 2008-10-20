@@ -50,7 +50,11 @@ func_name_list_t func_list[] =
      {"set_mwfact",   uicb_set_mwfact },
      {"set_nmaster",  uicb_set_nmaster },
      {"quit",         uicb_quit },
-     {"togglebarpos", uicb_togglebarpos }
+     {"togglebarpos", uicb_togglebarpos },
+     {"mouse_move",   uicb_mousemove },
+     {"mouse_resize", uicb_resizemouse },
+     {"client_raise", uicb_client_raise },
+     {"tile_switch",  uicb_tile_switch }
 };
 
 func_name_list_t layout_list[] =
@@ -176,25 +180,34 @@ init_conf(void)
 
      static cfg_opt_t colors_opts[] =
           {
-               CFG_STR("border_normal",        "#354B5C", CFGF_NONE),
-               CFG_STR("border_focus",         "#6286A1", CFGF_NONE),
-               CFG_STR("bar_bg",               "#090909", CFGF_NONE),
-               CFG_STR("bar_fg",               "#6289A1", CFGF_NONE),
-               CFG_STR("tag_sel_fg",           "#FFFFFF", CFGF_NONE),
-               CFG_STR("tag_sel_bg",           "#354B5C", CFGF_NONE),
-               CFG_STR("tag_border",           "#090909", CFGF_NONE),
-               CFG_STR("layout_fg",            "#FFFFFF", CFGF_NONE),
-               CFG_STR("layout_bg",            "#292929", CFGF_NONE),
+               CFG_STR("border_normal", "#354B5C", CFGF_NONE),
+               CFG_STR("border_focus",  "#6286A1", CFGF_NONE),
+               CFG_STR("bar_bg",        "#090909", CFGF_NONE),
+               CFG_STR("bar_fg",        "#6289A1", CFGF_NONE),
+               CFG_STR("tag_sel_fg",    "#FFFFFF", CFGF_NONE),
+               CFG_STR("tag_sel_bg",    "#354B5C", CFGF_NONE),
+               CFG_STR("tag_border",    "#090909", CFGF_NONE),
+               CFG_STR("layout_fg",     "#FFFFFF", CFGF_NONE),
+               CFG_STR("layout_bg",     "#292929", CFGF_NONE),
+               CFG_END()
+          };
+
+     static cfg_opt_t mouse_button_opts[] =
+          {
+               CFG_STR("button", "Button1", CFGF_NONE),
+               CFG_STR("func",   "",        CFGF_NONE),
+               CFG_STR("cmd",    "",        CFGF_NONE),
                CFG_END()
           };
 
      static cfg_opt_t titlebar_opts[] =
           {
-               CFG_INT("height",     0,         CFGF_NONE),
-               CFG_STR("bg",         "#090909", CFGF_NONE),
-               CFG_STR("fg_focus",   "#FFFFFF", CFGF_NONE),
-               CFG_STR("fg_normal",  "#FFFFFF", CFGF_NONE),
-               CFG_STR("text_align", "left",    CFGF_NONE),
+               CFG_INT("height",     0,                 CFGF_NONE),
+               CFG_STR("bg",         "#090909",         CFGF_NONE),
+               CFG_STR("fg_focus",   "#FFFFFF",         CFGF_NONE),
+               CFG_STR("fg_normal",  "#FFFFFF",         CFGF_NONE),
+               CFG_STR("text_align", "left",            CFGF_NONE),
+               CFG_SEC("mouse",      mouse_button_opts, CFGF_MULTI)
           };
 
      static cfg_opt_t layout_opts[] =
@@ -238,14 +251,6 @@ init_conf(void)
      static cfg_opt_t keys_opts[] =
           {
                CFG_SEC("key", key_opts, CFGF_MULTI),
-               CFG_END()
-          };
-
-     static cfg_opt_t mouse_button_opts[] =
-          {
-               CFG_STR("button", "Button1", CFGF_NONE),
-               CFG_STR("func",   "",        CFGF_NONE),
-               CFG_STR("cmd",    "",        CFGF_NONE),
                CFG_END()
           };
 
@@ -374,6 +379,17 @@ init_conf(void)
      else
           conf.titlebar.text_align = Left;
 
+     conf.titlebar.nmouse = cfg_size(cfg_titlebar, "mouse");
+     conf.titlebar.mouse = emalloc(conf.titlebar.nmouse, sizeof(MouseBinding));
+
+     for(i = 0; i < conf.titlebar.nmouse; ++i)
+     {
+          cfgtmp = cfg_getnsec(cfg_titlebar, "mouse", i);
+          conf.titlebar.mouse[i].button = char_to_button(cfg_getstr(cfgtmp, "button"));
+          conf.titlebar.mouse[i].func   = name_to_func(cfg_getstr(cfgtmp, "func"), func_list);
+          conf.titlebar.mouse[i].cmd    = strdup(var_to_str(cfg_getstr(cfgtmp, "cmd")));
+     }
+
      /* layout */
      if((conf.nlayout = cfg_size(cfg_layouts, "layout")) > MAXLAYOUT
           || !(conf.nlayout = cfg_size(cfg_layouts, "layout")))
@@ -477,9 +493,9 @@ init_conf(void)
           for(j = 0; j < cfg_size(cfgtmp2, "mouse");  ++j)
           {
                cfgtmp3 = cfg_getnsec(cfgtmp2, "mouse", j);
-               conf.barbutton[i].func[j]  = name_to_func(cfg_getstr(cfgtmp3, "func"), func_list);
-               conf.barbutton[i].cmd[j]   = strdup(var_to_str(cfg_getstr(cfgtmp3, "cmd")));
-               conf.barbutton[i].mouse[j] = char_to_button(cfg_getstr(cfgtmp3, "button"));
+               conf.barbutton[i].mouse[j].func   = name_to_func(cfg_getstr(cfgtmp3, "func"), func_list);
+               conf.barbutton[i].mouse[j].cmd    = strdup(var_to_str(cfg_getstr(cfgtmp3, "cmd")));
+               conf.barbutton[i].mouse[j].button = char_to_button(cfg_getstr(cfgtmp3, "button"));
           }
           conf.barbutton[i].nmousesec = cfg_size(cfgtmp2, "mouse");
           conf.barbutton[i].content   = strdup(var_to_str(cfg_getstr(cfgtmp2, "content")));
