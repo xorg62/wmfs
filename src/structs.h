@@ -50,6 +50,7 @@ typedef unsigned char uchar;
 enum { CurNormal, CurResize, CurMove, CurLast };
 enum { WMState, WMProtocols, WMName, WMDelete, WMLast };
 enum { NetSupported, NetWMName, NetLast };
+enum { Left = 0, Center, Right, AlignLast};
 
 /* BarWindow Structure
  * (titlebar, topbar..) */
@@ -143,7 +144,6 @@ typedef struct
      bool raiseswitch;
      bool bartop;
      int borderheight;
-     int ttbarheight;
      int tagbordwidth;
      struct
      {
@@ -158,9 +158,15 @@ typedef struct
           uint tagbord;
           char *layout_fg;
           uint layout_bg;
-          char *ttbar_text_focus;
-          char *ttbar_text_normal;
      } colors;
+     struct
+     {
+          int height;
+          uint bg;
+          char *fg_focus;
+          char *fg_normal;
+          int text_align;
+     } titlebar;
      Tag tag[MAXTAG];
      Layout layout[MAXLAYOUT];
      BarButton *barbutton;

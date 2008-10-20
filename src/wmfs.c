@@ -177,9 +177,9 @@ init(void)
 
      /* INIT WORKABLE SPACE */
      sgeo.x = 0;
-     sgeo.y = (conf.bartop) ? barheight + conf.ttbarheight : conf.ttbarheight;
+     sgeo.y = (conf.bartop) ? barheight + conf.titlebar.height : conf.titlebar.height;
      sgeo.width = DisplayWidth(dpy, screen);
-     sgeo.height = DisplayHeight(dpy, screen) - (barheight + conf.ttbarheight);
+     sgeo.height = DisplayHeight(dpy, screen) - (barheight + conf.titlebar.height);
 
 
      /* INIT STUFF */

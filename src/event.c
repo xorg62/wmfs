@@ -43,7 +43,7 @@ buttonpress(XEvent ev)
      int i, j;
      char s[6];
 
-     if(conf.ttbarheight)
+     if(conf.titlebar.height)
      {
           /* ******** */
           /* TITLEBAR */
@@ -287,7 +287,7 @@ expose(XEvent ev)
         && (ev.xexpose.window == bar->win))
           updatebar();
 
-     if(conf.ttbarheight)
+     if(conf.titlebar.height)
           for(c = clients; c; c = c->next)
                if(ev.xexpose.window == c->tbar->win)
                     updatetitlebar(c);

@@ -132,8 +132,6 @@ client_focus(Client *c)
      {
           grabbuttons(sel, False);
           XSetWindowBorder(dpy, sel->win, conf.colors.bordernormal);
-          if(conf.ttbarheight)
-               XSetWindowBorder(dpy, sel->tbar->win, conf.colors.bordernormal);
      }
 
      if(c)
@@ -145,8 +143,6 @@ client_focus(Client *c)
      if(c)
      {
           XSetWindowBorder(dpy, c->win, conf.colors.borderfocus);
-          if(c->tbar->win)
-               XSetWindowBorder(dpy, c->tbar->win, conf.colors.borderfocus);
           if(conf.raisefocus)
                client_raise(c);
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
@@ -176,7 +172,7 @@ client_gettbar(Window w)
 {
      Client *c;
 
-     if(!conf.ttbarheight)
+     if(!conf.titlebar.height)
           return NULL;
 
      for(c = clients; c && c->tbar->win != w; c = c->next);
@@ -188,7 +184,7 @@ void
 client_hide(Client *c)
 {
      XUnmapWindow(dpy, c->win);
-     if(conf.ttbarheight)
+     if(conf.titlebar.height)
           XUnmapWindow(dpy, c->tbar->win);
      setwinstate(c->win, IconicState);
 
@@ -233,7 +229,7 @@ client_map(Client *c)
           return;
 
      XMapWindow(dpy, c->win);
-     if(conf.ttbarheight)
+     if(conf.titlebar.height)
      {
           XMapWindow(dpy, c->tbar->win);
           bar_refresh(c->tbar);
@@ -253,17 +249,19 @@ client_manage(Window w, XWindowAttributes *wa)
      c = emalloc(1, sizeof(Client));
      c->win = w;
      c->geo.x = wa->x;
-     c->geo.y = wa->y + sgeo.y + conf.ttbarheight; /* Default free placement */
+     c->geo.y = wa->y + sgeo.y + conf.titlebar.height; /* Default free placement */
      c->geo.width = wa->width;
      c->geo.height = wa->height;
      c->tag = seltag;
      c->border = conf.borderheight;
 
      /* Create titlebar */
-     if(conf.ttbarheight)
-          c->tbar = bar_create(c->geo.x, c->geo.y - conf.ttbarheight,
-                               c->geo.width, conf.ttbarheight, conf.borderheight,
-                               conf.colors.bar, True);
+     if(conf.titlebar.height)
+          c->tbar = bar_create(c->geo.x,
+                               c->geo.y - conf.titlebar.height,
+                               c->geo.width + c->border,
+                               conf.titlebar.height, 0,
+                               conf.titlebar.bg, True);
 
      winc.border_width = c->border;
      XConfigureWindow(dpy, w, CWBorderWidth, &winc);
@@ -356,8 +354,11 @@ client_moveresize(Client *c, XRectangle geo, bool r)
           XMoveResizeWindow(dpy, c->win, geo.x, geo.y,
                             geo.width, geo.height);
 
-          if(conf.ttbarheight)
-               bar_moveresize(c->tbar, geo.x, geo.y - conf.ttbarheight, geo.width, conf.ttbarheight);
+          if(conf.titlebar.height)
+               bar_moveresize(c->tbar, geo.x,
+                              geo.y - conf.titlebar.height,
+                              geo.width + c->border*2,
+                              conf.titlebar.height);
 
           updatetitlebar(c);
           XSync(dpy, False);
@@ -444,7 +445,7 @@ client_raise(Client *c)
           return;
      XRaiseWindow(dpy, c->win);
 
-     if(conf.ttbarheight)
+     if(conf.titlebar.height)
      {
           XRaiseWindow(dpy, c->tbar->win);
           updatetitlebar(c);
@@ -457,7 +458,7 @@ void
 client_unhide(Client *c)
 {
      XMapWindow(dpy, c->win);
-     if(conf.ttbarheight)
+     if(conf.titlebar.height)
           XMapWindow(dpy, c->tbar->win);
      setwinstate(c->win, NormalState);
 
@@ -472,7 +473,7 @@ client_unmanage(Client *c)
      sel = ((sel == c) ? ((c->next) ? c->next : NULL) : NULL);
      selbytag[seltag] = (sel && sel->tag == seltag) ? sel : NULL;
      client_detach(c);
-     if(conf.ttbarheight)
+     if(conf.titlebar.height)
           bar_delete(c->tbar);
      setwinstate(c->win, WithdrawnState);
      free(c);
@@ -490,7 +491,7 @@ client_unmap(Client *c)
           return;
 
      XUnmapWindow(dpy, c->win);
-     if(conf.ttbarheight)
+     if(conf.titlebar.height)
           XUnmapWindow(dpy, c->tbar->win);
 
      return;

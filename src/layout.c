@@ -233,9 +233,9 @@ tile(void)
 
                /* Remainder */
                if(i + 1 == (n < nmaster ? n : nmaster))
-                    cgeo.height = (sgeo.height - mastergeo.height * i) + conf.ttbarheight;
+                    cgeo.height = (sgeo.height - mastergeo.height * i) + conf.titlebar.height;
 
-               cgeo.height -= border + conf.ttbarheight;
+               cgeo.height -= border + conf.titlebar.height;
           }
 
           /* Tiled Client */
@@ -253,13 +253,13 @@ tile(void)
                if(i + 1 == n)
                     cgeo.height = (sgeo.y + sgeo.height) - cgeo.y - border;
                else
-                    cgeo.height = tileheight - (border + conf.ttbarheight);
+                    cgeo.height = tileheight - (border + conf.titlebar.height);
           }
 
           client_moveresize(c, cgeo, tags[seltag].resizehint);
 
           if(n > nmaster && tileheight != sgeo.height)
-               cgeo.y = c->geo.y + c->geo.height + border + conf.ttbarheight;
+               cgeo.y = c->geo.y + c->geo.height + border + conf.titlebar.height;
      }
 
      return;

@@ -210,7 +210,7 @@ uicb_togglebarpos(uicb_t cmd)
      int i;
 
      conf.bartop = !conf.bartop;
-     sgeo.y = (conf.bartop) ? barheight + conf.ttbarheight : conf.ttbarheight;
+     sgeo.y = (conf.bartop) ? barheight + conf.titlebar.height : conf.titlebar.height;
 
      if(conf.bartop)
           bary = 0;
@@ -232,19 +232,35 @@ uicb_togglebarpos(uicb_t cmd)
 void
 updatetitlebar(Client *c)
 {
+
+     int pos_y, pos_x;
      XFetchName(dpy, c->win, &(c->title));
      if(!c->title)
           c->title = strdup("WMFS");
 
-     if(conf.ttbarheight > 10)
-     {
-          bar_refresh_color(c->tbar);
-          draw_text(c->tbar->dr, 3, ((fonth - xftfont->descent) + ((conf.ttbarheight - fonth) / 2)),
-                 ((c == sel) ? conf.colors.ttbar_text_focus : conf.colors.ttbar_text_normal),
-                 conf.colors.bar, 0, c->title);
+     bar_refresh_color(c->tbar);
 
-          bar_refresh(c->tbar);
+     /* Draw the client title in the titlebar *logeek* */
+     if(conf.titlebar.height > 9)
+     {
+          /* Set the text alignement */
+          switch(conf.titlebar.text_align)
+          {
+           case Center: pos_x = (c->geo.width / 2) - (textw(c->title) / 2); break;
+           case Right: pos_x = c->geo.width - textw(c->title) - 2; break;
+           default: case Left: pos_x = 2; break;
+          }
+
+          /* Set y text position (always at the middle) */
+          pos_y = (fonth - (xftfont->descent - 1)) + ((conf.titlebar.height - fonth) / 2);
+
+          /* Draw title */
+          draw_text(c->tbar->dr, pos_x, pos_y,
+                    ((c == sel) ? conf.titlebar.fg_focus : conf.titlebar.fg_normal),
+                    conf.titlebar.bg, 0, c->title);
      }
+
+     bar_refresh(c->tbar);
 
      return;
 }

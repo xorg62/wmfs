@@ -170,7 +170,6 @@ init_conf(void)
                CFG_BOOL("raisefocus",      cfg_false, CFGF_NONE),
                CFG_BOOL("raiseswitch",     cfg_true,  CFGF_NONE),
                CFG_INT("border_height",    1,         CFGF_NONE),
-               CFG_INT("titlebar_height",  0,         CFGF_NONE),
                CFG_INT("tag_border_width", 0,         CFGF_NONE),
                CFG_END()
           };
@@ -186,9 +185,16 @@ init_conf(void)
                CFG_STR("tag_border",           "#090909", CFGF_NONE),
                CFG_STR("layout_fg",            "#FFFFFF", CFGF_NONE),
                CFG_STR("layout_bg",            "#292929", CFGF_NONE),
-               CFG_STR("titlebar_text_focus",  "#FFFFFF", CFGF_NONE),
-               CFG_STR("titlebar_text_normal", "#FFFFFF", CFGF_NONE),
                CFG_END()
+          };
+
+     static cfg_opt_t titlebar_opts[] =
+          {
+               CFG_INT("height",     0,         CFGF_NONE),
+               CFG_STR("bg",         "#090909", CFGF_NONE),
+               CFG_STR("fg_focus",   "#FFFFFF", CFGF_NONE),
+               CFG_STR("fg_normal",  "#FFFFFF", CFGF_NONE),
+               CFG_STR("text_align", "left",    CFGF_NONE),
           };
 
      static cfg_opt_t layout_opts[] =
@@ -275,6 +281,7 @@ init_conf(void)
           {
                CFG_SEC("misc",      misc_opts,      CFGF_NONE),
                CFG_SEC("variables", variables_opts, CFGF_NONE),
+               CFG_SEC("titlebar",  titlebar_opts,  CFGF_NONE),
                CFG_SEC("colors",    colors_opts,    CFGF_NONE),
                CFG_SEC("layouts",   layouts_opts,   CFGF_NONE),
                CFG_SEC("tags",      tags_opts,      CFGF_NONE),
@@ -287,6 +294,7 @@ init_conf(void)
      cfg_t *cfg_misc;
      cfg_t *cfg_colors;
      cfg_t *cfg_variables;
+     cfg_t *cfg_titlebar;
      cfg_t *cfg_layouts;
      cfg_t *cfg_tags;
      cfg_t *cfg_keys;
@@ -314,6 +322,7 @@ init_conf(void)
 
      cfg_misc      = cfg_getsec(cfg, "misc");
      cfg_variables = cfg_getsec(cfg, "variables");
+     cfg_titlebar  = cfg_getsec(cfg, "titlebar");
      cfg_colors    = cfg_getsec(cfg, "colors");
      cfg_layouts   = cfg_getsec(cfg, "layouts");
      cfg_tags      = cfg_getsec(cfg, "tags");
@@ -338,7 +347,6 @@ init_conf(void)
      conf.raisefocus    = cfg_getbool(cfg_misc, "raisefocus");
      conf.raiseswitch   = cfg_getbool(cfg_misc, "raiseswitch");
      conf.borderheight  = cfg_getint(cfg_misc, "border_height");
-     conf.ttbarheight   = cfg_getint(cfg_misc, "titlebar_height");
      conf.tagbordwidth  = cfg_getint(cfg_misc, "tag_border_width");
      conf.bartop        = (strcmp(strdup(cfg_getstr(cfg_misc, "bar_position")), "top") == 0) ? True : False;
 
@@ -352,8 +360,19 @@ init_conf(void)
      conf.colors.tagbord           = getcolor(var_to_str(cfg_getstr(cfg_colors, "tag_border")));
      conf.colors.layout_fg         = strdup(var_to_str(cfg_getstr(cfg_colors, "layout_fg")));
      conf.colors.layout_bg         = getcolor(var_to_str(cfg_getstr(cfg_colors, "layout_bg")));
-     conf.colors.ttbar_text_focus  = strdup(var_to_str(cfg_getstr(cfg_colors, "titlebar_text_focus")));
-     conf.colors.ttbar_text_normal = strdup(var_to_str(cfg_getstr(cfg_colors, "titlebar_text_normal")));
+
+     /* titlebar */
+     conf.titlebar.height     = cfg_getint(cfg_titlebar, "height");
+     conf.titlebar.bg         = getcolor(var_to_str(cfg_getstr(cfg_titlebar, "bg")));
+     conf.titlebar.fg_focus   = var_to_str(cfg_getstr(cfg_titlebar, "fg_focus"));
+     conf.titlebar.fg_normal  = var_to_str(cfg_getstr(cfg_titlebar, "fg_normal"));
+
+     if(strcmp(var_to_str(cfg_getstr(cfg_titlebar, "text_align")), "center") == 0)
+          conf.titlebar.text_align = Center;
+     else if(strcmp(var_to_str(cfg_getstr(cfg_titlebar, "text_align")), "right") == 0)
+          conf.titlebar.text_align = Right;
+     else
+          conf.titlebar.text_align = Left;
 
      /* layout */
      if((conf.nlayout = cfg_size(cfg_layouts, "layout")) > MAXLAYOUT
