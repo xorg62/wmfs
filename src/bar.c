@@ -238,7 +238,8 @@ updatetitlebar(Client *c)
      if(!c->title)
           c->title = strdup("WMFS");
 
-     bar_refresh_color(c->tbar);
+     if(conf.titlebar.height)
+          bar_refresh_color(c->tbar);
 
      /* Draw the client title in the titlebar *logeek* */
      if(conf.titlebar.height > 9)
@@ -258,9 +259,9 @@ updatetitlebar(Client *c)
           draw_text(c->tbar->dr, pos_x, pos_y,
                     ((c == sel) ? conf.titlebar.fg_focus : conf.titlebar.fg_normal),
                     conf.titlebar.bg, 0, c->title);
-     }
 
-     bar_refresh(c->tbar);
+          bar_refresh(c->tbar);
+     }
 
      return;
 }
