@@ -37,7 +37,7 @@
 func_name_list_t func_list[] =
 {
      {"spawn",        uicb_spawn },
-     {"client_kill",   uicb_client_kill },
+     {"client_kill",  uicb_client_kill },
      {"client_prev",  uicb_client_prev },
      {"client_next",  uicb_client_next },
      {"togglemax",    uicb_togglemax },
@@ -170,22 +170,16 @@ init_conf(void)
      static cfg_opt_t misc_opts[] =
           {
                CFG_STR("font",             "sans-9",  CFGF_NONE),
-               CFG_STR("bar_position",     "top",     CFGF_NONE),
                CFG_BOOL("raisefocus",      cfg_false, CFGF_NONE),
                CFG_BOOL("raiseswitch",     cfg_true,  CFGF_NONE),
-               CFG_INT("tag_border_width", 0,         CFGF_NONE),
                CFG_END()
           };
 
-     static cfg_opt_t colors_opts[] =
+     static cfg_opt_t bar_opts[] =
           {
-               CFG_STR("bar_bg",        "#090909", CFGF_NONE),
-               CFG_STR("bar_fg",        "#6289A1", CFGF_NONE),
-               CFG_STR("tag_sel_fg",    "#FFFFFF", CFGF_NONE),
-               CFG_STR("tag_sel_bg",    "#354B5C", CFGF_NONE),
-               CFG_STR("tag_border",    "#090909", CFGF_NONE),
-               CFG_STR("layout_fg",     "#FFFFFF", CFGF_NONE),
-               CFG_STR("layout_bg",     "#292929", CFGF_NONE),
+               CFG_STR("bg",        "#090909", CFGF_NONE),
+               CFG_STR("fg",        "#6289A1", CFGF_NONE),
+               CFG_STR("position",  "top",     CFGF_NONE),
                CFG_END()
           };
 
@@ -225,6 +219,8 @@ init_conf(void)
 
      static cfg_opt_t layouts_opts[] =
           {
+               CFG_STR("fg",     "#FFFFFF", CFGF_NONE),
+               CFG_STR("bg",     "#292929", CFGF_NONE),
                CFG_SEC("layout", layout_opts, CFGF_MULTI),
                CFG_END()
           };
@@ -241,6 +237,10 @@ init_conf(void)
 
      static cfg_opt_t tags_opts[] =
           {
+               CFG_STR("sel_fg",    "#FFFFFF", CFGF_NONE),
+               CFG_STR("sel_bg",    "#354B5C", CFGF_NONE),
+               CFG_STR("border",    "#090909", CFGF_NONE),
+               CFG_INT("border_width", 0,         CFGF_NONE),
                CFG_SEC("tag", tag_opts, CFGF_MULTI),
                CFG_END()
           };
@@ -294,7 +294,7 @@ init_conf(void)
                CFG_SEC("variables", variables_opts, CFGF_NONE),
                CFG_SEC("titlebar",  titlebar_opts,  CFGF_NONE),
                CFG_SEC("client",    client_opts,    CFGF_NONE),
-               CFG_SEC("colors",    colors_opts,    CFGF_NONE),
+               CFG_SEC("bar",       bar_opts,       CFGF_NONE),
                CFG_SEC("layouts",   layouts_opts,   CFGF_NONE),
                CFG_SEC("tags",      tags_opts,      CFGF_NONE),
                CFG_SEC("keys",      keys_opts,      CFGF_NONE),
@@ -304,7 +304,7 @@ init_conf(void)
 
      cfg_t *cfg;
      cfg_t *cfg_misc;
-     cfg_t *cfg_colors;
+     cfg_t *cfg_bar;
      cfg_t *cfg_variables;
      cfg_t *cfg_titlebar;
      cfg_t *cfg_client;
@@ -337,7 +337,7 @@ init_conf(void)
      cfg_variables = cfg_getsec(cfg, "variables");
      cfg_titlebar  = cfg_getsec(cfg, "titlebar");
      cfg_client    = cfg_getsec(cfg, "client");
-     cfg_colors    = cfg_getsec(cfg, "colors");
+     cfg_bar       = cfg_getsec(cfg, "bar");
      cfg_layouts   = cfg_getsec(cfg, "layouts");
      cfg_tags      = cfg_getsec(cfg, "tags");
      cfg_keys      = cfg_getsec(cfg, "keys");
@@ -360,17 +360,11 @@ init_conf(void)
      conf.font          = var_to_str(strdup(cfg_getstr(cfg_misc, "font")));
      conf.raisefocus    = cfg_getbool(cfg_misc, "raisefocus");
      conf.raiseswitch   = cfg_getbool(cfg_misc, "raiseswitch");
-     conf.tagbordwidth  = cfg_getint(cfg_misc, "tag_border_width");
-     conf.bartop        = (strcmp(strdup(cfg_getstr(cfg_misc, "bar_position")), "top") == 0) ? True : False;
 
-     /* colors */
-     conf.colors.bar               = getcolor(var_to_str(cfg_getstr(cfg_colors, "bar_bg")));
-     conf.colors.text              = strdup(var_to_str(cfg_getstr(cfg_colors, "bar_fg")));
-     conf.colors.tagselfg          = strdup(var_to_str(cfg_getstr(cfg_colors, "tag_sel_fg")));
-     conf.colors.tagselbg          = getcolor(var_to_str(cfg_getstr(cfg_colors, "tag_sel_bg")));
-     conf.colors.tagbord           = getcolor(var_to_str(cfg_getstr(cfg_colors, "tag_border")));
-     conf.colors.layout_fg         = strdup(var_to_str(cfg_getstr(cfg_colors, "layout_fg")));
-     conf.colors.layout_bg         = getcolor(var_to_str(cfg_getstr(cfg_colors, "layout_bg")));
+     /* bar */
+     conf.colors.bar  = getcolor(var_to_str(cfg_getstr(cfg_bar, "bg")));
+     conf.colors.text = strdup(var_to_str(cfg_getstr(cfg_bar, "fg")));
+     conf.bartop      = (strcmp(strdup(cfg_getstr(cfg_bar, "position")), "top") == 0) ? True : False;
 
      /* titlebar */
      conf.titlebar.height     = cfg_getint(cfg_titlebar, "height");
@@ -415,6 +409,9 @@ init_conf(void)
 
 
      /* layout */
+     conf.colors.layout_fg  = strdup(var_to_str(cfg_getstr(cfg_layouts, "fg")));
+     conf.colors.layout_bg  = getcolor(var_to_str(cfg_getstr(cfg_layouts, "bg")));
+
      if((conf.nlayout = cfg_size(cfg_layouts, "layout")) > MAXLAYOUT
           || !(conf.nlayout = cfg_size(cfg_layouts, "layout")))
      {
@@ -446,9 +443,13 @@ init_conf(void)
 
 
      /* tag */
-
      /* if there is no tag in the conf or more than
       * MAXTAG (32) print an error and create only one. */
+     conf.colors.tagselfg  = strdup(var_to_str(cfg_getstr(cfg_tags, "sel_fg")));
+     conf.colors.tagselbg  = getcolor(var_to_str(cfg_getstr(cfg_tags, "sel_bg")));
+     conf.tagbordwidth     = cfg_getint(cfg_tags, "border_width");
+     conf.colors.tagbord   = getcolor(var_to_str(cfg_getstr(cfg_tags, "border")));
+
      conf.ntag = cfg_size(cfg_tags, "tag");
      if(!conf.ntag  || conf.ntag > MAXTAG)
      {

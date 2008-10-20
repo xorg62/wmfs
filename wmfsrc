@@ -7,31 +7,23 @@ variables
 
 misc
 {
-        font = "sans-9"
-        bar_position =    "top"
-        raisefocus =      false
-        raiseswitch =     true
-        tag_border_width = 1
+        font        = "sans-9"
+        raisefocus  = false
+        raiseswitch = true
 }
 
-colors
+bar
 {
-        #Bar
-          bar_bg               = "#191919"
-          bar_fg               = "#D4D4D4"
-
-        #Tag
-          tag_sel_fg           = "#191919"
-          tag_sel_bg           = "#7E89A2"
-          tag_border           = "#3F485E"
-
-        #Layout
-          layout_fg            = "#191919"
-          layout_bg            = "#7E89A2"
+        bg       = "#191919"
+        fg       = "#D4D4D4"
+        position = "top"
 }
 
 layouts
 {
+        fg = "#191919"
+        bg = "#7E89A2"
+
         layout { type = "tile" symbol = "TILE" }
         layout { type = "max"  symbol = "MAX"  }
         layout { type = "free" symbol = "FREE" }
@@ -39,6 +31,11 @@ layouts
 
 tags
 {
+        sel_fg       = "#191919"
+        sel_bg       = "#7E89A2"
+        border       = "#3F485E"
+        border_width = 1
+
         tag { name = "one" mwfact = 0.65 nmaster = 1 layout = "tile" resizehint = false }
         tag { name = "two"   }
         tag { name = "three" }
@@ -66,10 +63,10 @@ client
 
 titlebar
 {
-        height = 12
-        bg = "#191919"
-        fg_normal = "#D4D4D4"
-        fg_focus = "#D4D4D4"
+        height     = 12
+        bg         = "#191919"
+        fg_normal  = "#D4D4D4"
+        fg_focus   = "#D4D4D4"
         text_align = "center"
 
         mouse { button = "1" func = "client_raise" }
