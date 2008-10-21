@@ -66,41 +66,25 @@ client_detach(Client *c)
      return;
 }
 
-/* True : next
- * False : prev */
 void
-client_switch(Bool b)
+uicb_client_prev(uicb_t cmd)
 {
      Client *c;
 
      if(!sel || ishide(sel))
           return;
-     if(b)
+
+     for(c = sel->prev; c && ishide(c); c = c->prev);
+     if(!c)
      {
-          for(c = sel->next; c && ishide(c); c = c->next);
-          if(!c)
-               for(c = clients; c && ishide(c); c = c->next);
-          if(c)
-          {
-               client_focus(c);
-               if(!c->tile)
-                    client_raise(c);
-          }
+          for(c = clients; c && c->next; c = c->next);
+          for(; c && ishide(c); c = c->prev);
      }
-     else
+     if(c)
      {
-          for(c = sel->prev; c && ishide(c); c = c->prev);
-          if(!c)
-          {
-               for(c = clients; c && c->next; c = c->next);
-               for(; c && ishide(c); c = c->prev);
-          }
-          if(c)
-          {
-               client_focus(c);
-               if(!c->tile)
-                    client_raise(c);
-          }
+          client_focus(c);
+          if(!c->tile)
+               client_raise(c);
      }
      arrange();
 
@@ -108,17 +92,23 @@ client_switch(Bool b)
 }
 
 void
-uicb_client_prev(uicb_t cmd)
-{
-     client_switch(False);
-
-     return;
-}
-
-void
 uicb_client_next(uicb_t cmd)
 {
-     client_switch(True);
+     Client *c;
+
+     if(!sel || ishide(sel))
+          return;
+
+     for(c = sel->next; c && ishide(c); c = c->next);
+     if(!c)
+          for(c = clients; c && ishide(c); c = c->next);
+     if(c)
+     {
+          client_focus(c);
+          if(!c->tile)
+               client_raise(c);
+     }
+     arrange();
 
      return;
 }

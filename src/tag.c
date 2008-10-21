@@ -32,7 +32,6 @@
 
 #include "wmfs.h"
 
-
 /* if cmd is +X or -X, this is just switch
  * else {1, 2.. 9} it's go to the wanted tag. */
 void

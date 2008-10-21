@@ -84,7 +84,6 @@ ushort textw(const char *text);
 int client_pertag(int tag);
 void client_attach(Client *c);
 void client_detach(Client *c);
-void client_switch(Bool c);
 void client_focus(Client *c);
 Client *client_get(Window w);
 Client *client_gettbar(Window w);
