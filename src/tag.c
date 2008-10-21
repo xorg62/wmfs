@@ -83,7 +83,7 @@ uicb_tagtransfert(uicb_t cmd)
 {
      int n = atoi(cmd);
 
-     if(!sel)
+     if(!sel || n == seltag)
           return;
 
      if(!n)
