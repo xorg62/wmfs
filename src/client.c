@@ -195,11 +195,8 @@ client_hide(Client *c)
 Bool
 ishide(Client *c)
 {
-     int i;
-
-     for(i = 0; i < conf.ntag + 1; ++i)
-          if(c->tag == i && seltag == i)
-               return False;
+     if(c->tag == seltag)
+          return False;
      return True;
 }
 

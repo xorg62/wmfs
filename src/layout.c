@@ -194,6 +194,11 @@ tile(void)
      if(!n)
           return;
 
+     /* tile mirror
+     nmaster = (n > tags[seltag].nmaster) ? n - tags[seltag].nmaster : tags[seltag].nmaster;
+     mwfact = (1 - tags[seltag].mwfact) * sgeo.width
+     */
+
      /* Define the master(s) client(s) size */
      if(n <= nmaster)
      {

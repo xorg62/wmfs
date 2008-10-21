@@ -32,10 +32,7 @@
 
 #include "wmfs.h"
 
-/* BUTTONPRESS
-*  For make a code cleaner, i put
-*  more {} (useless sometimes)
-*  and BIG comment.*/
+/* BUTTONPRESS */
 void
 buttonpress(XEvent ev)
 {
@@ -43,138 +40,80 @@ buttonpress(XEvent ev)
      int i, j;
      char s[6];
 
-     /* ******** */
-     /* TITLEBAR */
-     /* ******** */
+     /* Titlebar */
+     if(conf.titlebar.height)
+          if((c = client_gettbar(ev.xbutton.window)))
+               for(i = 0; i < conf.titlebar.nmouse; ++i)
+                    if(ev.xbutton.button == conf.titlebar.mouse[i].button)
+                         if(conf.titlebar.mouse[i].func)
+                              conf.titlebar.mouse[i].func(conf.titlebar.mouse[i].cmd);
+
+     /* Client */
+     if((c = client_get(ev.xbutton.window)))
+          for(i = 0; i < conf.client.nmouse; ++i)
+               if(ev.xbutton.button == conf.client.mouse[i].button)
+                    if(conf.client.mouse[i].func)
+                         conf.client.mouse[i].func(conf.client.mouse[i].cmd);
+
+     /* Bar Buttons */
+     for(i = 0; i < conf.nbutton ; ++i)
+          for(j = 0; j < conf.barbutton[i].nmousesec; ++j)
+               if(ev.xbutton.window == conf.barbutton[i].bw->win
+                  && ev.xbutton.button == conf.barbutton[i].mouse[j].button)
+                    if(conf.barbutton[i].mouse[j].func)
+                         conf.barbutton[i].mouse[j].func(conf.barbutton[i].mouse[j].cmd);
+
+     /* Root */
+     if(ev.xbutton.window == root)
      {
-          if(conf.titlebar.height)
-               if((c = client_gettbar(ev.xbutton.window)))
-                    for(i = 0; i < conf.titlebar.nmouse; ++i)
-                         if(ev.xbutton.button == conf.titlebar.mouse[i].button)
-                              if(conf.titlebar.mouse[i].func)
-                                   conf.titlebar.mouse[i].func(conf.titlebar.mouse[i].cmd);
+          if(ev.xbutton.button == Button4)
+               uicb_tag("+1");
+          if(ev.xbutton.button == Button5)
+               uicb_tag("-1");
      }
 
-     /* ****** */
-     /* CLIENT */
-     /* ****** */
-     {
-          if((c = client_get(ev.xbutton.window)))
-               for(i = 0; i < conf.client.nmouse; ++i)
-                    if(ev.xbutton.button == conf.client.mouse[i].button)
-                         if(conf.client.mouse[i].func)
-                              conf.client.mouse[i].func(conf.client.mouse[i].cmd);
-     }
-
-     /* *** */
-     /* BAR */
-     /* *** */
+     /* Bar */
      {
           if(ev.xbutton.window == bar->win)
           {
-               /* *** */
-               /* TAG */
-               /* *** */
+               /* Tag*/
+               for(i = 0; i < conf.ntag + 1; ++i)
                {
-
-                    /* CLICK */
+                    if(ev.xbutton.x > taglen[i-1] - 3
+                       && ev.xbutton.x < (taglen[i] - 3))
                     {
-                         for(i = 0; i < conf.ntag + 1; ++i)
-                         {
-                              if(ev.xbutton.x > taglen[i-1] - 3
-                                 && ev.xbutton.x < (taglen[i] - 3))
-                              {
-                                   ITOA(s, i);
-                                   /* BUTTON 1 */
-                                   {
-                                        if(ev.xbutton.button == Button1)
-                                             uicb_tag(s);
-                                   }
-                                   /* BUTTON 2 */
-                                   {
-                                        if(ev.xbutton.button == Button3)
-                                             uicb_tagtransfert(s);
-                                   }
-                              }
-                         }
-
-                    }
-
-                    /* SCROLL */
-                    {
-                         if(ev.xbutton.x < taglen[conf.ntag])
-                         {
-                              /* BUTTON 4 (UP) */
-                              {
-                                   if(ev.xbutton.button == Button4)
-                                        uicb_tag("+1");
-                              }
-                              /* BUTTON 5 (UP) */
-                              {
-                                   if (ev.xbutton.button == Button5)
-                                        uicb_tag("-1");
-                              }
-                         }
+                         ITOA(s, i);
+                         if(ev.xbutton.button == Button1)
+                              uicb_tag(s);
+                         if(ev.xbutton.button == Button3)
+                              uicb_tagtransfert(s);
                     }
                }
+               if(ev.xbutton.x < taglen[conf.ntag])
+               {
+                    if(ev.xbutton.button == Button4)
+                         uicb_tag("+1");
+                    if (ev.xbutton.button == Button5)
+                         uicb_tag("-1");
+               }
 
-               /* ****** */
-               /* LAYOUT */
-               /* ****** */
+               /* Layout */
                {
                     if(ev.xbutton.x >= taglen[conf.ntag]
                        && ev.xbutton.x <=  taglen[conf.ntag]
                        + textw(tags[seltag].layout.symbol) + PAD/2)
                     {
-                         /* BUTTON 1 / 4 */
-                         {
-                              if(ev.xbutton.button == Button1
-                                 || ev.xbutton.button == Button4)
-                                   layoutswitch(True);
-                         }
-                         /* BUTTON 3 / 5 */
-                         {
-                              if(ev.xbutton.button == Button3
-                                 || ev.xbutton.button == Button5)
-                                   layoutswitch(False);
-                         }
+                         if(ev.xbutton.button == Button1
+                            || ev.xbutton.button == Button4)
+                              layoutswitch(True);
+                         if(ev.xbutton.button == Button3
+                            || ev.xbutton.button == Button5)
+                              layoutswitch(False);
                     }
                }
-
           }
      }
 
-     /* **** */
-     /* ROOT */
-     /* **** */
-     {
-          if(ev.xbutton.window == root)
-          {
-               /* BUTTON 4 */
-               {
-                    if(ev.xbutton.button == Button4)
-                         uicb_tag("+1");
-               }
-               /* BUTTON 5 */
-               {
-                    if(ev.xbutton.button == Button5)
-                         uicb_tag("-1");
-               }
-          }
-
-     }
-
-     /* *********** */
-     /* BAR BUTTONS */
-     /* *********** */
-     {
-          for(i = 0; i < conf.nbutton ; ++i)
-               for(j = 0; j < conf.barbutton[i].nmousesec; ++j)
-                    if(ev.xbutton.window == conf.barbutton[i].bw->win
-                       && ev.xbutton.button == conf.barbutton[i].mouse[j].button)
-                         if(conf.barbutton[i].mouse[j].func)
-                              conf.barbutton[i].mouse[j].func(conf.barbutton[i].mouse[j].cmd);
-     }
      return;
 }
 
