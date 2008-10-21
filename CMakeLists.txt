@@ -47,7 +47,7 @@ set(VERSION "0.1rc2 (Brain Damage)")
 set(CFLAGS "-g -Wall")
 set(CMAKE_C_FLAGS ${CFLAGS})
 set(LDFLAGS "-L /usr/local/lib")
-set(CMAKE_SHARED_LINKER_FLAGS ${LDFLAGS})
+set_target_properties(wmfs PROPERTIES LINK_FLAGS ${LDFLAGS})
 
 # Package find
 find_package(Freetype)
