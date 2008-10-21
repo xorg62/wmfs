@@ -185,7 +185,7 @@ client_hide(Client *c)
 Bool
 ishide(Client *c)
 {
-     if(c->tag == seltag)
+     if(c->tag && c->tag == seltag)
           return False;
      return True;
 }
