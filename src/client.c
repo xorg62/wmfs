@@ -66,7 +66,7 @@ client_detach(Client *c)
      return;
 }
 
-/* Fixed, need testing */
+/* Fixed, need testing4 */
 void
 uicb_client_prev(uicb_t cmd)
 {
@@ -176,9 +176,7 @@ client_gettbar(Window w)
 void
 client_hide(Client *c)
 {
-     XMoveWindow(dpy, c->win, c->geo.x + mw * 2, c->geo.y);
-     if(conf.titlebar.height)
-          XMoveWindow(dpy, c->tbar->win, c->geo.x + mw * 2, c->geo.y);
+     client_unmap(c);
      setwinstate(c->win, IconicState);
 
      return;
@@ -456,9 +454,7 @@ uicb_client_raise(uicb_t cmd)
 void
 client_unhide(Client *c)
 {
-     XMoveWindow(dpy, c->win, c->geo.x, c->geo.y);
-     if(conf.titlebar.height)
-          XMoveWindow(dpy, c->tbar->win, c->geo.x, c->geo.y - conf.titlebar.height);
+     client_map(c);
      setwinstate(c->win, NormalState);
 
      return;
