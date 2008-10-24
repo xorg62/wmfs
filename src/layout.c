@@ -194,7 +194,7 @@ tile(void)
      if(!n)
           return;
 
-     /* tile mirror
+     /* Tile mirror, maybe soon...
      nmaster = (n > tags[seltag].nmaster) ? n - tags[seltag].nmaster : tags[seltag].nmaster;
      mwfact = (1 - tags[seltag].mwfact) * sgeo.width
      */

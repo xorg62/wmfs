@@ -178,6 +178,7 @@ init(void)
      updatebar();
 
      /* INIT WORKABLE SPACE GEOMETRY */
+     conf.titlebar.height += conf.client.borderheight;
      sgeo.x = 0;
      sgeo.y = (conf.bartop) ? barheight + conf.titlebar.height : conf.titlebar.height;
      sgeo.width = DisplayWidth(dpy, screen);

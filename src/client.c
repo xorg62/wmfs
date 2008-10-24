@@ -125,6 +125,8 @@ client_focus(Client *c)
      {
           grabbuttons(sel, False);
           XSetWindowBorder(dpy, sel->win, conf.client.bordernormal);
+          if(conf.titlebar.height)
+               XSetWindowBorder(dpy, sel->tbar->win, conf.client.bordernormal);
      }
 
      if(c)
@@ -136,6 +138,8 @@ client_focus(Client *c)
      if(c)
      {
           XSetWindowBorder(dpy, c->win, conf.client.borderfocus);
+          if(conf.titlebar.height)
+               XSetWindowBorder(dpy, sel->tbar->win, conf.client.borderfocus);
           if(conf.raisefocus)
                client_raise(c);
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
@@ -176,7 +180,9 @@ client_gettbar(Window w)
 void
 client_hide(Client *c)
 {
-     client_unmap(c);
+     XMoveWindow(dpy, c->win, c->geo.x + mw * 2, c->geo.y);
+     if(conf.titlebar.height)
+          XMoveWindow(dpy, c->tbar->win, c->geo.x + mw * 2, c->geo.y);
      setwinstate(c->win, IconicState);
 
      return;
@@ -237,20 +243,23 @@ client_manage(Window w, XWindowAttributes *wa)
      c = emalloc(1, sizeof(Client));
      c->win = w;
      c->geo.x = wa->x;
-     /* Default free placement */
      c->geo.y = wa->y + sgeo.y + conf.titlebar.height;
      c->geo.width = wa->width;
      c->geo.height = wa->height;
      c->tag = seltag;
      c->border = conf.client.borderheight;
 
-     /* Create titlebar */
+     /* Create titlebar (or not) */
      if(conf.titlebar.height)
+     {
           c->tbar = bar_create(c->geo.x,
                                c->geo.y - conf.titlebar.height,
-                               c->geo.width + c->border,
-                               conf.titlebar.height, 0,
+                               c->geo.width,
+                               conf.titlebar.height - conf.client.borderheight,
+                               conf.client.borderheight,
                                conf.titlebar.bg, True);
+          XSetWindowBorder(dpy, c->tbar->win, conf.client.bordernormal);
+     }
 
      winc.border_width = c->border;
      XConfigureWindow(dpy, w, CWBorderWidth, &winc);
@@ -346,8 +355,8 @@ client_moveresize(Client *c, XRectangle geo, bool r)
           if(conf.titlebar.height)
                bar_moveresize(c->tbar, geo.x,
                               geo.y - conf.titlebar.height,
-                              geo.width + c->border*2,
-                              conf.titlebar.height);
+                              geo.width,
+                              conf.titlebar.height - conf.client.borderheight);
 
           updatetitlebar(c);
           XSync(dpy, False);
@@ -454,7 +463,9 @@ uicb_client_raise(uicb_t cmd)
 void
 client_unhide(Client *c)
 {
-     client_map(c);
+     XMoveWindow(dpy, c->win, c->geo.x, c->geo.y);
+     if(conf.titlebar.height)
+          XMoveWindow(dpy, c->tbar->win, c->geo.x, c->geo.y - conf.titlebar.height);
      setwinstate(c->win, NormalState);
 
      return;
