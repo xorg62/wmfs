@@ -177,7 +177,7 @@ init(void)
      updatebutton(False);
      updatebar();
 
-     /* INIT WORKABLE SPACE */
+     /* INIT WORKABLE SPACE GEOMETRY */
      sgeo.x = 0;
      sgeo.y = (conf.bartop) ? barheight + conf.titlebar.height : conf.titlebar.height;
      sgeo.width = DisplayWidth(dpy, screen);
