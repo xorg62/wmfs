@@ -66,27 +66,29 @@ client_detach(Client *c)
      return;
 }
 
-/* Need to be fix */
+/* Fixed, need testing */
 void
 uicb_client_prev(uicb_t cmd)
 {
-     Client *c;
+     Client *c = NULL, *d;
 
      if(!sel || ishide(sel))
           return;
 
-     for(c = sel->prev; c && ishide(c); c = c->prev);
+     for(d = clients; d != sel; d = d->next)
+          if(!ishide(d))
+               c = d;
      if(!c)
-     {
-          for(c = clients; c && c->next; c = c->next);
-          for(; c && ishide(c); c = c->prev);
-     }
+          for(; d; d = d->next)
+               if(!ishide(d))
+                    c = d;
      if(c)
      {
           client_focus(c);
           if(!c->tile)
                client_raise(c);
      }
+
      arrange();
 
      return;
@@ -95,7 +97,7 @@ uicb_client_prev(uicb_t cmd)
 void
 uicb_client_next(uicb_t cmd)
 {
-     Client *c;
+     Client *c = NULL;
 
      if(!sel || ishide(sel))
           return;
@@ -174,9 +176,9 @@ client_gettbar(Window w)
 void
 client_hide(Client *c)
 {
-     XUnmapWindow(dpy, c->win);
+     XMoveWindow(dpy, c->win, c->geo.x + mw * 2, c->geo.y);
      if(conf.titlebar.height)
-          XUnmapWindow(dpy, c->tbar->win);
+          XMoveWindow(dpy, c->tbar->win, c->geo.x + mw * 2, c->geo.y);
      setwinstate(c->win, IconicState);
 
      return;
@@ -454,9 +456,9 @@ uicb_client_raise(uicb_t cmd)
 void
 client_unhide(Client *c)
 {
-     XMapWindow(dpy, c->win);
+     XMoveWindow(dpy, c->win, c->geo.x, c->geo.y);
      if(conf.titlebar.height)
-          XMapWindow(dpy, c->tbar->win);
+          XMoveWindow(dpy, c->tbar->win, c->geo.x, c->geo.y - conf.titlebar.height);
      setwinstate(c->win, NormalState);
 
      return;
@@ -467,10 +469,9 @@ client_unmanage(Client *c)
 {
      XGrabServer(dpy);
      XSetErrorHandler(errorhandlerdummy);
-     sel = ((sel == c) ? ((c->next) ? c->next : NULL) : NULL);
-     selbytag[seltag] = (sel && sel->tag == seltag) ? sel : NULL;
+     if(sel == c)
+          client_focus(NULL);
      client_detach(c);
-
      XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
      setwinstate(c->win, WithdrawnState);
 
