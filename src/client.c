@@ -66,6 +66,7 @@ client_detach(Client *c)
      return;
 }
 
+/* Need to be fix */
 void
 uicb_client_prev(uicb_t cmd)
 {
@@ -236,7 +237,8 @@ client_manage(Window w, XWindowAttributes *wa)
      c = emalloc(1, sizeof(Client));
      c->win = w;
      c->geo.x = wa->x;
-     c->geo.y = wa->y + sgeo.y + conf.titlebar.height; /* Default free placement */
+     /* Default free placement */
+     c->geo.y = wa->y + sgeo.y + conf.titlebar.height;
      c->geo.width = wa->width;
      c->geo.height = wa->height;
      c->tag = seltag;
