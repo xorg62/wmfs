@@ -63,6 +63,7 @@ client
 
 titlebar
 {
+        position   = "top"
         height     = 12
         bg         = "#191919"
         fg_normal  = "#D4D4D4"

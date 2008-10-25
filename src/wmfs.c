@@ -135,8 +135,8 @@ init(void)
           fprintf(stderr, "WMFS Error: Cannot initialize font\n");
           xftfont = XftFontOpenName(dpy, screen, "sans-10");
      }
-     fonth = (xftfont->ascent + xftfont->descent) - 1;
-     barheight = fonth + 4;
+     fonth = (xftfont->ascent + xftfont->descent);
+     barheight = fonth + (float)4.5;
 
 
      /* INIT CURSOR */
@@ -180,7 +180,10 @@ init(void)
      /* INIT WORKABLE SPACE GEOMETRY */
      conf.titlebar.height += conf.client.borderheight;
      sgeo.x = 0;
-     sgeo.y = (conf.bartop) ? barheight + conf.titlebar.height : conf.titlebar.height;
+     if(conf.bartop)
+          sgeo.y = conf.titlebar.pos ? barheight : barheight + conf.titlebar.height;
+     else
+          sgeo.y = conf.titlebar.pos ? 0 : conf.titlebar.height;
      sgeo.width = DisplayWidth(dpy, screen);
      sgeo.height = DisplayHeight(dpy, screen) - (barheight + conf.titlebar.height);
 

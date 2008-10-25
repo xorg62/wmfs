@@ -193,6 +193,7 @@ init_conf(void)
 
      static cfg_opt_t titlebar_opts[] =
           {
+               CFG_STR("position",   "top",             CFGF_NONE),
                CFG_INT("height",     0,                 CFGF_NONE),
                CFG_STR("bg",         "#090909",         CFGF_NONE),
                CFG_STR("fg_focus",   "#FFFFFF",         CFGF_NONE),
@@ -367,6 +368,11 @@ init_conf(void)
      conf.bartop      = (strcmp(strdup(cfg_getstr(cfg_bar, "position")), "top") == 0) ? True : False;
 
      /* titlebar */
+     if(strcmp(var_to_str(cfg_getstr(cfg_titlebar, "position")), "bottom") == 0)
+          conf.titlebar.pos = True;
+     else
+          conf.titlebar.pos = False;
+
      conf.titlebar.height     = cfg_getint(cfg_titlebar, "height");
      conf.titlebar.bg         = getcolor(var_to_str(cfg_getstr(cfg_titlebar, "bg")));
      conf.titlebar.fg_focus   = var_to_str(cfg_getstr(cfg_titlebar, "fg_focus"));

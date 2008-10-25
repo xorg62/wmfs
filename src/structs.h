@@ -172,6 +172,7 @@ typedef struct
      } client;
      struct
      {
+          Bool pos;
           int height;
           uint bg;
           char *fg_focus;

@@ -192,7 +192,7 @@ updatebutton(Bool c)
 
                bar_refresh_color(conf.barbutton[i].bw);
                bar_moveresize(conf.barbutton[i].bw, x, y, buttonw, barheight + hi);
-               draw_text(conf.barbutton[i].bw->dr, BPAD/2, fonth, conf.barbutton[i].fg_color,
+               draw_text(conf.barbutton[i].bw->dr, BPAD/2, fonth - 1, conf.barbutton[i].fg_color,
                          conf.barbutton[i].bg_color, PAD, conf.barbutton[i].content);
 
                /* Refresh button */
@@ -210,7 +210,10 @@ uicb_togglebarpos(uicb_t cmd)
      int i;
 
      conf.bartop = !conf.bartop;
-     sgeo.y = (conf.bartop) ? barheight + conf.titlebar.height : conf.titlebar.height;
+     if(conf.bartop)
+          sgeo.y = conf.titlebar.pos ? barheight : barheight + conf.titlebar.height;
+     else
+          sgeo.y = conf.titlebar.pos ? 0 : conf.titlebar.height;
 
      if(conf.bartop)
           bary = 0;
@@ -225,51 +228,6 @@ uicb_togglebarpos(uicb_t cmd)
           XMapWindow(dpy, conf.barbutton[i].bw->win);
 
      arrange();
-
-     return;
-}
-
-void
-updatetitlebar(Client *c)
-{
-     int pos_y, pos_x;
-     char *tmpcolor = NULL;
-
-     XFetchName(dpy, c->win, &(c->title));
-     if(!c->title)
-          c->title = strdup("WMFS");
-
-     if(!conf.titlebar.height)
-          return;
-
-     bar_refresh_color(c->tbar);
-
-     /* Draw the client title in the titlebar *logeek* */
-     if(conf.titlebar.height > 9)
-     {
-          /* Set the text alignement */
-          switch(conf.titlebar.text_align)
-          {
-           case Center:
-                 pos_x = (c->geo.width / 2) - (textw(c->title) / 2);
-                 break;
-           case Right:
-                 pos_x = c->geo.width - textw(c->title) - 2;
-                 break;
-           default:
-           case Left:
-                 pos_x = 2;
-                 break;
-          }
-
-          /* Set y text position (always at the middle) and fg color */
-          pos_y = (fonth - (xftfont->descent - 1)) + ((conf.titlebar.height - fonth) / 2);
-          tmpcolor = ((c == sel) ? conf.titlebar.fg_focus : conf.titlebar.fg_normal);
-
-          /* Draw title */
-          draw_text(c->tbar->dr, pos_x, pos_y, tmpcolor, conf.titlebar.bg, 0, c->title);
-     }
-     bar_refresh(c->tbar);
 
      return;
 }

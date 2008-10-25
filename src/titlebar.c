@@ -1,0 +1,131 @@
+/*
+*      titlebar.c
+*      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.com>
+*      All rights reserved.
+*
+*      Redistribution and use in source and binary forms, with or without
+*      modification, are permitted provided that the following conditions are
+*      met:
+*
+*      * Redistributions of source code must retain the above copyright
+*        notice, this list of conditions and the following disclaimer.
+*      * Redistributions in binary form must reproduce the above
+*        copyright notice, this list of conditions and the following disclaimer
+*        in the documentation and/or other materials provided with the
+*        distribution.
+*      * Neither the name of the  nor the names of its
+*        contributors may be used to endorse or promote products derived from
+*        this software without specific prior written permission.
+*
+*      THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+*      "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+*      LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+*      A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+*      OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+*      SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+*      LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*      DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*      THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+*      (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*      OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+#include "wmfs.h"
+
+void
+titlebar_create(Client *c)
+{
+     int y;
+
+     /* Set titlebar position : Top/Bottom */
+     if(conf.titlebar.pos)
+          y = c->geo.y + c->geo.height + conf.client.borderheight;
+     else
+          y = c->geo.y - conf.titlebar.height;
+
+     c->tbar = bar_create(c->geo.x,
+                          c->geo.y - conf.titlebar.height,
+                          c->geo.width,
+                          conf.titlebar.height - conf.client.borderheight,
+                          conf.client.borderheight,
+                          conf.titlebar.bg, True);
+     XSetWindowBorder(dpy, c->tbar->win, conf.client.bordernormal);
+
+     return;
+}
+
+
+Client*
+titlebar_get(Window w)
+{
+     Client *c;
+
+     if(!conf.titlebar.height)
+          return NULL;
+
+     for(c = clients; c && c->tbar->win != w; c = c->next);
+
+     return c;
+}
+
+void
+titlebar_update_position(Client *c)
+{
+     int y;
+
+     /* Set titlebar position : Top/Bottom */
+     if(conf.titlebar.pos)
+          y = c->geo.y + c->geo.height + conf.client.borderheight;
+     else
+          y = c->geo.y - conf.titlebar.height;
+
+     bar_moveresize(c->tbar, c->geo.x, y, c->geo.width,
+                    conf.titlebar.height - conf.client.borderheight);
+
+     return;
+}
+
+void
+titlebar_update(Client *c)
+{
+     int pos_y, pos_x;
+     char *tmpcolor = NULL;
+
+     XFetchName(dpy, c->win, &(c->title));
+     if(!c->title)
+          c->title = strdup("WMFS");
+
+     if(!conf.titlebar.height)
+          return;
+
+     bar_refresh_color(c->tbar);
+
+     /* Draw the client title in the titlebar *logeek* */
+     if(conf.titlebar.height > 9)
+     {
+          /* Set the text alignement */
+          switch(conf.titlebar.text_align)
+          {
+          case Center:
+               pos_x = (c->geo.width / 2) - (textw(c->title) / 2);
+               break;
+          case Right:
+               pos_x = c->geo.width - textw(c->title) - 2;
+               break;
+          default:
+          case Left:
+               pos_x = 2;
+               break;
+          }
+
+          /* Set y text position (always at the middle) and fg color */
+          pos_y = (fonth - (xftfont->descent )) + ((conf.titlebar.height - fonth) / 2);
+          tmpcolor = ((c == sel) ? conf.titlebar.fg_focus : conf.titlebar.fg_normal);
+
+          /* Draw title */
+          draw_text(c->tbar->dr, pos_x, pos_y, tmpcolor, conf.titlebar.bg, 0, c->title);
+     }
+     bar_refresh(c->tbar);
+
+     return;
+}

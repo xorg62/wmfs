@@ -70,7 +70,6 @@ void bar_refresh_color(BarWindow *bw);
 void bar_refresh(BarWindow *bw);
 void updatebar(void);
 void updatebutton(Bool c);
-void updatetitlebar(Client *c);
 void uicb_togglebarpos(uicb_t);
 
 /* draw.c */
@@ -86,7 +85,6 @@ void client_attach(Client *c);
 void client_detach(Client *c);
 void client_focus(Client *c);
 Client *client_get(Window w);
-Client *client_gettbar(Window w);
 void client_hide(Client *c);
 Bool ishide(Client *c);
 void client_map(Client *c);
@@ -136,6 +134,12 @@ void uicb_tag(uicb_t);
 void uicb_tag_next(uicb_t);
 void uicb_tag_prev(uicb_t);
 void uicb_tagtransfert(uicb_t);
+
+/* titlebar.c */
+void titlebar_create(Client *c);
+Client* titlebar_get(Window w);
+void titlebar_update_position(Client *c);
+void titlebar_update(Client *c);
 
 /* layout.c */
 void arrange(void);

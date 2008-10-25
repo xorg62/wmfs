@@ -42,7 +42,7 @@ buttonpress(XEvent ev)
 
      /* Titlebar */
      if(conf.titlebar.height)
-          if((c = client_gettbar(ev.xbutton.window)))
+          if((c = titlebar_get(ev.xbutton.window)))
                for(i = 0; i < conf.titlebar.nmouse; ++i)
                     if(ev.xbutton.button == conf.titlebar.mouse[i].button)
                          if(conf.titlebar.mouse[i].func)
@@ -165,7 +165,7 @@ enternotify(XEvent ev)
         || ev.xcrossing.detail == NotifyInferior)
           return;
      if((c = client_get(ev.xcrossing.window))
-        || (c = client_gettbar(ev.xcrossing.window)))
+        || (c = titlebar_get(ev.xcrossing.window)))
           client_focus(c);
      else
           client_focus(NULL);
@@ -186,7 +186,7 @@ expose(XEvent ev)
      if(conf.titlebar.height)
           for(c = clients; c; c = c->next)
                if(ev.xexpose.window == c->tbar->win)
-                    updatetitlebar(c);
+                    titlebar_update(c);
 
      return;
 }
@@ -394,7 +394,7 @@ propertynotify(XEvent ev)
           }
           if(ev.xproperty.atom == XA_WM_NAME
              || ev.xproperty.atom == net_atom[NetWMName])
-               updatetitlebar(c);
+               titlebar_update(c);
      }
 
      return;
