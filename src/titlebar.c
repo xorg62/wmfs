@@ -44,7 +44,7 @@ titlebar_create(Client *c)
           y = c->geo.y - conf.titlebar.height;
 
      c->tbar = bar_create(c->geo.x,
-                          c->geo.y - conf.titlebar.height,
+                          y,
                           c->geo.width,
                           conf.titlebar.height - conf.client.borderheight,
                           conf.client.borderheight,
