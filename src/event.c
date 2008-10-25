@@ -41,7 +41,7 @@ buttonpress(XEvent ev)
      char s[6];
 
      /* Titlebar */
-     if(conf.titlebar.height)
+     if(conf.titlebar.exist)
           if((c = titlebar_get(ev.xbutton.window)))
                for(i = 0; i < conf.titlebar.nmouse; ++i)
                     if(ev.xbutton.button == conf.titlebar.mouse[i].button)
@@ -140,7 +140,6 @@ configurerequest(XEvent ev)
           if(wc.y < mw && wc.x < mh)
                client_moveresize(c, geo, True);
 
-
      return;
 }
 
@@ -183,7 +182,7 @@ expose(XEvent ev)
         && (ev.xexpose.window == bar->win))
           updatebar();
 
-     if(conf.titlebar.height)
+     if(conf.titlebar.exist)
           for(c = clients; c; c = c->next)
                if(ev.xexpose.window == c->tbar->win)
                     titlebar_update(c);

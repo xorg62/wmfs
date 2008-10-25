@@ -374,6 +374,7 @@ init_conf(void)
           conf.titlebar.pos = False;
 
      conf.titlebar.height     = cfg_getint(cfg_titlebar, "height");
+     conf.titlebar.exist      = conf.titlebar.height ? True : False;
      conf.titlebar.bg         = getcolor(var_to_str(cfg_getstr(cfg_titlebar, "bg")));
      conf.titlebar.fg_focus   = var_to_str(cfg_getstr(cfg_titlebar, "fg_focus"));
      conf.titlebar.fg_normal  = var_to_str(cfg_getstr(cfg_titlebar, "fg_normal"));

@@ -41,7 +41,7 @@ titlebar_create(Client *c)
      if(conf.titlebar.pos)
           y = c->geo.y + c->geo.height + conf.client.borderheight;
      else
-          y = c->geo.y - conf.titlebar.height;
+          y = c->geo.y - (conf.titlebar.height + conf.client.borderheight);
 
      c->tbar = bar_create(c->geo.x,
                           y,
@@ -60,7 +60,7 @@ titlebar_get(Window w)
 {
      Client *c;
 
-     if(!conf.titlebar.height)
+     if(!conf.titlebar.exist)
           return NULL;
 
      for(c = clients; c && c->tbar->win != w; c = c->next);
@@ -78,7 +78,6 @@ titlebar_update_position(Client *c)
           y = c->geo.y + c->geo.height + conf.client.borderheight;
      else
           y = c->geo.y - conf.titlebar.height;
-
      bar_moveresize(c->tbar, c->geo.x, y, c->geo.width,
                     conf.titlebar.height - conf.client.borderheight);
 
@@ -95,7 +94,7 @@ titlebar_update(Client *c)
      if(!c->title)
           c->title = strdup("WMFS");
 
-     if(!conf.titlebar.height)
+     if(!conf.titlebar.exist)
           return;
 
      bar_refresh_color(c->tbar);

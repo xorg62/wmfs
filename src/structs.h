@@ -172,6 +172,7 @@ typedef struct
      } client;
      struct
      {
+          Bool exist;
           Bool pos;
           int height;
           uint bg;

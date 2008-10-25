@@ -125,7 +125,7 @@ client_focus(Client *c)
      {
           grabbuttons(sel, False);
           XSetWindowBorder(dpy, sel->win, conf.client.bordernormal);
-          if(conf.titlebar.height)
+          if(conf.titlebar.exist)
                XSetWindowBorder(dpy, sel->tbar->win, conf.client.bordernormal);
      }
 
@@ -138,7 +138,7 @@ client_focus(Client *c)
      if(c)
      {
           XSetWindowBorder(dpy, c->win, conf.client.borderfocus);
-          if(conf.titlebar.height)
+          if(conf.titlebar.exist)
                XSetWindowBorder(dpy, sel->tbar->win, conf.client.borderfocus);
           if(conf.raisefocus)
                client_raise(c);
@@ -168,7 +168,7 @@ void
 client_hide(Client *c)
 {
      XMoveWindow(dpy, c->win, c->geo.x + mw * 2, c->geo.y);
-     if(conf.titlebar.height)
+     if(conf.titlebar.exist)
           XMoveWindow(dpy, c->tbar->win, c->geo.x + mw * 2, c->geo.y);
      setwinstate(c->win, IconicState);
 
@@ -210,7 +210,7 @@ client_map(Client *c)
           return;
 
      XMapWindow(dpy, c->win);
-     if(conf.titlebar.height)
+     if(conf.titlebar.exist)
      {
           XMapWindow(dpy, c->tbar->win);
           bar_refresh(c->tbar);
@@ -237,7 +237,7 @@ client_manage(Window w, XWindowAttributes *wa)
      c->border = conf.client.borderheight;
 
      /* Create titlebar */
-     if(conf.titlebar.height)
+     if(conf.titlebar.exist)
           titlebar_create(c);
 
      winc.border_width = c->border;
@@ -331,7 +331,7 @@ client_moveresize(Client *c, XRectangle geo, bool r)
           XMoveResizeWindow(dpy, c->win, geo.x, geo.y,
                             geo.width, geo.height);
 
-          if(conf.titlebar.height)
+          if(conf.titlebar.exist)
                titlebar_update_position(c);
 
           titlebar_update(c);
@@ -419,7 +419,7 @@ client_raise(Client *c)
           return;
      XRaiseWindow(dpy, c->win);
 
-     if(conf.titlebar.height)
+     if(conf.titlebar.exist)
      {
           XRaiseWindow(dpy, c->tbar->win);
           titlebar_update(c);
@@ -440,7 +440,7 @@ void
 client_unhide(Client *c)
 {
      XMoveWindow(dpy, c->win, c->geo.x, c->geo.y);
-     if(conf.titlebar.height)
+     if(conf.titlebar.exist)
           titlebar_update_position(c);
      setwinstate(c->win, NormalState);
 
@@ -461,7 +461,7 @@ client_unmanage(Client *c)
      XSync(dpy, False);
      XUngrabServer(dpy);
 
-     if(conf.titlebar.height)
+     if(conf.titlebar.exist)
           bar_delete(c->tbar);
      free(c);
 
@@ -477,7 +477,7 @@ client_unmap(Client *c)
           return;
 
      XUnmapWindow(dpy, c->win);
-     if(conf.titlebar.height)
+     if(conf.titlebar.exist)
           XUnmapWindow(dpy, c->tbar->win);
 
      return;
