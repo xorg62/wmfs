@@ -52,8 +52,6 @@ arrange(void)
 
      updatebar();
 
-     efree(c);
-
      return;
 }
 
@@ -78,8 +76,6 @@ freelayout(void)
                }
           }
      }
-
-     efree(c);
 
      return;
 }
@@ -140,8 +136,6 @@ maxlayout(void)
 
           client_moveresize(c, geo, False);
      }
-
-     efree(c);
 
      return;
 }
@@ -273,7 +267,6 @@ tile(void)
           if(n > nmaster && tileheight != sgeo.height)
                cgeo.y = c->geo.y + c->geo.height + border + titlebarh;
      }
-     efree(c);
 
      return;
 }
