@@ -135,72 +135,6 @@ updatebar(void)
      /* Refresh the bar */
      bar_refresh(bar);
 
-     /* Update Bar Buttons */
-     updatebutton(True);
-
-     return;
-}
-
-/* BARBUTTON MANAGE FUNCTION
- * if c is False, you can execute this function for the first time
- * else the button is just updated *TestingButWorking* */
-void
-updatebutton(Bool c)
-{
-     int i, j, x, pm = 0, buttonw = 0;
-     int y = 0, hi = 0;
-
-     /* Calcul the position of the first button with the layout image size */
-     j = taglen[conf.ntag] + textw(tags[seltag].layout.symbol) + PAD/2;
-
-     if(!conf.bartop)
-          y = bary + 2;
-     if(conf.tagbordwidth)
-          hi = -1;
-
-     for(i = 0; i < conf.nbutton; ++i)
-     {
-
-          /* CALCUL POSITION */
-          {
-               buttonw = textw(conf.barbutton[i].content) + BPAD;
-
-               if(!(x = conf.barbutton[i].x))
-               {
-                    if(i)
-                         pm += textw(conf.barbutton[i-1].content) + BPAD;
-
-                    buttonw = textw(conf.barbutton[i].content) + BPAD;
-                    x = (!i) ? j : j + pm;
-               }
-          }
-
-          /* FIRST TIME */
-          {
-               if(!c)
-               {
-                    conf.barbutton[i].bw = bar_create(x, y, buttonw, barheight + hi, 0,
-                                                      conf.barbutton[i].bg_color, False);
-                    XMapRaised(dpy, conf.barbutton[i].bw->win);
-               }
-          }
-
-          /* REFRESH TEXT */
-          {
-               if(!conf.barbutton[i].bw)
-                    return;
-
-               bar_refresh_color(conf.barbutton[i].bw);
-               bar_moveresize(conf.barbutton[i].bw, x, y, buttonw, barheight + hi);
-               draw_text(conf.barbutton[i].bw->dr, BPAD/2, fonth - 1, conf.barbutton[i].fg_color,
-                         conf.barbutton[i].bg_color, PAD, conf.barbutton[i].content);
-
-               /* Refresh button */
-               bar_refresh(conf.barbutton[i].bw);
-          }
-     }
-     XSync(dpy, False);
-
      return;
 }
 
@@ -223,7 +157,6 @@ uicb_togglebarpos(uicb_t cmd)
      updatebar();
      for(i = 0; i < conf.nbutton; ++i)
           XUnmapWindow(dpy, conf.barbutton[i].bw->win);
-     updatebutton(False);
      for(i = 0; i < conf.nbutton; ++i)
           XMapWindow(dpy, conf.barbutton[i].bw->win);
 

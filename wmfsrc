@@ -77,50 +77,6 @@ titlebar
         mouse { button = "3" func = "mouse_resize" }
 }
 
-buttons
-{
-        # MWFACT BUTTON {{{
-        button
-        {
-                content = "[-]"
-                mouse { button = "1" func = "set_mwfact" cmd = "-0.01" }
-                fg_color = "#FFFFFF"
-                bg_color = "#191919"
-        }
-        button
-        {
-               content = "Mwfact" fg_color = "#FFFFFF" bg_color = "#3E3E3E"
-               mouse { button = "4" func = "set_mwfact" cmd = "+0.01" }
-               mouse { button = "5" func = "set_mwfact" cmd = "-0.01" }
-        }
-        button
-        {
-               content = "[+] "
-               mouse { button = "1" func = "set_mwfact" cmd = "+0.01" }
-               fg_color = "#FFFFFF"
-               bg_color = "#191919"
-        }
-        # }}}
-
-        # NMASTER BUTTON {{{
-        button
-        {
-               content = "[-]"
-               mouse { button = "1" func = "set_nmaster" cmd = "-1" }
-               fg_color = "#FFFFFF"
-               bg_color = "#191919"
-        }
-        button { content = "Nmaster" fg_color = "#FFFFFF" bg_color = "#3E3E3E" }
-        button
-        {
-               content = "[+] "
-               mouse { button = "1" func = "set_nmaster" cmd = "+1" }
-               fg_color = "#FFFFFF"
-               bg_color = "#191919"
-        }
-        # }}}
-}
-
 keys
 {
 # general keybind
@@ -137,6 +93,9 @@ keys
         key { mod = {"Control"} key = "Down" func = "layout_prev" }
         key { mod = {"Alt"} key = "l" func = "set_mwfact" cmd = "+0.025" }
         key { mod = {"Alt"} key = "h" func = "set_mwfact" cmd = "-0.025" }
+        key { mod = {"Alt", "Shift"} key = "l" func = "set_nmaster" cmd = "+1" }
+        key { mod = {"Alt", "Shift"} key = "h" func = "set_nmaster" cmd = "-1" }
+
 
 # tag manipulation keybind
         key { mod = {"Alt"} key = "F1" func = "tag" cmd = "1" }

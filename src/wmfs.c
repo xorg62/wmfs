@@ -173,7 +173,6 @@ init(void)
      bar = bar_create(0, bary, mw, barheight, 0, conf.colors.bar, False);
      XMapRaised(dpy, bar->win);
      strcpy(bartext, "WMFS-" WMFS_VERSION);
-     updatebutton(False);
      updatebar();
 
      /* INIT WORKABLE SPACE GEOMETRY */

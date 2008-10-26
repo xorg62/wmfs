@@ -69,7 +69,6 @@ void bar_moveresize(BarWindow *bw, int x, int y, uint w, uint h);
 void bar_refresh_color(BarWindow *bw);
 void bar_refresh(BarWindow *bw);
 void updatebar(void);
-void updatebutton(Bool c);
 void uicb_togglebarpos(uicb_t);
 
 /* draw.c */

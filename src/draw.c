@@ -51,8 +51,10 @@ draw_text(Drawable d, int x, int y, char* fg, uint bg, int pad, char *str)
      /* Draw the text */
      XftDrawStringUtf8(xftd, &xftcolor, xftfont, x, y, (FcChar8 *)str, strlen(str));
 
-     /* Free the text color */
+     /* Free the text color and XftDraw */
      XftColorFree(dpy, DefaultVisual(dpy, screen), DefaultColormap(dpy, screen), &xftcolor);
+     XftDrawDestroy(xftd);
+
 
      return;
 }

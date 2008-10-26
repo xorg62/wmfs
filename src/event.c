@@ -37,7 +37,7 @@ void
 buttonpress(XEvent ev)
 {
      Client *c;
-     int i, j;
+     int i;
      char s[6];
 
      /* Titlebar */
@@ -54,14 +54,6 @@ buttonpress(XEvent ev)
                if(ev.xbutton.button == conf.client.mouse[i].button)
                     if(conf.client.mouse[i].func)
                          conf.client.mouse[i].func(conf.client.mouse[i].cmd);
-
-     /* Bar Buttons */
-     for(i = 0; i < conf.nbutton ; ++i)
-          for(j = 0; j < conf.barbutton[i].nmousesec; ++j)
-               if(ev.xbutton.window == conf.barbutton[i].bw->win
-                  && ev.xbutton.button == conf.barbutton[i].mouse[j].button)
-                    if(conf.barbutton[i].mouse[j].func)
-                         conf.barbutton[i].mouse[j].func(conf.barbutton[i].mouse[j].cmd);
 
      /* Root */
      if(ev.xbutton.window == root)
@@ -113,7 +105,6 @@ buttonpress(XEvent ev)
                }
           }
      }
-     efree(c);
 
      return;
 }

@@ -261,22 +261,6 @@ init_conf(void)
                CFG_END()
           };
 
-     static cfg_opt_t button_opts[] =
-          {
-               CFG_STR("content",  "",                CFGF_NONE),
-               CFG_SEC("mouse",    mouse_button_opts, CFGF_MULTI),
-               CFG_STR("fg_color", "#000000",         CFGF_NONE),
-               CFG_STR("bg_color", "#FFFFFF",         CFGF_NONE),
-               CFG_INT("x",        0,                 CFGF_NONE),
-               CFG_END()
-          };
-
-     static cfg_opt_t buttons_opts[] =
-          {
-               CFG_SEC("button", button_opts, CFGF_MULTI),
-               CFG_END()
-          };
-
      static cfg_opt_t variable_opts[] =
           {
                CFG_STR("content", "", CFGF_NONE),
@@ -299,7 +283,6 @@ init_conf(void)
                CFG_SEC("layouts",   layouts_opts,   CFGF_NONE),
                CFG_SEC("tags",      tags_opts,      CFGF_NONE),
                CFG_SEC("keys",      keys_opts,      CFGF_NONE),
-               CFG_SEC("buttons",   buttons_opts,   CFGF_NONE),
                CFG_END()
           };
 
@@ -312,8 +295,7 @@ init_conf(void)
      cfg_t *cfg_layouts;
      cfg_t *cfg_tags;
      cfg_t *cfg_keys;
-     cfg_t *cfg_buttons;
-     cfg_t *cfgtmp, *cfgtmp2, *cfgtmp3;
+     cfg_t *cfgtmp;
      char final_path[128];
      char sfinal_path[128];
      char buf[256] = {0};
@@ -343,7 +325,6 @@ init_conf(void)
      cfg_layouts   = cfg_getsec(cfg, "layouts");
      cfg_tags      = cfg_getsec(cfg, "tags");
      cfg_keys      = cfg_getsec(cfg, "keys");
-     cfg_buttons   = cfg_getsec(cfg, "buttons");
 
      if((cfg_size(cfg_variables, "var")) > 256)
      {
@@ -516,27 +497,6 @@ init_conf(void)
 
           keys[j].cmd = (!strdup(var_to_str((cfg_getstr(cfgtmp, "cmd"))))
                                  ?  NULL : strdup(var_to_str(cfg_getstr(cfgtmp, "cmd"))));
-     }
-
-     /* button */
-     conf.nbutton = cfg_size(cfg_buttons, "button");
-     conf.barbutton = emalloc(conf.nbutton, sizeof(BarButton));
-
-     for(i = 0; i < conf.nbutton; ++i)
-     {
-          cfgtmp2 = cfg_getnsec(cfg_buttons, "button", i);
-          for(j = 0; j < cfg_size(cfgtmp2, "mouse");  ++j)
-          {
-               cfgtmp3 = cfg_getnsec(cfgtmp2, "mouse", j);
-               conf.barbutton[i].mouse[j].func   = name_to_func(cfg_getstr(cfgtmp3, "func"), func_list);
-               conf.barbutton[i].mouse[j].cmd    = strdup(var_to_str(cfg_getstr(cfgtmp3, "cmd")));
-               conf.barbutton[i].mouse[j].button = char_to_button(cfg_getstr(cfgtmp3, "button"));
-          }
-          conf.barbutton[i].nmousesec = cfg_size(cfgtmp2, "mouse");
-          conf.barbutton[i].content   = strdup(var_to_str(cfg_getstr(cfgtmp2, "content")));
-          conf.barbutton[i].fg_color  = strdup(var_to_str(cfg_getstr(cfgtmp2, "fg_color")));
-          conf.barbutton[i].bg_color  = getcolor(strdup(var_to_str(cfg_getstr(cfgtmp2, "bg_color"))));
-          conf.barbutton[i].x         = cfg_getint(cfgtmp2, "x");
      }
 
      cfg_free(cfg);
