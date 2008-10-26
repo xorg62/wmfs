@@ -385,7 +385,7 @@ propertynotify(XEvent ev)
           }
           if(ev.xproperty.atom == XA_WM_NAME
              || ev.xproperty.atom == net_atom[NetWMName])
-               titlebar_update(c);
+               client_get_title(c);
      }
 
      return;

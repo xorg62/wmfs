@@ -96,9 +96,7 @@ titlebar_update(Client *c)
 {
      int pos_y, pos_x;
 
-     XFetchName(dpy, c->win, &(c->title));
-     if(!c->title)
-          c->title = strdup("WMFS");
+     client_get_title(c);
 
      if(!conf.titlebar.exist)
           return;

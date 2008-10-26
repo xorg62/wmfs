@@ -165,6 +165,16 @@ client_get(Window w)
 }
 
 void
+client_get_title(Client *c)
+{
+     XFetchName(dpy, c->win, &(c->title));
+     if(!c->title)
+          c->title = strdup("WMFS");
+
+     return;
+}
+
+void
 client_hide(Client *c)
 {
      XMoveWindow(dpy, c->win, c->geo.x + mw * 2, c->geo.y);
@@ -257,6 +267,8 @@ client_manage(Window w, XWindowAttributes *wa)
           c->free = (rettrans == Success) || c->hint;
      else
           client_raise(c);
+
+     efree(t);
 
      client_attach(c);
      XMoveResizeWindow(dpy, c->win, c->geo.x, c->geo.y, c->geo.width, c->geo.height);
@@ -415,8 +427,9 @@ client_size_hints(Client *c)
 void
 client_raise(Client *c)
 {
-     if(!c)
+     if(!c || !c->free)
           return;
+
      XRaiseWindow(dpy, c->win);
 
      if(conf.titlebar.exist)
