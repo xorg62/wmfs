@@ -267,8 +267,8 @@ client_manage(Window w, XWindowAttributes *wa)
           c->free = (rettrans == Success) || c->hint;
      else
           client_raise(c);
-
      efree(t);
+
 
      client_attach(c);
      XMoveResizeWindow(dpy, c->win, c->geo.x, c->geo.y, c->geo.width, c->geo.height);
@@ -427,7 +427,7 @@ client_size_hints(Client *c)
 void
 client_raise(Client *c)
 {
-     if(!c || !c->free)
+     if(!c || c->tile || c->max)
           return;
 
      XRaiseWindow(dpy, c->win);
@@ -477,7 +477,7 @@ client_unmanage(Client *c)
      if(conf.titlebar.exist)
           bar_delete(c->tbar);
      efree(c);
-
+     XSetErrorHandler(errorhandler);
      arrange();
 
      return;
