@@ -41,7 +41,6 @@ client_pertag(int tag)
      for(c = clients; c; c = c->next)
           if(c->tag == tag)
                ++i;
-     efree(c);
 
      return i;
 }
@@ -151,8 +150,6 @@ client_focus(Client *c)
      for(cc = clients; cc; cc = cc->next)
           if(!ishide(cc))
                titlebar_update(cc);
-
-     efree(cc);
 
      return;
 }

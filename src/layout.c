@@ -280,7 +280,8 @@ uicb_tile_switch(uicb_t cmd)
           return;
      if((c = sel) == nexttiled(clients))
           if(!(c = nexttiled(c->next)))
-               return;     client_detach(c);
+               return;
+     client_detach(c);
      client_attach(c);
      client_focus(c);
      arrange();
