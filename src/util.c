@@ -43,6 +43,15 @@ emalloc(uint element, uint size)
      return ret;
 }
 
+void
+efree(void *ptr)
+{
+     if(ptr)
+          free(ptr);
+
+     return;
+}
+
 ulong
 getcolor(char *color)
 {

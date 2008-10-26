@@ -113,6 +113,7 @@ buttonpress(XEvent ev)
                }
           }
      }
+     efree(c);
 
      return;
 }

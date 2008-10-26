@@ -74,10 +74,17 @@ titlebar_update_position(Client *c)
      int y;
 
      /* Set titlebar position : Top/Bottom */
-     if(conf.titlebar.pos)
-          y = c->geo.y + c->geo.height + conf.client.borderheight;
-     else
+     switch(conf.titlebar.pos)
+     {
+     default:
+     case Top:
           y = c->geo.y - conf.titlebar.height;
+          break;
+     case Bottom:
+          y = c->geo.y + c->geo.height + conf.client.borderheight;
+          break;
+     }
+
      bar_moveresize(c->tbar, c->geo.x, y, c->geo.width,
                     conf.titlebar.height - conf.client.borderheight);
 
@@ -88,7 +95,6 @@ void
 titlebar_update(Client *c)
 {
      int pos_y, pos_x;
-     char *tmpcolor = NULL;
 
      XFetchName(dpy, c->win, &(c->title));
      if(!c->title)
@@ -119,10 +125,11 @@ titlebar_update(Client *c)
 
           /* Set y text position (always at the middle) and fg color */
           pos_y = (fonth - (xftfont->descent )) + ((conf.titlebar.height - fonth) / 2);
-          tmpcolor = ((c == sel) ? conf.titlebar.fg_focus : conf.titlebar.fg_normal);
 
           /* Draw title */
-          draw_text(c->tbar->dr, pos_x, pos_y, tmpcolor, conf.titlebar.bg, 0, c->title);
+          draw_text(c->tbar->dr, pos_x, pos_y,
+                    (c == sel) ? conf.titlebar.fg_focus : conf.titlebar.fg_normal,
+                    conf.titlebar.bg, 0, c->title);
      }
      bar_refresh(c->tbar);
 

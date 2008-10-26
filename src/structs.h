@@ -40,17 +40,18 @@
 #define MAXLAYOUT    3
 
 /* Typedef */
-typedef const char* uicb_t;
-typedef unsigned int uint;
-typedef unsigned long ulong;
+typedef const char*    uicb_t;
+typedef unsigned int   uint;
+typedef unsigned long  ulong;
 typedef unsigned short ushort;
-typedef unsigned char uchar;
+typedef unsigned char  uchar;
 
 /* Enum */
 enum { CurNormal, CurResize, CurMove, CurLast };
 enum { WMState, WMProtocols, WMName, WMDelete, WMLast };
 enum { NetSupported, NetWMName, NetLast };
-enum { Left = 0, Center, Right, AlignLast};
+typedef enum { Left = 0, Center, Right, AlignLast} Align;
+typedef enum { Top = 0, Bottom, PosLast } Position;
 
 /* BarWindow Structure
  * (titlebar, topbar..) */
@@ -173,12 +174,12 @@ typedef struct
      struct
      {
           Bool exist;
-          Bool pos;
+          Position pos;
           int height;
           uint bg;
           char *fg_focus;
           char *fg_normal;
-          int text_align;
+          Align text_align;
           MouseBinding *mouse;
           int nmouse;
      } titlebar;

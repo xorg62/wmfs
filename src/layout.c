@@ -52,6 +52,8 @@ arrange(void)
 
      updatebar();
 
+     efree(c);
+
      return;
 }
 
@@ -76,6 +78,8 @@ freelayout(void)
                }
           }
      }
+
+     efree(c);
 
      return;
 }
@@ -136,6 +140,8 @@ maxlayout(void)
 
           client_moveresize(c, geo, False);
      }
+
+     efree(c);
 
      return;
 }
@@ -267,6 +273,7 @@ tile(void)
           if(n > nmaster && tileheight != sgeo.height)
                cgeo.y = c->geo.y + c->geo.height + border + titlebarh;
      }
+     efree(c);
 
      return;
 }
@@ -280,8 +287,7 @@ uicb_tile_switch(uicb_t cmd)
           return;
      if((c = sel) == nexttiled(clients))
           if(!(c = nexttiled(c->next)))
-               return;
-     client_detach(c);
+               return;     client_detach(c);
      client_attach(c);
      client_focus(c);
      arrange();

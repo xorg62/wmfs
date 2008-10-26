@@ -124,6 +124,7 @@ void getevent(void);
 
 /* util.c */
 void *emalloc(uint element, uint size);
+void efree(void *ptr);
 ulong getcolor(char *color);
 void setwinstate(Window win, long state);
 long getwinstate(Window win);

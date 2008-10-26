@@ -98,11 +98,10 @@ quit(void)
      if(conf.nbutton)
           for(i = 0; i < conf.nbutton; ++i)
                bar_delete(conf.barbutton[i].bw);
-     free(conf.barbutton);
-     free(keys);
-     free(clients);
-     free(conf.titlebar.mouse);
-     free(conf.client.mouse);
+     efree(conf.barbutton);
+     efree(keys);
+     efree(conf.titlebar.mouse);
+     efree(conf.client.mouse);
      XSync(dpy, False);
 
      return;

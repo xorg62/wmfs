@@ -316,6 +316,7 @@ init_conf(void)
      cfg_t *cfgtmp, *cfgtmp2, *cfgtmp3;
      char final_path[128];
      char sfinal_path[128];
+     char buf[256] = {0};
      int ret, i, j, l;
 
 
@@ -368,10 +369,11 @@ init_conf(void)
      conf.bartop      = (strcmp(strdup(cfg_getstr(cfg_bar, "position")), "top") == 0) ? True : False;
 
      /* titlebar */
-     if(strcmp(var_to_str(cfg_getstr(cfg_titlebar, "position")), "bottom") == 0)
-          conf.titlebar.pos = True;
-     else
-          conf.titlebar.pos = False;
+     strcpy(buf, var_to_str(cfg_getstr(cfg_titlebar, "position")));
+     if(strcmp(buf, "bottom") == 0)
+          conf.titlebar.pos = Bottom;
+     else if(strcmp(buf, "top") == 0)
+          conf.titlebar.pos = Top;
 
      conf.titlebar.height     = cfg_getint(cfg_titlebar, "height");
      conf.titlebar.exist      = conf.titlebar.height ? True : False;
@@ -379,11 +381,12 @@ init_conf(void)
      conf.titlebar.fg_focus   = var_to_str(cfg_getstr(cfg_titlebar, "fg_focus"));
      conf.titlebar.fg_normal  = var_to_str(cfg_getstr(cfg_titlebar, "fg_normal"));
 
-     if(strcmp(var_to_str(cfg_getstr(cfg_titlebar, "text_align")), "center") == 0)
+     strcpy(buf, var_to_str(cfg_getstr(cfg_titlebar, "text_align")));
+     if(strcmp(buf, "center") == 0)
           conf.titlebar.text_align = Center;
-     else if(strcmp(var_to_str(cfg_getstr(cfg_titlebar, "text_align")), "right") == 0)
+     else if(strcmp(buf, "right") == 0)
           conf.titlebar.text_align = Right;
-     else
+     else if(strcmp(buf, "left") == 0)
           conf.titlebar.text_align = Left;
 
      conf.titlebar.nmouse = cfg_size(cfg_titlebar, "mouse");

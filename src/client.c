@@ -41,6 +41,8 @@ client_pertag(int tag)
      for(c = clients; c; c = c->next)
           if(c->tag == tag)
                ++i;
+     efree(c);
+
      return i;
 }
 
@@ -88,7 +90,6 @@ uicb_client_prev(uicb_t cmd)
           if(!c->tile)
                client_raise(c);
      }
-
      arrange();
 
      return;
@@ -150,6 +151,8 @@ client_focus(Client *c)
      for(cc = clients; cc; cc = cc->next)
           if(!ishide(cc))
                titlebar_update(cc);
+
+     efree(cc);
 
      return;
 }
@@ -463,7 +466,7 @@ client_unmanage(Client *c)
 
      if(conf.titlebar.exist)
           bar_delete(c->tbar);
-     free(c);
+     efree(c);
 
      arrange();
 
