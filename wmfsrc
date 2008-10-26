@@ -47,6 +47,15 @@ tags
         tag { name = "nine"  }
 }
 
+root
+{
+        background_command = "xsetroot -solid black"
+
+        mouse { button = "4" func = "tag_next" }
+        mouse { button = "5" func = "tag_prev" }
+        mouse { button = "3" func = "spawn" cmd = term }
+}
+
 client
 {
         border_height  = 1

@@ -167,6 +167,8 @@ init(void)
           EnterWindowMask | LeaveWindowMask | StructureNotifyMask ;
      at.cursor = cursor[CurNormal];
      XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &at);
+     if(conf.root.background_command)
+          uicb_spawn(conf.root.background_command);
 
      /* INIT BAR / BUTTON */
      bary = (conf.bartop) ? 0 : mh - barheight;

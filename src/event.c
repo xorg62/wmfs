@@ -57,12 +57,10 @@ buttonpress(XEvent ev)
 
      /* Root */
      if(ev.xbutton.window == root)
-     {
-          if(ev.xbutton.button == Button4)
-               uicb_tag("+1");
-          if(ev.xbutton.button == Button5)
-               uicb_tag("-1");
-     }
+          for(i = 0; i < conf.root.nmouse; ++i)
+               if(ev.xbutton.button == conf.root.mouse[i].button)
+                    if(conf.root.mouse[i].func)
+                         conf.root.mouse[i].func(conf.root.mouse[i].cmd);
 
      /* Bar */
      {

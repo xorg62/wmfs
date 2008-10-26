@@ -191,6 +191,13 @@ init_conf(void)
                CFG_END()
           };
 
+     static cfg_opt_t root_opts[] =
+          {
+               CFG_STR("background_command", "", CFGF_NONE),
+               CFG_SEC("mouse", mouse_button_opts, CFGF_MULTI),
+               CFG_END()
+          };
+
      static cfg_opt_t titlebar_opts[] =
           {
                CFG_STR("position",   "top",             CFGF_NONE),
@@ -199,7 +206,8 @@ init_conf(void)
                CFG_STR("fg_focus",   "#FFFFFF",         CFGF_NONE),
                CFG_STR("fg_normal",  "#FFFFFF",         CFGF_NONE),
                CFG_STR("text_align", "left",            CFGF_NONE),
-               CFG_SEC("mouse",      mouse_button_opts, CFGF_MULTI)
+               CFG_SEC("mouse",      mouse_button_opts, CFGF_MULTI),
+               CFG_END()
           };
 
      static cfg_opt_t client_opts[]=
@@ -208,7 +216,8 @@ init_conf(void)
                CFG_STR("border_normal",  "#354B5C",          CFGF_NONE),
                CFG_STR("border_focus",   "#6286A1",          CFGF_NONE),
                CFG_STR("modifier",       "Alt",              CFGF_NONE),
-               CFG_SEC("mouse",           mouse_button_opts, CFGF_MULTI)
+               CFG_SEC("mouse",           mouse_button_opts, CFGF_MULTI),
+               CFG_END()
           };
 
      static cfg_opt_t layout_opts[] =
@@ -277,6 +286,7 @@ init_conf(void)
           {
                CFG_SEC("misc",      misc_opts,      CFGF_NONE),
                CFG_SEC("variables", variables_opts, CFGF_NONE),
+               CFG_SEC("root",      root_opts,      CFGF_NONE),
                CFG_SEC("titlebar",  titlebar_opts,  CFGF_NONE),
                CFG_SEC("client",    client_opts,    CFGF_NONE),
                CFG_SEC("bar",       bar_opts,       CFGF_NONE),
@@ -290,6 +300,7 @@ init_conf(void)
      cfg_t *cfg_misc;
      cfg_t *cfg_bar;
      cfg_t *cfg_variables;
+     cfg_t *cfg_root;
      cfg_t *cfg_titlebar;
      cfg_t *cfg_client;
      cfg_t *cfg_layouts;
@@ -319,6 +330,7 @@ init_conf(void)
 
      cfg_misc      = cfg_getsec(cfg, "misc");
      cfg_variables = cfg_getsec(cfg, "variables");
+     cfg_root      = cfg_getsec(cfg, "root");
      cfg_titlebar  = cfg_getsec(cfg, "titlebar");
      cfg_client    = cfg_getsec(cfg, "client");
      cfg_bar       = cfg_getsec(cfg, "bar");
@@ -348,6 +360,19 @@ init_conf(void)
      conf.colors.bar  = getcolor(var_to_str(cfg_getstr(cfg_bar, "bg")));
      conf.colors.text = strdup(var_to_str(cfg_getstr(cfg_bar, "fg")));
      conf.bartop      = (strcmp(strdup(cfg_getstr(cfg_bar, "position")), "top") == 0) ? True : False;
+
+     /* root */
+     conf.root.background_command = strdup(var_to_str(cfg_getstr(cfg_root, "background_command")));
+     conf.root.nmouse = cfg_size(cfg_root, "mouse");
+     conf.root.mouse = emalloc(conf.root.nmouse, sizeof(MouseBinding));
+
+     for(i = 0; i < conf.root.nmouse; ++i)
+     {
+          cfgtmp = cfg_getnsec(cfg_root, "mouse", i);
+          conf.root.mouse[i].button = char_to_button(cfg_getstr(cfgtmp, "button"));
+          conf.root.mouse[i].func   = name_to_func(cfg_getstr(cfgtmp, "func"), func_list);
+          conf.root.mouse[i].cmd    = strdup(var_to_str(cfg_getstr(cfgtmp, "cmd")));
+     }
 
      /* titlebar */
      strcpy(buf, var_to_str(cfg_getstr(cfg_titlebar, "position")));

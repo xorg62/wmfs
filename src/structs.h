@@ -164,6 +164,12 @@ typedef struct
      } colors;
      struct
      {
+          char *background_command;
+          MouseBinding *mouse;
+          int nmouse;
+     } root;
+     struct
+     {
           int borderheight;
           uint bordernormal;
           uint borderfocus;
