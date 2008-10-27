@@ -396,10 +396,7 @@ unmapnotify(XEvent ev)
      Client *c;
 
      if((c = client_get(ev.xunmap.window)))
-          if(ev.xunmap.send_event
-             && ev.xunmap.event == RootWindow(ev.xany.display, screen)
-             && getwinstate(c->win) == NormalState)
-               client_unmanage(c);
+          client_unmanage(c);
 
      return;
 }

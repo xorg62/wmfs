@@ -125,21 +125,16 @@ client_focus(Client *c)
      {
           grabbuttons(sel, False);
           XSetWindowBorder(dpy, sel->win, conf.client.bordernormal);
-          if(conf.titlebar.exist)
-               XSetWindowBorder(dpy, sel->tbar->win, conf.client.bordernormal);
      }
 
      if(c)
           grabbuttons(c, True);
 
-     sel = c;
-     selbytag[seltag] = sel;
+     selbytag[seltag] = sel = c;
 
      if(c)
      {
           XSetWindowBorder(dpy, c->win, conf.client.borderfocus);
-          if(conf.titlebar.exist)
-               XSetWindowBorder(dpy, sel->tbar->win, conf.client.borderfocus);
           if(conf.raisefocus)
                client_raise(c);
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
@@ -219,12 +214,13 @@ client_map(Client *c)
      if(!c)
           return;
 
-     XMapWindow(dpy, c->win);
      if(conf.titlebar.exist)
      {
           XMapWindow(dpy, c->tbar->win);
           bar_refresh(c->tbar);
      }
+
+     XMapWindow(dpy, c->win);
 
      return;
 }
@@ -265,14 +261,12 @@ client_manage(Window w, XWindowAttributes *wa)
           c->tag = t->tag;
      if(!c->free)
           c->free = (rettrans == Success) || c->hint;
-     else
-          client_raise(c);
      efree(t);
-
 
      client_attach(c);
      XMoveResizeWindow(dpy, c->win, c->geo.x, c->geo.y, c->geo.width, c->geo.height);
      client_map(c);
+     client_raise(c);
      setwinstate(c->win, NormalState);
      client_focus(c);
      arrange();
@@ -430,13 +424,12 @@ client_raise(Client *c)
      if(!c || c->tile || c->max)
           return;
 
-     XRaiseWindow(dpy, c->win);
-
      if(conf.titlebar.exist)
      {
           XRaiseWindow(dpy, c->tbar->win);
           titlebar_update(c);
      }
+     XRaiseWindow(dpy, c->win);
 
      return;
 }
@@ -463,19 +456,23 @@ client_unhide(Client *c)
 void
 client_unmanage(Client *c)
 {
+     int i;
+     Client *cc;
+
      XGrabServer(dpy);
      XSetErrorHandler(errorhandlerdummy);
      if(sel == c)
           client_focus(NULL);
+     for(i = 0, cc = clients; cc; cc = cc->next, ++i)
+          if(selbytag[i] == c)
+               selbytag[i] = NULL;
      client_detach(c);
      XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
      setwinstate(c->win, WithdrawnState);
-
      XSync(dpy, False);
      XUngrabServer(dpy);
-
      if(conf.titlebar.exist)
-          bar_delete(c->tbar);
+          titlebar_delete(c);
      efree(c);
      XSetErrorHandler(errorhandler);
      arrange();

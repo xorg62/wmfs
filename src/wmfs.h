@@ -60,7 +60,6 @@
 #define ITOA(p ,n)   sprintf(p, "%i", n)
 #define debug(p)     fprintf(stderr, "debug: %i\n", p)
 #define PAD          8
-#define BPAD         2
 
 /* bar.c */
 BarWindow *bar_create(int x, int y, uint w, uint h, int bord, uint color, Bool entermask);
@@ -138,6 +137,7 @@ void uicb_tagtransfert(uicb_t);
 
 /* titlebar.c */
 void titlebar_create(Client *c);
+void titlebar_delete(Client *c);
 Client* titlebar_get(Window w);
 void titlebar_update_position(Client *c);
 void titlebar_update(Client *c);

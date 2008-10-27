@@ -38,18 +38,31 @@ titlebar_create(Client *c)
      int y;
 
      /* Set titlebar position : Top/Bottom */
-     if(conf.titlebar.pos)
+     switch(conf.titlebar.pos)
+     {
+     case Bottom:
           y = c->geo.y + c->geo.height + conf.client.borderheight;
-     else
+          break;
+     default:
+     case Top:
           y = c->geo.y - (conf.titlebar.height + conf.client.borderheight);
+          break;
+     }
 
-     c->tbar = bar_create(c->geo.x,
-                          y,
-                          c->geo.width,
+     c->tbar = bar_create(c->geo.x, y, c->geo.width,
                           conf.titlebar.height - conf.client.borderheight,
                           conf.client.borderheight,
                           conf.titlebar.bg, True);
-     XSetWindowBorder(dpy, c->tbar->win, conf.client.bordernormal);
+     XSetWindowBorder(dpy, c->tbar->win, conf.titlebar.bg);
+
+     return;
+}
+
+void
+titlebar_delete(Client *c)
+{
+     bar_delete(c->tbar);
+     c->tbar = NULL;
 
      return;
 }

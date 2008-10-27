@@ -45,9 +45,10 @@ arrange(void)
 
      tags[seltag].layout.func();
 
-     if(selbytag[seltag] && selbytag[seltag]->win)
+     if(selbytag[seltag] != NULL
+         && selbytag[seltag]->tbar != NULL)
           client_focus(selbytag[seltag]);
-     else
+      else
           client_focus(NULL);
 
      updatebar();
@@ -71,8 +72,8 @@ freelayout(void)
                     geo.y = c->ogeo.y;
                     geo.width = c->ogeo.width;
                     geo.height = c->ogeo.height;
-                    client_moveresize(c, geo, True);
                     c->tile = c->lmax = False;
+                    client_moveresize(c, geo, True);
                }
           }
      }

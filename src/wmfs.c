@@ -102,6 +102,7 @@ quit(void)
      efree(keys);
      efree(conf.titlebar.mouse);
      efree(conf.client.mouse);
+     efree(conf.root.mouse);
      XSync(dpy, False);
 
      return;

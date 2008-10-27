@@ -92,10 +92,10 @@ draw_taglist(Drawable dr)
 void
 draw_layout(void)
 {
-     draw_text(bar->dr, taglen[conf.ntag] + BPAD/2, fonth,
+     draw_text(bar->dr, taglen[conf.ntag] + 1, fonth,
                conf.colors.layout_fg,
                conf.colors.layout_bg,
-               BPAD, tags[seltag].layout.symbol);
+               2, tags[seltag].layout.symbol);
 
      return;
 }
