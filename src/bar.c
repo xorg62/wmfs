@@ -141,8 +141,6 @@ updatebar(void)
 void
 uicb_togglebarpos(uicb_t cmd)
 {
-     int i;
-
      conf.bartop = !conf.bartop;
      if(conf.bartop)
           sgeo.y = conf.titlebar.pos ? barheight : barheight + conf.titlebar.height;
@@ -155,11 +153,6 @@ uicb_togglebarpos(uicb_t cmd)
           bary = mh - barheight;
      bar_moveresize(bar, 0, bary, mw, barheight);
      updatebar();
-     for(i = 0; i < conf.nbutton; ++i)
-          XUnmapWindow(dpy, conf.barbutton[i].bw->win);
-     for(i = 0; i < conf.nbutton; ++i)
-          XMapWindow(dpy, conf.barbutton[i].bw->win);
-
      arrange();
 
      return;

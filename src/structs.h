@@ -112,17 +112,18 @@ typedef struct
      uicb_t cmd;
 } MouseBinding;
 
-/* Bar Button */
+/* Surface \o/ */
 typedef struct
 {
-     char *content;
-     BarWindow *bw;
-     char *fg_color;
-     int bg_color;
-     uint x;
-     int nmousesec;
-     MouseBinding mouse[NBUTTON];
-} BarButton;
+     char *text;
+     Drawable dr;
+     Window win;
+     XRectangle geo;
+     MouseBinding mousebind[10];
+     int nmouse;
+     char *fg;
+     uint bg;
+} Surface;
 
 /* Layout Structure */
 typedef struct
@@ -191,7 +192,6 @@ typedef struct
      } titlebar;
      Tag tag[MAXTAG];
      Layout layout[MAXLAYOUT];
-     BarButton *barbutton;
      int ntag;
      int nkeybind;
      int nbutton;

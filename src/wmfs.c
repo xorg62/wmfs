@@ -87,18 +87,12 @@ errorhandlerstart(Display *d, XErrorEvent *event)
 void
 quit(void)
 {
-     int i;
-
      /* Exiting WMFS :'( */
      XftFontClose(dpy, xftfont);
      XFreeCursor(dpy, cursor[CurNormal]);
      XFreeCursor(dpy, cursor[CurMove]);
      XFreeCursor(dpy, cursor[CurResize]);
      bar_delete(bar);
-     if(conf.nbutton)
-          for(i = 0; i < conf.nbutton; ++i)
-               bar_delete(conf.barbutton[i].bw);
-     efree(conf.barbutton);
      efree(keys);
      efree(conf.titlebar.mouse);
      efree(conf.client.mouse);

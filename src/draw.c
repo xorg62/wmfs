@@ -78,7 +78,7 @@ draw_taglist(Drawable dr)
                  ((i+1 == seltag) ? conf.colors.tagselfg : conf.colors.text),
                  ((i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar), PAD, buf[i]);
 
-          /* Draw the tag border */
+          /* Draw the tag separation */
           draw_rectangle(dr, taglen[i] + textw(buf[i]) + PAD/2,
                          0, conf.tagbordwidth, barheight, conf.colors.tagbord);
 
@@ -92,10 +92,16 @@ draw_taglist(Drawable dr)
 void
 draw_layout(void)
 {
-     draw_text(bar->dr, taglen[conf.ntag] + 1, fonth,
+     /* Draw layout name / symbol */
+     draw_text(bar->dr, taglen[conf.ntag], fonth,
                conf.colors.layout_fg,
                conf.colors.layout_bg,
                2, tags[seltag].layout.symbol);
+
+     /* Draw right separation */
+     draw_rectangle(bar->dr,
+                    taglen[conf.ntag] + textw(tags[seltag].layout.symbol) + PAD/2,
+                    0, conf.tagbordwidth, barheight, conf.colors.tagbord);
 
      return;
 }
