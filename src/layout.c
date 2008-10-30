@@ -160,7 +160,8 @@ uicb_set_mwfact(uicb_t cmd)
         return;
      if(tags[seltag].mwfact + c > 0.95
         || tags[seltag].mwfact + c < 0.05
-        || tags[seltag].layout.func != tile)
+        || tags[seltag].layout.func == maxlayout
+        || tags[seltag].layout.func == freelayout)
           return;
      tags[seltag].mwfact += c;
      arrange();
@@ -201,24 +202,20 @@ multi_tile(Position type)
           : tags[seltag].mwfact * sgeo.width;
 
      /* MASTER SIZE */
-     switch(type)
+     if(type == Top || type == Bottom)
      {
-     case Top:
-     case Bottom:
+          if(type == Top)
+               mastergeo.y = (n <= nmaster) ? sgeo.y : sgeo.y + (sgeo.height - mwfact) - border;
           mastergeo.width = (sgeo.width / nmaster) - border;
           mastergeo.height = (n <= nmaster) ? sgeo.height - border : mwfact;
-          break;
-     default:
-     case Left:
-     case Right:
+     }
+     else
+     {
+          if(type == Left)
+               mastergeo.x = (n <= nmaster) ? sgeo.x : sgeo.width - mwfact - border;
           mastergeo.width = (n <= nmaster) ? sgeo.width - border : mwfact;
           mastergeo.height = (sgeo.height / nmaster) - border;
-          break;
      }
-     if(type == Top)
-          mastergeo.y = (n <= nmaster) ? sgeo.y : sgeo.y + (sgeo.height - mwfact) - border;
-     if(type == Left)
-          mastergeo.x = (n <= nmaster) ? sgeo.x : sgeo.width - mwfact - border;
 
      /* TILED SIZE */
      if(n > nmaster)
