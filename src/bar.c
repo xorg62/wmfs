@@ -126,8 +126,12 @@ updatebar(void)
      sprintf(buf, "mwfact: %.2f - nmaster: %d",
              tags[seltag].mwfact,
              tags[seltag].nmaster);
-     draw_text(bar->dr, taglen[conf.ntag] + textw(tags[seltag].layout.symbol) + conf.tagbordwidth + PAD,
-              fonth, conf.colors.text, conf.colors.bar, 0, buf);
+     draw_text(bar->dr,
+               taglen[conf.ntag] + textw(tags[seltag].layout.symbol) + conf.tagbordwidth + PAD,
+               fonth, conf.colors.text, conf.colors.bar, 0, buf);
+     draw_rectangle(bar->dr,
+                    taglen[conf.ntag] + textw(tags[seltag].layout.symbol) + textw(buf) + PAD * 2,
+                    0, conf.tagbordwidth, barheight, conf.colors.tagbord);
 
      /* Draw status text */
      draw_text(bar->dr, mw - textw(bartext), fonth, conf.colors.text, conf.colors.bar, 0, bartext);

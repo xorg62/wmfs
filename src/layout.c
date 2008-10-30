@@ -200,8 +200,11 @@ multi_tile(Position type)
      int i, border = conf.client.borderheight * 2;
 
      for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++n);
-     if(!n || n < nmaster)
+     if(!n)
           return;
+
+     /* FIX NMASTER */
+     nmaster = (n < nmaster) ? n : nmaster;
 
      /* SET MWFACT */
      mwfact = (type == Top || type == Bottom)

@@ -127,13 +127,11 @@ client_focus(Client *c)
           XSetWindowBorder(dpy, sel->win, conf.client.bordernormal);
      }
 
-     if(c)
-          grabbuttons(c, True);
-
      selbytag[seltag] = sel = c;
 
      if(c)
      {
+          grabbuttons(c, True);
           XSetWindowBorder(dpy, c->win, conf.client.borderfocus);
           if(conf.raisefocus)
                client_raise(c);
@@ -142,6 +140,7 @@ client_focus(Client *c)
      else
           XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 
+     /* Update all visible titlebar */
      for(cc = clients; cc; cc = cc->next)
           if(!ishide(cc))
                titlebar_update(cc);
