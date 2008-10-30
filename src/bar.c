@@ -111,6 +111,8 @@ bar_refresh(BarWindow *bw)
 void
 updatebar(void)
 {
+     char buf[256];
+
      /* Refresh bar color */
      bar_refresh_color(bar);
 
@@ -119,6 +121,13 @@ updatebar(void)
 
      /* Draw layout symbol */
      draw_layout();
+
+     /* Draw mwfact && nmaster info */
+     sprintf(buf, "mwfact: %.2f - nmaster: %d",
+             tags[seltag].mwfact,
+             tags[seltag].nmaster);
+     draw_text(bar->dr, taglen[conf.ntag] + textw(tags[seltag].layout.symbol) + conf.tagbordwidth + PAD,
+              fonth, conf.colors.text, conf.colors.bar, 0, buf);
 
      /* Draw status text */
      draw_text(bar->dr, mw - textw(bartext), fonth, conf.colors.text, conf.colors.bar, 0, bartext);

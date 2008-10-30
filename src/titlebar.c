@@ -109,7 +109,9 @@ titlebar_update(Client *c)
 {
      int pos_y, pos_x;
 
-     client_get_title(c);
+     XFetchName(dpy, c->win, &(c->title));
+     if(!c->title)
+          c->title = strdup("WMFS");
 
      if(!conf.titlebar.exist)
           return;
@@ -138,9 +140,10 @@ titlebar_update(Client *c)
           pos_y = (fonth - (xftfont->descent )) + ((conf.titlebar.height - fonth) / 2);
 
           /* Draw title */
-          draw_text(c->tbar->dr, pos_x, pos_y,
-                    (c == sel) ? conf.titlebar.fg_focus : conf.titlebar.fg_normal,
-                    conf.titlebar.bg, 0, c->title);
+          //if(c->title)
+               draw_text(c->tbar->dr, pos_x, pos_y,
+                         (c == sel) ? conf.titlebar.fg_focus : conf.titlebar.fg_normal,
+                         conf.titlebar.bg, 0, c->title);
      }
      bar_refresh(c->tbar);
 

@@ -160,16 +160,6 @@ client_get(Window w)
 }
 
 void
-client_get_title(Client *c)
-{
-     XFetchName(dpy, c->win, &(c->title));
-     if(!c->title)
-          c->title = strdup("WMFS");
-
-     return;
-}
-
-void
 client_hide(Client *c)
 {
      XMoveWindow(dpy, c->win, c->geo.x + mw * 2, c->geo.y);

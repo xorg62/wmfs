@@ -54,7 +54,7 @@
 #include "structs.h"
 
 /* Defines */
-#define ButtonMask   (ButtonPressMask | ButtonReleaseMask)
+#define ButtonMask   (ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
 #define MouseMask    (ButtonMask | PointerMotionMask)
 #define KeyMask      (KeyPressMask | KeyReleaseMask)
 #define ITOA(p ,n)   sprintf(p, "%i", n)
@@ -83,7 +83,6 @@ void client_attach(Client *c);
 void client_detach(Client *c);
 void client_focus(Client *c);
 Client *client_get(Window w);
-void client_get_title(Client *c);
 void client_hide(Client *c);
 Bool ishide(Client *c);
 void client_map(Client *c);

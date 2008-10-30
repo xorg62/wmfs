@@ -122,6 +122,9 @@ textw(const char *text)
 {
      XGlyphInfo gl;
 
+     if(!text)
+          return 0;
+
      XftTextExtentsUtf8(dpy, xftfont, (FcChar8 *)text, strlen(text), &gl);
 
      return gl.width + xftfont->descent;

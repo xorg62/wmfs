@@ -158,11 +158,11 @@ uicb_set_mwfact(uicb_t cmd)
 
      if(!(sscanf(cmd, "%lf", &c)))
         return;
+
      if(tags[seltag].mwfact + c > 0.95
-        || tags[seltag].mwfact + c < 0.05
-        || tags[seltag].layout.func == maxlayout
-        || tags[seltag].layout.func == freelayout)
+        || tags[seltag].mwfact + c < 0.05)
           return;
+
      tags[seltag].mwfact += c;
      arrange();
 
@@ -172,10 +172,15 @@ uicb_set_mwfact(uicb_t cmd)
 void
 uicb_set_nmaster(uicb_t cmd)
 {
-     int n = atoi(cmd);
+     int nc, n = atoi(cmd);
+     Client *c;
 
-     if(tags[seltag].nmaster + n == 0)
+     for(nc = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++nc);
+
+     if(!nc || tags[seltag].nmaster + n == 0
+        || tags[seltag].nmaster + n > nc)
           return;
+
      tags[seltag].nmaster += n;
      arrange();
 
@@ -186,7 +191,9 @@ void
 multi_tile(Position type)
 {
      Client *c;
+     /* Master geometry */
      XRectangle mastergeo = {sgeo.x, sgeo.y, 0, 0};
+     /* Client geometry */
      XRectangle cgeo = {sgeo.x, sgeo.y, 0, 0};
      uint n, mwfact, nmaster = tags[seltag].nmaster;
      uint tilesize = 0;
@@ -240,6 +247,7 @@ multi_tile(Position type)
           {
                cgeo.width = mastergeo.width;
                cgeo.height = mastergeo.height;
+
                if(type == Top || type == Bottom)
                     cgeo.y = mastergeo.y;
                else
