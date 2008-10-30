@@ -148,7 +148,13 @@ void freelayout(void);
 void layoutswitch(Bool b);
 void maxlayout(void);
 Client *nexttiled(Client *c);
+
+/* tile */
 void tile(void);
+void tile_left(void);
+void tile_top(void);
+void tile_bottom(void);
+
 void uicb_tile_switch(uicb_t);
 void uicb_togglemax(uicb_t);
 void uicb_layout_prev(uicb_t);

@@ -343,8 +343,8 @@ mouseaction(Client *c, int x, int y, int type)
 void
 uicb_mousemove(uicb_t cmd)
 {
-
-     mouseaction(sel, event.xbutton.x_root, event.xbutton.y_root, False);
+     if(sel)
+          mouseaction(sel, event.xbutton.x_root, event.xbutton.y_root, False);
 
      return;
 }
@@ -352,7 +352,8 @@ uicb_mousemove(uicb_t cmd)
 void
 uicb_resizemouse(uicb_t cmd)
 {
-     mouseaction(sel, event.xbutton.x_root, event.xbutton.y_root, True);
+     if(sel)
+          mouseaction(sel, event.xbutton.x_root, event.xbutton.y_root, True);
 
      return;
 }

@@ -24,7 +24,10 @@ layouts
         fg = "#191919"
         bg = "#7E89A2"
 
-        layout { type = "tile" symbol = "TILE" }
+        layout { type = "tile"         symbol = "TILE_R" }
+        layout { type = "tile_left"    symbol = "TILE_L" }
+        layout { type = "tile_top"     symbol = "TILE_T" }
+        layout { type = "tile_bottom"  symbol = "TILE_B" }
         layout { type = "max"  symbol = "MAX"  }
         layout { type = "free" symbol = "FREE" }
 }

@@ -37,7 +37,7 @@
 
 #define NBUTTON      8
 #define MAXTAG       36
-#define MAXLAYOUT    3
+#define MAXLAYOUT    6
 
 /* Typedef */
 typedef const char*    uicb_t;
@@ -50,8 +50,7 @@ typedef unsigned char  uchar;
 enum { CurNormal, CurResize, CurMove, CurLast };
 enum { WMState, WMProtocols, WMName, WMDelete, WMLast };
 enum { NetSupported, NetWMName, NetLast };
-typedef enum { Left = 0, Center, Right, AlignLast} Align;
-typedef enum { Top = 0, Bottom, PosLast } Position;
+typedef enum { Top = 0, Bottom, Right, Left, Center, PositionLast } Position;
 
 /* BarWindow Structure
  * (titlebar, topbar..) */
@@ -186,7 +185,7 @@ typedef struct
           uint bg;
           char *fg_focus;
           char *fg_normal;
-          Align text_align;
+          Position text_align;
           MouseBinding *mouse;
           int nmouse;
      } titlebar;

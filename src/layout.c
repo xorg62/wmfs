@@ -72,8 +72,8 @@ freelayout(void)
                     geo.y = c->ogeo.y;
                     geo.width = c->ogeo.width;
                     geo.height = c->ogeo.height;
-                    c->tile = c->lmax = False;
                     client_moveresize(c, geo, True);
+                    c->tile = c->lmax = False;
                }
           }
      }
@@ -182,92 +182,162 @@ uicb_set_nmaster(uicb_t cmd)
 }
 
 void
-tile(void)
+multi_tile(Position type)
 {
      Client *c;
-     XRectangle mastergeo = {0, 0, 0, 0};
+     XRectangle mastergeo = {sgeo.x, sgeo.y, 0, 0};
      XRectangle cgeo = {sgeo.x, sgeo.y, 0, 0};
-     uint n, mwfact = tags[seltag].mwfact * sgeo.width;
-     uint nmaster = tags[seltag].nmaster;
-     uint tileheight, i, border = conf.client.borderheight * 2;
-     int titlebarh = conf.titlebar.height;
+     uint n, mwfact, nmaster = tags[seltag].nmaster;
+     uint tilesize = 0;
+     int i, border = conf.client.borderheight * 2;
 
      for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++n);
-     if(!n)
+     if(!n || n < nmaster)
           return;
 
-     /* Tile mirror, maybe soon...
-     nmaster = (n > tags[seltag].nmaster) ? n - tags[seltag].nmaster : tags[seltag].nmaster;
-     mwfact = (1 - tags[seltag].mwfact) * sgeo.width
-     */
+     /* SET MWFACT */
+     mwfact = (type == Top || type == Bottom)
+          ? tags[seltag].mwfact * sgeo.height
+          : tags[seltag].mwfact * sgeo.width;
 
-     /* Define the master(s) client(s) size */
-     if(n <= nmaster)
+     /* MASTER SIZE */
+     switch(type)
      {
-          mastergeo.height = sgeo.height / (n > 0 ? n : 1);
-          mastergeo.width = sgeo.width;
+     case Top:
+     case Bottom:
+          mastergeo.width = (sgeo.width / nmaster) - border;
+          mastergeo.height = (n <= nmaster) ? sgeo.height - border : mwfact;
+          break;
+     default:
+     case Left:
+     case Right:
+          mastergeo.width = (n <= nmaster) ? sgeo.width - border : mwfact;
+          mastergeo.height = (sgeo.height / nmaster) - border;
+          break;
      }
-     else
-     {
-          mastergeo.height = sgeo.height / nmaster;
-          mastergeo.width = mwfact;
-     }
+     if(type == Top)
+          mastergeo.y = (n <= nmaster) ? sgeo.y : sgeo.y + (sgeo.height - mwfact) - border;
+     if(type == Left)
+          mastergeo.x = (n <= nmaster) ? sgeo.x : sgeo.width - mwfact - border;
 
-     /* Define the tiled clients size, so if the clients number > nmaster */
+     /* TILED SIZE */
      if(n > nmaster)
-          tileheight = sgeo.height / (n - nmaster);
-     else
-          tileheight = 0;
-
-     if(n > nmaster && tileheight < barheight)
-          tileheight = sgeo.height;
-
-
-     for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), i++)
      {
-          /* Set client property */
+          if(type == Top || type == Bottom)
+               tilesize = sgeo.width / (n - nmaster) - border;
+          else
+               tilesize = sgeo.height / (n - nmaster) - border;
+     }
+
+
+     for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++i)
+     {
+          /* Set client property, 'don't care */
           c->max = c->lmax = False;
           c->tile = True;
           c->ogeo.x = c->geo.x; c->ogeo.y = c->geo.y;
           c->ogeo.width = c->geo.width; c->ogeo.height = c->geo.height;
 
-          /* Master Client */
+          /* MASTER */
           if(i < nmaster)
           {
-               cgeo.y = sgeo.y + (i * mastergeo.height);
-               cgeo.width = mastergeo.width - border;
+               cgeo.width = mastergeo.width;
                cgeo.height = mastergeo.height;
-
-               /* Remainder */
-               if(i + 1 == (n < nmaster ? n : nmaster))
-                    cgeo.height = (sgeo.height - mastergeo.height * i) + titlebarh;
-
-               cgeo.height -= border + titlebarh;
+               if(type == Top || type == Bottom)
+                    cgeo.y = mastergeo.y;
+               else
+               {
+                    cgeo.x = mastergeo.x;
+                    cgeo.height -= (conf.titlebar.height + border);
+               }
           }
 
-          /* Tiled Client */
+          /* TILED */
           else
           {
                if(i == nmaster)
                {
-                    cgeo.y = sgeo.y;
-                    cgeo.x += mastergeo.width;
+                    switch(type)
+                    {
+                    case Top:
+                    case Left:
+                         cgeo.y = sgeo.y;
+                         cgeo.x = sgeo.x;
+                         break;
+                    case Bottom:
+                         cgeo.y += mastergeo.height + conf.titlebar.height + border;
+                         cgeo.x = sgeo.x;
+                         break;
+                    default:
+                    case Right:
+                         cgeo.x += mastergeo.width + border;
+                         cgeo.y = sgeo.y;
+                         break;
+                    }
                }
-
-               cgeo.width = sgeo.width - mastergeo.width - border;
-
-               /* Remainder */
-               if(i + 1 == n)
-                    cgeo.height = (sgeo.y + sgeo.height) - cgeo.y - border;
+               if(type == Top || type == Bottom)
+               {
+                    cgeo.width = tilesize;
+                    cgeo.width -= border;
+                    cgeo.height = sgeo.height - mastergeo.height - conf.titlebar.height - border*2;
+               }
                else
-                    cgeo.height = tileheight - (border + titlebarh);
+               {
+                    cgeo.width = sgeo.width - mastergeo.width - border*2;
+                    cgeo.height = tilesize;
+                    cgeo.height -= border + conf.titlebar.height;
+               }
           }
 
-          client_moveresize(c, cgeo, tags[seltag].resizehint);
+          /* REMAINDER */
+          if(i + 1 == n  || i + 1 == (n < nmaster ? n : nmaster))
+          {
+               if(type == Top || type == Bottom)
+                    cgeo.width = sgeo.width - cgeo.x - border;
+               else
+                    cgeo.height = (sgeo.y + sgeo.height) - cgeo.y - border;
+          }
 
-          if(n > nmaster && tileheight != sgeo.height)
-               cgeo.y = c->geo.y + c->geo.height + border + titlebarh;
+          /* Magic instant */
+          client_moveresize(c, cgeo, False);
+
+          /* Set the position of the next client */
+          if(type == Top || type == Bottom)
+               cgeo.x = c->geo.x + c->geo.width + border;
+          else
+               cgeo.y = c->geo.y + c->geo.height + border + conf.titlebar.height;
      }
+
+     return;
+}
+
+void
+tile(void)
+{
+     multi_tile(Right);
+
+     return;
+}
+
+void
+tile_left(void)
+{
+     multi_tile(Left);
+
+     return;
+}
+
+void
+tile_top(void)
+{
+     multi_tile(Top);
+
+     return;
+}
+void
+tile_bottom(void)
+{
+     multi_tile(Bottom);
 
      return;
 }
