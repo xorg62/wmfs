@@ -199,13 +199,20 @@ grabbuttons(Client *c, Bool focused)
 
      if(focused)
      {
-          /* Window */
           XGrabButton(dpy, Button1, mod, c->win, False, ButtonMask, GrabModeAsync,GrabModeSync, None, None);
           XGrabButton(dpy, Button1, mod|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button1, mod|numlockmask, c->win, False, ButtonMask, GrabModeAsync,GrabModeSync, None, None);
+          XGrabButton(dpy, Button1, mod|LockMask|numlockmask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+
           XGrabButton(dpy, Button2, mod, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
           XGrabButton(dpy, Button2, mod|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button2, mod|numlockmask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button2, mod|LockMask|numlockmask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+
           XGrabButton(dpy, Button3, mod, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
           XGrabButton(dpy, Button3, mod|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button3, mod|numlockmask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, Button3, mod|LockMask|numlockmask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
      }
      else
           XGrabButton(dpy, AnyButton, AnyModifier, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
