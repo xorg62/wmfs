@@ -45,8 +45,7 @@ arrange(void)
 
      tags[seltag].layout.func();
 
-     if(selbytag[seltag] != NULL
-         && selbytag[seltag]->tbar != NULL)
+     if(selbytag[seltag] != NULL)
           client_focus(selbytag[seltag]);
       else
           client_focus(NULL);
@@ -191,13 +190,10 @@ void
 multi_tile(Position type)
 {
      Client *c;
-     /* Master geometry */
      XRectangle mastergeo = {sgeo.x, sgeo.y, 0, 0};
-     /* Client geometry */
      XRectangle cgeo = {sgeo.x, sgeo.y, 0, 0};
-     uint n, mwfact, nmaster = tags[seltag].nmaster;
-     uint tilesize = 0;
-     int i, border = conf.client.borderheight * 2;
+     uint i , n, tilesize, mwfact, nmaster = tags[seltag].nmaster;
+     uint border = conf.client.borderheight * 2;
 
      for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++n);
      if(!n)
@@ -307,7 +303,7 @@ multi_tile(Position type)
           }
 
           /* Magic instant */
-          client_moveresize(c, cgeo, False);
+          client_moveresize(c, cgeo, tags[seltag].resizehint);
 
           /* Set the position of the next client */
           if(type == Top || type == Bottom)
@@ -377,8 +373,10 @@ uicb_togglemax(uicb_t cmd)
           return;
      if(!sel->max)
      {
-          sel->ogeo.x = sel->geo.x; sel->ogeo.y = sel->geo.y;
-          sel->ogeo.width = sel->geo.width; sel->ogeo.height = sel->geo.height;
+          sel->ogeo.x = sel->geo.x;
+          sel->ogeo.y = sel->geo.y;
+          sel->ogeo.width = sel->geo.width;
+          sel->ogeo.height = sel->geo.height;
 
           geo.x = sgeo.x; geo.y = sgeo.y;
           geo.width = sgeo.width - (sel->border * 2);
@@ -390,8 +388,10 @@ uicb_togglemax(uicb_t cmd)
      }
      else if(sel->max)
      {
-          geo.x = sel->ogeo.x; geo.y = sel->ogeo.y;
-          geo.width = sel->ogeo.width; geo.height = sel->ogeo.height;
+          geo.x = sel->ogeo.x;
+          geo.y = sel->ogeo.y;
+          geo.width = sel->ogeo.width;
+          geo.height = sel->ogeo.height;
 
           client_moveresize(sel, geo, False);
           sel->max = False;
@@ -400,5 +400,3 @@ uicb_togglemax(uicb_t cmd)
 
      return;
 }
-
-

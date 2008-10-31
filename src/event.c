@@ -227,7 +227,7 @@ grabkeys(void)
      KeyCode code;
 
      XUngrabKey(dpy, AnyKey, AnyModifier, root);
-     for(i = 0; i < conf.nkeybind; i++)
+     for(i = 0; i < conf.nkeybind; ++i)
      {
           code = XKeysymToKeycode(dpy, keys[i].keysym);
           XGrabKey(dpy, code, keys[i].mod, root, True, GrabModeAsync, GrabModeAsync);
@@ -248,7 +248,7 @@ keypress(XEvent ev)
      KeySym keysym;
 
      keysym = XKeycodeToKeysym(dpy, (KeyCode)ev.xkey.keycode, 0);
-     for(i = 0; i < conf.nkeybind; i++)
+     for(i = 0; i < conf.nkeybind; ++i)
           if(keysym == keys[i].keysym
              && (keys[i].mod & ~(numlockmask | LockMask)) ==
              (ev.xkey.state & ~(numlockmask | LockMask))
