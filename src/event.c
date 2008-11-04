@@ -279,7 +279,7 @@ maprequest(XEvent ev)
           return;
      if(at.override_redirect)
           return;
-     if(!client_get(ev.xmaprequest.window)
+     if(!client_get(ev.xmaprequest.window))
           client_manage(ev.xmaprequest.window, &at);
 
      return;
@@ -353,8 +353,8 @@ mouseaction(Client *c, int x, int y, int type)
                /* Set mwfact in tiled mode */
                else if(type && c->tile)
                {
-                    fy = (ROUND( ((ev.xmotion.y * 50) / sgeo.height)) ) / 50;
-                    fx = (ROUND( ((ev.xmotion.x * 50) / sgeo.width)) ) / 50;
+                    fy = (round( ((ev.xmotion.y * 50) / sgeo.height)) ) / 50;
+                    fx = (round( ((ev.xmotion.x * 50) / sgeo.width)) ) / 50;
 
                     if(tags[seltag].layout.func == tile)
                          mwf = fx;
