@@ -77,7 +77,7 @@ client
 titlebar
 {
         position   = "top"
-        height     = 13
+        height     = 12
         bg_normal  = "#191919"
         bg_focus   = "#191919"
         fg_normal  = "#D4D4D4"

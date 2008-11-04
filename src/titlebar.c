@@ -131,7 +131,7 @@ titlebar_update(Client *c)
      bar_refresh_color(c->tbar);
 
      /* Draw the client title in the titlebar *logeek* */
-     if(conf.titlebar.height > fonth)
+     if(conf.titlebar.height + 1 > fonth)
      {
           /* Set the text alignement */
           switch(conf.titlebar.text_align)

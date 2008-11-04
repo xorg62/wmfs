@@ -439,18 +439,6 @@ propertynotify(XEvent ev)
      return;
 }
 
-/* UNMAPNOTIFY */
-void
-unmapnotify(XEvent ev)
-{
-     Client *c;
-
-     if((c = client_get(ev.xunmap.window)))
-          client_unmanage(c);
-
-     return;
-}
-
 /* Handle */
 void
 getevent(void)
@@ -467,7 +455,6 @@ getevent(void)
       case MapRequest:        maprequest(event);        break;
       case MappingNotify:     mapnotify(event);         break;
       case PropertyNotify:    propertynotify(event);    break;
-      case UnmapNotify:       unmapnotify(event);       break;
      }
 
      return;

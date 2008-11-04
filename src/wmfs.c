@@ -184,7 +184,7 @@ init(void)
      grabkeys();
 
      /* MISC WARNING */
-     if(conf.titlebar.height - 1 < fonth)
+     if(conf.titlebar.height < fonth)
           fprintf(stderr, "WMFS Warning: Font too big, can't draw any text in the titlebar.\n");
 
      return;
