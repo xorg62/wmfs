@@ -79,30 +79,6 @@ setwinstate(Window win, long state)
      return;
 }
 
-long
-getwinstate(Window win)
-{
-     int f;
-     long ret = -1;
-     ulong n, e;
-     uchar *p = NULL;
-     Atom at;
-
-     if(XGetWindowProperty(dpy, win, XInternAtom(dpy, "WM_STATE", False),
-                           0L, 2L, False, XInternAtom(dpy, "WM_STATE", False),
-                           &at, &f, &n, &e, (unsigned char **)&p) != Success)
-     {
-          return -1;
-     }
-
-     if(n != 0)
-          ret = *p;
-
-     free(p);
-
-     return ret;
-}
-
 void
 uicb_spawn(uicb_t cmd)
 {

@@ -126,7 +126,6 @@ void efree(void *ptr);
 ulong getcolor(char *color);
 double round(double x);
 void setwinstate(Window win, long state);
-long getwinstate(Window win);
 void uicb_spawn(uicb_t);
 
 /* tag.c */
