@@ -279,13 +279,11 @@ maprequest(XEvent ev)
           return;
      if(at.override_redirect)
           return;
-     if(!client_get(ev.xmaprequest.window))
+     if(!client_get(ev.xmaprequest.window)
           client_manage(ev.xmaprequest.window, &at);
 
      return;
 }
-
-double ROUND(double x) { return (x > 0) ? x + 0.5 : x - 0.5; }
 
 /* If the type is 0, this function will move, else,
  * this will resize */
