@@ -132,7 +132,6 @@ init(void)
      fonth = (xftfont->ascent + xftfont->descent);
      barheight = fonth + (float)4.5;
 
-
      /* INIT CURSOR */
      cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
      cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
@@ -183,6 +182,10 @@ init(void)
 
      /* INIT STUFF */
      grabkeys();
+
+     /* MISC WARNING */
+     if(conf.titlebar.height - 1 < fonth)
+          fprintf(stderr, "WMFS Warning: Font too big, can't draw any text in the titlebar.\n");
 
      return;
 }

@@ -206,7 +206,8 @@ init_conf(void)
           {
                CFG_STR("position",   "top",             CFGF_NONE),
                CFG_INT("height",     0,                 CFGF_NONE),
-               CFG_STR("bg",         "#090909",         CFGF_NONE),
+               CFG_STR("bg_normal",  "#090909",         CFGF_NONE),
+               CFG_STR("bg_focus",   "#090909",         CFGF_NONE),
                CFG_STR("fg_focus",   "#FFFFFF",         CFGF_NONE),
                CFG_STR("fg_normal",  "#FFFFFF",         CFGF_NONE),
                CFG_STR("text_align", "left",            CFGF_NONE),
@@ -387,7 +388,8 @@ init_conf(void)
 
      conf.titlebar.height     = cfg_getint(cfg_titlebar, "height");
      conf.titlebar.exist      = conf.titlebar.height ? True : False;
-     conf.titlebar.bg         = getcolor(var_to_str(cfg_getstr(cfg_titlebar, "bg")));
+     conf.titlebar.bg_normal  = getcolor(var_to_str(cfg_getstr(cfg_titlebar, "bg_normal")));
+     conf.titlebar.bg_focus  = getcolor(var_to_str(cfg_getstr(cfg_titlebar, "bg_focus")));
      conf.titlebar.fg_focus   = var_to_str(cfg_getstr(cfg_titlebar, "fg_focus"));
      conf.titlebar.fg_normal  = var_to_str(cfg_getstr(cfg_titlebar, "fg_normal"));
 

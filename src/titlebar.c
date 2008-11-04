@@ -52,8 +52,8 @@ titlebar_create(Client *c)
      c->tbar = bar_create(c->geo.x, y, c->geo.width,
                           conf.titlebar.height - conf.client.borderheight,
                           conf.client.borderheight,
-                          conf.titlebar.bg, True);
-     XSetWindowBorder(dpy, c->tbar->win, conf.titlebar.bg);
+                          conf.titlebar.bg_normal, True);
+     XSetWindowBorder(dpy, c->tbar->win, conf.titlebar.bg_normal);
 
      return;
 }
@@ -108,6 +108,8 @@ void
 titlebar_update(Client *c)
 {
      int pos_y, pos_x;
+     uint bg;
+     char *fg;
 
      XFetchName(dpy, c->win, &(c->title));
      if(!c->title)
@@ -116,10 +118,20 @@ titlebar_update(Client *c)
      if(!conf.titlebar.exist)
           return;
 
+     /* Set titlebar color */
+     bg = (c == sel)
+          ? conf.titlebar.bg_focus
+          : conf.titlebar.bg_normal;
+     fg = (c == sel)
+          ? conf.titlebar.fg_focus
+          : conf.titlebar.fg_normal;
+     c->tbar->color = bg;
+
+     /* Refresh titlebar color */
      bar_refresh_color(c->tbar);
 
      /* Draw the client title in the titlebar *logeek* */
-     if(conf.titlebar.height > 9)
+     if(conf.titlebar.height > fonth)
      {
           /* Set the text alignement */
           switch(conf.titlebar.text_align)
@@ -140,11 +152,9 @@ titlebar_update(Client *c)
           pos_y = (fonth - (xftfont->descent )) + ((conf.titlebar.height - fonth) / 2);
 
           /* Draw title */
-          //if(c->title)
-               draw_text(c->tbar->dr, pos_x, pos_y,
-                         (c == sel) ? conf.titlebar.fg_focus : conf.titlebar.fg_normal,
-                         conf.titlebar.bg, 0, c->title);
+          draw_text(c->tbar->dr, pos_x, pos_y, fg, bg, 0, c->title);
      }
+
      bar_refresh(c->tbar);
 
      return;

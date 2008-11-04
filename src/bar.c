@@ -95,6 +95,8 @@ void
 bar_refresh_color(BarWindow *bw)
 {
      draw_rectangle(bw->dr, 0, 0, bw->w, bw->h, bw->color);
+     if(bw->bord)
+          XSetWindowBorder(dpy, bw->win, bw->color);
 
      return;
 }

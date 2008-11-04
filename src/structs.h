@@ -182,7 +182,8 @@ typedef struct
           Bool exist;
           Position pos;
           int height;
-          uint bg;
+          uint bg_normal;
+          uint bg_focus;
           char *fg_focus;
           char *fg_normal;
           Position text_align;

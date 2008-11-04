@@ -227,7 +227,7 @@ grid(void)
                cgeo.width = sgeo.width - cgeo.x - border;
 
           /* Resize */
-          client_moveresize(c, cgeo, False);
+          client_moveresize(c, cgeo, tags[seltag].resizehint);
 
           /* Set all the other size with current client info */
           cgeo.y = c->geo.y + c->geo.height + border + conf.titlebar.height;
