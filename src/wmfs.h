@@ -57,8 +57,8 @@
 #define ButtonMask   (ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
 #define MouseMask    (ButtonMask | PointerMotionMask)
 #define KeyMask      (KeyPressMask | KeyReleaseMask)
-#define ITOA(p ,n)   sprintf(p, "%i", n)
-#define debug(p)     fprintf(stderr, "debug: %i\n", p)
+#define ITOA(p ,n)   sprintf(p, "%d", n)
+#define debug(p)     fprintf(stderr, "debug: %f\n", p)
 #define PAD          8
 
 /* bar.c */
@@ -124,6 +124,7 @@ void getevent(void);
 void *emalloc(uint element, uint size);
 void efree(void *ptr);
 ulong getcolor(char *color);
+double round(double x);
 void setwinstate(Window win, long state);
 long getwinstate(Window win);
 void uicb_spawn(uicb_t);
@@ -149,6 +150,7 @@ void maxlayout(void);
 Client *nexttiled(Client *c);
 
 /* tile */
+void grid(void);
 void tile(void);
 void tile_left(void);
 void tile_top(void);

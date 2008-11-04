@@ -62,6 +62,12 @@ getcolor(char *color)
      return xcolor.pixel;
 }
 
+double
+round(double x)
+{
+     return (x > 0) ? x + 0.5 : x - 0.5;
+}
+
 void
 setwinstate(Window win, long state)
 {

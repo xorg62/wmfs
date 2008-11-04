@@ -63,6 +63,7 @@ func_name_list_t layout_list[] =
      {"tile_left", tile_left },
      {"tile_top", tile_top },
      {"tile_bottom", tile_bottom },
+     {"grid", grid},
      {"max",  maxlayout },
      {"free", freelayout }
 };

@@ -187,6 +187,62 @@ uicb_set_nmaster(uicb_t cmd)
 }
 
 void
+grid(void)
+{
+     Client *c;
+     XRectangle cgeo = {sgeo.x, sgeo.y, 0, 0};
+     unsigned int i, n, cols, rows, cpcols = 0;
+     unsigned int border = conf.client.borderheight * 2;
+
+     for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++n);
+     if(!n)
+          return;
+
+     for(rows = 0; rows <= n / 2; ++rows)
+          if(rows * rows >= n)
+               break;
+
+     cols = (rows && ((rows - 1) * rows) >= n)
+          ? rows - 1
+          : rows;
+
+     for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++i)
+     {
+          /* Set client property */
+          c->max = c->lmax = False;
+          c->tile = True;
+          c->ogeo.x = c->geo.x; c->ogeo.y = c->geo.y;
+          c->ogeo.width = c->geo.width; c->ogeo.height = c->geo.height;
+
+          ++cpcols;
+          cgeo.width = (sgeo.width / cols) - border;
+          cgeo.height = (sgeo.height / rows) - border;
+
+          /* Last row's and last client remainder */
+          if(cpcols == rows || i + 1 == n)
+               cgeo.height = (sgeo.y + sgeo.height) - cgeo.y - border;
+
+          /* Last column's client remainder */
+          if(i >= rows * (cols - 1))
+               cgeo.width = sgeo.width - cgeo.x - border;
+
+          /* Resize */
+          client_moveresize(c, cgeo, False);
+
+          /* Set all the other size with current client info */
+          cgeo.y = c->geo.y + c->geo.height + border + conf.titlebar.height;
+          if(cpcols + 1 > rows)
+          {
+               cpcols = 0;
+               cgeo.x = c->geo.x + c->geo.width + border;
+               cgeo.y = sgeo.y;
+          }
+     }
+
+     return;
+}
+
+void
 multi_tile(Position type)
 {
      Client *c;

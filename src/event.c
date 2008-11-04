@@ -280,13 +280,12 @@ maprequest(XEvent ev)
      if(at.override_redirect)
           return;
      if(!client_get(ev.xmaprequest.window))
-     {
-          client_focus(NULL);
           client_manage(ev.xmaprequest.window, &at);
-     }
 
      return;
 }
+
+double ROUND(double x) { return (x > 0) ? x + 0.5 : x - 0.5; }
 
 /* If the type is 0, this function will move, else,
  * this will resize */
@@ -294,10 +293,12 @@ void
 mouseaction(Client *c, int x, int y, int type)
 {
      int  ocx, ocy;
+     int my = sgeo.y, mx = 0;
+     double fy, fx, mwf;
      XRectangle geo;
      XEvent ev;
 
-     if(c->max || c->tile || c->lmax)
+     if(c->max || (c->tile && !type) || c->lmax)
           return;
 
      ocx = c->geo.x;
@@ -305,15 +306,36 @@ mouseaction(Client *c, int x, int y, int type)
      if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
                      None, cursor[((type) ?CurResize:CurMove)], CurrentTime) != GrabSuccess)
           return;
-     if(type)
+     /* Warp pointer for resize */
+     if(type && !c->tile)
           XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width, c->geo.height);
+
+     /* Warp pointer for mwfact resize */
+     if(type && c->tile)
+     {
+          if(tags[seltag].layout.func == tile)
+               mx = tags[seltag].mwfact * sgeo.width;
+          else if(tags[seltag].layout.func == tile_left)
+               mx = sgeo.width - (tags[seltag].mwfact * sgeo.width);
+          else if(tags[seltag].layout.func == tile_top)
+          {
+               mx = event.xmotion.x;
+               my = sgeo.height - (tags[seltag].mwfact * sgeo.height);
+          }
+          else if(tags[seltag].layout.func == tile_bottom)
+          {
+               mx = event.xmotion.x;
+               my = tags[seltag].mwfact * sgeo.height;
+          }
+          XWarpPointer(dpy, None, root, 0, 0, 0, 0, mx, my);
+     }
 
      for(;;)
      {
           XMaskEvent(dpy, MouseMask | ExposureMask | SubstructureRedirectMask, &ev);
           if(ev.type == ButtonRelease)
           {
-               if(type)
+               if(type && !c->tile)
                     XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width, c->geo.height);
                XUngrabPointer(dpy, CurrentTime);
                updatebar();
@@ -323,12 +345,34 @@ mouseaction(Client *c, int x, int y, int type)
           {
                XSync(dpy, False);
                /* Resize */
-               if(type)
+               if(type && !c->tile)
                {
                     geo.x = c->geo.x; geo.y = c->geo.y;
                     geo.width = ((ev.xmotion.x - ocx < 1) ? 1 : ev.xmotion.x - ocx);
                     geo.height = ((ev.xmotion.y - ocy < 1) ? 1 : ev.xmotion.y - ocy);
                     client_moveresize(c, geo, True);
+               }
+               /* Set mwfact in tiled mode */
+               else if(type && c->tile)
+               {
+                    fy = (ROUND( ((ev.xmotion.y * 50) / sgeo.height)) ) / 50;
+                    fx = (ROUND( ((ev.xmotion.x * 50) / sgeo.width)) ) / 50;
+
+                    if(tags[seltag].layout.func == tile)
+                         mwf = fx;
+                    else if(tags[seltag].layout.func == tile_left)
+                         mwf = 1 - fx;
+                    else if(tags[seltag].layout.func == tile_top)
+                         mwf = 1 - fy;
+                    else if(tags[seltag].layout.func == tile_bottom)
+                         mwf = fy;
+
+                    tags[seltag].mwfact =
+                         (((0.01) > (mwf) ? (0.01) : (mwf) ) < 0.99)
+                         ? ((0.01) > (mwf) ? (0.01): (mwf))
+                         : 0.99;
+
+                    arrange();
                }
                /* Move */
                else

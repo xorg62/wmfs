@@ -208,7 +208,6 @@ client_map(Client *c)
           XMapWindow(dpy, c->tbar->win);
           bar_refresh(c->tbar);
      }
-
      XMapWindow(dpy, c->win);
 
      return;
@@ -241,7 +240,6 @@ client_manage(Window w, XWindowAttributes *wa)
      grabbuttons(c, False);
      XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask
                   | PropertyChangeMask | StructureNotifyMask);
-
      client_size_hints(c);
      titlebar_update(c);
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
@@ -410,7 +408,7 @@ client_size_hints(Client *c)
 void
 client_raise(Client *c)
 {
-     if(!c || c->tile || c->max)
+     if(!c || c->max || c->tile)
           return;
 
      if(conf.titlebar.exist)

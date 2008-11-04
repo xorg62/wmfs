@@ -28,8 +28,9 @@ layouts
         layout { type = "tile_left"    symbol = "TILE <" }
         layout { type = "tile_top"     symbol = "TILE ^" }
         layout { type = "tile_bottom"  symbol = "TILE v" }
-        layout { type = "max"  symbol = "MAX"  }
-        layout { type = "free" symbol = "FREE" }
+        layout { type = "grid"         symbol = "GRID" }
+        layout { type = "max"          symbol = "MAX"  }
+        layout { type = "free"         symbol = "FREE" }
 }
 
 tags
