@@ -132,7 +132,6 @@ init(void)
           xftfont = XftFontOpenName(dpy, screen, "sans-10");
      }
      fonth = (xftfont->ascent + xftfont->descent);
-     infobar.geo.height = fonth + (float)4.5;
 
      /* INIT CURSOR */
      cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
@@ -166,20 +165,8 @@ init(void)
      if(conf.root.background_command)
           uicb_spawn(conf.root.background_command);
 
-     /* INIT BAR / BUTTON */
-     /* bar */
-     infobar.geo.y = (conf.bartop) ? 0 : mh - infobar.geo.height;
-     infobar.bar = bar_create(0, infobar.geo.y, mw, infobar.geo.height, 0, conf.colors.bar, False);
-
-     /* layout button */
-     infobar.layout_switch = bar_create(0, (conf.bartop) ? infobar.geo.y : infobar.geo.y + 1,
-                                1, infobar.geo.height - 1, 0,
-                                conf.colors.layout_bg, False);
-     infobar.layout_type_switch = bar_create(0, infobar.geo.y, 1, infobar.geo.height, 0, conf.colors.layout_bg, False);
-     bar_map(infobar.bar);
-     bar_map(infobar.layout_switch);
-     strcpy(infobar.statustext, "WMFS-" WMFS_VERSION);
-     infobar_draw();
+     /* INIT INFOBAR */
+     infobar_init(&infobar);
 
      /* INIT WORKABLE SPACE GEOMETRY */
      sgeo.x = 0;

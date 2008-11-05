@@ -77,6 +77,7 @@ void draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color);
 ushort textw(const char *text);
 
 /* infobar.c */
+void infobar_init(InfoBar *ib);
 void infobar_draw(void);
 void infobar_draw_layout(void);
 void infobar_draw_taglist(Drawable dr);

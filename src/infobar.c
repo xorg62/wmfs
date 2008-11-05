@@ -33,6 +33,33 @@
 #include "wmfs.h"
 
 void
+infobar_init(InfoBar *ib)
+{
+     ib->geo.height = fonth + (float)4.5;
+     ib->geo.y = (conf.bartop) ? 0 : mh - ib->geo.height;
+
+     /* Create infobar barwindow */
+     ib->bar = bar_create(0, ib->geo.y, mw, ib->geo.height, 0, conf.colors.bar, False);
+
+     /* Create layout switch & layout type switch barwindow */
+     ib->layout_switch = bar_create(0, (conf.bartop) ? ib->geo.y : ib->geo.y + 1,
+                                         1, ib->geo.height - 1, 0,
+                                         conf.colors.layout_bg, False);
+      ib->layout_type_switch = bar_create(0, ib->geo.y,
+                                              1, ib->geo.height,
+                                              0, conf.colors.layout_bg, False);
+
+     /* Map all */
+     bar_map(ib->bar);
+     bar_map(ib->layout_switch);
+
+     strcpy(ib->statustext, "WMFS-" WMFS_VERSION);
+     infobar_draw();
+
+     return;
+}
+
+void
 infobar_draw(void)
 {
      char buf[256];
@@ -99,11 +126,8 @@ infobar_draw_layout(void)
      width += textw(symbol) + PAD;
      bar_refresh(infobar.layout_switch);
 
-     if(tags[seltag].layout.func == tile
-        || tags[seltag].layout.func == tile_left
-        || tags[seltag].layout.func == tile_top
-        || tags[seltag].layout.func == tile_bottom
-        || tags[seltag].layout.func == grid)
+     if(tags[seltag].layout.func != freelayout
+        && tags[seltag].layout.func != maxlayout)
      {
           bar_map(infobar.layout_type_switch);
           bar_refresh_color(infobar.layout_type_switch);

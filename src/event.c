@@ -326,12 +326,12 @@ mouseaction(Client *c, int x, int y, int type)
                mx = sgeo.width - (tags[seltag].mwfact * sgeo.width);
           else if(tags[seltag].layout.func == tile_top)
           {
-               mx = event.xmotion.x;
+               mx = event.xmotion.x_root;
                my = sgeo.height - (tags[seltag].mwfact * sgeo.height);
           }
           else if(tags[seltag].layout.func == tile_bottom)
           {
-               mx = event.xmotion.x;
+               mx = event.xmotion.x_root;
                my = tags[seltag].mwfact * sgeo.height;
           }
           XWarpPointer(dpy, None, root, 0, 0, 0, 0, mx, my);
