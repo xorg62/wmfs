@@ -58,13 +58,16 @@
 #define MouseMask    (ButtonMask | PointerMotionMask)
 #define KeyMask      (KeyPressMask | KeyReleaseMask)
 #define ITOA(p ,n)   sprintf(p, "%d", n)
-#define debug(p)     fprintf(stderr, "debug: %f\n", p)
+#define debug(p)     fprintf(stderr, "debug: %d\n", p)
 #define PAD          8
 
 /* bar.c */
 BarWindow *bar_create(int x, int y, uint w, uint h, int bord, uint color, Bool entermask);
 void bar_delete(BarWindow *bw);
-void bar_moveresize(BarWindow *bw, int x, int y, uint w, uint h);
+void bar_map(BarWindow *bw);
+void bar_unmap(BarWindow *bw);
+void bar_move(BarWindow *bw, int x, int y);
+void bar_resize(BarWindow *bw, uint w, uint h);
 void bar_refresh_color(BarWindow *bw);
 void bar_refresh(BarWindow *bw);
 void updatebar(void);
@@ -144,6 +147,7 @@ void titlebar_update(Client *c);
 void arrange(void);
 void freelayout(void);
 void layoutswitch(Bool b);
+void layout_tile_switch(Bool b);
 void maxlayout(void);
 Client *nexttiled(Client *c);
 
@@ -196,14 +200,11 @@ Cursor cursor[CurLast];
 int fonth;
 XftFont *xftfont;
 
-/* Bar / Tags */
-BarWindow *bar;
+/* InfoBar */
+InfoBar infobar;
 Tag tags[MAXTAG];
-int barheight;
-char bartext[1024];
-int seltag;
 int taglen[MAXTAG];
-int bary;
+int seltag;
 
 /* Important Client */
 Client *clients;

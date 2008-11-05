@@ -59,11 +59,11 @@ func_name_list_t func_list[] =
 
 func_name_list_t layout_list[] =
 {
-     {"tile", tile },
+     {"tile_right", tile },
      {"tile_left", tile_left },
      {"tile_top", tile_top },
      {"tile_bottom", tile_bottom },
-     {"grid", grid},
+     {"tile_grid", grid},
      {"max",  maxlayout },
      {"free", freelayout }
 };
@@ -139,7 +139,7 @@ layout_name_to_struct(Layout lt[], char *name)
 {
      int i;
 
-     for(i = 0; i < MAXLAYOUT; ++i)
+     for(i = 0; i < NUM_OF_LAYOUT; ++i)
           if(lt[i].func == name_to_func(name, layout_list))
                return lt[i];
 
@@ -225,6 +225,7 @@ init_conf(void)
                CFG_END()
           };
 
+
      static cfg_opt_t layout_opts[] =
           {
                CFG_STR("type",   "", CFGF_NONE),
@@ -234,9 +235,10 @@ init_conf(void)
 
      static cfg_opt_t layouts_opts[] =
           {
-               CFG_STR("fg",     "#FFFFFF", CFGF_NONE),
-               CFG_STR("bg",     "#292929", CFGF_NONE),
-               CFG_SEC("layout", layout_opts, CFGF_MULTI),
+               CFG_STR("fg",           "#FFFFFF",   CFGF_NONE),
+               CFG_STR("bg",           "#292929",   CFGF_NONE),
+               CFG_STR("tile_symbol",  "TILE", CFGF_NONE),
+               CFG_SEC("layout",       layout_opts, CFGF_MULTI),
                CFG_END()
           };
 
@@ -433,8 +435,9 @@ init_conf(void)
      /* layout */
      conf.colors.layout_fg  = strdup(var_to_str(cfg_getstr(cfg_layouts, "fg")));
      conf.colors.layout_bg  = getcolor(var_to_str(cfg_getstr(cfg_layouts, "bg")));
+     conf.tile_symbol = var_to_str(cfg_getstr(cfg_layouts, "tile_symbol"));
 
-     if((conf.nlayout = cfg_size(cfg_layouts, "layout")) > MAXLAYOUT
+     if((conf.nlayout = cfg_size(cfg_layouts, "layout")) > NUM_OF_LAYOUT
           || !(conf.nlayout = cfg_size(cfg_layouts, "layout")))
      {
           fprintf(stderr, "WMFS Configuration: Too many or no layouts\n");
@@ -460,9 +463,11 @@ init_conf(void)
                     conf.layout[i].symbol = strdup(var_to_str(cfg_getstr(cfgtmp, "symbol")));
                     conf.layout[i].func = name_to_func(strdup(cfg_getstr(cfgtmp, "type")), layout_list);
                }
+               if(conf.layout[i].func != freelayout
+                  && conf.layout[i].func != maxlayout)
+                    ++conf.ntilelayout;
           }
      }
-
 
      /* tag */
      /* if there is no tag in the conf or more than

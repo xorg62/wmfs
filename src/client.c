@@ -161,9 +161,6 @@ client_get(Window w)
 void
 client_hide(Client *c)
 {
-     //XMoveWindow(dpy, c->win, c->geo.x + mw * 2, c->geo.y);
-     //if(conf.titlebar.exist)
-     //     XMoveWindow(dpy, c->tbar->win, c->geo.x + mw * 2, c->geo.y);
      client_unmap(c);
      setwinstate(c->win, IconicState);
 
@@ -210,6 +207,7 @@ client_map(Client *c)
           bar_refresh(c->tbar);
      }
      XMapWindow(dpy, c->win);
+     XMapSubwindows(dpy, c->win);
 
      return;
 }
@@ -433,9 +431,6 @@ uicb_client_raise(uicb_t cmd)
 void
 client_unhide(Client *c)
 {
-     //XMoveWindow(dpy, c->win, c->geo.x, c->geo.y);
-     //if(conf.titlebar.exist)
-     //     titlebar_update_position(c);
      client_map(c);
      setwinstate(c->win, NormalState);
 
@@ -475,6 +470,7 @@ client_unmap(Client *c)
           return;
 
      XUnmapWindow(dpy, c->win);
+     XUnmapSubwindows(dpy, c->win);
      if(conf.titlebar.exist)
           XUnmapWindow(dpy, c->tbar->win);
 

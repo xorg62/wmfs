@@ -52,8 +52,8 @@ bar_create(int x, int y, uint w, uint h, int bord, uint color, Bool entermask)
                              CopyFromParent, DefaultVisual(dpy, screen),
                              CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
 
-     bw->x = x; bw->y = y;
-     bw->w = w; bw->h = h;
+     bw->geo.x = x; bw->geo.y = y;
+     bw->geo.width = w; bw->geo.height = h;
      bw->bord = bord;
      bw->color = color;
 
@@ -71,22 +71,49 @@ bar_delete(BarWindow *bw)
 }
 
 void
-bar_moveresize(BarWindow *bw, int x, int y, uint w, uint h)
+bar_map(BarWindow *bw)
 {
-     if(w != bw->w || h != bw->h)
+     if(!bw->mapped)
      {
-          XFreePixmap(dpy, bw->dr);
-          bw->dr = XCreatePixmap(dpy, root, w, h, DefaultDepth(dpy, screen));
-          bw->w = w; bw->h = h;
+          XMapRaised(dpy, bw->win);
+          bw->mapped = True;
      }
 
-     if(x != bw->x || y != bw->y)
+     return;
+}
+
+void
+bar_unmap(BarWindow *bw)
+{
+     if(bw->mapped)
      {
-          bw->x = x;
-          bw->y = y;
+          XUnmapWindow(dpy, bw->win);
+          bw->mapped = False;
      }
 
-     XMoveResizeWindow(dpy, bw->win, bw->x, bw->y, bw->w, bw->h);
+     return;
+}
+
+void
+bar_move(BarWindow *bw, int x, int y)
+{
+     bw->geo.x = x;
+     bw->geo.y = y;
+
+     XMoveWindow(dpy, bw->win, x, y);
+
+     return;
+}
+
+void
+bar_resize(BarWindow *bw, uint w, uint h)
+{
+     bw->geo.width = w;
+     bw->geo.height = h;
+     XFreePixmap(dpy, bw->dr);
+     bw->dr = XCreatePixmap(dpy, root, w, h, DefaultDepth(dpy, screen));
+
+     XResizeWindow(dpy, bw->win, w, h);
 
      return;
 }
@@ -94,7 +121,7 @@ bar_moveresize(BarWindow *bw, int x, int y, uint w, uint h)
 void
 bar_refresh_color(BarWindow *bw)
 {
-     draw_rectangle(bw->dr, 0, 0, bw->w, bw->h, bw->color);
+     draw_rectangle(bw->dr, 0, 0, bw->geo.width, bw->geo.height, bw->color);
      if(bw->bord)
           XSetWindowBorder(dpy, bw->win, bw->color);
 
@@ -104,7 +131,7 @@ bar_refresh_color(BarWindow *bw)
 void
 bar_refresh(BarWindow *bw)
 {
-     XCopyArea(dpy, bw->dr, bw->win, gc, 0, 0, bw->w, bw->h, 0, 0);
+     XCopyArea(dpy, bw->dr, bw->win, gc, 0, 0, bw->geo.width, bw->geo.height, 0, 0);
 
      return;
 }
@@ -116,10 +143,10 @@ updatebar(void)
      char buf[256];
 
      /* Refresh bar color */
-     bar_refresh_color(bar);
+     bar_refresh_color(infobar.bar);
 
      /* Draw taglist */
-     draw_taglist(bar->dr);
+     draw_taglist(infobar.bar->dr);
 
      /* Draw layout symbol */
      draw_layout();
@@ -128,27 +155,24 @@ updatebar(void)
      sprintf(buf, "mwfact: %.2f - nmaster: %d",
              tags[seltag].mwfact,
              tags[seltag].nmaster);
-     draw_text(bar->dr,
-               taglen[conf.ntag] + textw(tags[seltag].layout.symbol) + conf.tagbordwidth + PAD,
-               fonth, conf.colors.text, conf.colors.bar, 0, buf);
-     draw_rectangle(bar->dr,
-                    taglen[conf.ntag] + textw(tags[seltag].layout.symbol) + textw(buf) + PAD * 2,
-                    0, conf.tagbordwidth, barheight, conf.colors.tagbord);
+     draw_text(infobar.bar->dr, infobar.lastsep + PAD/1.5, fonth, conf.colors.text, conf.colors.bar, 0, buf);
+     draw_rectangle(infobar.bar->dr, textw(buf) + infobar.lastsep + PAD,
+                    0, conf.tagbordwidth, infobar.geo.height, conf.colors.tagbord);
 
      /* Draw status text */
-     draw_text(bar->dr, mw - textw(bartext), fonth, conf.colors.text, conf.colors.bar, 0, bartext);
+     draw_text(infobar.bar->dr, mw - textw(infobar.statustext), fonth, conf.colors.text, conf.colors.bar, 0, infobar.statustext);
 
      /* Bar border */
      if(conf.tagbordwidth)
      {
-          draw_rectangle(bar->dr, 0, ((conf.bartop) ? barheight-1: 0),
+          draw_rectangle(infobar.bar->dr, 0, ((conf.bartop) ? infobar.geo.height - 1: 0),
                          mw, 1, conf.colors.tagbord);
-          draw_rectangle(bar->dr, mw - textw(bartext) - 5,
-                         0, conf.tagbordwidth, barheight, conf.colors.tagbord);
+          draw_rectangle(infobar.bar->dr, mw - textw(infobar.statustext) - 5,
+                         0, conf.tagbordwidth, infobar.geo.height, conf.colors.tagbord);
      }
 
      /* Refresh the bar */
-     bar_refresh(bar);
+     bar_refresh(infobar.bar);
 
      return;
 }
@@ -158,15 +182,11 @@ uicb_togglebarpos(uicb_t cmd)
 {
      conf.bartop = !conf.bartop;
      if(conf.bartop)
-          sgeo.y = conf.titlebar.pos ? barheight : barheight + conf.titlebar.height;
+          sgeo.y = conf.titlebar.pos ? infobar.geo.height : infobar.geo.height + conf.titlebar.height;
      else
           sgeo.y = conf.titlebar.pos ? 0 : conf.titlebar.height;
-
-     if(conf.bartop)
-          bary = 0;
-     else
-          bary = mh - barheight;
-     bar_moveresize(bar, 0, bary, mw, barheight);
+     infobar.geo.y = (conf.bartop) ? 0 : mh - infobar.geo.height;
+     bar_move(infobar.bar, 0, infobar.geo.y);
      updatebar();
      arrange();
 

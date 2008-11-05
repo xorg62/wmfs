@@ -97,9 +97,8 @@ titlebar_update_position(Client *c)
           y = c->geo.y + c->geo.height + conf.client.borderheight;
           break;
      }
-
-     bar_moveresize(c->tbar, c->geo.x, y, c->geo.width,
-                    conf.titlebar.height - conf.client.borderheight);
+     bar_move(c->tbar, c->geo.x, y);
+     bar_resize(c->tbar, c->geo.width, conf.titlebar.height - conf.client.borderheight);
 
      return;
 }
@@ -149,12 +148,11 @@ titlebar_update(Client *c)
           }
 
           /* Set y text position (always at the middle) and fg color */
-          pos_y = (fonth - (xftfont->descent )) + ((conf.titlebar.height - fonth) / 2);
+          pos_y = (fonth - (xftfont->descent ) - 1) + ((conf.titlebar.height - fonth) / 2);
 
           /* Draw title */
           draw_text(c->tbar->dr, pos_x, pos_y, fg, bg, 0, c->title);
      }
-
      bar_refresh(c->tbar);
 
      return;

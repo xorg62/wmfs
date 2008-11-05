@@ -37,7 +37,9 @@
 
 #define NBUTTON      8
 #define MAXTAG       36
-#define MAXLAYOUT    7
+
+#define NUM_OF_LAYOUT    7
+#define NUM_OF_TILE      5
 
 /* Typedef */
 typedef const char*    uicb_t;
@@ -58,10 +60,10 @@ typedef struct
 {
      Window win;
      Drawable dr;
-     int x, y;
-     uint w ,h;
+     XRectangle geo;
      uint color;
      int bord;
+     Bool mapped;
 } BarWindow;
 
 /* Client Structure. */
@@ -110,6 +112,17 @@ typedef struct
      void (*func)(uicb_t);
      uicb_t cmd;
 } MouseBinding;
+
+/* InfoBar Struct */
+typedef struct
+{
+     BarWindow *bar;
+     BarWindow *layout_switch;
+     BarWindow *layout_type_switch;
+     XRectangle geo;
+     int lastsep;
+     char statustext[1024];
+} InfoBar;
 
 /* Surface \o/ */
 typedef struct
@@ -191,11 +204,13 @@ typedef struct
           int nmouse;
      } titlebar;
      Tag tag[MAXTAG];
-     Layout layout[MAXLAYOUT];
+     Layout layout[NUM_OF_LAYOUT];
+     char *tile_symbol;
      int ntag;
      int nkeybind;
      int nbutton;
      int nlayout;
+     int ntilelayout;
 } Conf;
 
 /* Config.c struct */

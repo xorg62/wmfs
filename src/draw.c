@@ -42,7 +42,7 @@ draw_text(Drawable d, int x, int y, char* fg, uint bg, int pad, char *str)
      xftd = XftDrawCreate(dpy, d, DefaultVisual(dpy, screen), DefaultColormap(dpy, screen));
 
      /* Color the text font */
-     draw_rectangle(d, x - pad/2, 0, textw(str) + pad, barheight, bg);
+     draw_rectangle(d, x - pad/2, 0, textw(str) + pad, infobar.geo.height, bg);
 
      /* Alloc text color */
      XftColorAllocName(dpy, DefaultVisual(dpy, screen),
@@ -80,7 +80,7 @@ draw_taglist(Drawable dr)
 
           /* Draw the tag separation */
           draw_rectangle(dr, taglen[i] + textw(buf[i]) + PAD/2,
-                         0, conf.tagbordwidth, barheight, conf.colors.tagbord);
+                         0, conf.tagbordwidth, infobar.geo.height, conf.colors.tagbord);
 
           /* Edit taglen[i+1] for the next time */
           taglen[i+1] = taglen[i] + textw(buf[i]) + PAD + conf.tagbordwidth;
@@ -92,16 +92,54 @@ draw_taglist(Drawable dr)
 void
 draw_layout(void)
 {
-     /* Draw layout name / symbol */
-     draw_text(bar->dr, taglen[conf.ntag], fonth,
+     int px, py, width;
+     char symbol[256];
+
+     /* Set symbol & position */
+     px = width = taglen[conf.ntag];
+     py = conf.bartop ? infobar.geo.y : infobar.geo.y + 1;
+     if(tags[seltag].layout.func == freelayout
+        || tags[seltag].layout.func == maxlayout)
+          strcpy(symbol, tags[seltag].layout.symbol);
+     else
+          strcpy(symbol, conf.tile_symbol);
+
+     /* Draw layout name/symbol */
+     bar_refresh_color(infobar.layout_switch);
+
+     bar_move(infobar.layout_switch, px, py);
+     bar_resize(infobar.layout_switch, textw(symbol) + PAD, infobar.geo.height - 1);
+     draw_text(infobar.layout_switch->dr, PAD/2, fonth,
                conf.colors.layout_fg,
                conf.colors.layout_bg,
-               2, tags[seltag].layout.symbol);
+               PAD, symbol);
+     width += textw(symbol) + PAD;
+     bar_refresh(infobar.layout_switch);
+
+     if(tags[seltag].layout.func == tile
+        || tags[seltag].layout.func == tile_left
+        || tags[seltag].layout.func == tile_top
+        || tags[seltag].layout.func == tile_bottom
+        || tags[seltag].layout.func == grid)
+     {
+          bar_map(infobar.layout_type_switch);
+          bar_refresh_color(infobar.layout_type_switch);
+          bar_move(infobar.layout_type_switch, px + infobar.layout_switch->geo.width + PAD/2, py);
+          bar_resize(infobar.layout_type_switch, textw(tags[seltag].layout.symbol) + PAD, infobar.geo.height - 1);
+          draw_text(infobar.layout_type_switch->dr, PAD/2, fonth,
+                    conf.colors.layout_fg,
+                    conf.colors.layout_bg,
+                    PAD, tags[seltag].layout.symbol);
+          width += textw(tags[seltag].layout.symbol) + PAD * 1.5;
+
+          bar_refresh(infobar.layout_type_switch);
+     }
+     else
+          bar_unmap(infobar.layout_type_switch);
 
      /* Draw right separation */
-     draw_rectangle(bar->dr,
-                    taglen[conf.ntag] + textw(tags[seltag].layout.symbol) + PAD/2,
-                    0, conf.tagbordwidth, barheight, conf.colors.tagbord);
+     infobar.lastsep = width + PAD / 2;
+     draw_rectangle(infobar.bar->dr, infobar.lastsep, 0, conf.tagbordwidth, infobar.geo.height, conf.colors.tagbord);
 
      return;
 }

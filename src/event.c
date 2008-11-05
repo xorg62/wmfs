@@ -64,7 +64,7 @@ buttonpress(XEvent ev)
 
      /* Bar */
      {
-          if(ev.xbutton.window == bar->win)
+          if(ev.xbutton.window == infobar.bar->win)
           {
                /* Tag*/
                for(i = 0; i < conf.ntag + 1; ++i)
@@ -86,20 +86,29 @@ buttonpress(XEvent ev)
                     if (ev.xbutton.button == Button5)
                          uicb_tag("-1");
                }
-
-               /* Layout */
+          }
+          /* Layout */
+          {
+               if(ev.xbutton.window == infobar.layout_switch->win)
                {
-                    if(ev.xbutton.x >= taglen[conf.ntag]
-                       && ev.xbutton.x <=  taglen[conf.ntag]
-                       + textw(tags[seltag].layout.symbol) + PAD/2)
-                    {
-                         if(ev.xbutton.button == Button1
-                            || ev.xbutton.button == Button4)
-                              layoutswitch(True);
-                         if(ev.xbutton.button == Button3
-                            || ev.xbutton.button == Button5)
-                              layoutswitch(False);
-                    }
+                    if(ev.xbutton.button == Button1
+                       || ev.xbutton.button == Button4)
+                         layoutswitch(True);
+
+                    if(ev.xbutton.button == Button3
+                       || ev.xbutton.button == Button5)
+                         layoutswitch(False);
+               }
+
+               if(ev.xbutton.window == infobar.layout_type_switch->win)
+               {
+                    if(ev.xbutton.button == Button1
+                       || ev.xbutton.button == Button4)
+                         layout_tile_switch(True);
+
+                    if(ev.xbutton.button == Button3
+                       || ev.xbutton.button == Button5)
+                         layout_tile_switch(False);
                }
           }
      }
@@ -169,7 +178,7 @@ expose(XEvent ev)
      Client *c;
 
      if(ev.xexpose.count == 0
-        && (ev.xexpose.window == bar->win))
+        && (ev.xexpose.window == infobar.bar->win))
           updatebar();
 
      if(conf.titlebar.exist)

@@ -103,6 +103,29 @@ layoutswitch(Bool b)
 }
 
 void
+layout_tile_switch(Bool b)
+{
+     int i;
+
+     for(i = 0; i < conf.ntilelayout; ++i)
+     {
+          if(tags[seltag].layout.func == conf.layout[i].func
+             && (conf.layout[i].func != freelayout
+                 && conf.layout[i].func != maxlayout))
+          {
+               if(b)
+                    tags[seltag].layout = conf.layout[(i + 1) % conf.ntilelayout];
+               else
+                    tags[seltag].layout = conf.layout[(i + conf.ntilelayout - 1) % conf.ntilelayout];
+               break;
+          }
+     }
+     arrange();
+
+     return;
+}
+
+void
 uicb_layout_next(uicb_t cmd)
 {
      layoutswitch(True);
@@ -117,6 +140,7 @@ uicb_layout_prev(uicb_t cmd)
 
      return;
 }
+
 void
 maxlayout(void)
 {

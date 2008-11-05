@@ -92,7 +92,9 @@ quit(void)
      XFreeCursor(dpy, cursor[CurNormal]);
      XFreeCursor(dpy, cursor[CurMove]);
      XFreeCursor(dpy, cursor[CurResize]);
-     bar_delete(bar);
+     bar_delete(infobar.bar);
+     bar_delete(infobar.layout_switch);
+     bar_delete(infobar.layout_type_switch);
      efree(keys);
      efree(conf.titlebar.mouse);
      efree(conf.client.mouse);
@@ -130,7 +132,7 @@ init(void)
           xftfont = XftFontOpenName(dpy, screen, "sans-10");
      }
      fonth = (xftfont->ascent + xftfont->descent);
-     barheight = fonth + (float)4.5;
+     infobar.geo.height = fonth + (float)4.5;
 
      /* INIT CURSOR */
      cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
@@ -165,20 +167,28 @@ init(void)
           uicb_spawn(conf.root.background_command);
 
      /* INIT BAR / BUTTON */
-     bary = (conf.bartop) ? 0 : mh - barheight;
-     bar = bar_create(0, bary, mw, barheight, 0, conf.colors.bar, False);
-     XMapRaised(dpy, bar->win);
-     strcpy(bartext, "WMFS-" WMFS_VERSION);
+     /* bar */
+     infobar.geo.y = (conf.bartop) ? 0 : mh - infobar.geo.height;
+     infobar.bar = bar_create(0, infobar.geo.y, mw, infobar.geo.height, 0, conf.colors.bar, False);
+
+     /* layout button */
+     infobar.layout_switch = bar_create(0, (conf.bartop) ? infobar.geo.y : infobar.geo.y + 1,
+                                1, infobar.geo.height - 1, 0,
+                                conf.colors.layout_bg, False);
+     infobar.layout_type_switch = bar_create(0, infobar.geo.y, 1, infobar.geo.height, 0, conf.colors.layout_bg, False);
+     bar_map(infobar.bar);
+     bar_map(infobar.layout_switch);
+     strcpy(infobar.statustext, "WMFS-" WMFS_VERSION);
      updatebar();
 
      /* INIT WORKABLE SPACE GEOMETRY */
      sgeo.x = 0;
      if(conf.bartop)
-          sgeo.y = conf.titlebar.pos ? barheight : barheight + conf.titlebar.height;
+          sgeo.y = conf.titlebar.pos ? infobar.geo.height : infobar.geo.height + conf.titlebar.height;
      else
           sgeo.y = conf.titlebar.pos ? 0 : conf.titlebar.height;
      sgeo.width  = DisplayWidth(dpy, screen);
-     sgeo.height = DisplayHeight(dpy, screen) - (barheight + conf.titlebar.height);
+     sgeo.height = DisplayHeight(dpy, screen) - (infobar.geo.height + conf.titlebar.height);
 
      /* INIT STUFF */
      grabkeys();
@@ -194,12 +204,12 @@ void
 mainloop(void)
 {
      fd_set fd;
-     char sbuf[sizeof bartext], *p;
+     char sbuf[sizeof infobar.statustext], *p;
      int len, r, offset = 0;
      Bool readstdin = True;
 
-     len = sizeof bartext - 1;
-     sbuf[len] = bartext[len] = '\0';
+     len = sizeof infobar.statustext - 1;
+     sbuf[len] = infobar.statustext[len] = '\0';
 
      while(!exiting)
      {
@@ -218,7 +228,7 @@ mainloop(void)
                          if(*p == '\n')
                          {
                               *p = '\0';
-                              strncpy(bartext, sbuf, len);
+                              strncpy(infobar.statustext, sbuf, len);
                               p += r - 1;
                               for(r = 0; *(p - r) && *(p - r) != '\n'; ++r);
                               offset = r;
@@ -230,7 +240,7 @@ mainloop(void)
                }
                else
                {
-                    strncpy(bartext, sbuf, strlen(sbuf));
+                    strncpy(infobar.statustext, sbuf, strlen(sbuf));
                     readstdin = False;
                }
                updatebar();

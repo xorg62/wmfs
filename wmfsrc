@@ -7,7 +7,7 @@ variables
 
 misc
 {
-        font        = "sans-9"
+        font        = "dejavu-9"
         raisefocus  = false
         raiseswitch = true
 }
@@ -24,11 +24,15 @@ layouts
         fg = "#191919"
         bg = "#7E89A2"
 
-        layout { type = "tile"         symbol = "TILE >" }
-        layout { type = "tile_left"    symbol = "TILE <" }
-        layout { type = "tile_top"     symbol = "TILE ^" }
-        layout { type = "tile_bottom"  symbol = "TILE v" }
-        layout { type = "grid"         symbol = "GRID" }
+        # Tiling layouts
+        tile_symbol = "TILE"
+        layout { type = "tile_right"   symbol = "RIGHT" }
+        layout { type = "tile_left"    symbol = "LEFT" }
+        layout { type = "tile_top"     symbol = "TOP" }
+        layout { type = "tile_bottom"  symbol = "BOTTOM" }
+        layout { type = "tile_grid"    symbol = "GRID" }
+
+        # Other
         layout { type = "max"          symbol = "MAX"  }
         layout { type = "free"         symbol = "FREE" }
 }
@@ -38,7 +42,7 @@ tags
         sel_fg       = "#191919"
         sel_bg       = "#7E89A2"
         border       = "#3F485E"
-        border_width = 1
+        border_width = 2
 
         tag { name = "one" mwfact = 0.65 nmaster = 1 layout = "tile" resizehint = false }
         tag { name = "two"   }
@@ -62,9 +66,9 @@ root
 
 client
 {
-        border_height  = 1
-        border_normal  = "#3F485E"
-        border_focus   = "#7E89A2"
+        border_height  = 2
+        border_normal  = "#191919"
+        border_focus   = "#003366"
         modifier       = "Alt"
 
         mouse { button = "1" func = "client_raise" }
@@ -79,9 +83,9 @@ titlebar
         position   = "top"
         height     = 12
         bg_normal  = "#191919"
-        bg_focus   = "#191919"
+        bg_focus   = "#003366"
         fg_normal  = "#D4D4D4"
-        fg_focus   = "#D4D4D4"
+        fg_focus   = "#B4B4B4"
         text_align = "center"
 
         mouse { button = "1" func = "client_raise" }
