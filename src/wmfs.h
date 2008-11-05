@@ -70,15 +70,17 @@ void bar_move(BarWindow *bw, int x, int y);
 void bar_resize(BarWindow *bw, uint w, uint h);
 void bar_refresh_color(BarWindow *bw);
 void bar_refresh(BarWindow *bw);
-void updatebar(void);
-void uicb_togglebarpos(uicb_t);
 
 /* draw.c */
 void draw_text(Drawable d, int x, int y, char* fg, uint bg, int pad, char *str);
-void draw_taglist(Drawable dr);
-void draw_layout(void);
 void draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color);
 ushort textw(const char *text);
+
+/* infobar.c */
+void infobar_draw(void);
+void infobar_draw_layout(void);
+void infobar_draw_taglist(Drawable dr);
+void uicb_infobar_togglepos(uicb_t cmd);
 
 /* client.c */
 int client_pertag(int tag);

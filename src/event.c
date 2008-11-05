@@ -179,7 +179,7 @@ expose(XEvent ev)
 
      if(ev.xexpose.count == 0
         && (ev.xexpose.window == infobar.bar->win))
-          updatebar();
+          infobar_draw();
 
      if(conf.titlebar.exist)
           for(c = clients; c; c = c->next)
@@ -345,7 +345,7 @@ mouseaction(Client *c, int x, int y, int type)
                if(type && !c->tile)
                     XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width, c->geo.height);
                XUngrabPointer(dpy, CurrentTime);
-               updatebar();
+               infobar_draw();
                return;
           }
           else if(ev.type == MotionNotify)

@@ -179,7 +179,7 @@ init(void)
      bar_map(infobar.bar);
      bar_map(infobar.layout_switch);
      strcpy(infobar.statustext, "WMFS-" WMFS_VERSION);
-     updatebar();
+     infobar_draw();
 
      /* INIT WORKABLE SPACE GEOMETRY */
      sgeo.x = 0;
@@ -243,7 +243,7 @@ mainloop(void)
                     strncpy(infobar.statustext, sbuf, strlen(sbuf));
                     readstdin = False;
                }
-               updatebar();
+               infobar_draw();
           }
           while(XPending(dpy))
           {

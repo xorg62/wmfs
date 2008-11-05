@@ -102,7 +102,7 @@ keys
         key { mod = {"Alt"} key = "q" func = "client_kill" }
         key { mod = {"Control", "Alt", "Shift"} key = "q" func = "quit" }
         key { mod = {"Control"} key = "m" func = "togglemax" }
-        key { mod = {"Control"} key = "b" func = "togglebarpos" }
+        key { mod = {"Control"} key = "b" func = "toggle_infobar_position" }
         key { mod = {"Alt"} key = "Tab" func = "client_next" }
         key { mod = {"Alt","Shift"} key = "Tab" func = "client_prev" }
         key { mod = {"Control"} key = "Right" func = "tag_next" }

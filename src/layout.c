@@ -50,7 +50,7 @@ arrange(void)
       else
           client_focus(NULL);
 
-     updatebar();
+     infobar_draw();
 
      return;
 }
