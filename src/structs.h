@@ -39,7 +39,6 @@
 #define MAXTAG       36
 
 #define NUM_OF_LAYOUT    7
-#define NUM_OF_TILE      5
 
 /* Typedef */
 typedef const char*    uicb_t;

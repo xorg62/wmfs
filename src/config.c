@@ -135,11 +135,11 @@ char_to_button(char *name)
 }
 
 Layout
-layout_name_to_struct(Layout lt[], char *name)
+layout_name_to_struct(Layout lt[], char *name, int n)
 {
      int i;
 
-     for(i = 0; i < NUM_OF_LAYOUT; ++i)
+     for(i = 0; i < n; ++i)
           if(lt[i].func == name_to_func(name, layout_list))
                return lt[i];
 
@@ -469,6 +469,7 @@ init_conf(void)
           }
      }
 
+
      /* tag */
      /* if there is no tag in the conf or more than
       * MAXTAG (32) print an error and create only one. */
@@ -487,7 +488,7 @@ init_conf(void)
           conf.tag[0].mwfact     = 0.65;
           conf.tag[0].nmaster    = 1;
           conf.tag[0].resizehint = False;
-          conf.tag[0].layout     = layout_name_to_struct(conf.layout, "tile");
+          conf.tag[0].layout     = layout_name_to_struct(conf.layout, "tile", conf.nlayout);
      }
      else
      {
@@ -500,7 +501,7 @@ init_conf(void)
                conf.tag[i].mwfact      = cfg_getfloat(cfgtmp, "mwfact");
                conf.tag[i].nmaster     = cfg_getint(cfgtmp, "nmaster");
                conf.tag[i].resizehint  = cfg_getbool(cfgtmp, "resizehint");
-               conf.tag[i].layout      = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"));
+               conf.tag[i].layout      = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"), conf.nlayout);
           }
      }
 
