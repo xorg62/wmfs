@@ -125,12 +125,14 @@ void mouseaction(Client *c, int x, int y, int type);
 void uicb_mousemove(uicb_t cmd);
 void uicb_resizemouse(uicb_t cmd);
 void propertynotify(XEvent ev);
+void unmapnotify(XEvent ev);
 void getevent(void);
 
 /* util.c */
 void *emalloc(uint element, uint size);
 void efree(void *ptr);
 ulong getcolor(char *color);
+long getwinstate(Window win);
 double round(double x);
 void setwinstate(Window win, long state);
 void uicb_spawn(uicb_t);

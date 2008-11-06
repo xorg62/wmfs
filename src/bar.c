@@ -68,6 +68,7 @@ bar_create(int x, int y, uint w, uint h, int bord, uint color, Bool entermask)
 void
 bar_delete(BarWindow *bw)
 {
+     XSelectInput(dpy, bw->win, NoEventMask);
      XDestroyWindow(dpy, bw->win);
      XFreePixmap(dpy, bw->dr);
      free(bw);

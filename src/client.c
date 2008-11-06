@@ -444,21 +444,25 @@ client_unmanage(Client *c)
      int i;
      Client *cc;
 
-     XGrabServer(dpy);
      XSetErrorHandler(errorhandlerdummy);
+
+     /* Unset all focus stuff {{{ */
      if(sel == c)
           client_focus(NULL);
      for(i = 0, cc = clients; cc; cc = cc->next, ++i)
           if(selbytag[i] == c)
                selbytag[i] = NULL;
+     /* }}} */
+
+     /* Detach this client of the chain
+      * and set the withdraw state */
      client_detach(c);
-     XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
      setwinstate(c->win, WithdrawnState);
-     XSync(dpy, False);
-     XUngrabServer(dpy);
+
      if(conf.titlebar.exist)
           titlebar_delete(c);
      efree(c);
+     XSync(dpy, False);
      arrange();
 
      return;

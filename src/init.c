@@ -38,7 +38,6 @@ init(void)
      /* First init */
      gc = DefaultGC (dpy, screen);
      screen = DefaultScreen (dpy);
-     root = RootWindow (dpy, screen);
 
      init_font();
      init_cursor();
@@ -116,6 +115,8 @@ void
 init_root(void)
 {
      XSetWindowAttributes at;
+
+     root = RootWindow (dpy, screen);
 
      at.event_mask = KeyMask | ButtonPressMask | ButtonReleaseMask |
           SubstructureRedirectMask | SubstructureNotifyMask |

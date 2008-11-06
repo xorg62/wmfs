@@ -61,6 +61,8 @@ titlebar_create(Client *c)
 void
 titlebar_delete(Client *c)
 {
+     if(c->title)
+          XFree(c->title);
      bar_delete(c->tbar);
      c->tbar = NULL;
 

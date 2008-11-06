@@ -442,6 +442,21 @@ propertynotify(XEvent ev)
 }
 
 
+void
+unmapnotify(XEvent ev)
+{
+     Client *c;
+
+     if((c = client_get(event.xunmap.window))
+        && ev.xunmap.event == root
+        && ev.xunmap.send_event
+        && getwinstate(c->win) == NormalState
+        && !c->hide)
+          client_unmanage(c);
+
+     return;
+}
+
 /* Handle */
 void
 getevent(void)
@@ -458,6 +473,7 @@ getevent(void)
       case MapRequest:        maprequest(event);        break;
       case MappingNotify:     mapnotify(event);         break;
       case PropertyNotify:    propertynotify(event);    break;
+      case UnmapNotify:       unmapnotify(event);       break;
      }
 
      return;
