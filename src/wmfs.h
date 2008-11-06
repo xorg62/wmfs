@@ -120,7 +120,6 @@ void grabkeys(void);
 void keypress(XEvent ev);
 void mapnotify(XEvent ev);
 void maprequest(XEvent ev);
-void mouseaction(Client *c, int x, int y, int type);
 void propertynotify(XEvent ev);
 void unmapnotify(XEvent ev);
 void getevent(void);
