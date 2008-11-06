@@ -31,6 +31,7 @@ set(wmfs_src
   src/wmfs.c
   src/config.c
   src/event.c
+  src/mouse.c
   src/util.c
   src/layout.c
   src/tag.c

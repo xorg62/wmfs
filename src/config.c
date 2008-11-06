@@ -51,8 +51,8 @@ func_name_list_t func_list[] =
      {"set_nmaster",             uicb_set_nmaster },
      {"quit",                    uicb_quit },
      {"toggle_infobar_position", uicb_infobar_togglepos },
-     {"mouse_move",              uicb_mousemove },
-     {"mouse_resize",            uicb_resizemouse },
+     {"mouse_move",              uicb_mouse_move },
+     {"mouse_resize",            uicb_mouse_resize },
      {"client_raise",            uicb_client_raise },
      {"tile_switch",             uicb_tile_switch }
 };

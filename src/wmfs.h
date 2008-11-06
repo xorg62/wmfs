@@ -116,17 +116,21 @@ void destroynotify(XEvent ev);
 void enternotify(XEvent ev);
 void expose(XEvent ev);
 void focusin(XEvent ev);
-void grabbuttons(Client *c, Bool focused);
 void grabkeys(void);
 void keypress(XEvent ev);
 void mapnotify(XEvent ev);
 void maprequest(XEvent ev);
 void mouseaction(Client *c, int x, int y, int type);
-void uicb_mousemove(uicb_t cmd);
-void uicb_resizemouse(uicb_t cmd);
 void propertynotify(XEvent ev);
 void unmapnotify(XEvent ev);
 void getevent(void);
+
+/* mouse.c */
+void mouse_move(Client *c);
+void mouse_resize(Client *c);
+void uicb_mouse_move(uicb_t cmd);
+void uicb_mouse_resize(uicb_t cmd);
+void grabbuttons(Client *c, Bool focused);
 
 /* util.c */
 void *emalloc(uint element, uint size);
