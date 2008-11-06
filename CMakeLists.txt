@@ -27,6 +27,7 @@ project(${PROJECT_NAME} C)
 
 # Definition of the wmfs source
 set(wmfs_src
+  src/init.c
   src/wmfs.c
   src/config.c
   src/event.c

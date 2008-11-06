@@ -57,6 +57,8 @@
 #define ButtonMask   (ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
 #define MouseMask    (ButtonMask | PointerMotionMask)
 #define KeyMask      (KeyPressMask | KeyReleaseMask)
+#define MAXH         DisplayHeight(dpy, screen)
+#define MAXW         DisplayWidth(dpy, screen)
 #define ITOA(p ,n)   sprintf(p, "%d", n)
 #define debug(p)     fprintf(stderr, "debug: %d\n", p)
 #define PAD          8
@@ -168,13 +170,21 @@ void uicb_layout_next(uicb_t);
 void uicb_set_mwfact(uicb_t);
 void uicb_set_nmaster(uicb_t);
 
+/* init.c */
+void init(void);
+void init_atom(void);
+void init_font(void);
+void init_cursor(void);
+void init_root(void);
+void init_key(void);
+void init_geometry(void);
+
 /* wmfs.c */
 void checkotherwm(void);
 int errorhandler(Display *d, XErrorEvent *event);
 int errorhandlerdummy(Display *d, XErrorEvent *event);
 int errorhandlerstart(Display *d, XErrorEvent *event);
 void quit(void);
-void init(void);
 void mainloop(void);
 void scan(void);
 void uicb_quit(uicb_t);
@@ -188,7 +198,6 @@ GC gc;
 Window root;
 XRectangle sgeo;
 int screen;
-int mw, mh;
 Conf conf;
 Key *keys;
 Bool exiting;
@@ -200,8 +209,7 @@ Atom net_atom[NetLast];
 Cursor cursor[CurLast];
 
 /* Fonts */
-int fonth;
-XftFont *xftfont;
+XftFont *font;
 
 /* InfoBar */
 InfoBar infobar;
@@ -216,6 +224,7 @@ Client *selbytag[MAXTAG];
 
 /* Other */
 uint numlockmask;
+uint scrolllockmask;
 Variable confvar[256];
 
 #endif /* WMFS_H */

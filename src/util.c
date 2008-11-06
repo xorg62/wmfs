@@ -62,6 +62,27 @@ getcolor(char *color)
      return xcolor.pixel;
 }
 
+long
+getwinstate(Window win)
+{
+     int f;
+     long ret = -1;
+     ulong n, e;
+     uchar *p = NULL;
+     Atom at;
+
+     if(XGetWindowProperty(dpy, win, wm_atom[WMState], 0L, 2L, False, wm_atom[WMState],
+                           &at, &f, &n, &e, (uchar **)&p) != Success)
+          return -1;
+
+     if(n != 0)
+          ret = *p;
+     free(p);
+
+     return ret;
+}
+
+
 double
 round(double x)
 {

@@ -88,7 +88,7 @@ void
 quit(void)
 {
      /* Exiting WMFS :'( */
-     XftFontClose(dpy, xftfont);
+     XftFontClose(dpy, font);
      XFreeCursor(dpy, cursor[CurNormal]);
      XFreeCursor(dpy, cursor[CurMove]);
      XFreeCursor(dpy, cursor[CurResize]);
@@ -100,89 +100,6 @@ quit(void)
      efree(conf.client.mouse);
      efree(conf.root.mouse);
      XSync(dpy, False);
-
-     return;
-}
-
-void
-init(void)
-{
-     XSetWindowAttributes at;
-     XModifierKeymap *modmap;
-     int i, j;
-
-     /* FIRST INIT */
-     gc = DefaultGC (dpy, screen);
-     screen = DefaultScreen (dpy);
-     root = RootWindow (dpy, screen);
-     mw = DisplayWidth (dpy, screen);
-     mh = DisplayHeight (dpy, screen);
-
-
-     /* INIT TAG / LAYOUT ATTRIBUTE */
-     seltag = 1;
-     for(i = 0; i < conf.ntag + 1; ++i)
-          tags[i] = conf.tag[i - 1];
-
-     /* INIT FONT */
-     xftfont = XftFontOpenName(dpy, screen, conf.font);
-     if(!xftfont)
-     {
-          fprintf(stderr, "WMFS Error: Cannot initialize font\n");
-          xftfont = XftFontOpenName(dpy, screen, "sans-10");
-     }
-     fonth = (xftfont->ascent + xftfont->descent);
-
-     /* INIT CURSOR */
-     cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
-     cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
-     cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
-
-     /* INIT MODIFIER */
-     modmap = XGetModifierMapping(dpy);
-     for(i = 0; i < 8; i++)
-          for(j = 0; j < modmap->max_keypermod; ++j)
-               if(modmap->modifiermap[i * modmap->max_keypermod + j]
-                  == XKeysymToKeycode(dpy, XK_Num_Lock))
-                    numlockmask = (1 << i);
-     XFreeModifiermap(modmap);
-
-     /* INIT ATOM */
-     wm_atom[WMState] = XInternAtom(dpy, "WM_STATE", False);
-     wm_atom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
-     wm_atom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
-     net_atom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
-     net_atom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
-     XChangeProperty(dpy, root, net_atom[NetSupported], XA_ATOM, 32,
-                     PropModeReplace, (unsigned char *) net_atom, NetLast);
-
-     /* INIT ROOT */
-     at.event_mask = KeyMask | ButtonPressMask | ButtonReleaseMask |
-          SubstructureRedirectMask | SubstructureNotifyMask |
-          EnterWindowMask | LeaveWindowMask | StructureNotifyMask ;
-     at.cursor = cursor[CurNormal];
-     XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &at);
-     if(conf.root.background_command)
-          uicb_spawn(conf.root.background_command);
-
-     /* INIT INFOBAR */
-     infobar_init(&infobar);
-
-     /* INIT WORKABLE SPACE GEOMETRY */
-     sgeo.x = 0;
-     if(conf.bartop)
-          sgeo.y = conf.titlebar.pos ? infobar.geo.height : infobar.geo.height + conf.titlebar.height;
-     else
-          sgeo.y = conf.titlebar.pos ? 0 : conf.titlebar.height;
-     sgeo.width  = DisplayWidth(dpy, screen);
-     sgeo.height = DisplayHeight(dpy, screen) - (infobar.geo.height + conf.titlebar.height);
-
-     /* INIT STUFF */
-     grabkeys();
-
-     /* MISC WARNING */
-     if(conf.titlebar.height < fonth)
-          fprintf(stderr, "WMFS Warning: Font too big, can't draw any text in the titlebar.\n");
 
      return;
 }

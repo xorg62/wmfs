@@ -136,7 +136,7 @@ configurerequest(XEvent ev)
      XConfigureWindow(dpy, ev.xconfigurerequest.window,
                       ev.xconfigurerequest.value_mask, &wc);
      if((c = client_get(ev.xconfigurerequest.window)))
-          if(wc.y < mw && wc.x < mh)
+          if(wc.y < MAXW && wc.x < MAXH)
                client_moveresize(c, geo, True);
 
      return;
@@ -202,29 +202,23 @@ focusin(XEvent ev)
 void
 grabbuttons(Client *c, Bool focused)
 {
+     int i, j;
      uint mod = conf.client.mod;
+     uint bl[] = {Button1, Button2, Button3, Button4, Button5};
+     uint ml[] = {mod, mod|LockMask, mod|numlockmask, mod|scrolllockmask,
+                  mod|numlockmask|scrolllockmask, mod|LockMask|scrolllockmask,
+                  mod|LockMask|numlockmask,mod|LockMask|numlockmask|scrolllockmask};
 
      XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 
      if(focused)
-     {
-          XGrabButton(dpy, Button1, mod, c->win, False, ButtonMask, GrabModeAsync,GrabModeSync, None, None);
-          XGrabButton(dpy, Button1, mod|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, Button1, mod|numlockmask, c->win, False, ButtonMask, GrabModeAsync,GrabModeSync, None, None);
-          XGrabButton(dpy, Button1, mod|LockMask|numlockmask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-
-          XGrabButton(dpy, Button2, mod, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, Button2, mod|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, Button2, mod|numlockmask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, Button2, mod|LockMask|numlockmask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-
-          XGrabButton(dpy, Button3, mod, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, Button3, mod|LockMask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, Button3, mod|numlockmask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-          XGrabButton(dpy, Button3, mod|LockMask|numlockmask, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-     }
+          for(i = 0; i < (sizeof bl / sizeof bl[0]); ++i)
+               for(j = 0; j < (sizeof ml / sizeof ml[0]); ++j)
+                    XGrabButton(dpy, bl[i], ml[j], c->win, False,
+                                ButtonMask, GrabModeAsync,GrabModeSync, None, None);
      else
-          XGrabButton(dpy, AnyButton, AnyModifier, c->win, False, ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
+                      ButtonMask, GrabModeAsync, GrabModeSync, None, None);
 
      return;
 }
@@ -232,17 +226,17 @@ grabbuttons(Client *c, Bool focused)
 void
 grabkeys(void)
 {
-     uint i;
+     uint i, j;
      KeyCode code;
+     uint ml[] = {LockMask, numlockmask, scrolllockmask, numlockmask|scrolllockmask,
+                  LockMask|scrolllockmask, LockMask|numlockmask, LockMask|numlockmask|scrolllockmask};
 
      XUngrabKey(dpy, AnyKey, AnyModifier, root);
      for(i = 0; i < conf.nkeybind; ++i)
      {
           code = XKeysymToKeycode(dpy, keys[i].keysym);
-          XGrabKey(dpy, code, keys[i].mod, root, True, GrabModeAsync, GrabModeAsync);
-          XGrabKey(dpy, code, keys[i].mod|numlockmask, root, True, GrabModeAsync, GrabModeAsync);
-          XGrabKey(dpy, code, keys[i].mod|LockMask, root, True, GrabModeAsync, GrabModeAsync);
-          XGrabKey(dpy, code, keys[i].mod|LockMask|numlockmask, root, True, GrabModeAsync, GrabModeAsync);
+          for(j = 0; j < (sizeof ml / sizeof ml[0]); ++j)
+               XGrabKey(dpy, code, keys[i].mod|ml[j], root, True, GrabModeAsync, GrabModeAsync);
      }
 
      return;
@@ -277,7 +271,6 @@ mapnotify(XEvent ev)
      return;
 }
 
-
 /* MAPREQUEST */
 void
 maprequest(XEvent ev)
@@ -311,7 +304,7 @@ mouseaction(Client *c, int x, int y, int type)
      ocx = c->geo.x;
      ocy = c->geo.y;
      if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
-                     None, cursor[((type) ?CurResize:CurMove)], CurrentTime) != GrabSuccess)
+                     None, cursor[((type) ? CurResize:CurMove)], CurrentTime) != GrabSuccess)
           return;
      /* Warp pointer for resize */
      if(type && !c->tile)
@@ -447,6 +440,7 @@ propertynotify(XEvent ev)
 
      return;
 }
+
 
 /* Handle */
 void

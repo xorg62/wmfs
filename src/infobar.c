@@ -35,11 +35,11 @@
 void
 infobar_init(InfoBar *ib)
 {
-     ib->geo.height = fonth + (float)4.5;
-     ib->geo.y = (conf.bartop) ? 0 : mh - ib->geo.height;
+     ib->geo.height = font->height + (float)4.5;
+     ib->geo.y = (conf.bartop) ? 0 : MAXH - ib->geo.height;
 
      /* Create infobar barwindow */
-     ib->bar = bar_create(0, ib->geo.y, mw, ib->geo.height, 0, conf.colors.bar, False);
+     ib->bar = bar_create(0, ib->geo.y, MAXW, ib->geo.height, 0, conf.colors.bar, False);
 
      /* Create layout switch & layout type switch barwindow */
      ib->layout_switch = bar_create(0, (conf.bartop) ? ib->geo.y : ib->geo.y + 1,
@@ -77,19 +77,23 @@ infobar_draw(void)
      sprintf(buf, "mwfact: %.2f - nmaster: %d",
              tags[seltag].mwfact,
              tags[seltag].nmaster);
-     draw_text(infobar.bar->dr, infobar.lastsep + PAD/1.5, fonth, conf.colors.text, conf.colors.bar, 0, buf);
+     draw_text(infobar.bar->dr, infobar.lastsep + PAD/1.5, font->height, conf.colors.text, conf.colors.bar, 0, buf);
      draw_rectangle(infobar.bar->dr, textw(buf) + infobar.lastsep + PAD,
                     0, conf.tagbordwidth, infobar.geo.height, conf.colors.tagbord);
 
      /* Draw status text */
-     draw_text(infobar.bar->dr, mw - textw(infobar.statustext), fonth, conf.colors.text, conf.colors.bar, 0, infobar.statustext);
+     draw_text(infobar.bar->dr,
+               MAXW - textw(infobar.statustext),
+               font->height,
+               conf.colors.text,
+               conf.colors.bar, 0, infobar.statustext);
 
      /* Bar border */
      if(conf.tagbordwidth)
      {
           draw_rectangle(infobar.bar->dr, 0, ((conf.bartop) ? infobar.geo.height - 1: 0),
-                         mw, 1, conf.colors.tagbord);
-          draw_rectangle(infobar.bar->dr, mw - textw(infobar.statustext) - 5,
+                         MAXW, 1, conf.colors.tagbord);
+          draw_rectangle(infobar.bar->dr, MAXW - textw(infobar.statustext) - 5,
                          0, conf.tagbordwidth, infobar.geo.height, conf.colors.tagbord);
      }
 
@@ -119,7 +123,7 @@ infobar_draw_layout(void)
 
      bar_move(infobar.layout_switch, px, py);
      bar_resize(infobar.layout_switch, textw(symbol) + PAD, infobar.geo.height - 1);
-     draw_text(infobar.layout_switch->dr, PAD/2, fonth,
+     draw_text(infobar.layout_switch->dr, PAD/2, font->height,
                conf.colors.layout_fg,
                conf.colors.layout_bg,
                PAD, symbol);
@@ -133,7 +137,7 @@ infobar_draw_layout(void)
           bar_refresh_color(infobar.layout_type_switch);
           bar_move(infobar.layout_type_switch, px + infobar.layout_switch->geo.width + PAD/2, py);
           bar_resize(infobar.layout_type_switch, textw(tags[seltag].layout.symbol) + PAD, infobar.geo.height - 1);
-          draw_text(infobar.layout_type_switch->dr, PAD/2, fonth,
+          draw_text(infobar.layout_type_switch->dr, PAD/2, font->height,
                     conf.colors.layout_fg,
                     conf.colors.layout_bg,
                     PAD, tags[seltag].layout.symbol);
@@ -166,7 +170,7 @@ infobar_draw_taglist(Drawable dr)
           sprintf(buf[i], "%s<%s>", tags[i+1].name, (client_pertag(i+1)) ? p : "");
 
           /* Draw the string */
-          draw_text(dr, taglen[i], fonth,
+          draw_text(dr, taglen[i], font->height,
                  ((i+1 == seltag) ? conf.colors.tagselfg : conf.colors.text),
                  ((i+1 == seltag) ? conf.colors.tagselbg : conf.colors.bar), PAD, buf[i]);
 
@@ -189,7 +193,7 @@ uicb_infobar_togglepos(uicb_t cmd)
           sgeo.y = conf.titlebar.pos ? infobar.geo.height : infobar.geo.height + conf.titlebar.height;
      else
           sgeo.y = conf.titlebar.pos ? 0 : conf.titlebar.height;
-     infobar.geo.y = (conf.bartop) ? 0 : mh - infobar.geo.height;
+     infobar.geo.y = (conf.bartop) ? 0 : MAXH - infobar.geo.height;
      bar_move(infobar.bar, 0, infobar.geo.y);
      infobar_draw();
      arrange();

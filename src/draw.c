@@ -49,7 +49,7 @@ draw_text(Drawable d, int x, int y, char* fg, uint bg, int pad, char *str)
                        DefaultColormap(dpy, screen), fg, &xftcolor);
 
      /* Draw the text */
-     XftDrawStringUtf8(xftd, &xftcolor, xftfont, x, y, (FcChar8 *)str, strlen(str));
+     XftDrawStringUtf8(xftd, &xftcolor, font, x, y, (FcChar8 *)str, strlen(str));
 
      /* Free the text color and XftDraw */
      XftColorFree(dpy, DefaultVisual(dpy, screen), DefaultColormap(dpy, screen), &xftcolor);
@@ -78,7 +78,7 @@ textw(const char *text)
      if(!text)
           return 0;
 
-     XftTextExtentsUtf8(dpy, xftfont, (FcChar8 *)text, strlen(text), &gl);
+     XftTextExtentsUtf8(dpy, font, (FcChar8 *)text, strlen(text), &gl);
 
-     return gl.width + xftfont->descent;
+     return gl.width + font->descent;
 }

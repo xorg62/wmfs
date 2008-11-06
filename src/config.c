@@ -511,7 +511,9 @@ init_conf(void)
                if(j != i && strcmp(conf.tag[i].name, conf.tag[j].name) == 0)
                     fprintf(stderr, "WMFS Configuration: Warning! "
                             "tag \"%s\" is already defined\n", conf.tag[j].name);
-
+     seltag = 1;
+     for(i = 0; i < conf.ntag; ++i)
+          tags[i + 1] = conf.tag[i];
 
      /* keybind */
      conf.nkeybind = cfg_size(cfg_keys, "key");

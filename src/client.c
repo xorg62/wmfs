@@ -162,6 +162,7 @@ void
 client_hide(Client *c)
 {
      client_unmap(c);
+     c->hide = True;
      setwinstate(c->win, IconicState);
 
      return;
@@ -432,6 +433,7 @@ void
 client_unhide(Client *c)
 {
      client_map(c);
+     c->hide = False;
      setwinstate(c->win, NormalState);
 
      return;

@@ -130,7 +130,7 @@ titlebar_update(Client *c)
      bar_refresh_color(c->tbar);
 
      /* Draw the client title in the titlebar *logeek* */
-     if(conf.titlebar.height + 1 > fonth)
+     if(conf.titlebar.height + 1 > font->height)
      {
           /* Set the text alignement */
           switch(conf.titlebar.text_align)
@@ -148,7 +148,7 @@ titlebar_update(Client *c)
           }
 
           /* Set y text position (always at the middle) and fg color */
-          pos_y = (fonth - (xftfont->descent ) - 1) + ((conf.titlebar.height - fonth) / 2);
+          pos_y = (font->height - (font->descent ) - 1) + ((conf.titlebar.height - font->height) / 2);
 
           /* Draw title */
           draw_text(c->tbar->dr, pos_x, pos_y, fg, bg, 0, c->title);

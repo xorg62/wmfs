@@ -88,7 +88,7 @@ struct Client
      /* Border */
      int border;
      /* Client Layout Information */
-     Bool max, tile, free;
+     Bool max, tile, free, hide;
      Bool hint, lmax, havetbar;
      /* Struct in chains */
      Client *next;
