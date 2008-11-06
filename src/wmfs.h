@@ -127,9 +127,9 @@ void getevent(void);
 /* mouse.c */
 void mouse_move(Client *c);
 void mouse_resize(Client *c);
+void mouse_grabbuttons(Client *c, Bool focused);
 void uicb_mouse_move(uicb_t cmd);
 void uicb_mouse_resize(uicb_t cmd);
-void grabbuttons(Client *c, Bool focused);
 
 /* util.c */
 void *emalloc(uint element, uint size);

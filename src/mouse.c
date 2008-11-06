@@ -174,25 +174,7 @@ mouse_resize(Client *c)
 }
 
 void
-uicb_mouse_move(uicb_t cmd)
-{
-     if(sel)
-          mouse_move(sel);
-
-     return;
-}
-
-void
-uicb_mouse_resize(uicb_t cmd)
-{
-     if(sel)
-          mouse_resize(sel);
-
-     return;
-}
-
-void
-grabbuttons(Client *c, Bool focused)
+mouse_grabbuttons(Client *c, Bool focused)
 {
      int i, j;
      uint mod = conf.client.mod;
@@ -214,4 +196,23 @@ grabbuttons(Client *c, Bool focused)
 
      return;
 }
+
+void
+uicb_mouse_move(uicb_t cmd)
+{
+     if(sel)
+          mouse_move(sel);
+
+     return;
+}
+
+void
+uicb_mouse_resize(uicb_t cmd)
+{
+     if(sel)
+          mouse_resize(sel);
+
+     return;
+}
+
 

@@ -123,7 +123,7 @@ client_focus(Client *c)
 
      if(sel && sel != c)
      {
-          grabbuttons(sel, False);
+          mouse_grabbuttons(sel, False);
           XSetWindowBorder(dpy, sel->win, conf.client.bordernormal);
      }
 
@@ -131,7 +131,7 @@ client_focus(Client *c)
 
      if(c)
      {
-          grabbuttons(c, True);
+          mouse_grabbuttons(c, True);
           XSetWindowBorder(dpy, c->win, conf.client.borderfocus);
           if(conf.raisefocus)
                client_raise(c);
@@ -237,9 +237,8 @@ client_manage(Window w, XWindowAttributes *wa)
      winc.border_width = c->border;
      XConfigureWindow(dpy, w, CWBorderWidth, &winc);
      XSetWindowBorder(dpy, w, conf.client.bordernormal);
-     grabbuttons(c, False);
+     mouse_grabbuttons(c, False);
      XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask | PropertyChangeMask | StructureNotifyMask);
-
      client_size_hints(c);
      titlebar_update(c);
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
