@@ -40,12 +40,12 @@ titlebar_create(Client *c)
      /* Set titlebar position : Top/Bottom */
      switch(conf.titlebar.pos)
      {
-     case Bottom:
-          y = c->geo.y + c->geo.height + conf.client.borderheight;
-          break;
      default:
      case Top:
-          y = c->geo.y - (conf.titlebar.height + conf.client.borderheight);
+          y = c->geo.y - conf.titlebar.height;
+          break;
+     case Bottom:
+          y = c->geo.y + c->geo.height + conf.client.borderheight;
           break;
      }
 

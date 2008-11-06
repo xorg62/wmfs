@@ -238,8 +238,8 @@ client_manage(Window w, XWindowAttributes *wa)
      XConfigureWindow(dpy, w, CWBorderWidth, &winc);
      XSetWindowBorder(dpy, w, conf.client.bordernormal);
      grabbuttons(c, False);
-     XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask
-                  | PropertyChangeMask | StructureNotifyMask);
+     XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask | PropertyChangeMask | StructureNotifyMask);
+
      client_size_hints(c);
      titlebar_update(c);
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
@@ -323,7 +323,6 @@ client_moveresize(Client *c, XRectangle geo, bool r)
 
           XMoveResizeWindow(dpy, c->win, geo.x, geo.y,
                             geo.width, geo.height);
-
           if(conf.titlebar.exist)
                titlebar_update_position(c);
 

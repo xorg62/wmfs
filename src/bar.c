@@ -43,17 +43,22 @@ bar_create(int x, int y, uint w, uint h, int bord, uint color, Bool entermask)
      at.override_redirect = 1;
      at.background_pixmap = ParentRelative;
      if(entermask)
-          at.event_mask = ButtonPressMask | ExposureMask | EnterWindowMask;
+          at.event_mask = SubstructureRedirectMask | SubstructureNotifyMask |
+               ButtonPressMask | ExposureMask | EnterWindowMask |
+               LeaveWindowMask | StructureNotifyMask;
      else
-          at.event_mask = ButtonPressMask | ExposureMask;
+          at.event_mask = SubstructureRedirectMask | SubstructureNotifyMask |
+               ButtonPressMask | ExposureMask | StructureNotifyMask;
 
-     bw->dr = XCreatePixmap(dpy, root, w, h, DefaultDepth(dpy, screen));
      bw->win = XCreateWindow(dpy, root, x, y, w, h, bord, DefaultDepth(dpy, screen),
                              CopyFromParent, DefaultVisual(dpy, screen),
                              CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
+     bw->dr = XCreatePixmap(dpy, root, w, h, DefaultDepth(dpy, screen));
 
-     bw->geo.x = x; bw->geo.y = y;
-     bw->geo.width = w; bw->geo.height = h;
+     bw->geo.x = x;
+     bw->geo.y = y;
+     bw->geo.width = w;
+     bw->geo.height = h;
      bw->bord = bord;
      bw->color = color;
 
