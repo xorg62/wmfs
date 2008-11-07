@@ -122,6 +122,7 @@ init_root(void)
           SubstructureRedirectMask | SubstructureNotifyMask |
           EnterWindowMask | LeaveWindowMask | StructureNotifyMask ;
      at.cursor = cursor[CurNormal];
+     at.override_redirect = 1;
      XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &at);
      if(conf.root.background_command)
           uicb_spawn(conf.root.background_command);
@@ -132,16 +133,15 @@ init_root(void)
 void
 init_geometry(void)
 {
-     sgeo.x = 0;
+     sgeo.y = sgeo.x = 0;
 
      if(conf.bartop)
           sgeo.y = (conf.titlebar.pos)
                ? infobar.geo.height
                : infobar.geo.height + conf.titlebar.height;
      else
-          sgeo.y = (conf.titlebar.pos)
-               ? 0
-               : conf.titlebar.height;
+          if(conf.titlebar.pos)
+               sgeo.y = conf.titlebar.height;
 
      sgeo.width  = MAXW;
      sgeo.height = MAXH - (infobar.geo.height + conf.titlebar.height);

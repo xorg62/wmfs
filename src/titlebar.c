@@ -35,25 +35,10 @@
 void
 titlebar_create(Client *c)
 {
-     int y;
-
-     /* Set titlebar position : Top/Bottom */
-     switch(conf.titlebar.pos)
-     {
-     default:
-     case Top:
-          y = c->geo.y - conf.titlebar.height;
-          break;
-     case Bottom:
-          y = c->geo.y + c->geo.height + conf.client.borderheight;
-          break;
-     }
-
-     c->tbar = bar_create(c->geo.x, y, c->geo.width,
+     c->tbar = bar_create(c->geo.x, c->geo.y, c->geo.width,
                           conf.titlebar.height - conf.client.borderheight,
-                          conf.client.borderheight,
-                          conf.titlebar.bg_normal, True);
-     XSetWindowBorder(dpy, c->tbar->win, conf.titlebar.bg_normal);
+                          0, conf.titlebar.bg_normal, True);
+     titlebar_update_position(c);
 
      return;
 }
@@ -100,7 +85,7 @@ titlebar_update_position(Client *c)
           break;
      }
      bar_move(c->tbar, c->geo.x, y);
-     bar_resize(c->tbar, c->geo.width, conf.titlebar.height - conf.client.borderheight);
+     bar_resize(c->tbar, c->geo.width + c->border * 2, conf.titlebar.height);
 
      return;
 }
@@ -112,6 +97,7 @@ titlebar_update(Client *c)
      uint bg;
      char *fg;
 
+     /* Get the window name, will be free by XFree later... */
      XFetchName(dpy, c->win, &(c->title));
      if(!c->title)
           c->title = strdup("WMFS");
@@ -150,7 +136,7 @@ titlebar_update(Client *c)
           }
 
           /* Set y text position (always at the middle) and fg color */
-          pos_y = (font->height - (font->descent ) - 1) + ((conf.titlebar.height - font->height) / 2);
+          pos_y = (font->height - (font->descent )) + ((conf.titlebar.height - font->height) / 2);
 
           /* Draw title */
           draw_text(c->tbar->dr, pos_x, pos_y, fg, bg, 0, c->title);

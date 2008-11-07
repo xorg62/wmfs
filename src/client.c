@@ -202,13 +202,13 @@ client_map(Client *c)
      if(!c)
           return;
 
+     XMapWindow(dpy, c->win);
+     XMapSubwindows(dpy, c->win);
      if(conf.titlebar.exist)
      {
           XMapWindow(dpy, c->tbar->win);
           bar_refresh(c->tbar);
      }
-     XMapWindow(dpy, c->win);
-     XMapSubwindows(dpy, c->win);
 
      return;
 }
@@ -335,72 +335,72 @@ client_moveresize(Client *c, XRectangle geo, bool r)
 void
 client_size_hints(Client *c)
 {
-	long msize;
-	XSizeHints size;
+     long msize;
+     XSizeHints size;
 
-	if(!XGetWMNormalHints(dpy, c->win, &size, &msize) || !size.flags)
-             size.flags = PSize;
-        /* base */
-	if(size.flags & PBaseSize)
-        {
-             c->basew = size.base_width;
-             c->baseh = size.base_height;
-        }
-	else if(size.flags & PMinSize)
-        {
-             c->basew = size.min_width;
-             c->baseh = size.min_height;
-	}
-	else
-             c->basew = c->baseh = 0;
+     if(!XGetWMNormalHints(dpy, c->win, &size, &msize) || !size.flags)
+          size.flags = PSize;
+     /* base */
+     if(size.flags & PBaseSize)
+     {
+          c->basew = size.base_width;
+          c->baseh = size.base_height;
+     }
+     else if(size.flags & PMinSize)
+     {
+          c->basew = size.min_width;
+          c->baseh = size.min_height;
+     }
+     else
+          c->basew = c->baseh = 0;
 
-        /* inc */
-	if(size.flags & PResizeInc)
-        {
-             c->incw = size.width_inc;
-             c->inch = size.height_inc;
-	}
-	else
-             c->incw = c->inch = 0;
+     /* inc */
+     if(size.flags & PResizeInc)
+     {
+          c->incw = size.width_inc;
+          c->inch = size.height_inc;
+     }
+     else
+          c->incw = c->inch = 0;
 
-        /* max */
-	if(size.flags & PMaxSize)
-        {
-             c->maxw = size.max_width;
-             c->maxh = size.max_height;
-	}
-	else
-             c->maxw = c->maxh = 0;
+     /* max */
+     if(size.flags & PMaxSize)
+     {
+          c->maxw = size.max_width;
+          c->maxh = size.max_height;
+     }
+     else
+          c->maxw = c->maxh = 0;
 
-        /* min */
-	if(size.flags & PMinSize)
-        {
-             c->minw = size.min_width;
-             c->minh = size.min_height;
-	}
-	else if(size.flags & PBaseSize)
-        {
-             c->minw = size.base_width;
-             c->minh = size.base_height;
-	}
-	else
-             c->minw = c->minh = 0;
+     /* min */
+     if(size.flags & PMinSize)
+     {
+          c->minw = size.min_width;
+          c->minh = size.min_height;
+     }
+     else if(size.flags & PBaseSize)
+     {
+          c->minw = size.base_width;
+          c->minh = size.base_height;
+     }
+     else
+          c->minw = c->minh = 0;
 
-        /* aspect */
-	if(size.flags & PAspect)
-        {
-             c->minax = size.min_aspect.x;
-             c->maxax = size.max_aspect.x;
-             c->minay = size.min_aspect.y;
-             c->maxay = size.max_aspect.y;
-	}
-	else
+     /* aspect */
+     if(size.flags & PAspect)
+     {
+          c->minax = size.min_aspect.x;
+          c->maxax = size.max_aspect.x;
+          c->minay = size.min_aspect.y;
+          c->maxay = size.max_aspect.y;
+     }
+     else
 
-             c->minax = c->maxax = c->minay = c->maxay = 0;
-        c->hint = (c->maxw && c->minw && c->maxh && c->minh
-                   && c->maxw == c->minw && c->maxh == c->minh);
+          c->minax = c->maxax = c->minay = c->maxay = 0;
+     c->hint = (c->maxw && c->minw && c->maxh && c->minh
+                && c->maxw == c->minw && c->maxh == c->minh);
 
-        return;
+     return;
 }
 
 void
@@ -409,12 +409,12 @@ client_raise(Client *c)
      if(!c || c->max || c->tile)
           return;
 
+     XRaiseWindow(dpy, c->win);
      if(conf.titlebar.exist)
      {
           XRaiseWindow(dpy, c->tbar->win);
           titlebar_update(c);
      }
-     XRaiseWindow(dpy, c->win);
 
      return;
 }
@@ -457,7 +457,6 @@ client_unmanage(Client *c)
       * and set the withdraw state */
      client_detach(c);
      setwinstate(c->win, WithdrawnState);
-
      if(conf.titlebar.exist)
           titlebar_delete(c);
      efree(c);

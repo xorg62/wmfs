@@ -35,7 +35,7 @@
 void
 infobar_init(InfoBar *ib)
 {
-     ib->geo.height = font->height + (float)4.5;
+     ib->geo.height = font->height * 1.5;
      ib->geo.y = (conf.bartop) ? 0 : MAXH - ib->geo.height;
 
      /* Create infobar barwindow */
@@ -45,9 +45,9 @@ infobar_init(InfoBar *ib)
      ib->layout_switch = bar_create(0, (conf.bartop) ? ib->geo.y : ib->geo.y + 1,
                                          1, ib->geo.height - 1, 0,
                                          conf.colors.layout_bg, False);
-      ib->layout_type_switch = bar_create(0, ib->geo.y,
-                                              1, ib->geo.height,
-                                              0, conf.colors.layout_bg, False);
+     ib->layout_type_switch = bar_create(0, ib->geo.y,
+                                         1, ib->geo.height,
+                                         0, conf.colors.layout_bg, False);
 
      /* Map all */
      bar_map(ib->bar);
