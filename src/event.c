@@ -40,13 +40,16 @@ buttonpress(XEvent ev)
      int i;
      char s[6];
 
-     /* Titlebar */
-     if(conf.titlebar.exist)
-          if((c = titlebar_get(ev.xbutton.window)))
-               for(i = 0; i < conf.titlebar.nmouse; ++i)
-                    if(ev.xbutton.button == conf.titlebar.mouse[i].button)
-                         if(conf.titlebar.mouse[i].func)
-                              conf.titlebar.mouse[i].func(conf.titlebar.mouse[i].cmd);
+     /* Frame & titlebar */
+     if((c = frame_get_titlebar(ev.xbutton.window)))
+          for(i = 0; i < conf.titlebar.nmouse; ++i)
+                if(ev.xbutton.button == conf.titlebar.mouse[i].button)
+                    if(conf.titlebar.mouse[i].func)
+                         conf.titlebar.mouse[i].func(conf.titlebar.mouse[i].cmd);
+
+     /* Frame Resize Area */
+     if((c = frame_get_resize(ev.xbutton.window)))
+          mouse_resize(c);
 
      /* Client */
      if((c = client_get(ev.xbutton.window)))
@@ -123,9 +126,11 @@ configurerequest(XEvent ev)
      Client *c;
      XWindowChanges wc;
      XRectangle geo;
+
      if((c = client_get(ev.xconfigurerequest.window)))
-          if(c->tile || c->lmax)
+           if(c->tile || c->lmax)
                return;
+
      geo.x = wc.x = ev.xconfigurerequest.x;
      geo.y = wc.y = ev.xconfigurerequest.y;
      geo.width = wc.width = ev.xconfigurerequest.width;
@@ -133,11 +138,18 @@ configurerequest(XEvent ev)
      wc.border_width = ev.xconfigurerequest.border_width;
      wc.sibling = ev.xconfigurerequest.above;
      wc.stack_mode = ev.xconfigurerequest.detail;
+
      XConfigureWindow(dpy, ev.xconfigurerequest.window,
                       ev.xconfigurerequest.value_mask, &wc);
+
      if((c = client_get(ev.xconfigurerequest.window)))
-          if(wc.y < MAXW && wc.x < MAXH)
-               client_moveresize(c, geo, True);
+     {
+          client_moveresize(c, geo, True);
+          XReparentWindow(dpy, c->win, c->frame,
+                          conf.client.borderheight,
+                          conf.titlebar.height + conf.client.borderheight);
+     }
+     XSync(dpy, False);
 
      return;
 }
@@ -163,7 +175,9 @@ enternotify(XEvent ev)
         || ev.xcrossing.detail == NotifyInferior)
           return;
      if((c = client_get(ev.xcrossing.window))
-        || (c = titlebar_get(ev.xcrossing.window)))
+        || (c = frame_get(ev.xcrossing.window))
+        || (c = frame_get_titlebar(ev.xcrossing.window))
+        || (c = frame_get_resize(ev.xcrossing.window)))
           client_focus(c);
      else
           client_focus(NULL);
@@ -181,10 +195,9 @@ expose(XEvent ev)
         && (ev.xexpose.window == infobar.bar->win))
           infobar_draw();
 
-     if(conf.titlebar.exist)
-          for(c = clients; c; c = c->next)
-               if(ev.xexpose.window == c->tbar->win)
-                    titlebar_update(c);
+     for(c = clients; c; c = c->next)
+          if(ev.xexpose.window == c->titlebar)
+               frame_update(c);
 
      return;
 }
@@ -253,10 +266,8 @@ maprequest(XEvent ev)
 {
      XWindowAttributes at;
 
-     if(!XGetWindowAttributes(dpy, ev.xmaprequest.window, &at))
-          return;
-     if(at.override_redirect)
-          return;
+     CHECK(XGetWindowAttributes(dpy, ev.xmaprequest.window, &at));
+     CHECK(!at.override_redirect);
      if(!client_get(ev.xmaprequest.window))
           client_manage(ev.xmaprequest.window, &at);
 
@@ -289,7 +300,7 @@ propertynotify(XEvent ev)
           }
           if(ev.xproperty.atom == XA_WM_NAME
              || ev.xproperty.atom == net_atom[NetWMName])
-               titlebar_update(c);
+               client_get_name(c);
      }
 
      return;

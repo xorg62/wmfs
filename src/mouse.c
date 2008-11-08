@@ -96,7 +96,7 @@ mouse_resize(Client *c)
           return;
 
      if(!c->tile)
-          XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width, c->geo.height);
+          XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
 
      /* Warp pointer for mwfact resize {{{ */
      if(c->tile)
@@ -126,7 +126,7 @@ mouse_resize(Client *c)
           if(ev.type == ButtonRelease)
           {
                if(!c->tile)
-                    XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width, c->geo.height);
+                    XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
                XUngrabPointer(dpy, CurrentTime);
                return;
           }
@@ -142,7 +142,7 @@ mouse_resize(Client *c)
                }
                else
                {
-                                  fy = (round(((ev.xmotion.y * 50) / sgeo.height))) / 50;
+                    fy = (round(((ev.xmotion.y * 50) / sgeo.height))) / 50;
                     fx = (round(((ev.xmotion.x * 50) / sgeo.width))) / 50;
 
                     if(tags[seltag].layout.func == tile)
@@ -200,8 +200,8 @@ mouse_grabbuttons(Client *c, Bool focused)
 void
 uicb_mouse_move(uicb_t cmd)
 {
-     if(sel)
-          mouse_move(sel);
+     CHECK(sel);
+     mouse_move(sel);
 
      return;
 }
@@ -209,8 +209,8 @@ uicb_mouse_move(uicb_t cmd)
 void
 uicb_mouse_resize(uicb_t cmd)
 {
-     if(sel)
-          mouse_resize(sel);
+     CHECK(sel);
+     mouse_resize(sel);
 
      return;
 }

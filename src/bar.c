@@ -79,11 +79,11 @@ bar_delete(BarWindow *bw)
 void
 bar_map(BarWindow *bw)
 {
-     if(!bw->mapped)
-     {
-          XMapRaised(dpy, bw->win);
-          bw->mapped = True;
-     }
+     CHECK(!bw->mapped);
+
+     XMapRaised(dpy, bw->win);
+     bw->mapped = True;
+
 
      return;
 }
@@ -91,11 +91,10 @@ bar_map(BarWindow *bw)
 void
 bar_unmap(BarWindow *bw)
 {
-     if(bw->mapped)
-     {
-          XUnmapWindow(dpy, bw->win);
-          bw->mapped = False;
-     }
+     CHECK(bw->mapped);
+
+     XUnmapWindow(dpy, bw->win);
+     bw->mapped = False;
 
      return;
 }

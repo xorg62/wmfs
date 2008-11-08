@@ -204,13 +204,9 @@ init_conf(void)
 
      static cfg_opt_t titlebar_opts[] =
           {
-               CFG_STR("position",   "top",             CFGF_NONE),
                CFG_INT("height",     0,                 CFGF_NONE),
-               CFG_STR("bg_normal",  "#090909",         CFGF_NONE),
-               CFG_STR("bg_focus",   "#090909",         CFGF_NONE),
                CFG_STR("fg_focus",   "#FFFFFF",         CFGF_NONE),
                CFG_STR("fg_normal",  "#FFFFFF",         CFGF_NONE),
-               CFG_STR("text_align", "left",            CFGF_NONE),
                CFG_SEC("mouse",      mouse_button_opts, CFGF_MULTI),
                CFG_END()
           };
@@ -220,8 +216,11 @@ init_conf(void)
                CFG_INT("border_height",  1,                  CFGF_NONE),
                CFG_STR("border_normal",  "#354B5C",          CFGF_NONE),
                CFG_STR("border_focus",   "#6286A1",          CFGF_NONE),
+               CFG_STR("resize_corner_normal",  "#ff0000",   CFGF_NONE),
+               CFG_STR("resize_corner_focus",   "#ff0000",   CFGF_NONE),
                CFG_STR("modifier",       "Alt",              CFGF_NONE),
                CFG_SEC("mouse",           mouse_button_opts, CFGF_MULTI),
+               CFG_SEC("titlebar",        titlebar_opts,     CFGF_NONE),
                CFG_END()
           };
 
@@ -294,7 +293,6 @@ init_conf(void)
                CFG_SEC("misc",      misc_opts,      CFGF_NONE),
                CFG_SEC("variables", variables_opts, CFGF_NONE),
                CFG_SEC("root",      root_opts,      CFGF_NONE),
-               CFG_SEC("titlebar",  titlebar_opts,  CFGF_NONE),
                CFG_SEC("client",    client_opts,    CFGF_NONE),
                CFG_SEC("bar",       bar_opts,       CFGF_NONE),
                CFG_SEC("layouts",   layouts_opts,   CFGF_NONE),
@@ -308,15 +306,13 @@ init_conf(void)
      cfg_t *cfg_bar;
      cfg_t *cfg_variables;
      cfg_t *cfg_root;
-     cfg_t *cfg_titlebar;
      cfg_t *cfg_client;
      cfg_t *cfg_layouts;
      cfg_t *cfg_tags;
      cfg_t *cfg_keys;
-     cfg_t *cfgtmp;
+     cfg_t *cfgtmp, *cfgtmp2;
      char final_path[128];
      char sfinal_path[128];
-     char buf[256] = {0};
      int ret, i, j, l;
 
 
@@ -338,7 +334,6 @@ init_conf(void)
      cfg_misc      = cfg_getsec(cfg, "misc");
      cfg_variables = cfg_getsec(cfg, "variables");
      cfg_root      = cfg_getsec(cfg, "root");
-     cfg_titlebar  = cfg_getsec(cfg, "titlebar");
      cfg_client    = cfg_getsec(cfg, "client");
      cfg_bar       = cfg_getsec(cfg, "bar");
      cfg_layouts   = cfg_getsec(cfg, "layouts");
@@ -381,47 +376,15 @@ init_conf(void)
           conf.root.mouse[i].cmd    = strdup(var_to_str(cfg_getstr(cfgtmp, "cmd")));
      }
 
-     /* titlebar */
-     strcpy(buf, var_to_str(cfg_getstr(cfg_titlebar, "position")));
-     if(strcmp(buf, "bottom") == 0)
-          conf.titlebar.pos = Bottom;
-     else if(strcmp(buf, "top") == 0)
-          conf.titlebar.pos = Top;
-
-     conf.titlebar.height     = cfg_getint(cfg_titlebar, "height");
-     conf.titlebar.exist      = conf.titlebar.height ? True : False;
-     conf.titlebar.bg_normal  = getcolor(var_to_str(cfg_getstr(cfg_titlebar, "bg_normal")));
-     conf.titlebar.bg_focus  = getcolor(var_to_str(cfg_getstr(cfg_titlebar, "bg_focus")));
-     conf.titlebar.fg_focus   = var_to_str(cfg_getstr(cfg_titlebar, "fg_focus"));
-     conf.titlebar.fg_normal  = var_to_str(cfg_getstr(cfg_titlebar, "fg_normal"));
-
-     strcpy(buf, var_to_str(cfg_getstr(cfg_titlebar, "text_align")));
-     if(strcmp(buf, "center") == 0)
-          conf.titlebar.text_align = Center;
-     else if(strcmp(buf, "right") == 0)
-          conf.titlebar.text_align = Right;
-     else if(strcmp(buf, "left") == 0)
-          conf.titlebar.text_align = Left;
-
-     conf.titlebar.nmouse = cfg_size(cfg_titlebar, "mouse");
-     conf.titlebar.mouse = emalloc(conf.titlebar.nmouse, sizeof(MouseBinding));
-
-     for(i = 0; i < conf.titlebar.nmouse; ++i)
-     {
-          cfgtmp = cfg_getnsec(cfg_titlebar, "mouse", i);
-          conf.titlebar.mouse[i].button = char_to_button(cfg_getstr(cfgtmp, "button"));
-          conf.titlebar.mouse[i].func   = name_to_func(cfg_getstr(cfgtmp, "func"), func_list);
-          conf.titlebar.mouse[i].cmd    = strdup(var_to_str(cfg_getstr(cfgtmp, "cmd")));
-     }
-
      /* client */
-     conf.client.borderheight      =  cfg_getint(cfg_client, "border_height");
-     conf.client.bordernormal      =  getcolor(var_to_str(cfg_getstr(cfg_client, "border_normal")));
-     conf.client.borderfocus       =  getcolor(var_to_str(cfg_getstr(cfg_client, "border_focus")));
-     conf.client.mod               |= char_to_modkey(cfg_getstr(cfg_client, "modifier"));
-
-     conf.client.nmouse = cfg_size(cfg_titlebar, "mouse");
-     conf.client.mouse = emalloc(conf.client.nmouse, sizeof(MouseBinding));
+     conf.client.borderheight        = cfg_getint(cfg_client, "border_height");
+     conf.client.bordernormal        = getcolor(var_to_str(cfg_getstr(cfg_client, "border_normal")));
+     conf.client.borderfocus         = getcolor(var_to_str(cfg_getstr(cfg_client, "border_focus")));
+     conf.client.resizecorner_normal = getcolor(var_to_str(cfg_getstr(cfg_client, "resize_corner_normal")));
+     conf.client.resizecorner_focus  = getcolor(var_to_str(cfg_getstr(cfg_client, "resize_corner_focus")));
+     conf.client.mod                |= char_to_modkey(cfg_getstr(cfg_client, "modifier"));
+     conf.client.nmouse              = cfg_size(cfg_client, "mouse");
+     conf.client.mouse               = emalloc(conf.client.nmouse, sizeof(MouseBinding));
 
      for(i = 0; i < conf.client.nmouse; ++i)
      {
@@ -429,6 +392,22 @@ init_conf(void)
           conf.client.mouse[i].button = char_to_button(cfg_getstr(cfgtmp, "button"));
           conf.client.mouse[i].func   = name_to_func(cfg_getstr(cfgtmp, "func"), func_list);
           conf.client.mouse[i].cmd    = strdup(var_to_str(cfg_getstr(cfgtmp, "cmd")));
+     }
+
+     /* titlebar (in client) */
+     cfgtmp = cfg_getsec(cfg_client, "titlebar");
+     conf.titlebar.height     = cfg_getint(cfgtmp, "height");
+     conf.titlebar.fg_focus   = var_to_str(cfg_getstr(cfgtmp, "fg_focus"));
+     conf.titlebar.fg_normal  = var_to_str(cfg_getstr(cfgtmp, "fg_normal"));
+     conf.titlebar.nmouse = cfg_size(cfgtmp, "mouse");
+     conf.titlebar.mouse = emalloc(conf.titlebar.nmouse, sizeof(MouseBinding));
+
+     for(i = 0; i < conf.titlebar.nmouse; ++i)
+     {
+          cfgtmp2 = cfg_getnsec(cfgtmp, "mouse", i);
+          conf.titlebar.mouse[i].button = char_to_button(cfg_getstr(cfgtmp2, "button"));
+          conf.titlebar.mouse[i].func   = name_to_func(cfg_getstr(cfgtmp2, "func"), func_list);
+          conf.titlebar.mouse[i].cmd    = strdup(var_to_str(cfg_getstr(cfgtmp2, "cmd")));
      }
 
 

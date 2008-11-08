@@ -49,7 +49,7 @@ init(void)
      grabkeys();
 
      /* Warning about font */
-     if(conf.titlebar.height < font->height)
+     if(TBARH + BORDH < font->height)
           fprintf(stderr, "WMFS Warning: Font too big, can't draw any text in the titlebar.\n");
 
      return;
@@ -122,7 +122,6 @@ init_root(void)
           SubstructureRedirectMask | SubstructureNotifyMask |
           EnterWindowMask | LeaveWindowMask | StructureNotifyMask ;
      at.cursor = cursor[CurNormal];
-     at.override_redirect = 1;
      XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &at);
      if(conf.root.background_command)
           uicb_spawn(conf.root.background_command);
@@ -133,18 +132,16 @@ init_root(void)
 void
 init_geometry(void)
 {
-     sgeo.y = sgeo.x = 0;
+     sgeo.x = BORDH;
+     sgeo.y = infobar.geo.height;
 
      if(conf.bartop)
-          sgeo.y = (conf.titlebar.pos)
-               ? infobar.geo.height
-               : infobar.geo.height + conf.titlebar.height;
+          sgeo.y += TBARH;
      else
-          if(conf.titlebar.pos)
-               sgeo.y = conf.titlebar.height;
+          sgeo.y = TBARH;
 
      sgeo.width  = MAXW;
-     sgeo.height = MAXH - (infobar.geo.height + conf.titlebar.height);
+     sgeo.height = MAXH - infobar.geo.height - TBARH;
 
      return;
 }

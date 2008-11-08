@@ -53,12 +53,21 @@
 #include "config.h"
 #include "structs.h"
 
-/* Defines */
+/* MACRO */
 #define ButtonMask   (ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
 #define MouseMask    (ButtonMask | PointerMotionMask)
 #define KeyMask      (KeyPressMask | KeyReleaseMask)
+
 #define MAXH         DisplayHeight(dpy, screen)
 #define MAXW         DisplayWidth(dpy, screen)
+
+#define FRAMEW(w)    w + conf.client.borderheight * 2
+#define FRAMEH(h)    h + (conf.client.borderheight * 2) + conf.titlebar.height
+#define BORDH        conf.client.borderheight
+#define TBARH        conf.titlebar.height
+#define RESHW        15
+
+#define CHECK(x)     if(!x) return
 #define ITOA(p ,n)   sprintf(p, "%d", n)
 #define debug(p)     fprintf(stderr, "debug: %d\n", p)
 #define PAD          8
@@ -91,6 +100,7 @@ void client_attach(Client *c);
 void client_detach(Client *c);
 void client_focus(Client *c);
 Client *client_get(Window w);
+void client_get_name(Client *c);
 void client_hide(Client *c);
 Bool ishide(Client *c);
 void client_map(Client *c);
@@ -105,6 +115,15 @@ void uicb_client_raise(uicb_t cmd);
 void uicb_client_prev(uicb_t);
 void uicb_client_next(uicb_t);
 void uicb_client_kill(uicb_t);
+
+/* frame.c */
+void frame_create(Client *c);
+void frame_moveresize(Client *c, XRectangle geo);
+Client* frame_get(Window w);
+void frame_update(Client *c);
+void frame_set_color(Client *c, uint bg);
+Client* frame_get_titlebar(Window w);
+Client* frame_get_resize(Window w);
 
 /* config.c */
 void init_conf(void);
@@ -146,13 +165,6 @@ void uicb_tag_next(uicb_t);
 void uicb_tag_prev(uicb_t);
 void uicb_tagtransfert(uicb_t);
 
-/* titlebar.c */
-void titlebar_create(Client *c);
-void titlebar_delete(Client *c);
-Client* titlebar_get(Window w);
-void titlebar_update_position(Client *c);
-void titlebar_update(Client *c);
-
 /* layout.c */
 void arrange(void);
 void freelayout(void);
@@ -160,14 +172,13 @@ void layoutswitch(Bool b);
 void layout_tile_switch(Bool b);
 void maxlayout(void);
 Client *nexttiled(Client *c);
-
-/* tile */
-void grid(void);
-void tile(void);
-void tile_left(void);
-void tile_top(void);
-void tile_bottom(void);
-
+/* tile {{{ */
+ void grid(void);
+ void tile(void);
+ void tile_left(void);
+ void tile_top(void);
+ void tile_bottom(void);
+/* }}} */
 void uicb_tile_switch(uicb_t);
 void uicb_togglemax(uicb_t);
 void uicb_layout_prev(uicb_t);

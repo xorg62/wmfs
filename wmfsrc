@@ -66,34 +66,34 @@ root
 
 client
 {
-        border_height  = 2
-        border_normal  = "#191919"
-        border_focus   = "#003366"
-        modifier       = "Alt"
+        border_height         = 3
+        border_normal         = "#191919"
+        border_focus          = "#003366"
+        resize_corner_normal  = "#191919"
+        resize_corner_focus   = "#771103"
+        modifier              = "Alt"
 
         mouse { button = "1" func = "client_raise" }
         mouse { button = "1" func = "mouse_move" }
         mouse { button = "2" func = "tile_switch" }
         mouse { button = "3" func = "client_raise" }
         mouse { button = "3" func = "mouse_resize" }
+
+        titlebar
+        {
+                height     = 11
+                fg_normal  = "#B4B4B4"
+                fg_focus   = "#D4D4D4"
+
+                mouse { button = "1" func = "client_raise" }
+                mouse { button = "1" func = "mouse_move" }
+                mouse { button = "2" func = "tile_switch" }
+                mouse { button = "3" func = "client_raise" }
+                mouse { button = "3" func = "mouse_resize" }
+        }
+
 }
 
-titlebar
-{
-        position   = "top"
-        height     = 12
-        bg_normal  = "#191919"
-        bg_focus   = "#003366"
-        fg_normal  = "#D4D4D4"
-        fg_focus   = "#B4B4B4"
-        text_align = "center"
-
-        mouse { button = "1" func = "client_raise" }
-        mouse { button = "1" func = "mouse_move" }
-        mouse { button = "2" func = "client_kill" }
-        mouse { button = "3" func = "client_raise" }
-        mouse { button = "3" func = "mouse_resize" }
-}
 
 keys
 {

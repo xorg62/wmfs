@@ -37,7 +37,6 @@
 
 #define NBUTTON      8
 #define MAXTAG       36
-
 #define NUM_OF_LAYOUT    7
 
 /* Typedef */
@@ -75,16 +74,23 @@ struct Client
      int tag;
      /* Window attribute */
      XRectangle geo;
+     XRectangle frame_geo;
      /* Old window attribute */
      XRectangle ogeo;
      /* For resizehint usage */
      int basew, baseh, incw, inch;
      int maxw, maxh, minw, minh;
      int minax, maxax, minay, maxay;
-     /* Window */
+     /* Client composant */
      Window win;
-     /* Titlebar */
-     BarWindow *tbar;
+     Window frame;
+     Window resize, titlebar;
+     struct
+     {
+          uint frame;
+          uint resizecorner;
+          char *titlebar;
+     } colors;
      /* Border */
      int border;
      /* Client Layout Information */
@@ -185,20 +191,17 @@ typedef struct
           int borderheight;
           uint bordernormal;
           uint borderfocus;
+          uint resizecorner_normal;
+          uint resizecorner_focus;
           uint mod;
           MouseBinding *mouse;
           int nmouse;
      } client;
      struct
      {
-          Bool exist;
-          Position pos;
           int height;
-          uint bg_normal;
-          uint bg_focus;
           char *fg_focus;
           char *fg_normal;
-          Position text_align;
           MouseBinding *mouse;
           int nmouse;
      } titlebar;

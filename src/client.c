@@ -119,31 +119,30 @@ uicb_client_next(uicb_t cmd)
 void
 client_focus(Client *c)
 {
-     Client *cc;
-
      if(sel && sel != c)
      {
+          sel->colors.frame = conf.client.bordernormal;
+          sel->colors.titlebar = conf.titlebar.fg_normal;
+          sel->colors.resizecorner = conf.client.resizecorner_normal;
+          frame_update(sel);
           mouse_grabbuttons(sel, False);
-          XSetWindowBorder(dpy, sel->win, conf.client.bordernormal);
      }
 
      selbytag[seltag] = sel = c;
 
      if(c)
      {
+          c->colors.frame = conf.client.borderfocus;
+          c->colors.titlebar = conf.titlebar.fg_focus;
+          c->colors.resizecorner = conf.client.resizecorner_focus;
+          frame_update(c);
           mouse_grabbuttons(c, True);
-          XSetWindowBorder(dpy, c->win, conf.client.borderfocus);
           if(conf.raisefocus)
                client_raise(c);
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
      }
      else
           XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
-
-     /* Update all visible titlebar */
-     for(cc = clients; cc; cc = cc->next)
-          if(!ishide(cc))
-               titlebar_update(cc);
 
      return;
 }
@@ -156,6 +155,19 @@ client_get(Window w)
      for(c = clients; c && c->win != w; c = c->next);
 
      return c;
+}
+
+void
+client_get_name(Client *c)
+{
+
+     XFetchName(dpy, c->win, &(c->title));
+     if(!c->title)
+          c->title = strdup("WMFS");
+
+     frame_update(c);
+
+     return;
 }
 
 void
@@ -182,8 +194,7 @@ uicb_client_kill(uicb_t cmd)
 {
      XEvent ev;
 
-     if(!sel)
-          return;
+     CHECK(sel);
 
      ev.type = ClientMessage;
      ev.xclient.window = sel->win;
@@ -199,16 +210,10 @@ uicb_client_kill(uicb_t cmd)
 void
 client_map(Client *c)
 {
-     if(!c)
-          return;
+     CHECK(c);
 
-     XMapWindow(dpy, c->win);
-     XMapSubwindows(dpy, c->win);
-     if(conf.titlebar.exist)
-     {
-          XMapWindow(dpy, c->tbar->win);
-          bar_refresh(c->tbar);
-     }
+     XMapWindow(dpy, c->frame);
+     XMapSubwindows(dpy, c->frame);
 
      return;
 }
@@ -219,7 +224,6 @@ client_manage(Window w, XWindowAttributes *wa)
      Client *c, *t = NULL;
      Window trans;
      Status rettrans;
-     XWindowChanges winc;
 
      c = emalloc(1, sizeof(Client));
      c->win = w;
@@ -228,33 +232,24 @@ client_manage(Window w, XWindowAttributes *wa)
      c->geo.width = wa->width;
      c->geo.height = wa->height;
      c->tag = seltag;
-     c->border = conf.client.borderheight;
 
-     /* Create titlebar */
-     if(conf.titlebar.exist)
-          titlebar_create(c);
+     frame_create(c);
 
-     winc.border_width = c->border;
-     XConfigureWindow(dpy, w, CWBorderWidth, &winc);
-     XSetWindowBorder(dpy, w, conf.client.bordernormal);
+     XSelectInput(dpy, c->win, PropertyChangeMask | StructureNotifyMask);
      mouse_grabbuttons(c, False);
-     XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask | PropertyChangeMask | StructureNotifyMask);
      client_size_hints(c);
-     titlebar_update(c);
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
           for(t = clients; t && t->win != trans; t = t->next);
-     if(t)
-          c->tag = t->tag;
-     if(!c->free)
-          c->free = (rettrans == Success) || c->hint;
+     if(t) c->tag = t->tag;
+     if(!c->free) c->free = (rettrans == Success) || c->hint;
      efree(t);
 
      client_attach(c);
-     XMoveResizeWindow(dpy, c->win, c->geo.x, c->geo.y, c->geo.width, c->geo.height);
      client_map(c);
+     client_get_name(c);
      client_raise(c);
-     setwinstate(c->win, NormalState);
      client_focus(c);
+     setwinstate(c->win, NormalState);
      arrange();
 
      return;
@@ -263,8 +258,7 @@ client_manage(Window w, XWindowAttributes *wa)
 void
 client_moveresize(Client *c, XRectangle geo, bool r)
 {
-     if(!c)
-          return;
+     CHECK(c);
 
      /* Resize hints {{{ */
      if(r)
@@ -319,13 +313,8 @@ client_moveresize(Client *c, XRectangle geo, bool r)
         || c->geo.height != geo.height)
      {
           c->geo = geo;
-
-          XMoveResizeWindow(dpy, c->win, geo.x, geo.y,
-                            geo.width, geo.height);
-          if(conf.titlebar.exist)
-               titlebar_update_position(c);
-
-          titlebar_update(c);
+          frame_moveresize(c, geo);
+          XResizeWindow(dpy, c->win, geo.width, geo.height);
           XSync(dpy, False);
      }
 
@@ -409,12 +398,7 @@ client_raise(Client *c)
      if(!c || c->max || c->tile)
           return;
 
-     XRaiseWindow(dpy, c->win);
-     if(conf.titlebar.exist)
-     {
-          XRaiseWindow(dpy, c->tbar->win);
-          titlebar_update(c);
-     }
+     XRaiseWindow(dpy, c->frame);
 
      return;
 }
@@ -457,8 +441,10 @@ client_unmanage(Client *c)
       * and set the withdraw state */
      client_detach(c);
      setwinstate(c->win, WithdrawnState);
-     if(conf.titlebar.exist)
-          titlebar_delete(c);
+
+     XDestroySubwindows(dpy, c->frame);
+     XDestroyWindow(dpy, c->frame);
+     XFree(c->title);
      efree(c);
      XSync(dpy, False);
      arrange();
@@ -469,13 +455,10 @@ client_unmanage(Client *c)
 void
 client_unmap(Client *c)
 {
-     if(!c)
-          return;
+     CHECK(c);
 
-     XUnmapWindow(dpy, c->win);
-     XUnmapSubwindows(dpy, c->win);
-     if(conf.titlebar.exist)
-          XUnmapWindow(dpy, c->tbar->win);
+     XUnmapWindow(dpy, c->frame);
+     XUnmapSubwindows(dpy, c->frame);
 
      return;
 }

@@ -179,8 +179,7 @@ uicb_set_mwfact(uicb_t cmd)
 {
      double c;
 
-     if(!(sscanf(cmd, "%lf", &c)))
-        return;
+     CHECK((sscanf(cmd, "%lf", &c)));
 
      if(tags[seltag].mwfact + c > 0.95
         || tags[seltag].mwfact + c < 0.05)
@@ -216,11 +215,10 @@ grid(void)
      Client *c;
      XRectangle cgeo = {sgeo.x, sgeo.y, 0, 0};
      unsigned int i, n, cols, rows, cpcols = 0;
-     unsigned int border = conf.client.borderheight * 2;
+     unsigned int border = BORDH * 2;
 
      for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++n);
-     if(!n)
-          return;
+     CHECK(n);
 
      for(rows = 0; rows <= n / 2; ++rows)
           if(rows * rows >= n)
@@ -248,13 +246,13 @@ grid(void)
 
           /* Last column's client remainder */
           if(i >= rows * (cols - 1))
-               cgeo.width = sgeo.width - cgeo.x - border;
+               cgeo.width = sgeo.width - cgeo.x - BORDH;
 
           /* Resize */
           client_moveresize(c, cgeo, tags[seltag].resizehint);
 
           /* Set all the other size with current client info */
-          cgeo.y = c->geo.y + c->geo.height + border + conf.titlebar.height;
+          cgeo.y = c->geo.y + c->geo.height + border + TBARH;
           if(cpcols + 1 > rows)
           {
                cpcols = 0;
@@ -273,11 +271,10 @@ multi_tile(Position type)
      XRectangle mastergeo = {sgeo.x, sgeo.y, 0, 0};
      XRectangle cgeo = {sgeo.x, sgeo.y, 0, 0};
      uint i , n, tilesize, mwfact, nmaster = tags[seltag].nmaster;
-     uint border = conf.client.borderheight * 2;
+     uint border = BORDH * 2;
 
      for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++n);
-     if(!n)
-          return;
+     CHECK(n);
 
      /* FIX NMASTER */
      nmaster = (n < nmaster) ? n : nmaster;
@@ -292,13 +289,13 @@ multi_tile(Position type)
      {
           if(type == Top)
                mastergeo.y = (n <= nmaster) ? sgeo.y : sgeo.y + (sgeo.height - mwfact) - border;
-          mastergeo.width = (sgeo.width / nmaster) - border;
-          mastergeo.height = (n <= nmaster) ? sgeo.height - border : mwfact;
+          mastergeo.width = (sgeo.width / nmaster) - BORDH;
+          mastergeo.height = (n <= nmaster) ? sgeo.height - BORDH : mwfact;
      }
      else
      {
           if(type == Left)
-               mastergeo.x = (n <= nmaster) ? sgeo.x : sgeo.width - mwfact - border;
+               mastergeo.x = (n <= nmaster) ? sgeo.x : sgeo.width - mwfact - BORDH;
           mastergeo.width = (n <= nmaster) ? sgeo.width - border : mwfact;
           mastergeo.height = (sgeo.height / nmaster) - border;
      }
@@ -332,7 +329,7 @@ multi_tile(Position type)
                else
                {
                     cgeo.x = mastergeo.x;
-                    cgeo.height -= (conf.titlebar.height + border);
+                    cgeo.height -= (TBARH + border);
                }
           }
 
@@ -349,7 +346,7 @@ multi_tile(Position type)
                          cgeo.x = sgeo.x;
                          break;
                     case Bottom:
-                         cgeo.y += mastergeo.height + conf.titlebar.height + border;
+                         cgeo.y += mastergeo.height + TBARH + border;
                          cgeo.x = sgeo.x;
                          break;
                     default:
@@ -363,13 +360,13 @@ multi_tile(Position type)
                {
                     cgeo.width = tilesize;
                     cgeo.width -= border;
-                    cgeo.height = sgeo.height - mastergeo.height - conf.titlebar.height - border*2;
+                    cgeo.height = sgeo.height - mastergeo.height - TBARH - border*2;
                }
                else
                {
                     cgeo.width = sgeo.width - mastergeo.width - border*2;
                     cgeo.height = tilesize;
-                    cgeo.height -= border + conf.titlebar.height;
+                    cgeo.height -= border + TBARH;
                }
           }
 
@@ -377,7 +374,7 @@ multi_tile(Position type)
           if(i + 1 == n  || i + 1 == (n < nmaster ? n : nmaster))
           {
                if(type == Top || type == Bottom)
-                    cgeo.width = sgeo.width - cgeo.x - border;
+                    cgeo.width = sgeo.width - cgeo.x - BORDH;
                else
                     cgeo.height = (sgeo.y + sgeo.height) - cgeo.y - border;
           }

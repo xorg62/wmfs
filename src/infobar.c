@@ -190,9 +190,10 @@ uicb_infobar_togglepos(uicb_t cmd)
 {
      conf.bartop = !conf.bartop;
      if(conf.bartop)
-          sgeo.y = conf.titlebar.pos ? infobar.geo.height : infobar.geo.height + conf.titlebar.height;
+          sgeo.y =  infobar.geo.height + TBARH;
      else
-          sgeo.y = conf.titlebar.pos ? 0 : conf.titlebar.height;
+          sgeo.y = TBARH;
+
      infobar.geo.y = (conf.bartop) ? 0 : MAXH - infobar.geo.height;
      bar_move(infobar.bar, 0, infobar.geo.y);
      infobar_draw();
