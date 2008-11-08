@@ -33,7 +33,7 @@
 #include "wmfs.h"
 
 BarWindow*
-bar_create(int x, int y, uint w, uint h, int bord, uint color, Bool entermask)
+bar_create(Window parent, int x, int y, uint w, uint h, int bord, uint color, Bool entermask)
 {
      XSetWindowAttributes at;
      BarWindow *bw;
@@ -50,10 +50,10 @@ bar_create(int x, int y, uint w, uint h, int bord, uint color, Bool entermask)
           at.event_mask = SubstructureRedirectMask | SubstructureNotifyMask |
                ButtonPressMask | ExposureMask | StructureNotifyMask;
 
-     bw->win = XCreateWindow(dpy, root, x, y, w, h, bord, DefaultDepth(dpy, screen),
+     bw->win = XCreateWindow(dpy, parent, x, y, w, h, bord, DefaultDepth(dpy, screen),
                              CopyFromParent, DefaultVisual(dpy, screen),
                              CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
-     bw->dr = XCreatePixmap(dpy, root, w, h, DefaultDepth(dpy, screen));
+     bw->dr = XCreatePixmap(dpy, parent, w, h, DefaultDepth(dpy, screen));
 
      bw->geo.x = x;
      bw->geo.y = y;

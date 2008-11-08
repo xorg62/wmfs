@@ -40,18 +40,17 @@ frame_create(Client *c)
      at.background_pixel = conf.client.bordernormal;
      at.background_pixmap = ParentRelative;
      at.override_redirect = True;
-     at.event_mask = SubstructureRedirectMask | SubstructureNotifyMask |
-          ExposureMask | VisibilityChangeMask | EnterWindowMask |
-          FocusChangeMask | KeyMask | ButtonMask | MouseMask;
+     at.event_mask = SubstructureRedirectMask|SubstructureNotifyMask|ExposureMask|
+          VisibilityChangeMask|EnterWindowMask|FocusChangeMask|KeyMask|ButtonMask|MouseMask;
 
      /* Set size */
-     c->frame_geo.x          =  c->geo.x - conf.client.borderheight;
-     c->frame_geo.y          =  c->geo.y - conf.titlebar.height;
+     c->frame_geo.x          =  c->geo.x - BORDH;
+     c->frame_geo.y          =  c->geo.y - TBARH;
      c->frame_geo.width      =  FRAMEW(c->geo.width);
      c->frame_geo.height     =  FRAMEH(c->geo.height);
-     c->colors.frame         = conf.client.bordernormal;
-     c->colors.resizecorner  = conf.client.resizecorner_normal;
-     c->colors.titlebar      = conf.titlebar.fg_normal;
+     c->colors.frame         =  conf.client.bordernormal;
+     c->colors.resizecorner  =  conf.client.resizecorner_normal;
+     c->colors.titlebar      =  conf.titlebar.fg_normal;
 
      /* Create frame window */
      c->frame = XCreateWindow(dpy, root,
@@ -84,9 +83,7 @@ frame_create(Client *c)
      XSetWindowBackground(dpy, c->frame, c->colors.frame);
 
      /* Reparent window with the frame */
-     XReparentWindow(dpy, c->win, c->frame,
-                     conf.client.borderheight,
-                     conf.titlebar.height + conf.client.borderheight);
+     XReparentWindow(dpy, c->win, c->frame, BORDH, BORDH + TBARH);
 
      return;
 }
@@ -94,8 +91,8 @@ frame_create(Client *c)
 void
 frame_moveresize(Client *c, XRectangle geo)
 {
-     c->frame_geo.x      =  geo.x - conf.client.borderheight;
-     c->frame_geo.y      =  geo.y - conf.titlebar.height;
+     c->frame_geo.x      =  geo.x - BORDH;
+     c->frame_geo.y      =  geo.y - TBARH;
      c->frame_geo.width  =  FRAMEW(geo.width);
      c->frame_geo.height =  FRAMEH(geo.height);
 

@@ -151,12 +151,14 @@ maxlayout(void)
      {
           c->tile = False;
           c->lmax = True;
-          c->ogeo.x = c->geo.x; c->ogeo.y = c->geo.y;
-          c->ogeo.width = c->geo.width; c->ogeo.height = c->geo.height;
+          c->ogeo.x = c->geo.x;
+          c->ogeo.y = c->geo.y;
+          c->ogeo.width = c->geo.width;
+          c->ogeo.height = c->geo.height;
 
           geo.x = sgeo.x; geo.y = sgeo.y;
-          geo.width = sgeo.width - (c->border * 2);
-          geo.height = sgeo.height - (c->border * 2);
+          geo.width = sgeo.width - BORDH * 2;
+          geo.height = sgeo.height - BORDH * 2;
 
           client_moveresize(c, geo, False);
      }

@@ -39,13 +39,13 @@ infobar_init(InfoBar *ib)
      ib->geo.y = (conf.bartop) ? 0 : MAXH - ib->geo.height;
 
      /* Create infobar barwindow */
-     ib->bar = bar_create(0, ib->geo.y, MAXW, ib->geo.height, 0, conf.colors.bar, False);
+     ib->bar = bar_create(root, 0, ib->geo.y, MAXW, ib->geo.height, 0, conf.colors.bar, False);
 
      /* Create layout switch & layout type switch barwindow */
-     ib->layout_switch = bar_create(0, (conf.bartop) ? ib->geo.y : ib->geo.y + 1,
+     ib->layout_switch = bar_create(ib->bar->win, 0, 0,
                                          1, ib->geo.height - 1, 0,
                                          conf.colors.layout_bg, False);
-     ib->layout_type_switch = bar_create(0, ib->geo.y,
+     ib->layout_type_switch = bar_create(ib->bar->win, 0, 0,
                                          1, ib->geo.height,
                                          0, conf.colors.layout_bg, False);
 
@@ -111,7 +111,6 @@ infobar_draw_layout(void)
 
      /* Set symbol & position */
      px = width = taglen[conf.ntag];
-     py = conf.bartop ? infobar.geo.y : infobar.geo.y + 1;
      if(tags[seltag].layout.func == freelayout
         || tags[seltag].layout.func == maxlayout)
           strcpy(symbol, tags[seltag].layout.symbol);
@@ -121,8 +120,8 @@ infobar_draw_layout(void)
      /* Draw layout name/symbol */
      bar_refresh_color(infobar.layout_switch);
 
-     bar_move(infobar.layout_switch, px, py);
-     bar_resize(infobar.layout_switch, textw(symbol) + PAD, infobar.geo.height - 1);
+     bar_move(infobar.layout_switch, px, 0);
+     bar_resize(infobar.layout_switch, textw(symbol) + PAD, infobar.geo.height);
      draw_text(infobar.layout_switch->dr, PAD/2, font->height,
                conf.colors.layout_fg,
                conf.colors.layout_bg,
@@ -136,7 +135,7 @@ infobar_draw_layout(void)
           bar_map(infobar.layout_type_switch);
           bar_refresh_color(infobar.layout_type_switch);
           bar_move(infobar.layout_type_switch, px + infobar.layout_switch->geo.width + PAD/2, py);
-          bar_resize(infobar.layout_type_switch, textw(tags[seltag].layout.symbol) + PAD, infobar.geo.height - 1);
+          bar_resize(infobar.layout_type_switch, textw(tags[seltag].layout.symbol) + PAD, infobar.geo.height);
           draw_text(infobar.layout_type_switch->dr, PAD/2, font->height,
                     conf.colors.layout_fg,
                     conf.colors.layout_bg,

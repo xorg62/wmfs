@@ -73,7 +73,7 @@
 #define PAD          8
 
 /* bar.c */
-BarWindow *bar_create(int x, int y, uint w, uint h, int bord, uint color, Bool entermask);
+BarWindow *bar_create(Window parent, int x, int y, uint w, uint h, int bord, uint color, Bool entermask);
 void bar_delete(BarWindow *bw);
 void bar_map(BarWindow *bw);
 void bar_unmap(BarWindow *bw);

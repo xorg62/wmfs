@@ -128,9 +128,10 @@ configurerequest(XEvent ev)
      XRectangle geo;
 
      if((c = client_get(ev.xconfigurerequest.window)))
-           if(c->tile || c->lmax)
-               return;
-
+     {
+          CHECK(!c->tile);
+          CHECK(!c->lmax);
+     }
      geo.x = wc.x = ev.xconfigurerequest.x;
      geo.y = wc.y = ev.xconfigurerequest.y;
      geo.width = wc.width = ev.xconfigurerequest.width;
@@ -338,7 +339,7 @@ getevent(void)
       case MapRequest:        maprequest(event);        break;
       case MappingNotify:     mapnotify(event);         break;
       case PropertyNotify:    propertynotify(event);    break;
-      case UnmapNotify:       unmapnotify(event);       break;
+           //case UnmapNotify:       unmapnotify(event);       break;
      }
 
      return;
