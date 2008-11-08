@@ -433,8 +433,7 @@ uicb_tile_switch(uicb_t cmd)
      if(!sel || sel->hint || !sel->tile)
           return;
      if((c = sel) == nexttiled(clients))
-          if(!(c = nexttiled(c->next)))
-               return;
+          CHECK((c = nexttiled(c->next)));
      client_detach(c);
      client_attach(c);
      client_focus(c);
@@ -458,8 +457,8 @@ uicb_togglemax(uicb_t cmd)
           sel->ogeo.height = sel->geo.height;
 
           geo.x = sgeo.x; geo.y = sgeo.y;
-          geo.width = sgeo.width - (sel->border * 2);
-          geo.height = sgeo.height - (sel->border * 2);
+          geo.width = sgeo.width - BORDH * 2;
+          geo.height = sgeo.height - BORDH * 2;
 
           client_moveresize(sel, geo, False);
           client_raise(sel);
