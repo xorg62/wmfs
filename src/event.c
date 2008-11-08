@@ -339,7 +339,7 @@ getevent(void)
       case MapRequest:        maprequest(event);        break;
       case MappingNotify:     mapnotify(event);         break;
       case PropertyNotify:    propertynotify(event);    break;
-           //case UnmapNotify:       unmapnotify(event);       break;
+      case UnmapNotify:       unmapnotify(event);       break;
      }
 
      return;

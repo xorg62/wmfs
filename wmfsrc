@@ -101,7 +101,8 @@ keys
         key { mod = {"Control"} key = "Return" func = "spawn" cmd = term }
         key { mod = {"Alt"} key = "q" func = "client_kill" }
         key { mod = {"Control", "Alt", "Shift"} key = "q" func = "quit" }
-        key { mod = {"Control"} key = "m" func = "togglemax" }
+        key { mod = {"Control"} key = "m" func = "toggle_max" }
+        key { mod = {"Control"} key = "f" func = "toggle_free" }
         key { mod = {"Control"} key = "b" func = "toggle_infobar_position" }
         key { mod = {"Alt"} key = "Tab" func = "client_next" }
         key { mod = {"Alt","Shift"} key = "Tab" func = "client_prev" }
@@ -126,13 +127,13 @@ keys
         key { mod = {"Alt"} key = "F8" func = "tag" cmd = "8" }
         key { mod = {"Alt"} key = "F9" func = "tag" cmd = "9" }
 
-        key { mod = {"Control", "Shift"} key = "F1" func = "tagtransfert" cmd ="1" }
-        key { mod = {"Control", "Shift"} key = "F2" func = "tagtransfert" cmd ="2" }
-        key { mod = {"Control", "Shift"} key = "F3" func = "tagtransfert" cmd ="3" }
-        key { mod = {"Control", "Shift"} key = "F4" func = "tagtransfert" cmd ="4" }
-        key { mod = {"Control", "Shift"} key = "F5" func = "tagtransfert" cmd ="5" }
-        key { mod = {"Control", "Shift"} key = "F6" func = "tagtransfert" cmd ="6" }
-        key { mod = {"Control", "Shift"} key = "F7" func = "tagtransfert" cmd ="7" }
-        key { mod = {"Control", "Shift"} key = "F8" func = "tagtransfert" cmd ="8" }
-        key { mod = {"Control", "Shift"} key = "F9" func = "tagtransfert" cmd ="9" }
+        key { mod = {"Control", "Shift"} key = "F1" func = "tag_transfert" cmd ="1" }
+        key { mod = {"Control", "Shift"} key = "F2" func = "tag_transfert" cmd ="2" }
+        key { mod = {"Control", "Shift"} key = "F3" func = "tag_transfert" cmd ="3" }
+        key { mod = {"Control", "Shift"} key = "F4" func = "tag_transfert" cmd ="4" }
+        key { mod = {"Control", "Shift"} key = "F5" func = "tag_transfert" cmd ="5" }
+        key { mod = {"Control", "Shift"} key = "F6" func = "tag_transfert" cmd ="6" }
+        key { mod = {"Control", "Shift"} key = "F7" func = "tag_transfert" cmd ="7" }
+        key { mod = {"Control", "Shift"} key = "F8" func = "tag_transfert" cmd ="8" }
+        key { mod = {"Control", "Shift"} key = "F9" func = "tag_transfert" cmd ="9" }
 }

@@ -181,6 +181,7 @@ Client *nexttiled(Client *c);
 /* }}} */
 void uicb_tile_switch(uicb_t);
 void uicb_togglemax(uicb_t);
+void uicb_togglefree(uicb_t cmd);
 void uicb_layout_prev(uicb_t);
 void uicb_layout_next(uicb_t);
 void uicb_set_mwfact(uicb_t);

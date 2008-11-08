@@ -388,7 +388,7 @@ multi_tile(Position type)
           if(type == Top || type == Bottom)
                cgeo.x = c->geo.x + c->geo.width + border;
           else
-               cgeo.y = c->geo.y + c->geo.height + border + conf.titlebar.height;
+               cgeo.y = c->geo.y + c->geo.height + border + TBARH;
      }
 
      return;
@@ -437,6 +437,22 @@ uicb_tile_switch(uicb_t cmd)
      client_detach(c);
      client_attach(c);
      client_focus(c);
+     arrange();
+
+     return;
+}
+
+void
+uicb_togglefree(uicb_t cmd)
+{
+     CHECK(sel);
+
+     sel->free = !sel->free;
+     sel->tile = False;
+     sel->max  = False;
+     sel->lmax = False;
+     client_raise(sel);
+
      arrange();
 
      return;

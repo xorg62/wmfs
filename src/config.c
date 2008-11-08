@@ -40,13 +40,13 @@ func_name_list_t func_list[] =
      {"client_kill",             uicb_client_kill },
      {"client_prev",             uicb_client_prev },
      {"client_next",             uicb_client_next },
-     {"togglemax",               uicb_togglemax },
+     {"toggle_max",              uicb_togglemax },
      {"layout_next",             uicb_layout_next },
      {"layout_prev",             uicb_layout_prev },
      {"tag",                     uicb_tag },
      {"tag_next",                uicb_tag_next },
      {"tag_prev",                uicb_tag_prev },
-     {"tagtransfert",            uicb_tagtransfert },
+     {"tag_transfert",           uicb_tagtransfert },
      {"set_mwfact",              uicb_set_mwfact },
      {"set_nmaster",             uicb_set_nmaster },
      {"quit",                    uicb_quit },
@@ -54,7 +54,8 @@ func_name_list_t func_list[] =
      {"mouse_move",              uicb_mouse_move },
      {"mouse_resize",            uicb_mouse_resize },
      {"client_raise",            uicb_client_raise },
-     {"tile_switch",             uicb_tile_switch }
+     {"tile_switch",             uicb_tile_switch },
+     {"toggle_free",             uicb_togglefree }
 };
 
 func_name_list_t layout_list[] =
