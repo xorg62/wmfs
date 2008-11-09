@@ -166,6 +166,7 @@ scan(void)
                     continue;
                if(wa.map_state == IsViewable || getwinstate(wins[i]) == IconicState)
                     client_manage(wins[i], &wa);
+
           }
           for(i = 0; i < num; i++)
           {
@@ -194,8 +195,7 @@ handle_signal(int signum)
           for(c = clients; c; c = c->next)
           {
                XReparentWindow(dpy, c->win, root, 0, 0);
-               XDestroySubwindows(dpy, c->frame);
-               XDestroyWindow(dpy, c->frame);
+               client_unmanage(c);
           }
           fprintf(stderr, "\nExit WMFS... Bye !!\n");
           quit();
@@ -264,7 +264,6 @@ main(int argc, char **argv)
 
      /* Check if an other WM is already running; set the error handler */
      XSetErrorHandler(errorhandler);
-     XSetErrorHandler(errorhandlerdummy);
 
      /* Let's Go ! */
      init_conf();

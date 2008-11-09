@@ -36,6 +36,7 @@ void
 init(void)
 {
      /* First init */
+     XSetErrorHandler(errorhandlerdummy);
      gc = DefaultGC(dpy, screen);
      screen = DefaultScreen(dpy);
      init_font();

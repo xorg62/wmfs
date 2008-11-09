@@ -464,8 +464,6 @@ client_unmanage(Client *c)
                selbytag[i] = NULL;
      /* }}} */
 
-     /* Detach this client of the chain
-      * and set the withdraw state */
      client_detach(c);
      setwinstate(c->win, WithdrawnState);
      XDestroySubwindows(dpy, c->frame);
