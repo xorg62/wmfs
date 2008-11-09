@@ -147,7 +147,7 @@ mainloop(void)
 
 /** Set the exiting variable to True
  *  for stop the main loop
- * \param unused uicb_t
+ * \param cmd unused uicb_t
  */
 void
 uicb_quit(uicb_t cmd)

@@ -132,7 +132,7 @@ uicb_client_prev(uicb_t cmd)
 }
 
 /** Switch to the next client
- * \param cnd uicb_t type unused
+ * \param cmd uicb_t type unused
 */
 void
 uicb_client_next(uicb_t cmd)

@@ -341,7 +341,7 @@ propertynotify(XPropertyEvent *ev)
 }
 
 /** UnmapNotify handle event
- * \param XUnmapEvent pointer
+ * \param ev XUnmapEvent pointer
 */
 void
 unmapnotify(XUnmapEvent *ev)

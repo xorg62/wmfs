@@ -33,7 +33,7 @@
 #include "wmfs.h"
 
 /** Set a tag
- * \param cmd Tag number or '+' / '-'
+ * \param cmd Tag number or '+' / '-', uicb_t type
 */
 void
 uicb_tag(uicb_t cmd)
@@ -86,7 +86,7 @@ uicb_tag_prev(uicb_t cmd)
 
 /** Transfert the selected client to
  *  the wanted tag
- * \param cmd Wanted tag
+ * \param cmd Wanted tag, uicb_t type
 */
 void
 uicb_tagtransfert(uicb_t cmd)

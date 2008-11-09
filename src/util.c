@@ -33,8 +33,8 @@
 #include "wmfs.h"
 
 /** Calloc with an error message if there is a probleme
- * \param uint Element
- * \param uint Size
+ * \param element Element
+ * \param size Size
  * \return void pointer
 */
 void*
