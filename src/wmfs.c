@@ -158,18 +158,49 @@ scan(void)
      XWindowAttributes wa;
 
      if(XQueryTree(dpy, root, &d, &d, &wins, &num))
+     {
           for(i = 0; i < num; i++)
           {
-               if(wins[i] && wins[i] != infobar->bar->win)
-               {
-                    XGetWindowAttributes(dpy, wins[i], &wa);
-                    if(wa.override_redirect && wa.map_state == IsViewable)
-                         client_manage(wins[i], &wa);
-               }
+               if(!XGetWindowAttributes(dpy, wins[i], &wa)
+                  || wa.override_redirect || XGetTransientForHint(dpy, wins[i], &d))
+                    continue;
+               if(wa.map_state == IsViewable || getwinstate(wins[i]) == IconicState)
+                    client_manage(wins[i], &wa);
           }
+          for(i = 0; i < num; i++)
+          {
+               if(!XGetWindowAttributes(dpy, wins[i], &wa))
+                    continue;
+               if(XGetTransientForHint(dpy, wins[i], &d)
+                  && (wa.map_state == IsViewable || getwinstate(wins[i]) == IconicState))
+                    client_manage(wins[i], &wa);
+          }
+     }
      XFree(wins);
 
      arrange();
+
+     return;
+}
+
+void
+handle_signal(int signum)
+{
+     Client *c;
+
+     if(signum == SIGTERM || signum == SIGINT)
+     {
+          XSetErrorHandler(errorhandlerdummy);
+          for(c = clients; c; c = c->next)
+          {
+               XReparentWindow(dpy, c->win, root, 0, 0);
+               XDestroySubwindows(dpy, c->frame);
+               XDestroyWindow(dpy, c->frame);
+          }
+          fprintf(stderr, "\nExit WMFS... Bye !!\n");
+          quit();
+          exit(EXIT_FAILURE);
+     }
 
      return;
 }
@@ -178,6 +209,7 @@ int
 main(int argc, char **argv)
 {
      int i;
+     struct sigaction sig;
 
      static struct option long_options[] = {
 
@@ -222,6 +254,14 @@ main(int argc, char **argv)
           exit(EXIT_FAILURE);
      }
 
+     /* Set signal handle */
+     sig.sa_handler = handle_signal;
+     sig.sa_flags   = 0;
+     memset(&sig.sa_mask, 0, sizeof(sigset_t));
+     sigaction(SIGTERM, &sig, NULL);
+     sigaction(SIGINT, &sig, NULL);
+
+
      /* Check if an other WM is already running; set the error handler */
      XSetErrorHandler(errorhandler);
      XSetErrorHandler(errorhandlerdummy);
@@ -231,7 +271,7 @@ main(int argc, char **argv)
      init();
      scan();
      mainloop();
-     quit();
+     raise(SIGTERM);
 
      XCloseDisplay(dpy);
 

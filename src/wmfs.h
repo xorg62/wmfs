@@ -39,6 +39,7 @@
 #include <stdbool.h>
 #include <stdarg.h>
 #include <string.h>
+#include <signal.h>
 #include <unistd.h>
 #include <time.h>
 #include <getopt.h>
@@ -205,6 +206,7 @@ int errorhandlerstart(Display *d, XErrorEvent *event);
 void quit(void);
 void mainloop(void);
 void scan(void);
+void handle_signal(int signum);
 void uicb_quit(uicb_t);
 
 /* Variables */

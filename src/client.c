@@ -468,7 +468,6 @@ client_unmanage(Client *c)
       * and set the withdraw state */
      client_detach(c);
      setwinstate(c->win, WithdrawnState);
-
      XDestroySubwindows(dpy, c->frame);
      XDestroyWindow(dpy, c->frame);
      XFree(c->title);

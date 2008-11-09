@@ -306,7 +306,6 @@ propertynotify(XPropertyEvent *ev)
      return;
 }
 
-
 void
 unmapnotify(XUnmapEvent *ev)
 {
@@ -328,17 +327,17 @@ getevent(XEvent ev)
 {
      switch (ev.type)
      {
-      case ButtonPress:       buttonpress(&ev.xbutton);       break;
+      case ButtonPress:       buttonpress(&ev.xbutton);                 break;
       case ConfigureRequest:  configurerequest(&ev.xconfigurerequest);  break;
-      case DestroyNotify:     destroynotify(&ev.xdestroywindow);     break;
-      case EnterNotify:       enternotify(&ev.xcrossing);       break;
-      case Expose:            expose(&ev.xexpose);            break;
-      case FocusIn:           focusin(&ev.xfocus);           break;
-      case KeyPress:          keypress(&ev.xkey);          break;
-      case MapRequest:        maprequest(&ev.xmaprequest);      break;
-      case MappingNotify:     mapnotify(&ev.xmapping);         break;
-      case PropertyNotify:    propertynotify(&ev.xproperty);    break;
-      case UnmapNotify:       unmapnotify(&ev.xunmap);       break;
+      case DestroyNotify:     destroynotify(&ev.xdestroywindow);        break;
+      case EnterNotify:       enternotify(&ev.xcrossing);               break;
+      case Expose:            expose(&ev.xexpose);                      break;
+      case FocusIn:           focusin(&ev.xfocus);                      break;
+      case KeyPress:          keypress(&ev.xkey);                       break;
+      case MapRequest:        maprequest(&ev.xmaprequest);              break;
+      case MappingNotify:     mapnotify(&ev.xmapping);                  break;
+      case PropertyNotify:    propertynotify(&ev.xproperty);            break;
+      case UnmapNotify:       unmapnotify(&ev.xunmap);                  break;
      }
 
      return;
