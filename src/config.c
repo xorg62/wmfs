@@ -411,7 +411,6 @@ init_conf(void)
           conf.titlebar.mouse[i].cmd    = strdup(var_to_str(cfg_getstr(cfgtmp2, "cmd")));
      }
 
-
      /* layout */
      conf.colors.layout_fg  = strdup(var_to_str(cfg_getstr(cfg_layouts, "fg")));
      conf.colors.layout_bg  = getcolor(var_to_str(cfg_getstr(cfg_layouts, "bg")));
@@ -448,7 +447,6 @@ init_conf(void)
                     ++conf.ntilelayout;
           }
      }
-
 
      /* tag */
      /* if there is no tag in the conf or more than

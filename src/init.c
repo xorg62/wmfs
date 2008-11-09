@@ -36,17 +36,17 @@ void
 init(void)
 {
      /* First init */
-     gc = DefaultGC (dpy, screen);
-     screen = DefaultScreen (dpy);
-
+     gc = DefaultGC(dpy, screen);
+     screen = DefaultScreen(dpy);
      init_font();
      init_cursor();
      init_key();
      init_atom();
      init_root();
-     infobar_init(&infobar);
+     infobar_init();
      init_geometry();
      grabkeys();
+     XSetErrorHandler(errorhandler);
 
      /* Warning about font */
      if(TBARH + BORDH < font->height)
@@ -133,7 +133,7 @@ void
 init_geometry(void)
 {
      sgeo.x = BORDH;
-     sgeo.y = infobar.geo.height;
+     sgeo.y = infobar->geo.height;
 
      if(conf.bartop)
           sgeo.y += TBARH;
@@ -141,7 +141,7 @@ init_geometry(void)
           sgeo.y = TBARH;
 
      sgeo.width  = MAXW;
-     sgeo.height = MAXH - infobar.geo.height - TBARH;
+     sgeo.height = MAXH - infobar->geo.height - TBARH;
 
      return;
 }

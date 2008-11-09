@@ -138,33 +138,4 @@ frame_update(Client *c)
      return;
 }
 
-Client*
-frame_get(Window w)
-{
-     Client *c;
-
-     for(c = clients; c && c->frame != w; c = c->next);
-
-     return c;
-}
-
-Client*
-frame_get_titlebar(Window w)
-{
-     Client *c;
-
-     for(c = clients; c && c->titlebar != w; c = c->next);
-
-     return c;
-}
-
-Client*
-frame_get_resize(Window w)
-{
-     Client *c;
-
-     for(c = clients; c && c->resize != w; c = c->next);
-
-     return c;
-}
 

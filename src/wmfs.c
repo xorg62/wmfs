@@ -32,38 +32,27 @@
 
 #include "wmfs.h"
 
-void
-checkotherwm(void)
-{
-     owm = False;
-
-     XSetErrorHandler(errorhandlerstart);
-     XSelectInput(dpy, DefaultRootWindow(dpy), SubstructureRedirectMask);
-     XSync(dpy, False);
-
-     if(owm)
-     {
-         fprintf(stderr, "WMFS Error: Another Window Manager is already running.\n");
-         exit(EXIT_FAILURE);
-     }
-
-     XSetErrorHandler(errorhandler);
-     XSync(dpy, False);
-
-     return;
-}
 
 int
 errorhandler(Display *d, XErrorEvent *event)
 {
-     char mess[512];
+     char mess[256];
+
+     /* Check if there are another WM running */
+     if(BadAccess == event->error_code
+        && DefaultRootWindow(dpy) == event->resourceid)
+     {
+          fprintf(stderr, "WMFS Error: Another Window Manager is already running.\n");
+          exit(EXIT_FAILURE);
+     }
 
      XGetErrorText(d, event->error_code, mess, 128);
-     fprintf(stderr, "WMFS error: %s(%d) opcodes %d/%d\n  resource 0x%lx\n", mess,
+     fprintf(stderr, "WMFS error: %s(%d) opcodes %d/%d\n  resource #%lx\n", mess,
              event->error_code,
              event->request_code,
              event->minor_code,
              event->resourceid);
+
 
      return 1;
 }
@@ -75,15 +64,6 @@ errorhandlerdummy(Display *d, XErrorEvent *event)
      return 0;
 }
 
-/* Only for check if another WM is already running */
-int
-errorhandlerstart(Display *d, XErrorEvent *event)
-{
-     owm = True;
-
-     return -1;
-}
-
 void
 quit(void)
 {
@@ -92,9 +72,10 @@ quit(void)
      XFreeCursor(dpy, cursor[CurNormal]);
      XFreeCursor(dpy, cursor[CurMove]);
      XFreeCursor(dpy, cursor[CurResize]);
-     bar_delete(infobar.bar);
-     bar_delete(infobar.layout_switch);
-     bar_delete(infobar.layout_type_switch);
+     bar_delete(infobar->bar);
+     bar_delete(infobar->layout_switch);
+     bar_delete(infobar->layout_type_switch);
+     efree(infobar);
      efree(keys);
      efree(conf.titlebar.mouse);
      efree(conf.client.mouse);
@@ -108,12 +89,13 @@ void
 mainloop(void)
 {
      fd_set fd;
-     char sbuf[sizeof infobar.statustext], *p;
+     char sbuf[sizeof infobar->statustext], *p;
      int len, r, offset = 0;
      Bool readstdin = True;
+     XEvent ev;
 
-     len = sizeof infobar.statustext - 1;
-     sbuf[len] = infobar.statustext[len] = '\0';
+     len = sizeof infobar->statustext - 1;
+     sbuf[len] = infobar->statustext[len] = '\0';
 
      while(!exiting)
      {
@@ -132,7 +114,7 @@ mainloop(void)
                          if(*p == '\n')
                          {
                               *p = '\0';
-                              strncpy(infobar.statustext, sbuf, len);
+                              strncpy(infobar->statustext, sbuf, len);
                               p += r - 1;
                               for(r = 0; *(p - r) && *(p - r) != '\n'; ++r);
                               offset = r;
@@ -144,15 +126,15 @@ mainloop(void)
                }
                else
                {
-                    strncpy(infobar.statustext, sbuf, strlen(sbuf));
+                    strncpy(infobar->statustext, sbuf, strlen(sbuf));
                     readstdin = False;
                }
                infobar_draw();
           }
           while(XPending(dpy))
           {
-               XNextEvent(dpy, &event);
-               getevent();
+               XNextEvent(dpy, &ev);
+               getevent(ev);
           }
      }
 
@@ -172,24 +154,20 @@ void
 scan(void)
 {
      uint i, num;
-     Window *wins, d1, d2;
+     Window *wins = NULL, d;
      XWindowAttributes wa;
 
-     wins = NULL;
-     if(XQueryTree(dpy, root, &d1, &d2, &wins, &num))
-     {
+     if(XQueryTree(dpy, root, &d, &d, &wins, &num))
           for(i = 0; i < num; i++)
           {
-               if(!XGetWindowAttributes(dpy, wins[i], &wa))
-                    continue;
-               if(wa.override_redirect || XGetTransientForHint(dpy, wins[i], &d1))
-                    continue;
-               if(wa.map_state == IsViewable)
-                    client_manage(wins[i], &wa);
+               if(wins[i] && wins[i] != infobar->bar->win)
+               {
+                    XGetWindowAttributes(dpy, wins[i], &wa);
+                    if(wa.override_redirect && wa.map_state == IsViewable)
+                         client_manage(wins[i], &wa);
+               }
           }
-     }
-     if(wins)
-          XFree(wins);
+     XFree(wins);
 
      arrange();
 
@@ -244,8 +222,9 @@ main(int argc, char **argv)
           exit(EXIT_FAILURE);
      }
 
-     /* Check if an other WM is already running */
-     checkotherwm();
+     /* Check if an other WM is already running; set the error handler */
+     XSetErrorHandler(errorhandler);
+     XSetErrorHandler(errorhandlerdummy);
 
      /* Let's Go ! */
      init_conf();

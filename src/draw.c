@@ -42,7 +42,8 @@ draw_text(Drawable d, int x, int y, char* fg, uint bg, int pad, char *str)
      xftd = XftDrawCreate(dpy, d, DefaultVisual(dpy, screen), DefaultColormap(dpy, screen));
 
      /* Color the text font */
-     draw_rectangle(d, x - pad/2, 0, textw(str) + pad, infobar.geo.height, bg);
+     draw_rectangle(d, x - pad/2, 0, textw(str) + pad, infobar->geo.height, bg);
+
 
      /* Alloc text color */
      XftColorAllocName(dpy, DefaultVisual(dpy, screen),
@@ -53,6 +54,7 @@ draw_text(Drawable d, int x, int y, char* fg, uint bg, int pad, char *str)
 
      /* Free the text color and XftDraw */
      XftColorFree(dpy, DefaultVisual(dpy, screen), DefaultColormap(dpy, screen), &xftcolor);
+
      XftDrawDestroy(xftd);
 
 

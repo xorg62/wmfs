@@ -72,7 +72,7 @@ mouse_move(Client *c)
                client_moveresize(c, geo, True);
           }
           else if(ev.type == Expose)
-               expose(ev);
+               expose(&ev.xexpose);
      }
 
      return;
@@ -107,12 +107,12 @@ mouse_resize(Client *c)
                mx = sgeo.width - (tags[seltag].mwfact * sgeo.width);
           else if(tags[seltag].layout.func == tile_top)
           {
-               mx = event.xmotion.x_root;
+               mx = ev.xmotion.x_root;
                my = sgeo.height - (tags[seltag].mwfact * sgeo.height);
           }
           else if(tags[seltag].layout.func == tile_bottom)
           {
-               mx = event.xmotion.x_root;
+               mx = ev.xmotion.x_root;
                my = tags[seltag].mwfact * sgeo.height;
           }
           XWarpPointer(dpy, None, root, 0, 0, 0, 0, mx, my);
@@ -166,7 +166,7 @@ mouse_resize(Client *c)
                     client_moveresize(c, geo, True);
           }
           else if(ev.type == Expose)
-               expose(ev);
+               expose(&ev.xexpose);
 
      }
 

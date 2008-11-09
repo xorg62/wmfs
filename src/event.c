@@ -34,83 +34,83 @@
 
 /* BUTTONPRESS */
 void
-buttonpress(XEvent ev)
+buttonpress(XButtonEvent *ev)
 {
      Client *c;
      int i;
      char s[6];
 
      /* Frame & titlebar */
-     if((c = frame_get_titlebar(ev.xbutton.window)))
+     if((c = client_gb_titlebar(ev->window)))
           for(i = 0; i < conf.titlebar.nmouse; ++i)
-                if(ev.xbutton.button == conf.titlebar.mouse[i].button)
+                if(ev->button == conf.titlebar.mouse[i].button)
                     if(conf.titlebar.mouse[i].func)
                          conf.titlebar.mouse[i].func(conf.titlebar.mouse[i].cmd);
 
      /* Frame Resize Area */
-     if((c = frame_get_resize(ev.xbutton.window)))
+     if((c = client_gb_resize(ev->window)))
           mouse_resize(c);
 
      /* Client */
-     if((c = client_get(ev.xbutton.window)))
+     if((c = client_gb_win(ev->window)))
           for(i = 0; i < conf.client.nmouse; ++i)
-               if(ev.xbutton.button == conf.client.mouse[i].button)
+               if(ev->button == conf.client.mouse[i].button)
                     if(conf.client.mouse[i].func)
                          conf.client.mouse[i].func(conf.client.mouse[i].cmd);
 
      /* Root */
-     if(ev.xbutton.window == root)
+     if(ev->window == root)
           for(i = 0; i < conf.root.nmouse; ++i)
-               if(ev.xbutton.button == conf.root.mouse[i].button)
+               if(ev->button == conf.root.mouse[i].button)
                     if(conf.root.mouse[i].func)
                          conf.root.mouse[i].func(conf.root.mouse[i].cmd);
 
      /* Bar */
      {
-          if(ev.xbutton.window == infobar.bar->win)
+          if(ev->window == infobar->bar->win)
           {
                /* Tag*/
                for(i = 0; i < conf.ntag + 1; ++i)
                {
-                    if(ev.xbutton.x > taglen[i-1] - 3
-                       && ev.xbutton.x < (taglen[i] - 3))
+                    if(ev->x > taglen[i-1] - 3
+                       && ev->x < (taglen[i] - 3))
                     {
                          ITOA(s, i);
-                         if(ev.xbutton.button == Button1)
+                         if(ev->button == Button1)
                               uicb_tag(s);
-                         if(ev.xbutton.button == Button3)
+                         if(ev->button == Button3)
                               uicb_tagtransfert(s);
                     }
                }
-               if(ev.xbutton.x < taglen[conf.ntag])
+               if(ev->x < taglen[conf.ntag])
                {
-                    if(ev.xbutton.button == Button4)
+                    if(ev->button == Button4)
                          uicb_tag("+1");
-                    if (ev.xbutton.button == Button5)
+                    if (ev->button == Button5)
                          uicb_tag("-1");
                }
           }
           /* Layout */
           {
-               if(ev.xbutton.window == infobar.layout_switch->win)
+               if(ev->window == infobar->layout_switch->win)
                {
-                    if(ev.xbutton.button == Button1
-                       || ev.xbutton.button == Button4)
+                    if(ev->button == Button1
+                       || ev->button == Button4)
                          layoutswitch(True);
 
-                    if(ev.xbutton.button == Button3
-                       || ev.xbutton.button == Button5)
+                    if(ev->button == Button3
+                       || ev->button == Button5)
                          layoutswitch(False);
                }
 
-               if(ev.xbutton.window == infobar.layout_type_switch->win)
+               if(ev->window == infobar->layout_type_switch->win)
                {
-                    if(ev.xbutton.button == Button1
-                       || ev.xbutton.button == Button4)
+                    if(ev->button == Button1
+                       || ev->button == Button4)
                          layout_tile_switch(True);
 
-                    if(ev.xbutton.button == Button3
-                       || ev.xbutton.button == Button5)
+                    if(ev->button == Button3
+                       || ev->button == Button5)
                          layout_tile_switch(False);
                }
           }
@@ -121,29 +121,28 @@ buttonpress(XEvent ev)
 
 /* CONFIGUREREQUEST */
 void
-configurerequest(XEvent ev)
+configurerequest(XConfigureRequestEvent *ev)
 {
      Client *c;
      XWindowChanges wc;
      XRectangle geo;
 
-     if((c = client_get(ev.xconfigurerequest.window)))
+     if((c = client_gb_win(ev->window)))
      {
           CHECK(!c->tile);
           CHECK(!c->lmax);
      }
-     geo.x = wc.x = ev.xconfigurerequest.x;
-     geo.y = wc.y = ev.xconfigurerequest.y;
-     geo.width = wc.width = ev.xconfigurerequest.width;
-     geo.height = wc.height = ev.xconfigurerequest.height;
-     wc.border_width = ev.xconfigurerequest.border_width;
-     wc.sibling = ev.xconfigurerequest.above;
-     wc.stack_mode = ev.xconfigurerequest.detail;
+     geo.x = wc.x = ev->x;
+     geo.y = wc.y = ev->y;
+     geo.width = wc.width = ev->width;
+     geo.height = wc.height = ev->height;
+     wc.border_width = ev->border_width;
+     wc.sibling = ev->above;
+     wc.stack_mode = ev->detail;
 
-     XConfigureWindow(dpy, ev.xconfigurerequest.window,
-                      ev.xconfigurerequest.value_mask, &wc);
+     XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
 
-     if((c = client_get(ev.xconfigurerequest.window)))
+     if((c = client_gb_win(ev->window)))
      {
           client_moveresize(c, geo, True);
           XReparentWindow(dpy, c->win, c->frame,
@@ -157,10 +156,10 @@ configurerequest(XEvent ev)
 
 /* DESTROYNOTIFY */
 void
-destroynotify(XEvent ev)
+destroynotify(XDestroyWindowEvent *ev)
 {
      Client *c;
-     if((c = client_get(ev.xdestroywindow.window)))
+     if((c = client_gb_win(ev->window)))
           client_unmanage(c);
 
      return;
@@ -168,18 +167,18 @@ destroynotify(XEvent ev)
 
 /* ENTERNOTIFY */
 void
-enternotify(XEvent ev)
+enternotify(XCrossingEvent *ev)
 {
      Client *c;
 
-     if(ev.xcrossing.mode != NotifyNormal
-        || ev.xcrossing.detail == NotifyInferior)
+     if(ev->mode != NotifyNormal
+        || ev->detail == NotifyInferior)
           return;
-     if((c = client_get(ev.xcrossing.window))
-        || (c = frame_get(ev.xcrossing.window))
-        || (c = frame_get_titlebar(ev.xcrossing.window))
-        || (c = frame_get_resize(ev.xcrossing.window)))
-          client_focus(c);
+     if((c = client_gb_win(ev->window))
+        || (c = client_gb_frame(ev->window))
+        || (c = client_gb_titlebar(ev->window))
+        || (c = client_gb_resize(ev->window)))
+             client_focus(c);
      else
           client_focus(NULL);
 
@@ -188,16 +187,16 @@ enternotify(XEvent ev)
 
 /* EXPOSE */
 void
-expose(XEvent ev)
+expose(XExposeEvent *ev)
 {
      Client *c;
 
-     if(ev.xexpose.count == 0
-        && (ev.xexpose.window == infobar.bar->win))
+     if(ev->count == 0
+        && (ev->window == infobar->bar->win))
           infobar_draw();
 
      for(c = clients; c; c = c->next)
-          if(ev.xexpose.window == c->titlebar)
+          if(ev->window == c->titlebar)
                frame_update(c);
 
      return;
@@ -205,9 +204,9 @@ expose(XEvent ev)
 
 /* FOCUSIN */
 void
-focusin(XEvent ev)
+focusin(XFocusChangeEvent *ev)
 {
-     if(sel && ev.xfocus.window != sel->win)
+     if(sel && ev->window != sel->win)
           XSetInputFocus(dpy, sel->win, RevertToPointerRoot, CurrentTime);
 
      return;
@@ -235,16 +234,16 @@ grabkeys(void)
 
 /* KEYPRESS */
 void
-keypress(XEvent ev)
+keypress(XKeyPressedEvent *ev)
 {
      uint i;
      KeySym keysym;
 
-     keysym = XKeycodeToKeysym(dpy, (KeyCode)ev.xkey.keycode, 0);
+     keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
      for(i = 0; i < conf.nkeybind; ++i)
           if(keysym == keys[i].keysym
              && (keys[i].mod & ~(numlockmask | LockMask)) ==
-             (ev.xkey.state & ~(numlockmask | LockMask))
+             (ev->state & ~(numlockmask | LockMask))
              && keys[i].func)
                keys[i].func(keys[i].cmd);
 
@@ -253,9 +252,9 @@ keypress(XEvent ev)
 
 /* MAPPINGNOTIFY */
 void
-mapnotify(XEvent ev)
+mapnotify(XMappingEvent *ev)
 {
-     if(ev.xmapping.request == MappingKeyboard)
+     if(ev->request == MappingKeyboard)
           grabkeys();
 
      return;
@@ -263,14 +262,14 @@ mapnotify(XEvent ev)
 
 /* MAPREQUEST */
 void
-maprequest(XEvent ev)
+maprequest(XMapRequestEvent *ev)
 {
      XWindowAttributes at;
 
-     CHECK(XGetWindowAttributes(dpy, ev.xmaprequest.window, &at));
+     CHECK(XGetWindowAttributes(dpy, ev->window, &at));
      CHECK(!at.override_redirect);
-     if(!client_get(ev.xmaprequest.window))
-          client_manage(ev.xmaprequest.window, &at);
+     if(!client_gb_win(ev->window))
+          client_manage(ev->window, &at);
 
      return;
 }
@@ -278,29 +277,29 @@ maprequest(XEvent ev)
 
 /* PROPERTYNOTIFY */
 void
-propertynotify(XEvent ev)
+propertynotify(XPropertyEvent *ev)
 {
      Client *c;
      Window trans;
 
-     if(event.xproperty.state == PropertyDelete)
+     if(ev->state == PropertyDelete)
           return;
-     if((c = client_get(event.xproperty.window)))
+     if((c = client_gb_win(ev->window)))
      {
-          switch(event.xproperty.atom)
+          switch(ev->atom)
           {
           default: break;
           case XA_WM_TRANSIENT_FOR:
                XGetTransientForHint(dpy, c->win, &trans);
-               if((c->tile || c->max) && (c->hint = (client_get(trans) != NULL)))
+               if((c->tile || c->max) && (c->hint = (client_gb_win(trans) != NULL)))
                     arrange();
                break;
           case XA_WM_NORMAL_HINTS:
                client_size_hints(c);
                break;
           }
-          if(ev.xproperty.atom == XA_WM_NAME
-             || ev.xproperty.atom == net_atom[NetWMName])
+          if(ev->atom == XA_WM_NAME
+             || ev->atom == net_atom[NetWMName])
                client_get_name(c);
      }
 
@@ -309,13 +308,13 @@ propertynotify(XEvent ev)
 
 
 void
-unmapnotify(XEvent ev)
+unmapnotify(XUnmapEvent *ev)
 {
      Client *c;
 
-     if((c = client_get(event.xunmap.window))
-        && ev.xunmap.event == root
-        && ev.xunmap.send_event
+     if((c = client_gb_win(ev->window))
+        && ev->event == root
+        && ev->send_event
         && getwinstate(c->win) == NormalState
         && !c->hide)
           client_unmanage(c);
@@ -325,21 +324,21 @@ unmapnotify(XEvent ev)
 
 /* Handle */
 void
-getevent(void)
+getevent(XEvent ev)
 {
-     switch (event.type)
+     switch (ev.type)
      {
-      case ButtonPress:       buttonpress(event);       break;
-      case ConfigureRequest:  configurerequest(event);  break;
-      case DestroyNotify:     destroynotify(event);     break;
-      case EnterNotify:       enternotify(event);       break;
-      case Expose:            expose(event);            break;
-      case FocusIn:           focusin(event);           break;
-      case KeyPress:          keypress(event);          break;
-      case MapRequest:        maprequest(event);        break;
-      case MappingNotify:     mapnotify(event);         break;
-      case PropertyNotify:    propertynotify(event);    break;
-      case UnmapNotify:       unmapnotify(event);       break;
+      case ButtonPress:       buttonpress(&ev.xbutton);       break;
+      case ConfigureRequest:  configurerequest(&ev.xconfigurerequest);  break;
+      case DestroyNotify:     destroynotify(&ev.xdestroywindow);     break;
+      case EnterNotify:       enternotify(&ev.xcrossing);       break;
+      case Expose:            expose(&ev.xexpose);            break;
+      case FocusIn:           focusin(&ev.xfocus);           break;
+      case KeyPress:          keypress(&ev.xkey);          break;
+      case MapRequest:        maprequest(&ev.xmaprequest);      break;
+      case MappingNotify:     mapnotify(&ev.xmapping);         break;
+      case PropertyNotify:    propertynotify(&ev.xproperty);    break;
+      case UnmapNotify:       unmapnotify(&ev.xunmap);       break;
      }
 
      return;

@@ -88,10 +88,10 @@ void draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color);
 ushort textw(const char *text);
 
 /* infobar.c */
-void infobar_init(InfoBar *ib);
+void infobar_init(void);
 void infobar_draw(void);
 void infobar_draw_layout(void);
-void infobar_draw_taglist(Drawable dr);
+void infobar_draw_taglist(void);
 void uicb_infobar_togglepos(uicb_t cmd);
 
 /* client.c */
@@ -99,7 +99,12 @@ int client_pertag(int tag);
 void client_attach(Client *c);
 void client_detach(Client *c);
 void client_focus(Client *c);
-Client *client_get(Window w);
+/* client_gb_*() {{{ */
+Client* client_gb_win(Window w);
+Client* client_gb_frame(Window w);
+Client* client_gb_titlebar(Window w);
+Client* client_gb_resize(Window w);
+/* }}} */
 void client_get_name(Client *c);
 void client_hide(Client *c);
 Bool ishide(Client *c);
@@ -119,29 +124,25 @@ void uicb_client_kill(uicb_t);
 /* frame.c */
 void frame_create(Client *c);
 void frame_moveresize(Client *c, XRectangle geo);
-Client* frame_get(Window w);
 void frame_update(Client *c);
-void frame_set_color(Client *c, uint bg);
-Client* frame_get_titlebar(Window w);
-Client* frame_get_resize(Window w);
 
 /* config.c */
 void init_conf(void);
 
 /* event.c */
-void buttonpress(XEvent ev);
-void configurerequest(XEvent ev);
-void destroynotify(XEvent ev);
-void enternotify(XEvent ev);
-void expose(XEvent ev);
-void focusin(XEvent ev);
+void buttonpress(XButtonEvent *ev);
+void configurerequest(XConfigureRequestEvent *ev);
+void destroynotify(XDestroyWindowEvent *ev);
+void enternotify(XCrossingEvent *ev);
+void expose(XExposeEvent *ev);
+void focusin(XFocusChangeEvent *ev);
 void grabkeys(void);
-void keypress(XEvent ev);
-void mapnotify(XEvent ev);
-void maprequest(XEvent ev);
-void propertynotify(XEvent ev);
-void unmapnotify(XEvent ev);
-void getevent(void);
+void keypress(XKeyPressedEvent *ev);
+void mapnotify(XMappingEvent *ev);
+void maprequest(XMapRequestEvent *ev);
+void propertynotify(XPropertyEvent *ev);
+void unmapnotify(XUnmapEvent *ev);
+void getevent(XEvent ev);
 
 /* mouse.c */
 void mouse_move(Client *c);
@@ -210,7 +211,6 @@ void uicb_quit(uicb_t);
 
 /* Principal */
 Display *dpy;
-XEvent event;
 GC gc;
 Window root;
 XRectangle sgeo;
@@ -218,7 +218,6 @@ int screen;
 Conf conf;
 Key *keys;
 Bool exiting;
-Bool owm;
 
 /* Atoms / Cursors */
 Atom wm_atom[WMLast];
@@ -229,7 +228,7 @@ Cursor cursor[CurLast];
 XftFont *font;
 
 /* InfoBar */
-InfoBar infobar;
+InfoBar *infobar;
 Tag tags[MAXTAG];
 int taglen[MAXTAG];
 int seltag;

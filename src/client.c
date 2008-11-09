@@ -147,20 +147,47 @@ client_focus(Client *c)
      return;
 }
 
-Client*
-client_get(Window w)
-{
-     Client *c;
+/* Get Client with any window Client member {{{ */
+     Client* client_gb_win(Window w)
+     {
+          Client *c;
 
-     for(c = clients; c && c->win != w; c = c->next);
+          for(c = clients; c && c->win != w; c = c->next);
 
-     return c;
-}
+          return c;
+     }
+
+     Client* client_gb_frame(Window w)
+     {
+          Client *c;
+
+          for(c = clients; c && c->frame != w; c = c->next);
+
+          return c;
+     }
+
+     Client* client_gb_titlebar(Window w)
+     {
+          Client *c;
+
+          for(c = clients; c && c->titlebar != w; c = c->next);
+
+          return c;
+     }
+
+     Client* client_gb_resize(Window w)
+     {
+          Client *c;
+
+          for(c = clients; c && c->resize != w; c = c->next);
+
+          return c;
+     }
+/* }}} */
 
 void
 client_get_name(Client *c)
 {
-
      XFetchName(dpy, c->win, &(c->title));
      if(!c->title)
           c->title = strdup("WMFS");
