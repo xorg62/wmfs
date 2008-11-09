@@ -129,19 +129,6 @@ typedef struct
      char statustext[1024];
 } InfoBar;
 
-/* Surface \o/ */
-typedef struct
-{
-     char *text;
-     Drawable dr;
-     Window win;
-     XRectangle geo;
-     MouseBinding mousebind[10];
-     int nmouse;
-     char *fg;
-     uint bg;
-} Surface;
-
 /* Layout Structure */
 typedef struct
 {

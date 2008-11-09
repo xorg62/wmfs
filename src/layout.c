@@ -499,6 +499,15 @@ uicb_togglefree(uicb_t cmd)
      sel->tile = False;
      sel->max  = False;
      sel->lmax = False;
+     if(sel->free)
+     {
+          sel->geo.x = sel->ogeo.x;
+          sel->geo.y = sel->ogeo.y;
+          sel->geo.width = sel->ogeo.width;
+          sel->geo.height = sel->ogeo.height;
+          client_moveresize(sel, sel->geo, True);
+     }
+
      client_raise(sel);
 
      arrange();
