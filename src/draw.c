@@ -32,6 +32,15 @@
 
 #include "wmfs.h"
 
+/** Draw a string in a Drawable
+ * \param d Drawable
+ * \param x X position
+ * \param y Y position
+ * \param fg Foreground text color
+ * \param bg Background text color
+ * \param pad Text padding
+ * \param str String that will be draw
+*/
 void
 draw_text(Drawable d, int x, int y, char* fg, uint bg, int pad, char *str)
 {
@@ -61,6 +70,14 @@ draw_text(Drawable d, int x, int y, char* fg, uint bg, int pad, char *str)
      return;
 }
 
+/** Draw a Rectangle in a drawable
+ * \param dr Drawable
+ * \param x X position
+ * \param y Y position
+ * \param w Width
+ * \param h Height
+ * \param color Color of the rectangle
+*/
 void
 draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color)
 {
@@ -72,6 +89,10 @@ draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color)
      return;
 }
 
+/** Calculates the text's size relatively to the font
+ * \param text Text string
+ * \return final text width
+*/
 ushort
 textw(const char *text)
 {

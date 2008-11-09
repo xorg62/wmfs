@@ -32,6 +32,8 @@
 
 #include "wmfs.h"
 
+/** Init the Infobar
+*/
 void
 infobar_init(void)
 {
@@ -60,6 +62,8 @@ infobar_init(void)
      return;
 }
 
+/** Draw the Infobar
+*/
 void
 infobar_draw(void)
 {
@@ -103,6 +107,8 @@ infobar_draw(void)
      return;
 }
 
+/** Draw the layout button in the InfoBar
+*/
 void
 infobar_draw_layout(void)
 {
@@ -155,6 +161,8 @@ infobar_draw_layout(void)
      return;
 }
 
+/** Draw the taglist in the InfoBar
+*/
 void
 infobar_draw_taglist(void)
 {
@@ -184,6 +192,9 @@ infobar_draw_taglist(void)
      return;
 }
 
+/** Toggle the infobar position
+ * \param cmd uicb_t type unused
+*/
 void
 uicb_infobar_togglepos(uicb_t cmd)
 {

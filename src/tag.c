@@ -32,8 +32,9 @@
 
 #include "wmfs.h"
 
-/* if cmd is +X or -X, this is just switch
- * else {1, 2.. 9} it's go to the wanted tag. */
+/** Set a tag
+ * \param cmd Tag number or '+' / '-'
+*/
 void
 uicb_tag(uicb_t cmd)
 {
@@ -61,6 +62,9 @@ uicb_tag(uicb_t cmd)
      return;
 }
 
+/** Set the next tag
+ * \param cmd uicb_t type unused
+*/
 void
 uicb_tag_next(uicb_t cmd)
 {
@@ -69,6 +73,9 @@ uicb_tag_next(uicb_t cmd)
      return;
 }
 
+/** Set the previous tag
+ * \param cmd uicb_t type unused
+*/
 void
 uicb_tag_prev(uicb_t cmd)
 {
@@ -77,6 +84,10 @@ uicb_tag_prev(uicb_t cmd)
      return;
 }
 
+/** Transfert the selected client to
+ *  the wanted tag
+ * \param cmd Wanted tag
+*/
 void
 uicb_tagtransfert(uicb_t cmd)
 {

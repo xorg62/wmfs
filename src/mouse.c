@@ -32,6 +32,9 @@
 
 #include "wmfs.h"
 
+/** Move the client with the mouse
+ * \param c Client pointer
+*/
 void
 mouse_move(Client *c)
 {
@@ -78,6 +81,9 @@ mouse_move(Client *c)
      return;
 }
 
+/** Resize a client with the mouse
+ * \param c Client pointer
+*/
 void
 mouse_resize(Client *c)
 {
@@ -172,6 +178,10 @@ mouse_resize(Client *c)
      return;
 }
 
+/** Grab buttons
+ * \param c Client pointer
+ * \param focused For know if c is or not focused
+*/
 void
 mouse_grabbuttons(Client *c, Bool focused)
 {
@@ -196,6 +206,9 @@ mouse_grabbuttons(Client *c, Bool focused)
      return;
 }
 
+/** Move the selected client
+ * \param cmd uicb_t type unused
+*/
 void
 uicb_mouse_move(uicb_t cmd)
 {
@@ -205,6 +218,9 @@ uicb_mouse_move(uicb_t cmd)
      return;
 }
 
+/** Reisze the selected client
+ * \param cmd uicb_t type unused
+*/
 void
 uicb_mouse_resize(uicb_t cmd)
 {

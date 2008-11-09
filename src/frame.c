@@ -32,6 +32,10 @@
 
 #include "wmfs.h"
 
+/** Frame creation function, for make a
+ *  client frame, and configure it
+ * \param c Client pointer
+*/
 void
 frame_create(Client *c)
 {
@@ -88,6 +92,10 @@ frame_create(Client *c)
      return;
 }
 
+/** Move a frame
+ * \param c The client frame
+ * \param geo Coordinate info for move the frame
+*/
 void
 frame_moveresize(Client *c, XRectangle geo)
 {
@@ -111,6 +119,9 @@ frame_moveresize(Client *c, XRectangle geo)
      return;
 }
 
+/** Update a frame
+ * \param c Client pointer
+*/
 void
 frame_update(Client *c)
 {

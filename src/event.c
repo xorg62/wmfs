@@ -32,7 +32,9 @@
 
 #include "wmfs.h"
 
-/* BUTTONPRESS */
+/** ButtonPress handle event
+ * \param ev XButtonEvent pointer
+*/
 void
 buttonpress(XButtonEvent *ev)
 {
@@ -119,7 +121,9 @@ buttonpress(XButtonEvent *ev)
      return;
 }
 
-/* CONFIGUREREQUEST */
+/** ConfigureRequest handle event
+ * \param ev XConfigureRequestEvent pointer
+*/
 void
 configurerequest(XConfigureRequestEvent *ev)
 {
@@ -167,7 +171,9 @@ configurerequest(XConfigureRequestEvent *ev)
      return;
 }
 
-/* DESTROYNOTIFY */
+/** DestroyNotify handle event
+ * \param ev XDestroyWindowEvent pointer
+*/
 void
 destroynotify(XDestroyWindowEvent *ev)
 {
@@ -178,7 +184,9 @@ destroynotify(XDestroyWindowEvent *ev)
      return;
 }
 
-/* ENTERNOTIFY */
+/** EnterNotify handle event
+ * \param ev XCrossingEvent pointer
+*/
 void
 enternotify(XCrossingEvent *ev)
 {
@@ -198,7 +206,9 @@ enternotify(XCrossingEvent *ev)
      return;
 }
 
-/* EXPOSE */
+/** ExposeEvent handle event
+ * \param ev XExposeEvent pointer
+*/
 void
 expose(XExposeEvent *ev)
 {
@@ -215,7 +225,10 @@ expose(XExposeEvent *ev)
      return;
 }
 
-/* FOCUSIN */
+/** FocusChange handle event
+ * \param ev XFocusChangeEvent pointer
+ * \return
+*/
 void
 focusin(XFocusChangeEvent *ev)
 {
@@ -225,6 +238,8 @@ focusin(XFocusChangeEvent *ev)
      return;
 }
 
+/** Key grabbing function
+*/
 void
 grabkeys(void)
 {
@@ -244,8 +259,9 @@ grabkeys(void)
      return;
 }
 
-
-/* KEYPRESS */
+/** KeyPress handle event
+ * \param ev XKeyPressedEvent pointer
+*/
 void
 keypress(XKeyPressedEvent *ev)
 {
@@ -263,7 +279,9 @@ keypress(XKeyPressedEvent *ev)
      return;
 }
 
-/* MAPPINGNOTIFY */
+/** MapNotify handle event
+ * \param ev XMappingEvent pointer
+*/
 void
 mapnotify(XMappingEvent *ev)
 {
@@ -273,7 +291,9 @@ mapnotify(XMappingEvent *ev)
      return;
 }
 
-/* MAPREQUEST */
+/** MapRequest handle event
+ * \param ev XMapRequestEvent pointer
+*/
 void
 maprequest(XMapRequestEvent *ev)
 {
@@ -287,8 +307,9 @@ maprequest(XMapRequestEvent *ev)
      return;
 }
 
-
-/* PROPERTYNOTIFY */
+/** PropertyNotify handle event
+ * \param ev XPropertyEvent pointer
+*/
 void
 propertynotify(XPropertyEvent *ev)
 {
@@ -319,6 +340,9 @@ propertynotify(XPropertyEvent *ev)
      return;
 }
 
+/** UnmapNotify handle event
+ * \param XUnmapEvent pointer
+*/
 void
 unmapnotify(XUnmapEvent *ev)
 {
@@ -334,7 +358,10 @@ unmapnotify(XUnmapEvent *ev)
      return;
 }
 
-/* Handle */
+/** Event handle function: execute every function
+  * handle by event
+ * \param ev Event
+*/
 void
 getevent(XEvent ev)
 {

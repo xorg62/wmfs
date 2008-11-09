@@ -32,6 +32,17 @@
 
 #include "wmfs.h"
 
+/** Create a BarWindow
+ * \param parent Parent window of the BarWindow
+ * \param x X position
+ * \param y Y position
+ * \param w BarWindow Width
+ * \param h BarWindow Height
+ * \param bord Bord width
+ * \param color BarWindow color
+ * \param entermask Bool for know if the EnterMask mask is needed
+ * \return The new BarWindow pointer
+*/
 BarWindow*
 bar_create(Window parent, int x, int y, uint w, uint h, int bord, uint color, Bool entermask)
 {
@@ -63,8 +74,11 @@ bar_create(Window parent, int x, int y, uint w, uint h, int bord, uint color, Bo
      bw->color = color;
 
      return bw;
- }
+}
 
+/** Delete a BarWindow
+ * \param bw BarWindow pointer
+*/
 void
 bar_delete(BarWindow *bw)
 {
@@ -76,6 +90,9 @@ bar_delete(BarWindow *bw)
      return;
 }
 
+/** Map a BarWindow
+ * \param bw BarWindow pointer
+*/
 void
 bar_map(BarWindow *bw)
 {
@@ -88,6 +105,9 @@ bar_map(BarWindow *bw)
      return;
 }
 
+/** Unmap a BarWindow
+ * \param bw BarWindow pointer
+*/
 void
 bar_unmap(BarWindow *bw)
 {
@@ -99,6 +119,11 @@ bar_unmap(BarWindow *bw)
      return;
 }
 
+/** Move a BarWindow
+ * \param bw BarWindow pointer
+ * \param x X position
+ * \param y Y poistion
+*/
 void
 bar_move(BarWindow *bw, int x, int y)
 {
@@ -110,6 +135,11 @@ bar_move(BarWindow *bw, int x, int y)
      return;
 }
 
+/** Resize a BarWindow
+ * \param bw BarWindow pointer
+ * \param w Width
+ * \param h Height
+*/
 void
 bar_resize(BarWindow *bw, uint w, uint h)
 {
@@ -123,6 +153,9 @@ bar_resize(BarWindow *bw, uint w, uint h)
      return;
 }
 
+/** Refresh the BarWindowColor
+ * \param bw BarWindow pointer
+*/
 void
 bar_refresh_color(BarWindow *bw)
 {
@@ -133,6 +166,9 @@ bar_refresh_color(BarWindow *bw)
      return;
 }
 
+/** Refresh a BarWindow
+ * \param bw BarWindow pointer
+*/
 void
 bar_refresh(BarWindow *bw)
 {

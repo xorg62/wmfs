@@ -32,6 +32,11 @@
 
 #include "wmfs.h"
 
+/** Calloc with an error message if there is a probleme
+ * \param uint Element
+ * \param uint Size
+ * \return void pointer
+*/
 void*
 emalloc(uint element, uint size)
 {
@@ -43,6 +48,9 @@ emalloc(uint element, uint size)
      return ret;
 }
 
+/** Free with a conditions
+ * \param ptr void pointer
+*/
 void
 efree(void *ptr)
 {
@@ -52,6 +60,10 @@ efree(void *ptr)
      return;
 }
 
+/** Get a color with a string
+ * \param color Color string
+ * \return Color pixel
+*/
 ulong
 getcolor(char *color)
 {
@@ -62,6 +74,10 @@ getcolor(char *color)
      return xcolor.pixel;
 }
 
+/** Get a Window WM State
+ * \param win Window
+ * \return The state
+*/
 long
 getwinstate(Window win)
 {
@@ -82,13 +98,20 @@ getwinstate(Window win)
      return ret;
 }
 
-
+/** Round function
+ * \param x double type
+ * \return the round of x
+*/
 double
 round(double x)
 {
      return (x > 0) ? x + 0.5 : x - 0.5;
 }
 
+/** Set the window WM State
+ * \param win Window target
+ * \param state WM State
+*/
 void
 setwinstate(Window win, long state)
 {
@@ -100,6 +123,9 @@ setwinstate(Window win, long state)
      return;
 }
 
+/** Execute a sh command
+ * \param cmd Command
+*/
 void
 uicb_spawn(uicb_t cmd)
 {

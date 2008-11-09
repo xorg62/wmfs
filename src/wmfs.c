@@ -32,7 +32,6 @@
 
 #include "wmfs.h"
 
-
 int
 errorhandler(Display *d, XErrorEvent *event)
 {
@@ -57,13 +56,14 @@ errorhandler(Display *d, XErrorEvent *event)
      return 1;
 }
 
-/* for no-important error */
 int
 errorhandlerdummy(Display *d, XErrorEvent *event)
 {
      return 0;
 }
 
+/** Clean wmfs before the exit
+ */
 void
 quit(void)
 {
@@ -85,6 +85,9 @@ quit(void)
      return;
 }
 
+/** WMFS main loop: Check stdin and
+ *  execute the event loop
+ */
 void
 mainloop(void)
 {
@@ -124,7 +127,7 @@ mainloop(void)
                          }
                     }
                }
-               else
+              else
                {
                     strncpy(infobar->statustext, sbuf, strlen(sbuf));
                     readstdin = False;
@@ -141,6 +144,11 @@ mainloop(void)
      return;
 }
 
+
+/** Set the exiting variable to True
+ *  for stop the main loop
+ * \param unused uicb_t
+ */
 void
 uicb_quit(uicb_t cmd)
 {
@@ -149,7 +157,9 @@ uicb_quit(uicb_t cmd)
      return;
 }
 
-/* scan all the client who was in X before wmfs */
+/** Scan if there are window on X
+ *  for manage it
+*/
 void
 scan(void)
 {
@@ -184,6 +194,9 @@ scan(void)
      return;
 }
 
+/** Signal handle function
+ * \param signum Signal number
+*/
 void
 handle_signal(int signum)
 {
@@ -205,6 +218,11 @@ handle_signal(int signum)
      return;
 }
 
+/** main function
+ * \param argc ?
+ * \param argv ?
+ * \return 0
+*/
 int
 main(int argc, char **argv)
 {

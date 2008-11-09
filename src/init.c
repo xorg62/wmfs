@@ -32,6 +32,8 @@
 
 #include "wmfs.h"
 
+/** Init WMFS
+*/
 void
 init(void)
 {
@@ -56,6 +58,8 @@ init(void)
      return;
 }
 
+/** Init the font
+*/
 void
 init_font(void)
 {
@@ -67,6 +71,8 @@ init_font(void)
      }
 }
 
+/** Init WMFS cursor
+*/
 void
 init_cursor(void)
 {
@@ -77,6 +83,8 @@ init_cursor(void)
      return;
 }
 
+/** Init key modifier
+*/
 void
 init_key(void)
 {
@@ -98,6 +106,8 @@ init_key(void)
      return;
 }
 
+/** Init atoms
+*/
 void
 init_atom(void)
 {
@@ -112,6 +122,8 @@ init_atom(void)
      return;
 }
 
+/** Init root Window
+*/
 void
 init_root(void)
 {
@@ -130,6 +142,8 @@ init_root(void)
      return;
 }
 
+/** Init screen geometry
+*/
 void
 init_geometry(void)
 {

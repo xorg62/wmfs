@@ -167,7 +167,8 @@ var_to_str(char *conf_choice)
      return NULL;
 }
 
-
+/** Configuration initialization
+*/
 void
 init_conf(void)
 {

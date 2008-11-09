@@ -32,6 +32,8 @@
 
 #include "wmfs.h"
 
+/** Arrange All
+*/
 void
 arrange(void)
 {
@@ -55,6 +57,8 @@ arrange(void)
      return;
 }
 
+/** The free layout function
+*/
 void
 freelayout(void)
 {
@@ -80,6 +84,9 @@ freelayout(void)
      return;
 }
 
+/** Layout switching function
+ * \param b Bool True : next False : previous
+*/
 void
 layoutswitch(Bool b)
 {
@@ -102,6 +109,9 @@ layoutswitch(Bool b)
      return;
 }
 
+/** Tile layout switching function
+ * \param b Bool True : next False : previous
+*/
 void
 layout_tile_switch(Bool b)
 {
@@ -125,6 +135,9 @@ layout_tile_switch(Bool b)
      return;
 }
 
+/** Set the next layout
+ * \param cmd uicb_t type unused
+*/
 void
 uicb_layout_next(uicb_t cmd)
 {
@@ -133,6 +146,9 @@ uicb_layout_next(uicb_t cmd)
      return;
 }
 
+/** Set the previous layout
+ * \param cmd uicb_t type unused
+*/
 void
 uicb_layout_prev(uicb_t cmd)
 {
@@ -141,6 +157,8 @@ uicb_layout_prev(uicb_t cmd)
      return;
 }
 
+/** Max layout function
+*/
 void
 maxlayout(void)
 {
@@ -166,8 +184,11 @@ maxlayout(void)
      return;
 }
 
-/* To use in a for, select only the
- * client who can be tiled */
+/** Sort all the client that can be
+ *  tiled
+ * \param c Client pointer
+ * \return a client pointer
+*/
 Client*
 nexttiled(Client *c)
 {
@@ -176,6 +197,9 @@ nexttiled(Client *c)
      return c;
 }
 
+/** Set the mwfact
+ * \param cmd Mwfact
+*/
 void
 uicb_set_mwfact(uicb_t cmd)
 {
@@ -193,6 +217,9 @@ uicb_set_mwfact(uicb_t cmd)
      return;
 }
 
+/** Set the nmaster
+ * \param cmd nmaster
+*/
 void
 uicb_set_nmaster(uicb_t cmd)
 {
@@ -211,6 +238,8 @@ uicb_set_nmaster(uicb_t cmd)
      return;
 }
 
+/** Grid layout function
+*/
 void
 grid(void)
 {
@@ -266,6 +295,9 @@ grid(void)
      return;
 }
 
+/** Multi tile function
+ * \param type Postion type { Top, Bottom, Left, Right }
+*/
 void
 multi_tile(Position type)
 {
@@ -394,6 +426,8 @@ multi_tile(Position type)
      return;
 }
 
+/** Tile Right function
+*/
 void
 tile(void)
 {
@@ -402,6 +436,8 @@ tile(void)
      return;
 }
 
+/** Tile Left function
+*/
 void
 tile_left(void)
 {
@@ -410,6 +446,8 @@ tile_left(void)
      return;
 }
 
+/** Tile Top function
+*/
 void
 tile_top(void)
 {
@@ -417,6 +455,10 @@ tile_top(void)
 
      return;
 }
+
+
+/** Tile Bottom function
+*/
 void
 tile_bottom(void)
 {
@@ -425,6 +467,9 @@ tile_bottom(void)
      return;
 }
 
+/** Put the selected client to the master postion
+ * \param cmd uicb_t type unused
+*/
 void
 uicb_tile_switch(uicb_t cmd)
 {
@@ -442,6 +487,9 @@ uicb_tile_switch(uicb_t cmd)
      return;
 }
 
+/** Toggle the selected client to free
+ * \param cmd uicb_t type unused
+*/
 void
 uicb_togglefree(uicb_t cmd)
 {
@@ -458,6 +506,9 @@ uicb_togglefree(uicb_t cmd)
      return;
 }
 
+/** Toggle the selected client to max
+ * \param cmd uicb_t type unused
+*/
 void
 uicb_togglemax(uicb_t cmd)
 {

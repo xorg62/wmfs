@@ -32,6 +32,11 @@
 
 #include "wmfs.h"
 
+/** Calcule how many of client there are
+ *  Per tag
+ * \param tag Tag number
+ * \return Number of client
+*/
 int
 client_pertag(int tag)
 {
@@ -45,6 +50,9 @@ client_pertag(int tag)
      return i;
 }
 
+/** Attach client in the client chain
+ * \param c Client pointer
+*/
 void
 client_attach(Client *c)
 {
@@ -56,6 +64,9 @@ client_attach(Client *c)
      return;
 }
 
+/** Send a ConfigureRequest event to the Client
+ * \param c Client pointer
+*/
 void
 client_configure(Client *c)
 {
@@ -77,7 +88,9 @@ client_configure(Client *c)
      return;
 }
 
-
+/** Detach a client to the client chain
+ * \param c Client pointer
+*/
 void
 client_detach(Client *c)
 {
@@ -89,7 +102,9 @@ client_detach(Client *c)
      return;
 }
 
-/* Fixed, need testing */
+/** Switch to the previous client
+ * \param cmd uicb_t type unused
+*/
 void
 uicb_client_prev(uicb_t cmd)
 {
@@ -116,6 +131,9 @@ uicb_client_prev(uicb_t cmd)
      return;
 }
 
+/** Switch to the next client
+ * \param cnd uicb_t type unused
+*/
 void
 uicb_client_next(uicb_t cmd)
 {
@@ -138,6 +156,9 @@ uicb_client_next(uicb_t cmd)
      return;
 }
 
+/** Set the focus to a client
+ * \param c Client pointer
+*/
 void
 client_focus(Client *c)
 {
@@ -170,6 +191,10 @@ client_focus(Client *c)
 }
 
 /* Get Client with any window Client member {{{ */
+/** Get a client->win with a window
+ * \param w Window
+ * \return The client
+*/
      Client* client_gb_win(Window w)
      {
           Client *c;
@@ -179,6 +204,10 @@ client_focus(Client *c)
           return c;
      }
 
+/** Get a client->frame with a window
+ * \param w Window
+ * \return The client
+*/
      Client* client_gb_frame(Window w)
      {
           Client *c;
@@ -188,6 +217,10 @@ client_focus(Client *c)
           return c;
      }
 
+/** Get a client->titlebar with a window
+ * \param w Window
+ * \return The client
+*/
      Client* client_gb_titlebar(Window w)
      {
           Client *c;
@@ -197,6 +230,10 @@ client_focus(Client *c)
           return c;
      }
 
+/** Get a client->resize with a window
+ * \param w Window
+ * \return The client
+*/
      Client* client_gb_resize(Window w)
      {
           Client *c;
@@ -207,6 +244,9 @@ client_focus(Client *c)
      }
 /* }}} */
 
+/** Get a client name
+ * \param c Client pointer
+*/
 void
 client_get_name(Client *c)
 {
@@ -219,6 +259,9 @@ client_get_name(Client *c)
      return;
 }
 
+/** Hide a client (for tag switching)
+ * \param c Client pointer
+*/
 void
 client_hide(Client *c)
 {
@@ -229,7 +272,10 @@ client_hide(Client *c)
      return;
 }
 
-
+/** Check if the client 'c' is hide
+ * \param c Client pointer
+ * \return True if the client is hide; False if not
+*/
 Bool
 ishide(Client *c)
 {
@@ -238,6 +284,9 @@ ishide(Client *c)
      return True;
 }
 
+/** Kill a client
+ * \param cmd uicb_t type unused
+*/
 void
 uicb_client_kill(uicb_t cmd)
 {
@@ -256,6 +305,9 @@ uicb_client_kill(uicb_t cmd)
      return;
 }
 
+/** Map a client
+ * \param c Client pointer
+*/
 void
 client_map(Client *c)
 {
@@ -267,6 +319,10 @@ client_map(Client *c)
      return;
 }
 
+/** Manage a client with a window and his attributes
+ * \param w Cient's futur Window
+ * \param wa XWindowAttributes pointer, Window w attributes
+*/
 void
 client_manage(Window w, XWindowAttributes *wa)
 {
@@ -304,6 +360,12 @@ client_manage(Window w, XWindowAttributes *wa)
      return;
 }
 
+/** Move and Resize a client
+ * \param c Client pointer
+ * \param geo Coordinate info for the future size
+ * of the client
+ * \param r Bool for resize hint or not
+*/
 void
 client_moveresize(Client *c, XRectangle geo, bool r)
 {
@@ -370,6 +432,9 @@ client_moveresize(Client *c, XRectangle geo, bool r)
      return;
 }
 
+/** Get client size hints
+ * \param c Client pointer
+*/
 void
 client_size_hints(Client *c)
 {
@@ -441,6 +506,9 @@ client_size_hints(Client *c)
      return;
 }
 
+/** Raise a client
+ * \param c Client pointer
+*/
 void
 client_raise(Client *c)
 {
@@ -452,6 +520,9 @@ client_raise(Client *c)
      return;
 }
 
+/** Raise the selected client
+ * \param cmd uicb_t type unused
+*/
 void
 uicb_client_raise(uicb_t cmd)
 {
@@ -460,6 +531,9 @@ uicb_client_raise(uicb_t cmd)
      return;
 }
 
+/** UnHide a client (for tag switching)
+ * \param c Client pointer
+*/
 void
 client_unhide(Client *c)
 {
@@ -470,6 +544,9 @@ client_unhide(Client *c)
      return;
 }
 
+/** Unmanage a client
+ * \param c Client pointer
+*/
 void
 client_unmanage(Client *c)
 {
@@ -498,6 +575,9 @@ client_unmanage(Client *c)
      return;
 }
 
+/** Unmap a client
+ * \param c Client pointer
+*/
 void
 client_unmap(Client *c)
 {
