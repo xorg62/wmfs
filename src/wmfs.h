@@ -98,6 +98,7 @@ void uicb_infobar_togglepos(uicb_t cmd);
 /* client.c */
 int client_pertag(int tag);
 void client_attach(Client *c);
+void client_configure(Client *c);
 void client_detach(Client *c);
 void client_focus(Client *c);
 /* client_gb_*() {{{ */

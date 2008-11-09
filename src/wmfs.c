@@ -194,7 +194,7 @@ handle_signal(int signum)
           XSetErrorHandler(errorhandlerdummy);
           for(c = clients; c; c = c->next)
           {
-               XReparentWindow(dpy, c->win, root, 0, 0);
+               XReparentWindow(dpy, c->win, root, c->frame_geo.x, c->frame_geo.y);
                client_unmanage(c);
           }
           fprintf(stderr, "\nExit WMFS... Bye !!\n");
@@ -260,7 +260,6 @@ main(int argc, char **argv)
      memset(&sig.sa_mask, 0, sizeof(sigset_t));
      sigaction(SIGTERM, &sig, NULL);
      sigaction(SIGINT, &sig, NULL);
-
 
      /* Check if an other WM is already running; set the error handler */
      XSetErrorHandler(errorhandler);

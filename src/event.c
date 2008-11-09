@@ -131,23 +131,36 @@ configurerequest(XConfigureRequestEvent *ev)
      {
           CHECK(!c->tile);
           CHECK(!c->lmax);
+
+          if(ev->value_mask & CWX)
+               geo.x = ev->x;
+          if(ev->value_mask & CWY)
+               geo.y = ev->y;
+          if(ev->value_mask & CWWidth)
+               geo.width = ev->width;
+          if(ev->value_mask & CWHeight)
+               geo.height = ev->height;
+
+          if(geo.x != c->geo.x || geo.y != c->geo.y
+               || geo.width != c->geo.width || geo.height != c->geo.height)
+          {
+               geo.x += BORDH;
+               geo.y += TBARH;
+               client_moveresize(c, geo, True);
+          }
+          else
+               client_configure(c);
      }
-     geo.x = wc.x = ev->x;
-     geo.y = wc.y = ev->y;
-     geo.width = wc.width = ev->width;
-     geo.height = wc.height = ev->height;
-     wc.border_width = ev->border_width;
-     wc.sibling = ev->above;
-     wc.stack_mode = ev->detail;
-
-     XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
-
-     if((c = client_gb_win(ev->window)))
+     else
      {
-          client_moveresize(c, geo, True);
-          XReparentWindow(dpy, c->win, c->frame,
-                          conf.client.borderheight,
-                          conf.titlebar.height + conf.client.borderheight);
+          wc.x = ev->x;
+          wc.y = ev->y;
+          wc.width = ev->width;
+          wc.height = ev->height;
+          wc.border_width = ev->border_width;
+          wc.sibling = ev->above;
+          wc.stack_mode = ev->detail;
+          XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
      }
      XSync(dpy, False);
 

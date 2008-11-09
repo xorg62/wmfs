@@ -57,6 +57,28 @@ client_attach(Client *c)
 }
 
 void
+client_configure(Client *c)
+{
+     XConfigureEvent ev;
+
+     ev.type               = ConfigureNotify;
+     ev.event              = c->win;
+     ev.window             = c->win;
+     ev.x                  = c->geo.x;
+     ev.y                  = c->geo.y;
+     ev.width              = c->geo.width;
+     ev.height             = c->geo.height;
+     ev.above              = None;
+     ev.border_width       = 0;
+     ev.override_redirect  = 0;
+
+     XSendEvent(dpy, c->win, False, StructureNotifyMask, (XEvent *)&ev);
+
+     return;
+}
+
+
+void
 client_detach(Client *c)
 {
      Client **cc;
