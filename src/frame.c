@@ -40,6 +40,7 @@ void
 frame_create(Client *c)
 {
      XSetWindowAttributes at;
+     int i;
 
      at.background_pixel = conf.client.bordernormal;
      at.background_pixmap = ParentRelative;
@@ -54,41 +55,48 @@ frame_create(Client *c)
      c->frame_geo.height     =  FRAMEH(c->geo.height);
      c->colors.frame         =  conf.client.bordernormal;
      c->colors.resizecorner  =  conf.client.resizecorner_normal;
-     c->colors.titlebar      =  conf.titlebar.fg_normal;
 
      /* Create frame window */
-     c->frame = XCreateWindow(dpy, root,
-                              c->frame_geo.x,
-                              c->frame_geo.y,
-                              c->frame_geo.width,
-                              c->frame_geo.height, 0,
-                              CopyFromParent, InputOutput, CopyFromParent,
-                              CWOverrideRedirect|CWBackPixmap|CWEventMask, &at);
+     CWIN(c->frame, root,
+          c->frame_geo.x,
+          c->frame_geo.y,
+          c->frame_geo.width,
+          c->frame_geo.height, 0,
+          CWOverrideRedirect|CWBackPixmap|CWEventMask, c->colors.frame, &at);
 
      /* Create titlebar window */
-     c->titlebar = XCreateWindow(dpy, c->frame, 0, 0,
-                                 c->frame_geo.width,
-                                 TBARH + BORDH, 0,
-                                 CopyFromParent, InputOutput, CopyFromParent,
-                                 CWEventMask|CWBackPixel, &at);
+     if(TBARH)
+          CWIN(c->titlebar, c->frame, 0, 0,
+               c->frame_geo.width,
+               TBARH + BORDH,
+               0, CWEventMask|CWBackPixel,
+               c->colors.frame, &at);
+
+     /* Titlebar buttons */
+     at.event_mask &= ~EnterWindowMask; /* <- Delete the EnterWindow mask */
+     if(CTBAR)
+          for(i = 0; i < LastButton; ++i)
+          {
+               CWIN(c->button[i], c->frame,
+                    BUTX(i), 2,
+                    BUTHW, BUTHW,
+                    1, CWEventMask|CWBackPixel,
+                    c->colors.frame, &at);
+               XSetWindowBorder(dpy, c->button[i], getcolor(conf.titlebar.fg));
+          }
 
      /* Create resize area */
      at.cursor = cursor[CurResize];
-     c->resize = XCreateWindow(dpy, c->frame,
-                               c->frame_geo.width - RESHW,
-                               c->frame_geo.height - RESHW,
-                               RESHW, RESHW, 0, CopyFromParent,
-                               InputOutput, CopyFromParent,
-                               CWEventMask|CWBackPixel|CWCursor, &at);
-
-     /* Color it */
-     XSetWindowBackground(dpy, c->resize, c->colors.resizecorner);
-     XSetWindowBackground(dpy, c->titlebar, c->colors.frame);
-     XSetWindowBackground(dpy, c->frame, c->colors.frame);
+     if(BORDH)
+          CWIN(c->resize, c->frame,
+               c->frame_geo.width - RESHW,
+               c->frame_geo.height - RESHW,
+               RESHW,
+               RESHW, 0,
+               CWEventMask|CWBackPixel|CWCursor, c->colors.resizecorner, &at);
 
      /* Reparent window with the frame */
      XReparentWindow(dpy, c->win, c->frame, BORDH, BORDH + TBARH);
-
      return;
 }
 
@@ -111,10 +119,12 @@ frame_moveresize(Client *c, XRectangle geo)
                        c->frame_geo.width,
                        c->frame_geo.height);
      /* Titlebar */
-     XResizeWindow(dpy, c->titlebar, c->frame_geo.width, TBARH + BORDH);
+     if(TBARH)
+          XResizeWindow(dpy, c->titlebar, c->frame_geo.width, TBARH + BORDH);
 
      /* Resize area */
-     XMoveWindow(dpy, c->resize, c->frame_geo.width - RESHW, c->frame_geo.height - RESHW);
+     if(BORDH)
+          XMoveWindow(dpy, c->resize, c->frame_geo.width - RESHW, c->frame_geo.height - RESHW);
 
      return;
 }
@@ -125,27 +135,33 @@ frame_moveresize(Client *c, XRectangle geo)
 void
 frame_update(Client *c)
 {
-     int px, py;
+     int i;
 
-     XSetWindowBackground(dpy, c->frame, c->colors.frame);
-     XSetWindowBackground(dpy, c->titlebar, c->colors.frame);
-     XSetWindowBackground(dpy, c->resize, c->colors.resizecorner);
-
-     XClearWindow(dpy, c->frame);
-     XClearWindow(dpy, c->titlebar);
-     XClearWindow(dpy, c->resize);
-
-     /* Draw the client title \in the titlebar *logeek* */
-     if((conf.titlebar.height + BORDH + 1) > font->height)
+     if(CTBAR)
+          for(i = 0; i < LastButton; ++i)
+          {
+               XSetWindowBackground(dpy, c->button[i], c->colors.frame);
+               XClearWindow(dpy, c->button[i]);
+          }
+     if(BORDH)
      {
-          /* x position of the text (center) */
-          px = (c->frame_geo.width / 2) - (textw(c->title) / 2);
-          /* y position of the text (center too) */
-          py = (font->height - (font->descent )) + (((TBARH + BORDH) - font->height) / 2);
-
-          draw_text(c->titlebar, px, py, c->colors.titlebar, c->colors.frame, 0, c->title);
+          XSetWindowBackground(dpy, c->resize, c->colors.resizecorner);
+          XClearWindow(dpy, c->resize);
+     }
+     if(TBARH)
+     {
+          XSetWindowBackground(dpy, c->titlebar, c->colors.frame);
+          XClearWindow(dpy, c->titlebar);
      }
 
+     XSetWindowBackground(dpy, c->frame, c->colors.frame);
+     XClearWindow(dpy, c->frame);
+
+     if((TBARH + BORDH + 1) > font->height)
+          draw_text(c->titlebar,
+                    (c->frame_geo.width / 2) - (textw(c->title) / 2),
+                    (font->height - (font->descent )) + (((TBARH + BORDH) - font->height) / 2),
+                    conf.titlebar.fg, c->colors.frame, 0, c->title);
      return;
 }
 

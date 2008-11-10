@@ -42,7 +42,7 @@ buttonpress(XButtonEvent *ev)
      int i;
      char s[6];
 
-     /* Frame & titlebar */
+     /* Titlebar */
      if((c = client_gb_titlebar(ev->window)))
           for(i = 0; i < conf.titlebar.nmouse; ++i)
                 if(ev->button == conf.titlebar.mouse[i].button)
@@ -145,11 +145,18 @@ configurerequest(XConfigureRequestEvent *ev)
           if(ev->value_mask & CWHeight)
                geo.height = ev->height;
 
-          if(geo.x != c->geo.x || geo.y != c->geo.y
-               || geo.width != c->geo.width || geo.height != c->geo.height)
+          if(geo.x != c->geo.x
+             || geo.y != c->geo.y
+             || geo.width != c->geo.width
+             || geo.height != c->geo.height)
           {
+               /*
+                * Adjust the client's future geo to
+                * set the correct position of the frame
+                */
                geo.x += BORDH;
                geo.y += TBARH;
+               /*  Resize  */
                client_moveresize(c, geo, True);
           }
           else
@@ -197,9 +204,9 @@ enternotify(XCrossingEvent *ev)
           return;
      if((c = client_gb_win(ev->window))
         || (c = client_gb_frame(ev->window))
-        || (c = client_gb_titlebar(ev->window))
-        || (c = client_gb_resize(ev->window)))
+        || (c = client_gb_titlebar(ev->window)))
              client_focus(c);
+
      else
           client_focus(NULL);
 
@@ -218,9 +225,8 @@ expose(XExposeEvent *ev)
         && (ev->window == infobar->bar->win))
           infobar_draw();
 
-     for(c = clients; c; c = c->next)
-          if(ev->window == c->titlebar)
-               frame_update(c);
+     if((c = client_gb_titlebar(ev->window)))
+          frame_update(c);
 
      return;
 }

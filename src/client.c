@@ -165,7 +165,6 @@ client_focus(Client *c)
      if(sel && sel != c)
      {
           sel->colors.frame = conf.client.bordernormal;
-          sel->colors.titlebar = conf.titlebar.fg_normal;
           sel->colors.resizecorner = conf.client.resizecorner_normal;
           frame_update(sel);
           mouse_grabbuttons(sel, False);
@@ -176,7 +175,6 @@ client_focus(Client *c)
      if(c)
      {
           c->colors.frame = conf.client.borderfocus;
-          c->colors.titlebar = conf.titlebar.fg_focus;
           c->colors.resizecorner = conf.client.resizecorner_focus;
           frame_update(c);
           mouse_grabbuttons(c, True);
@@ -242,6 +240,21 @@ client_focus(Client *c)
 
           return c;
      }
+
+/** Get a client->button[button_number] with a window
+ * \param b Button type
+ * \param w Window
+ * \return The client
+*/
+     Client* client_gb_button(ButtonType b, Window w)
+     {
+          Client *c;
+
+          for(c = clients; c && c->button[b] != w; c = c->next);
+
+          return c;
+     }
+
 /* }}} */
 
 /** Get a client name
@@ -333,13 +346,12 @@ client_manage(Window w, XWindowAttributes *wa)
      c = emalloc(1, sizeof(Client));
      c->win = w;
      c->geo.x = wa->x;
-     c->geo.y = wa->y + sgeo.y + conf.titlebar.height;
+     c->geo.y = wa->y + sgeo.y;
      c->geo.width = wa->width;
      c->geo.height = wa->height;
      c->tag = seltag;
 
      frame_create(c);
-
      XSelectInput(dpy, c->win, PropertyChangeMask | StructureNotifyMask);
      mouse_grabbuttons(c, False);
      client_size_hints(c);
@@ -498,7 +510,6 @@ client_size_hints(Client *c)
           c->maxay = size.max_aspect.y;
      }
      else
-
           c->minax = c->maxax = c->minay = c->maxay = 0;
      c->hint = (c->maxw && c->minw && c->maxh && c->minh
                 && c->maxw == c->minw && c->maxh == c->minh);

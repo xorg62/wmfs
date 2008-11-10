@@ -198,7 +198,7 @@ nexttiled(Client *c)
 }
 
 /** Set the mwfact
- * \param cmd Mwfact
+ * \param cmd Mwfact (string)
 */
 void
 uicb_set_mwfact(uicb_t cmd)
@@ -218,7 +218,7 @@ uicb_set_mwfact(uicb_t cmd)
 }
 
 /** Set the nmaster
- * \param cmd nmaster
+ * \param cmd Nmaster (string)
 */
 void
 uicb_set_nmaster(uicb_t cmd)
@@ -324,7 +324,7 @@ multi_tile(Position type)
           if(type == Top)
                mastergeo.y = (n <= nmaster) ? sgeo.y : sgeo.y + (sgeo.height - mwfact) - border;
           mastergeo.width = (sgeo.width / nmaster) - BORDH;
-          mastergeo.height = (n <= nmaster) ? sgeo.height - BORDH : mwfact;
+          mastergeo.height = (n <= nmaster) ? sgeo.height - border : mwfact;
      }
      else
      {
@@ -346,7 +346,7 @@ multi_tile(Position type)
 
      for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++i)
      {
-          /* Set client property, 'don't care */
+          /* Set client property */
           c->max = c->lmax = False;
           c->tile = True;
           c->ogeo.x = c->geo.x; c->ogeo.y = c->geo.y;

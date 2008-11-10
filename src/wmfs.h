@@ -59,18 +59,29 @@
 #define MouseMask    (ButtonMask | PointerMotionMask)
 #define KeyMask      (KeyPressMask | KeyReleaseMask)
 
+#define CWIN(win, parent, x, y, w, h, b, mask, col, at)                 \
+     win = XCreateWindow(dpy, parent, x, y, w, h, b, CopyFromParent,    \
+                         InputOutput, CopyFromParent, mask, at);        \
+     XSetWindowBackground(dpy, win, col);
+
 #define MAXH         DisplayHeight(dpy, screen)
 #define MAXW         DisplayWidth(dpy, screen)
 
-#define FRAMEW(w)    w + conf.client.borderheight * 2
-#define FRAMEH(h)    h + (conf.client.borderheight * 2) + conf.titlebar.height
 #define BORDH        conf.client.borderheight
 #define TBARH        conf.titlebar.height
-#define RESHW        15
+#define FRAMEW(w)    w + BORDH * 2
+#define FRAMEH(h)    h + (BORDH * 2) + TBARH
+
+/* To checking if wmfs can create and use the titlebar buttons */
+#define CTBAR        TBARH - BORDH > 1
+
+#define BUTHW        (BORDH + TBARH) - 6
+#define BUTX(b)      (b + 0.5) * BUTHW + BORDH + 1
+#define RESHW        5 * BORDH
 
 #define CHECK(x)     if(!x) return
 #define ITOA(p ,n)   sprintf(p, "%d", n)
-#define debug(p)     fprintf(stderr, "debug: %d\n", p)
+#define deb(p)       fprintf(stderr, "debug: %d\n", p)
 #define PAD          8
 
 /* bar.c */
@@ -106,6 +117,7 @@ Client* client_gb_win(Window w);
 Client* client_gb_frame(Window w);
 Client* client_gb_titlebar(Window w);
 Client* client_gb_resize(Window w);
+Client* client_gb_button(ButtonType b, Window w);
 /* }}} */
 void client_get_name(Client *c);
 void client_hide(Client *c);

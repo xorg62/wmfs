@@ -51,9 +51,12 @@ enum { CurNormal, CurResize, CurMove, CurLast };
 enum { WMState, WMProtocols, WMName, WMDelete, WMLast };
 enum { NetSupported, NetWMName, NetLast };
 typedef enum { Top = 0, Bottom, Right, Left, Center, PositionLast } Position;
+typedef enum { CloseButton = 0, MaxButton = 1, FreeButton = 2, LastButton } ButtonType;
 
-/* BarWindow Structure
- * (titlebar, topbar..) */
+/*
+ *  BarWindow Structure
+ * (titlebar, topbar..)
+ */
 typedef struct
 {
      Window win;
@@ -85,14 +88,12 @@ struct Client
      Window win;
      Window frame;
      Window resize, titlebar;
+     Window button[LastButton];
      struct
      {
           uint frame;
           uint resizecorner;
-          char *titlebar;
      } colors;
-     /* Border */
-     int border;
      /* Client Layout Information */
      Bool max, tile, free, hide;
      Bool hint, lmax, havetbar;
@@ -157,8 +158,10 @@ typedef struct
      int tagbordwidth;
      struct
      {
-          /* Only the colors will be use for text
-           * are 'char*' (for xprint -> XftColorAllocName) */
+          /*
+           * Only the colors will be use for text
+           * are 'char*' (for xprint -> XftColorAllocName)
+           */
           uint bar;
           char *text;
           char *tagselfg;
@@ -187,8 +190,7 @@ typedef struct
      struct
      {
           int height;
-          char *fg_focus;
-          char *fg_normal;
+          char *fg;
           MouseBinding *mouse;
           int nmouse;
      } titlebar;

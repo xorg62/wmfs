@@ -206,10 +206,9 @@ init_conf(void)
 
      static cfg_opt_t titlebar_opts[] =
           {
-               CFG_INT("height",     0,                 CFGF_NONE),
-               CFG_STR("fg_focus",   "#FFFFFF",         CFGF_NONE),
-               CFG_STR("fg_normal",  "#FFFFFF",         CFGF_NONE),
-               CFG_SEC("mouse",      mouse_button_opts, CFGF_MULTI),
+               CFG_INT("height", 0,                 CFGF_NONE),
+               CFG_STR("fg",     "#FFFFFF",         CFGF_NONE),
+               CFG_SEC("mouse",  mouse_button_opts, CFGF_MULTI),
                CFG_END()
           };
 
@@ -399,8 +398,7 @@ init_conf(void)
      /* titlebar (in client) */
      cfgtmp = cfg_getsec(cfg_client, "titlebar");
      conf.titlebar.height     = cfg_getint(cfgtmp, "height");
-     conf.titlebar.fg_focus   = var_to_str(cfg_getstr(cfgtmp, "fg_focus"));
-     conf.titlebar.fg_normal  = var_to_str(cfg_getstr(cfgtmp, "fg_normal"));
+     conf.titlebar.fg    = var_to_str(cfg_getstr(cfgtmp, "fg"));
      conf.titlebar.nmouse = cfg_size(cfgtmp, "mouse");
      conf.titlebar.mouse = emalloc(conf.titlebar.nmouse, sizeof(MouseBinding));
 
@@ -451,7 +449,8 @@ init_conf(void)
 
      /* tag */
      /* if there is no tag in the conf or more than
-      * MAXTAG (32) print an error and create only one. */
+      * MAXTAG (32) print an error and create only one.
+      */
      conf.colors.tagselfg  = strdup(var_to_str(cfg_getstr(cfg_tags, "sel_fg")));
      conf.colors.tagselbg  = getcolor(var_to_str(cfg_getstr(cfg_tags, "sel_bg")));
      conf.tagbordwidth     = cfg_getint(cfg_tags, "border_width");
