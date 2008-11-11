@@ -70,9 +70,9 @@ client
         border_normal         = "#191919"
         border_focus          = "#003366"
         resize_corner_normal  = "#191919"
-        resize_corner_focus   = "#771103"
-        modifier              = "Alt"
+        resize_corner_focus   = "#003366"
 
+        modifier              = "Alt"
         mouse { button = "1" func = "client_raise" }
         mouse { button = "1" func = "mouse_move" }
         mouse { button = "2" func = "tile_switch" }

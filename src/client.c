@@ -240,21 +240,6 @@ client_focus(Client *c)
 
           return c;
      }
-
-/** Get a client->button[button_number] with a window
- * \param b Button type
- * \param w Window
- * \return The client
-*/
-     Client* client_gb_button(ButtonType b, Window w)
-     {
-          Client *c;
-
-          for(c = clients; c && c->button[b] != w; c = c->next);
-
-          return c;
-     }
-
 /* }}} */
 
 /** Get a client name

@@ -40,15 +40,16 @@ void
 frame_create(Client *c)
 {
      XSetWindowAttributes at;
-     int i;
 
      at.background_pixel = conf.client.bordernormal;
      at.background_pixmap = ParentRelative;
      at.override_redirect = True;
-     at.event_mask = SubstructureRedirectMask|SubstructureNotifyMask|ExposureMask|
-          VisibilityChangeMask|EnterWindowMask|FocusChangeMask|KeyMask|ButtonMask|MouseMask;
+     at.event_mask = SubstructureRedirectMask|SubstructureNotifyMask
+          |ExposureMask|VisibilityChangeMask
+          |EnterWindowMask|LeaveWindowMask|FocusChangeMask
+          |KeyMask|ButtonMask|MouseMask;
 
-     /* Set size */
+     /* Set property */
      c->frame_geo.x          =  c->geo.x - BORDH;
      c->frame_geo.y          =  c->geo.y - TBARH;
      c->frame_geo.width      =  FRAMEW(c->geo.width);
@@ -66,34 +67,31 @@ frame_create(Client *c)
 
      /* Create titlebar window */
      if(TBARH)
+     {
           CWIN(c->titlebar, c->frame, 0, 0,
                c->frame_geo.width,
-               TBARH + BORDH,
-               0, CWEventMask|CWBackPixel,
+               (TBARH - SHADH*2) + BORDH,
+               1, CWEventMask|CWBackPixel,
                c->colors.frame, &at);
-
+          XSetWindowBorder(dpy, c->titlebar, 0x212121);
+     }
      /* Titlebar buttons */
-     at.event_mask &= ~EnterWindowMask; /* <- Delete the EnterWindow mask */
-     if(CTBAR)
-          for(i = 0; i < LastButton; ++i)
-          {
-               CWIN(c->button[i], c->frame,
-                    BUTX(i), 2,
-                    BUTHW, BUTHW,
-                    1, CWEventMask|CWBackPixel,
-                    c->colors.frame, &at);
-               XSetWindowBorder(dpy, c->button[i], getcolor(conf.titlebar.fg));
-          }
+     at.event_mask &= ~(EnterWindowMask | LeaveWindowMask); /* <- Delete useless mask */
 
      /* Create resize area */
      at.cursor = cursor[CurResize];
-     if(BORDH)
-          CWIN(c->resize, c->frame,
-               c->frame_geo.width - RESHW,
-               c->frame_geo.height - RESHW,
-               RESHW,
-               RESHW, 0,
-               CWEventMask|CWBackPixel|CWCursor, c->colors.resizecorner, &at);
+     CWIN(c->resize, c->frame,
+          c->frame_geo.width - RESHW,
+          c->frame_geo.height - RESHW,
+          RESHW,
+          RESHW, 0,
+          CWEventMask|CWBackPixel|CWCursor, c->colors.resizecorner, &at);
+
+     /* Border (for shadow) */
+     CWIN(c->left,   c->frame, 0, 0, SHADH, c->frame_geo.height, 0, CWBackPixel, 0x585858, &at);
+     CWIN(c->top,    c->frame, 0, 0, c->frame_geo.width, SHADH, 0, CWBackPixel, 0x585858, &at);
+     CWIN(c->bottom, c->frame, 0, c->frame_geo.height, c->frame_geo.width, SHADH, 0, CWBackPixel, 0x212121, &at);
+     CWIN(c->right,  c->frame, c->frame_geo.width - SHADH, 0, SHADH, c->frame_geo.height, 0, CWBackPixel, 0x212121, &at);
 
      /* Reparent window with the frame */
      XReparentWindow(dpy, c->win, c->frame, BORDH, BORDH + TBARH);
@@ -118,13 +116,19 @@ frame_moveresize(Client *c, XRectangle geo)
                        c->frame_geo.y,
                        c->frame_geo.width,
                        c->frame_geo.height);
+
      /* Titlebar */
      if(TBARH)
-          XResizeWindow(dpy, c->titlebar, c->frame_geo.width, TBARH + BORDH);
+          XResizeWindow(dpy, c->titlebar, c->frame_geo.width, (TBARH - SHADH*2)  + BORDH);
 
      /* Resize area */
-     if(BORDH)
-          XMoveWindow(dpy, c->resize, c->frame_geo.width - RESHW, c->frame_geo.height - RESHW);
+     XMoveWindow(dpy, c->resize, c->frame_geo.width - RESHW, c->frame_geo.height - RESHW);
+
+     /* Border */
+     XResizeWindow(dpy, c->left, SHADH, c->frame_geo.height - SHADH);
+     XResizeWindow(dpy, c->top, c->frame_geo.width, SHADH);
+     XMoveResizeWindow(dpy, c->bottom, 0, c->frame_geo.height - SHADH, c->frame_geo.width, SHADH);
+     XMoveResizeWindow(dpy, c->right, c->frame_geo.width - SHADH, 0, SHADH, c->frame_geo.height);
 
      return;
 }
@@ -135,19 +139,6 @@ frame_moveresize(Client *c, XRectangle geo)
 void
 frame_update(Client *c)
 {
-     int i;
-
-     if(CTBAR)
-          for(i = 0; i < LastButton; ++i)
-          {
-               XSetWindowBackground(dpy, c->button[i], c->colors.frame);
-               XClearWindow(dpy, c->button[i]);
-          }
-     if(BORDH)
-     {
-          XSetWindowBackground(dpy, c->resize, c->colors.resizecorner);
-          XClearWindow(dpy, c->resize);
-     }
      if(TBARH)
      {
           XSetWindowBackground(dpy, c->titlebar, c->colors.frame);
@@ -155,12 +146,14 @@ frame_update(Client *c)
      }
 
      XSetWindowBackground(dpy, c->frame, c->colors.frame);
+     XSetWindowBackground(dpy, c->resize, c->colors.resizecorner);
+     XClearWindow(dpy, c->resize);
      XClearWindow(dpy, c->frame);
 
      if((TBARH + BORDH + 1) > font->height)
           draw_text(c->titlebar,
                     (c->frame_geo.width / 2) - (textw(c->title) / 2),
-                    (font->height - (font->descent )) + (((TBARH + BORDH) - font->height) / 2),
+                    (font->height - (font->descent))  + (((TBARH + BORDH) - font->height) / 2),
                     conf.titlebar.fg, c->colors.frame, 0, c->title);
      return;
 }

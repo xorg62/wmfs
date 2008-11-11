@@ -378,7 +378,8 @@ init_conf(void)
      }
 
      /* client */
-     conf.client.borderheight        = cfg_getint(cfg_client, "border_height");
+     conf.client.borderheight        = (cfg_getint(cfg_client, "border_height"))
+          ? cfg_getint(cfg_client, "border_height") : 1;
      conf.client.bordernormal        = getcolor(var_to_str(cfg_getstr(cfg_client, "border_normal")));
      conf.client.borderfocus         = getcolor(var_to_str(cfg_getstr(cfg_client, "border_focus")));
      conf.client.resizecorner_normal = getcolor(var_to_str(cfg_getstr(cfg_client, "resize_corner_normal")));

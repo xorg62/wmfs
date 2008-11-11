@@ -67,6 +67,7 @@
 #define MAXH         DisplayHeight(dpy, screen)
 #define MAXW         DisplayWidth(dpy, screen)
 
+#define SHADH        1
 #define BORDH        conf.client.borderheight
 #define TBARH        conf.titlebar.height
 #define FRAMEW(w)    w + BORDH * 2
@@ -117,7 +118,6 @@ Client* client_gb_win(Window w);
 Client* client_gb_frame(Window w);
 Client* client_gb_titlebar(Window w);
 Client* client_gb_resize(Window w);
-Client* client_gb_button(ButtonType b, Window w);
 /* }}} */
 void client_get_name(Client *c);
 void client_hide(Client *c);

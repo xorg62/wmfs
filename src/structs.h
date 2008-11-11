@@ -86,9 +86,8 @@ struct Client
      int minax, maxax, minay, maxay;
      /* Client composant */
      Window win;
-     Window frame;
-     Window resize, titlebar;
-     Window button[LastButton];
+     Window frame, resize, titlebar;
+     Window right, left, top, bottom;
      struct
      {
           uint frame;
