@@ -68,18 +68,19 @@
 #define MAXW         DisplayWidth(dpy, screen)
 
 #define SHADH        1
+#define SHADC        0x000000
 #define BORDH        conf.client.borderheight
 #define TBARH        conf.titlebar.height
 #define FRAMEW(w)    w + BORDH * 2
 #define FRAMEH(h)    h + (BORDH * 2) + TBARH
 
-/* To checking if wmfs can create and use the titlebar buttons */
+/* To checking if wmfs can create
+ * and use the titlebar buttons */
 #define CTBAR        TBARH - BORDH > 1
 
 #define BUTHW        (BORDH + TBARH) - 6
 #define BUTX(b)      (b + 0.5) * BUTHW + BORDH + 1
 #define RESHW        5 * BORDH
-
 #define CHECK(x)     if(!x) return
 #define ITOA(p ,n)   sprintf(p, "%d", n)
 #define deb(p)       fprintf(stderr, "debug: %d\n", p)
@@ -166,6 +167,7 @@ void uicb_mouse_move(uicb_t cmd);
 void uicb_mouse_resize(uicb_t cmd);
 
 /* util.c */
+ulong color_enlight(ulong col);
 void *emalloc(uint element, uint size);
 void efree(void *ptr);
 ulong getcolor(char *color);

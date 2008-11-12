@@ -70,10 +70,10 @@ frame_create(Client *c)
      {
           CWIN(c->titlebar, c->frame, 0, 0,
                c->frame_geo.width,
-               (TBARH - SHADH*2) + BORDH,
+               (TBARH + SHADH/2) + BORDH,
                1, CWEventMask|CWBackPixel,
                c->colors.frame, &at);
-          XSetWindowBorder(dpy, c->titlebar, 0x212121);
+          XSetWindowBorder(dpy, c->titlebar, SHADC);
      }
      /* Titlebar buttons */
      at.event_mask &= ~(EnterWindowMask | LeaveWindowMask); /* <- Delete useless mask */
@@ -88,13 +88,18 @@ frame_create(Client *c)
           CWEventMask|CWBackPixel|CWCursor, c->colors.resizecorner, &at);
 
      /* Border (for shadow) */
-     CWIN(c->left,   c->frame, 0, 0, SHADH, c->frame_geo.height, 0, CWBackPixel, 0x585858, &at);
-     CWIN(c->top,    c->frame, 0, 0, c->frame_geo.width, SHADH, 0, CWBackPixel, 0x585858, &at);
-     CWIN(c->bottom, c->frame, 0, c->frame_geo.height, c->frame_geo.width, SHADH, 0, CWBackPixel, 0x212121, &at);
-     CWIN(c->right,  c->frame, c->frame_geo.width - SHADH, 0, SHADH, c->frame_geo.height, 0, CWBackPixel, 0x212121, &at);
+     CWIN(c->left,   c->frame, 0, 0, SHADH, c->frame_geo.height, 0,
+          CWBackPixel, color_enlight(c->colors.frame), &at);
+     CWIN(c->top,    c->frame, 0, 0, c->frame_geo.width, SHADH, 0,
+          CWBackPixel, color_enlight(c->colors.frame), &at);
+     CWIN(c->bottom, c->frame, 0, c->frame_geo.height, c->frame_geo.width, SHADH, 0,
+          CWBackPixel, SHADC, &at);
+     CWIN(c->right,  c->frame, c->frame_geo.width - SHADH, 0, SHADH, c->frame_geo.height, 0,
+          CWBackPixel, SHADC, &at);
 
      /* Reparent window with the frame */
      XReparentWindow(dpy, c->win, c->frame, BORDH, BORDH + TBARH);
+
      return;
 }
 
@@ -133,7 +138,8 @@ frame_moveresize(Client *c, XRectangle geo)
      return;
 }
 
-/** Update a frame
+/** Update the client frame; Set the new color
+ *  and the title ---> refresh all
  * \param c Client pointer
 */
 void
@@ -142,13 +148,22 @@ frame_update(Client *c)
      if(TBARH)
      {
           XSetWindowBackground(dpy, c->titlebar, c->colors.frame);
+          XSetWindowBorder(dpy, c->titlebar, SHADC);
           XClearWindow(dpy, c->titlebar);
      }
-
-     XSetWindowBackground(dpy, c->frame, c->colors.frame);
+     XSetWindowBackground(dpy, c->frame,  c->colors.frame);
      XSetWindowBackground(dpy, c->resize, c->colors.resizecorner);
+     XSetWindowBackground(dpy, c->left,   color_enlight(c->colors.frame));
+     XSetWindowBackground(dpy, c->top,    color_enlight(c->colors.frame));
+     XSetWindowBackground(dpy, c->right,  SHADC);
+     XSetWindowBackground(dpy, c->bottom, SHADC);
+
      XClearWindow(dpy, c->resize);
      XClearWindow(dpy, c->frame);
+     XClearWindow(dpy, c->left);
+     XClearWindow(dpy, c->top);
+     XClearWindow(dpy, c->right);
+     XClearWindow(dpy, c->bottom);
 
      if((TBARH + BORDH + 1) > font->height)
           draw_text(c->titlebar,
