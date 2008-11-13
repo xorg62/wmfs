@@ -237,7 +237,6 @@ init_conf(void)
           {
                CFG_STR("fg",           "#FFFFFF",   CFGF_NONE),
                CFG_STR("bg",           "#292929",   CFGF_NONE),
-               CFG_STR("tile_symbol",  "TILE", CFGF_NONE),
                CFG_SEC("layout",       layout_opts, CFGF_MULTI),
                CFG_END()
           };
@@ -414,7 +413,6 @@ init_conf(void)
      /* layout */
      conf.colors.layout_fg  = strdup(var_to_str(cfg_getstr(cfg_layouts, "fg")));
      conf.colors.layout_bg  = getcolor(var_to_str(cfg_getstr(cfg_layouts, "bg")));
-     conf.tile_symbol = var_to_str(cfg_getstr(cfg_layouts, "tile_symbol"));
 
      if((conf.nlayout = cfg_size(cfg_layouts, "layout")) > NUM_OF_LAYOUT
           || !(conf.nlayout = cfg_size(cfg_layouts, "layout")))

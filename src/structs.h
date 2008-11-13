@@ -202,7 +202,6 @@ typedef struct
      } titlebar;
      Tag tag[MAXTAG];
      Layout layout[NUM_OF_LAYOUT];
-     char *tile_symbol;
      int ntag;
      int nkeybind;
      int nbutton;

@@ -25,7 +25,6 @@ layouts
         bg = "#7E89A2"
 
         # Tiling layouts
-        tile_symbol = "TILE"
         layout { type = "tile_right"   symbol = "RIGHT" }
         layout { type = "tile_left"    symbol = "LEFT" }
         layout { type = "tile_top"     symbol = "TOP" }
