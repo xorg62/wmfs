@@ -134,7 +134,9 @@ configurerequest(XConfigureRequestEvent *ev)
                geo.x += BORDH;
                geo.y += TBARH;
                /*  Resize  */
-               client_moveresize(c, geo, True);
+               if((geo.x < MAXW && geo.x > geo.width)
+                  && geo.y < MAXH && geo.y > geo.height)
+                    client_moveresize(c, geo, True);
           }
           else
                client_configure(c);

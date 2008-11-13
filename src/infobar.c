@@ -65,7 +65,6 @@ infobar_init(void)
      bar_map(infobar->bar);
      bar_refresh_color(infobar->bar);
      bar_refresh(infobar->bar);
-
      XMapSubwindows(dpy, infobar->layout_button->win);
 
      strcpy(infobar->statustext, "WMFS-" WMFS_VERSION);
@@ -86,7 +85,7 @@ infobar_draw(void)
 
      /* Draw status text */
      draw_text(infobar->bar->dr,
-               MAXW - textw(infobar->statustext),
+               (MAXW - SHADH) - textw(infobar->statustext),
                font->height,
                conf.colors.text, 0,
                infobar->statustext);
