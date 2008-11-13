@@ -84,10 +84,10 @@
 #define CHECK(x)     if(!x) return
 #define ITOA(p ,n)   sprintf(p, "%d", n)
 #define deb(p)       fprintf(stderr, "debug: %d\n", p)
-#define PAD          8
+#define PAD          14
 
 /* bar.c */
-BarWindow *bar_create(Window parent, int x, int y, uint w, uint h, int bord, uint color, Bool entermask);
+BarWindow *bar_create(Window parent, int x, int y, uint w, uint h, uint color, Bool entermask);
 void bar_delete(BarWindow *bw);
 void bar_map(BarWindow *bw);
 void bar_unmap(BarWindow *bw);
@@ -97,7 +97,7 @@ void bar_refresh_color(BarWindow *bw);
 void bar_refresh(BarWindow *bw);
 
 /* draw.c */
-void draw_text(Drawable d, int x, int y, char* fg, uint bg, int pad, char *str);
+void draw_text(Drawable d, int x, int y, char* fg, int pad, char *str);
 void draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color);
 ushort textw(const char *text);
 
@@ -106,6 +106,7 @@ void infobar_init(void);
 void infobar_draw(void);
 void infobar_draw_layout(void);
 void infobar_draw_taglist(void);
+void infobar_destroy(void);
 void uicb_infobar_togglepos(uicb_t cmd);
 
 /* client.c */
@@ -249,6 +250,7 @@ InfoBar *infobar;
 Tag tags[MAXTAG];
 int taglen[MAXTAG];
 int seltag;
+int prevtag;
 
 /* Important Client */
 Client *clients;

@@ -67,15 +67,8 @@ frame_create(Client *c)
 
      /* Create titlebar window */
      if(TBARH)
-     {
-          CWIN(c->titlebar, c->frame, 0, 0,
-               c->frame_geo.width,
-               (TBARH + SHADH/2) + BORDH,
-               1, CWEventMask|CWBackPixel,
-               c->colors.frame, &at);
-          XSetWindowBorder(dpy, c->titlebar, SHADC);
-     }
-     /* Titlebar buttons */
+          c->titlebar = bar_create(c->frame, 0, 0, c->frame_geo.width, TBARH + BORDH, c->colors.frame, True);
+
      at.event_mask &= ~(EnterWindowMask | LeaveWindowMask); /* <- Delete useless mask */
 
      /* Create resize area */
@@ -124,7 +117,7 @@ frame_moveresize(Client *c, XRectangle geo)
 
      /* Titlebar */
      if(TBARH)
-          XResizeWindow(dpy, c->titlebar, c->frame_geo.width, (TBARH - SHADH*2)  + BORDH);
+          bar_resize(c->titlebar, c->frame_geo.width, TBARH + BORDH);
 
      /* Resize area */
      XMoveWindow(dpy, c->resize, c->frame_geo.width - RESHW, c->frame_geo.height - RESHW);
@@ -139,7 +132,7 @@ frame_moveresize(Client *c, XRectangle geo)
 }
 
 /** Update the client frame; Set the new color
- *  and the title ---> refresh all
+ *  and the title --> refresh
  * \param c Client pointer
 */
 void
@@ -147,10 +140,10 @@ frame_update(Client *c)
 {
      if(TBARH)
      {
-          XSetWindowBackground(dpy, c->titlebar, c->colors.frame);
-          XSetWindowBorder(dpy, c->titlebar, SHADC);
-          XClearWindow(dpy, c->titlebar);
+          c->titlebar->color = c->colors.frame;
+          bar_refresh_color(c->titlebar);
      }
+
      XSetWindowBackground(dpy, c->frame,  c->colors.frame);
      XSetWindowBackground(dpy, c->resize, c->colors.resizecorner);
      XSetWindowBackground(dpy, c->left,   color_enlight(c->colors.frame));
@@ -166,10 +159,14 @@ frame_update(Client *c)
      XClearWindow(dpy, c->bottom);
 
      if((TBARH + BORDH + 1) > font->height)
-          draw_text(c->titlebar,
+     {
+          draw_text(c->titlebar->dr,
                     (c->frame_geo.width / 2) - (textw(c->title) / 2),
                     (font->height - (font->descent))  + (((TBARH + BORDH) - font->height) / 2),
-                    conf.titlebar.fg, c->colors.frame, 0, c->title);
+                    conf.titlebar.fg, 0, c->title);
+          bar_refresh(c->titlebar);
+     }
+
      return;
 }
 

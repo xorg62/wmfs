@@ -72,9 +72,7 @@ quit(void)
      XFreeCursor(dpy, cursor[CurNormal]);
      XFreeCursor(dpy, cursor[CurMove]);
      XFreeCursor(dpy, cursor[CurResize]);
-     bar_delete(infobar->bar);
-     bar_delete(infobar->layout_switch);
-     bar_delete(infobar->layout_type_switch);
+     infobar_destroy();
      efree(infobar);
      efree(keys);
      efree(conf.titlebar.mouse);

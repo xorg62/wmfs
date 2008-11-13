@@ -223,7 +223,7 @@ client_focus(Client *c)
      {
           Client *c;
 
-          for(c = clients; c && c->titlebar != w; c = c->next);
+          for(c = clients; c && c->titlebar->win != w; c = c->next);
 
           return c;
      }
@@ -313,6 +313,7 @@ client_map(Client *c)
 
      XMapWindow(dpy, c->frame);
      XMapSubwindows(dpy, c->frame);
+     bar_map(c->titlebar);
 
      return;
 }
@@ -563,6 +564,7 @@ client_unmanage(Client *c)
      setwinstate(c->win, WithdrawnState);
      XDestroySubwindows(dpy, c->frame);
      XDestroyWindow(dpy, c->frame);
+     bar_delete(c->titlebar);
      XFree(c->title);
      efree(c);
      XSync(dpy, False);
@@ -581,6 +583,7 @@ client_unmap(Client *c)
 
      XUnmapWindow(dpy, c->frame);
      XUnmapSubwindows(dpy, c->frame);
+     bar_unmap(c->titlebar);
 
      return;
 }

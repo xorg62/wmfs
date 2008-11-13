@@ -37,22 +37,17 @@
  * \param x X position
  * \param y Y position
  * \param fg Foreground text color
- * \param bg Background text color
  * \param pad Text padding
  * \param str String that will be draw
 */
 void
-draw_text(Drawable d, int x, int y, char* fg, uint bg, int pad, char *str)
+draw_text(Drawable d, int x, int y, char* fg, int pad, char *str)
 {
      XftColor xftcolor;
      XftDraw *xftd;
 
      /* Transform X Drawable -> Xft Drawable */
      xftd = XftDrawCreate(dpy, d, DefaultVisual(dpy, screen), DefaultColormap(dpy, screen));
-
-     /* Color the text font */
-     draw_rectangle(d, x - pad/2, 0, textw(str) + pad, infobar->geo.height, bg);
-
 
      /* Alloc text color */
      XftColorAllocName(dpy, DefaultVisual(dpy, screen),

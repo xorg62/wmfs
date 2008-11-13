@@ -37,14 +37,15 @@
  * \param x X position
  * \param y Y position
  * \param w BarWindow Width
- * \param h BarWindow Height
- * \param bord Bord width
+ * \param h BarWindow HeightXS
  * \param color BarWindow color
  * \param entermask Bool for know if the EnterMask mask is needed
  * \return The new BarWindow pointer
 */
 BarWindow*
-bar_create(Window parent, int x, int y, uint w, uint h, int bord, uint color, Bool entermask)
+bar_create(Window parent,
+           int x, int y, uint w, uint h,
+           uint color, Bool entermask)
 {
      XSetWindowAttributes at;
      BarWindow *bw;
@@ -61,17 +62,25 @@ bar_create(Window parent, int x, int y, uint w, uint h, int bord, uint color, Bo
           at.event_mask = SubstructureRedirectMask | SubstructureNotifyMask |
                ButtonPressMask | ExposureMask | StructureNotifyMask;
 
-     bw->win = XCreateWindow(dpy, parent, x, y, w, h, bord, DefaultDepth(dpy, screen),
+     /* Create window */
+     bw->win = XCreateWindow(dpy, parent, x, y, w, h, 0, DefaultDepth(dpy, screen),
                              CopyFromParent, DefaultVisual(dpy, screen),
                              CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
      bw->dr = XCreatePixmap(dpy, parent, w, h, DefaultDepth(dpy, screen));
+
+     /* His border */
+     CWIN(bw->border.left,   bw->win, 0, 0, SHADH, h, 0, CWBackPixel, color_enlight(color), &at);
+     CWIN(bw->border.top,    bw->win, 0, 0, w, SHADH, 0, CWBackPixel, color_enlight(color), &at);
+     CWIN(bw->border.bottom, bw->win, 0, h - SHADH, w, SHADH, 0, CWBackPixel, SHADC, &at);
+     CWIN(bw->border.right,  bw->win, w - SHADH, 0, SHADH, h, 0, CWBackPixel, SHADC, &at);
 
      bw->geo.x = x;
      bw->geo.y = y;
      bw->geo.width = w;
      bw->geo.height = h;
-     bw->bord = bord;
      bw->color = color;
+     bw->border.light = color_enlight(color);
+     bw->border.dark = SHADC;
 
      return bw;
 }
@@ -83,6 +92,7 @@ void
 bar_delete(BarWindow *bw)
 {
      XSelectInput(dpy, bw->win, NoEventMask);
+     XDestroySubwindows(dpy, bw->win);
      XDestroyWindow(dpy, bw->win);
      XFreePixmap(dpy, bw->dr);
      free(bw);
@@ -98,9 +108,10 @@ bar_map(BarWindow *bw)
 {
      CHECK(!bw->mapped);
 
-     XMapRaised(dpy, bw->win);
-     bw->mapped = True;
+     XMapWindow(dpy, bw->win);
+     XMapSubwindows(dpy, bw->win);
 
+     bw->mapped = True;
 
      return;
 }
@@ -113,7 +124,9 @@ bar_unmap(BarWindow *bw)
 {
      CHECK(bw->mapped);
 
+     XUnmapSubwindows(dpy, bw->win);
      XUnmapWindow(dpy, bw->win);
+
      bw->mapped = False;
 
      return;
@@ -146,27 +159,43 @@ bar_resize(BarWindow *bw, uint w, uint h)
      bw->geo.width = w;
      bw->geo.height = h;
      XFreePixmap(dpy, bw->dr);
-     bw->dr = XCreatePixmap(dpy, root, w, h, DefaultDepth(dpy, screen));
 
+     /* Frame */
+     bw->dr = XCreatePixmap(dpy, root, w - SHADH, h - SHADH, DefaultDepth(dpy, screen));
      XResizeWindow(dpy, bw->win, w, h);
+
+     /* Border */
+     XResizeWindow(dpy, bw->border.left, SHADH, h);
+     XResizeWindow(dpy, bw->border.top, w, SHADH);
+     XResizeWindow(dpy, bw->border.bottom, w, SHADH);
+     XMoveResizeWindow(dpy, bw->border.right, w - SHADH, 0, SHADH, h);
+
 
      return;
 }
 
-/** Refresh the BarWindowColor
+/** Refresh the BarWindow Color
  * \param bw BarWindow pointer
 */
 void
 bar_refresh_color(BarWindow *bw)
 {
      draw_rectangle(bw->dr, 0, 0, bw->geo.width, bw->geo.height, bw->color);
-     if(bw->bord)
-          XSetWindowBorder(dpy, bw->win, bw->color);
+
+     XSetWindowBackground(dpy, bw->border.left ,   bw->border.light);
+     XSetWindowBackground(dpy, bw->border.top ,    bw->border.light);
+     XSetWindowBackground(dpy, bw->border.bottom , bw->border.dark);
+     XSetWindowBackground(dpy, bw->border.right ,  bw->border.dark);
+
+     XClearWindow(dpy, bw->border.left);
+     XClearWindow(dpy, bw->border.top);
+     XClearWindow(dpy, bw->border.bottom);
+     XClearWindow(dpy, bw->border.right);
 
      return;
 }
 
-/** Refresh a BarWindow
+/** Refresh the BarWindow
  * \param bw BarWindow pointer
 */
 void

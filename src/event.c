@@ -67,55 +67,32 @@ buttonpress(XButtonEvent *ev)
                     if(conf.root.mouse[i].func)
                          conf.root.mouse[i].func(conf.root.mouse[i].cmd);
 
-     /* Bar */
+     /* Tag */
+     for(i = 1; i < conf.ntag + 1; ++i)
      {
-          if(ev->window == infobar->bar->win)
+          ITOA(s, i);
+          if(ev->window == infobar->tags[i]->win)
           {
-               /* Tag*/
-               for(i = 0; i < conf.ntag + 1; ++i)
-               {
-                    if(ev->x > taglen[i-1] - 3
-                       && ev->x < (taglen[i] - 3))
-                    {
-                         ITOA(s, i);
-                         if(ev->button == Button1)
-                              uicb_tag(s);
-                         if(ev->button == Button3)
-                              uicb_tagtransfert(s);
-                    }
-               }
-               if(ev->x < taglen[conf.ntag])
-               {
-                    if(ev->button == Button4)
-                         uicb_tag("+1");
-                    if (ev->button == Button5)
-                         uicb_tag("-1");
-               }
+               if(ev->button == Button1)
+                    uicb_tag(s);
+               if(ev->button == Button3)
+                    uicb_tagtransfert(s);
+               if(ev->button == Button4)
+                    uicb_tag("+1");
+               if (ev->button == Button5)
+                    uicb_tag("-1");
           }
-          /* Layout */
-          {
-               if(ev->window == infobar->layout_switch->win)
-               {
-                    if(ev->button == Button1
-                       || ev->button == Button4)
-                         layoutswitch(True);
+     }
 
-                    if(ev->button == Button3
-                       || ev->button == Button5)
-                         layoutswitch(False);
-               }
-
-               if(ev->window == infobar->layout_type_switch->win)
-               {
-                    if(ev->button == Button1
-                       || ev->button == Button4)
-                         layout_tile_switch(True);
-
-                    if(ev->button == Button3
-                       || ev->button == Button5)
-                         layout_tile_switch(False);
-               }
-          }
+     /* Layout button */
+     if(ev->window == infobar->layout_button->win)
+     {
+          if(ev->button == Button1
+             || ev->button == Button4)
+               layoutswitch(True);
+          if(ev->button == Button3
+             || ev->button == Button5)
+               layoutswitch(False);
      }
 
      return;
@@ -220,10 +197,18 @@ void
 expose(XExposeEvent *ev)
 {
      Client *c;
+     int i;
 
      if(ev->count == 0
         && (ev->window == infobar->bar->win))
           infobar_draw();
+
+     for(i = 1; i < conf.ntag + 1; ++i)
+          if(ev->window == infobar->tags[i]->win)
+               infobar_draw_taglist();
+
+     if(ev->window == infobar->layout_button->win)
+          infobar_draw_layout();
 
      if((c = client_gb_titlebar(ev->window)))
           frame_update(c);

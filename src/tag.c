@@ -48,6 +48,7 @@ uicb_tag(uicb_t cmd)
           if(tmp + seltag < 1
              || tmp + seltag > conf.ntag)
                return;
+          prevtag = seltag;
           seltag += tmp;
      }
      else
@@ -55,6 +56,7 @@ uicb_tag(uicb_t cmd)
           if(tmp == seltag
              || tmp > conf.ntag)
                return;
+          prevtag = seltag;
           seltag = tmp;
      }
      arrange();

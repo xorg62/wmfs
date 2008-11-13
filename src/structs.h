@@ -59,11 +59,18 @@ typedef enum { CloseButton = 0, MaxButton = 1, FreeButton = 2, LastButton } Butt
  */
 typedef struct
 {
+     /* Frame window */
      Window win;
      Drawable dr;
-     XRectangle geo;
+     struct
+     {
+          /* Border Window */
+          Window left, right, top, bottom;
+          /* Border color */
+          uint dark, light;
+     } border;
      uint color;
-     int bord;
+     XRectangle geo;
      Bool mapped;
 } BarWindow;
 
@@ -86,7 +93,8 @@ struct Client
      int minax, maxax, minay, maxay;
      /* Client composant */
      Window win;
-     Window frame, resize, titlebar;
+     BarWindow *titlebar;
+     Window frame, resize;
      Window right, left, top, bottom;
      struct
      {
@@ -122,10 +130,9 @@ typedef struct
 typedef struct
 {
      BarWindow *bar;
-     BarWindow *layout_switch;
-     BarWindow *layout_type_switch;
+     BarWindow *layout_button;
+     BarWindow *tags[MAXTAG];
      XRectangle geo;
-     int lastsep;
      char statustext[1024];
 } InfoBar;
 

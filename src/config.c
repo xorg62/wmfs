@@ -491,6 +491,7 @@ init_conf(void)
                     fprintf(stderr, "WMFS Configuration: Warning! "
                             "tag \"%s\" is already defined\n", conf.tag[j].name);
      seltag = 1;
+     prevtag = 0;
      for(i = 0; i < conf.ntag; ++i)
           tags[i + 1] = conf.tag[i];
 
