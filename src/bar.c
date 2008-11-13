@@ -37,10 +37,10 @@
  * \param x X position
  * \param y Y position
  * \param w BarWindow Width
- * \param h BarWindow HeightXS
+ * \param h BarWindow Height
  * \param color BarWindow color
  * \param entermask Bool for know if the EnterMask mask is needed
- * \return The new BarWindow pointer
+ * \return The BarWindow pointer
 */
 BarWindow*
 bar_create(Window parent,

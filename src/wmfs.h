@@ -187,7 +187,6 @@ void uicb_tagtransfert(uicb_t);
 void arrange(void);
 void freelayout(void);
 void layoutswitch(Bool b);
-void layout_tile_switch(Bool b);
 void maxlayout(void);
 Client *nexttiled(Client *c);
 /* tile {{{ */

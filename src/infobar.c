@@ -88,7 +88,8 @@ infobar_draw(void)
      draw_text(infobar->bar->dr,
                MAXW - textw(infobar->statustext),
                font->height,
-               conf.colors.text, 0, infobar->statustext);
+               conf.colors.text, 0,
+               infobar->statustext);
 
      bar_refresh(infobar->bar);
 

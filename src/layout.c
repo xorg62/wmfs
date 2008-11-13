@@ -109,32 +109,6 @@ layoutswitch(Bool b)
      return;
 }
 
-/** Tile layout switching function
- * \param b Bool True : next False : previous
-*/
-void
-layout_tile_switch(Bool b)
-{
-     int i;
-
-     for(i = 0; i < conf.ntilelayout; ++i)
-     {
-          if(tags[seltag].layout.func == conf.layout[i].func
-             && (conf.layout[i].func != freelayout
-                 && conf.layout[i].func != maxlayout))
-          {
-               if(b)
-                    tags[seltag].layout = conf.layout[(i + 1) % conf.ntilelayout];
-               else
-                    tags[seltag].layout = conf.layout[(i + conf.ntilelayout - 1) % conf.ntilelayout];
-               break;
-          }
-     }
-     arrange();
-
-     return;
-}
-
 /** Set the next layout
  * \param cmd uicb_t type unused
 */
