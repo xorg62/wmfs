@@ -137,12 +137,6 @@ mainloop(void)
                XNextEvent(dpy, &ev);
                getevent(ev);
           }
-          if(sel)
-               printf("x: %d y: %d w: %d, h: %d\n",
-                      sel->geo.x,
-                      sel->geo.y,
-                      sel->geo.width,
-                      sel->geo.height);
      }
 
      return;
