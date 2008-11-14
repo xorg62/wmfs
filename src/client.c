@@ -559,7 +559,7 @@ client_unmanage(Client *c)
 
      XGrabServer(dpy);
      XSetErrorHandler(errorhandlerdummy);
-
+     XReparentWindow(dpy, c->win, root, 0, 0);
      /* Unset all focus stuff {{{ */
      if(sel == c)
           client_focus(NULL);
