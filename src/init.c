@@ -38,18 +38,16 @@ void
 init(void)
 {
      /* First init */
-     XSetErrorHandler(errorhandlerdummy);
      gc = DefaultGC(dpy, screen);
      screen = DefaultScreen(dpy);
      init_font();
      init_cursor();
      init_key();
-     init_atom();
      init_root();
+     init_atom();
      infobar_init();
      init_geometry();
      grabkeys();
-     XSetErrorHandler(errorhandler);
 
      /* Warning about font */
      if(TBARH + BORDH < font->height)
@@ -106,6 +104,26 @@ init_key(void)
      return;
 }
 
+/** Init root Window
+*/
+void
+init_root(void)
+{
+     XSetWindowAttributes at;
+
+     root = RootWindow(dpy, screen);
+
+     at.event_mask = KeyMask | ButtonPressMask | ButtonReleaseMask |
+          SubstructureRedirectMask | SubstructureNotifyMask |
+          EnterWindowMask | LeaveWindowMask | StructureNotifyMask ;
+     at.cursor = cursor[CurNormal];
+     XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &at);
+     if(conf.root.background_command)
+          uicb_spawn(conf.root.background_command);
+
+     return;
+}
+
 /** Init atoms
 */
 void
@@ -117,28 +135,9 @@ init_atom(void)
      wm_atom[WMName] = XInternAtom(dpy, "WM_NAME", False);
      net_atom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
      net_atom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
+
      XChangeProperty(dpy, root, net_atom[NetSupported], XA_ATOM, 32,
                      PropModeReplace, (unsigned char *) net_atom, NetLast);
-     return;
-}
-
-/** Init root Window
-*/
-void
-init_root(void)
-{
-     XSetWindowAttributes at;
-
-     root = RootWindow (dpy, screen);
-
-     at.event_mask = KeyMask | ButtonPressMask | ButtonReleaseMask |
-          SubstructureRedirectMask | SubstructureNotifyMask |
-          EnterWindowMask | LeaveWindowMask | StructureNotifyMask ;
-     at.cursor = cursor[CurNormal];
-     XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &at);
-     if(conf.root.background_command)
-          uicb_spawn(conf.root.background_command);
-
      return;
 }
 

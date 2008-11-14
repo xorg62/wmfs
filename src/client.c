@@ -223,6 +223,9 @@ client_focus(Client *c)
      {
           Client *c;
 
+          if(!TBARH)
+               return NULL;
+
           for(c = clients; c && c->titlebar->win != w; c = c->next);
 
           return c;
@@ -313,7 +316,11 @@ client_map(Client *c)
 
      XMapWindow(dpy, c->frame);
      XMapSubwindows(dpy, c->frame);
-     bar_map(c->titlebar);
+     if(TBARH)
+     {
+          bar_map(c->titlebar);
+          bar_map_subwin(c->titlebar);
+     }
 
      return;
 }
@@ -340,7 +347,6 @@ client_manage(Window w, XWindowAttributes *wa)
      frame_create(c);
      XSelectInput(dpy, c->win, PropertyChangeMask | StructureNotifyMask);
      mouse_grabbuttons(c, False);
-     client_size_hints(c);
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
           for(t = clients; t && t->win != trans; t = t->next);
      if(t) c->tag = t->tag;
@@ -348,6 +354,7 @@ client_manage(Window w, XWindowAttributes *wa)
      efree(t);
 
      client_attach(c);
+     client_size_hints(c);
      client_map(c);
      client_get_name(c);
      client_raise(c);
@@ -373,9 +380,9 @@ client_moveresize(Client *c, XRectangle geo, bool r)
      if(r)
      {
           /* minimum possible */
-          if (geo.width < 1)
+          if(geo.width < 1)
                geo.width = 1;
-          if (geo.height < 1)
+          if(geo.height < 1)
                geo.height = 1;
 
           /* base */
@@ -383,12 +390,12 @@ client_moveresize(Client *c, XRectangle geo, bool r)
           geo.height -= c->baseh;
 
           /* aspect */
-          if (c->minay > 0 && c->maxay > 0
+          if(c->minay > 0 && c->maxay > 0
               && c->minax > 0 && c->maxax > 0)
           {
-               if (geo.width * c->maxay > geo.height * c->maxax)
+               if(geo.width * c->maxay > geo.height * c->maxax)
                     geo.width = geo.height * c->maxax / c->maxay;
-               else if (geo.width * c->minay < geo.height * c->minax)
+               else if(geo.width * c->minay < geo.height * c->minax)
                     geo.height = geo.width * c->minay / c->minax;
           }
 
@@ -423,7 +430,7 @@ client_moveresize(Client *c, XRectangle geo, bool r)
      {
           c->geo = geo;
           frame_moveresize(c, geo);
-          XResizeWindow(dpy, c->win, geo.width, geo.height);
+          XMoveResizeWindow(dpy, c->win, BORDH, BORDH + TBARH, geo.width, geo.height);
           XSync(dpy, False);
      }
 
@@ -550,6 +557,7 @@ client_unmanage(Client *c)
      int i;
      Client *cc;
 
+     XGrabServer(dpy);
      XSetErrorHandler(errorhandlerdummy);
 
      /* Unset all focus stuff {{{ */
@@ -564,10 +572,15 @@ client_unmanage(Client *c)
      setwinstate(c->win, WithdrawnState);
      XDestroySubwindows(dpy, c->frame);
      XDestroyWindow(dpy, c->frame);
-     bar_delete(c->titlebar);
+     if(TBARH)
+     {
+          bar_delete_subwin(c->titlebar);
+          bar_delete(c->titlebar);
+     }
      XFree(c->title);
      efree(c);
      XSync(dpy, False);
+     XUngrabServer(dpy);
      arrange();
 
      return;
@@ -583,7 +596,11 @@ client_unmap(Client *c)
 
      XUnmapWindow(dpy, c->frame);
      XUnmapSubwindows(dpy, c->frame);
-     bar_unmap(c->titlebar);
+     if(TBARH)
+     {
+          bar_unmap_subwin(c->titlebar);
+          bar_unmap(c->titlebar);
+     }
 
      return;
 }

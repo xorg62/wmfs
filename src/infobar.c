@@ -53,7 +53,7 @@ infobar_init(void)
           infobar->tags[i] = bar_create(infobar->bar->win, j, 0, textw(tags[i].name) + PAD,
                                         infobar->geo.height, conf.colors.bar, False);
           j += textw(tags[i].name) + PAD;
-          XMapSubwindows(dpy, infobar->tags[i]->win);
+          bar_map_subwin(infobar->tags[i]);
      }
 
      /* Create layout switch & layout type switch barwindow */
@@ -61,11 +61,12 @@ infobar_init(void)
                                          textw(tags[seltag].layout.symbol) + PAD,
                                          infobar->geo.height, conf.colors.layout_bg, False);
 
-     /* Map all */
+     /* Map/Refresh all */
      bar_map(infobar->bar);
+     bar_map_subwin(infobar->bar);
+     bar_map_subwin(infobar->layout_button);
      bar_refresh_color(infobar->bar);
      bar_refresh(infobar->bar);
-     XMapSubwindows(dpy, infobar->layout_button->win);
 
      strcpy(infobar->statustext, "WMFS-" WMFS_VERSION);
      infobar_draw();
@@ -135,12 +136,15 @@ infobar_destroy(void)
      int i;
 
      bar_delete(infobar->bar);
+     bar_delete_subwin(infobar->bar);
      for(i = 1; i < conf.ntag + 1; ++i)
      {
-          XFreePixmap(dpy, infobar->tags[i]->dr);
-          XDestroySubwindows(dpy, infobar->tags[i]->win);
+          bar_delete_subwin(infobar->tags[i]);
+          bar_delete(infobar->tags[i]);
      }
-     XDestroySubwindows(dpy, infobar->layout_button->win);
+     bar_delete(infobar->layout_button);
+     bar_delete_subwin(infobar->layout_button);
+     efree(infobar);
 
      return;
 }

@@ -55,11 +55,10 @@ typedef enum { CloseButton = 0, MaxButton = 1, FreeButton = 2, LastButton } Butt
 
 /*
  *  BarWindow Structure
- * (titlebar, topbar..)
+ * (titlebar, infobar..)
  */
 typedef struct
 {
-     /* Frame window */
      Window win;
      Drawable dr;
      struct
@@ -142,7 +141,6 @@ typedef struct
      char *symbol;
      void (*func)(void);
 } Layout;
-
 
 /* Tag Structure */
 typedef struct

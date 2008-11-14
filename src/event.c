@@ -121,25 +121,20 @@ configurerequest(XConfigureRequestEvent *ev)
                geo.width = ev->width;
           if(ev->value_mask & CWHeight)
                geo.height = ev->height;
-
+          if((ev->value_mask & (CWX | CWY))
+             && !(ev->value_mask & (CWWidth | CWHeight)))
+               client_configure(c);
           if(geo.x != c->geo.x
              || geo.y != c->geo.y
              || geo.width != c->geo.width
              || geo.height != c->geo.height)
           {
-               /*
-                * Adjust the client's future geo to
-                * set the correct position of the frame
-                */
                geo.x += BORDH;
                geo.y += TBARH;
-               /*  Resize  */
-               if((geo.x < MAXW && geo.x > geo.width)
-                  && geo.y < MAXH && geo.y > geo.height)
+               if((geo.x < MAXW && geo.x > 0 - geo.width)
+                  && (geo.y < MAXH && geo.y > 0 - geo.height))
                     client_moveresize(c, geo, True);
           }
-          else
-               client_configure(c);
      }
      else
      {
@@ -150,8 +145,10 @@ configurerequest(XConfigureRequestEvent *ev)
           wc.border_width = ev->border_width;
           wc.sibling = ev->above;
           wc.stack_mode = ev->detail;
+
           XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
-     }
+      }
+
      XSync(dpy, False);
 
      return;
@@ -164,6 +161,7 @@ void
 destroynotify(XDestroyWindowEvent *ev)
 {
      Client *c;
+
      if((c = client_gb_win(ev->window)))
           client_unmanage(c);
 
@@ -203,14 +201,14 @@ expose(XExposeEvent *ev)
 
      if(ev->count == 0
         && (ev->window == infobar->bar->win))
-          infobar_draw();
+          bar_refresh(infobar->bar);
 
      for(i = 1; i < conf.ntag + 1; ++i)
           if(ev->window == infobar->tags[i]->win)
-               infobar_draw_taglist();
+               bar_refresh(infobar->tags[i]);
 
      if(ev->window == infobar->layout_button->win)
-          infobar_draw_layout();
+          bar_refresh(infobar->layout_button);
 
      if((c = client_gb_titlebar(ev->window)))
           frame_update(c);

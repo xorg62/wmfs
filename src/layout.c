@@ -186,7 +186,7 @@ uicb_set_mwfact(uicb_t cmd)
           return;
 
      tags[seltag].mwfact += c;
-     arrange();
+     tags[seltag].layout.func();
 
      return;
 }
@@ -207,7 +207,7 @@ uicb_set_nmaster(uicb_t cmd)
           return;
 
      tags[seltag].nmaster += n;
-     arrange();
+     tags[seltag].layout.func();
 
      return;
 }
@@ -456,7 +456,7 @@ uicb_tile_switch(uicb_t cmd)
      client_detach(c);
      client_attach(c);
      client_focus(c);
-     arrange();
+     tags[seltag].layout.func();
 
      return;
 }
@@ -474,8 +474,7 @@ uicb_togglefree(uicb_t cmd)
      sel->max  = False;
      sel->lmax = False;
      client_moveresize(sel, sel->ogeo, True);
-
-     arrange();
+     tags[seltag].layout.func();
 
      return;
 }

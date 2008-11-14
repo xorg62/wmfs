@@ -158,7 +158,7 @@ frame_update(Client *c)
      XClearWindow(dpy, c->right);
      XClearWindow(dpy, c->bottom);
 
-     if((TBARH + BORDH + 1) > font->height)
+     if(TBARH && (TBARH + BORDH + 1) > font->height)
      {
           draw_text(c->titlebar->dr,
                     (c->frame_geo.width / 2) - (textw(c->title) / 2),

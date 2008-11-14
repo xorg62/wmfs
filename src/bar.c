@@ -52,7 +52,7 @@ bar_create(Window parent,
 
      bw = emalloc(1, sizeof(BarWindow));
 
-     at.override_redirect = 1;
+     at.override_redirect = True;
      at.background_pixmap = ParentRelative;
      if(entermask)
           at.event_mask = SubstructureRedirectMask | SubstructureNotifyMask |
@@ -91,11 +91,25 @@ bar_create(Window parent,
 void
 bar_delete(BarWindow *bw)
 {
+     CHECK(bw);
+
      XSelectInput(dpy, bw->win, NoEventMask);
-     XDestroySubwindows(dpy, bw->win);
      XDestroyWindow(dpy, bw->win);
      XFreePixmap(dpy, bw->dr);
      free(bw);
+
+     return;
+}
+
+/** Delete the BarWindow sub windows
+ * \param bw BarWindow pointer
+*/
+void
+bar_delete_subwin(BarWindow *bw)
+{
+     CHECK(bw);
+
+     XDestroySubwindows(dpy, bw->win);
 
      return;
 }
@@ -109,9 +123,23 @@ bar_map(BarWindow *bw)
      CHECK(!bw->mapped);
 
      XMapWindow(dpy, bw->win);
-     XMapSubwindows(dpy, bw->win);
 
      bw->mapped = True;
+
+     return;
+}
+
+
+/** Map the subwindows of a BarWindow
+ *  Use for the BarWindow special border...
+ * \param bw BarWindow pointer
+ */
+void
+bar_map_subwin(BarWindow *bw)
+{
+     CHECK(bw);
+
+     XMapSubwindows(dpy, bw->win);
 
      return;
 }
@@ -124,10 +152,22 @@ bar_unmap(BarWindow *bw)
 {
      CHECK(bw->mapped);
 
-     XUnmapSubwindows(dpy, bw->win);
      XUnmapWindow(dpy, bw->win);
 
      bw->mapped = False;
+
+     return;
+}
+
+/** Unmap the BarWindow sub windows
+ * \param bw BarWindow pointer
+*/
+void
+bar_unmap_subwin(BarWindow *bw)
+{
+     CHECK(bw);
+
+     XUnmapSubwindows(dpy, bw->win);
 
      return;
 }
@@ -140,6 +180,8 @@ bar_unmap(BarWindow *bw)
 void
 bar_move(BarWindow *bw, int x, int y)
 {
+     CHECK(bw);
+
      bw->geo.x = x;
      bw->geo.y = y;
 
@@ -156,6 +198,8 @@ bar_move(BarWindow *bw, int x, int y)
 void
 bar_resize(BarWindow *bw, uint w, uint h)
 {
+     CHECK(bw);
+
      bw->geo.width = w;
      bw->geo.height = h;
      XFreePixmap(dpy, bw->dr);
@@ -180,6 +224,8 @@ bar_resize(BarWindow *bw, uint w, uint h)
 void
 bar_refresh_color(BarWindow *bw)
 {
+     CHECK(bw);
+
      draw_rectangle(bw->dr, 0, 0, bw->geo.width, bw->geo.height, bw->color);
 
      XSetWindowBackground(dpy, bw->border.left ,   bw->border.light);
@@ -201,6 +247,8 @@ bar_refresh_color(BarWindow *bw)
 void
 bar_refresh(BarWindow *bw)
 {
+     CHECK(bw);
+
      XCopyArea(dpy, bw->dr, bw->win, gc, 0, 0, bw->geo.width, bw->geo.height, 0, 0);
 
      return;

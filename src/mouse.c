@@ -163,8 +163,7 @@ mouse_resize(Client *c)
                          mwf = tags[seltag].mwfact;
 
                     tags[seltag].mwfact = (mwf < 0.05) ? 0.05 : ((mwf > 0.95) ? 0.95 : mwf);
-
-                    arrange();
+                    tags[seltag].layout.func();
                }
 
                if(!c->tile)

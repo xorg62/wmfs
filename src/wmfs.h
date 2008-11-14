@@ -89,8 +89,11 @@
 /* bar.c */
 BarWindow *bar_create(Window parent, int x, int y, uint w, uint h, uint color, Bool entermask);
 void bar_delete(BarWindow *bw);
+void bar_delete_subwin(BarWindow *bw);
 void bar_map(BarWindow *bw);
+void bar_map_subwin(BarWindow *bw);
 void bar_unmap(BarWindow *bw);
+void bar_unmap_subwin(BarWindow *bw);
 void bar_move(BarWindow *bw, int x, int y);
 void bar_resize(BarWindow *bw, uint w, uint h);
 void bar_refresh_color(BarWindow *bw);
@@ -206,10 +209,10 @@ void uicb_set_nmaster(uicb_t);
 
 /* init.c */
 void init(void);
+void init_root(void);
 void init_atom(void);
 void init_font(void);
 void init_cursor(void);
-void init_root(void);
 void init_key(void);
 void init_geometry(void);
 
