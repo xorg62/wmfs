@@ -1,4 +1,4 @@
-  · Add Doxygen comment
+  · Add Doxygen comment <-> OK
   · Mouse bindings in the config file
   · Can change client position in the tile grid
   · Add image support <- *.xpm: Removed because bugs.

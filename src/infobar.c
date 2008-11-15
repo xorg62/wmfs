@@ -137,13 +137,13 @@ infobar_destroy(void)
 
      bar_delete(infobar->bar);
      bar_delete_subwin(infobar->bar);
+     bar_delete(infobar->layout_button);
+     bar_delete_subwin(infobar->layout_button);
      for(i = 1; i < conf.ntag + 1; ++i)
      {
           bar_delete_subwin(infobar->tags[i]);
           bar_delete(infobar->tags[i]);
      }
-     bar_delete(infobar->layout_button);
-     bar_delete_subwin(infobar->layout_button);
      efree(infobar);
 
      return;

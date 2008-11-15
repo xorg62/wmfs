@@ -188,7 +188,7 @@ client_focus(Client *c)
      return;
 }
 
-/* Get Client with any window Client member {{{ */
+/* Get Client with a window */
 /** Get a client->win with a window
  * \param w Window
  * \return The client
@@ -301,7 +301,9 @@ uicb_client_kill(uicb_t cmd)
      ev.xclient.format = 32;
      ev.xclient.data.l[0] = wm_atom[WMDelete];
      ev.xclient.data.l[1] = CurrentTime;
+
      XSendEvent(dpy, sel->win, False, NoEventMask, &ev);
+     client_unmanage(sel);
 
      return;
 }
