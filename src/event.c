@@ -135,6 +135,8 @@ configurerequest(XConfigureRequestEvent *ev)
                   && (geo.y < MAXH && geo.y > 0 - geo.height))
                     client_moveresize(c, geo, True);
           }
+          else
+               client_configure(c);
      }
      else
      {
@@ -333,7 +335,7 @@ propertynotify(XPropertyEvent *ev)
 
 /** UnmapNotify handle event
  * \param ev XUnmapEvent pointer
-*/
+ */
 void
 unmapnotify(XUnmapEvent *ev)
 {
@@ -350,9 +352,9 @@ unmapnotify(XUnmapEvent *ev)
 }
 
 /** Event handle function: execute every function
-  * handle by event
+ * handle by event
  * \param ev Event
-*/
+ */
 void
 getevent(XEvent ev)
 {

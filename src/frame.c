@@ -96,6 +96,26 @@ frame_create(Client *c)
      return;
 }
 
+/** Delete a frame
+ * \param c The client frame
+*/
+void
+frame_delete(Client *c)
+{
+     /* If there is, delete the titlebar */
+     if(TBARH)
+     {
+          bar_delete_subwin(c->titlebar);
+          bar_delete(c->titlebar);
+     }
+
+     /* Delete the frame's sub win and the frame */
+     XDestroySubwindows(dpy, c->frame);
+     XDestroyWindow(dpy, c->frame);
+
+     return;
+}
+
 /** Move a frame
  * \param c The client frame
  * \param geo Coordinate info for move the frame

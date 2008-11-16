@@ -72,6 +72,8 @@ client_configure(Client *c)
 {
      XConfigureEvent ev;
 
+     client_moveresize(c, c->geo, True);
+
      ev.type               = ConfigureNotify;
      ev.event              = c->win;
      ev.window             = c->win;
@@ -187,6 +189,10 @@ client_focus(Client *c)
 
      return;
 }
+
+/* The following function are the same point :
+ * find a client membere with a Window {{{
+ */
 
 /* Get Client with a window */
 /** Get a client->win with a window
@@ -556,34 +562,25 @@ client_unhide(Client *c)
 void
 client_unmanage(Client *c)
 {
-     int i;
-     Client *cc;
-
      XGrabServer(dpy);
      XSetErrorHandler(errorhandlerdummy);
+
+     /* Some ******* require that... */
      XReparentWindow(dpy, c->win, root, 0, 0);
-     /* Unset all focus stuff {{{ */
+
      if(sel == c)
           client_focus(NULL);
-     for(i = 0, cc = clients; cc; cc = cc->next, ++i)
-          if(selbytag[i] == c)
-               selbytag[i] = NULL;
-     /* }}} */
 
      client_detach(c);
+     XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
      setwinstate(c->win, WithdrawnState);
-     XDestroySubwindows(dpy, c->frame);
-     XDestroyWindow(dpy, c->frame);
-     if(TBARH)
-     {
-          bar_delete_subwin(c->titlebar);
-          bar_delete(c->titlebar);
-     }
-     XFree(c->title);
-     efree(c);
      XSync(dpy, False);
+     frame_delete(c);
+     XSetErrorHandler(errorhandler);
      XUngrabServer(dpy);
      arrange();
+     XFree(c->title);
+     efree(c);
 
      return;
 }

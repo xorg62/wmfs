@@ -135,6 +135,7 @@ void uicb_client_kill(uicb_t);
 
 /* frame.c */
 void frame_create(Client *c);
+void frame_delete(Client *c);
 void frame_moveresize(Client *c, XRectangle geo);
 void frame_update(Client *c);
 
