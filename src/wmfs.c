@@ -67,7 +67,18 @@ errorhandlerdummy(Display *d, XErrorEvent *event)
 void
 quit(void)
 {
-     /* Exiting WMFS :'( */
+     Client *c;
+
+     /* Set the silent error handler */
+     XSetErrorHandler(errorhandlerdummy);
+
+     /* Unmanage all clients */
+     for(c = clients; c; c = c->next)
+     {
+          XReparentWindow(dpy, c->win, root, c->frame_geo.x, c->frame_geo.y);
+          client_unmanage(c);
+     }
+
      XftFontClose(dpy, font);
      XFreeCursor(dpy, cursor[CurNormal]);
      XFreeCursor(dpy, cursor[CurMove]);
@@ -197,17 +208,8 @@ scan(void)
 void
 handle_signal(int signum)
 {
-     Client *c;
-
      if(signum == SIGTERM || signum == SIGINT)
      {
-          XSetErrorHandler(errorhandlerdummy);
-          for(c = clients; c; c = c->next)
-          {
-               XReparentWindow(dpy, c->win, root, c->frame_geo.x, c->frame_geo.y);
-               client_unmanage(c);
-          }
-          fprintf(stderr, "\nExit WMFS... Bye !!\n");
           quit();
           exit(EXIT_FAILURE);
      }

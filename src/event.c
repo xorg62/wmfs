@@ -165,7 +165,10 @@ destroynotify(XDestroyWindowEvent *ev)
      Client *c;
 
      if((c = client_gb_win(ev->window)))
+     {
           client_unmanage(c);
+          XSetErrorHandler(errorhandler);
+     }
 
      return;
 }
@@ -346,7 +349,11 @@ unmapnotify(XUnmapEvent *ev)
         && ev->send_event
         && getwinstate(c->win) == NormalState
         && !c->hide)
+     {
+          XReparentWindow(dpy, c->win, root, 0, 0);
           client_unmanage(c);
+          XSetErrorHandler(errorhandler);
+     }
 
      return;
 }

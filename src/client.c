@@ -310,6 +310,7 @@ uicb_client_kill(uicb_t cmd)
 
      XSendEvent(dpy, sel->win, False, NoEventMask, &ev);
      client_unmanage(sel);
+     XSetErrorHandler(errorhandler);
 
      return;
 }
@@ -565,9 +566,6 @@ client_unmanage(Client *c)
      XGrabServer(dpy);
      XSetErrorHandler(errorhandlerdummy);
 
-     /* Some ******* require that... */
-     XReparentWindow(dpy, c->win, root, 0, 0);
-
      if(sel == c)
           client_focus(NULL);
 
@@ -575,9 +573,8 @@ client_unmanage(Client *c)
      XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
      setwinstate(c->win, WithdrawnState);
      XSync(dpy, False);
-     frame_delete(c);
-     XSetErrorHandler(errorhandler);
      XUngrabServer(dpy);
+     frame_delete(c);
      arrange();
      XFree(c->title);
      efree(c);
@@ -593,13 +590,13 @@ client_unmap(Client *c)
 {
      CHECK(c);
 
-     XUnmapWindow(dpy, c->frame);
-     XUnmapSubwindows(dpy, c->frame);
      if(TBARH)
      {
           bar_unmap_subwin(c->titlebar);
           bar_unmap(c->titlebar);
      }
+     XUnmapWindow(dpy, c->frame);
+     XUnmapSubwindows(dpy, c->frame);
 
      return;
 }

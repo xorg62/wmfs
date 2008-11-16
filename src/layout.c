@@ -297,7 +297,7 @@ multi_tile(Position type)
      {
           if(type == Top)
                mastergeo.y = (n <= nmaster) ? sgeo.y : sgeo.y + (sgeo.height - mwfact) - border;
-          mastergeo.width = (sgeo.width / nmaster) - BORDH;
+          mastergeo.width = (sgeo.width / nmaster) - (border * 2);
           mastergeo.height = (n <= nmaster) ? sgeo.height - border : mwfact;
      }
      else
