@@ -347,6 +347,7 @@ client_manage(Window w, XWindowAttributes *wa)
      c->tag = seltag;
 
      frame_create(c);
+     client_size_hints(c);
      XSelectInput(dpy, c->win, PropertyChangeMask | StructureNotifyMask);
      mouse_grabbuttons(c, False);
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
@@ -356,7 +357,6 @@ client_manage(Window w, XWindowAttributes *wa)
      efree(t);
 
      client_attach(c);
-     client_size_hints(c);
      client_map(c);
      client_get_name(c);
      client_raise(c);

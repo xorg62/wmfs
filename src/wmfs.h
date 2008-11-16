@@ -73,13 +73,6 @@
 #define TBARH        conf.titlebar.height
 #define FRAMEW(w)    w + BORDH * 2
 #define FRAMEH(h)    h + (BORDH * 2) + TBARH
-
-/* To checking if wmfs can create
- * and use the titlebar buttons */
-#define CTBAR        TBARH - BORDH > 1
-
-#define BUTHW        (BORDH + TBARH) - 6
-#define BUTX(b)      (b + 0.5) * BUTHW + BORDH + 1
 #define RESHW        5 * BORDH
 #define CHECK(x)     if(!x) return
 #define ITOA(p ,n)   sprintf(p, "%d", n)

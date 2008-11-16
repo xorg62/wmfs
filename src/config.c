@@ -167,6 +167,23 @@ var_to_str(char *conf_choice)
      return NULL;
 }
 
+void
+mouse_section(MouseBinding mb[], cfg_t *cfg, int ns)
+{
+     int i;
+     cfg_t *tmp;
+
+     for(i = 0; i < ns; ++i)
+     {
+          tmp          = cfg_getnsec(cfg, "mouse", i);
+          mb[i].button = char_to_button(cfg_getstr(tmp, "button"));
+          mb[i].func   = name_to_func(cfg_getstr(tmp, "func"), func_list);
+          mb[i].cmd    = strdup(var_to_str(cfg_getstr(tmp, "cmd")));
+     }
+
+     return;
+}
+
 /** Configuration initialization
 */
 void
@@ -199,8 +216,8 @@ init_conf(void)
 
      static cfg_opt_t root_opts[] =
           {
-               CFG_STR("background_command", "", CFGF_NONE),
-               CFG_SEC("mouse", mouse_button_opts, CFGF_MULTI),
+               CFG_STR("background_command", "",                CFGF_NONE),
+               CFG_SEC("mouse",              mouse_button_opts, CFGF_MULTI),
                CFG_END()
           };
 
@@ -214,14 +231,14 @@ init_conf(void)
 
      static cfg_opt_t client_opts[]=
           {
-               CFG_INT("border_height",  1,                  CFGF_NONE),
-               CFG_STR("border_normal",  "#354B5C",          CFGF_NONE),
-               CFG_STR("border_focus",   "#6286A1",          CFGF_NONE),
-               CFG_STR("resize_corner_normal",  "#ff0000",   CFGF_NONE),
-               CFG_STR("resize_corner_focus",   "#ff0000",   CFGF_NONE),
-               CFG_STR("modifier",       "Alt",              CFGF_NONE),
-               CFG_SEC("mouse",           mouse_button_opts, CFGF_MULTI),
-               CFG_SEC("titlebar",        titlebar_opts,     CFGF_NONE),
+               CFG_INT("border_height",         1,                  CFGF_NONE),
+               CFG_STR("border_normal",         "#354B5C",          CFGF_NONE),
+               CFG_STR("border_focus",          "#6286A1",          CFGF_NONE),
+               CFG_STR("resize_corner_normal",  "#ff0000",          CFGF_NONE),
+               CFG_STR("resize_corner_focus",   "#ff0000",          CFGF_NONE),
+               CFG_STR("modifier",              "Alt",              CFGF_NONE),
+               CFG_SEC("mouse",                 mouse_button_opts,  CFGF_MULTI),
+               CFG_SEC("titlebar",              titlebar_opts,      CFGF_NONE),
                CFG_END()
           };
 
@@ -243,21 +260,21 @@ init_conf(void)
 
      static cfg_opt_t tag_opts[] =
           {
-               CFG_STR("name",        "",        CFGF_NONE),
-               CFG_FLOAT("mwfact",    0.65,      CFGF_NONE),
-               CFG_INT("nmaster",     1,         CFGF_NONE),
-               CFG_STR("layout",      "tile",    CFGF_NONE),
-               CFG_BOOL("resizehint", cfg_false, CFGF_NONE),
+               CFG_STR("name",        "",           CFGF_NONE),
+               CFG_FLOAT("mwfact",    0.65,         CFGF_NONE),
+               CFG_INT("nmaster",     1,            CFGF_NONE),
+               CFG_STR("layout",      "tile_right", CFGF_NONE),
+               CFG_BOOL("resizehint", cfg_false,    CFGF_NONE),
                CFG_END()
           };
 
      static cfg_opt_t tags_opts[] =
           {
-               CFG_STR("sel_fg",    "#FFFFFF", CFGF_NONE),
-               CFG_STR("sel_bg",    "#354B5C", CFGF_NONE),
-               CFG_STR("border",    "#090909", CFGF_NONE),
+               CFG_STR("sel_fg",       "#FFFFFF", CFGF_NONE),
+               CFG_STR("sel_bg",       "#354B5C", CFGF_NONE),
+               CFG_STR("border",       "#090909", CFGF_NONE),
                CFG_INT("border_width", 0,         CFGF_NONE),
-               CFG_SEC("tag", tag_opts, CFGF_MULTI),
+               CFG_SEC("tag",          tag_opts,  CFGF_MULTI),
                CFG_END()
           };
 
@@ -310,25 +327,25 @@ init_conf(void)
      cfg_t *cfg_layouts;
      cfg_t *cfg_tags;
      cfg_t *cfg_keys;
-     cfg_t *cfgtmp, *cfgtmp2;
+     cfg_t *cfgtmp;
      char final_path[128];
-     char sfinal_path[128];
      int ret, i, j, l;
 
-
-     sprintf(final_path,"%s/%s",
+     sprintf(final_path, "%s/%s",
              strdup(getenv("HOME")),
              strdup(FILE_NAME));
 
      cfg = cfg_init(opts, CFGF_NONE);
      ret = cfg_parse(cfg, final_path);
 
-     if(ret == CFG_FILE_ERROR || ret == CFG_PARSE_ERROR)
+     if(ret == CFG_FILE_ERROR
+        || ret == CFG_PARSE_ERROR)
      {
-          sprintf(sfinal_path, "%s/wmfs/wmfsrc", XDG_CONFIG_DIR);
-          fprintf(stderr, "WMFS: parsing configuration file (%s) failed\n"
-                 "Use the default configuration (%s).\n", final_path, sfinal_path);
-          ret = cfg_parse(cfg, sfinal_path);
+          fprintf(stderr, "WMFS: parsing configuration file (%s) failed\n", final_path);
+          sprintf(final_path, "%s/wmfs/wmfsrc", XDG_CONFIG_DIR);
+          fprintf(stderr, "Use the default configuration (%s).\n", final_path);
+          cfg = cfg_init(opts, CFGF_NONE);
+          ret = cfg_parse(cfg, final_path);
      }
 
      cfg_misc      = cfg_getsec(cfg, "misc");
@@ -367,14 +384,7 @@ init_conf(void)
      conf.root.background_command = strdup(var_to_str(cfg_getstr(cfg_root, "background_command")));
      conf.root.nmouse = cfg_size(cfg_root, "mouse");
      conf.root.mouse = emalloc(conf.root.nmouse, sizeof(MouseBinding));
-
-     for(i = 0; i < conf.root.nmouse; ++i)
-     {
-          cfgtmp = cfg_getnsec(cfg_root, "mouse", i);
-          conf.root.mouse[i].button = char_to_button(cfg_getstr(cfgtmp, "button"));
-          conf.root.mouse[i].func   = name_to_func(cfg_getstr(cfgtmp, "func"), func_list);
-          conf.root.mouse[i].cmd    = strdup(var_to_str(cfg_getstr(cfgtmp, "cmd")));
-     }
+     mouse_section(conf.root.mouse, cfg_root, conf.root.nmouse);
 
      /* client */
      conf.client.borderheight        = (cfg_getint(cfg_client, "border_height"))
@@ -386,29 +396,15 @@ init_conf(void)
      conf.client.mod                |= char_to_modkey(cfg_getstr(cfg_client, "modifier"));
      conf.client.nmouse              = cfg_size(cfg_client, "mouse");
      conf.client.mouse               = emalloc(conf.client.nmouse, sizeof(MouseBinding));
-
-     for(i = 0; i < conf.client.nmouse; ++i)
-     {
-          cfgtmp = cfg_getnsec(cfg_client, "mouse", i);
-          conf.client.mouse[i].button = char_to_button(cfg_getstr(cfgtmp, "button"));
-          conf.client.mouse[i].func   = name_to_func(cfg_getstr(cfgtmp, "func"), func_list);
-          conf.client.mouse[i].cmd    = strdup(var_to_str(cfg_getstr(cfgtmp, "cmd")));
-     }
+     mouse_section(conf.client.mouse, cfg_client, conf.client.nmouse);
 
      /* titlebar (in client) */
-     cfgtmp = cfg_getsec(cfg_client, "titlebar");
-     conf.titlebar.height     = cfg_getint(cfgtmp, "height");
-     conf.titlebar.fg    = var_to_str(cfg_getstr(cfgtmp, "fg"));
-     conf.titlebar.nmouse = cfg_size(cfgtmp, "mouse");
-     conf.titlebar.mouse = emalloc(conf.titlebar.nmouse, sizeof(MouseBinding));
-
-     for(i = 0; i < conf.titlebar.nmouse; ++i)
-     {
-          cfgtmp2 = cfg_getnsec(cfgtmp, "mouse", i);
-          conf.titlebar.mouse[i].button = char_to_button(cfg_getstr(cfgtmp2, "button"));
-          conf.titlebar.mouse[i].func   = name_to_func(cfg_getstr(cfgtmp2, "func"), func_list);
-          conf.titlebar.mouse[i].cmd    = strdup(var_to_str(cfg_getstr(cfgtmp2, "cmd")));
-     }
+     cfgtmp                = cfg_getsec(cfg_client, "titlebar");
+     conf.titlebar.height  = cfg_getint(cfgtmp, "height");
+     conf.titlebar.fg      = var_to_str(cfg_getstr(cfgtmp, "fg"));
+     conf.titlebar.nmouse  = cfg_size(cfgtmp, "mouse");
+     conf.titlebar.mouse   = emalloc(conf.titlebar.nmouse, sizeof(MouseBinding));
+     mouse_section(conf.titlebar.mouse, cfgtmp, conf.titlebar.nmouse);
 
      /* layout */
      conf.colors.layout_fg  = strdup(var_to_str(cfg_getstr(cfg_layouts, "fg")));
@@ -417,7 +413,7 @@ init_conf(void)
      if((conf.nlayout = cfg_size(cfg_layouts, "layout")) > NUM_OF_LAYOUT
           || !(conf.nlayout = cfg_size(cfg_layouts, "layout")))
      {
-          fprintf(stderr, "WMFS Configuration: Too many or no layouts\n");
+          fprintf(stderr, "WMFS Configuration: Too many or no layouts (%d)\n", conf.nlayout);
           conf.nlayout          = 1;
           conf.layout[0].symbol = strdup("TILE");
           conf.layout[0].func   = tile;
@@ -432,7 +428,7 @@ init_conf(void)
                if(!name_to_func(strdup(cfg_getstr(cfgtmp, "type")), layout_list))
                {
                     fprintf(stderr, "WMFS Configuration: Unknow Layout type: \"%s\"\n",
-                           strdup(cfg_getstr(cfgtmp, "type")));
+                            strdup(cfg_getstr(cfgtmp, "type")));
                     exit(EXIT_FAILURE);
                }
                else
@@ -440,9 +436,6 @@ init_conf(void)
                     conf.layout[i].symbol = strdup(var_to_str(cfg_getstr(cfgtmp, "symbol")));
                     conf.layout[i].func = name_to_func(strdup(cfg_getstr(cfgtmp, "type")), layout_list);
                }
-               if(conf.layout[i].func != freelayout
-                  && conf.layout[i].func != maxlayout)
-                    ++conf.ntilelayout;
           }
      }
 
@@ -465,7 +458,7 @@ init_conf(void)
           conf.tag[0].mwfact     = 0.65;
           conf.tag[0].nmaster    = 1;
           conf.tag[0].resizehint = False;
-          conf.tag[0].layout     = layout_name_to_struct(conf.layout, "tile", conf.nlayout);
+          conf.tag[0].layout     = layout_name_to_struct(conf.layout, "tile_right", conf.nlayout);
      }
      else
      {
@@ -482,12 +475,6 @@ init_conf(void)
           }
      }
 
-     /* Check if the tag name is already used */
-     for(i = 0; i < conf.ntag; ++i)
-          for(j = 0; j < conf.ntag ; ++j)
-               if(j != i && strcmp(conf.tag[i].name, conf.tag[j].name) == 0)
-                    fprintf(stderr, "WMFS Configuration: Warning! "
-                            "tag \"%s\" is already defined\n", conf.tag[j].name);
      seltag = 1;
      prevtag = 0;
      for(i = 0; i < conf.ntag; ++i)
@@ -508,14 +495,13 @@ init_conf(void)
           keys[j].func = name_to_func(cfg_getstr(cfgtmp, "func"), func_list);
           if(keys[j].func == NULL)
           {
-               fprintf(stderr, "WMFS Configuration: Unknow Function %s", cfg_getstr(cfgtmp, "func"));
-               return;
+               fprintf(stderr, "WMFS Configuration error: Unknow Function \"%s\"\n",
+                       cfg_getstr(cfgtmp, "func"));
+               exit(EXIT_FAILURE);
           }
-
           keys[j].cmd = (!strdup(var_to_str((cfg_getstr(cfgtmp, "cmd"))))
                                  ?  NULL : strdup(var_to_str(cfg_getstr(cfgtmp, "cmd"))));
      }
-
      cfg_free(cfg);
 
      return;

@@ -35,9 +35,9 @@
 
 #include "wmfs.h"
 
-#define NBUTTON      8
-#define MAXTAG       36
-#define NUM_OF_LAYOUT    7
+#define NBUTTON        8
+#define MAXTAG         36
+#define NUM_OF_LAYOUT  7
 
 /* Typedef */
 typedef const char*    uicb_t;
@@ -51,7 +51,6 @@ enum { CurNormal, CurResize, CurMove, CurLast };
 enum { WMState, WMProtocols, WMName, WMDelete, WMLast };
 enum { NetSupported, NetWMName, NetLast };
 typedef enum { Top = 0, Bottom, Right, Left, Center, PositionLast } Position;
-typedef enum { CloseButton = 0, MaxButton = 1, FreeButton = 2, LastButton } ButtonType;
 
 /*
  *  BarWindow Structure
@@ -90,11 +89,13 @@ struct Client
      int basew, baseh, incw, inch;
      int maxw, maxh, minw, minh;
      int minax, maxax, minay, maxay;
-     /* Client composant */
+     /* Client composant {{{ */
      Window win;
      BarWindow *titlebar;
      Window frame, resize;
+     /* Border */
      Window right, left, top, bottom;
+     /* }}} */
      struct
      {
           uint frame;
@@ -204,7 +205,6 @@ typedef struct
      int nkeybind;
      int nbutton;
      int nlayout;
-     int ntilelayout;
 } Conf;
 
 /* Config.c struct */
