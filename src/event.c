@@ -149,8 +149,7 @@ configurerequest(XConfigureRequestEvent *ev)
           wc.stack_mode = ev->detail;
 
           XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
-      }
-
+     }
      XSync(dpy, False);
 
      return;
@@ -187,8 +186,7 @@ enternotify(XCrossingEvent *ev)
      if((c = client_gb_win(ev->window))
         || (c = client_gb_frame(ev->window))
         || (c = client_gb_titlebar(ev->window)))
-             client_focus(c);
-
+          client_focus(c);
      else
           client_focus(NULL);
 
@@ -267,8 +265,7 @@ keypress(XKeyPressedEvent *ev)
      keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
      for(i = 0; i < conf.nkeybind; ++i)
           if(keysym == keys[i].keysym
-             && (keys[i].mod & ~(numlockmask | LockMask)) ==
-             (ev->state & ~(numlockmask | LockMask))
+             && (keys[i].mod & ~(numlockmask | LockMask)) ==  (ev->state & ~(numlockmask | LockMask))
              && keys[i].func)
                keys[i].func(keys[i].cmd);
 

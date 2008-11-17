@@ -135,7 +135,7 @@ mainloop(void)
                          }
                     }
                }
-              else
+               else
                {
                     strncpy(infobar->statustext, sbuf, strlen(sbuf));
                     readstdin = False;
@@ -171,31 +171,23 @@ uicb_quit(uicb_t cmd)
 void
 scan(void)
 {
-     uint i, num;
-     Window *wins = NULL, d;
+     uint i, n;
+     Window usl, usl2, *w = NULL;
      XWindowAttributes wa;
 
-     if(XQueryTree(dpy, root, &d, &d, &wins, &num))
+     if(XQueryTree(dpy, root, &usl, &usl2, &w, &n))
      {
-          for(i = 0; i < num; i++)
+          for(i = 0; i < n; i++)
           {
-               if(!XGetWindowAttributes(dpy, wins[i], &wa)
-                  || wa.override_redirect || XGetTransientForHint(dpy, wins[i], &d))
+               if(!XGetWindowAttributes(dpy, w[i], &wa))
                     continue;
-               if(wa.map_state == IsViewable || getwinstate(wins[i]) == IconicState)
-                    client_manage(wins[i], &wa);
-
-          }
-          for(i = 0; i < num; i++)
-          {
-               if(!XGetWindowAttributes(dpy, wins[i], &wa))
+               if(wa.override_redirect || XGetTransientForHint(dpy, w[i], &usl))
                     continue;
-               if(XGetTransientForHint(dpy, wins[i], &d)
-                  && (wa.map_state == IsViewable || getwinstate(wins[i]) == IconicState))
-                    client_manage(wins[i], &wa);
+               if(wa.map_state == IsViewable)
+                    client_manage(w[i], &wa);
           }
      }
-     XFree(wins);
+     XFree(w);
 
      arrange();
 

@@ -211,10 +211,8 @@ void init_key(void);
 void init_geometry(void);
 
 /* wmfs.c */
-void checkotherwm(void);
 int errorhandler(Display *d, XErrorEvent *event);
 int errorhandlerdummy(Display *d, XErrorEvent *event);
-int errorhandlerstart(Display *d, XErrorEvent *event);
 void quit(void);
 void mainloop(void);
 void scan(void);

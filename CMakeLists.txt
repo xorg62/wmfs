@@ -1,4 +1,4 @@
-#Cmakelists.txt
+ #Cmakelists.txt
 # Minimum version of CMake
 cmake_minimum_required(VERSION 2.6)
 if(COMMAND cmake_policy)
@@ -27,19 +27,19 @@ project(${PROJECT_NAME} C)
 
 # Definition of the wmfs source
 set(wmfs_src
-  src/init.c
-  src/wmfs.c
-  src/config.c
-  src/event.c
-  src/mouse.c
-  src/util.c
-  src/layout.c
-  src/tag.c
   src/bar.c
-  src/draw.c
   src/client.c
+  src/config.c
+  src/draw.c
+  src/event.c
   src/frame.c
-  src/infobar.c)
+  src/infobar.c
+  src/init.c
+  src/layout.c
+  src/mouse.c
+  src/tag.c
+  src/util.c
+  src/wmfs.c)
 
 # Set the executable from the wmfs_src
 add_executable(wmfs ${wmfs_src})
