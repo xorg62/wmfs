@@ -172,23 +172,16 @@ void
 scan(void)
 {
      uint i, n;
-     Window usl, usl2, *w = NULL;
      XWindowAttributes wa;
+     Window usl, usl2, *w = NULL;
 
      if(XQueryTree(dpy, root, &usl, &usl2, &w, &n))
-     {
-          for(i = 0; i < n; i++)
-          {
-               if(!XGetWindowAttributes(dpy, w[i], &wa))
-                    continue;
-               if(wa.override_redirect || XGetTransientForHint(dpy, w[i], &usl))
-                    continue;
-               if(wa.map_state == IsViewable)
+          for(i = 0; i < n; ++i)
+               if(XGetWindowAttributes(dpy, w[i], &wa)
+                  && !(wa.override_redirect || XGetTransientForHint(dpy, w[i], &usl))
+                  && wa.map_state == IsViewable)
                     client_manage(w[i], &wa);
-          }
-     }
      XFree(w);
-
      arrange();
 
      return;
