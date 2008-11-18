@@ -61,7 +61,6 @@ draw_text(Drawable d, int x, int y, char* fg, int pad, char *str)
 
      XftDrawDestroy(xftd);
 
-
      return;
 }
 

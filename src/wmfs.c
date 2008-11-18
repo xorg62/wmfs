@@ -165,7 +165,7 @@ uicb_quit(uicb_t cmd)
      return;
 }
 
-/** Scan if there are window on X
+/** Scan if there are windows on X
  *  for manage it
 */
 void

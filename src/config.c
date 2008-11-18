@@ -185,6 +185,7 @@ mouse_section(MouseBinding mb[], cfg_t *cfg, int ns)
 }
 
 /** Configuration initialization
+ * \todo Make functions for all section (tag, client, layout...)
 */
 void
 init_conf(void)
@@ -439,8 +440,8 @@ init_conf(void)
           }
      }
 
-     /* tag */
-     /* if there is no tag in the conf or more than
+     /* tag
+      * if there is no tag in the conf or more than
       * MAXTAG (32) print an error and create only one.
       */
      conf.colors.tagselfg  = strdup(var_to_str(cfg_getstr(cfg_tags, "sel_fg")));

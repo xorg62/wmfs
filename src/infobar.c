@@ -129,6 +129,8 @@ infobar_draw_taglist(void)
      return;
 }
 
+/** Destroy the InfoBar
+*/
 void
 infobar_destroy(void)
 {

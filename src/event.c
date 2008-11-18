@@ -239,8 +239,13 @@ grabkeys(void)
 {
      uint i, j;
      KeyCode code;
-     uint ml[] = {LockMask, numlockmask, scrolllockmask, numlockmask|scrolllockmask,
-                  LockMask|scrolllockmask, LockMask|numlockmask, LockMask|numlockmask|scrolllockmask};
+     uint ml[] = {LockMask,
+                  numlockmask,
+                  scrolllockmask,
+                  numlockmask|scrolllockmask,
+                  LockMask|scrolllockmask,
+                  LockMask|numlockmask,
+                  LockMask|numlockmask|scrolllockmask};
 
      XUngrabKey(dpy, AnyKey, AnyModifier, root);
      for(i = 0; i < conf.nkeybind; ++i)
@@ -265,7 +270,8 @@ keypress(XKeyPressedEvent *ev)
      keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
      for(i = 0; i < conf.nkeybind; ++i)
           if(keysym == keys[i].keysym
-             && (keys[i].mod & ~(numlockmask | LockMask)) ==  (ev->state & ~(numlockmask | LockMask))
+             && (keys[i].mod & ~(numlockmask | LockMask | scrolllockmask))
+             == (ev->state & ~(numlockmask | LockMask | scrolllockmask))
              && keys[i].func)
                keys[i].func(keys[i].cmd);
 

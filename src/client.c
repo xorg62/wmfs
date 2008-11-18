@@ -125,8 +125,7 @@ uicb_client_prev(uicb_t cmd)
      if(c)
      {
           client_focus(c);
-          if(!c->tile)
-               client_raise(c);
+          client_raise(c);
      }
      arrange();
 
@@ -150,8 +149,7 @@ uicb_client_next(uicb_t cmd)
      if(c)
      {
           client_focus(c);
-          if(!c->tile)
-               client_raise(c);
+          client_raise(c);
      }
      arrange();
 
