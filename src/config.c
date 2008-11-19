@@ -399,7 +399,7 @@ init_conf(void)
      conf.client.mouse               = emalloc(conf.client.nmouse, sizeof(MouseBinding));
      mouse_section(conf.client.mouse, cfg_client, conf.client.nmouse);
 
-     /* titlebar (in client) */
+     /* titlebar (into the client section) */
      cfgtmp                = cfg_getsec(cfg_client, "titlebar");
      conf.titlebar.height  = cfg_getint(cfgtmp, "height");
      conf.titlebar.fg      = var_to_str(cfg_getstr(cfgtmp, "fg"));

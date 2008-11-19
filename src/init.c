@@ -138,6 +138,7 @@ init_atom(void)
 
      XChangeProperty(dpy, root, net_atom[NetSupported], XA_ATOM, 32,
                      PropModeReplace, (unsigned char *) net_atom, NetLast);
+
      return;
 }
 

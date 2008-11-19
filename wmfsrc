@@ -43,7 +43,7 @@ tags
         border       = "#3F485E"
         border_width = 2
 
-        tag { name = "one" mwfact = 0.65 nmaster = 1 layout = "tile" resizehint = false }
+        tag { name = "one" mwfact = 0.65 nmaster = 1 layout = "tile_right" resizehint = false }
         tag { name = "two"   }
         tag { name = "three" }
         tag { name = "four"  }
