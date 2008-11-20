@@ -41,9 +41,10 @@ frame_create(Client *c)
 {
      XSetWindowAttributes at;
 
-     at.background_pixel = conf.client.bordernormal;
+     at.background_pixel  = conf.client.bordernormal;
      at.background_pixmap = ParentRelative;
      at.override_redirect = True;
+     at.bit_gravity       = StaticGravity;
      at.event_mask = SubstructureRedirectMask|SubstructureNotifyMask
           |ExposureMask|VisibilityChangeMask
           |EnterWindowMask|LeaveWindowMask|FocusChangeMask

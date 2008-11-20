@@ -45,6 +45,10 @@ errorhandler(Display *d, XErrorEvent *event)
           exit(EXIT_FAILURE);
      }
 
+     /* Ignore focus change error */
+     if(event->request_code == 42)
+          return 0;
+
      XGetErrorText(d, event->error_code, mess, 128);
      fprintf(stderr, "WMFS error: %s(%d) opcodes %d/%d\n  resource #%lx\n", mess,
              event->error_code,

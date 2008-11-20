@@ -137,6 +137,7 @@ configurerequest(XConfigureRequestEvent *ev)
           }
           else
                client_configure(c);
+
      }
      else
      {
@@ -147,7 +148,6 @@ configurerequest(XConfigureRequestEvent *ev)
           wc.border_width = ev->border_width;
           wc.sibling = ev->above;
           wc.stack_mode = ev->detail;
-
           XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
      }
      XSync(dpy, False);
@@ -227,7 +227,7 @@ void
 focusin(XFocusChangeEvent *ev)
 {
      if(sel && ev->window != sel->win)
-          XSetInputFocus(dpy, sel->win, RevertToPointerRoot, CurrentTime);
+          client_focus(sel);
 
      return;
 }
@@ -282,7 +282,7 @@ keypress(XKeyPressedEvent *ev)
  * \param ev XMappingEvent pointer
 */
 void
-mapnotify(XMappingEvent *ev)
+mappingnotify(XMappingEvent *ev)
 {
      if(ev->request == MappingKeyboard)
           grabkeys();
@@ -302,6 +302,7 @@ maprequest(XMapRequestEvent *ev)
      CHECK(!at.override_redirect);
      if(!client_gb_win(ev->window))
           client_manage(ev->window, &at);
+
 
      return;
 }
@@ -339,28 +340,6 @@ propertynotify(XPropertyEvent *ev)
      return;
 }
 
-/** UnmapNotify handle event
- * \param ev XUnmapEvent pointer
- */
-void
-unmapnotify(XUnmapEvent *ev)
-{
-     Client *c;
-
-     if((c = client_gb_win(ev->window))
-        && ev->event == root
-        && ev->send_event
-        && getwinstate(c->win) == NormalState
-        && !c->hide)
-     {
-          XReparentWindow(dpy, c->win, root, 0, 0);
-          client_unmanage(c);
-          XSetErrorHandler(errorhandler);
-     }
-
-     return;
-}
-
 /** Event handle function: execute every function
  * handle by event
  * \param ev Event
@@ -368,6 +347,8 @@ unmapnotify(XUnmapEvent *ev)
 void
 getevent(XEvent ev)
 {
+
+
      switch (ev.type)
      {
       case ButtonPress:       buttonpress(&ev.xbutton);                 break;
@@ -378,10 +359,10 @@ getevent(XEvent ev)
       case FocusIn:           focusin(&ev.xfocus);                      break;
       case KeyPress:          keypress(&ev.xkey);                       break;
       case MapRequest:        maprequest(&ev.xmaprequest);              break;
-      case MappingNotify:     mapnotify(&ev.xmapping);                  break;
+      case MappingNotify:     mappingnotify(&ev.xmapping);              break;
       case PropertyNotify:    propertynotify(&ev.xproperty);            break;
-      case UnmapNotify:       unmapnotify(&ev.xunmap);                  break;
      }
+
 
      return;
 }

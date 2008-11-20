@@ -151,10 +151,9 @@ void expose(XExposeEvent *ev);
 void focusin(XFocusChangeEvent *ev);
 void grabkeys(void);
 void keypress(XKeyPressedEvent *ev);
-void mapnotify(XMappingEvent *ev);
+void mappingnotify(XMappingEvent *ev);
 void maprequest(XMapRequestEvent *ev);
 void propertynotify(XPropertyEvent *ev);
-void unmapnotify(XUnmapEvent *ev);
 void getevent(XEvent ev);
 
 /* mouse.c */

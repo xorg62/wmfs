@@ -296,19 +296,36 @@ void
 uicb_client_kill(uicb_t cmd)
 {
      XEvent ev;
+     Atom *atom = NULL;
+     int proto;
+     Bool canbedel = 0;
 
      CHECK(sel);
 
-     ev.type = ClientMessage;
-     ev.xclient.window = sel->win;
-     ev.xclient.message_type = wm_atom[WMProtocols];
-     ev.xclient.format = 32;
-     ev.xclient.data.l[0] = wm_atom[WMDelete];
-     ev.xclient.data.l[1] = CurrentTime;
-
-     XSendEvent(dpy, sel->win, False, NoEventMask, &ev);
-     client_unmanage(sel);
-     XSetErrorHandler(errorhandler);
+     if(XGetWMProtocols(dpy, sel->win, &atom, &proto) && atom)
+     {
+          while(proto--)
+               if(atom[proto] == wm_atom[WMDelete])
+                    ++canbedel;
+          XFree(atom);
+          if(canbedel)
+          {
+                    ev.type = ClientMessage;
+                    ev.xclient.window = sel->win;
+                    ev.xclient.message_type = wm_atom[WMProtocols];
+                    ev.xclient.format = 32;
+                    ev.xclient.data.l[0] = wm_atom[WMDelete];
+                    ev.xclient.data.l[1] = CurrentTime;
+                    ev.xclient.data.l[2] = 0;
+                    ev.xclient.data.l[3] = 0;
+                    ev.xclient.data.l[4] = 0;
+                    XSendEvent(dpy, sel->win, False, NoEventMask, &ev);
+          }
+          else
+               XDestroyWindow(dpy, sel->win);
+     }
+     else
+          XDestroyWindow(dpy, sel->win);
 
      return;
 }
@@ -342,6 +359,8 @@ client_manage(Window w, XWindowAttributes *wa)
      Client *c, *t = NULL;
      Window trans;
      Status rettrans;
+     XSetWindowAttributes at;
+
 
      c = emalloc(1, sizeof(Client));
      c->win = w;
@@ -350,10 +369,11 @@ client_manage(Window w, XWindowAttributes *wa)
      c->geo.width = wa->width;
      c->geo.height = wa->height;
      c->tag = seltag;
+     at.event_mask = PropertyChangeMask;
 
      frame_create(c);
      client_size_hints(c);
-     XSelectInput(dpy, c->win, PropertyChangeMask | StructureNotifyMask);
+     XChangeWindowAttributes(dpy, c->win, CWEventMask, &at);
      mouse_grabbuttons(c, False);
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
           for(t = clients; t && t->win != trans; t = t->next);
