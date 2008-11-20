@@ -119,6 +119,7 @@ Client* client_gb_resize(Window w);
 /* }}} */
 void client_get_name(Client *c);
 void client_hide(Client *c);
+void client_kill(Client *c);
 Bool ishide(Client *c);
 void client_map(Client *c);
 void client_manage(Window w, XWindowAttributes *wa);

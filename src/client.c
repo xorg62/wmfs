@@ -290,19 +290,19 @@ ishide(Client *c)
 }
 
 /** Kill a client
- * \param cmd uicb_t type unused
+ * \param c Client pointer
 */
 void
-uicb_client_kill(uicb_t cmd)
+client_kill(Client *c)
 {
-     XEvent ev;
+ XEvent ev;
      Atom *atom = NULL;
      int proto;
      Bool canbedel = 0;
 
-     CHECK(sel);
+     CHECK(c);
 
-     if(XGetWMProtocols(dpy, sel->win, &atom, &proto) && atom)
+     if(XGetWMProtocols(dpy, c->win, &atom, &proto) && atom)
      {
           while(proto--)
                if(atom[proto] == wm_atom[WMDelete])
@@ -311,7 +311,7 @@ uicb_client_kill(uicb_t cmd)
           if(canbedel)
           {
                     ev.type = ClientMessage;
-                    ev.xclient.window = sel->win;
+                    ev.xclient.window = c->win;
                     ev.xclient.message_type = wm_atom[WMProtocols];
                     ev.xclient.format = 32;
                     ev.xclient.data.l[0] = wm_atom[WMDelete];
@@ -319,13 +319,26 @@ uicb_client_kill(uicb_t cmd)
                     ev.xclient.data.l[2] = 0;
                     ev.xclient.data.l[3] = 0;
                     ev.xclient.data.l[4] = 0;
-                    XSendEvent(dpy, sel->win, False, NoEventMask, &ev);
+                    XSendEvent(dpy, c->win, False, NoEventMask, &ev);
           }
           else
-               XDestroyWindow(dpy, sel->win);
+               XKillClient(dpy, c->win);
      }
      else
-          XDestroyWindow(dpy, sel->win);
+          XKillClient(dpy, c->win);
+
+     return;
+}
+
+/** Kill the selected client
+ * \param cmd uicb_t type unused
+*/
+void
+uicb_client_kill(uicb_t cmd)
+{
+     CHECK(sel);
+
+     client_kill(sel);
 
      return;
 }
@@ -345,6 +358,7 @@ client_map(Client *c)
           bar_map(c->titlebar);
           bar_map_subwin(c->titlebar);
      }
+     c->unmapped = False;
 
      return;
 }
@@ -583,6 +597,7 @@ client_unmanage(Client *c)
 {
      XGrabServer(dpy);
      XSetErrorHandler(errorhandlerdummy);
+     XReparentWindow(dpy, c->win, root, c->geo.x, c->geo.y);
 
      if(sel == c)
           client_focus(NULL);
@@ -590,9 +605,9 @@ client_unmanage(Client *c)
      client_detach(c);
      XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
      setwinstate(c->win, WithdrawnState);
+     frame_delete(c);
      XSync(dpy, False);
      XUngrabServer(dpy);
-     frame_delete(c);
      arrange();
      XFree(c->title);
      efree(c);
@@ -615,6 +630,7 @@ client_unmap(Client *c)
      }
      XUnmapWindow(dpy, c->frame);
      XUnmapSubwindows(dpy, c->frame);
+     c->unmapped = True;
 
      return;
 }

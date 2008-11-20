@@ -297,11 +297,18 @@ void
 maprequest(XMapRequestEvent *ev)
 {
      XWindowAttributes at;
+     Client *c;
 
      CHECK(XGetWindowAttributes(dpy, ev->window, &at));
      CHECK(!at.override_redirect);
-     if(!client_gb_win(ev->window))
+     if(!(c = client_gb_win(ev->window)))
           client_manage(ev->window, &at);
+     else
+          /* Re-map the clients that was unmapped
+           * with the unmap event
+           */
+          if(c->unmapped)
+               client_map(c);
 
 
      return;
@@ -340,6 +347,22 @@ propertynotify(XPropertyEvent *ev)
      return;
 }
 
+/** UnmapNotify handle event
+ * \param ev XUnmapEvent pointer
+ */
+void
+unmapnotify(XUnmapEvent *ev)
+{
+     Client *c;
+
+     if((c = client_gb_win(ev->window))
+        && ev->send_event)
+          client_unmap(c);
+
+     return;
+}
+
+
 /** Event handle function: execute every function
  * handle by event
  * \param ev Event
@@ -361,6 +384,7 @@ getevent(XEvent ev)
       case MapRequest:        maprequest(&ev.xmaprequest);              break;
       case MappingNotify:     mappingnotify(&ev.xmapping);              break;
       case PropertyNotify:    propertynotify(&ev.xproperty);            break;
+      case UnmapNotify:       unmapnotify(&ev.xunmap);                  break;
      }
 
 

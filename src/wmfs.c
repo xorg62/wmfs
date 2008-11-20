@@ -36,6 +36,7 @@ int
 errorhandler(Display *d, XErrorEvent *event)
 {
      char mess[256];
+     Client *c;
 
      /* Check if there are another WM running */
      if(BadAccess == event->error_code
@@ -45,8 +46,10 @@ errorhandler(Display *d, XErrorEvent *event)
           exit(EXIT_FAILURE);
      }
 
-     /* Ignore focus change error */
-     if(event->request_code == 42)
+     /* Ignore focus change error for unmapped client */
+     if((c = client_gb_win(event->resourceid))
+        && c->unmapped
+        && event->request_code == 42)
           return 0;
 
      XGetErrorText(d, event->error_code, mess, 128);
@@ -55,7 +58,6 @@ errorhandler(Display *d, XErrorEvent *event)
              event->request_code,
              event->minor_code,
              event->resourceid);
-
 
      return 1;
 }
@@ -80,6 +82,11 @@ quit(void)
      for(c = clients; c; c = c->next)
      {
           XReparentWindow(dpy, c->win, root, c->frame_geo.x, c->frame_geo.y);
+          if(c->hide)
+               client_unhide(c);
+          if(c->unmapped)
+               client_map(c);
+
           client_unmanage(c);
      }
 
