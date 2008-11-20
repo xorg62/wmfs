@@ -308,7 +308,10 @@ maprequest(XMapRequestEvent *ev)
            * with the unmap event
            */
           if(c->unmapped)
+          {
                client_map(c);
+               c->unmapwithevent = False;
+          }
 
 
      return;
@@ -357,7 +360,10 @@ unmapnotify(XUnmapEvent *ev)
 
      if((c = client_gb_win(ev->window))
         && ev->send_event)
+     {
           client_unmap(c);
+          c->unmapwithevent = True;
+     }
 
      return;
 }

@@ -50,7 +50,10 @@ errorhandler(Display *d, XErrorEvent *event)
      if((c = client_gb_win(event->resourceid))
         && c->unmapped
         && event->request_code == 42)
+     {
+          //client_kill(c);
           return 0;
+     }
 
      XGetErrorText(d, event->error_code, mess, 128);
      fprintf(stderr, "WMFS error: %s(%d) opcodes %d/%d\n  resource #%lx\n", mess,

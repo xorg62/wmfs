@@ -270,6 +270,8 @@ client_get_name(Client *c)
 void
 client_hide(Client *c)
 {
+     CHECK(!c->unmapwithevent);
+
      client_unmap(c);
      c->hide = True;
      setwinstate(c->win, IconicState);
@@ -582,6 +584,8 @@ uicb_client_raise(uicb_t cmd)
 void
 client_unhide(Client *c)
 {
+     CHECK(!c->unmapwithevent);
+
      client_map(c);
      c->hide = False;
      setwinstate(c->win, NormalState);

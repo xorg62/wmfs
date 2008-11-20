@@ -103,7 +103,7 @@ struct Client
      } colors;
      /* Client Layout Information */
      Bool max, tile, free, hide;
-     Bool hint, lmax, unmapped;
+     Bool hint, lmax, unmapped, unmapwithevent;
      /* Struct in chains */
      Client *next;
      Client *prev;
