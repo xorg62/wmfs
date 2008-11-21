@@ -106,38 +106,28 @@ configurerequest(XConfigureRequestEvent *ev)
 {
      Client *c;
      XWindowChanges wc;
-     XRectangle geo;
 
      if((c = client_gb_win(ev->window)))
      {
           CHECK(!c->tile);
           CHECK(!c->lmax);
 
-          if(ev->value_mask & CWX)
-               geo.x = ev->x;
-          if(ev->value_mask & CWY)
-               geo.y = ev->y;
-          if(ev->value_mask & CWWidth)
-               geo.width = ev->width;
-          if(ev->value_mask & CWHeight)
-               geo.height = ev->height;
-          if((ev->value_mask & (CWX | CWY))
-             && !(ev->value_mask & (CWWidth | CWHeight)))
-               client_configure(c);
-          if(geo.x != c->geo.x
-             || geo.y != c->geo.y
-             || geo.width != c->geo.width
-             || geo.height != c->geo.height)
-          {
-               geo.x += BORDH;
-               geo.y += TBARH;
-               if((geo.x < MAXW && geo.x > 0 - geo.width)
-                  && (geo.y < MAXH && geo.y > 0 - geo.height))
-                    client_moveresize(c, geo, True);
-          }
-          else
-               client_configure(c);
+          c->geo.x = ev->x + BORDH;
+          c->geo.y = ev->y + TBARH;
+          c->geo.width = ev->width;
+          c->geo.height = ev->height;
 
+          wc.x = BORDH;
+          wc.y = TBARH + BORDH;
+          wc.width = c->geo.width;
+          wc.height = c->geo.height;
+          wc.border_width = ev->border_width;
+          wc.sibling = ev->above;
+          wc.stack_mode = ev->detail;
+
+          XConfigureWindow(dpy, c->win, ev->value_mask, &wc);
+
+          client_configure(c);
      }
      else
      {
@@ -304,15 +294,7 @@ maprequest(XMapRequestEvent *ev)
      if(!(c = client_gb_win(ev->window)))
           client_manage(ev->window, &at);
      else
-          /* Re-map the clients that was unmapped
-           * with the unmap event
-           */
-          if(c->unmapped)
-          {
-               client_map(c);
-               c->unmapwithevent = False;
-          }
-
+          client_map(c);
 
      return;
 }
@@ -360,10 +342,7 @@ unmapnotify(XUnmapEvent *ev)
 
      if((c = client_gb_win(ev->window))
         && ev->send_event)
-     {
-          client_unmap(c);
-          c->unmapwithevent = True;
-     }
+          client_unmanage(c);
 
      return;
 }
@@ -376,8 +355,6 @@ unmapnotify(XUnmapEvent *ev)
 void
 getevent(XEvent ev)
 {
-
-
      switch (ev.type)
      {
       case ButtonPress:       buttonpress(&ev.xbutton);                 break;
@@ -392,7 +369,6 @@ getevent(XEvent ev)
       case PropertyNotify:    propertynotify(&ev.xproperty);            break;
       case UnmapNotify:       unmapnotify(&ev.xunmap);                  break;
      }
-
 
      return;
 }

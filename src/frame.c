@@ -87,7 +87,7 @@ frame_create(Client *c)
           CWBackPixel, color_enlight(c->colors.frame), &at);
      CWIN(c->top,    c->frame, 0, 0, c->frame_geo.width, SHADH, 0,
           CWBackPixel, color_enlight(c->colors.frame), &at);
-     CWIN(c->bottom, c->frame, 0, c->frame_geo.height, c->frame_geo.width, SHADH, 0,
+     CWIN(c->bottom, c->frame, 0, c->frame_geo.height - SHADH, c->frame_geo.width, SHADH, 0,
           CWBackPixel, SHADC, &at);
      CWIN(c->right,  c->frame, c->frame_geo.width - SHADH, 0, SHADH, c->frame_geo.height, 0,
           CWBackPixel, SHADC, &at);
@@ -125,10 +125,10 @@ frame_delete(Client *c)
 void
 frame_moveresize(Client *c, XRectangle geo)
 {
-     c->frame_geo.x      =  geo.x - BORDH;
-     c->frame_geo.y      =  geo.y - TBARH;
-     c->frame_geo.width  =  FRAMEW(geo.width);
-     c->frame_geo.height =  FRAMEH(geo.height);
+     c->frame_geo.x      = geo.x - BORDH;
+     c->frame_geo.y      = geo.y - TBARH;
+     c->frame_geo.width  = FRAMEW(geo.width);
+     c->frame_geo.height = FRAMEH(geo.height);
 
      /* Frame */
      XMoveResizeWindow(dpy, c->frame,
