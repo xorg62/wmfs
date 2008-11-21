@@ -72,8 +72,6 @@ client_configure(Client *c)
 {
      XConfigureEvent ev;
 
-     client_moveresize(c, c->geo, True);
-
      ev.type               = ConfigureNotify;
      ev.event              = c->win;
      ev.window             = c->win;

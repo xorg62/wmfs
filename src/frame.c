@@ -45,7 +45,7 @@ frame_create(Client *c)
      at.background_pixmap = ParentRelative;
      at.override_redirect = True;
      at.bit_gravity       = StaticGravity;
-     at.event_mask = SubstructureRedirectMask|SubstructureNotifyMask
+     at.event_mask        = SubstructureRedirectMask|SubstructureNotifyMask
           |ExposureMask|VisibilityChangeMask
           |EnterWindowMask|LeaveWindowMask|FocusChangeMask
           |KeyMask|ButtonMask|MouseMask;
@@ -125,10 +125,10 @@ frame_delete(Client *c)
 void
 frame_moveresize(Client *c, XRectangle geo)
 {
-     c->frame_geo.x      = geo.x - BORDH;
-     c->frame_geo.y      = geo.y - TBARH;
-     c->frame_geo.width  = FRAMEW(geo.width);
-     c->frame_geo.height = FRAMEH(geo.height);
+     c->frame_geo.x      = (geo.x) ? geo.x - BORDH : c->frame_geo.x;
+     c->frame_geo.y      = (geo.y) ? geo.y - TBARH : c->frame_geo.y;
+     c->frame_geo.width  = (geo.width) ? FRAMEW(geo.width) : c->frame_geo.width;
+     c->frame_geo.height = (geo.height) ? FRAMEH(geo.height) : c->frame_geo.height;
 
      /* Frame */
      XMoveResizeWindow(dpy, c->frame,

@@ -145,7 +145,7 @@ void init_conf(void);
 
 /* event.c */
 void buttonpress(XButtonEvent *ev);
-void configurerequest(XConfigureRequestEvent *ev);
+void configureevent(XEvent *ev);
 void destroynotify(XDestroyWindowEvent *ev);
 void enternotify(XCrossingEvent *ev);
 void expose(XExposeEvent *ev);

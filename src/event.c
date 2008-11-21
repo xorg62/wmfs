@@ -98,49 +98,58 @@ buttonpress(XButtonEvent *ev)
      return;
 }
 
-/** ConfigureRequest handle event
- * \param ev XConfigureRequestEvent pointer
+/** ConfigureRequest & ConfigureNotify handle event
+ * \param ev XEvent pointer
 */
 void
-configurerequest(XConfigureRequestEvent *ev)
+configureevent(XEvent *ev)
 {
-     Client *c;
      XWindowChanges wc;
+     XWindowAttributes win_at, ev_at;
+     XRectangle geo = { 0 };
+     Client *c;
 
-     if((c = client_gb_win(ev->window)))
+     /* Check part */
+     if((c = client_gb_win(ev->xconfigurerequest.window))
+        || (c = client_gb_win(ev->xconfigure.window)))
      {
           CHECK(!c->tile);
           CHECK(!c->lmax);
-
-          c->geo.x = ev->x + BORDH;
-          c->geo.y = ev->y + TBARH;
-          c->geo.width = ev->width;
-          c->geo.height = ev->height;
-
-          wc.x = BORDH;
-          wc.y = TBARH + BORDH;
-          wc.width = c->geo.width;
-          wc.height = c->geo.height;
-          wc.border_width = ev->border_width;
-          wc.sibling = ev->above;
-          wc.stack_mode = ev->detail;
-
-          XConfigureWindow(dpy, c->win, ev->value_mask, &wc);
-
-          client_configure(c);
      }
-     else
+
+     /* Configure Request Part {{{ */
+     wc.x = ev->xconfigurerequest.x;
+     wc.y = ev->xconfigurerequest.y;
+     wc.width = ev->xconfigurerequest.width;
+     wc.height = ev->xconfigurerequest.height;
+     wc.border_width = ev->xconfigurerequest.border_width;
+     wc.sibling = ev->xconfigurerequest.above;
+     wc.stack_mode = ev->xconfigurerequest.detail;
+     XConfigureWindow(dpy, ev->xconfigurerequest.window,
+                      ev->xconfigurerequest.value_mask, &wc);
+     /* }}} */
+
+     /* Configure Notify Part  {{{*/
+     if((c = client_gb_win(ev->xconfigure.window)))
      {
-          wc.x = ev->x;
-          wc.y = ev->y;
-          wc.width = ev->width;
-          wc.height = ev->height;
-          wc.border_width = ev->border_width;
-          wc.sibling = ev->above;
-          wc.stack_mode = ev->detail;
-          XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
+          XGetWindowAttributes(dpy, ev->xconfigure.window, &win_at);
+          XGetWindowAttributes(dpy, ev->xconfigure.event, &ev_at);
+
+          /* Frame config */
+          if(win_at.width != ev_at.width
+             || win_at.height != ev_at.height)
+          {
+               c->geo.width = geo.width = ev->xconfigure.width;
+               c->geo.height = geo.height = ev->xconfigure.height;
+               frame_moveresize(c, geo);
+          }
+
+          /* Win config (re-adjust it with the frame) */
+          if(ev->xconfigure.x != BORDH
+              || ev->xconfigure.y != BORDH + TBARH)
+               XMoveWindow(dpy, ev->xconfigure.window, BORDH, BORDH + TBARH);
      }
-     XSync(dpy, False);
+     /* }}} */
 
      return;
 }
@@ -358,7 +367,7 @@ getevent(XEvent ev)
      switch (ev.type)
      {
       case ButtonPress:       buttonpress(&ev.xbutton);                 break;
-      case ConfigureRequest:  configurerequest(&ev.xconfigurerequest);  break;
+      case ConfigureRequest:  configureevent(&ev);                      break;
       case DestroyNotify:     destroynotify(&ev.xdestroywindow);        break;
       case EnterNotify:       enternotify(&ev.xcrossing);               break;
       case Expose:            expose(&ev.xexpose);                      break;
