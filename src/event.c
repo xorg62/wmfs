@@ -146,10 +146,11 @@ configureevent(XEvent *ev)
 
           /* Win config (re-adjust it with the frame) */
           if(ev->xconfigure.x != BORDH
-              || ev->xconfigure.y != BORDH + TBARH)
+             || ev->xconfigure.y != BORDH + TBARH)
                XMoveWindow(dpy, ev->xconfigure.window, BORDH, BORDH + TBARH);
      }
      /* }}} */
+
 
      return;
 }
@@ -302,8 +303,6 @@ maprequest(XMapRequestEvent *ev)
      CHECK(!at.override_redirect);
      if(!(c = client_gb_win(ev->window)))
           client_manage(ev->window, &at);
-     else
-          client_map(c);
 
      return;
 }
@@ -370,17 +369,17 @@ getevent(XEvent ev)
 {
      switch (ev.type)
      {
-      case ButtonPress:       buttonpress(&ev.xbutton);                 break;
-      case ConfigureRequest:  configureevent(&ev);                      break;
-      case DestroyNotify:     destroynotify(&ev.xdestroywindow);        break;
-      case EnterNotify:       enternotify(&ev.xcrossing);               break;
-      case Expose:            expose(&ev.xexpose);                      break;
-      case FocusIn:           focusin(&ev.xfocus);                      break;
-      case KeyPress:          keypress(&ev.xkey);                       break;
-      case MapRequest:        maprequest(&ev.xmaprequest);              break;
-      case MappingNotify:     mappingnotify(&ev.xmapping);              break;
-      case PropertyNotify:    propertynotify(&ev.xproperty);            break;
-      case UnmapNotify:       unmapnotify(&ev.xunmap);                  break;
+      case ButtonPress:       buttonpress(&ev.xbutton);           break;
+      case ConfigureRequest:  configureevent(&ev);                break;
+      case DestroyNotify:     destroynotify(&ev.xdestroywindow);  break;
+      case EnterNotify:       enternotify(&ev.xcrossing);         break;
+      case Expose:            expose(&ev.xexpose);                break;
+      case FocusIn:           focusin(&ev.xfocus);                break;
+      case KeyPress:          keypress(&ev.xkey);                 break;
+      case MapRequest:        maprequest(&ev.xmaprequest);        break;
+      case MappingNotify:     mappingnotify(&ev.xmapping);        break;
+      case PropertyNotify:    propertynotify(&ev.xproperty);      break;
+      case UnmapNotify:       unmapnotify(&ev.xunmap);            break;
      }
 
      return;
