@@ -350,8 +350,12 @@ unmapnotify(XUnmapEvent *ev)
      Client *c;
 
      if((c = client_gb_win(ev->window))
-        && ev->send_event)
+        && ev->send_event
+        && !c->hide)
+     {
           client_unmanage(c);
+          XSetErrorHandler(errorhandler);
+     }
 
      return;
 }

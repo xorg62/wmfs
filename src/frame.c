@@ -80,7 +80,8 @@ frame_create(Client *c)
           c->frame_geo.height - RESHW,
           RESHW,
           RESHW, 0,
-          CWEventMask|CWBackPixel|CWCursor, c->colors.resizecorner, &at);
+          CWEventMask|CWBackPixel|CWCursor,
+          c->colors.resizecorner, &at);
 
      /* Border (for shadow) */
      CWIN(c->left,   c->frame, 0, 0, SHADH, c->frame_geo.height, 0,
@@ -127,7 +128,7 @@ frame_moveresize(Client *c, XRectangle geo)
 {
      c->frame_geo.x      = (geo.x) ? geo.x - BORDH : c->frame_geo.x;
      c->frame_geo.y      = (geo.y) ? geo.y - TBARH : c->frame_geo.y;
-     c->frame_geo.width  = (geo.width) ? FRAMEW(geo.width) : c->frame_geo.width;
+     c->frame_geo.width  = (geo.width)  ? FRAMEW(geo.width)  : c->frame_geo.width;
      c->frame_geo.height = (geo.height) ? FRAMEH(geo.height) : c->frame_geo.height;
 
      /* Frame */
