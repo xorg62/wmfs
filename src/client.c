@@ -378,10 +378,10 @@ client_manage(Window w, XWindowAttributes *wa)
 
      c = emalloc(1, sizeof(Client));
      c->win = w;
-     c->geo.x = wa->x;
-     c->geo.y = wa->y + sgeo.y;
-     c->geo.width = wa->width;
-     c->geo.height = wa->height;
+     c->ogeo.x = c->geo.x = wa->x;
+     c->ogeo.y = c->geo.y = wa->y + sgeo.y;
+     c->ogeo.width = c->geo.width = wa->width;
+     c->ogeo.height = c->geo.height = wa->height;
      c->tag = seltag;
      at.event_mask = PropertyChangeMask;
 
