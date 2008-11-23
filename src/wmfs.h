@@ -218,6 +218,7 @@ void mainloop(void);
 void scan(void);
 void handle_signal(int signum);
 void uicb_quit(uicb_t);
+void uicb_reload(uicb_t cmd);
 
 /* Variables */
 

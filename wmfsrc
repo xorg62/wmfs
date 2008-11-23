@@ -96,6 +96,7 @@ client
 keys
 {
 # general keybind
+        key { mod = {"Alt"} key = "r" func = "reload" }
         key { mod = {"Control"} key = "Return" func = "spawn" cmd = term }
         key { mod = {"Alt"} key = "q" func = "client_kill" }
         key { mod = {"Control", "Alt", "Shift"} key = "q" func = "quit" }

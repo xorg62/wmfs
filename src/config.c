@@ -55,7 +55,8 @@ func_name_list_t func_list[] =
      {"mouse_resize",            uicb_mouse_resize },
      {"client_raise",            uicb_client_raise },
      {"tile_switch",             uicb_tile_switch },
-     {"toggle_free",             uicb_togglefree }
+     {"toggle_free",             uicb_togglefree },
+     {"reload",                  uicb_reload }
 };
 
 func_name_list_t layout_list[] =
@@ -408,6 +409,13 @@ init_conf(void)
      mouse_section(conf.titlebar.mouse, cfgtmp, conf.titlebar.nmouse);
 
      /* layout */
+     /* Set conf.layout NULL for conf reload */
+     for(i = 0; i < NUM_OF_LAYOUT; ++i)
+     {
+          conf.layout[i].symbol = NULL;
+          conf.layout[i].func = NULL;
+     }
+
      conf.colors.layout_fg  = strdup(var_to_str(cfg_getstr(cfg_layouts, "fg")));
      conf.colors.layout_bg  = getcolor(var_to_str(cfg_getstr(cfg_layouts, "bg")));
 

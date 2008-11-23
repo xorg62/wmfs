@@ -82,7 +82,6 @@ quit(void)
      /* Unmanage all clients */
      for(c = clients; c; c = c->next)
      {
-          XReparentWindow(dpy, c->win, root, c->frame_geo.x, c->frame_geo.y);
           if(c->hide)
                client_unhide(c);
           if(c->unmapped)
@@ -195,6 +194,23 @@ scan(void)
                     client_manage(w[i], &wa);
      XFree(w);
      arrange();
+
+     return;
+}
+
+void
+uicb_reload(uicb_t cmd)
+{
+     /* If there is a bar size changement */
+     bar_unmap_subwin(infobar->bar);
+     bar_unmap(infobar->bar);
+
+     init_conf();
+     init();
+     scan();
+
+     mainloop();
+     raise(SIGTERM);
 
      return;
 }
