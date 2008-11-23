@@ -121,7 +121,7 @@ a_find_program(CAT_EXECUTABLE cat TRUE)
 if(EXISTS ${SOURCE_DIR}/.git/HEAD AND GIT_EXECUTABLE)
 
   # generate
-message("Generating changelog...")
+message("Git dir -- Generating changelog...")
 execute_process(
   COMMAND ${GIT_EXECUTABLE} log
   WORKING_DIRECTORY ${SOURCE_DIR}
@@ -129,6 +129,14 @@ execute_process(
   )
 set(CHANGELOG_FILE ${SOURCE_DIR}/CHANGELOG)
 file(WRITE ${CHANGELOG_FILE} ${WMFS_CHANGELOG})
+
+else()
+
+message("Non-Git dir -- Generating fake changelog")
+execute_process(
+  COMMAND touch ${SOURCE_DIR}/CHANGELOG
+  )
+
 endif()
 
 # {{{ Check if documentation can be build
