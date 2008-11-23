@@ -34,6 +34,144 @@
 
 #define FILE_NAME   ".config/wmfs/wmfsrc"
 
+cfg_t *cfg;
+cfg_t *cfg_misc;
+cfg_t *cfg_bar;
+cfg_t *cfg_variables;
+cfg_t *cfg_root;
+cfg_t *cfg_client;
+cfg_t *cfg_layouts;
+cfg_t *cfg_tags;
+cfg_t *cfg_keys;
+cfg_t *cfgtmp;
+
+static cfg_opt_t misc_opts[] =
+{
+     CFG_STR("font",             "sans-9",  CFGF_NONE),
+     CFG_BOOL("raisefocus",      cfg_false, CFGF_NONE),
+     CFG_BOOL("raiseswitch",     cfg_true,  CFGF_NONE),
+     CFG_END()
+};
+
+static cfg_opt_t bar_opts[] =
+{
+     CFG_STR("bg",        "#090909", CFGF_NONE),
+     CFG_STR("fg",        "#6289A1", CFGF_NONE),
+     CFG_STR("position",  "top",     CFGF_NONE),
+     CFG_END()
+};
+
+static cfg_opt_t mouse_button_opts[] =
+{
+     CFG_STR("button", "Button1", CFGF_NONE),
+     CFG_STR("func",   "",        CFGF_NONE),
+     CFG_STR("cmd",    "",        CFGF_NONE),
+     CFG_END()
+};
+
+static cfg_opt_t root_opts[] =
+{
+     CFG_STR("background_command", "",                CFGF_NONE),
+     CFG_SEC("mouse",              mouse_button_opts, CFGF_MULTI),
+     CFG_END()
+};
+
+static cfg_opt_t titlebar_opts[] =
+{
+     CFG_INT("height", 0,                 CFGF_NONE),
+     CFG_STR("fg",     "#FFFFFF",         CFGF_NONE),
+     CFG_SEC("mouse",  mouse_button_opts, CFGF_MULTI),
+     CFG_END()
+};
+
+static cfg_opt_t client_opts[]=
+{
+     CFG_INT("border_height",         1,                  CFGF_NONE),
+     CFG_STR("border_normal",         "#354B5C",          CFGF_NONE),
+     CFG_STR("border_focus",          "#6286A1",          CFGF_NONE),
+     CFG_STR("resize_corner_normal",  "#ff0000",          CFGF_NONE),
+     CFG_STR("resize_corner_focus",   "#ff0000",          CFGF_NONE),
+     CFG_STR("modifier",              "Alt",              CFGF_NONE),
+     CFG_SEC("mouse",                 mouse_button_opts,  CFGF_MULTI),
+     CFG_SEC("titlebar",              titlebar_opts,      CFGF_NONE),
+     CFG_END()
+};
+
+static cfg_opt_t layout_opts[] =
+{
+     CFG_STR("type",   "", CFGF_NONE),
+     CFG_STR("symbol", "", CFGF_NONE),
+     CFG_END()
+};
+
+static cfg_opt_t layouts_opts[] =
+{
+     CFG_STR("fg",           "#FFFFFF",   CFGF_NONE),
+     CFG_STR("bg",           "#292929",   CFGF_NONE),
+     CFG_SEC("layout",       layout_opts, CFGF_MULTI),
+     CFG_END()
+};
+
+static cfg_opt_t tag_opts[] =
+{
+     CFG_STR("name",        "",           CFGF_NONE),
+     CFG_FLOAT("mwfact",    0.65,         CFGF_NONE),
+     CFG_INT("nmaster",     1,            CFGF_NONE),
+     CFG_STR("layout",      "tile_right", CFGF_NONE),
+     CFG_BOOL("resizehint", cfg_false,    CFGF_NONE),
+     CFG_END()
+};
+
+static cfg_opt_t tags_opts[] =
+{
+     CFG_STR("sel_fg",       "#FFFFFF", CFGF_NONE),
+     CFG_STR("sel_bg",       "#354B5C", CFGF_NONE),
+     CFG_STR("border",       "#090909", CFGF_NONE),
+     CFG_SEC("tag",          tag_opts,  CFGF_MULTI),
+     CFG_END()
+};
+
+static cfg_opt_t key_opts[] =
+{
+     CFG_STR_LIST("mod", "{Control}", CFGF_NONE),
+     CFG_STR("key",      "None",      CFGF_NONE),
+     CFG_STR("func",     "",          CFGF_NONE),
+     CFG_STR("cmd",      "",          CFGF_NONE),
+     CFG_END()
+};
+
+static cfg_opt_t keys_opts[] =
+{
+     CFG_SEC("key", key_opts, CFGF_MULTI),
+     CFG_END()
+};
+
+static cfg_opt_t variable_opts[] =
+{
+     CFG_STR("content", "", CFGF_NONE),
+     CFG_END()
+};
+
+static cfg_opt_t variables_opts[] =
+{
+     CFG_SEC("var", variable_opts, CFGF_TITLE | CFGF_MULTI),
+     CFG_END()
+};
+
+static cfg_opt_t opts[] =
+{
+     CFG_SEC("misc",      misc_opts,      CFGF_NONE),
+     CFG_SEC("variables", variables_opts, CFGF_NONE),
+     CFG_SEC("root",      root_opts,      CFGF_NONE),
+     CFG_SEC("client",    client_opts,    CFGF_NONE),
+     CFG_SEC("bar",       bar_opts,       CFGF_NONE),
+     CFG_SEC("layouts",   layouts_opts,   CFGF_NONE),
+     CFG_SEC("tags",      tags_opts,      CFGF_NONE),
+     CFG_SEC("keys",      keys_opts,      CFGF_NONE),
+     CFG_END()
+};
+
+
 func_name_list_t func_list[] =
 {
      {"spawn",                   uicb_spawn },
@@ -191,144 +329,6 @@ mouse_section(MouseBinding mb[], cfg_t *cfg, int ns)
 void
 init_conf(void)
 {
-
-     static cfg_opt_t misc_opts[] =
-          {
-               CFG_STR("font",             "sans-9",  CFGF_NONE),
-               CFG_BOOL("raisefocus",      cfg_false, CFGF_NONE),
-               CFG_BOOL("raiseswitch",     cfg_true,  CFGF_NONE),
-               CFG_END()
-          };
-
-     static cfg_opt_t bar_opts[] =
-          {
-               CFG_STR("bg",        "#090909", CFGF_NONE),
-               CFG_STR("fg",        "#6289A1", CFGF_NONE),
-               CFG_STR("position",  "top",     CFGF_NONE),
-               CFG_END()
-          };
-
-     static cfg_opt_t mouse_button_opts[] =
-          {
-               CFG_STR("button", "Button1", CFGF_NONE),
-               CFG_STR("func",   "",        CFGF_NONE),
-               CFG_STR("cmd",    "",        CFGF_NONE),
-               CFG_END()
-          };
-
-     static cfg_opt_t root_opts[] =
-          {
-               CFG_STR("background_command", "",                CFGF_NONE),
-               CFG_SEC("mouse",              mouse_button_opts, CFGF_MULTI),
-               CFG_END()
-          };
-
-     static cfg_opt_t titlebar_opts[] =
-          {
-               CFG_INT("height", 0,                 CFGF_NONE),
-               CFG_STR("fg",     "#FFFFFF",         CFGF_NONE),
-               CFG_SEC("mouse",  mouse_button_opts, CFGF_MULTI),
-               CFG_END()
-          };
-
-     static cfg_opt_t client_opts[]=
-          {
-               CFG_INT("border_height",         1,                  CFGF_NONE),
-               CFG_STR("border_normal",         "#354B5C",          CFGF_NONE),
-               CFG_STR("border_focus",          "#6286A1",          CFGF_NONE),
-               CFG_STR("resize_corner_normal",  "#ff0000",          CFGF_NONE),
-               CFG_STR("resize_corner_focus",   "#ff0000",          CFGF_NONE),
-               CFG_STR("modifier",              "Alt",              CFGF_NONE),
-               CFG_SEC("mouse",                 mouse_button_opts,  CFGF_MULTI),
-               CFG_SEC("titlebar",              titlebar_opts,      CFGF_NONE),
-               CFG_END()
-          };
-
-
-     static cfg_opt_t layout_opts[] =
-          {
-               CFG_STR("type",   "", CFGF_NONE),
-               CFG_STR("symbol", "", CFGF_NONE),
-               CFG_END()
-          };
-
-     static cfg_opt_t layouts_opts[] =
-          {
-               CFG_STR("fg",           "#FFFFFF",   CFGF_NONE),
-               CFG_STR("bg",           "#292929",   CFGF_NONE),
-               CFG_SEC("layout",       layout_opts, CFGF_MULTI),
-               CFG_END()
-          };
-
-     static cfg_opt_t tag_opts[] =
-          {
-               CFG_STR("name",        "",           CFGF_NONE),
-               CFG_FLOAT("mwfact",    0.65,         CFGF_NONE),
-               CFG_INT("nmaster",     1,            CFGF_NONE),
-               CFG_STR("layout",      "tile_right", CFGF_NONE),
-               CFG_BOOL("resizehint", cfg_false,    CFGF_NONE),
-               CFG_END()
-          };
-
-     static cfg_opt_t tags_opts[] =
-          {
-               CFG_STR("sel_fg",       "#FFFFFF", CFGF_NONE),
-               CFG_STR("sel_bg",       "#354B5C", CFGF_NONE),
-               CFG_STR("border",       "#090909", CFGF_NONE),
-               CFG_SEC("tag",          tag_opts,  CFGF_MULTI),
-               CFG_END()
-          };
-
-     static cfg_opt_t key_opts[] =
-          {
-               CFG_STR_LIST("mod", "{Control}", CFGF_NONE),
-               CFG_STR("key",      "None",      CFGF_NONE),
-               CFG_STR("func",     "",          CFGF_NONE),
-               CFG_STR("cmd",      "",          CFGF_NONE),
-               CFG_END()
-          };
-
-     static cfg_opt_t keys_opts[] =
-          {
-               CFG_SEC("key", key_opts, CFGF_MULTI),
-               CFG_END()
-          };
-
-     static cfg_opt_t variable_opts[] =
-          {
-               CFG_STR("content", "", CFGF_NONE),
-               CFG_END()
-          };
-
-     static cfg_opt_t variables_opts[] =
-          {
-               CFG_SEC("var", variable_opts, CFGF_TITLE | CFGF_MULTI),
-               CFG_END()
-          };
-
-     static cfg_opt_t opts[] =
-          {
-               CFG_SEC("misc",      misc_opts,      CFGF_NONE),
-               CFG_SEC("variables", variables_opts, CFGF_NONE),
-               CFG_SEC("root",      root_opts,      CFGF_NONE),
-               CFG_SEC("client",    client_opts,    CFGF_NONE),
-               CFG_SEC("bar",       bar_opts,       CFGF_NONE),
-               CFG_SEC("layouts",   layouts_opts,   CFGF_NONE),
-               CFG_SEC("tags",      tags_opts,      CFGF_NONE),
-               CFG_SEC("keys",      keys_opts,      CFGF_NONE),
-               CFG_END()
-          };
-
-     cfg_t *cfg;
-     cfg_t *cfg_misc;
-     cfg_t *cfg_bar;
-     cfg_t *cfg_variables;
-     cfg_t *cfg_root;
-     cfg_t *cfg_client;
-     cfg_t *cfg_layouts;
-     cfg_t *cfg_tags;
-     cfg_t *cfg_keys;
-     cfg_t *cfgtmp;
      char final_path[128];
      int ret, i, j, l;
 
@@ -509,7 +509,10 @@ init_conf(void)
           keys[j].cmd = (!strdup(var_to_str((cfg_getstr(cfgtmp, "cmd"))))
                                  ?  NULL : strdup(var_to_str(cfg_getstr(cfgtmp, "cmd"))));
      }
-     cfg_free(cfg);
+
+//     cfg_free(cfg);
+
+     cfg_free(cfgtmp);
 
      return;
 }

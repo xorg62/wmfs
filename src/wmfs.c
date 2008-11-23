@@ -95,6 +95,7 @@ quit(void)
      XFreeCursor(dpy, cursor[CurMove]);
      XFreeCursor(dpy, cursor[CurResize]);
      infobar_destroy();
+     efree(infobar);
      efree(keys);
      efree(conf.titlebar.mouse);
      efree(conf.client.mouse);
@@ -201,14 +202,16 @@ scan(void)
 void
 uicb_reload(uicb_t cmd)
 {
-     /* If there is a bar size changement */
-     bar_unmap_subwin(infobar->bar);
-     bar_unmap(infobar->bar);
+     XSetErrorHandler(errorhandlerdummy);
+
+     XftFontClose(dpy, font);
+     infobar_destroy();
 
      init_conf();
      init();
      scan();
 
+     XSetErrorHandler(errorhandler);
      mainloop();
      raise(SIGTERM);
 

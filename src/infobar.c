@@ -145,7 +145,6 @@ infobar_destroy(void)
           bar_delete(infobar->tags[i]);
      }
      bar_delete_subwin(infobar->bar);
-     efree(infobar);
 
      return;
 }
