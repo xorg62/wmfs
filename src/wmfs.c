@@ -113,7 +113,7 @@ mainloop(void)
 {
      fd_set fd;
      char sbuf[sizeof infobar->statustext], *p;
-     int len, r, offset = 0, st;
+     int len, r, offset = 0;
      Bool readstdin = True;
      XEvent ev;
 
@@ -153,7 +153,6 @@ mainloop(void)
                     readstdin = False;
                }
                infobar_draw();
-               wait(&st);
           }
           while(XPending(dpy))
           {

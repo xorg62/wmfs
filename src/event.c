@@ -367,6 +367,8 @@ unmapnotify(XUnmapEvent *ev)
 void
 getevent(XEvent ev)
 {
+     int st;
+
      switch (ev.type)
      {
       case ButtonPress:       buttonpress(&ev.xbutton);           break;
@@ -381,6 +383,8 @@ getevent(XEvent ev)
       case PropertyNotify:    propertynotify(&ev.xproperty);      break;
       case UnmapNotify:       unmapnotify(&ev.xunmap);            break;
      }
+
+     wait(&st);
 
      return;
 }
