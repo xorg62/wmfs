@@ -46,7 +46,7 @@ set(wmfs_src
 add_executable(wmfs ${wmfs_src})
 
 # Set the version - NOT USED AT THE MOMENT
-set(VERSION "0.1rc2 (Brain Damage)")
+set(VERSION "0.1rc3 (Empty Spaces)")
 
 # FLAGS
 set(CFLAGS "-g -Wall")
