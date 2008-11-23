@@ -160,7 +160,6 @@ typedef struct
      bool raisefocus;
      bool raiseswitch;
      bool bartop;
-     int tagbordwidth;
      struct
      {
           /*

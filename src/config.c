@@ -275,7 +275,6 @@ init_conf(void)
                CFG_STR("sel_fg",       "#FFFFFF", CFGF_NONE),
                CFG_STR("sel_bg",       "#354B5C", CFGF_NONE),
                CFG_STR("border",       "#090909", CFGF_NONE),
-               CFG_INT("border_width", 0,         CFGF_NONE),
                CFG_SEC("tag",          tag_opts,  CFGF_MULTI),
                CFG_END()
           };
@@ -454,7 +453,6 @@ init_conf(void)
       */
      conf.colors.tagselfg  = strdup(var_to_str(cfg_getstr(cfg_tags, "sel_fg")));
      conf.colors.tagselbg  = getcolor(var_to_str(cfg_getstr(cfg_tags, "sel_bg")));
-     conf.tagbordwidth     = cfg_getint(cfg_tags, "border_width");
      conf.colors.tagbord   = getcolor(var_to_str(cfg_getstr(cfg_tags, "border")));
 
      conf.ntag = cfg_size(cfg_tags, "tag");

@@ -41,7 +41,6 @@ tags
         sel_fg       = "#191919"
         sel_bg       = "#7E89A2"
         border       = "#3F485E"
-        border_width = 2
 
         tag { name = "one" mwfact = 0.65 nmaster = 1 layout = "tile_right" resizehint = false }
         tag { name = "two"   }
@@ -89,9 +88,7 @@ client
                 mouse { button = "3" func = "client_raise" }
                 mouse { button = "3" func = "mouse_resize" }
         }
-
 }
-
 
 keys
 {
