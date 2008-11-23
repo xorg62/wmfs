@@ -44,6 +44,7 @@
 #include <time.h>
 #include <getopt.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <confuse.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>

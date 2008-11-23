@@ -277,7 +277,7 @@ ishide(Client *c)
 void
 client_kill(Client *c)
 {
- XEvent ev;
+     XEvent ev;
      Atom *atom = NULL;
      int proto;
      Bool canbedel = 0;
