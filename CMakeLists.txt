@@ -1,4 +1,5 @@
- #Cmakelists.txt
+# -*- mode: cmake -*-
+#Cmakelists.txt
 # Minimum version of CMake
 cmake_minimum_required(VERSION 2.6)
 if(COMMAND cmake_policy)
@@ -84,6 +85,7 @@ message("Using these LDFLAGS: ${LDFLAGS}")
 message("Linking with theses libraries : ${LIBRARIES_TO_LINK}")
 
 # Includes
+include(FindDoxygen)
 include(FindPkgConfig)
 
 # Use pkgconfig to get required libraries
@@ -221,6 +223,14 @@ if(GENERATE_MANPAGES)
 endif()
 # }}}
 
+# {{ Doxygen
+if(DOXYGEN_EXECUTABLE)
+  add_custom_target(doc
+    COMMAND ${DOXYGEN_EXECUTABLE} wmfs.doxygen
+    WORKING_DIRECTORY ${BUILD_DIR})
+endif()
+# }}
+
 # Remplace strings in configs
 set(WMFS_VERSION ${VERSION})
 set(WMFS_COMPILE_MACHINE ${CMAKE_SYSTEM_PROCESSOR})
@@ -228,17 +238,19 @@ set(WMFS_COMPILE_BY $ENV{USER})
 set(WMFS_COMPILE_FLAGS ${CFLAGS})
 set(WMFS_LINKED_LIBS ${LIBRARIES_TO_LINK})
 set(WMFS_SYSCONFDIR ${XDG_CONFIG_DIR}/${PROJECT_NAME})
+set(WMFS_SOURCE_DIR ${SOURCE_DIR})
 
 # Configure files
 set(wmfs_configure_files
   src/config.h.in
-  wmfs.1.txt.in)
+  wmfs.1.txt.in
+  wmfs.doxygen.in)
 
 macro(a_configure_file file)
     string(REGEX REPLACE ".in\$" "" outfile ${file})
     message(STATUS "Configuring ${outfile}")
     configure_file(${SOURCE_DIR}/${file}
-                   ${SOURCE_DIR}/${outfile}
+                   ${BUILD_DIR}/${outfile}
                    ESCAPE_QUOTE
                    @ONLY)
 endmacro()
