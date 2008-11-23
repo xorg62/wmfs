@@ -509,10 +509,8 @@ init_conf(void)
           keys[j].cmd = (!strdup(var_to_str((cfg_getstr(cfgtmp, "cmd"))))
                                  ?  NULL : strdup(var_to_str(cfg_getstr(cfgtmp, "cmd"))));
      }
+     cfg_free(cfg);
 
-//     cfg_free(cfg);
-
-     cfg_free(cfgtmp);
 
      return;
 }

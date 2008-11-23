@@ -68,7 +68,7 @@
 #define MAXW         DisplayWidth(dpy, screen)
 
 #define SHADH        1
-#define SHADC        0x000000
+#define SHADC        0x000000 /* 'Cause i don't know how darken a color yet */
 #define BORDH        conf.client.borderheight
 #define TBARH        conf.titlebar.height
 #define FRAMEW(w)    w + BORDH * 2
@@ -106,7 +106,6 @@ void infobar_destroy(void);
 void uicb_infobar_togglepos(uicb_t cmd);
 
 /* client.c */
-int client_pertag(int tag);
 void client_attach(Client *c);
 void client_configure(Client *c);
 void client_detach(Client *c);

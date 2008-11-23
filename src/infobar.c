@@ -39,7 +39,8 @@ infobar_init(void)
 {
      int i, j = 0;
 
-     infobar = emalloc(1, sizeof(InfoBar));
+     if(!infobar)
+          infobar = emalloc(1, sizeof(InfoBar));
      infobar->geo.height = font->height * 1.5;
      infobar->geo.y = (conf.bartop) ? 0 : MAXH - infobar->geo.height;
 
@@ -157,6 +158,7 @@ void
 uicb_infobar_togglepos(uicb_t cmd)
 {
      conf.bartop = !conf.bartop;
+
      if(conf.bartop)
           sgeo.y =  infobar->geo.height + TBARH;
      else

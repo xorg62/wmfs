@@ -49,7 +49,7 @@ errorhandler(Display *d, XErrorEvent *event)
      /* Ignore focus change error for unmapped client */
      if((c = client_gb_win(event->resourceid))
         && c->unmapped
-        && event->request_code == 42)
+        && event->request_code == 42) /* 42: X_SetInputFocus (Xproto.h) */
           return 0;
 
 
@@ -199,6 +199,9 @@ scan(void)
      return;
 }
 
+/** Reload the WMFS with the new configuration
+ * file changement *TESTING*
+*/
 void
 uicb_reload(uicb_t cmd)
 {

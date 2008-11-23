@@ -216,6 +216,7 @@ void
 uicb_mouse_move(uicb_t cmd)
 {
      CHECK(sel);
+
      mouse_move(sel);
 
      return;
@@ -228,6 +229,7 @@ void
 uicb_mouse_resize(uicb_t cmd)
 {
      CHECK(sel);
+
      mouse_resize(sel);
 
      return;
