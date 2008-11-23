@@ -32,24 +32,6 @@
 
 #include "wmfs.h"
 
-/** Calcule how many of client there are
- *  Per tag
- * \param tag Tag number
- * \return Number of client
-*/
-int
-client_pertag(int tag)
-{
-     Client *c;
-     int i = 0;
-
-     for(c = clients; c; c = c->next)
-          if(c->tag == tag)
-               ++i;
-
-     return i;
-}
-
 /** Attach client in the client chain
  * \param c Client pointer
 */
