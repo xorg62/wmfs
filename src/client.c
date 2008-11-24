@@ -292,16 +292,16 @@ client_kill(Client *c)
           XFree(atom);
           if(canbedel)
           {
-                    ev.type = ClientMessage;
-                    ev.xclient.window = c->win;
-                    ev.xclient.message_type = wm_atom[WMProtocols];
-                    ev.xclient.format = 32;
-                    ev.xclient.data.l[0] = wm_atom[WMDelete];
-                    ev.xclient.data.l[1] = CurrentTime;
-                    ev.xclient.data.l[2] = 0;
-                    ev.xclient.data.l[3] = 0;
-                    ev.xclient.data.l[4] = 0;
-                    XSendEvent(dpy, c->win, False, NoEventMask, &ev);
+               ev.type = ClientMessage;
+               ev.xclient.window = c->win;
+               ev.xclient.message_type = wm_atom[WMProtocols];
+               ev.xclient.format = 32;
+               ev.xclient.data.l[0] = wm_atom[WMDelete];
+               ev.xclient.data.l[1] = CurrentTime;
+               ev.xclient.data.l[2] = 0;
+               ev.xclient.data.l[3] = 0;
+               ev.xclient.data.l[4] = 0;
+               XSendEvent(dpy, c->win, False, NoEventMask, &ev);
           }
           else
                XKillClient(dpy, c->win);

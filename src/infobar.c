@@ -160,7 +160,7 @@ uicb_infobar_togglepos(uicb_t cmd)
      conf.bartop = !conf.bartop;
 
      if(conf.bartop)
-          sgeo.y =  infobar->geo.height + TBARH;
+          sgeo.y = infobar->geo.height + TBARH;
      else
           sgeo.y = TBARH;
 

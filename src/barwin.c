@@ -1,5 +1,5 @@
 /*
-*      bar.c
+*      barwin.c
 *      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.com>
 *      All rights reserved.
 *
@@ -50,17 +50,18 @@ barwin_create(Window parent,
      XSetWindowAttributes at;
      BarWindow *bw;
 
+     /* Allocate memory */
      bw = emalloc(1, sizeof(BarWindow));
 
+     /* Barwin attributes */
      at.override_redirect = True;
      at.background_pixmap = ParentRelative;
+     at.event_mask = SubstructureRedirectMask|SubstructureNotifyMask
+          |ButtonMask|MouseMask
+          |ExposureMask|VisibilityChangeMask
+          |StructureNotifyMask|SubstructureRedirectMask;
      if(entermask)
-          at.event_mask = SubstructureRedirectMask | SubstructureNotifyMask |
-               ButtonPressMask | ExposureMask | EnterWindowMask |
-               LeaveWindowMask | StructureNotifyMask;
-     else
-          at.event_mask = SubstructureRedirectMask | SubstructureNotifyMask |
-               ButtonPressMask | ExposureMask | StructureNotifyMask;
+          at.event_mask |= EnterWindowMask|LeaveWindowMask|FocusChangeMask;
 
      /* Create window */
      bw->win = XCreateWindow(dpy, parent, x, y, w, h, 0, DefaultDepth(dpy, screen),
@@ -69,11 +70,12 @@ barwin_create(Window parent,
      bw->dr = XCreatePixmap(dpy, parent, w, h, DefaultDepth(dpy, screen));
 
      /* His border */
-     CWIN(bw->border.left,   bw->win, 0, 0, SHADH, h, 0, CWBackPixel, color_enlight(color), &at);
-     CWIN(bw->border.top,    bw->win, 0, 0, w, SHADH, 0, CWBackPixel, color_enlight(color), &at);
+     CWIN(bw->border.left, bw->win, 0, 0, SHADH, h, 0, CWBackPixel, color_enlight(color), &at);
+     CWIN(bw->border.top, bw->win, 0, 0, w, SHADH, 0, CWBackPixel, color_enlight(color), &at);
      CWIN(bw->border.bottom, bw->win, 0, h - SHADH, w, SHADH, 0, CWBackPixel, SHADC, &at);
-     CWIN(bw->border.right,  bw->win, w - SHADH, 0, SHADH, h, 0, CWBackPixel, SHADC, &at);
+     CWIN(bw->border.right, bw->win, w - SHADH, 0, SHADH, h, 0, CWBackPixel, SHADC, &at);
 
+     /* Property */
      bw->geo.x = x;
      bw->geo.y = y;
      bw->geo.width = w;
@@ -96,7 +98,7 @@ barwin_delete(BarWindow *bw)
      XSelectInput(dpy, bw->win, NoEventMask);
      XDestroyWindow(dpy, bw->win);
      XFreePixmap(dpy, bw->dr);
-     free(bw);
+     efree(bw);
 
      return;
 }
@@ -228,10 +230,10 @@ barwin_refresh_color(BarWindow *bw)
 
      draw_rectangle(bw->dr, 0, 0, bw->geo.width, bw->geo.height, bw->color);
 
-     XSetWindowBackground(dpy, bw->border.left ,   bw->border.light);
-     XSetWindowBackground(dpy, bw->border.top ,    bw->border.light);
-     XSetWindowBackground(dpy, bw->border.bottom , bw->border.dark);
-     XSetWindowBackground(dpy, bw->border.right ,  bw->border.dark);
+     XSetWindowBackground(dpy, bw->border.left, bw->border.light);
+     XSetWindowBackground(dpy, bw->border.top, bw->border.light);
+     XSetWindowBackground(dpy, bw->border.bottom, bw->border.dark);
+     XSetWindowBackground(dpy, bw->border.right, bw->border.dark);
 
      XClearWindow(dpy, bw->border.left);
      XClearWindow(dpy, bw->border.top);

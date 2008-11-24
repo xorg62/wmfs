@@ -51,12 +51,12 @@ frame_create(Client *c)
           |KeyMask|ButtonMask|MouseMask;
 
      /* Set property */
-     c->frame_geo.x          =  c->geo.x - BORDH;
-     c->frame_geo.y          =  c->geo.y - TBARH;
-     c->frame_geo.width      =  FRAMEW(c->geo.width);
-     c->frame_geo.height     =  FRAMEH(c->geo.height);
-     c->colors.frame         =  conf.client.bordernormal;
-     c->colors.resizecorner  =  conf.client.resizecorner_normal;
+     c->frame_geo.x          = c->geo.x - BORDH;
+     c->frame_geo.y          = c->geo.y - TBARH;
+     c->frame_geo.width      = FRAMEW(c->geo.width);
+     c->frame_geo.height     = FRAMEH(c->geo.height);
+     c->colors.frame         = conf.client.bordernormal;
+     c->colors.resizecorner  = conf.client.resizecorner_normal;
 
      /* Create frame window */
      CWIN(c->frame, root,
@@ -84,14 +84,10 @@ frame_create(Client *c)
           c->colors.resizecorner, &at);
 
      /* Border (for shadow) */
-     CWIN(c->left,   c->frame, 0, 0, SHADH, c->frame_geo.height, 0,
-          CWBackPixel, color_enlight(c->colors.frame), &at);
-     CWIN(c->top,    c->frame, 0, 0, c->frame_geo.width, SHADH, 0,
-          CWBackPixel, color_enlight(c->colors.frame), &at);
-     CWIN(c->bottom, c->frame, 0, c->frame_geo.height - SHADH, c->frame_geo.width, SHADH, 0,
-          CWBackPixel, SHADC, &at);
-     CWIN(c->right,  c->frame, c->frame_geo.width - SHADH, 0, SHADH, c->frame_geo.height, 0,
-          CWBackPixel, SHADC, &at);
+     CWIN(c->left, c->frame, 0, 0, SHADH, c->frame_geo.height, 0, CWBackPixel, color_enlight(c->colors.frame), &at);
+     CWIN(c->top, c->frame, 0, 0, c->frame_geo.width, SHADH, 0, CWBackPixel, color_enlight(c->colors.frame), &at);
+     CWIN(c->bottom, c->frame, 0, c->frame_geo.height - SHADH, c->frame_geo.width, SHADH, 0, CWBackPixel, SHADC, &at);
+     CWIN(c->right,  c->frame, c->frame_geo.width - SHADH, 0, SHADH, c->frame_geo.height, 0, CWBackPixel, SHADC, &at);
 
      /* Reparent window with the frame */
      XReparentWindow(dpy, c->win, c->frame, BORDH, BORDH + TBARH);
@@ -167,11 +163,11 @@ frame_update(Client *c)
           barwin_refresh_color(c->titlebar);
      }
 
-     XSetWindowBackground(dpy, c->frame,  c->colors.frame);
+     XSetWindowBackground(dpy, c->frame, c->colors.frame);
      XSetWindowBackground(dpy, c->resize, c->colors.resizecorner);
-     XSetWindowBackground(dpy, c->left,   color_enlight(c->colors.frame));
-     XSetWindowBackground(dpy, c->top,    color_enlight(c->colors.frame));
-     XSetWindowBackground(dpy, c->right,  SHADC);
+     XSetWindowBackground(dpy, c->left, color_enlight(c->colors.frame));
+     XSetWindowBackground(dpy, c->top, color_enlight(c->colors.frame));
+     XSetWindowBackground(dpy, c->right, SHADC);
      XSetWindowBackground(dpy, c->bottom, SHADC);
 
      XClearWindow(dpy, c->resize);

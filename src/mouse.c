@@ -187,13 +187,16 @@ mouse_grabbuttons(Client *c, Bool focused)
      int i, j;
      uint mod = conf.client.mod;
      uint bl[] = {Button1, Button2, Button3, Button4, Button5};
-     uint ml[] = {mod, mod|LockMask,
-                  mod|numlockmask,
-                  mod|scrolllockmask,
-                  mod|numlockmask|scrolllockmask,
-                  mod|LockMask|scrolllockmask,
-                  mod|LockMask|numlockmask,
-                  mod|LockMask|numlockmask|scrolllockmask};
+     uint ml[] =
+          {
+               mod, mod|LockMask,
+               mod|numlockmask,
+               mod|scrolllockmask,
+               mod|numlockmask|scrolllockmask,
+               mod|LockMask|scrolllockmask,
+               mod|LockMask|numlockmask,
+               mod|LockMask|numlockmask|scrolllockmask
+          };
 
      XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 
