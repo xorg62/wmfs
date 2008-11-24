@@ -53,6 +53,10 @@ set(CFLAGS "-g -Wall")
 set(CMAKE_C_FLAGS ${CFLAGS})
 set(LDFLAGS "-L /usr/local/lib")
 set_target_properties(wmfs PROPERTIES LINK_FLAGS ${LDFLAGS})
+# Includes dir for libs in build_dir
+include_directories(
+  ${BUILD_DIR}/src
+  )
 
 # Package find
 find_package(Freetype)
@@ -258,7 +262,7 @@ macro(a_configure_file file)
     string(REGEX REPLACE ".in\$" "" outfile ${file})
     message(STATUS "Configuring ${outfile}")
     configure_file(${SOURCE_DIR}/${file}
-                   ${SOURCE_DIR}/${outfile}
+                   ${BUILD_DIR}/${outfile}
                    ESCAPE_QUOTE
                    @ONLY)
 endmacro()
