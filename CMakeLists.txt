@@ -238,7 +238,7 @@ endif()
 # {{ Doxygen
 if(DOXYGEN_EXECUTABLE)
   add_custom_target(doc
-    COMMAND ${DOXYGEN_EXECUTABLE} wmfs.doxygen
+    COMMAND ${DOXYGEN_EXECUTABLE} ${SOURCE_DIR}/wmfs.doxygen
     WORKING_DIRECTORY ${BUILD_DIR})
 endif()
 # }}
@@ -262,7 +262,7 @@ macro(a_configure_file file)
     string(REGEX REPLACE ".in\$" "" outfile ${file})
     message(STATUS "Configuring ${outfile}")
     configure_file(${SOURCE_DIR}/${file}
-                   ${BUILD_DIR}/${outfile}
+                   ${SOURCE_DIR}/${outfile}
                    ESCAPE_QUOTE
                    @ONLY)
 endmacro()
