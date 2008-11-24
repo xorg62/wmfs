@@ -80,18 +80,18 @@
 #define deb(p)       fprintf(stderr, "debug: %d\n", p)
 #define PAD          14
 
-/* bar.c */
-BarWindow *bar_create(Window parent, int x, int y, uint w, uint h, uint color, Bool entermask);
-void bar_delete(BarWindow *bw);
-void bar_delete_subwin(BarWindow *bw);
-void bar_map(BarWindow *bw);
-void bar_map_subwin(BarWindow *bw);
-void bar_unmap(BarWindow *bw);
-void bar_unmap_subwin(BarWindow *bw);
-void bar_move(BarWindow *bw, int x, int y);
-void bar_resize(BarWindow *bw, uint w, uint h);
-void bar_refresh_color(BarWindow *bw);
-void bar_refresh(BarWindow *bw);
+/* barwin.c */
+BarWindow *barwin_create(Window parent, int x, int y, uint w, uint h, uint color, Bool entermask);
+void barwin_delete(BarWindow *bw);
+void barwin_delete_subwin(BarWindow *bw);
+void barwin_map(BarWindow *bw);
+void barwin_map_subwin(BarWindow *bw);
+void barwin_unmap(BarWindow *bw);
+void barwin_unmap_subwin(BarWindow *bw);
+void barwin_move(BarWindow *bw, int x, int y);
+void barwin_resize(BarWindow *bw, uint w, uint h);
+void barwin_refresh_color(BarWindow *bw);
+void barwin_refresh(BarWindow *bw);
 
 /* draw.c */
 void draw_text(Drawable d, int x, int y, char* fg, int pad, char *str);

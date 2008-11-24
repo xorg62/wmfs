@@ -45,29 +45,29 @@ infobar_init(void)
      infobar->geo.y = (conf.bartop) ? 0 : MAXH - infobar->geo.height;
 
      /* Create infobar barwindow */
-     infobar->bar = bar_create(root, 0, infobar->geo.y, MAXW, infobar->geo.height, conf.colors.bar, False);
+     infobar->bar = barwin_create(root, 0, infobar->geo.y, MAXW, infobar->geo.height, conf.colors.bar, False);
 
 
      /* Create tags window */
      for(i = 1; i < conf.ntag + 1; ++i)
      {
-          infobar->tags[i] = bar_create(infobar->bar->win, j, 0, textw(tags[i].name) + PAD,
-                                        infobar->geo.height, conf.colors.bar, False);
+          infobar->tags[i] = barwin_create(infobar->bar->win, j, 0, textw(tags[i].name) + PAD,
+                                           infobar->geo.height, conf.colors.bar, False);
           j += textw(tags[i].name) + PAD;
-          bar_map_subwin(infobar->tags[i]);
+          barwin_map_subwin(infobar->tags[i]);
      }
 
      /* Create layout switch & layout type switch barwindow */
-     infobar->layout_button = bar_create(infobar->bar->win, j + PAD / 2, 0,
+     infobar->layout_button = barwin_create(infobar->bar->win, j + PAD / 2, 0,
                                          textw(tags[seltag].layout.symbol) + PAD,
                                          infobar->geo.height, conf.colors.layout_bg, False);
 
      /* Map/Refresh all */
-     bar_map(infobar->bar);
-     bar_map_subwin(infobar->bar);
-     bar_map_subwin(infobar->layout_button);
-     bar_refresh_color(infobar->bar);
-     bar_refresh(infobar->bar);
+     barwin_map(infobar->bar);
+     barwin_map_subwin(infobar->bar);
+     barwin_map_subwin(infobar->layout_button);
+     barwin_refresh_color(infobar->bar);
+     barwin_refresh(infobar->bar);
 
      strcpy(infobar->statustext, "WMFS-" WMFS_VERSION);
      infobar_draw();
@@ -82,7 +82,7 @@ infobar_draw(void)
 {
      infobar_draw_taglist();
      infobar_draw_layout();
-     bar_refresh_color(infobar->bar);
+     barwin_refresh_color(infobar->bar);
 
      /* Draw status text */
      draw_text(infobar->bar->dr,
@@ -91,7 +91,7 @@ infobar_draw(void)
                conf.colors.text, 0,
                infobar->statustext);
 
-     bar_refresh(infobar->bar);
+     barwin_refresh(infobar->bar);
 
      return;
 }
@@ -101,11 +101,11 @@ infobar_draw(void)
 void
 infobar_draw_layout(void)
 {
-     bar_resize(infobar->layout_button, textw(tags[seltag].layout.symbol) + PAD, infobar->geo.height);
-     bar_refresh_color(infobar->layout_button);
+     barwin_resize(infobar->layout_button, textw(tags[seltag].layout.symbol) + PAD, infobar->geo.height);
+     barwin_refresh_color(infobar->layout_button);
      draw_text(infobar->layout_button->dr, PAD / 2, font->height,
                conf.colors.layout_fg, 0, tags[seltag].layout.symbol);
-     bar_refresh(infobar->layout_button);
+     barwin_refresh(infobar->layout_button);
 
      return;
 }
@@ -120,11 +120,11 @@ infobar_draw_taglist(void)
      for(i = 1; i < conf.ntag + 1; ++i)
      {
           infobar->tags[i]->color = ((i == seltag) ? conf.colors.tagselbg : conf.colors.bar);
-          bar_refresh_color(infobar->tags[i]);
+          barwin_refresh_color(infobar->tags[i]);
           draw_text(infobar->tags[i]->dr, PAD / 2, font->height,
                     ((i == seltag) ? conf.colors.tagselfg : conf.colors.text),
                     0, tags[i].name);
-          bar_refresh(infobar->tags[i]);
+          barwin_refresh(infobar->tags[i]);
      }
 
      return;
@@ -137,15 +137,15 @@ infobar_destroy(void)
 {
      int i;
 
-     bar_delete(infobar->bar);
-     bar_delete(infobar->layout_button);
-     bar_delete_subwin(infobar->layout_button);
+     barwin_delete(infobar->bar);
+     barwin_delete(infobar->layout_button);
+     barwin_delete_subwin(infobar->layout_button);
      for(i = 1; i < conf.ntag + 1; ++i)
      {
-          bar_delete_subwin(infobar->tags[i]);
-          bar_delete(infobar->tags[i]);
+          barwin_delete_subwin(infobar->tags[i]);
+          barwin_delete(infobar->tags[i]);
      }
-     bar_delete_subwin(infobar->bar);
+     barwin_delete_subwin(infobar->bar);
 
      return;
 }
@@ -165,7 +165,7 @@ uicb_infobar_togglepos(uicb_t cmd)
           sgeo.y = TBARH;
 
      infobar->geo.y = (conf.bartop) ? 0 : MAXH - infobar->geo.height;
-     bar_move(infobar->bar, 0, infobar->geo.y);
+     barwin_move(infobar->bar, 0, infobar->geo.y);
      infobar_draw();
      arrange();
 

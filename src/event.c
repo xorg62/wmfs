@@ -206,14 +206,14 @@ expose(XExposeEvent *ev)
 
      if(ev->count == 0
         && (ev->window == infobar->bar->win))
-          bar_refresh(infobar->bar);
+          barwin_refresh(infobar->bar);
 
      for(i = 1; i < conf.ntag + 1; ++i)
           if(ev->window == infobar->tags[i]->win)
-               bar_refresh(infobar->tags[i]);
+               barwin_refresh(infobar->tags[i]);
 
      if(ev->window == infobar->layout_button->win)
-          bar_refresh(infobar->layout_button);
+          barwin_refresh(infobar->layout_button);
 
      if((c = client_gb_titlebar(ev->window)))
           frame_update(c);

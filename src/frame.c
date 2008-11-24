@@ -69,7 +69,7 @@ frame_create(Client *c)
 
      /* Create titlebar window */
      if(TBARH)
-          c->titlebar = bar_create(c->frame, 0, 0, c->frame_geo.width, TBARH + BORDH, c->colors.frame, True);
+          c->titlebar = barwin_create(c->frame, 0, 0, c->frame_geo.width, TBARH + BORDH, c->colors.frame, True);
 
      at.event_mask &= ~(EnterWindowMask | LeaveWindowMask); /* <- Delete useless mask */
 
@@ -108,8 +108,8 @@ frame_delete(Client *c)
      /* If there is, delete the titlebar */
      if(TBARH)
      {
-          bar_delete_subwin(c->titlebar);
-          bar_delete(c->titlebar);
+          barwin_delete_subwin(c->titlebar);
+          barwin_delete(c->titlebar);
      }
 
      /* Delete the frame's sub win and the frame */
@@ -140,7 +140,7 @@ frame_moveresize(Client *c, XRectangle geo)
 
      /* Titlebar */
      if(TBARH)
-          bar_resize(c->titlebar, c->frame_geo.width, TBARH + BORDH);
+          barwin_resize(c->titlebar, c->frame_geo.width, TBARH + BORDH);
 
      /* Resize area */
      XMoveWindow(dpy, c->resize, c->frame_geo.width - RESHW, c->frame_geo.height - RESHW);
@@ -164,7 +164,7 @@ frame_update(Client *c)
      if(TBARH)
      {
           c->titlebar->color = c->colors.frame;
-          bar_refresh_color(c->titlebar);
+          barwin_refresh_color(c->titlebar);
      }
 
      XSetWindowBackground(dpy, c->frame,  c->colors.frame);
@@ -187,7 +187,7 @@ frame_update(Client *c)
                     (c->frame_geo.width / 2) - (textw(c->title) / 2),
                     (font->height - (font->descent))  + (((TBARH + BORDH) - font->height) / 2),
                     conf.titlebar.fg, 0, c->title);
-          bar_refresh(c->titlebar);
+          barwin_refresh(c->titlebar);
      }
 
      return;

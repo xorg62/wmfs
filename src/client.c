@@ -337,8 +337,8 @@ client_map(Client *c)
      XMapSubwindows(dpy, c->frame);
      if(TBARH)
      {
-          bar_map(c->titlebar);
-          bar_map_subwin(c->titlebar);
+          barwin_map(c->titlebar);
+          barwin_map_subwin(c->titlebar);
      }
      c->unmapped = False;
 
@@ -609,8 +609,8 @@ client_unmap(Client *c)
 
      if(TBARH)
      {
-          bar_unmap_subwin(c->titlebar);
-          bar_unmap(c->titlebar);
+          barwin_unmap_subwin(c->titlebar);
+          barwin_unmap(c->titlebar);
      }
      XUnmapWindow(dpy, c->frame);
      XUnmapSubwindows(dpy, c->frame);
