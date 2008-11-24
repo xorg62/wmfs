@@ -121,6 +121,7 @@ typedef struct
 /* Mouse Binding Struct */
 typedef struct
 {
+     int tag;
      uint button;
      void (*func)(uicb_t);
      uicb_t cmd;
