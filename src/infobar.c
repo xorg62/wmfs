@@ -48,7 +48,7 @@ infobar_init(void)
           infobar[sc].geo.height = INFOBARH;
           infobar[sc].geo.y = (conf.bartop)
                ? screen_get_geo(sc).y - INFOBARH - TBARH
-               : screen_get_geo(sc).height - infobar[sc].geo.height;
+               : screen_get_geo(sc).height - INFOBARH;
 
           /* Create infobar barwindow */
           infobar[sc].bar = barwin_create(root, screen_get_geo(sc).x - BORDH, infobar[sc].geo.y,
@@ -170,14 +170,12 @@ uicb_infobar_togglepos(uicb_t cmd)
 
      conf.bartop = !conf.bartop;
 
-     if(conf.bartop)
-          sg.y = infobar[selscreen].geo.height + TBARH;
-     else
-          sg.y = TBARH;
-
-     infobar[selscreen].geo.y = (conf.bartop) ? sg.y : MAXH - infobar[selscreen].geo.height;
-     barwin_move(infobar[selscreen].bar, sg.y, infobar[selscreen].geo.y);
+     infobar[selscreen].geo.y = (conf.bartop)
+          ? sg.y - TBARH
+          : (sg.y - INFOBARH - TBARH) + sg.height + TBARH;
+     barwin_move(infobar[selscreen].bar, sg.x - BORDH, infobar[selscreen].geo.y);
      infobar_draw(selscreen);
+
      arrange();
 
      return;

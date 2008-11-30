@@ -208,17 +208,17 @@ expose(XExposeEvent *ev)
 
 
      for(sc = 0; sc > screen_count(); ++sc)
-     {
           if(ev->window == infobar[sc].bar->win)
-               barwin_refresh(infobar[sc].bar);
+               infobar_draw(sc);
 
+     for(sc = 0; sc > screen_count(); ++sc)
           for(i = 1; i < conf.ntag + 1; ++i)
                if(ev->window == infobar[sc].tags[i]->win)
-                    barwin_refresh(infobar[sc].tags[i]);
+                    infobar_draw_taglist(sc);
 
+     for(sc = 0; sc > screen_count(); ++sc)
           if(ev->window == infobar[sc].layout_button->win)
-               barwin_refresh(infobar[sc].layout_button);
-     }
+               infobar_draw(sc);
 
      if((c = client_gb_titlebar(ev->window)))
           frame_update(c);
