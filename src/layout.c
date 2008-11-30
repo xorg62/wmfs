@@ -108,7 +108,8 @@ layoutswitch(Bool b)
                break;
           }
      }
-     arrange();
+     tags[selscreen][seltag[selscreen]].layout.func();
+     infobar_draw(selscreen);
 
      return;
 }
