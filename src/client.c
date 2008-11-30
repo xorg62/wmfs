@@ -375,7 +375,7 @@ client_manage(Window w, XWindowAttributes *wa)
           for(t = clients; t && t->win != trans; t = t->next);
      if(t) c->tag = t->tag;
      if(!c->free) c->free = (rettrans == Success) || c->hint;
-     efree(t);
+     free(t);
 
      client_attach(c);
      client_map(c);
@@ -603,7 +603,7 @@ client_unmanage(Client *c)
      XUngrabServer(dpy);
      arrange();
      XFree(c->title);
-     efree(c);
+     free(c);
 
      return;
 }

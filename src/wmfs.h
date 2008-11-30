@@ -168,7 +168,6 @@ void uicb_mouse_resize(uicb_t cmd);
 /* util.c */
 ulong color_enlight(ulong col);
 void *emalloc(uint element, uint size);
-void efree(void *ptr);
 ulong getcolor(char *color);
 long getwinstate(Window win);
 double round(double x);

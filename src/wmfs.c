@@ -101,12 +101,12 @@ quit(void)
      XFreeCursor(dpy, cursor[CurMove]);
      XFreeCursor(dpy, cursor[CurResize]);
      infobar_destroy();
-     efree(infobar);
-     efree(seltag);
-     efree(keys);
-     efree(conf.titlebar.mouse);
-     efree(conf.client.mouse);
-     efree(conf.root.mouse);
+     free(infobar);
+     free(seltag);
+     free(keys);
+     free(conf.titlebar.mouse);
+     free(conf.client.mouse);
+     free(conf.root.mouse);
      XSync(dpy, False);
 
      return;

@@ -70,7 +70,7 @@ screen_get_geo(int s)
           geo.height = xsi[s].height - INFOBARH - TBARH;
           geo.width = xsi[s].width;
 
-          efree(xsi);
+          free(xsi);
      }
      else
      {

@@ -98,7 +98,7 @@ barwin_delete(BarWindow *bw)
      XSelectInput(dpy, bw->win, NoEventMask);
      XDestroyWindow(dpy, bw->win);
      XFreePixmap(dpy, bw->dr);
-     efree(bw);
+     free(bw);
 
      return;
 }

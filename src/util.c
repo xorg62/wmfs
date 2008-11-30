@@ -48,18 +48,6 @@ emalloc(uint element, uint size)
      return ret;
 }
 
-/** Free with a conditions
- * \param ptr void pointer
-*/
-void
-efree(void *ptr)
-{
-     if(ptr)
-          free(ptr);
-
-     return;
-}
-
 /** Get a color with a string
  * \param color Color string
  * \return Color pixel
