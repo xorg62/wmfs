@@ -81,6 +81,7 @@ void
 quit(void)
 {
      Client *c;
+     int i;
 
      /* Set the silent error handler */
      XSetErrorHandler(errorhandlerdummy);
@@ -95,7 +96,9 @@ quit(void)
 
           client_unmanage(c);
      }
-
+     for(i = 0; i < screen_count(); ++i)
+          free(tags[i]);
+     free(tags);
      XftFontClose(dpy, font);
      XFreeCursor(dpy, cursor[CurNormal]);
      XFreeCursor(dpy, cursor[CurMove]);

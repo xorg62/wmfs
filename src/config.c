@@ -484,14 +484,11 @@ init_conf(void)
           }
      }
 
-
      seltag = emalloc(screen_count(), sizeof(int));
-
-     //tags = emalloc(screen_count(), sizeof(Tag*));
-
+     tags = emalloc(screen_count(), sizeof(Tag*));
      for(j = 0; j < screen_count(); ++j)
      {
-          //tags[j] = emalloc(conf.ntag, sizeof(Tag));
+          tags[j] = emalloc(conf.ntag + 1, sizeof(Tag));
           seltag[j] = 1;
           for(i = 0; i < conf.ntag; ++i)
                tags[j][i + 1] = conf.tag[i];

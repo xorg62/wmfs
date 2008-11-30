@@ -248,7 +248,7 @@ XftFont *font;
 
 /* InfoBar */
 InfoBar *infobar;
-Tag tags[32][MAXTAG];
+Tag **tags;
 int *seltag;
 
 /* Important Client */
