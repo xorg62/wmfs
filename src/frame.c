@@ -87,7 +87,7 @@ frame_create(Client *c)
      CWIN(c->left, c->frame, 0, 0, SHADH, c->frame_geo.height, 0, CWBackPixel, color_enlight(c->colors.frame), &at);
      CWIN(c->top, c->frame, 0, 0, c->frame_geo.width, SHADH, 0, CWBackPixel, color_enlight(c->colors.frame), &at);
      CWIN(c->bottom, c->frame, 0, c->frame_geo.height - SHADH, c->frame_geo.width, SHADH, 0, CWBackPixel, SHADC, &at);
-     CWIN(c->right,  c->frame, c->frame_geo.width - SHADH, 0, SHADH, c->frame_geo.height, 0, CWBackPixel, SHADC, &at);
+     CWIN(c->right, c->frame, c->frame_geo.width - SHADH, 0, SHADH, c->frame_geo.height, 0, CWBackPixel, SHADC, &at);
 
      /* Reparent window with the frame */
      XReparentWindow(dpy, c->win, c->frame, BORDH, BORDH + TBARH);
@@ -122,6 +122,8 @@ frame_delete(Client *c)
 void
 frame_moveresize(Client *c, XRectangle geo)
 {
+     CHECK(c);
+
      c->frame_geo.x      = (geo.x) ? geo.x - BORDH : c->frame_geo.x;
      c->frame_geo.y      = (geo.y) ? geo.y - TBARH : c->frame_geo.y;
      c->frame_geo.width  = (geo.width)  ? FRAMEW(geo.width)  : c->frame_geo.width;
@@ -157,6 +159,8 @@ frame_moveresize(Client *c, XRectangle geo)
 void
 frame_update(Client *c)
 {
+     CHECK(c);
+
      if(TBARH)
      {
           c->titlebar->color = c->colors.frame;
@@ -179,6 +183,7 @@ frame_update(Client *c)
 
      if(TBARH && (TBARH + BORDH + 1) > font->height)
      {
+
           draw_text(c->titlebar->dr,
                     (c->frame_geo.width / 2) - (textw(c->title) / 2),
                     (font->height - (font->descent))  + (((TBARH + BORDH) - font->height) / 2),

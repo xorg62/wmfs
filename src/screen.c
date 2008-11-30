@@ -1,5 +1,5 @@
 /*
-*      tag.c
+*      screen.c
 *      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.com>
 *      All rights reserved.
 *
@@ -32,80 +32,87 @@
 
 #include "wmfs.h"
 
-/** Set a tag
- * \param cmd Tag number or '+' / '-', uicb_t type
+/** Count the screens
+ *\return the number of screen
 */
-void
-uicb_tag(uicb_t cmd)
+int
+screen_count(void)
 {
-     int tmp = atoi(cmd);
+     int n = 0;
 
-     screen_get_sel();
+     if(XineramaIsActive(dpy))
+          XineramaQueryScreens(dpy, &n);
+     else
+          n = ScreenCount(dpy);
 
-     if(!tmp)
-          tmp = 1;
+     return n;
+}
 
-     if(cmd[0] == '+' || cmd[0] == '-')
+/** Get screen geometry by number
+ *\param s Screen number
+ *\return XRectangle struct
+*/
+XRectangle
+screen_get_geo(int s)
+{
+     int n = 0;
+     XineramaScreenInfo *xsi;
+     XRectangle geo;
+
+     if(XineramaIsActive(dpy))
      {
-          if(tmp + seltag[selscreen] < 1
-             || tmp + seltag[selscreen] > conf.ntag)
-               return;
-          seltag[selscreen] += tmp;
+          xsi = XineramaQueryScreens(dpy, &n);
+          geo.x = xsi[s].x_org + BORDH;
+          geo.y = (conf.bartop)
+               ? xsi[s].y_org + INFOBARH + TBARH
+               : xsi[s].y_org + TBARH;
+          geo.height = xsi[s].height - INFOBARH - TBARH;
+          geo.width = xsi[s].width;
+
+          efree(xsi);
      }
      else
      {
-          if(tmp == seltag[selscreen]
-             || tmp > conf.ntag)
-               return;
-          seltag[selscreen] = tmp;
+          geo.x = BORDH;
+          geo.y = (conf.bartop) ? INFOBARH + TBARH  : TBARH; ;
+          geo.height = MAXH - INFOBARH - TBARH;
+          geo.width = MAXW;
      }
-     arrange();
 
-     return;
+     return geo;
 }
 
-/** Set the next tag
- * \param cmd uicb_t type unused
+/** Get and set the selected screen
+ *\return The number of the selected screen
 */
-void
-uicb_tag_next(uicb_t cmd)
+int
+screen_get_sel(void)
 {
-     uicb_tag("+1");
+     if(XineramaIsActive(dpy))
+     {
+          Window w;
+          uint du;
+          int x, y, d, i = 0;
 
-     return;
+          XQueryPointer(dpy, root, &w, &w, &x, &y, &d, &d, &du);
+
+          for(i = 0; i < screen_count(); ++i)
+               if(x >= screen_get_geo(i).x
+                  && x < screen_get_geo(i).x + screen_get_geo(i).width)
+                    selscreen = i;
+
+          return selscreen;
+     }
+     else
+          return 0;
 }
 
-/** Set the previous tag
- * \param cmd uicb_t type unused
+/** Init screen geometry
 */
 void
-uicb_tag_prev(uicb_t cmd)
+screen_init(void)
 {
-     uicb_tag("-1");
-
-     return;
-}
-
-/** Transfert the selected client to
- *  the wanted tag
- * \param cmd Wanted tag, uicb_t type
-*/
-void
-uicb_tagtransfert(uicb_t cmd)
-{
-     int n = atoi(cmd);
-
      screen_get_sel();
-
-     if(!sel || n == seltag[selscreen])
-          return;
-
-     if(!n)
-          n = 1;
-
-     sel->tag = n;
-
-     arrange();
 
      return;
 }

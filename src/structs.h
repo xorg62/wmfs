@@ -80,6 +80,8 @@ struct Client
      char *title;
      /* Tag num */
      int tag;
+     /* Screen */
+     int screen;
      /* Window attribute */
      XRectangle geo;
      XRectangle frame_geo;

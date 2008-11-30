@@ -50,6 +50,7 @@
 #include <X11/Xatom.h>
 #include <X11/cursorfont.h>
 #include <X11/Xft/Xft.h>
+#include <X11/extensions/Xinerama.h>
 
 /* Local headers */
 #include "config.h"
@@ -67,7 +68,7 @@
 
 #define MAXH         DisplayHeight(dpy, screen)
 #define MAXW         DisplayWidth(dpy, screen)
-
+#define INFOBARH     font->height * 1.5
 #define SHADH        1
 #define SHADC        0x000000 /* 'Cause i don't know how darken a color yet */
 #define BORDH        conf.client.borderheight
@@ -100,9 +101,9 @@ ushort textw(const char *text);
 
 /* infobar.c */
 void infobar_init(void);
-void infobar_draw(void);
-void infobar_draw_layout(void);
-void infobar_draw_taglist(void);
+void infobar_draw(int sc);
+void infobar_draw_layout(int sc);
+void infobar_draw_taglist(int sc);
 void infobar_destroy(void);
 void uicb_infobar_togglepos(uicb_t cmd);
 
@@ -180,6 +181,12 @@ void uicb_tag_next(uicb_t);
 void uicb_tag_prev(uicb_t);
 void uicb_tagtransfert(uicb_t);
 
+/* screen */
+int screen_count(void);
+XRectangle screen_get_geo(int s);
+int screen_get_sel(void);
+void screen_init(void);
+
 /* layout.c */
 void arrange(void);
 void freelayout(void);
@@ -226,8 +233,8 @@ void uicb_reload(uicb_t cmd);
 Display *dpy;
 GC gc;
 Window root;
-XRectangle sgeo;
 int screen;
+int selscreen;
 Conf conf;
 Key *keys;
 Bool exiting;
@@ -242,19 +249,15 @@ XftFont *font;
 
 /* InfoBar */
 InfoBar *infobar;
-Tag tags[MAXTAG];
-int taglen[MAXTAG];
-int seltag;
-int prevtag;
+Tag tags[32][MAXTAG];
+int *seltag;
 
 /* Important Client */
 Client *clients;
 Client *sel;
-Client *selbytag[MAXTAG];
 
 /* Other */
 uint numlockmask;
-uint scrolllockmask;
 Variable confvar[256];
 
 #endif /* WMFS_H */

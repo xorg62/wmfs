@@ -69,7 +69,7 @@ getcolor(char *color)
 {
      XColor xcolor;
 
-     if(!XAllocNamedColor(dpy,DefaultColormap(dpy, screen), color, &xcolor, &xcolor))
+     if(!XAllocNamedColor(dpy, DefaultColormap(dpy, screen), color, &xcolor, &xcolor))
           fprintf(stderr,"WMFS Error: cannot allocate color \"%s\"\n", color);
      return xcolor.pixel;
 }
@@ -81,14 +81,13 @@ getcolor(char *color)
 ulong
 color_enlight(ulong col)
 {
-     ulong ret = col;
-
      if((col + 0x330000) < 0xffffff
         && (col + 0x003300) < 0xffffff
         && (col + 0x000033) < 0xffffff)
-          ret += 0x333333;
+          return col + 0x333333;
+     else
+          return col;
 
-     return ret;
 }
 
 /** Get a Window WM State

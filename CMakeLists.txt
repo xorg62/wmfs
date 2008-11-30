@@ -38,6 +38,7 @@ set(wmfs_src
   src/init.c
   src/layout.c
   src/mouse.c
+  src/screen.c
   src/tag.c
   src/util.c
   src/wmfs.c)
@@ -78,7 +79,8 @@ set(LIBRARIES_TO_LINK
   ${FREETYPE_LIBRARIES}
   ${X11_LIBRARIES}
   confuse
-  Xft)
+  Xft
+  Xinerama)
 
 target_link_libraries(wmfs ${LIBRARIES_TO_LINK})
 

@@ -47,9 +47,15 @@ errorhandler(Display *d, XErrorEvent *event)
      }
 
      /* Ignore focus change error for unmapped client */
-     if((c = client_gb_win(event->resourceid))
-        && c->unmapped
-        && event->request_code == 42) /* 42: X_SetInputFocus (Xproto.h) */
+     /* Too lemmy to add Xproto.h so:
+      * 42 = X_SetInputFocus
+      * 28 = X_GrabButton
+      */
+
+     if((c = client_gb_win(event->resourceid)))
+          if(event->error_code == BadWindow
+             || (event->error_code == BadMatch && event->request_code == 42)
+             ||  event->request_code == 28)
           return 0;
 
 
@@ -96,6 +102,8 @@ quit(void)
      XFreeCursor(dpy, cursor[CurResize]);
      infobar_destroy();
      efree(infobar);
+     efree(seltag);
+     efree(tags);
      efree(keys);
      efree(conf.titlebar.mouse);
      efree(conf.client.mouse);
@@ -112,13 +120,15 @@ void
 mainloop(void)
 {
      fd_set fd;
-     char sbuf[sizeof infobar->statustext], *p;
-     int len, r, offset = 0;
+     int len, r, offset = 0, sc = screen_count() - 1;
+     char sbuf[sizeof infobar[sc].statustext], *p;
      Bool readstdin = True;
      XEvent ev;
 
-     len = sizeof infobar->statustext - 1;
-     sbuf[len] = infobar->statustext[len] = '\0';
+
+
+     len = sizeof infobar[sc].statustext - 1;
+     sbuf[len] = infobar[sc].statustext[len] = '\0';
 
      while(!exiting)
      {
@@ -137,7 +147,7 @@ mainloop(void)
                          if(*p == '\n')
                          {
                               *p = '\0';
-                              strncpy(infobar->statustext, sbuf, len);
+                              strncpy(infobar[sc].statustext, sbuf, len);
                               p += r - 1;
                               for(r = 0; *(p - r) && *(p - r) != '\n'; ++r);
                               offset = r;
@@ -149,10 +159,10 @@ mainloop(void)
                }
                else
                {
-                    strncpy(infobar->statustext, sbuf, strlen(sbuf));
+                    strncpy(infobar[sc].statustext, sbuf, strlen(sbuf));
                     readstdin = False;
                }
-               infobar_draw();
+               infobar_draw(screen_get_sel());
           }
           while(XPending(dpy))
           {

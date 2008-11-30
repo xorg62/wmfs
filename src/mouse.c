@@ -40,7 +40,7 @@ mouse_move(Client *c)
 {
      int ocx = c->geo.x;
      int ocy = c->geo.y;
-     int mx, my, dint;
+     int mx = 0, my = 0, dint;
      uint duint;
      Window dw;
      XRectangle geo;
@@ -57,7 +57,7 @@ mouse_move(Client *c)
 
      for(;;)
      {
-          XMaskEvent(dpy, MouseMask | ExposureMask | SubstructureRedirectMask, &ev);
+          XMaskEvent(dpy, ButtonMask | MouseMask | ExposureMask | SubstructureRedirectMask, &ev);
 
           if(ev.type == ButtonRelease)
           {
@@ -89,9 +89,10 @@ mouse_resize(Client *c)
 {
      int ocx = c->geo.x;
      int ocy = c->geo.y;
-     int my = sgeo.y, mx = 0;
      double fy, fx, mwf;
      XRectangle geo;
+     XRectangle sg = screen_get_geo(screen_get_sel());
+     int my = sg.y, mx = 0;
      XEvent ev;
 
     if(c->max || c->lmax)
@@ -107,21 +108,21 @@ mouse_resize(Client *c)
      /* Warp pointer for mwfact resize {{{ */
      if(c->tile)
      {
-          if(tags[seltag].layout.func == tile)
-               mx = tags[seltag].mwfact * sgeo.width;
-          else if(tags[seltag].layout.func == tile_left)
-               mx = sgeo.width - (tags[seltag].mwfact * sgeo.width);
-          else if(tags[seltag].layout.func == tile_top)
+          if(tags[selscreen][seltag[selscreen]].layout.func == tile)
+               mx = tags[selscreen][seltag[selscreen]].mwfact * sg.width;
+          else if(tags[selscreen][seltag[selscreen]].layout.func == tile_left)
+               mx = sg.width - (tags[selscreen][seltag[selscreen]].mwfact * sg.width);
+          else if(tags[selscreen][seltag[selscreen]].layout.func == tile_top)
           {
-               mx = ev.xmotion.x_root;
-               my = sgeo.height - (tags[seltag].mwfact * sgeo.height);
+               mx = sg.width / 2;
+               my = sg.height - (tags[selscreen][seltag[selscreen]].mwfact * sg.height);
           }
-          else if(tags[seltag].layout.func == tile_bottom)
+          else if(tags[selscreen][seltag[selscreen]].layout.func == tile_bottom)
           {
-               mx = ev.xmotion.x_root;
-               my = tags[seltag].mwfact * sgeo.height;
+               mx = sg.width / 2;
+               my = tags[selscreen][seltag[selscreen]].mwfact * sg.height;
           }
-          XWarpPointer(dpy, None, root, 0, 0, 0, 0, mx, my);
+          XWarpPointer(dpy, None, root, 0, 0, 0, 0, sg.x + mx, sg.y + my);
      }
      /* }}} */
 
@@ -148,22 +149,22 @@ mouse_resize(Client *c)
                }
                else
                {
-                    fy = (round(((ev.xmotion.y * 50) / sgeo.height))) / 50;
-                    fx = (round(((ev.xmotion.x * 50) / sgeo.width))) / 50;
+                    fy = (round(((ev.xmotion.y * 50) / sg.height))) / 50;
+                    fx = (round(((ev.xmotion.x * 50) / sg.width))) / 50;
 
-                    if(tags[seltag].layout.func == tile)
-                         mwf = fx;
-                    else if(tags[seltag].layout.func == tile_left)
-                         mwf = 1 - fx;
-                    else if(tags[seltag].layout.func == tile_top)
+                    if(tags[selscreen][seltag[selscreen]].layout.func == tile)
+                         mwf = sg.x + fx;
+                    else if(tags[selscreen][seltag[selscreen]].layout.func == tile_left)
+                         mwf = 1 - (sg.x + fx);
+                    else if(tags[selscreen][seltag[selscreen]].layout.func == tile_top)
                          mwf = 1 - fy;
-                    else if(tags[seltag].layout.func == tile_bottom)
+                    else if(tags[selscreen][seltag[selscreen]].layout.func == tile_bottom)
                          mwf = fy;
                     else
-                         mwf = tags[seltag].mwfact;
+                         mwf = tags[selscreen][seltag[selscreen]].mwfact;
 
-                    tags[seltag].mwfact = (mwf < 0.05) ? 0.05 : ((mwf > 0.95) ? 0.95 : mwf);
-                    tags[seltag].layout.func();
+                    tags[selscreen][seltag[selscreen]].mwfact = (mwf < 0.05) ? 0.05 : ((mwf > 0.95) ? 0.95 : mwf);
+                    tags[selscreen][seltag[selscreen]].layout.func();
                }
 
                if(!c->tile)
@@ -184,27 +185,22 @@ mouse_resize(Client *c)
 void
 mouse_grabbuttons(Client *c, Bool focused)
 {
-     int i, j;
-     uint mod = conf.client.mod;
-     uint bl[] = {Button1, Button2, Button3, Button4, Button5};
-     uint ml[] =
-          {
-               mod, mod|LockMask,
-               mod|numlockmask,
-               mod|scrolllockmask,
-               mod|numlockmask|scrolllockmask,
-               mod|LockMask|scrolllockmask,
-               mod|LockMask|numlockmask,
-               mod|LockMask|numlockmask|scrolllockmask
-          };
+     int i;
+     uint but[] = {Button1, Button2, Button3, Button4, Button5};
 
      XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
-
      if(focused)
-          for(i = 0; i < (sizeof bl / sizeof bl[0]); ++i)
-               for(j = 0; j < (sizeof ml / sizeof ml[0]); ++j)
-                    XGrabButton(dpy, bl[i], ml[j], c->win, False,
-                                ButtonMask, GrabModeAsync,GrabModeSync, None, None);
+          for(i = 0; i < (sizeof but / sizeof but[0]); ++i)
+          {
+               XGrabButton(dpy, but[i], conf.client.mod, c->win, False,
+                           ButtonMask, GrabModeAsync,GrabModeSync, None, None);
+               XGrabButton(dpy, but[i], conf.client.mod|LockMask, c->win, False,
+                           ButtonMask, GrabModeAsync,GrabModeSync, None, None);
+               XGrabButton(dpy, but[i], conf.client.mod|numlockmask, c->win, False,
+                           ButtonMask, GrabModeAsync,GrabModeSync, None, None);
+               XGrabButton(dpy, but[i], conf.client.mod|LockMask|numlockmask, c->win, False,
+                           ButtonMask, GrabModeAsync,GrabModeSync, None, None);
+          }
      else
           XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
                       ButtonMask, GrabModeAsync, GrabModeSync, None, None);

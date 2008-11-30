@@ -249,7 +249,8 @@ barwin_refresh_color(BarWindow *bw)
 void
 barwin_refresh(BarWindow *bw)
 {
-     CHECK(bw);
+     if(!bw || !bw->dr || !bw->win)
+          return;
 
      XCopyArea(dpy, bw->dr, bw->win, gc, 0, 0, bw->geo.width, bw->geo.height, 0, 0);
 

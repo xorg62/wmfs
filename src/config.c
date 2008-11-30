@@ -484,10 +484,18 @@ init_conf(void)
           }
      }
 
-     seltag = 1;
-     prevtag = 0;
-     for(i = 0; i < conf.ntag; ++i)
-          tags[i + 1] = conf.tag[i];
+
+     seltag = emalloc(screen_count(), sizeof(int));
+
+     //tags = emalloc(screen_count(), sizeof(Tag*));
+
+     for(j = 0; j < screen_count(); ++j)
+     {
+          //tags[j] = emalloc(conf.ntag, sizeof(Tag));
+          seltag[j] = 1;
+          for(i = 0; i < conf.ntag; ++i)
+               tags[j][i + 1] = conf.tag[i];
+     }
 
      /* keybind */
      conf.nkeybind = cfg_size(cfg_keys, "key");

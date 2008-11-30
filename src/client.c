@@ -107,7 +107,6 @@ uicb_client_prev(uicb_t cmd)
           client_focus(c);
           client_raise(c);
      }
-     arrange();
 
      return;
 }
@@ -131,7 +130,6 @@ uicb_client_next(uicb_t cmd)
           client_focus(c);
           client_raise(c);
      }
-     arrange();
 
      return;
 }
@@ -150,7 +148,7 @@ client_focus(Client *c)
           mouse_grabbuttons(sel, False);
      }
 
-     selbytag[seltag] = sel = c;
+     sel = c;
 
      if(c)
      {
@@ -168,8 +166,8 @@ client_focus(Client *c)
      return;
 }
 
-/* The following function are the same point :
- * find a client membere with a Window {{{
+/* The following function have the same point :
+ * find a client member with a Window {{{
  */
 
 /* Get Client with a window */
@@ -227,6 +225,7 @@ client_focus(Client *c)
 
           return c;
      }
+
 /* }}} */
 
 /** Get a client name
@@ -266,7 +265,7 @@ client_hide(Client *c)
 Bool
 ishide(Client *c)
 {
-     if(c->tag && c->tag == seltag)
+     if(c->tag && c->tag == seltag[screen_get_sel()])
           return False;
      return True;
 }
@@ -360,11 +359,12 @@ client_manage(Window w, XWindowAttributes *wa)
 
      c = emalloc(1, sizeof(Client));
      c->win = w;
+     c->screen = screen_get_sel();
      c->ogeo.x = c->geo.x = wa->x;
-     c->ogeo.y = c->geo.y = wa->y + sgeo.y;
+     c->ogeo.y = c->geo.y = wa->y + TBARH + INFOBARH;
      c->ogeo.width = c->geo.width = wa->width;
      c->ogeo.height = c->geo.height = wa->height;
-     c->tag = seltag;
+     c->tag = seltag[c->screen];
      at.event_mask = PropertyChangeMask;
 
      frame_create(c);
@@ -398,6 +398,8 @@ void
 client_moveresize(Client *c, XRectangle geo, bool r)
 {
      CHECK(c);
+
+     int i;
 
      /* Resize hints {{{ */
      if(r)
@@ -452,6 +454,13 @@ client_moveresize(Client *c, XRectangle geo, bool r)
         || c->geo.height != geo.height)
      {
           c->geo = geo;
+
+          /* Set the client screen */
+          for(i = 0; i < screen_count(); ++i)
+               if(geo.x >= screen_get_geo(i).x
+                  && geo.x < screen_get_geo(i).x + screen_get_geo(i).width)
+                    c->screen = i;
+
           frame_moveresize(c, geo);
           XMoveResizeWindow(dpy, c->win, BORDH, BORDH + TBARH, geo.width, geo.height);
           XSync(dpy, False);

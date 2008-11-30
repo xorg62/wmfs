@@ -46,7 +46,7 @@ init(void)
      init_root();
      init_atom();
      infobar_init();
-     init_geometry();
+     screen_init();
      grabkeys();
 
      /* Warning about font */
@@ -91,14 +91,10 @@ init_key(void)
 
      for(i = 0; i < 8; i++)
           for(j = 0; j < modmap->max_keypermod; ++j)
-          {
                if(modmap->modifiermap[i * modmap->max_keypermod + j]
                   == XKeysymToKeycode(dpy, XK_Num_Lock))
                     numlockmask = (1 << i);
-               if(modmap->modifiermap[i * modmap->max_keypermod + j]
-                  == XKeysymToKeycode(dpy, XK_Scroll_Lock))
-                    scrolllockmask = (1 << i);
-          }
+
      XFreeModifiermap(modmap);
 
      return;
@@ -113,9 +109,10 @@ init_root(void)
 
      root = RootWindow(dpy, screen);
 
-     at.event_mask = KeyMask | ButtonPressMask | ButtonReleaseMask |
-          SubstructureRedirectMask | SubstructureNotifyMask |
-          EnterWindowMask | LeaveWindowMask | StructureNotifyMask ;
+     at.event_mask = KeyMask|ButtonMask|MouseMask
+          |SubstructureRedirectMask|SubstructureNotifyMask
+          |EnterWindowMask|LeaveWindowMask|StructureNotifyMask;
+
      at.cursor = cursor[CurNormal];
      XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &at);
      if(conf.root.background_command)
@@ -142,21 +139,3 @@ init_atom(void)
      return;
 }
 
-/** Init screen geometry
-*/
-void
-init_geometry(void)
-{
-     sgeo.x = BORDH;
-     sgeo.y = infobar->geo.height;
-
-     if(conf.bartop)
-          sgeo.y += TBARH;
-     else
-          sgeo.y = TBARH;
-
-     sgeo.width  = MAXW;
-     sgeo.height = MAXH - infobar->geo.height - TBARH;
-
-     return;
-}

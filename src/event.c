@@ -42,6 +42,8 @@ buttonpress(XButtonEvent *ev)
      int i;
      char s[6];
 
+     screen_get_sel();
+
      /* Titlebar */
      if((c = client_gb_titlebar(ev->window)))
           for(i = 0; i < conf.titlebar.nmouse; ++i)
@@ -63,7 +65,7 @@ buttonpress(XButtonEvent *ev)
      /* Root */
      if(ev->window == root)
           for(i = 0; i < conf.root.nmouse; ++i)
-               if(conf.root.mouse[i].tag == seltag
+               if(conf.root.mouse[i].tag == seltag[selscreen]
                   || conf.root.mouse[i].tag < 0)
                     if(ev->button == conf.root.mouse[i].button)
                          if(conf.root.mouse[i].func)
@@ -73,7 +75,7 @@ buttonpress(XButtonEvent *ev)
      for(i = 1; i < conf.ntag + 1; ++i)
      {
           ITOA(s, i);
-          if(ev->window == infobar->tags[i]->win)
+          if(ev->window == infobar[screen_get_sel()].tags[i]->win)
           {
                if(ev->button == Button1)
                     uicb_tag(s);
@@ -87,7 +89,7 @@ buttonpress(XButtonEvent *ev)
      }
 
      /* Layout button */
-     if(ev->window == infobar->layout_button->win)
+     if(ev->window == infobar[screen_get_sel()].layout_button->win)
      {
           if(ev->button == Button1
              || ev->button == Button4)
@@ -202,18 +204,21 @@ void
 expose(XExposeEvent *ev)
 {
      Client *c;
-     int i;
+     int i, sc;
 
-     if(ev->count == 0
-        && (ev->window == infobar->bar->win))
-          barwin_refresh(infobar->bar);
 
-     for(i = 1; i < conf.ntag + 1; ++i)
-          if(ev->window == infobar->tags[i]->win)
-               barwin_refresh(infobar->tags[i]);
+     for(sc = 0; sc > screen_count(); ++sc)
+     {
+          if(ev->window == infobar[sc].bar->win)
+               barwin_refresh(infobar[sc].bar);
 
-     if(ev->window == infobar->layout_button->win)
-          barwin_refresh(infobar->layout_button);
+          for(i = 1; i < conf.ntag + 1; ++i)
+               if(ev->window == infobar[sc].tags[i]->win)
+                    barwin_refresh(infobar[sc].tags[i]);
+
+          if(ev->window == infobar[sc].layout_button->win)
+               barwin_refresh(infobar[sc].layout_button);
+     }
 
      if((c = client_gb_titlebar(ev->window)))
           frame_update(c);
@@ -239,25 +244,17 @@ focusin(XFocusChangeEvent *ev)
 void
 grabkeys(void)
 {
-     uint i, j;
+     uint i;
      KeyCode code;
-     uint ml[] =
-          {
-               LockMask,
-               numlockmask,
-               scrolllockmask,
-               numlockmask|scrolllockmask,
-               LockMask|scrolllockmask,
-               LockMask|numlockmask,
-               LockMask|numlockmask|scrolllockmask
-          };
 
      XUngrabKey(dpy, AnyKey, AnyModifier, root);
      for(i = 0; i < conf.nkeybind; ++i)
      {
           code = XKeysymToKeycode(dpy, keys[i].keysym);
-          for(j = 0; j < (sizeof ml / sizeof ml[0]); ++j)
-               XGrabKey(dpy, code, keys[i].mod|ml[j], root, True, GrabModeAsync, GrabModeAsync);
+          XGrabKey(dpy, code, keys[i].mod, root, True, GrabModeAsync, GrabModeAsync);
+          XGrabKey(dpy, code, keys[i].mod|LockMask, root, True, GrabModeAsync, GrabModeAsync);
+          XGrabKey(dpy, code, keys[i].mod|numlockmask, root, True, GrabModeAsync, GrabModeAsync);
+          XGrabKey(dpy, code, keys[i].mod|LockMask|numlockmask, root, True, GrabModeAsync, GrabModeAsync);
      }
 
      return;
@@ -275,8 +272,8 @@ keypress(XKeyPressedEvent *ev)
      keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
      for(i = 0; i < conf.nkeybind; ++i)
           if(keysym == keys[i].keysym
-             && (keys[i].mod & ~(numlockmask | LockMask | scrolllockmask))
-             == (ev->state & ~(numlockmask | LockMask | scrolllockmask))
+             && (keys[i].mod & ~(numlockmask | LockMask))
+             == (ev->state & ~(numlockmask | LockMask))
              && keys[i].func)
                keys[i].func(keys[i].cmd);
 
@@ -372,6 +369,7 @@ unmapnotify(XUnmapEvent *ev)
 void
 getevent(XEvent ev)
 {
+
      int st;
 
      switch (ev.type)
