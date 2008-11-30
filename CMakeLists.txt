@@ -99,7 +99,8 @@ pkg_check_modules(wmfs_required
   x11
   libconfuse
   freetype2
-  xft)
+  xft
+  xinerama)
 
 # Find exterbal programs
 macro(a_find_program var prg req)
