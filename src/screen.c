@@ -56,11 +56,12 @@ XRectangle
 screen_get_geo(int s)
 {
      int n = 0;
-     XineramaScreenInfo *xsi;
      XRectangle geo;
 
      if(XineramaIsActive(dpy))
      {
+          XineramaScreenInfo *xsi;
+
           xsi = XineramaQueryScreens(dpy, &n);
           geo.x = xsi[s].x_org + BORDH;
           geo.y = (conf.bartop)

@@ -103,7 +103,6 @@ quit(void)
      infobar_destroy();
      efree(infobar);
      efree(seltag);
-     efree(tags);
      efree(keys);
      efree(conf.titlebar.mouse);
      efree(conf.client.mouse);
