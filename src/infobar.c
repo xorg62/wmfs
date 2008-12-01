@@ -55,7 +55,7 @@ infobar_init(void)
                                           screen_get_geo(sc).width, infobar[sc].geo.height, conf.colors.bar, False);
 
           /* Create tags window */
-          for(i = 1; i < conf.ntag + 1; ++i)
+          for(i = 1; i < conf.ntag[sc] + 1; ++i)
           {
                infobar[sc].tags[i] = barwin_create(infobar[sc].bar->win, j, 0, textw(tags[sc][i].name) + PAD,
                                                 infobar[sc].geo.height, conf.colors.bar, False);
@@ -110,6 +110,7 @@ infobar_draw_layout(int sc)
 {
      barwin_resize(infobar[sc].layout_button, textw(tags[sc][seltag[sc]].layout.symbol) + PAD, infobar[sc].geo.height);
      barwin_refresh_color(infobar[sc].layout_button);
+     if(tags[sc][seltag[sc]].layout.symbol)
      draw_text(infobar[sc].layout_button->dr, PAD / 2, font->height,
                conf.colors.layout_fg, 0, tags[sc][seltag[sc]].layout.symbol);
      barwin_refresh(infobar[sc].layout_button);
@@ -124,12 +125,17 @@ infobar_draw_taglist(int sc)
 {
      int i;
 
-     for(i = 1; i < conf.ntag + 1; ++i)
+     for(i = 1; i < conf.ntag[sc] + 1; ++i)
      {
           infobar[sc].tags[i]->color = ((i == seltag[sc]) ? conf.colors.tagselbg : conf.colors.bar);
           barwin_refresh_color(infobar[sc].tags[i]);
-          draw_text(infobar[sc].tags[i]->dr, PAD / 2, font->height,
-                    ((i == seltag[sc]) ? conf.colors.tagselfg : conf.colors.text), 0, tags[sc][i].name);
+          if(tags[sc][i].name)
+          draw_text(infobar[sc].tags[i]->dr,
+                    PAD / 2,
+                    font->height,
+                    ((i == seltag[sc]) ? conf.colors.tagselfg : conf.colors.text),
+                    0,
+                    tags[sc][i].name);
           barwin_refresh(infobar[sc].tags[i]);
      }
 
@@ -147,7 +153,7 @@ infobar_destroy(void)
      {
           barwin_delete(infobar[sc].layout_button);
           barwin_delete_subwin(infobar[sc].layout_button);
-          for(i = 1; i < conf.ntag + 1; ++i)
+          for(i = 1; i < conf.ntag[sc] + 1; ++i)
           {
                barwin_delete_subwin(infobar[sc].tags[i]);
                barwin_delete(infobar[sc].tags[i]);

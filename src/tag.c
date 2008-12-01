@@ -48,14 +48,14 @@ uicb_tag(uicb_t cmd)
      if(cmd[0] == '+' || cmd[0] == '-')
      {
           if(tmp + seltag[selscreen] < 1
-             || tmp + seltag[selscreen] > conf.ntag)
+             || tmp + seltag[selscreen] > conf.ntag[selscreen])
                return;
           seltag[selscreen] += tmp;
      }
      else
      {
           if(tmp == seltag[selscreen]
-             || tmp > conf.ntag)
+             || tmp > conf.ntag[selscreen])
                return;
           seltag[selscreen] = tmp;
      }

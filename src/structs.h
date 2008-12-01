@@ -203,7 +203,7 @@ typedef struct
      } titlebar;
      Tag tag[MAXTAG];
      Layout layout[NUM_OF_LAYOUT];
-     int ntag;
+     int *ntag;
      int nkeybind;
      int nbutton;
      int nlayout;

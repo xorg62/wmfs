@@ -70,12 +70,12 @@ screen_get_geo(int s)
           geo.height = xsi[s].height - INFOBARH - TBARH;
           geo.width = xsi[s].width;
 
-          free(xsi);
+          XFree(xsi);
      }
      else
      {
           geo.x = BORDH;
-          geo.y = (conf.bartop) ? INFOBARH + TBARH  : TBARH; ;
+          geo.y = (conf.bartop) ? INFOBARH + TBARH : TBARH;
           geo.height = MAXH - INFOBARH - TBARH;
           geo.width = MAXW;
      }

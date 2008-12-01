@@ -72,10 +72,10 @@ buttonpress(XButtonEvent *ev)
                               conf.root.mouse[i].func(conf.root.mouse[i].cmd);
 
      /* Tag */
-     for(i = 1; i < conf.ntag + 1; ++i)
+     for(i = 1; i < conf.ntag[screen_get_sel()]+ 1; ++i)
      {
           ITOA(s, i);
-          if(ev->window == infobar[screen_get_sel()].tags[i]->win)
+          if(ev->window == infobar[selscreen].tags[i]->win)
           {
                if(ev->button == Button1)
                     uicb_tag(s);
@@ -89,7 +89,7 @@ buttonpress(XButtonEvent *ev)
      }
 
      /* Layout button */
-     if(ev->window == infobar[screen_get_sel()].layout_button->win)
+     if(ev->window == infobar[selscreen].layout_button->win)
      {
           if(ev->button == Button1
              || ev->button == Button4)
@@ -213,7 +213,7 @@ expose(XExposeEvent *ev)
                barwin_refresh(infobar[sc].bar);
           if(ev->window == infobar[sc].layout_button->win)
                barwin_refresh(infobar[sc].layout_button);
-          for(i = 1; i < conf.ntag + 1; ++i)
+          for(i = 1; i < conf.ntag[sc] + 1; ++i)
                if(ev->window == infobar[sc].tags[i]->win)
                     barwin_refresh(infobar[sc].tags[i]);
      }

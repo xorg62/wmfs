@@ -63,7 +63,7 @@ static cfg_opt_t bar_opts[] =
 
 static cfg_opt_t mouse_button_opts[] =
 {
-     CFG_INT("tag",    -1,        CFGF_NONE),
+     CFG_INT("tag",    0,         CFGF_NONE),
      CFG_STR("button", "Button1", CFGF_NONE),
      CFG_STR("func",   "",        CFGF_NONE),
      CFG_STR("cmd",    "",        CFGF_NONE),
@@ -115,6 +115,7 @@ static cfg_opt_t layouts_opts[] =
 
 static cfg_opt_t tag_opts[] =
 {
+     CFG_INT("screen",      0,           CFGF_NONE),
      CFG_STR("name",        "",           CFGF_NONE),
      CFG_FLOAT("mwfact",    0.65,         CFGF_NONE),
      CFG_INT("nmaster",     1,            CFGF_NONE),
@@ -449,50 +450,52 @@ init_conf(void)
           }
      }
 
-     /* tag
-      * if there is no tag in the conf or more than
+     /* Tag
+      * If there is no tag in the conf or more than
       * MAXTAG (32) print an error and create only one.
       */
      conf.colors.tagselfg  = strdup(var_to_str(cfg_getstr(cfg_tags, "sel_fg")));
      conf.colors.tagselbg  = getcolor(var_to_str(cfg_getstr(cfg_tags, "sel_bg")));
      conf.colors.tagbord   = getcolor(var_to_str(cfg_getstr(cfg_tags, "border")));
 
-     conf.ntag = cfg_size(cfg_tags, "tag");
-     if(!conf.ntag  || conf.ntag > MAXTAG)
+     /* Alloc all */
+     conf.ntag = emalloc(screen_count(), sizeof(int));
+     tags = emalloc(screen_count(), sizeof(Tag*));
+     for(i = 0; i < screen_count(); ++i)
+          tags[i] = emalloc(cfg_size(cfg_tags, "tag") + 1, sizeof(Tag));
+
+     for(i = 0; i < cfg_size(cfg_tags, "tag"); ++i)
      {
-          fprintf(stderr, "WMFS Configuration: Too many or no tag"
-                  " (%d) in the configration file\n", conf.ntag);
-          conf.ntag = 1;
-          conf.tag[0].name       = strdup("WMFS");
-          conf.tag[0].mwfact     = 0.65;
-          conf.tag[0].nmaster    = 1;
-          conf.tag[0].resizehint = False;
-          conf.tag[0].layout     = layout_name_to_struct(conf.layout, "tile_right", conf.nlayout);
-     }
-     else
-     {
-          for(i = 0; i < conf.ntag; ++i)
-          {
-               cfgtmp                  = cfg_getnsec(cfg_tags, "tag", i);
-               if(strlen(strdup(cfg_getstr(cfgtmp, "name"))) > 256)
-                    fprintf(stderr, "WMFS Configuration: name of tag %d too long !\n", i);
-               conf.tag[i].name        = strdup(cfg_getstr(cfgtmp, "name"));
-               conf.tag[i].mwfact      = cfg_getfloat(cfgtmp, "mwfact");
-               conf.tag[i].nmaster     = cfg_getint(cfgtmp, "nmaster");
-               conf.tag[i].resizehint  = cfg_getbool(cfgtmp, "resizehint");
-               conf.tag[i].layout      = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"), conf.nlayout);
-          }
+          cfgtmp = cfg_getnsec(cfg_tags, "tag", i);
+          j = cfg_getint(cfgtmp, "screen");
+          if(j < 0 || j > screen_count() - 1)
+               j = 0;
+          ++conf.ntag[j];
+
+          tags[j][conf.ntag[j]].name       = strdup(cfg_getstr(cfgtmp, "name"));
+          tags[j][conf.ntag[j]].mwfact     = cfg_getfloat(cfgtmp, "mwfact");
+          tags[j][conf.ntag[j]].nmaster    = cfg_getint(cfgtmp, "nmaster");
+          tags[j][conf.ntag[j]].resizehint = cfg_getbool(cfgtmp, "resizehint");
+          tags[j][conf.ntag[j]].layout     = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"), conf.nlayout);
      }
 
+     for(i = 0; i < screen_count(); ++i)
+          if(!conf.ntag[i] || conf.ntag[i] > MAXTAG)
+          {
+               fprintf(stderr, "WMFS Configuration: Too many or no tag"
+                       " (%d) in the screen %d\n", conf.ntag[i], i);
+
+               conf.ntag[i] = 1;
+               tags[i][1].name       = strdup("WMFS");
+               tags[i][1].mwfact     = 0.50;
+               tags[i][1].nmaster    = 1;
+               tags[i][1].resizehint = False;
+               tags[i][1].layout     = layout_name_to_struct(conf.layout, "tile_right", conf.nlayout);
+          }
+
      seltag = emalloc(screen_count(), sizeof(int));
-     tags = emalloc(screen_count(), sizeof(Tag*));
      for(j = 0; j < screen_count(); ++j)
-     {
-          tags[j] = emalloc(conf.ntag + 1, sizeof(Tag));
           seltag[j] = 1;
-          for(i = 0; i < conf.ntag; ++i)
-               tags[j][i + 1] = conf.tag[i];
-     }
 
      /* keybind */
      conf.nkeybind = cfg_size(cfg_keys, "key");
