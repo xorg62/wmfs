@@ -127,8 +127,20 @@ infobar_draw_taglist(int sc)
 
      for(i = 1; i < conf.ntag[sc] + 1; ++i)
      {
+          Client *c;
+
           infobar[sc].tags[i]->color = ((i == seltag[sc]) ? conf.colors.tagselbg : conf.colors.bar);
           barwin_refresh_color(infobar[sc].tags[i]);
+
+          for(c = clients; c; c = c->next)
+          {
+               if(c->screen == sc)
+               {
+                   infobar[sc].tags[c->tag]->color = ((c->tag == seltag[sc]) ? conf.colors.tagselbg : conf.colors.tag_occupied_bg);
+                   barwin_refresh_color(infobar[sc].tags[i]);
+               }
+          }
+
           if(tags[sc][i].name)
           draw_text(infobar[sc].tags[i]->dr,
                     PAD / 2,

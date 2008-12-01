@@ -173,6 +173,7 @@ typedef struct
           char *text;
           char *tagselfg;
           uint tagselbg;
+          uint tag_occupied_bg;
           uint tagbord;
           char *layout_fg;
           uint layout_bg;

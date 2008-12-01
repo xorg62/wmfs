@@ -126,6 +126,7 @@ static cfg_opt_t tag_opts[] =
 
 static cfg_opt_t tags_opts[] =
 {
+     CFG_STR("occupied_bg",  "#003366", CFGF_NONE),
      CFG_STR("sel_fg",       "#FFFFFF", CFGF_NONE),
      CFG_STR("sel_bg",       "#354B5C", CFGF_NONE),
      CFG_STR("border",       "#090909", CFGF_NONE),
@@ -454,9 +455,10 @@ init_conf(void)
       * If there is no tag in the conf or more than
       * MAXTAG (32) print an error and create only one.
       */
-     conf.colors.tagselfg  = strdup(var_to_str(cfg_getstr(cfg_tags, "sel_fg")));
-     conf.colors.tagselbg  = getcolor(var_to_str(cfg_getstr(cfg_tags, "sel_bg")));
-     conf.colors.tagbord   = getcolor(var_to_str(cfg_getstr(cfg_tags, "border")));
+     conf.colors.tagselfg         = strdup(var_to_str(cfg_getstr(cfg_tags, "sel_fg")));
+     conf.colors.tagselbg         = getcolor(var_to_str(cfg_getstr(cfg_tags, "sel_bg")));
+     conf.colors.tag_occupied_bg  = getcolor(var_to_str(cfg_getstr(cfg_tags, "occupied_bg")));
+     conf.colors.tagbord          = getcolor(var_to_str(cfg_getstr(cfg_tags, "border")));
 
      /* Alloc all */
      conf.ntag = emalloc(screen_count(), sizeof(int));
@@ -478,6 +480,7 @@ init_conf(void)
           tags[j][conf.ntag[j]].resizehint = cfg_getbool(cfgtmp, "resizehint");
           tags[j][conf.ntag[j]].layout     = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"), conf.nlayout);
      }
+
      for(i = 0; i < screen_count(); ++i)
           if(!conf.ntag[i] || conf.ntag[i] > MAXTAG)
           {
