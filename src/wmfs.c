@@ -107,6 +107,7 @@ quit(void)
      free(infobar);
      free(seltag);
      free(keys);
+     free(conf.ntag);
      free(conf.titlebar.mouse);
      free(conf.client.mouse);
      free(conf.root.mouse);
