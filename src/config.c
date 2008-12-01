@@ -478,7 +478,6 @@ init_conf(void)
           tags[j][conf.ntag[j]].resizehint = cfg_getbool(cfgtmp, "resizehint");
           tags[j][conf.ntag[j]].layout     = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"), conf.nlayout);
      }
-
      for(i = 0; i < screen_count(); ++i)
           if(!conf.ntag[i] || conf.ntag[i] > MAXTAG)
           {

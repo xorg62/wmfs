@@ -184,7 +184,6 @@ void uicb_tagtransfert(uicb_t);
 int screen_count(void);
 XRectangle screen_get_geo(int s);
 int screen_get_sel(void);
-void screen_init(void);
 
 /* layout.c */
 void arrange(void);

@@ -531,7 +531,6 @@ uicb_togglemax(uicb_t cmd)
           client_moveresize(sel, geo, False);
           sel->max = False;
      }
-     arrange();
 
      return;
 }

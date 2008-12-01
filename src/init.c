@@ -46,7 +46,6 @@ init(void)
      init_root();
      init_atom();
      infobar_init();
-     screen_init();
      grabkeys();
 
      /* Warning about font */

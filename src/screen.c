@@ -98,22 +98,13 @@ screen_get_sel(void)
           XQueryPointer(dpy, root, &w, &w, &x, &y, &d, &d, &du);
 
           for(i = 0; i < screen_count(); ++i)
-               if(x >= screen_get_geo(i).x
-                  && x < screen_get_geo(i).x + screen_get_geo(i).width)
+               if((x >= screen_get_geo(i).x && x < screen_get_geo(i).x + screen_get_geo(i).width)
+                  && (y >= screen_get_geo(i).y - INFOBARH - TBARH
+                      && y < screen_get_geo(i).y - INFOBARH - TBARH + screen_get_geo(i).height + INFOBARH))
                     selscreen = i;
 
           return selscreen;
      }
      else
           return 0;
-}
-
-/** Init screen geometry
-*/
-void
-screen_init(void)
-{
-     screen_get_sel();
-
-     return;
 }
