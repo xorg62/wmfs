@@ -360,7 +360,7 @@ client_manage(Window w, XWindowAttributes *wa)
      c = emalloc(1, sizeof(Client));
      c->win = w;
      c->screen = screen_get_sel();
-     c->ogeo.x = c->geo.x = wa->x;
+     c->ogeo.x = c->geo.x = wa->x + BORDH;
      c->ogeo.y = c->geo.y = wa->y + TBARH + INFOBARH;
      c->ogeo.width = c->geo.width = wa->width;
      c->ogeo.height = c->geo.height = wa->height;

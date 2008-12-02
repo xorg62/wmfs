@@ -123,7 +123,7 @@ void
 mainloop(void)
 {
      fd_set fd;
-     int len, r, offset = 0;
+     int len, r, offset = 0, i;
      char sbuf[sizeof statustext], *p;
      Bool readstdin = True;
      XEvent ev;
@@ -163,7 +163,8 @@ mainloop(void)
                     strncpy(statustext, sbuf, strlen(sbuf));
                     readstdin = False;
                }
-               infobar_draw(screen_get_sel());
+               for(i = 0; i < screen_count(); ++i)
+                    infobar_draw(i);
           }
           while(XPending(dpy))
           {
