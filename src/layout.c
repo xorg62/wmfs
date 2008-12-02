@@ -96,8 +96,8 @@ layoutswitch(Bool b)
 
      for(i = 0; i < conf.nlayout; ++i)
      {
-          if(tags[selscreen][seltag[selscreen]].layout.symbol == conf.layout[i].symbol
-             && tags[selscreen][seltag[selscreen]].layout.func == conf.layout[i].func)
+          if(tags[selscreen][seltag[selscreen]].layout.func == conf.layout[i].func
+             && tags[selscreen][seltag[selscreen]].layout.symbol == conf.layout[i].symbol)
           {
                if(b)
                     tags[selscreen][seltag[selscreen]].layout = conf.layout[(i + 1) % conf.nlayout];

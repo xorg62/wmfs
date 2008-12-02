@@ -359,7 +359,6 @@ client_manage(Window w, XWindowAttributes *wa)
      uint duint;
      Window dw;
 
-
      c = emalloc(1, sizeof(Client));
      c->win = w;
      c->screen = screen_get_sel();

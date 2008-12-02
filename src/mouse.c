@@ -89,42 +89,17 @@ mouse_resize(Client *c)
 {
      int ocx = c->geo.x;
      int ocy = c->geo.y;
-     double fy, fx, mwf;
      XRectangle geo;
-     XRectangle sg = screen_get_geo(screen_get_sel());
-     int my = sg.y, mx = 0;
      XEvent ev;
 
-    if(c->max || c->lmax)
+    if(c->max || c->lmax || c->tile)
           return;
 
      if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
                      None, cursor[CurResize], CurrentTime) != GrabSuccess)
           return;
 
-     if(!c->tile)
-          XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
-
-     /* Warp pointer for mwfact resize {{{ */
-     if(c->tile)
-     {
-          if(tags[selscreen][seltag[selscreen]].layout.func == tile)
-               mx = tags[selscreen][seltag[selscreen]].mwfact * sg.width;
-          else if(tags[selscreen][seltag[selscreen]].layout.func == tile_left)
-               mx = sg.width - (tags[selscreen][seltag[selscreen]].mwfact * sg.width);
-          else if(tags[selscreen][seltag[selscreen]].layout.func == tile_top)
-          {
-               mx = sg.width / 2;
-               my = sg.height - (tags[selscreen][seltag[selscreen]].mwfact * sg.height);
-          }
-          else if(tags[selscreen][seltag[selscreen]].layout.func == tile_bottom)
-          {
-               mx = sg.width / 2;
-               my = tags[selscreen][seltag[selscreen]].mwfact * sg.height;
-          }
-          XWarpPointer(dpy, None, root, 0, 0, 0, 0, sg.x + mx, sg.y + my);
-     }
-     /* }}} */
+     XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
 
      for(;;)
      {
@@ -141,34 +116,11 @@ mouse_resize(Client *c)
           {
                XSync(dpy, False);
 
-               if(!c->tile)
-               {
-                    geo.x = c->geo.x; geo.y = c->geo.y;
-                    geo.width = ((ev.xmotion.x - ocx < 1) ? 1 : ev.xmotion.x - ocx);
-                    geo.height = ((ev.xmotion.y - ocy < 1) ? 1 : ev.xmotion.y - ocy);
-               }
-               else
-               {
-                    fy = (round(((ev.xmotion.y * 50) / sg.height))) / 50;
-                    fx = (round(((ev.xmotion.x * 50) / sg.width))) / 50;
+               geo.x = c->geo.x; geo.y = c->geo.y;
+               geo.width = ((ev.xmotion.x - ocx < 1) ? 1 : ev.xmotion.x - ocx);
+               geo.height = ((ev.xmotion.y - ocy < 1) ? 1 : ev.xmotion.y - ocy);
 
-                    if(tags[selscreen][seltag[selscreen]].layout.func == tile)
-                         mwf = sg.x + fx;
-                    else if(tags[selscreen][seltag[selscreen]].layout.func == tile_left)
-                         mwf = 1 - (sg.x + fx);
-                    else if(tags[selscreen][seltag[selscreen]].layout.func == tile_top)
-                         mwf = 1 - fy;
-                    else if(tags[selscreen][seltag[selscreen]].layout.func == tile_bottom)
-                         mwf = fy;
-                    else
-                         mwf = tags[selscreen][seltag[selscreen]].mwfact;
-
-                    tags[selscreen][seltag[selscreen]].mwfact = (mwf < 0.05) ? 0.05 : ((mwf > 0.95) ? 0.95 : mwf);
-                    tags[selscreen][seltag[selscreen]].layout.func();
-               }
-
-               if(!c->tile)
-                    client_moveresize(c, geo, True);
+               client_moveresize(c, geo, True);
           }
           else if(ev.type == Expose)
                expose(&ev.xexpose);
