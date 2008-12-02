@@ -73,6 +73,7 @@ uicb_tag(uicb_t cmd)
      }
 
      arrange();
+     client_focus(NULL);
 
      return;
 }

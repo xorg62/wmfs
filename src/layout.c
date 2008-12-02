@@ -51,7 +51,6 @@ arrange(void)
           }
 
      tags[selscreen][seltag[selscreen]].layout.func();
-     client_focus(NULL);
      infobar_draw(selscreen);
 
      return;
