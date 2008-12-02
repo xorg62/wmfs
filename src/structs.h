@@ -205,6 +205,7 @@ typedef struct
      Tag tag[MAXTAG];
      Layout layout[NUM_OF_LAYOUT];
      int *ntag;
+     bool tag_round;
      int nkeybind;
      int nbutton;
      int nlayout;

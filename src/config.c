@@ -126,6 +126,7 @@ static cfg_opt_t tag_opts[] =
 
 static cfg_opt_t tags_opts[] =
 {
+     CFG_BOOL("tag_round",   cfg_false, CFGF_NONE),
      CFG_STR("occupied_bg",  "#003366", CFGF_NONE),
      CFG_STR("sel_fg",       "#FFFFFF", CFGF_NONE),
      CFG_STR("sel_bg",       "#354B5C", CFGF_NONE),
@@ -455,6 +456,7 @@ init_conf(void)
       * If there is no tag in the conf or more than
       * MAXTAG (32) print an error and create only one.
       */
+     conf.tag_round               = cfg_getbool(cfg_tags, "tag_round");
      conf.colors.tagselfg         = strdup(var_to_str(cfg_getstr(cfg_tags, "sel_fg")));
      conf.colors.tagselbg         = getcolor(var_to_str(cfg_getstr(cfg_tags, "sel_bg")));
      conf.colors.tag_occupied_bg  = getcolor(var_to_str(cfg_getstr(cfg_tags, "occupied_bg")));

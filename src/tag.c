@@ -45,20 +45,33 @@ uicb_tag(uicb_t cmd)
      if(!tmp)
           tmp = 1;
 
-     if(cmd[0] == '+' || cmd[0] == '-')
+     if(conf.tag_round)
      {
-          if(tmp + seltag[selscreen] < 1
-             || tmp + seltag[selscreen] > conf.ntag[selscreen])
-               return;
-          seltag[selscreen] += tmp;
+          if(tmp + seltag[selscreen] < 1)
+               seltag[selscreen] = conf.ntag[selscreen];
+          else if (tmp + seltag[selscreen] > conf.ntag[selscreen])
+               seltag[selscreen] = 1;
+          else
+               seltag[selscreen] += tmp;
      }
      else
      {
-          if(tmp == seltag[selscreen]
-             || tmp > conf.ntag[selscreen])
-               return;
-          seltag[selscreen] = tmp;
+          if(cmd[0] == '+' || cmd[0] == '-')
+          {
+               if(tmp + seltag[selscreen] < 1
+                   || tmp + seltag[selscreen] > conf.ntag[selscreen])
+                    return;
+               seltag[selscreen] += tmp;
+          }
+          else
+          {
+               if(tmp == seltag[selscreen]
+                   || tmp > conf.ntag[selscreen])
+                    return;
+               seltag[selscreen] = tmp;
+          }
      }
+
      arrange();
 
      return;
