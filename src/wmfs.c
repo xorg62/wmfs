@@ -123,15 +123,13 @@ void
 mainloop(void)
 {
      fd_set fd;
-     int len, r, offset = 0, sc = screen_count() - 1;
-     char sbuf[sizeof infobar[sc].statustext], *p;
+     int len, r, offset = 0;
+     char sbuf[sizeof statustext], *p;
      Bool readstdin = True;
      XEvent ev;
 
-
-
-     len = sizeof infobar[sc].statustext - 1;
-     sbuf[len] = infobar[sc].statustext[len] = '\0';
+     len = sizeof statustext - 1;
+     sbuf[len] = statustext[len] = '\0';
 
      while(!exiting)
      {
@@ -150,7 +148,7 @@ mainloop(void)
                          if(*p == '\n')
                          {
                               *p = '\0';
-                              strncpy(infobar[sc].statustext, sbuf, len);
+                              strncpy(statustext, sbuf, len);
                               p += r - 1;
                               for(r = 0; *(p - r) && *(p - r) != '\n'; ++r);
                               offset = r;
@@ -162,7 +160,7 @@ mainloop(void)
                }
                else
                {
-                    strncpy(infobar[sc].statustext, sbuf, strlen(sbuf));
+                    strncpy(statustext, sbuf, strlen(sbuf));
                     readstdin = False;
                }
                infobar_draw(screen_get_sel());

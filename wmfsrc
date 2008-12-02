@@ -39,7 +39,7 @@ layouts
 tags
 {
         tag_round    = false
-        occupied_tag = "#003366"
+        occupied_bg = "#003366"
         sel_fg       = "#191919"
         sel_bg       = "#7E89A2"
         border       = "#3F485E"

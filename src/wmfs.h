@@ -236,6 +236,7 @@ int selscreen;
 Conf conf;
 Key *keys;
 Bool exiting;
+char statustext[1024];
 
 /* Atoms / Cursors */
 Atom wm_atom[WMLast];
