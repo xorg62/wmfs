@@ -1,8 +1,8 @@
 # WMFS config file
 
-variables
+alias
 {
-        var term { content = "urxvt" }
+        alias term { content = "urxvt" }
 }
 
 misc

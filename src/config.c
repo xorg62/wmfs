@@ -37,13 +37,14 @@
 cfg_t *cfg;
 cfg_t *cfg_misc;
 cfg_t *cfg_bar;
-cfg_t *cfg_variables;
+cfg_t *cfg_alias;
 cfg_t *cfg_root;
 cfg_t *cfg_client;
 cfg_t *cfg_layouts;
 cfg_t *cfg_tags;
 cfg_t *cfg_keys;
 cfg_t *cfgtmp;
+Alias *confalias;
 
 static cfg_opt_t misc_opts[] =
 {
@@ -151,28 +152,28 @@ static cfg_opt_t keys_opts[] =
      CFG_END()
 };
 
-static cfg_opt_t variable_opts[] =
+static cfg_opt_t _alias_opts[] =
 {
      CFG_STR("content", "", CFGF_NONE),
      CFG_END()
 };
 
-static cfg_opt_t variables_opts[] =
+static cfg_opt_t alias_opts[] =
 {
-     CFG_SEC("var", variable_opts, CFGF_TITLE | CFGF_MULTI),
+     CFG_SEC("alias", _alias_opts, CFGF_TITLE | CFGF_MULTI),
      CFG_END()
 };
 
 static cfg_opt_t opts[] =
 {
-     CFG_SEC("misc",      misc_opts,      CFGF_NONE),
-     CFG_SEC("variables", variables_opts, CFGF_NONE),
-     CFG_SEC("root",      root_opts,      CFGF_NONE),
-     CFG_SEC("client",    client_opts,    CFGF_NONE),
-     CFG_SEC("bar",       bar_opts,       CFGF_NONE),
-     CFG_SEC("layouts",   layouts_opts,   CFGF_NONE),
-     CFG_SEC("tags",      tags_opts,      CFGF_NONE),
-     CFG_SEC("keys",      keys_opts,      CFGF_NONE),
+     CFG_SEC("misc",    misc_opts,      CFGF_NONE),
+     CFG_SEC("alias",   alias_opts,     CFGF_NONE),
+     CFG_SEC("root",    root_opts,      CFGF_NONE),
+     CFG_SEC("client",  client_opts,    CFGF_NONE),
+     CFG_SEC("bar",     bar_opts,       CFGF_NONE),
+     CFG_SEC("layouts", layouts_opts,   CFGF_NONE),
+     CFG_SEC("tags",    tags_opts,      CFGF_NONE),
+     CFG_SEC("keys",    keys_opts,      CFGF_NONE),
      CFG_END()
 };
 
@@ -292,7 +293,7 @@ layout_name_to_struct(Layout lt[], char *name, int n)
 }
 
 char*
-var_to_str(char *conf_choice)
+alias_to_str(char *conf_choice)
 {
      int i;
      char *tmpchar = NULL;
@@ -300,9 +301,9 @@ var_to_str(char *conf_choice)
      if(!conf_choice)
           return 0;
 
-     for(i = 0; confvar[i].name; i++)
-          if(!strcmp(conf_choice, confvar[i].name))
-               tmpchar = confvar[i].content;
+     for(i = 0; confalias[i].name; i++)
+          if(!strcmp(conf_choice, confalias[i].name))
+               tmpchar = confalias[i].content;
      if(tmpchar)
           return strdup(tmpchar);
      else
@@ -323,7 +324,7 @@ mouse_section(MouseBinding mb[], cfg_t *cfg, int ns)
           mb[i].tag    = cfg_getint(tmp, "tag");
           mb[i].button = char_to_button(cfg_getstr(tmp, "button"));
           mb[i].func   = name_to_func(cfg_getstr(tmp, "func"), func_list);
-          mb[i].cmd    = strdup(var_to_str(cfg_getstr(tmp, "cmd")));
+          mb[i].cmd    = strdup(alias_to_str(cfg_getstr(tmp, "cmd")));
      }
 
      return;
@@ -355,40 +356,40 @@ init_conf(void)
           ret = cfg_parse(cfg, final_path);
      }
 
-     cfg_misc      = cfg_getsec(cfg, "misc");
-     cfg_variables = cfg_getsec(cfg, "variables");
-     cfg_root      = cfg_getsec(cfg, "root");
-     cfg_client    = cfg_getsec(cfg, "client");
-     cfg_bar       = cfg_getsec(cfg, "bar");
-     cfg_layouts   = cfg_getsec(cfg, "layouts");
-     cfg_tags      = cfg_getsec(cfg, "tags");
-     cfg_keys      = cfg_getsec(cfg, "keys");
+     cfg_misc    = cfg_getsec(cfg, "misc");
+     cfg_alias   = cfg_getsec(cfg, "alias");
+     cfg_root    = cfg_getsec(cfg, "root");
+     cfg_client  = cfg_getsec(cfg, "client");
+     cfg_bar     = cfg_getsec(cfg, "bar");
+     cfg_layouts = cfg_getsec(cfg, "layouts");
+     cfg_tags    = cfg_getsec(cfg, "tags");
+     cfg_keys    = cfg_getsec(cfg, "keys");
 
-     if((cfg_size(cfg_variables, "var")) > 256)
+     /* alias */
+     if(cfg_size(cfg_alias, "alias"))
      {
-          fprintf(stderr,"WMFS Configuration: Too many variables !\n");
-          exit(EXIT_FAILURE);
-     }
+          confalias = emalloc(cfg_size(cfg_alias, "alias"), sizeof(Alias));
 
-     for(i = 0; i < cfg_size(cfg_variables, "var"); ++i)
-     {
-          cfgtmp             = cfg_getnsec(cfg_variables, "var", i);
-          confvar[i].name    = strdup(cfg_title(cfgtmp));
-          confvar[i].content = strdup(cfg_getstr(cfgtmp, "content"));
+          for(i = 0; i < cfg_size(cfg_alias, "alias"); ++i)
+          {
+               cfgtmp               = cfg_getnsec(cfg_alias, "alias", i);
+               confalias[i].name    = strdup(cfg_title(cfgtmp));
+               confalias[i].content = strdup(cfg_getstr(cfgtmp, "content"));
+          }
      }
 
      /* misc */
-     conf.font          = var_to_str(strdup(cfg_getstr(cfg_misc, "font")));
+     conf.font          = alias_to_str(strdup(cfg_getstr(cfg_misc, "font")));
      conf.raisefocus    = cfg_getbool(cfg_misc, "raisefocus");
      conf.raiseswitch   = cfg_getbool(cfg_misc, "raiseswitch");
 
      /* bar */
-     conf.colors.bar  = getcolor(var_to_str(cfg_getstr(cfg_bar, "bg")));
-     conf.colors.text = strdup(var_to_str(cfg_getstr(cfg_bar, "fg")));
+     conf.colors.bar  = getcolor(alias_to_str(cfg_getstr(cfg_bar, "bg")));
+     conf.colors.text = strdup(alias_to_str(cfg_getstr(cfg_bar, "fg")));
      conf.bartop      = (strcmp(strdup(cfg_getstr(cfg_bar, "position")), "top") == 0) ? True : False;
 
      /* root */
-     conf.root.background_command = strdup(var_to_str(cfg_getstr(cfg_root, "background_command")));
+     conf.root.background_command = strdup(alias_to_str(cfg_getstr(cfg_root, "background_command")));
      conf.root.nmouse = cfg_size(cfg_root, "mouse");
      conf.root.mouse = emalloc(conf.root.nmouse, sizeof(MouseBinding));
      mouse_section(conf.root.mouse, cfg_root, conf.root.nmouse);
@@ -397,10 +398,10 @@ init_conf(void)
      conf.client.borderheight        = (cfg_getint(cfg_client, "border_height"))
           ? cfg_getint(cfg_client, "border_height") : 1;
      conf.client.place_at_mouse      = cfg_getbool(cfg_client, "place_at_mouse");
-     conf.client.bordernormal        = getcolor(var_to_str(cfg_getstr(cfg_client, "border_normal")));
-     conf.client.borderfocus         = getcolor(var_to_str(cfg_getstr(cfg_client, "border_focus")));
-     conf.client.resizecorner_normal = getcolor(var_to_str(cfg_getstr(cfg_client, "resize_corner_normal")));
-     conf.client.resizecorner_focus  = getcolor(var_to_str(cfg_getstr(cfg_client, "resize_corner_focus")));
+     conf.client.bordernormal        = getcolor(alias_to_str(cfg_getstr(cfg_client, "border_normal")));
+     conf.client.borderfocus         = getcolor(alias_to_str(cfg_getstr(cfg_client, "border_focus")));
+     conf.client.resizecorner_normal = getcolor(alias_to_str(cfg_getstr(cfg_client, "resize_corner_normal")));
+     conf.client.resizecorner_focus  = getcolor(alias_to_str(cfg_getstr(cfg_client, "resize_corner_focus")));
      conf.client.mod                |= char_to_modkey(cfg_getstr(cfg_client, "modifier"));
      conf.client.nmouse              = cfg_size(cfg_client, "mouse");
      conf.client.mouse               = emalloc(conf.client.nmouse, sizeof(MouseBinding));
@@ -409,7 +410,7 @@ init_conf(void)
      /* titlebar (into the client section) */
      cfgtmp                = cfg_getsec(cfg_client, "titlebar");
      conf.titlebar.height  = cfg_getint(cfgtmp, "height");
-     conf.titlebar.fg      = var_to_str(cfg_getstr(cfgtmp, "fg"));
+     conf.titlebar.fg      = alias_to_str(cfg_getstr(cfgtmp, "fg"));
      conf.titlebar.nmouse  = cfg_size(cfgtmp, "mouse");
      conf.titlebar.mouse   = emalloc(conf.titlebar.nmouse, sizeof(MouseBinding));
      mouse_section(conf.titlebar.mouse, cfgtmp, conf.titlebar.nmouse);
@@ -422,8 +423,8 @@ init_conf(void)
           conf.layout[i].func = NULL;
      }
 
-     conf.colors.layout_fg  = strdup(var_to_str(cfg_getstr(cfg_layouts, "fg")));
-     conf.colors.layout_bg  = getcolor(var_to_str(cfg_getstr(cfg_layouts, "bg")));
+     conf.colors.layout_fg  = strdup(alias_to_str(cfg_getstr(cfg_layouts, "fg")));
+     conf.colors.layout_bg  = getcolor(alias_to_str(cfg_getstr(cfg_layouts, "bg")));
 
      if((conf.nlayout = cfg_size(cfg_layouts, "layout")) > NUM_OF_LAYOUT
           || !(conf.nlayout = cfg_size(cfg_layouts, "layout")))
@@ -448,7 +449,7 @@ init_conf(void)
                }
                else
                {
-                    conf.layout[i].symbol = strdup(var_to_str(cfg_getstr(cfgtmp, "symbol")));
+                    conf.layout[i].symbol = strdup(alias_to_str(cfg_getstr(cfgtmp, "symbol")));
                     conf.layout[i].func = name_to_func(strdup(cfg_getstr(cfgtmp, "type")), layout_list);
                }
           }
@@ -459,10 +460,10 @@ init_conf(void)
       * MAXTAG (32) print an error and create only one.
       */
      conf.tag_round               = cfg_getbool(cfg_tags, "tag_round");
-     conf.colors.tagselfg         = strdup(var_to_str(cfg_getstr(cfg_tags, "sel_fg")));
-     conf.colors.tagselbg         = getcolor(var_to_str(cfg_getstr(cfg_tags, "sel_bg")));
-     conf.colors.tag_occupied_bg  = getcolor(var_to_str(cfg_getstr(cfg_tags, "occupied_bg")));
-     conf.colors.tagbord          = getcolor(var_to_str(cfg_getstr(cfg_tags, "border")));
+     conf.colors.tagselfg         = strdup(alias_to_str(cfg_getstr(cfg_tags, "sel_fg")));
+     conf.colors.tagselbg         = getcolor(alias_to_str(cfg_getstr(cfg_tags, "sel_bg")));
+     conf.colors.tag_occupied_bg  = getcolor(alias_to_str(cfg_getstr(cfg_tags, "occupied_bg")));
+     conf.colors.tagbord          = getcolor(alias_to_str(cfg_getstr(cfg_tags, "border")));
 
      /* Alloc all */
      conf.ntag = emalloc(screen_count(), sizeof(int));
@@ -522,11 +523,11 @@ init_conf(void)
                        cfg_getstr(cfgtmp, "func"));
                exit(EXIT_FAILURE);
           }
-          keys[j].cmd = (!strdup(var_to_str((cfg_getstr(cfgtmp, "cmd"))))
-                                 ?  NULL : strdup(var_to_str(cfg_getstr(cfgtmp, "cmd"))));
+          keys[j].cmd = (!strdup(alias_to_str((cfg_getstr(cfgtmp, "cmd"))))
+                                 ?  NULL : strdup(alias_to_str(cfg_getstr(cfgtmp, "cmd"))));
      }
      cfg_free(cfg);
-
+     free(confalias);
 
      return;
 }

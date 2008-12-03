@@ -257,7 +257,7 @@ Client *sel;
 
 /* Other */
 uint numlockmask;
-Variable confvar[256];
+Alias *confalias;
 
 #endif /* WMFS_H */
 

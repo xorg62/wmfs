@@ -495,6 +495,7 @@ client_moveresize(Client *c, XRectangle geo, bool r)
 
           frame_moveresize(c, geo);
           XMoveResizeWindow(dpy, c->win, BORDH, BORDH + TBARH, geo.width, geo.height);
+
           XSync(dpy, False);
      }
 

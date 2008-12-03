@@ -235,6 +235,6 @@ typedef struct
 {
      char *name;
      char *content;
-} Variable;
+} Alias;
 
 #endif /* STRUCTS_H */
