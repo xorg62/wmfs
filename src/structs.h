@@ -186,6 +186,7 @@ typedef struct
      } root;
      struct
      {
+          Bool place_at_mouse;
           int borderheight;
           uint bordernormal;
           uint borderfocus;

@@ -355,28 +355,38 @@ client_manage(Window w, XWindowAttributes *wa)
      Window trans;
      Status rettrans;
      XSetWindowAttributes at;
-     int mx = 0, my = 0, dint;
-     uint duint;
-     Window dw;
+     int mx, my;
 
      c = emalloc(1, sizeof(Client));
      c->win = w;
      c->screen = screen_get_sel();
 
-     XQueryPointer(dpy, root, &dw, &dw, &mx, &my, &dint, &dint, &duint);
+     if(conf.client.place_at_mouse)
+     {
+          int dint;
+          uint duint;
+          Window dw;
 
-     mx += BORDH;
-     my += TBARH;
+          XQueryPointer(dpy, root, &dw, &dw, &mx, &my, &dint, &dint, &duint);
 
-     if(mx == 0)
           mx += BORDH;
-     else if(mx == MAXW)
-          mx -= wa->width + BORDH;
+          my += TBARH;
 
-     if(my == 0)
-          my += TBARH + INFOBARH;
-     else if(my == MAXH)
-          my -= wa->height + BORDH;
+          if(mx == 0)
+               mx += BORDH;
+          else if(mx == MAXW)
+               mx -= wa->width + BORDH;
+
+          if(my == 0)
+               my += TBARH + INFOBARH;
+          else if(my == MAXH)
+               my -= wa->height + BORDH;
+     }
+     else
+     {
+          mx = wa->x + BORDH;
+          my = wa->y + TBARH + INFOBARH;
+     }
 
      c->ogeo.x = c->geo.x = mx;
      c->ogeo.y = c->geo.y = my;

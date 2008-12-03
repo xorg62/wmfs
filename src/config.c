@@ -87,6 +87,7 @@ static cfg_opt_t titlebar_opts[] =
 
 static cfg_opt_t client_opts[]=
 {
+     CFG_BOOL("place_at_mouse",       cfg_false,          CFGF_NONE),
      CFG_INT("border_height",         1,                  CFGF_NONE),
      CFG_STR("border_normal",         "#354B5C",          CFGF_NONE),
      CFG_STR("border_focus",          "#6286A1",          CFGF_NONE),
@@ -395,6 +396,7 @@ init_conf(void)
      /* client */
      conf.client.borderheight        = (cfg_getint(cfg_client, "border_height"))
           ? cfg_getint(cfg_client, "border_height") : 1;
+     conf.client.place_at_mouse      = cfg_getbool(cfg_client, "place_at_mouse");
      conf.client.bordernormal        = getcolor(var_to_str(cfg_getstr(cfg_client, "border_normal")));
      conf.client.borderfocus         = getcolor(var_to_str(cfg_getstr(cfg_client, "border_focus")));
      conf.client.resizecorner_normal = getcolor(var_to_str(cfg_getstr(cfg_client, "resize_corner_normal")));
