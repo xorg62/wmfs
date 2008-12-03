@@ -44,7 +44,6 @@ cfg_t *cfg_layouts;
 cfg_t *cfg_tags;
 cfg_t *cfg_keys;
 cfg_t *cfgtmp;
-Alias *confalias;
 
 static cfg_opt_t misc_opts[] =
 {
@@ -301,9 +300,11 @@ alias_to_str(char *conf_choice)
      if(!conf_choice)
           return 0;
 
-     for(i = 0; confalias[i].name; i++)
-          if(!strcmp(conf_choice, confalias[i].name))
-               tmpchar = confalias[i].content;
+     if(conf.alias)
+          for(i = 0; conf.alias[i].name; i++)
+               if(!strcmp(conf_choice, conf.alias[i].name))
+                    tmpchar = conf.alias[i].content;
+
      if(tmpchar)
           return strdup(tmpchar);
      else
@@ -368,13 +369,13 @@ init_conf(void)
      /* alias */
      if(cfg_size(cfg_alias, "alias"))
      {
-          confalias = emalloc(cfg_size(cfg_alias, "alias"), sizeof(Alias));
+          conf.alias = emalloc(cfg_size(cfg_alias, "alias"), sizeof(Alias));
 
           for(i = 0; i < cfg_size(cfg_alias, "alias"); ++i)
           {
-               cfgtmp               = cfg_getnsec(cfg_alias, "alias", i);
-               confalias[i].name    = strdup(cfg_title(cfgtmp));
-               confalias[i].content = strdup(cfg_getstr(cfgtmp, "content"));
+               cfgtmp                = cfg_getnsec(cfg_alias, "alias", i);
+               conf.alias[i].name    = strdup(cfg_title(cfgtmp));
+               conf.alias[i].content = strdup(cfg_getstr(cfgtmp, "content"));
           }
      }
 
@@ -527,7 +528,6 @@ init_conf(void)
                                  ?  NULL : strdup(alias_to_str(cfg_getstr(cfgtmp, "cmd"))));
      }
      cfg_free(cfg);
-     free(confalias);
 
      return;
 }

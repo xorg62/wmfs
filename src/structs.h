@@ -156,9 +156,17 @@ typedef struct
      Layout layout;
 } Tag;
 
+/* Alias struct */
+typedef struct
+{
+     char *name;
+     char *content;
+} Alias;
+
 /* Configuration structure */
 typedef struct
 {
+     /* Misc option */
      char *font;
      bool raisefocus;
      bool raiseswitch;
@@ -203,6 +211,7 @@ typedef struct
           MouseBinding *mouse;
           int nmouse;
      } titlebar;
+     Alias *alias;
      Tag tag[MAXTAG];
      Layout layout[NUM_OF_LAYOUT];
      int *ntag;
@@ -230,11 +239,5 @@ typedef struct
      char *name;
      uint button;
 } name_to_uint_t;
-
-typedef struct
-{
-     char *name;
-     char *content;
-} Alias;
 
 #endif /* STRUCTS_H */

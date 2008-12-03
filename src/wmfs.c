@@ -111,6 +111,8 @@ quit(void)
      free(conf.titlebar.mouse);
      free(conf.client.mouse);
      free(conf.root.mouse);
+     if(conf.alias)
+          free(conf.alias);
      XSync(dpy, False);
 
      return;
