@@ -372,15 +372,11 @@ client_manage(Window w, XWindowAttributes *wa)
           mx += BORDH;
           my += TBARH;
 
-          if(!mx)
-               mx += BORDH;
-          else if(mx == MAXW)
+          if((MAXW - mx) < wa->width)
                mx -= wa->width + BORDH;
 
-          if(!my)
-               my += TBARH + INFOBARH;
-          else if(my == MAXH)
-               my -= wa->height + BORDH;
+          if((MAXH - my) < wa->height)
+               my -= wa->height + TBARH;
      }
      else
      {
