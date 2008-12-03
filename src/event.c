@@ -65,7 +65,7 @@ buttonpress(XButtonEvent *ev)
      /* Root */
      if(ev->window == root)
           for(i = 0; i < conf.root.nmouse; ++i)
-               if(conf.root.mouse[i].tag == seltag[screen_get_sel()]
+               if(conf.root.mouse[i].tag == seltag[conf.root.mouse[i].screen]
                   || conf.root.mouse[i].tag < 0)
                     if(ev->button == conf.root.mouse[i].button)
                          if(conf.root.mouse[i].func)

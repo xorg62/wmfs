@@ -124,6 +124,7 @@ typedef struct
 typedef struct
 {
      int tag;
+     int screen;
      uint button;
      void (*func)(uicb_t);
      uicb_t cmd;

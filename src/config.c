@@ -63,7 +63,8 @@ static cfg_opt_t bar_opts[] =
 
 static cfg_opt_t mouse_button_opts[] =
 {
-     CFG_INT("tag",    0,         CFGF_NONE),
+     CFG_INT("tag",    -1,        CFGF_NONE),
+     CFG_INT("screen", 0,         CFGF_NONE),
      CFG_STR("button", "Button1", CFGF_NONE),
      CFG_STR("func",   "",        CFGF_NONE),
      CFG_STR("cmd",    "",        CFGF_NONE),
@@ -323,6 +324,7 @@ mouse_section(MouseBinding mb[], cfg_t *cfg, int ns)
      {
           tmp          = cfg_getnsec(cfg, "mouse", i);
           mb[i].tag    = cfg_getint(tmp, "tag");
+          mb[i].screen = cfg_getint(tmp, "screen");
           mb[i].button = char_to_button(cfg_getstr(tmp, "button"));
           mb[i].func   = name_to_func(cfg_getstr(tmp, "func"), func_list);
           mb[i].cmd    = strdup(alias_to_str(cfg_getstr(tmp, "cmd")));
