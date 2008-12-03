@@ -75,7 +75,7 @@ infobar_init(void)
           barwin_refresh_color(infobar[sc].bar);
           barwin_refresh(infobar[sc].bar);
 
-          strcpy(infobar[sc].statustext, "WMFS-" WMFS_VERSION);
+          strcpy(statustext, "WMFS-" WMFS_VERSION);
           infobar_draw(sc);
      }
 
@@ -91,12 +91,12 @@ infobar_draw(int sc)
      infobar_draw_layout(sc);
      barwin_refresh_color(infobar[sc].bar);
 
-     /* Draw status text */
+     /* DRAW status text */
      draw_text(infobar[sc].bar->dr,
-               (MAXW - SHADH) - textw(infobar[sc].statustext),
+               (screen_get_geo(sc).width - SHADH) - textw(statustext),
                font->height,
                conf.colors.text, 0,
-               infobar[sc].statustext);
+               statustext);
 
      barwin_refresh(infobar[sc].bar);
 
