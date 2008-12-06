@@ -369,16 +369,19 @@ init_conf(void)
      cfg_keys    = cfg_getsec(cfg, "keys");
 
      /* alias */
-     if(cfg_size(cfg_alias, "alias"))
+     if(cfg_size(cfg_alias, "alias") < 256)
      {
-          conf.alias = emalloc(cfg_size(cfg_alias, "alias"), sizeof(Alias));
-
           for(i = 0; i < cfg_size(cfg_alias, "alias"); ++i)
           {
                cfgtmp                = cfg_getnsec(cfg_alias, "alias", i);
                conf.alias[i].name    = strdup(cfg_title(cfgtmp));
                conf.alias[i].content = strdup(cfg_getstr(cfgtmp, "content"));
           }
+     }
+     else
+     {
+          fprintf(stderr,"WMFS Configuration: Too many alias (%d) !\n", cfg_size(cfg_alias, "alias"));
+          exit(EXIT_FAILURE);
      }
 
      /* misc */

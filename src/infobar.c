@@ -148,11 +148,9 @@ infobar_draw_taglist(int sc)
 
           if(tags[sc][i].name)
                draw_text(infobar[sc].tags[i]->dr,
-                         PAD / 2,
-                         font->height,
+                         PAD / 2, font->height,
                          ((i == seltag[sc]) ? conf.colors.tagselfg : conf.colors.text),
-                         0,
-                         tags[sc][i].name);
+                         0, tags[sc][i].name);
           barwin_refresh(infobar[sc].tags[i]);
      }
 

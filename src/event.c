@@ -72,7 +72,7 @@ buttonpress(XButtonEvent *ev)
                               conf.root.mouse[i].func(conf.root.mouse[i].cmd);
 
      /* Tag */
-     for(i = 1; i < conf.ntag[screen_get_sel()]+ 1; ++i)
+     for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
      {
           ITOA(s, i);
           if(ev->window == infobar[selscreen].tags[i]->win)
