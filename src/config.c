@@ -117,7 +117,7 @@ static cfg_opt_t layouts_opts[] =
 
 static cfg_opt_t tag_opts[] =
 {
-     CFG_INT("screen",      0,           CFGF_NONE),
+     CFG_INT("screen",      -1,           CFGF_NONE),
      CFG_STR("name",        "",           CFGF_NONE),
      CFG_FLOAT("mwfact",    0.65,         CFGF_NONE),
      CFG_INT("nmaster",     1,            CFGF_NONE),
@@ -340,7 +340,7 @@ void
 init_conf(void)
 {
      char final_path[128];
-     int ret, i, j, l;
+     int ret, i, j, l, k, m;
 
      sprintf(final_path, "%s/%s",
              strdup(getenv("HOME")),
@@ -482,14 +482,31 @@ init_conf(void)
           cfgtmp = cfg_getnsec(cfg_tags, "tag", i);
           j = cfg_getint(cfgtmp, "screen");
           if(j < 0 || j > screen_count() - 1)
-               j = 0;
-          ++conf.ntag[j];
+               j = -1;
 
-          tags[j][conf.ntag[j]].name       = strdup(cfg_getstr(cfgtmp, "name"));
-          tags[j][conf.ntag[j]].mwfact     = cfg_getfloat(cfgtmp, "mwfact");
-          tags[j][conf.ntag[j]].nmaster    = cfg_getint(cfgtmp, "nmaster");
-          tags[j][conf.ntag[j]].resizehint = cfg_getbool(cfgtmp, "resizehint");
-          tags[j][conf.ntag[j]].layout     = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"), conf.nlayout);
+          if(j == -1)
+          {
+               for(k = 0; k < screen_count(); ++k)
+               {
+                    ++conf.ntag[k];
+
+                    tags[k][conf.ntag[k]].name       = strdup(cfg_getstr(cfgtmp, "name"));
+                    tags[k][conf.ntag[k]].mwfact     = cfg_getfloat(cfgtmp, "mwfact");
+                    tags[k][conf.ntag[k]].nmaster    = cfg_getint(cfgtmp, "nmaster");
+                    tags[k][conf.ntag[k]].resizehint = cfg_getbool(cfgtmp, "resizehint");
+                    tags[k][conf.ntag[k]].layout     = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"), conf.nlayout);
+               }
+          }
+          else
+          {
+               ++conf.ntag[j];
+
+               tags[j][conf.ntag[j]].name       = strdup(cfg_getstr(cfgtmp, "name"));
+               tags[j][conf.ntag[j]].mwfact     = cfg_getfloat(cfgtmp, "mwfact");
+               tags[j][conf.ntag[j]].nmaster    = cfg_getint(cfgtmp, "nmaster");
+               tags[j][conf.ntag[j]].resizehint = cfg_getbool(cfgtmp, "resizehint");
+               tags[j][conf.ntag[j]].layout     = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"), conf.nlayout);
+          }
      }
 
      for(i = 0; i < screen_count(); ++i)

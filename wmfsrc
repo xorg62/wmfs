@@ -44,7 +44,7 @@ tags
         sel_bg       = "#7E89A2"
         border       = "#3F485E"
 
-        tag { name = "one" mwfact = 0.65 nmaster = 1 layout = "tile_right" resizehint = false }
+        tag { screen = 1 name = "one" mwfact = 0.65 nmaster = 1 layout = "tile_right" resizehint = false }
         tag { name = "two"   }
         tag { name = "three" }
         tag { name = "four"  }
