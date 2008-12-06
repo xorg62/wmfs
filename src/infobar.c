@@ -83,6 +83,7 @@ infobar_init(void)
 }
 
 /** Draw the Infobar
+ *\param sc Screen number
 */
 void
 infobar_draw(int sc)
@@ -104,6 +105,7 @@ infobar_draw(int sc)
 }
 
 /** Draw the layout button in the InfoBar
+ *\param sc Screen number
  */
 void
 infobar_draw_layout(int sc)
@@ -119,6 +121,7 @@ infobar_draw_layout(int sc)
 }
 
 /** Draw the taglist in the InfoBar
+ *\param sc Screen number
 */
 void
 infobar_draw_taglist(int sc)
