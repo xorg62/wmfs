@@ -223,6 +223,7 @@ key_name_list_t key_list[] =
      {"Mod2",    Mod2Mask },
      {"Mod3",    Mod3Mask },
      {"Mod4",    Mod4Mask },
+     {"Super",   Mod4Mask },
      {"Mod5",    Mod5Mask },
      {NULL,      NoSymbol }
 };
@@ -340,7 +341,7 @@ void
 init_conf(void)
 {
      char final_path[128];
-     int ret, i, j, l, k, m;
+     int ret, i, j, l, k;
 
      sprintf(final_path, "%s/%s",
              strdup(getenv("HOME")),
