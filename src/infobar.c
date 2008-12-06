@@ -47,12 +47,12 @@ infobar_init(void)
           j = 0;
           infobar[sc].geo.height = INFOBARH;
           infobar[sc].geo.y = (conf.bartop)
-               ? screen_get_geo(sc).y - INFOBARH - TBARH
-               : screen_get_geo(sc).height - INFOBARH;
+               ? sgeo[sc].y - INFOBARH - TBARH
+               : sgeo[sc].height - INFOBARH;
 
           /* Create infobar barwindow */
-          infobar[sc].bar = barwin_create(root, screen_get_geo(sc).x - BORDH, infobar[sc].geo.y,
-                                          screen_get_geo(sc).width, infobar[sc].geo.height, conf.colors.bar, False);
+          infobar[sc].bar = barwin_create(root, sgeo[sc].x - BORDH, infobar[sc].geo.y,
+                                          sgeo[sc].width, infobar[sc].geo.height, conf.colors.bar, False);
 
           /* Create tags window */
           for(i = 1; i < conf.ntag[sc] + 1; ++i)
@@ -93,7 +93,7 @@ infobar_draw(int sc)
 
      /* DRAW status text */
      draw_text(infobar[sc].bar->dr,
-               (screen_get_geo(sc).width - SHADH) - textw(statustext),
+               (sgeo[sc].width - SHADH) - textw(statustext),
                font->height,
                conf.colors.text, 0,
                statustext);
@@ -186,7 +186,7 @@ infobar_destroy(void)
 void
 uicb_infobar_togglepos(uicb_t cmd)
 {
-     XRectangle sg = screen_get_geo(screen_get_sel());
+     XRectangle sg = sgeo[screen_get_sel()];
 
      conf.bartop = !conf.bartop;
 

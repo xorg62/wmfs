@@ -184,6 +184,7 @@ void uicb_tagtransfert(uicb_t);
 int screen_count(void);
 XRectangle screen_get_geo(int s);
 int screen_get_sel(void);
+void screen_init_geo(void);
 
 /* layout.c */
 void arrange(void);
@@ -237,6 +238,7 @@ Conf conf;
 Key *keys;
 Bool exiting;
 char statustext[1024];
+XRectangle *sgeo;
 
 /* Atoms / Cursors */
 Atom wm_atom[WMLast];

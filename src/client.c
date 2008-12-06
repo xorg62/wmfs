@@ -482,11 +482,10 @@ client_moveresize(Client *c, XRectangle geo, bool r)
 
           /* Set the client screen */
           for(i = 0; i < screen_count(); ++i)
-               if(geo.x >= screen_get_geo(i).x
-                  && geo.x < screen_get_geo(i).x + screen_get_geo(i).width
-                  && geo.y >= screen_get_geo(i).y - INFOBARH - TBARH
-                  && geo.y < screen_get_geo(i).y - INFOBARH - TBARH + screen_get_geo(i).height + INFOBARH)
-
+               if(geo.x >= sgeo[i].x
+                  && geo.x < sgeo[i].x + sgeo[i].width
+                  && geo.y >= sgeo[i].y - INFOBARH - TBARH
+                  && geo.y < sgeo[i].y - INFOBARH - TBARH + sgeo[i].height + INFOBARH)
                     c->screen = i;
 
           frame_moveresize(c, geo);

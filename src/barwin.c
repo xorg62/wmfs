@@ -44,8 +44,12 @@
 */
 BarWindow*
 barwin_create(Window parent,
-           int x, int y, uint w, uint h,
-           uint color, Bool entermask)
+              int x,
+              int y,
+              uint w,
+              uint h,
+              uint color,
+              Bool entermask)
 {
      XSetWindowAttributes at;
      BarWindow *bw;

@@ -51,7 +51,6 @@ errorhandler(Display *d, XErrorEvent *event)
       * 42 = X_SetInputFocus
       * 28 = X_GrabButton
       */
-
      if((c = client_gb_win(event->resourceid)))
           if(event->error_code == BadWindow
              || (event->error_code == BadMatch && event->request_code == 42)
@@ -104,6 +103,7 @@ quit(void)
      XFreeCursor(dpy, cursor[CurMove]);
      XFreeCursor(dpy, cursor[CurResize]);
      infobar_destroy();
+     free(sgeo);
      free(infobar);
      free(seltag);
      free(keys);

@@ -45,6 +45,7 @@ init(void)
      init_key();
      init_root();
      init_atom();
+     screen_init_geo();
      infobar_init();
      grabkeys();
 

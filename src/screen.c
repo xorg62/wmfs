@@ -108,3 +108,20 @@ screen_get_sel(void)
      else
           return 0;
 }
+
+/** Init screen geo
+ */
+void
+screen_init_geo(void)
+{
+     int i;
+
+     sgeo = emalloc(screen_count(), sizeof(XRectangle));
+
+     for(i = 0; i < screen_count(); ++i)
+          sgeo[i] = screen_get_geo(i);
+
+     return;
+}
+
+

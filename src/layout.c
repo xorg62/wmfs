@@ -140,7 +140,7 @@ maxlayout(void)
 {
      Client *c;
      XRectangle geo;
-     XRectangle sg = screen_get_geo(screen_get_sel());
+     XRectangle sg = sgeo[selscreen];
 
      for(c = nexttiled(clients); c; c = nexttiled(c->next))
      {
@@ -170,7 +170,7 @@ maxlayout(void)
 Client*
 nexttiled(Client *c)
 {
-     for(; c && (c->max || c->free || c->screen != screen_get_sel() || ishide(c)); c = c->next);
+     for(; c && (c->max || c->free || c->screen != selscreen || ishide(c)); c = c->next);
 
      return c;
 }
@@ -226,7 +226,7 @@ void
 grid(void)
 {
      Client *c;
-     XRectangle sg = screen_get_geo(screen_get_sel());
+     XRectangle sg = sgeo[selscreen];
      XRectangle cgeo = {sg.x, sg.y, 0, 0};
      unsigned int i, n, cols, rows, cpcols = 0;
      unsigned int border = BORDH * 2;
@@ -285,7 +285,7 @@ void
 multi_tile(Position type)
 {
      Client *c;
-     XRectangle sg = screen_get_geo(screen_get_sel());
+     XRectangle sg = sgeo[selscreen];
      XRectangle mastergeo = {sg.x, sg.y, 0, 0};
      XRectangle cgeo = {sg.x, sg.y, 0, 0};
      uint i , n, tilesize, mwfact, nmaster = tags[selscreen][seltag[selscreen]].nmaster;
@@ -481,8 +481,6 @@ uicb_togglefree(uicb_t cmd)
 {
      CHECK(sel);
 
-     screen_get_sel();
-
      sel->free = !sel->free;
      sel->tile = False;
      sel->max  = False;
@@ -500,7 +498,7 @@ void
 uicb_togglemax(uicb_t cmd)
 {
      XRectangle geo;
-     XRectangle sg = screen_get_geo(screen_get_sel());
+     XRectangle sg = sgeo[screen_get_sel()];
 
      if(!sel || ishide(sel) || sel->hint)
           return;
