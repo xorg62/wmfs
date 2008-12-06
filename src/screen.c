@@ -93,14 +93,14 @@ screen_get_sel(void)
      {
           Window w;
           uint du;
-          int x, y, d, i = 0;
+          int x, y, d, i;
 
           XQueryPointer(dpy, root, &w, &w, &x, &y, &d, &d, &du);
 
           for(i = 0; i < screen_count(); ++i)
-               if((x >= screen_get_geo(i).x && x < screen_get_geo(i).x + screen_get_geo(i).width)
-                  && (y >= screen_get_geo(i).y - INFOBARH - TBARH
-                      && y < screen_get_geo(i).y - INFOBARH - TBARH + screen_get_geo(i).height + INFOBARH))
+               if((x >= sgeo[i].x && x < sgeo[i].x + sgeo[i].width)
+                  && (y >= sgeo[i].y - INFOBARH - TBARH
+                      && y < sgeo[i].y - INFOBARH - TBARH + sgeo[i].height + INFOBARH))
                     selscreen = i;
 
           return selscreen;
