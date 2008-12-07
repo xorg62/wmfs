@@ -194,7 +194,7 @@ uicb_infobar_togglepos(uicb_t cmd)
      if(conf.bartop)
      {
           sgeo[selscreen].y = INFOBARH + TBARH;
-          infobar[selscreen].geo.y = 0;
+          infobar[selscreen].geo.y = sgeo[selscreen].y - (INFOBARH + TBARH);
      }
      else
      {
