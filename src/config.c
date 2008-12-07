@@ -210,15 +210,15 @@ conf_tag_section(cfg_t *cfg_t)
           for(k = ((j == -1) ? 0 : j);
               ((j == -1) ? (k < screen_count()) : !l);
               ((j == -1) ? ++k : --l))
-               {
-                    ++conf.ntag[k];
-                    tags[k][conf.ntag[k]].name       = strdup(cfg_getstr(cfgtmp, "name"));
-                    tags[k][conf.ntag[k]].mwfact     = cfg_getfloat(cfgtmp, "mwfact");
-                    tags[k][conf.ntag[k]].nmaster    = cfg_getint(cfgtmp, "nmaster");
-                    tags[k][conf.ntag[k]].resizehint = cfg_getbool(cfgtmp, "resizehint");
-                    tags[k][conf.ntag[k]].layout     = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"),
-                                                                             conf.nlayout, layout_list);
-               }
+          {
+               ++conf.ntag[k];
+               tags[k][conf.ntag[k]].name       = strdup(cfg_getstr(cfgtmp, "name"));
+               tags[k][conf.ntag[k]].mwfact     = cfg_getfloat(cfgtmp, "mwfact");
+               tags[k][conf.ntag[k]].nmaster    = cfg_getint(cfgtmp, "nmaster");
+               tags[k][conf.ntag[k]].resizehint = cfg_getbool(cfgtmp, "resizehint");
+               tags[k][conf.ntag[k]].layout     = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"),
+                                                                        conf.nlayout, layout_list);
+          }
           l = 0;
      }
 
