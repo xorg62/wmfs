@@ -43,7 +43,7 @@ mouse_move(Client *c)
      int mx = 0, my = 0, dint;
      uint duint;
      Window dw;
-     XRectangle geo;
+     XRectangle geo = c->geo;
      XEvent ev;
 
      if(c->max || c->tile || c->lmax)
@@ -57,7 +57,7 @@ mouse_move(Client *c)
 
      for(;;)
      {
-          XMaskEvent(dpy, ButtonMask | MouseMask | ExposureMask | SubstructureRedirectMask, &ev);
+          XMaskEvent(dpy, MouseMask | ExposureMask | SubstructureRedirectMask, &ev);
 
           if(ev.type == ButtonRelease)
           {
@@ -66,13 +66,12 @@ mouse_move(Client *c)
           }
           else if(ev.type == MotionNotify)
           {
-               XSync(dpy, False);
-               geo.width = c->geo.width;
-               geo.height = c->geo.height;
                geo.x = (ocx + (ev.xmotion.x - mx));
                geo.y = (ocy + (ev.xmotion.y - my));
 
                client_moveresize(c, geo, True);
+
+               XSync(dpy, False);
           }
           else if(ev.type == Expose)
                expose(&ev.xexpose);
@@ -89,7 +88,7 @@ mouse_resize(Client *c)
 {
      int ocx = c->geo.x;
      int ocy = c->geo.y;
-     XRectangle geo;
+     XRectangle geo = c->geo;
      XEvent ev;
 
     if(c->max || c->lmax || c->tile)
@@ -114,13 +113,12 @@ mouse_resize(Client *c)
           }
           else if(ev.type == MotionNotify)
           {
-               XSync(dpy, False);
-
-               geo.x = c->geo.x; geo.y = c->geo.y;
                geo.width = ((ev.xmotion.x - ocx < 1) ? 1 : ev.xmotion.x - ocx);
                geo.height = ((ev.xmotion.y - ocy < 1) ? 1 : ev.xmotion.y - ocy);
 
                client_moveresize(c, geo, True);
+
+               XSync(dpy, False);
           }
           else if(ev.type == Expose)
                expose(&ev.xexpose);

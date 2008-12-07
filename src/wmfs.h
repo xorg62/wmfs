@@ -105,7 +105,7 @@ void infobar_draw(int sc);
 void infobar_draw_layout(int sc);
 void infobar_draw_taglist(int sc);
 void infobar_destroy(void);
-void uicb_infobar_togglepos(uicb_t cmd);
+void uicb_infobar_togglepos(uicb_t);
 
 /* client.c */
 void client_attach(Client *c);
@@ -130,7 +130,7 @@ void client_raise(Client *c);
 void client_unhide(Client *c);
 void client_unmanage(Client *c);
 void client_unmap(Client *c);
-void uicb_client_raise(uicb_t cmd);
+void uicb_client_raise(uicb_t);
 void uicb_client_prev(uicb_t);
 void uicb_client_next(uicb_t);
 void uicb_client_kill(uicb_t);
@@ -162,8 +162,8 @@ void getevent(XEvent ev);
 void mouse_move(Client *c);
 void mouse_resize(Client *c);
 void mouse_grabbuttons(Client *c, Bool focused);
-void uicb_mouse_move(uicb_t cmd);
-void uicb_mouse_resize(uicb_t cmd);
+void uicb_mouse_move(uicb_t);
+void uicb_mouse_resize(uicb_t);
 
 /* util.c */
 ulong color_enlight(ulong col);
@@ -201,7 +201,7 @@ Client *nexttiled(Client *c);
 /* }}} */
 void uicb_tile_switch(uicb_t);
 void uicb_togglemax(uicb_t);
-void uicb_togglefree(uicb_t cmd);
+void uicb_togglefree(uicb_t);
 void uicb_layout_prev(uicb_t);
 void uicb_layout_next(uicb_t);
 void uicb_set_mwfact(uicb_t);
@@ -224,7 +224,7 @@ void mainloop(void);
 void scan(void);
 void handle_signal(int signum);
 void uicb_quit(uicb_t);
-void uicb_reload(uicb_t cmd);
+void uicb_reload(uicb_t);
 
 /* Variables */
 

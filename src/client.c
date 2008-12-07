@@ -488,8 +488,8 @@ client_moveresize(Client *c, XRectangle geo, bool r)
                   && geo.y < sgeo[i].y - INFOBARH - TBARH + sgeo[i].height + INFOBARH)
                     c->screen = i;
 
-          frame_moveresize(c, geo);
-          XMoveResizeWindow(dpy, c->win, BORDH, BORDH + TBARH, geo.width, geo.height);
+          frame_moveresize(c, c->geo);
+          XMoveResizeWindow(dpy, c->win, BORDH, BORDH + TBARH, c->geo.width, c->geo.height);
 
           XSync(dpy, False);
      }

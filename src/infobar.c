@@ -187,14 +187,22 @@ infobar_destroy(void)
 void
 uicb_infobar_togglepos(uicb_t cmd)
 {
-     XRectangle sg = sgeo[screen_get_sel()];
+     screen_get_sel();
 
      conf.bartop = !conf.bartop;
 
-     infobar[selscreen].geo.y = (conf.bartop)
-          ? sg.y - TBARH
-          : (sg.y - INFOBARH - TBARH) + sg.height + TBARH;
-     barwin_move(infobar[selscreen].bar, sg.x - BORDH, infobar[selscreen].geo.y);
+     if(conf.bartop)
+     {
+          sgeo[selscreen].y = INFOBARH + TBARH;
+          infobar[selscreen].geo.y = 0;
+     }
+     else
+     {
+          sgeo[selscreen].y = TBARH;
+          infobar[selscreen].geo.y = sgeo[selscreen].height + TBARH;
+     }
+
+     barwin_move(infobar[selscreen].bar, sgeo[selscreen].x - BORDH, infobar[selscreen].geo.y);
      infobar_draw(selscreen);
 
      arrange();
