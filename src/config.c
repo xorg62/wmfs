@@ -32,9 +32,6 @@
 
 #include "config_struct.h"
 
-#define FILE_NAME   ".config/wmfs/wmfsrc"
-
-cfg_t *cfg, *cfgtmp;
 
 /* The following function are the
    different configuration section. {{{
@@ -186,7 +183,7 @@ conf_layout_section(cfg_t *cfg_l)
 void
 conf_tag_section(cfg_t *cfg_t)
 {
-     int i, j, k;
+     int i, j, k, l = 0;
 
      /* If there is no tag in the conf or more than
       * MAXTAG (32) print an error and create only one.
@@ -210,37 +207,20 @@ conf_tag_section(cfg_t *cfg_t)
           if(j < 0 || j > screen_count() - 1)
                j = -1;
 
-          if(j == -1)
-          {
-               for(k = 0; k < screen_count(); ++k)
+          for(k = ((j == -1) ? 0 : j);
+              ((j == -1) ? (k < screen_count()) : !l);
+              ((j == -1) ? ++k : --l))
                {
                     ++conf.ntag[k];
-
                     tags[k][conf.ntag[k]].name       = strdup(cfg_getstr(cfgtmp, "name"));
                     tags[k][conf.ntag[k]].mwfact     = cfg_getfloat(cfgtmp, "mwfact");
                     tags[k][conf.ntag[k]].nmaster    = cfg_getint(cfgtmp, "nmaster");
                     tags[k][conf.ntag[k]].resizehint = cfg_getbool(cfgtmp, "resizehint");
-                    tags[k][conf.ntag[k]].layout     = layout_name_to_struct(conf.layout,
-                                                                             cfg_getstr(cfgtmp, "layout"),
-                                                                             conf.nlayout,
-                                                                             layout_list);
+                    tags[k][conf.ntag[k]].layout     = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"),
+                                                                             conf.nlayout, layout_list);
                }
-          }
-          else
-          {
-               ++conf.ntag[j];
-
-               tags[j][conf.ntag[j]].name       = strdup(cfg_getstr(cfgtmp, "name"));
-               tags[j][conf.ntag[j]].mwfact     = cfg_getfloat(cfgtmp, "mwfact");
-               tags[j][conf.ntag[j]].nmaster    = cfg_getint(cfgtmp, "nmaster");
-               tags[j][conf.ntag[j]].resizehint = cfg_getbool(cfgtmp, "resizehint");
-               tags[j][conf.ntag[j]].layout     = layout_name_to_struct(conf.layout,
-                                                                        cfg_getstr(cfgtmp, "layout"),
-                                                                        conf.nlayout,
-                                                                        layout_list);
-          }
+          l = 0;
      }
-
 
      for(i = 0; i < screen_count(); ++i)
           if(!conf.ntag[i] || conf.ntag[i] > MAXTAG)

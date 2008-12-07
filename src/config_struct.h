@@ -195,13 +195,13 @@ func_name_list_t func_list[] =
 
 func_name_list_t layout_list[] =
 {
-     {"tile_right", tile },
-     {"tile_left", tile_left },
-     {"tile_top", tile_top },
+     {"tile_right",  tile },
+     {"tile_left",   tile_left },
+     {"tile_top",    tile_top },
      {"tile_bottom", tile_bottom },
-     {"tile_grid", grid},
-     {"max",  maxlayout },
-     {"free", freelayout }
+     {"tile_grid",   grid },
+     {"max",         maxlayout },
+     {"free",        freelayout }
 };
 
 key_name_list_t key_list[] =
