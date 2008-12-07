@@ -169,7 +169,7 @@ static cfg_opt_t opts[] =
 };
 
 
-func_name_list_t func_list[] =
+static func_name_list_t func_list[] =
 {
      {"spawn",                   uicb_spawn },
      {"client_kill",             uicb_client_kill },
@@ -194,7 +194,7 @@ func_name_list_t func_list[] =
      {"reload",                  uicb_reload }
 };
 
-func_name_list_t layout_list[] =
+static func_name_list_t layout_list[] =
 {
      {"tile_right", tile },
      {"tile_left", tile_left },
@@ -205,7 +205,7 @@ func_name_list_t layout_list[] =
      {"free", freelayout }
 };
 
-key_name_list_t key_list[] =
+static key_name_list_t key_list[] =
 {
      {"Control", ControlMask },
      {"Shift",   ShiftMask },
@@ -219,7 +219,7 @@ key_name_list_t key_list[] =
      {NULL,      NoSymbol }
 };
 
-name_to_uint_t mouse_button_list[] =
+static name_to_uint_t mouse_button_list[] =
 {
      {"Button1", Button1 },
      {"Button2", Button2 },
@@ -233,81 +233,10 @@ name_to_uint_t mouse_button_list[] =
      {"5", Button5 },
 };
 
-/* The following function are for configuration
-   section util. {{{
+
+/* The following function are the
+   different configuration section. {{{
 */
-void*
-name_to_func(char *name, func_name_list_t l[])
-{
-     int i;
-
-     if(name)
-          for(i = 0; l[i].name ; ++i)
-               if(!strcmp(name, l[i].name))
-                    return l[i].func;
-
-     return NULL;
-}
-
-ulong
-char_to_modkey(char *name)
-{
-     int i;
-
-     if(name)
-          for(i = 0; key_list[i].name; ++i)
-               if(!strcmp(name, key_list[i].name))
-                    return key_list[i].keysym;
-
-     return NoSymbol;
-}
-
-uint
-char_to_button(char *name)
-{
-     int i;
-
-     if(name)
-          for(i = 0; mouse_button_list[i].name; ++i)
-               if(!strcmp(name, mouse_button_list[i].name))
-                    return mouse_button_list[i].button;
-
-     return 0;
-}
-
-Layout
-layout_name_to_struct(Layout lt[], char *name, int n)
-{
-     int i;
-
-     for(i = 0; i < n; ++i)
-          if(lt[i].func == name_to_func(name, layout_list))
-               return lt[i];
-
-     return lt[0];
-}
-
-char*
-alias_to_str(char *conf_choice)
-{
-     int i;
-     char *tmpchar = NULL;
-
-     if(!conf_choice)
-          return 0;
-
-     if(conf.alias)
-          for(i = 0; conf.alias[i].name; i++)
-               if(!strcmp(conf_choice, conf.alias[i].name))
-                    tmpchar = conf.alias[i].content;
-
-     if(tmpchar)
-          return strdup(tmpchar);
-     else
-          return strdup(conf_choice);
-
-     return NULL;
-}
 
 void
 mouse_section(MouseBinding mb[], cfg_t *cfg, int ns)
@@ -320,7 +249,7 @@ mouse_section(MouseBinding mb[], cfg_t *cfg, int ns)
           tmp          = cfg_getnsec(cfg, "mouse", i);
           mb[i].tag    = cfg_getint(tmp, "tag");
           mb[i].screen = cfg_getint(tmp, "screen");
-          mb[i].button = char_to_button(cfg_getstr(tmp, "button"));
+          mb[i].button = char_to_button(cfg_getstr(tmp, "button"), mouse_button_list);
           mb[i].func   = name_to_func(cfg_getstr(tmp, "func"), func_list);
           mb[i].cmd    = strdup(alias_to_str(cfg_getstr(tmp, "cmd")));
      }
@@ -328,12 +257,6 @@ mouse_section(MouseBinding mb[], cfg_t *cfg, int ns)
      return;
 }
 
-/* }}} */
-
-
-/* The following function are the
-   different configuration section. {{{
-*/
 void
 conf_alias_section(cfg_t *cfg_a)
 {
@@ -396,7 +319,7 @@ conf_client_section(cfg_t *cfg_c)
      conf.client.borderfocus         = getcolor(alias_to_str(cfg_getstr(cfg_c, "border_focus")));
      conf.client.resizecorner_normal = getcolor(alias_to_str(cfg_getstr(cfg_c, "resize_corner_normal")));
      conf.client.resizecorner_focus  = getcolor(alias_to_str(cfg_getstr(cfg_c, "resize_corner_focus")));
-     conf.client.mod                |= char_to_modkey(cfg_getstr(cfg_c, "modifier"));
+     conf.client.mod                |= char_to_modkey(cfg_getstr(cfg_c, "modifier"), key_list);
      conf.client.nmouse              = cfg_size(cfg_c, "mouse");
      conf.client.mouse               = emalloc(conf.client.nmouse, sizeof(MouseBinding));
      mouse_section(conf.client.mouse, cfg_c, conf.client.nmouse);
@@ -496,7 +419,10 @@ conf_tag_section(cfg_t *cfg_t)
                     tags[k][conf.ntag[k]].mwfact     = cfg_getfloat(cfgtmp, "mwfact");
                     tags[k][conf.ntag[k]].nmaster    = cfg_getint(cfgtmp, "nmaster");
                     tags[k][conf.ntag[k]].resizehint = cfg_getbool(cfgtmp, "resizehint");
-                    tags[k][conf.ntag[k]].layout     = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"), conf.nlayout);
+                    tags[k][conf.ntag[k]].layout     = layout_name_to_struct(conf.layout,
+                                                                             cfg_getstr(cfgtmp, "layout"),
+                                                                             conf.nlayout,
+                                                                             layout_list);
                }
           }
           else
@@ -507,7 +433,10 @@ conf_tag_section(cfg_t *cfg_t)
                tags[j][conf.ntag[j]].mwfact     = cfg_getfloat(cfgtmp, "mwfact");
                tags[j][conf.ntag[j]].nmaster    = cfg_getint(cfgtmp, "nmaster");
                tags[j][conf.ntag[j]].resizehint = cfg_getbool(cfgtmp, "resizehint");
-               tags[j][conf.ntag[j]].layout     = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"), conf.nlayout);
+               tags[j][conf.ntag[j]].layout     = layout_name_to_struct(conf.layout,
+                                                                        cfg_getstr(cfgtmp, "layout"),
+                                                                        conf.nlayout,
+                                                                        layout_list);
           }
      }
 
@@ -523,7 +452,10 @@ conf_tag_section(cfg_t *cfg_t)
                tags[i][1].mwfact     = 0.50;
                tags[i][1].nmaster    = 1;
                tags[i][1].resizehint = False;
-               tags[i][1].layout     = layout_name_to_struct(conf.layout, "tile_right", conf.nlayout);
+               tags[i][1].layout     = layout_name_to_struct(conf.layout,
+                                                             "tile_right",
+                                                             conf.nlayout,
+                                                             layout_list);
           }
 
      seltag = emalloc(screen_count(), sizeof(int));
@@ -546,7 +478,7 @@ conf_keybind_section(cfg_t *cfg_k)
           cfgtmp = cfg_getnsec(cfg_k, "key", i);
 
           for(j = 0; j < cfg_size(cfgtmp, "mod"); ++j)
-               keys[j].mod |= char_to_modkey(cfg_getnstr(cfgtmp, "mod", j));
+               keys[j].mod |= char_to_modkey(cfg_getnstr(cfgtmp, "mod", j), key_list);
 
           keys[i].keysym = XStringToKeysym(cfg_getstr(cfgtmp, "key"));
           keys[i].func = name_to_func(cfg_getstr(cfgtmp, "func"), func_list);

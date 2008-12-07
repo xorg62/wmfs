@@ -180,6 +180,13 @@ ulong getcolor(char *color);
 long getwinstate(Window win);
 double round(double x);
 void setwinstate(Window win, long state);
+/* Conf usage {{{ */
+void* name_to_func(char *name, func_name_list_t l[]);
+ulong char_to_modkey(char *name, key_name_list_t key_l[]);
+uint char_to_button(char *name, name_to_uint_t blist[]);
+Layout layout_name_to_struct(Layout lt[], char *name, int n, func_name_list_t llist[]);
+char* alias_to_str(char *conf_choice);
+/* }}} */
 void uicb_spawn(uicb_t);
 
 /* tag.c */

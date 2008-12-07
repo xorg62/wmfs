@@ -127,6 +127,84 @@ setwinstate(Window win, long state)
      return;
 }
 
+
+/* The following function are for configuration
+   usage. {{{
+*/
+void*
+name_to_func(char *name, func_name_list_t l[])
+{
+     int i;
+
+     if(name)
+          for(i = 0; l[i].name ; ++i)
+               if(!strcmp(name, l[i].name))
+                    return l[i].func;
+
+     return NULL;
+}
+
+ulong
+char_to_modkey(char *name, key_name_list_t key_l[])
+{
+     int i;
+
+     if(name)
+          for(i = 0; key_l[i].name; ++i)
+               if(!strcmp(name, key_l[i].name))
+                    return key_l[i].keysym;
+
+     return NoSymbol;
+}
+
+uint
+char_to_button(char *name, name_to_uint_t blist[])
+{
+     int i;
+
+     if(name)
+          for(i = 0; blist[i].name; ++i)
+               if(!strcmp(name, blist[i].name))
+                    return blist[i].button;
+
+     return 0;
+}
+
+Layout
+layout_name_to_struct(Layout lt[], char *name, int n, func_name_list_t llist[])
+{
+     int i;
+
+     for(i = 0; i < n; ++i)
+          if(lt[i].func == name_to_func(name, llist))
+               return lt[i];
+
+     return lt[0];
+}
+
+char*
+alias_to_str(char *conf_choice)
+{
+     int i;
+     char *tmpchar = NULL;
+
+     if(!conf_choice)
+          return 0;
+
+     if(conf.alias)
+          for(i = 0; conf.alias[i].name; i++)
+               if(!strcmp(conf_choice, conf.alias[i].name))
+                    tmpchar = conf.alias[i].content;
+
+     if(tmpchar)
+          return strdup(tmpchar);
+     else
+          return strdup(conf_choice);
+
+     return NULL;
+}
+/* }}} */
+
 /** Execute a sh command
  * \param cmd Command
 */
