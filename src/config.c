@@ -259,7 +259,7 @@ conf_keybind_section(cfg_t *cfg_k)
           cfgtmp = cfg_getnsec(cfg_k, "key", i);
 
           for(j = 0; j < cfg_size(cfgtmp, "mod"); ++j)
-               keys[j].mod |= char_to_modkey(cfg_getnstr(cfgtmp, "mod", j), key_list);
+               keys[i].mod |= char_to_modkey(cfg_getnstr(cfgtmp, "mod", j), key_list);
 
           keys[i].keysym = XStringToKeysym(cfg_getstr(cfgtmp, "key"));
           keys[i].func = name_to_func(cfg_getstr(cfgtmp, "func"), func_list);
@@ -286,9 +286,7 @@ init_conf(void)
      char final_path[128];
      int ret;
 
-     sprintf(final_path, "%s/%s",
-             strdup(getenv("HOME")),
-             strdup(FILE_NAME));
+     sprintf(final_path, "%s/%s", strdup(getenv("HOME")), strdup(FILE_NAME));
 
      cfg = cfg_init(opts, CFGF_NONE);
      ret = cfg_parse(cfg, final_path);
