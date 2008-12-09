@@ -184,10 +184,15 @@ void
 conf_tag_section(cfg_t *cfg_t)
 {
      int i, j, k, l = 0;
+     Bool grh = False;
 
      /* If there is no tag in the conf or more than
       * MAXTAG (32) print an error and create only one.
       */
+
+     printf("---> %s\n", tag_opts[5].name);
+     deb(tag_opts[5].def.boolean);
+
      conf.tag_round               = cfg_getbool(cfg_t, "tag_round");
      conf.colors.tagselfg         = strdup(alias_to_str(cfg_getstr(cfg_t, "sel_fg")));
      conf.colors.tagselbg         = getcolor(alias_to_str(cfg_getstr(cfg_t, "sel_bg")));
@@ -272,7 +277,6 @@ conf_keybind_section(cfg_t *cfg_k)
           keys[i].cmd = (!strdup(alias_to_str((cfg_getstr(cfgtmp, "cmd"))))
                                  ?  NULL : strdup(alias_to_str(cfg_getstr(cfgtmp, "cmd"))));
      }
-
      return;
 }
 
@@ -283,7 +287,6 @@ conf_keybind_section(cfg_t *cfg_k)
 void
 init_conf(void)
 {
-     char final_path[128];
      int ret;
 
      sprintf(final_path, "%s/%s", strdup(getenv("HOME")), strdup(FILE_NAME));

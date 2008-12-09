@@ -395,6 +395,7 @@ client_manage(Window w, XWindowAttributes *wa)
      frame_create(c);
      client_size_hints(c);
      XChangeWindowAttributes(dpy, c->win, CWEventMask, &at);
+     XSetWindowBorderWidth(dpy, c->win, 0); /* client win must _not_ has border */
      mouse_grabbuttons(c, False);
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
           for(t = clients; t && t->win != trans; t = t->next);

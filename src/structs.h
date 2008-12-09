@@ -213,7 +213,6 @@ typedef struct
           int nmouse;
      } titlebar;
      Alias alias[256];
-     Tag tag[MAXTAG];
      Layout layout[NUM_OF_LAYOUT];
      int *ntag;
      bool tag_round;

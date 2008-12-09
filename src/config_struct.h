@@ -35,6 +35,7 @@
 #define FILE_NAME   ".config/wmfs/wmfsrc"
 
 cfg_t *cfg, *cfgtmp;
+char final_path[128];
 
 cfg_opt_t misc_opts[] =
 {
@@ -119,12 +120,13 @@ cfg_opt_t tag_opts[] =
 
 cfg_opt_t tags_opts[] =
 {
-     CFG_BOOL("tag_round",   cfg_false, CFGF_NONE),
-     CFG_STR("occupied_bg",  "#003366", CFGF_NONE),
-     CFG_STR("sel_fg",       "#FFFFFF", CFGF_NONE),
-     CFG_STR("sel_bg",       "#354B5C", CFGF_NONE),
-     CFG_STR("border",       "#090909", CFGF_NONE),
-     CFG_SEC("tag",          tag_opts,  CFGF_MULTI),
+     CFG_BOOL("tag_round",         cfg_false, CFGF_NONE),
+     CFG_BOOL("global_resizehint", cfg_false, CFGF_NONE),
+     CFG_STR("occupied_bg",        "#003366", CFGF_NONE),
+     CFG_STR("sel_fg",             "#FFFFFF", CFGF_NONE),
+     CFG_STR("sel_bg",             "#354B5C", CFGF_NONE),
+     CFG_STR("border",             "#090909", CFGF_NONE),
+     CFG_SEC("tag",                tag_opts,  CFGF_MULTI),
      CFG_END()
 };
 
