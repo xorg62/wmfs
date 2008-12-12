@@ -480,6 +480,8 @@ void
 uicb_togglefree(uicb_t cmd)
 {
      CHECK(sel);
+     if(!sel || sel->screen != screen_get_sel())
+          return;
 
      sel->free = !sel->free;
      sel->tile = False;

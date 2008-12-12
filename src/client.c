@@ -355,11 +355,13 @@ client_manage(Window w, XWindowAttributes *wa)
      Window trans;
      Status rettrans;
      XSetWindowAttributes at;
-     int mx, my;
+     int mx, my, s;
+
+     screen_get_sel();
 
      c = emalloc(1, sizeof(Client));
      c->win = w;
-     c->screen = screen_get_sel();
+     c->screen = selscreen;
 
      if(conf.client.place_at_mouse)
      {
@@ -382,6 +384,14 @@ client_manage(Window w, XWindowAttributes *wa)
      {
           mx = wa->x + BORDH;
           my = wa->y + TBARH + INFOBARH;
+
+          s = screen_get_with_geo(mx, my);
+
+          if(s != selscreen)
+          {
+               mx += sgeo[selscreen].x - BORDH;
+               my += sgeo[selscreen].y - TBARH - INFOBARH;
+          }
      }
 
      c->ogeo.x = c->geo.x = mx;
@@ -395,7 +405,7 @@ client_manage(Window w, XWindowAttributes *wa)
      frame_create(c);
      client_size_hints(c);
      XChangeWindowAttributes(dpy, c->win, CWEventMask, &at);
-     XSetWindowBorderWidth(dpy, c->win, 0); /* client win must _not_ has border */
+     XSetWindowBorderWidth(dpy, c->win, 0); /* client win sould _not_ have borders */
      mouse_grabbuttons(c, False);
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
           for(t = clients; t && t->win != trans; t = t->next);
@@ -424,8 +434,6 @@ void
 client_moveresize(Client *c, XRectangle geo, bool r)
 {
      CHECK(c);
-
-     int i;
 
      /* Resize hints {{{ */
      if(r)
@@ -482,12 +490,7 @@ client_moveresize(Client *c, XRectangle geo, bool r)
           c->geo = geo;
 
           /* Set the client screen */
-          for(i = 0; i < screen_count(); ++i)
-               if(geo.x >= sgeo[i].x
-                  && geo.x < sgeo[i].x + sgeo[i].width
-                  && geo.y >= sgeo[i].y - INFOBARH - TBARH
-                  && geo.y < sgeo[i].y - INFOBARH - TBARH + sgeo[i].height + INFOBARH)
-                    c->screen = i;
+          c->screen = screen_get_with_geo(geo.x, geo.y);
 
           frame_moveresize(c, c->geo);
           XMoveResizeWindow(dpy, c->win, BORDH, BORDH + TBARH, c->geo.width, c->geo.height);

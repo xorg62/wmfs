@@ -83,6 +83,25 @@ screen_get_geo(int s)
      return geo;
 }
 
+/** Get the current screen number with
+ * coordinated
+ *\param geo Geometry for get the screen number
+ *\return The screen number
+*/
+int
+screen_get_with_geo(int x, int y)
+{
+     int i, r = 0;
+
+     for(i = 0; i < screen_count(); ++i)
+          if((x >= sgeo[i].x && x < sgeo[i].x + sgeo[i].width)
+             && (y >= sgeo[i].y - INFOBARH - TBARH
+                 && y < sgeo[i].y - INFOBARH - TBARH + sgeo[i].height + INFOBARH))
+               r = i;
+
+     return r;
+}
+
 /** Get and set the selected screen
  *\return The number of the selected screen
 */
@@ -91,22 +110,16 @@ screen_get_sel(void)
 {
      if(XineramaIsActive(dpy))
      {
+          /* Unused variables */
           Window w;
-          uint du;
-          int x, y, d, i;
+          int d, u, x, y;
 
-          XQueryPointer(dpy, root, &w, &w, &x, &y, &d, &d, &du);
+          XQueryPointer(dpy, root, &w, &w, &x, &y, &d, &d, (uint *)&u);
 
-          for(i = 0; i < screen_count(); ++i)
-               if((x >= sgeo[i].x && x < sgeo[i].x + sgeo[i].width)
-                  && (y >= sgeo[i].y - INFOBARH - TBARH
-                      && y < sgeo[i].y - INFOBARH - TBARH + sgeo[i].height + INFOBARH))
-                    selscreen = i;
-
-          return selscreen;
+          selscreen = screen_get_with_geo(x, y);
      }
-     else
-          return 0;
+
+     return selscreen;
 }
 
 /** Init screen geo

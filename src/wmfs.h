@@ -198,6 +198,7 @@ void uicb_tagtransfert(uicb_t);
 /* screen */
 int screen_count(void);
 XRectangle screen_get_geo(int s);
+int screen_get_with_geo(int x, int y);
 int screen_get_sel(void);
 void screen_init_geo(void);
 
