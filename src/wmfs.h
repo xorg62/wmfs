@@ -68,6 +68,7 @@
 
 #define MAXH         DisplayHeight(dpy, screen)
 #define MAXW         DisplayWidth(dpy, screen)
+#define ATOM(a)      XInternAtom(dpy, a, False)
 #define INFOBARH     font->height * 1.5
 #define SHADH        1
 #define SHADC        0x000000 /* 'Cause i don't know how darken a color yet */
@@ -226,7 +227,6 @@ void uicb_set_nmaster(uicb_t);
 /* init.c */
 void init(void);
 void init_root(void);
-void init_atom(void);
 void init_font(void);
 void init_cursor(void);
 void init_key(void);
@@ -255,10 +255,6 @@ Key *keys;
 Bool exiting;
 char statustext[1024];
 XRectangle *sgeo;
-
-/* Atoms / Cursors */
-Atom wm_atom[WMLast];
-Atom net_atom[NetLast];
 Cursor cursor[CurLast];
 
 /* Fonts */

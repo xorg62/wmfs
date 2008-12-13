@@ -91,13 +91,13 @@ getwinstate(Window win)
      uchar *p = NULL;
      Atom at;
 
-     if(XGetWindowProperty(dpy, win, wm_atom[WMState], 0L, 2L, False, wm_atom[WMState],
-                           &at, &f, &n, &e, (uchar **)&p) != Success)
+     if(XGetWindowProperty(dpy, win, ATOM("WM_STATE"), 0L, 2L, False,
+                           ATOM("WM_STATE"), &at, &f, &n, &e, (uchar **)&p) != Success)
           return -1;
 
      if(n != 0)
           ret = *p;
-     free(p);
+     XFree(p);
 
      return ret;
 }
@@ -121,8 +121,8 @@ setwinstate(Window win, long state)
 {
      long data[] = {state, None};
 
-     XChangeProperty(dpy, win, wm_atom[WMState], wm_atom[WMState], 32,
-                     PropModeReplace, (unsigned char *)data, 2);
+     XChangeProperty(dpy, win, ATOM("WM_STATE"), ATOM("WM_STATE"), 32,
+                     PropModeReplace, (uchar *)data, 2);
 
      return;
 }

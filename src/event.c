@@ -334,7 +334,7 @@ propertynotify(XPropertyEvent *ev)
                break;
           }
           if(ev->atom == XA_WM_NAME
-             || ev->atom == net_atom[NetWMName])
+             || ev->atom == ATOM("_NET_WM_NAME"))
                client_get_name(c);
      }
 

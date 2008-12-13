@@ -44,7 +44,6 @@ init(void)
      init_cursor();
      init_key();
      init_root();
-     init_atom();
      screen_init_geo();
      infobar_init();
      grabkeys();
@@ -106,6 +105,7 @@ void
 init_root(void)
 {
      XSetWindowAttributes at;
+     Atom data[] = { ATOM("_NET_SUPPORTED"), ATOM("_NET_WM_NAME") };
 
      root = RootWindow(dpy, screen);
 
@@ -118,24 +118,10 @@ init_root(void)
      if(conf.root.background_command)
           uicb_spawn(conf.root.background_command);
 
-     return;
-}
-
-/** Init atoms
-*/
-void
-init_atom(void)
-{
-     wm_atom[WMState] = XInternAtom(dpy, "WM_STATE", False);
-     wm_atom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
-     wm_atom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
-     wm_atom[WMName] = XInternAtom(dpy, "WM_NAME", False);
-     net_atom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
-     net_atom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
-
-     XChangeProperty(dpy, root, net_atom[NetSupported], XA_ATOM, 32,
-                     PropModeReplace, (unsigned char *) net_atom, NetLast);
+     XChangeProperty(dpy, root, ATOM("_NET_SUPPORTED"), XA_ATOM, 32,
+                     PropModeReplace, (uchar*)data, NetLast);
 
      return;
 }
+
 

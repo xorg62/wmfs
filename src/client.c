@@ -286,16 +286,16 @@ client_kill(Client *c)
      if(XGetWMProtocols(dpy, c->win, &atom, &proto) && atom)
      {
           while(proto--)
-               if(atom[proto] == wm_atom[WMDelete])
+               if(atom[proto] == ATOM("WM_DELETE_WINDOW"))
                     ++canbedel;
           XFree(atom);
           if(canbedel)
           {
                ev.type = ClientMessage;
                ev.xclient.window = c->win;
-               ev.xclient.message_type = wm_atom[WMProtocols];
+               ev.xclient.message_type = ATOM("WM_PROTOCOLS");
                ev.xclient.format = 32;
-               ev.xclient.data.l[0] = wm_atom[WMDelete];
+               ev.xclient.data.l[0] = ATOM("WM_DELETE_WINDOW");
                ev.xclient.data.l[1] = CurrentTime;
                ev.xclient.data.l[2] = 0;
                ev.xclient.data.l[3] = 0;
@@ -355,7 +355,7 @@ client_manage(Window w, XWindowAttributes *wa)
      Window trans;
      Status rettrans;
      XSetWindowAttributes at;
-     int mx, my, s;
+     int mx, my;
 
      screen_get_sel();
 
@@ -385,9 +385,9 @@ client_manage(Window w, XWindowAttributes *wa)
           mx = wa->x + BORDH;
           my = wa->y + TBARH + INFOBARH;
 
-          s = screen_get_with_geo(mx, my);
-
-          if(s != selscreen)
+          /* Check if the client is already in the selected
+           * screen, else place the client in it */
+          if(screen_get_with_geo(mx, my) != selscreen)
           {
                mx += sgeo[selscreen].x - BORDH;
                my += sgeo[selscreen].y - TBARH - INFOBARH;

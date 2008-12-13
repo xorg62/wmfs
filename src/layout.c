@@ -62,23 +62,13 @@ void
 freelayout(void)
 {
      Client *c;
-     XRectangle geo;
 
      for(c = clients; c; c = c->next)
-     {
           if(!ishide(c) && c->screen == screen_get_sel())
           {
-               if(c->tile || c->lmax)
-               {
-                    geo.x = c->ogeo.x;
-                    geo.y = c->ogeo.y;
-                    geo.width = c->ogeo.width;
-                    geo.height = c->ogeo.height;
-                    client_moveresize(c, geo, True);
-                    c->tile = c->lmax = False;
-               }
+               client_moveresize(c, c->ogeo, True);
+               c->tile = c->lmax = False;
           }
-     }
 
      return;
 }
@@ -90,8 +80,16 @@ void
 layoutswitch(Bool b)
 {
      int i;
+     Client *c;
 
      screen_get_sel();
+
+     if(tags[selscreen][seltag[selscreen]].layout.func == freelayout)
+     {
+          deb(666);
+          for(c = clients; c && (c->tag != seltag[selscreen] && c->screen != selscreen); c = c->next)
+               c->ogeo = c->geo;
+     }
 
      for(i = 0; i < conf.nlayout; ++i)
      {
@@ -146,11 +144,6 @@ maxlayout(void)
      {
           c->tile = False;
           c->lmax = True;
-          c->ogeo.x = c->geo.x;
-          c->ogeo.y = c->geo.y;
-          c->ogeo.width = c->geo.width;
-          c->ogeo.height = c->geo.height;
-
           geo.x = sg.x;
           geo.y = sg.y;
           geo.width = sg.width - BORDH * 2;
@@ -247,9 +240,6 @@ grid(void)
           /* Set client property */
           c->max = c->lmax = False;
           c->tile = True;
-          c->ogeo.x = c->geo.x; c->ogeo.y = c->geo.y;
-          c->ogeo.width = c->geo.width; c->ogeo.height = c->geo.height;
-
           ++cpcols;
           cgeo.width = (sg.width / cols) - border;
           cgeo.height = (sg.height / rows) - border;
@@ -333,8 +323,6 @@ multi_tile(Position type)
           /* Set client property */
           c->max = c->lmax = False;
           c->tile = True;
-          c->ogeo.x = c->geo.x; c->ogeo.y = c->geo.y;
-          c->ogeo.width = c->geo.width; c->ogeo.height = c->geo.height;
 
           /* MASTER */
           if(i < nmaster)
@@ -506,11 +494,6 @@ uicb_togglemax(uicb_t cmd)
           return;
      if(!sel->max)
      {
-          sel->ogeo.x = sel->geo.x;
-          sel->ogeo.y = sel->geo.y;
-          sel->ogeo.width = sel->geo.width;
-          sel->ogeo.height = sel->geo.height;
-
           geo.x = sg.x;
           geo.y = sg.y;
           geo.width = sg.width - BORDH * 2;
