@@ -72,6 +72,7 @@ uicb_tag(uicb_t cmd)
                seltag[selscreen] = tmp;
           }
      }
+     ewmh_get_current_desktop();
 
      arrange();
      client_focus(NULL);

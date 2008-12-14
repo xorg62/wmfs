@@ -161,7 +161,7 @@ client_focus(Client *c)
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
      }
      else
-          XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
+          XSetInputFocus(dpy, ROOT, RevertToPointerRoot, CurrentTime);
 
      return;
 }
@@ -369,7 +369,7 @@ client_manage(Window w, XWindowAttributes *wa)
           uint duint;
           Window dw;
 
-          XQueryPointer(dpy, root, &dw, &dw, &mx, &my, &dint, &dint, &duint);
+          XQueryPointer(dpy, ROOT, &dw, &dw, &mx, &my, &dint, &dint, &duint);
 
           mx += BORDH;
           my += TBARH;
@@ -393,12 +393,11 @@ client_manage(Window w, XWindowAttributes *wa)
                my += sgeo[selscreen].y - TBARH - INFOBARH;
           }
      }
-
      c->ogeo.x = c->geo.x = mx;
      c->ogeo.y = c->geo.y = my;
-
      c->ogeo.width = c->geo.width = wa->width;
      c->ogeo.height = c->geo.height = wa->height;
+
      c->tag = seltag[c->screen];
      at.event_mask = PropertyChangeMask;
 
@@ -419,6 +418,7 @@ client_manage(Window w, XWindowAttributes *wa)
      client_raise(c);
      client_focus(c);
      setwinstate(c->win, NormalState);
+     ewmh_manage_window_type(c);
      arrange();
 
      return;
@@ -487,7 +487,7 @@ client_moveresize(Client *c, XRectangle geo, bool r)
         || c->geo.width != geo.width
         || c->geo.height != geo.height)
      {
-          c->geo = geo;
+          c->geo = c->ogeo = geo;
 
           /* Set the client screen */
           c->screen = screen_get_with_geo(geo.x, geo.y);
@@ -497,6 +497,38 @@ client_moveresize(Client *c, XRectangle geo, bool r)
 
           XSync(dpy, False);
      }
+
+     return;
+}
+
+/** Maximize a client
+ * \param c Client pointer
+*/
+void
+client_maximize(Client *c)
+{
+     CHECK(c);
+
+     XRectangle geo;
+
+     c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
+
+     geo.x = sgeo[c->screen].x;
+     geo.y = sgeo[c->screen].y;
+     geo.width = sgeo[c->screen].width - BORDH * 2;
+     geo.height = sgeo[c->screen].height - BORDH * 2;
+
+     if(c->state_fullscreen)
+     {
+          geo.y -= TBARH + INFOBARH + BORDH;
+          geo.height += TBARH + INFOBARH + (BORDH * 2);
+          client_moveresize(c, geo, False);
+          XMoveResizeWindow(dpy, c->win, 0, BORDH + TBARH, c->geo.width + BORDH * 2, c->geo.height);
+     }
+     else
+          client_moveresize(c, geo, False);
+
+     client_raise(c);
 
      return;
 }
@@ -580,7 +612,7 @@ client_size_hints(Client *c)
 void
 client_raise(Client *c)
 {
-     if(!c || c->max || c->tile)
+     if(!c || c->tile)
           return;
 
      XRaiseWindow(dpy, c->frame);
@@ -622,7 +654,7 @@ client_unmanage(Client *c)
 {
      XGrabServer(dpy);
      XSetErrorHandler(errorhandlerdummy);
-     XReparentWindow(dpy, c->win, root, c->geo.x, c->geo.y);
+     XReparentWindow(dpy, c->win, ROOT, c->geo.x, c->geo.y);
 
      if(sel == c)
           client_focus(NULL);

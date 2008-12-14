@@ -199,7 +199,7 @@ scan(void)
      XWindowAttributes wa;
      Window usl, usl2, *w = NULL;
 
-     if(XQueryTree(dpy, root, &usl, &usl2, &w, &n))
+     if(XQueryTree(dpy, ROOT, &usl, &usl2, &w, &n))
           for(i = 0; i < n; ++i)
                if(XGetWindowAttributes(dpy, w[i], &wa)
                   && !(wa.override_redirect || XGetTransientForHint(dpy, w[i], &usl))

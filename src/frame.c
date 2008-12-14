@@ -59,7 +59,7 @@ frame_create(Client *c)
      c->colors.resizecorner  = conf.client.resizecorner_normal;
 
      /* Create frame window */
-     CWIN(c->frame, root,
+     CWIN(c->frame, ROOT,
           c->frame_geo.x,
           c->frame_geo.y,
           c->frame_geo.width,

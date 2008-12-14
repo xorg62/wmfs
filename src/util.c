@@ -57,7 +57,7 @@ getcolor(char *color)
 {
      XColor xcolor;
 
-     if(!XAllocNamedColor(dpy, DefaultColormap(dpy, screen), color, &xcolor, &xcolor))
+     if(!XAllocNamedColor(dpy, DefaultColormap(dpy, SCREEN), color, &xcolor, &xcolor))
           fprintf(stderr,"WMFS Error: cannot allocate color \"%s\"\n", color);
      return xcolor.pixel;
 }
@@ -76,30 +76,6 @@ color_enlight(ulong col)
      else
           return col;
 
-}
-
-/** Get a Window WM State
- * \param win Window
- * \return The state
-*/
-long
-getwinstate(Window win)
-{
-     int f;
-     long ret = -1;
-     ulong n, e;
-     uchar *p = NULL;
-     Atom at;
-
-     if(XGetWindowProperty(dpy, win, ATOM("WM_STATE"), 0L, 2L, False,
-                           ATOM("WM_STATE"), &at, &f, &n, &e, (uchar **)&p) != Success)
-          return -1;
-
-     if(n != 0)
-          ret = *p;
-     XFree(p);
-
-     return ret;
 }
 
 /** Round function

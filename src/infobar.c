@@ -51,7 +51,7 @@ infobar_init(void)
                : sgeo[sc].height - INFOBARH;
 
           /* Create infobar barwindow */
-          infobar[sc].bar = barwin_create(root, sgeo[sc].x - BORDH, infobar[sc].geo.y,
+          infobar[sc].bar = barwin_create(ROOT, sgeo[sc].x - BORDH, infobar[sc].geo.y,
                                           sgeo[sc].width, infobar[sc].geo.height, conf.colors.bar, False);
 
           /* Create tags window */

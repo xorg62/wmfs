@@ -49,11 +49,11 @@ mouse_move(Client *c)
      if(c->max || c->tile || c->lmax)
           return;
 
-     if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
+     if(XGrabPointer(dpy, ROOT, False, MouseMask, GrabModeAsync, GrabModeAsync,
                      None, cursor[CurMove], CurrentTime) != GrabSuccess)
           return;
 
-     XQueryPointer(dpy, root, &dw, &dw, &mx, &my, &dint, &dint, &duint);
+     XQueryPointer(dpy, ROOT, &dw, &dw, &mx, &my, &dint, &dint, &duint);
 
      for(;;)
      {
@@ -94,8 +94,8 @@ mouse_resize(Client *c)
     if(c->max || c->lmax || c->tile)
           return;
 
-     if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
-                     None, cursor[CurResize], CurrentTime) != GrabSuccess)
+    if(XGrabPointer(dpy, ROOT, False, MouseMask, GrabModeAsync, GrabModeAsync,
+                    None, cursor[CurResize], CurrentTime) != GrabSuccess)
           return;
 
      XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);

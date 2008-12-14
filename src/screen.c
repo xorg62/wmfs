@@ -114,7 +114,7 @@ screen_get_sel(void)
           Window w;
           int d, u, x, y;
 
-          XQueryPointer(dpy, root, &w, &w, &x, &y, &d, &d, (uint *)&u);
+          XQueryPointer(dpy, ROOT, &w, &w, &x, &y, &d, &d, (uint *)&u);
 
           selscreen = screen_get_with_geo(x, y);
      }

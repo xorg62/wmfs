@@ -137,19 +137,12 @@ void
 maxlayout(void)
 {
      Client *c;
-     XRectangle geo;
-     XRectangle sg = sgeo[selscreen];
 
      for(c = nexttiled(clients); c; c = nexttiled(c->next))
      {
           c->tile = False;
           c->lmax = True;
-          geo.x = sg.x;
-          geo.y = sg.y;
-          geo.width = sg.width - BORDH * 2;
-          geo.height = sg.height - BORDH * 2;
-
-          client_moveresize(c, geo, False);
+          client_maximize(c);
      }
 
      return;
@@ -163,7 +156,11 @@ maxlayout(void)
 Client*
 nexttiled(Client *c)
 {
-     for(; c && (c->max || c->free || c->screen != selscreen || ishide(c)); c = c->next);
+     for(;c && (c->max
+                || c->free
+                || c->screen != selscreen
+                || c->state_fullscreen
+                || ishide(c)); c = c->next);
 
      return c;
 }
@@ -449,7 +446,7 @@ uicb_tile_switch(uicb_t cmd)
 
      screen_get_sel();
 
-     if(!sel || sel->hint || !sel->tile)
+     if(!sel || sel->hint || !sel->tile || sel->state_fullscreen)
           return;
      if((c = sel) == nexttiled(clients))
           CHECK((c = nexttiled(c->next)));
@@ -467,19 +464,24 @@ uicb_tile_switch(uicb_t cmd)
 void
 uicb_togglefree(uicb_t cmd)
 {
-     CHECK(sel);
-     if(!sel || sel->screen != screen_get_sel())
+     if(!sel || sel->screen != screen_get_sel() || sel->state_fullscreen)
           return;
 
      sel->free = !sel->free;
-     sel->tile = False;
-     sel->max  = False;
-     sel->lmax = False;
-     client_moveresize(sel, sel->ogeo, True);
+
+     if(sel->free)
+     {
+          sel->tile = sel->max = sel->lmax = False;
+          client_moveresize(sel, sel->ogeo, True);
+     }
+     else
+          sel->ogeo = sel->geo;
+
      tags[selscreen][seltag[selscreen]].layout.func();
 
      return;
 }
+
 
 /** Toggle the selected client to max
  * \param cmd uicb_t type unused
@@ -487,31 +489,19 @@ uicb_togglefree(uicb_t cmd)
 void
 uicb_togglemax(uicb_t cmd)
 {
-     XRectangle geo;
-     XRectangle sg = sgeo[screen_get_sel()];
-
-     if(!sel || ishide(sel) || sel->hint)
+     if(!sel || ishide(sel) || sel->hint || sel->state_fullscreen)
           return;
+
      if(!sel->max)
      {
-          geo.x = sg.x;
-          geo.y = sg.y;
-          geo.width = sg.width - BORDH * 2;
-          geo.height = sg.height - BORDH * 2;
-
-          client_moveresize(sel, geo, False);
-          client_raise(sel);
+          sel->tile = sel->free = False;
+          client_maximize(sel);
           sel->max = True;
      }
      else if(sel->max)
      {
-          geo.x = sel->ogeo.x;
-          geo.y = sel->ogeo.y;
-          geo.width = sel->ogeo.width;
-          geo.height = sel->ogeo.height;
-
-          client_moveresize(sel, geo, False);
           sel->max = False;
+          tags[selscreen][seltag[selscreen]].layout.func();
      }
 
      return;

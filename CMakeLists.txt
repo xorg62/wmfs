@@ -33,6 +33,7 @@ set(wmfs_src
   src/config.c
   src/draw.c
   src/event.c
+  src/ewmh.c
   src/frame.c
   src/infobar.c
   src/init.c

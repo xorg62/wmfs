@@ -48,6 +48,7 @@
 #include <confuse.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
+#include <X11/Xmd.h>
 #include <X11/cursorfont.h>
 #include <X11/Xft/Xft.h>
 #include <X11/extensions/Xinerama.h>
@@ -66,8 +67,10 @@
                          InputOutput, CopyFromParent, mask, at);        \
      XSetWindowBackground(dpy, win, col);
 
-#define MAXH         DisplayHeight(dpy, screen)
-#define MAXW         DisplayWidth(dpy, screen)
+#define SCREEN       DefaultScreen(dpy)
+#define ROOT         RootWindow(dpy, SCREEN)
+#define MAXH         DisplayHeight(dpy, DefaultScreen(dpy))
+#define MAXW         DisplayWidth(dpy, DefaultScreen(dpy))
 #define ATOM(a)      XInternAtom(dpy, a, False)
 #define INFOBARH     font->height * 1.5
 #define SHADH        1
@@ -126,6 +129,7 @@ Bool ishide(Client *c);
 void client_map(Client *c);
 void client_manage(Window w, XWindowAttributes *wa);
 void client_moveresize(Client *c, XRectangle geo, bool r);
+void client_maximize(Client *c);
 void client_size_hints(Client *c);
 void client_raise(Client *c);
 void client_unhide(Client *c);
@@ -135,6 +139,15 @@ void uicb_client_raise(uicb_t);
 void uicb_client_prev(uicb_t);
 void uicb_client_next(uicb_t);
 void uicb_client_kill(uicb_t);
+
+/* ewmh.c */
+void ewmh_init_hints(void);
+void ewmh_get_number_of_desktop(void);
+void ewmh_get_current_desktop(void);
+void ewmh_get_desktop_names(void);
+void ewmh_manage_net_wm_state(long data_l[], Client *c);
+void ewmh_manage_window_type(Client *c);
+long ewmh_get_wm_state(Window win);
 
 /* frame.c */
 void frame_create(Client *c);
@@ -178,8 +191,6 @@ void uicb_mouse_resize(uicb_t);
 ulong color_enlight(ulong col);
 void *emalloc(uint element, uint size);
 ulong getcolor(char *color);
-long getwinstate(Window win);
-double round(double x);
 void setwinstate(Window win, long state);
 /* Conf usage {{{ */
 void* name_to_func(char *name, func_name_list_t l[]);
@@ -247,8 +258,6 @@ void uicb_reload(uicb_t);
 /* Principal */
 Display *dpy;
 GC gc;
-Window root;
-int screen;
 int selscreen;
 Conf conf;
 Key *keys;
@@ -259,6 +268,7 @@ Cursor cursor[CurLast];
 
 /* Fonts */
 XftFont *font;
+Atom net_atom[net_last];
 
 /* InfoBar */
 InfoBar *infobar;

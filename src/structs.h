@@ -48,8 +48,30 @@ typedef unsigned char  uchar;
 
 /* Enum */
 enum { CurNormal, CurResize, CurMove, CurLast };
-enum { WMState, WMProtocols, WMName, WMDelete, WMLast };
-enum { NetSupported, NetWMName, NetLast };
+/* Ewmh hints list */
+enum
+{
+     net_supported,
+     net_wm_name,
+     net_number_of_desktops,
+     net_current_desktop,
+     net_desktop_names,
+     net_active_window,
+     net_close_window,
+     net_wm_icon_name,
+     net_wm_window_type,
+     net_wm_window_type_normal,
+     net_wm_window_type_dock,
+     net_wm_window_type_splash,
+     net_wm_window_type_dialog,
+     net_wm_icon,
+     net_wm_state,
+     net_wm_state_sticky,
+     net_wm_state_skip_taskbar,
+     net_wm_state_fullscreen,
+     net_wm_state_demands_attention,
+     net_last
+};
 typedef enum { Top, Bottom, Right, Left, Center, PositionLast } Position;
 
 /*
@@ -84,6 +106,7 @@ struct Client
      int screen;
      /* Window attribute */
      XRectangle geo;
+     XRectangle tmp_geo;
      XRectangle frame_geo;
      /* Old window attribute */
      XRectangle ogeo;
@@ -105,7 +128,7 @@ struct Client
      } colors;
      /* Client Layout Information */
      Bool max, tile, free, hide;
-     Bool hint, lmax, unmapped;
+     Bool hint, lmax, unmapped, state_fullscreen;
      /* Struct in chains */
      Client *next;
      Client *prev;

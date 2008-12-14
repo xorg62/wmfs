@@ -63,7 +63,7 @@ buttonpress(XButtonEvent *ev)
                          conf.client.mouse[i].func(conf.client.mouse[i].cmd);
 
      /* Root */
-     if(ev->window == root)
+     if(ev->window == ROOT)
           for(i = 0; i < conf.root.nmouse; ++i)
                if(conf.root.mouse[i].tag == seltag[conf.root.mouse[i].screen]
                   || conf.root.mouse[i].tag < 0)
@@ -97,6 +97,45 @@ buttonpress(XButtonEvent *ev)
           if(ev->button == Button3
              || ev->button == Button5)
                layoutswitch(False);
+     }
+
+     return;
+}
+
+/* ClientMessage handle event
+ *\param ev XClientMessageEvent pointer
+*/
+void
+clientmessageevent(XClientMessageEvent *ev)
+{
+     Client *c;
+     int i, mess_t = 0;
+
+     if(ev->format != 32)
+          return;
+
+     for(i = 0; i < net_last; ++i)
+          if(net_atom[i] == ev->message_type)
+               mess_t = i;
+     if(ev->window == ROOT)
+     {
+          /* Manage _NET_CURRENT_DESKTOP */
+          if(mess_t == net_current_desktop)
+               ewmh_get_current_desktop();
+          /* Manage _NET_ACTIVE_WINDOW */
+          if(mess_t == net_active_window)
+               if((c = client_gb_win(ev->data.l[0])))
+                    client_focus(c);
+     }
+
+     if((c = client_gb_win(ev->window)))
+     {
+          /* Manage _NET_WM_STATE */
+          if(mess_t == net_wm_state)
+               ewmh_manage_net_wm_state(ev->data.l, c);
+          /* Manage _NET_CLOSE_WINDOW */
+          if(mess_t == net_close_window)
+               client_kill(c);
      }
 
      return;
@@ -246,14 +285,14 @@ grabkeys(void)
      uint i;
      KeyCode code;
 
-     XUngrabKey(dpy, AnyKey, AnyModifier, root);
+     XUngrabKey(dpy, AnyKey, AnyModifier, ROOT);
      for(i = 0; i < conf.nkeybind; ++i)
      {
           code = XKeysymToKeycode(dpy, keys[i].keysym);
-          XGrabKey(dpy, code, keys[i].mod, root, True, GrabModeAsync, GrabModeAsync);
-          XGrabKey(dpy, code, keys[i].mod|LockMask, root, True, GrabModeAsync, GrabModeAsync);
-          XGrabKey(dpy, code, keys[i].mod|numlockmask, root, True, GrabModeAsync, GrabModeAsync);
-          XGrabKey(dpy, code, keys[i].mod|LockMask|numlockmask, root, True, GrabModeAsync, GrabModeAsync);
+          XGrabKey(dpy, code, keys[i].mod, ROOT, True, GrabModeAsync, GrabModeAsync);
+          XGrabKey(dpy, code, keys[i].mod|LockMask, ROOT, True, GrabModeAsync, GrabModeAsync);
+          XGrabKey(dpy, code, keys[i].mod|numlockmask, ROOT, True, GrabModeAsync, GrabModeAsync);
+          XGrabKey(dpy, code, keys[i].mod|LockMask|numlockmask, ROOT, True, GrabModeAsync, GrabModeAsync);
      }
 
      return;
@@ -368,12 +407,12 @@ unmapnotify(XUnmapEvent *ev)
 void
 getevent(XEvent ev)
 {
-
      int st;
 
      switch (ev.type)
      {
       case ButtonPress:      buttonpress(&ev.xbutton);          break;
+      case ClientMessage:    clientmessageevent(&ev.xclient);   break;
       case ConfigureRequest: configureevent(&ev);               break;
       case DestroyNotify:    destroynotify(&ev.xdestroywindow); break;
       case EnterNotify:      enternotify(&ev.xcrossing);        break;
@@ -386,6 +425,7 @@ getevent(XEvent ev)
       case UnmapNotify:      unmapnotify(&ev.xunmap);           break;
      }
 
+     //ewmh_get_current_desktop();
      wait(&st);
 
      return;

@@ -68,10 +68,10 @@ barwin_create(Window parent,
           at.event_mask |= EnterWindowMask|LeaveWindowMask|FocusChangeMask;
 
      /* Create window */
-     bw->win = XCreateWindow(dpy, parent, x, y, w, h, 0, DefaultDepth(dpy, screen),
-                             CopyFromParent, DefaultVisual(dpy, screen),
+     bw->win = XCreateWindow(dpy, parent, x, y, w, h, 0, DefaultDepth(dpy, SCREEN),
+                             CopyFromParent, DefaultVisual(dpy, SCREEN),
                              CWOverrideRedirect | CWBackPixmap | CWEventMask, &at);
-     bw->dr = XCreatePixmap(dpy, parent, w, h, DefaultDepth(dpy, screen));
+     bw->dr = XCreatePixmap(dpy, parent, w, h, DefaultDepth(dpy, SCREEN));
 
      /* His border */
      CWIN(bw->border.left, bw->win, 0, 0, SHADH, h, 0, CWBackPixel, color_enlight(color), &at);
@@ -211,7 +211,7 @@ barwin_resize(BarWindow *bw, uint w, uint h)
      XFreePixmap(dpy, bw->dr);
 
      /* Frame */
-     bw->dr = XCreatePixmap(dpy, root, w - SHADH, h - SHADH, DefaultDepth(dpy, screen));
+     bw->dr = XCreatePixmap(dpy, ROOT, w - SHADH, h - SHADH, DefaultDepth(dpy, SCREEN));
      XResizeWindow(dpy, bw->win, w, h);
 
      /* Border */

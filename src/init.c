@@ -38,13 +38,13 @@ void
 init(void)
 {
      /* First init */
-     gc = DefaultGC(dpy, screen);
-     screen = DefaultScreen(dpy);
+     gc = DefaultGC(dpy, SCREEN);
      init_font();
      init_cursor();
      init_key();
      init_root();
      screen_init_geo();
+     ewmh_init_hints();
      infobar_init();
      grabkeys();
 
@@ -60,11 +60,11 @@ init(void)
 void
 init_font(void)
 {
-     font = XftFontOpenName(dpy, screen, conf.font);
+     font = XftFontOpenName(dpy, SCREEN, conf.font);
      if(!font)
      {
           fprintf(stderr, "WMFS Error: Cannot initialize font\n");
-          font = XftFontOpenName(dpy, screen, "sans-10");
+          font = XftFontOpenName(dpy, SCREEN, "sans-10");
      }
 }
 
@@ -105,21 +105,19 @@ void
 init_root(void)
 {
      XSetWindowAttributes at;
-     Atom data[] = { ATOM("_NET_SUPPORTED"), ATOM("_NET_WM_NAME") };
-
-     root = RootWindow(dpy, screen);
 
      at.event_mask = KeyMask|ButtonMask|MouseMask
           |SubstructureRedirectMask|SubstructureNotifyMask
           |EnterWindowMask|LeaveWindowMask|StructureNotifyMask;
 
      at.cursor = cursor[CurNormal];
-     XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &at);
+     XChangeWindowAttributes(dpy, ROOT, CWEventMask | CWCursor, &at);
      if(conf.root.background_command)
           uicb_spawn(conf.root.background_command);
 
-     XChangeProperty(dpy, root, ATOM("_NET_SUPPORTED"), XA_ATOM, 32,
-                     PropModeReplace, (uchar*)data, NetLast);
+     ewmh_init_hints();
+     ewmh_get_number_of_desktop();
+     ewmh_get_desktop_names();
 
      return;
 }
