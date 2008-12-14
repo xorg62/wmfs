@@ -109,6 +109,7 @@ void
 clientmessageevent(XClientMessageEvent *ev)
 {
      Client *c;
+     char tmp[3];
      int i, mess_t = 0;
 
      if(ev->format != 32)
@@ -120,8 +121,13 @@ clientmessageevent(XClientMessageEvent *ev)
      if(ev->window == ROOT)
      {
           /* Manage _NET_CURRENT_DESKTOP */
-          if(mess_t == net_current_desktop)
-               ewmh_get_current_desktop();
+          if(mess_t == net_current_desktop
+             && ev->data.l[0] >= 1
+             && ev->data.l[0] < conf.ntag[selscreen])
+          {
+               ITOA(tmp, (int)(ev->data.l[0] + 1));
+               uicb_tag(tmp);
+          }
           /* Manage _NET_ACTIVE_WINDOW */
           if(mess_t == net_active_window)
                if((c = client_gb_win(ev->data.l[0])))
@@ -373,7 +379,7 @@ propertynotify(XPropertyEvent *ev)
                break;
           }
           if(ev->atom == XA_WM_NAME
-             || ev->atom == ATOM("_NET_WM_NAME"))
+             || ev->atom == net_atom[net_wm_name])
                client_get_name(c);
      }
 

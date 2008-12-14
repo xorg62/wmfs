@@ -89,11 +89,14 @@ ewmh_get_number_of_desktop(void)
 void
 ewmh_get_current_desktop(void)
 {
+     int t;
+
      screen_get_sel();
+     t = seltag[selscreen] - 1;
 
      /* Get current desktop (tag) */
      XChangeProperty(dpy, ROOT, net_atom[net_current_desktop], XA_CARDINAL, 32,
-                     PropModeReplace, (uchar*)&seltag[selscreen], 1);
+                     PropModeReplace, (uchar*)&t, 1);
 
      return;
 }
