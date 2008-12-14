@@ -119,10 +119,8 @@ clientmessageevent(XClientMessageEvent *ev)
           /* Manage _NET_ACTIVE_WINDOW */
           else if(mess_t == net_active_window)
                if((c = client_gb_win((Window)ev->data.l[0])))
-               {
-                    tag_set(c->tag);
                     client_focus(c);
-               }
+
      }
 
      /* Manage _NET_WM_STATE */

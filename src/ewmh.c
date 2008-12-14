@@ -184,6 +184,7 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
      {
           if(data_l[0] == _NET_WM_STATE_ADD)
           {
+               screen_set_sel(c->screen);
                tag_set(c->tag);
                client_focus(c);
           }

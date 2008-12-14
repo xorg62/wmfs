@@ -102,6 +102,24 @@ screen_get_with_geo(int x, int y)
      return r;
 }
 
+/** Set the selected screen
+ *\param screen Number of the wanted selected screen
+*/
+void
+screen_set_sel(int screen)
+{
+     if(screen < 0 || screen > screen_count() - 1)
+          screen = 0;
+
+     client_focus(NULL);
+     XWarpPointer(dpy, None, ROOT, 0, 0, 0, 0,
+                  sgeo[screen].x + sgeo[screen].width / 2,
+                  sgeo[screen].y + sgeo[screen].height / 2);
+     selscreen = screen;
+
+     return;
+}
+
 /** Get and set the selected screen
  *\return The number of the selected screen
 */
@@ -137,4 +155,15 @@ screen_init_geo(void)
      return;
 }
 
+/** Uicb screen select
+ * \param cmd Screen uicb_t type
+*/
+void
+uicb_screen_select(uicb_t cmd)
+{
+     int s = atoi(cmd);
 
+     screen_set_sel(s);
+
+     return;
+}

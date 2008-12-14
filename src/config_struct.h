@@ -192,6 +192,7 @@ func_name_list_t func_list[] =
      {"client_raise",            uicb_client_raise },
      {"tile_switch",             uicb_tile_switch },
      {"toggle_free",             uicb_togglefree },
+     {"screen_select",           uicb_screen_select },
      {"reload",                  uicb_reload }
 };
 
