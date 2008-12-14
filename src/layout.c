@@ -85,11 +85,8 @@ layoutswitch(Bool b)
      screen_get_sel();
 
      if(tags[selscreen][seltag[selscreen]].layout.func == freelayout)
-     {
-          deb(666);
           for(c = clients; c && (c->tag != seltag[selscreen] && c->screen != selscreen); c = c->next)
                c->ogeo = c->geo;
-     }
 
      for(i = 0; i < conf.nlayout; ++i)
      {

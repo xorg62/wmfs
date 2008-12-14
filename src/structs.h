@@ -53,6 +53,7 @@ enum
 {
      net_supported,
      net_wm_name,
+     net_client_list,
      net_number_of_desktops,
      net_current_desktop,
      net_desktop_names,
@@ -70,6 +71,7 @@ enum
      net_wm_state_skip_taskbar,
      net_wm_state_fullscreen,
      net_wm_state_demands_attention,
+     utf8_string,
      net_last
 };
 typedef enum { Top, Bottom, Right, Left, Center, PositionLast } Position;

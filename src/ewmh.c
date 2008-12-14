@@ -43,6 +43,7 @@ void
 ewmh_init_hints(void)
 {
      net_atom[net_supported]                  = ATOM("_NET_SUPPORTED");
+     net_atom[net_client_list]                = ATOM("_NET_CLIENT_LIST");
      net_atom[net_number_of_desktops]         = ATOM("_NET_NUMBER_OF_DESKTOPS");
      net_atom[net_current_desktop]            = ATOM("_NET_CURRENT_DESKTOP");
      net_atom[net_desktop_names]              = ATOM("_NET_DESKTOP_NAMES");
@@ -61,6 +62,7 @@ ewmh_init_hints(void)
      net_atom[net_wm_state_skip_taskbar]      = ATOM("_NET_WM_STATE_SKIP_TASKBAR");
      net_atom[net_wm_state_fullscreen]        = ATOM("_NET_WM_STATE_FULLSCREEN");
      net_atom[net_wm_state_demands_attention] = ATOM("_NET_WM_STATE_DEMANDS_ATTENTION");
+     net_atom[utf8_string]                    = ATOM("UTF8_STRING");
 
      XChangeProperty(dpy, ROOT, net_atom[net_supported], XA_ATOM, 32,
                      PropModeReplace, (uchar*)net_atom, net_last);
@@ -101,6 +103,29 @@ ewmh_get_current_desktop(void)
      return;
 }
 
+/** Get _NET_CLIENT_LIST
+*/
+void
+ewmh_get_client_list(void)
+{
+     Window *list;
+     Client *c;
+     int win_n;
+
+     for(win_n = 0, c = clients; c; c = c->next, ++win_n);
+     list = emalloc(win_n, sizeof(Window));
+
+     for(win_n = 0, c = clients; c; c = c->next, ++win_n)
+          list[win_n] = c->win;
+
+     XChangeProperty(dpy, ROOT, net_atom[net_client_list], XA_WINDOW, 32,
+                     PropModeReplace, (uchar *)list, win_n);
+
+     free(list);
+
+     return;
+}
+
 /** The desktop names
  */
 void
@@ -123,7 +148,7 @@ ewmh_get_desktop_names(void)
                str[pos] = '\0';
           }
 
-     XChangeProperty(dpy, ROOT, net_atom[net_desktop_names], XA_STRING, 8,
+     XChangeProperty(dpy, ROOT, net_atom[net_desktop_names], net_atom[utf8_string], 8,
                      PropModeReplace, (uchar*)str, pos);
 
      free(str);
@@ -158,7 +183,10 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
      else if(data_l[1] == net_atom[net_wm_state_demands_attention])
      {
           if(data_l[0] == _NET_WM_STATE_ADD)
+          {
+               tag_set(c->tag);
                client_focus(c);
+          }
           if(data_l[0] == _NET_WM_STATE_REMOVE)
                if(c == sel)
                     client_focus(NULL);

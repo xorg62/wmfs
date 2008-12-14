@@ -418,6 +418,7 @@ client_manage(Window w, XWindowAttributes *wa)
      client_raise(c);
      client_focus(c);
      setwinstate(c->win, NormalState);
+     ewmh_get_client_list();
      ewmh_manage_window_type(c);
      arrange();
 
@@ -487,6 +488,8 @@ client_moveresize(Client *c, XRectangle geo, bool r)
         || c->geo.width != geo.width
         || c->geo.height != geo.height)
      {
+          if(tags[selscreen][seltag[selscreen]].layout.func == freelayout
+             || c->free);
           c->geo = c->ogeo = geo;
 
           /* Set the client screen */
@@ -665,6 +668,7 @@ client_unmanage(Client *c)
      frame_delete(c);
      XSync(dpy, False);
      XUngrabServer(dpy);
+     ewmh_get_client_list();
      arrange();
      XFree(c->title);
      free(c);

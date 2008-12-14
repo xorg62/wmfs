@@ -70,32 +70,24 @@ buttonpress(XButtonEvent *ev)
                          if(conf.root.mouse[i].func)
                               conf.root.mouse[i].func(conf.root.mouse[i].cmd);
 
-     /* Tag */
+     /* Tags */
      for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
-     {
           if(ev->window == infobar[selscreen].tags[i]->win)
-          {
-               if(ev->button == Button1)
-                    tag_set(i);
-               if(ev->button == Button3)
-                    tag_transfert(sel, i);
-               if(ev->button == Button4)
-                    tag_set(seltag[selscreen] + 1);
-               if (ev->button == Button5)
-                    tag_set(seltag[selscreen] - 1);
-          }
-     }
+               switch(ev->button)
+               {
+                case Button1: tag_set(i);                     break;
+                case Button3: tag_transfert(sel, i);          break;
+                case Button4: tag_set(seltag[selscreen] + 1); break;
+                case Button5: tag_set(seltag[selscreen] - 1); break;
+               }
 
      /* Layout button */
      if(ev->window == infobar[selscreen].layout_button->win)
-     {
-          if(ev->button == Button1
-             || ev->button == Button4)
-               layoutswitch(True);
-          if(ev->button == Button3
-             || ev->button == Button5)
-               layoutswitch(False);
-     }
+          switch(ev->button)
+          {
+           case Button1: case Button4: layoutswitch(True);  break;
+           case Button3: case Button5: layoutswitch(False); break;
+          }
 
      return;
 }
@@ -115,6 +107,7 @@ clientmessageevent(XClientMessageEvent *ev)
      for(i = 0; i < net_last; ++i)
           if(net_atom[i] == ev->message_type)
                mess_t = i;
+
      if(ev->window == ROOT)
      {
           /* Manage _NET_CURRENT_DESKTOP */
@@ -125,19 +118,21 @@ clientmessageevent(XClientMessageEvent *ev)
 
           /* Manage _NET_ACTIVE_WINDOW */
           else if(mess_t == net_active_window)
-               if((c = client_gb_win(ev->data.l[0])))
+               if((c = client_gb_win((Window)ev->data.l[0])))
+               {
+                    tag_set(c->tag);
                     client_focus(c);
+               }
      }
 
-     if((c = client_gb_win(ev->window)))
-     {
-          /* Manage _NET_WM_STATE */
-          if(mess_t == net_wm_state)
+     /* Manage _NET_WM_STATE */
+     if(mess_t == net_wm_state)
+          if((c = client_gb_win(ev->window)))
                ewmh_manage_net_wm_state(ev->data.l, c);
-          /* Manage _NET_CLOSE_WINDOW */
-          if(mess_t == net_close_window)
+     /* Manage _NET_CLOSE_WINDOW */
+     if(mess_t == net_close_window)
+          if((c = client_gb_win(ev->window)))
                client_kill(c);
-     }
 
      return;
 }
@@ -426,7 +421,6 @@ getevent(XEvent ev)
       case UnmapNotify:      unmapnotify(&ev.xunmap);           break;
      }
 
-     //ewmh_get_current_desktop();
      wait(&st);
 
      return;
