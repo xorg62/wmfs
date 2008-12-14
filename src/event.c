@@ -40,7 +40,6 @@ buttonpress(XButtonEvent *ev)
 {
      Client *c;
      int i;
-     char s[6];
 
      screen_get_sel();
 
@@ -74,17 +73,16 @@ buttonpress(XButtonEvent *ev)
      /* Tag */
      for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
      {
-          ITOA(s, i);
           if(ev->window == infobar[selscreen].tags[i]->win)
           {
                if(ev->button == Button1)
-                    uicb_tag(s);
+                    tag_set(i);
                if(ev->button == Button3)
-                    uicb_tagtransfert(s);
+                    tag_transfert(sel, i);
                if(ev->button == Button4)
-                    uicb_tag("+1");
+                    tag_set(seltag[selscreen] + 1);
                if (ev->button == Button5)
-                    uicb_tag("-1");
+                    tag_set(seltag[selscreen] - 1);
           }
      }
 
@@ -109,7 +107,6 @@ void
 clientmessageevent(XClientMessageEvent *ev)
 {
      Client *c;
-     char tmp[3];
      int i, mess_t = 0;
 
      if(ev->format != 32)
@@ -122,14 +119,12 @@ clientmessageevent(XClientMessageEvent *ev)
      {
           /* Manage _NET_CURRENT_DESKTOP */
           if(mess_t == net_current_desktop
-             && ev->data.l[0] >= 1
+             && ev->data.l[0] >= 0
              && ev->data.l[0] < conf.ntag[selscreen])
-          {
-               ITOA(tmp, (int)(ev->data.l[0] + 1));
-               uicb_tag(tmp);
-          }
+               tag_set((int)(ev->data.l[0] + 1));
+
           /* Manage _NET_ACTIVE_WINDOW */
-          if(mess_t == net_active_window)
+          else if(mess_t == net_active_window)
                if((c = client_gb_win(ev->data.l[0])))
                     client_focus(c);
      }

@@ -202,6 +202,8 @@ char* alias_to_str(char *conf_choice);
 void uicb_spawn(uicb_t);
 
 /* tag.c */
+void tag_set(int tag);
+void tag_transfert(Client *c, int tag);
 void uicb_tag(uicb_t);
 void uicb_tag_next(uicb_t);
 void uicb_tag_prev(uicb_t);

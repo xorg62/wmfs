@@ -33,7 +33,66 @@
 
 #include "wmfs.h"
 
-/** Set a tag
+/* Set the tag
+ * \param tag The tag number
+*/
+void
+tag_set(int tag)
+{
+     screen_get_sel();
+
+     if(!tag)
+          tag = 1;
+
+     if(conf.tag_round)
+     {
+          if(tag < 1)
+               seltag[selscreen] = conf.ntag[selscreen];
+          else if(tag  > conf.ntag[selscreen])
+               seltag[selscreen] = 1;
+          else
+               seltag[selscreen] = tag;
+     }
+     else
+     {
+          if(tag == seltag[selscreen]
+             || tag > conf.ntag[selscreen])
+               return;
+          seltag[selscreen] = tag;
+     }
+     ewmh_get_current_desktop();
+     arrange();
+     client_focus(NULL);
+
+     return;
+}
+
+/* Transfert a client to a tag
+ * \param c Client pointer
+ * \param tag Tag
+*/
+void
+tag_transfert(Client *c, int tag)
+{
+     screen_get_sel();
+
+     if(!c || c->tag == tag)
+          return;
+
+     if(!tag)
+          tag = 1;
+
+     c->tag = tag;
+
+     arrange();
+
+     if(c == sel)
+          client_focus(NULL);
+
+     return;
+}
+
+/** Uicb Set a tag
  * \param cmd Tag number or '+' / '-', uicb_t type
 */
 void
@@ -41,41 +100,10 @@ uicb_tag(uicb_t cmd)
 {
      int tmp = atoi(cmd);
 
-     screen_get_sel();
-
-     if(!tmp)
-          tmp = 1;
-
-     if(conf.tag_round)
-     {
-          if(tmp + seltag[selscreen] < 1)
-               seltag[selscreen] = conf.ntag[selscreen];
-          else if (tmp + seltag[selscreen] > conf.ntag[selscreen])
-               seltag[selscreen] = 1;
-          else
-               seltag[selscreen] += tmp;
-     }
+     if(cmd[0] == '+' || cmd[0] == '-')
+          tag_set(seltag[selscreen] + tmp);
      else
-     {
-          if(cmd[0] == '+' || cmd[0] == '-')
-          {
-               if(tmp + seltag[selscreen] < 1
-                   || tmp + seltag[selscreen] > conf.ntag[selscreen])
-                    return;
-               seltag[selscreen] += tmp;
-          }
-          else
-          {
-               if(tmp == seltag[selscreen]
-                   || tmp > conf.ntag[selscreen])
-                    return;
-               seltag[selscreen] = tmp;
-          }
-     }
-     ewmh_get_current_desktop();
-
-     arrange();
-     client_focus(NULL);
+          tag_set(tmp);
 
      return;
 }
@@ -86,7 +114,7 @@ uicb_tag(uicb_t cmd)
 void
 uicb_tag_next(uicb_t cmd)
 {
-     uicb_tag("+1");
+     tag_set(seltag[selscreen] + 1);
 
      return;
 }
@@ -97,7 +125,7 @@ uicb_tag_next(uicb_t cmd)
 void
 uicb_tag_prev(uicb_t cmd)
 {
-     uicb_tag("-1");
+     tag_set(seltag[selscreen] - 1);
 
      return;
 }
@@ -109,19 +137,9 @@ uicb_tag_prev(uicb_t cmd)
 void
 uicb_tagtransfert(uicb_t cmd)
 {
-     int n = atoi(cmd);
+     CHECK(sel);
 
-     screen_get_sel();
-
-     if(!sel || n == seltag[selscreen])
-          return;
-
-     if(!n)
-          n = 1;
-
-     sel->tag = n;
-
-     arrange();
+     tag_transfert(sel, atoi(cmd));
 
      return;
 }
