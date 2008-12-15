@@ -46,7 +46,8 @@ mouse_move(Client *c)
      XRectangle geo = c->geo;
      XEvent ev;
 
-     if(c->max || c->tile || c->lmax || c->state_fullscreen)
+     if(c->max || c->tile || c->lmax
+        || c->state_fullscreen || c->state_dock)
           return;
 
      if(XGrabPointer(dpy, ROOT, False, MouseMask, GrabModeAsync, GrabModeAsync,
@@ -91,7 +92,8 @@ mouse_resize(Client *c)
      XRectangle geo = c->geo;
      XEvent ev;
 
-    if(c->max || c->lmax || c->tile || c->state_fullscreen)
+     if(c->max || c->lmax || c->tile
+        || c->state_fullscreen || c->state_dock)
           return;
 
     if(XGrabPointer(dpy, ROOT, False, MouseMask, GrabModeAsync, GrabModeAsync,

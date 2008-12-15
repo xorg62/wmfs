@@ -434,7 +434,8 @@ client_manage(Window w, XWindowAttributes *wa)
 void
 client_moveresize(Client *c, XRectangle geo, bool r)
 {
-     CHECK(c);
+     if(!c || c->state_dock)
+          return;
 
      /* Resize hints {{{ */
      if(r)

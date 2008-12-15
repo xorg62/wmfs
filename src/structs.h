@@ -57,6 +57,7 @@ enum
      net_number_of_desktops,
      net_current_desktop,
      net_desktop_names,
+     net_desktop_names_string,
      net_desktop_geometry,
      net_workarea,
      net_active_window,
@@ -132,7 +133,8 @@ struct Client
      } colors;
      /* Client Layout Information */
      Bool max, tile, free, hide;
-     Bool hint, lmax, unmapped, state_fullscreen;
+     Bool hint, lmax, unmapped;
+     Bool state_dock, state_fullscreen;
      /* Struct in chains */
      Client *next;
      Client *prev;

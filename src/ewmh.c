@@ -47,6 +47,7 @@ ewmh_init_hints(void)
      net_atom[net_number_of_desktops]         = ATOM("_NET_NUMBER_OF_DESKTOPS");
      net_atom[net_current_desktop]            = ATOM("_NET_CURRENT_DESKTOP");
      net_atom[net_desktop_names]              = ATOM("_NET_DESKTOP_NAMES");
+     net_atom[net_desktop_names_string]       = ATOM("_NET_DESKTOP_NAMES_STRING");
      net_atom[net_desktop_geometry]           = ATOM("_NET_DESKTOP_GEOMETRY");
      net_atom[net_workarea]                   = ATOM("_NET_WORKAREA");
      net_atom[net_active_window]              = ATOM("_NET_ACTIVE_WINDOW");
@@ -153,6 +154,9 @@ ewmh_get_desktop_names(void)
      XChangeProperty(dpy, ROOT, net_atom[net_desktop_names], net_atom[utf8_string], 8,
                      PropModeReplace, (uchar*)str, pos);
 
+     XChangeProperty(dpy, ROOT, net_atom[net_desktop_names_string], XA_STRING, 8,
+                     PropModeReplace, (uchar*)str, pos);
+
      free(str);
 
      return;
@@ -177,11 +181,13 @@ ewmh_set_desktop_geometry(void)
 void
 ewmh_set_workarea(void)
 {
-     long data[4 * 1024] = { 0 }; /* Array [] because dynamic alloc seems doesn't work */
+     long *data;
      int i, j, tag_c = 0, pos = 0;
 
      for(i = 0; i < screen_count(); ++i)
           tag_c += conf.ntag[i];
+
+     data = emalloc(tag_c * 4, sizeof(long));
 
      for(i = 0; i < screen_count(); ++i)
           for(j = 0; j < conf.ntag[i]; ++j)
@@ -193,8 +199,9 @@ ewmh_set_workarea(void)
           }
 
      XChangeProperty(dpy, ROOT, net_atom[net_workarea], XA_CARDINAL, 32,
-                     PropModeReplace, (uchar*)&data, 4 * tag_c);
+                     PropModeReplace, (uchar*)data, 4 * tag_c);
 
+     free(data);
 
      return;
 }
@@ -264,6 +271,7 @@ ewmh_manage_window_type(Client *c)
                     XUnmapSubwindows(dpy, c->frame);
                     XUnmapWindow(dpy, c->frame);
                     XRaiseWindow(dpy, c->win);
+                    c->state_dock = True;
                }
                /* MANAGE _NET_WM_WINDOW_TYPE_DIALOG */
                else if(atom[i] == net_atom[net_wm_window_type_dialog])
