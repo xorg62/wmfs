@@ -47,6 +47,8 @@ ewmh_init_hints(void)
      net_atom[net_number_of_desktops]         = ATOM("_NET_NUMBER_OF_DESKTOPS");
      net_atom[net_current_desktop]            = ATOM("_NET_CURRENT_DESKTOP");
      net_atom[net_desktop_names]              = ATOM("_NET_DESKTOP_NAMES");
+     net_atom[net_desktop_geometry]           = ATOM("_NET_DESKTOP_GEOMETRY");
+     net_atom[net_workarea]                   = ATOM("_NET_WORKAREA");
      net_atom[net_active_window]              = ATOM("_NET_ACTIVE_WINDOW");
      net_atom[net_close_window]               = ATOM("_NET_CLOSE_WINDOW");
      net_atom[net_wm_name]                    = ATOM("_NET_WM_NAME");
@@ -152,6 +154,47 @@ ewmh_get_desktop_names(void)
                      PropModeReplace, (uchar*)str, pos);
 
      free(str);
+
+     return;
+}
+
+
+/** Manage _NET_DESKTOP_GEOMETRY
+*/
+void
+ewmh_set_desktop_geometry(void)
+{
+     long data[2] = { MAXW, MAXH };
+
+     XChangeProperty(dpy, ROOT, net_atom[net_desktop_geometry], XA_CARDINAL, 32,
+                     PropModeReplace, (uchar*)&data, 2);
+
+     return;
+}
+
+/** Manage _NET_WORKAREA
+*/
+void
+ewmh_set_workarea(void)
+{
+     long data[4 * 1024] = { 0 }; /* Array [] because dynamic alloc seems doesn't work */
+     int i, j, tag_c = 0, pos = 0;
+
+     for(i = 0; i < screen_count(); ++i)
+          tag_c += conf.ntag[i];
+
+     for(i = 0; i < screen_count(); ++i)
+          for(j = 0; j < conf.ntag[i]; ++j)
+          {
+               data[pos++] = sgeo[i].x - BORDH;
+               data[pos++] = sgeo[i].y;
+               data[pos++] = sgeo[i].width;
+               data[pos++] = sgeo[i].height;
+          }
+
+     XChangeProperty(dpy, ROOT, net_atom[net_workarea], XA_CARDINAL, 32,
+                     PropModeReplace, (uchar*)&data, 4 * tag_c);
+
 
      return;
 }

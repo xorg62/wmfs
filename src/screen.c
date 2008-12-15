@@ -152,6 +152,9 @@ screen_init_geo(void)
      for(i = 0; i < screen_count(); ++i)
           sgeo[i] = screen_get_geo(i);
 
+     ewmh_set_desktop_geometry();
+     ewmh_set_workarea();
+
      return;
 }
 
@@ -161,9 +164,7 @@ screen_init_geo(void)
 void
 uicb_screen_select(uicb_t cmd)
 {
-     int s = atoi(cmd);
-
-     screen_set_sel(s);
+     screen_set_sel(atoi(cmd));
 
      return;
 }

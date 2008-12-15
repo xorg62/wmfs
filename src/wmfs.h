@@ -146,6 +146,8 @@ void ewmh_get_number_of_desktop(void);
 void ewmh_get_current_desktop(void);
 void ewmh_get_client_list(void);
 void ewmh_get_desktop_names(void);
+void ewmh_set_desktop_geometry(void);
+void ewmh_set_workarea(void);
 void ewmh_manage_net_wm_state(long data_l[], Client *c);
 void ewmh_manage_window_type(Client *c);
 long ewmh_get_wm_state(Window win);
