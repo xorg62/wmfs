@@ -193,7 +193,7 @@ ewmh_set_workarea(void)
           for(j = 0; j < conf.ntag[i]; ++j)
           {
                data[pos++] = sgeo[i].x - BORDH;
-               data[pos++] = sgeo[i].y;
+               data[pos++] = sgeo[i].y - TBARH;
                data[pos++] = sgeo[i].width;
                data[pos++] = sgeo[i].height;
           }
