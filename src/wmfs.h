@@ -220,6 +220,8 @@ int screen_get_sel(void);
 void screen_set_sel(int screen);
 void screen_init_geo(void);
 void uicb_screen_select(uicb_t cmd);
+void uicb_screen_next(uicb_t cmd);
+void uicb_screen_prev(uicb_t cmd);
 
 /* layout.c */
 void arrange(void);

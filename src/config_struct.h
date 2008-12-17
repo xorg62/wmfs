@@ -193,6 +193,8 @@ func_name_list_t func_list[] =
      {"tile_switch",             uicb_tile_switch },
      {"toggle_free",             uicb_togglefree },
      {"screen_select",           uicb_screen_select },
+     {"screen_next",             uicb_screen_next },
+     {"screen_prev",             uicb_screen_prev },
      {"reload",                  uicb_reload }
 };
 

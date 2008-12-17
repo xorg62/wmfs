@@ -158,13 +158,39 @@ screen_init_geo(void)
      return;
 }
 
-/** Uicb screen select
+/** Uicb: screen select
  * \param cmd Screen uicb_t type
 */
 void
 uicb_screen_select(uicb_t cmd)
 {
      screen_set_sel(atoi(cmd));
+
+     return;
+}
+
+/** Uicb: screen next
+ * \param cmd Screen uicb_t type
+*/
+void
+uicb_screen_next(uicb_t cmd)
+{
+     selscreen = (selscreen + 1 > screen_count() - 1) ? 0 : selscreen + 1;
+
+     screen_set_sel(selscreen);
+
+     return;
+}
+
+/** Uicb: screen prev
+ * \param cmd Screen uicb_t type
+*/
+void
+uicb_screen_prev(uicb_t cmd)
+{
+     selscreen = (selscreen - 1 < 0) ? screen_count() - 1 : selscreen - 1;
+
+     screen_set_sel(selscreen);
 
      return;
 }
