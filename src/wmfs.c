@@ -206,7 +206,7 @@ scan(void)
                   && wa.map_state == IsViewable)
                     client_manage(w[i], &wa);
      XFree(w);
-     arrange();
+     arrange(screen_get_sel());
 
      return;
 }

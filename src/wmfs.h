@@ -144,6 +144,7 @@ void uicb_client_kill(uicb_t);
 void ewmh_init_hints(void);
 void ewmh_get_number_of_desktop(void);
 void ewmh_get_current_desktop(void);
+void ewmh_get_current_layout(void);
 void ewmh_get_client_list(void);
 void ewmh_get_desktop_names(void);
 void ewmh_set_desktop_geometry(void);
@@ -224,7 +225,7 @@ void uicb_screen_next(uicb_t cmd);
 void uicb_screen_prev(uicb_t cmd);
 
 /* layout.c */
-void arrange(void);
+void arrange(int screen);
 void freelayout(void);
 void layoutswitch(Bool b);
 void maxlayout(void);

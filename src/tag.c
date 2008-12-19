@@ -61,7 +61,7 @@ tag_set(int tag)
           seltag[selscreen] = tag;
      }
      ewmh_get_current_desktop();
-     arrange();
+     arrange(selscreen);
      client_focus(NULL);
 
      return;
@@ -84,7 +84,7 @@ tag_transfert(Client *c, int tag)
 
      c->tag = tag;
 
-     arrange();
+     arrange(c->screen);
 
      if(c == sel)
           client_focus(NULL);
@@ -114,6 +114,8 @@ uicb_tag(uicb_t cmd)
 void
 uicb_tag_next(uicb_t cmd)
 {
+     screen_get_sel();
+
      tag_set(seltag[selscreen] + 1);
 
      return;
@@ -125,6 +127,8 @@ uicb_tag_next(uicb_t cmd)
 void
 uicb_tag_prev(uicb_t cmd)
 {
+     screen_get_sel();
+
      tag_set(seltag[selscreen] - 1);
 
      return;

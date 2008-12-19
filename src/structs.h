@@ -57,7 +57,6 @@ enum
      net_number_of_desktops,
      net_current_desktop,
      net_desktop_names,
-     net_desktop_names_string,
      net_desktop_geometry,
      net_workarea,
      net_active_window,
@@ -68,6 +67,7 @@ enum
      net_wm_window_type_dock,
      net_wm_window_type_splash,
      net_wm_window_type_dialog,
+     net_wm_desktop,
      net_wm_icon,
      net_wm_state,
      net_wm_state_sticky,
@@ -75,6 +75,9 @@ enum
      net_wm_state_fullscreen,
      net_wm_state_demands_attention,
      utf8_string,
+     /* WMFS HINTS */
+     wmfs_tag_names,
+     wmfs_current_layout,
      net_last
 };
 typedef enum { Top, Bottom, Right, Left, Center, PositionLast } Position;

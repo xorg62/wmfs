@@ -42,17 +42,18 @@
 void
 ewmh_init_hints(void)
 {
+     /* EWMH hints */
      net_atom[net_supported]                  = ATOM("_NET_SUPPORTED");
      net_atom[net_client_list]                = ATOM("_NET_CLIENT_LIST");
      net_atom[net_number_of_desktops]         = ATOM("_NET_NUMBER_OF_DESKTOPS");
      net_atom[net_current_desktop]            = ATOM("_NET_CURRENT_DESKTOP");
      net_atom[net_desktop_names]              = ATOM("_NET_DESKTOP_NAMES");
-     net_atom[net_desktop_names_string]       = ATOM("_NET_DESKTOP_NAMES_STRING");
      net_atom[net_desktop_geometry]           = ATOM("_NET_DESKTOP_GEOMETRY");
      net_atom[net_workarea]                   = ATOM("_NET_WORKAREA");
      net_atom[net_active_window]              = ATOM("_NET_ACTIVE_WINDOW");
      net_atom[net_close_window]               = ATOM("_NET_CLOSE_WINDOW");
      net_atom[net_wm_name]                    = ATOM("_NET_WM_NAME");
+     net_atom[net_wm_desktop]                 = ATOM("_NET_WM_DESKTOP");
      net_atom[net_wm_icon_name]               = ATOM("_NET_WM_ICON_NAME");
      net_atom[net_wm_window_type]             = ATOM("_NET_WM_WINDOW_TYPE");
      net_atom[net_wm_window_type_normal]      = ATOM("_NET_WM_WINDOW_TYPE_NORMAL");
@@ -66,6 +67,9 @@ ewmh_init_hints(void)
      net_atom[net_wm_state_fullscreen]        = ATOM("_NET_WM_STATE_FULLSCREEN");
      net_atom[net_wm_state_demands_attention] = ATOM("_NET_WM_STATE_DEMANDS_ATTENTION");
      net_atom[utf8_string]                    = ATOM("UTF8_STRING");
+     /* WMFS hints */
+     net_atom[wmfs_tag_names]                 = ATOM("_WMFS_TAG_NAMES");
+     net_atom[wmfs_current_layout]            = ATOM("_WMFS_CURRENT_LAYOUT");
 
      XChangeProperty(dpy, ROOT, net_atom[net_supported], XA_ATOM, 32,
                      PropModeReplace, (uchar*)net_atom, net_last);
@@ -105,6 +109,19 @@ ewmh_get_current_desktop(void)
 
      return;
 }
+
+/** Manage _WMFS_CURRENT_LAYOUT
+*/
+void
+ewmh_get_current_layout(void)
+{
+     XChangeProperty(dpy, ROOT, net_atom[wmfs_current_layout], XA_STRING, 8,
+                     PropModeReplace, (uchar*)tags[selscreen][seltag[selscreen]].layout.symbol,
+                     strlen(tags[selscreen][seltag[selscreen]].layout.symbol));
+
+     return;
+}
+
 
 /** Get _NET_CLIENT_LIST
 */
@@ -154,7 +171,8 @@ ewmh_get_desktop_names(void)
      XChangeProperty(dpy, ROOT, net_atom[net_desktop_names], net_atom[utf8_string], 8,
                      PropModeReplace, (uchar*)str, pos);
 
-     XChangeProperty(dpy, ROOT, net_atom[net_desktop_names_string], XA_STRING, 8,
+     /* _WMFS_TAG_NAMES */
+     XChangeProperty(dpy, ROOT, net_atom[wmfs_tag_names], XA_STRING, 8,
                      PropModeReplace, (uchar*)str, pos);
 
      free(str);

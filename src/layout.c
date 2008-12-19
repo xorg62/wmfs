@@ -35,14 +35,12 @@
 /** Arrange All
 */
 void
-arrange(void)
+arrange(int screen)
 {
      Client *c;
 
-     screen_get_sel();
-
      for(c = clients; c; c = c->next)
-          if(c->screen == selscreen)
+          if(c->screen == screen)
           {
                if(!ishide(c))
                     client_unhide(c);
@@ -50,8 +48,9 @@ arrange(void)
                     client_hide(c);
           }
 
-     tags[selscreen][seltag[selscreen]].layout.func();
-     infobar_draw(selscreen);
+     tags[screen][seltag[screen]].layout.func();
+     infobar_draw(screen);
+     ewmh_get_current_layout();
 
      return;
 }
@@ -100,6 +99,7 @@ layoutswitch(Bool b)
                break;
           }
      }
+     ewmh_get_current_layout();
      tags[selscreen][seltag[selscreen]].layout.func();
      infobar_draw(selscreen);
 

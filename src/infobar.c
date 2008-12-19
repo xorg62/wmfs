@@ -206,7 +206,7 @@ uicb_infobar_togglepos(uicb_t cmd)
      infobar_draw(selscreen);
      ewmh_set_workarea();
 
-     arrange();
+     arrange(selscreen);
 
      return;
 }

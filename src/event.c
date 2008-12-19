@@ -120,7 +120,6 @@ clientmessageevent(XClientMessageEvent *ev)
           else if(mess_t == net_active_window)
                if((c = client_gb_win((Window)ev->data.l[0])))
                     client_focus(c);
-
      }
 
      /* Manage _NET_WM_STATE */
@@ -131,6 +130,11 @@ clientmessageevent(XClientMessageEvent *ev)
      if(mess_t == net_close_window)
           if((c = client_gb_win(ev->window)))
                client_kill(c);
+     /* Manage _NET_WM_DESKTOP */
+     if(mess_t == net_wm_desktop)
+          if((c = client_gb_win(ev->window)))
+               tag_transfert(c, ev->data.l[0]);
+
 
      return;
 }
@@ -360,7 +364,7 @@ propertynotify(XPropertyEvent *ev)
           case XA_WM_TRANSIENT_FOR:
                XGetTransientForHint(dpy, c->win, &trans);
                if((c->tile || c->max) && (c->hint = (client_gb_win(trans) != NULL)))
-                    arrange();
+                    arrange(c->screen);
                break;
           case XA_WM_NORMAL_HINTS:
                client_size_hints(c);

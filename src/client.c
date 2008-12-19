@@ -420,7 +420,7 @@ client_manage(Window w, XWindowAttributes *wa)
      setwinstate(c->win, NormalState);
      ewmh_get_client_list();
      ewmh_manage_window_type(c);
-     arrange();
+     arrange(c->screen);
 
      return;
 }
@@ -670,7 +670,7 @@ client_unmanage(Client *c)
      XSync(dpy, False);
      XUngrabServer(dpy);
      ewmh_get_client_list();
-     arrange();
+     arrange(c->screen);
      XFree(c->title);
      free(c);
 
