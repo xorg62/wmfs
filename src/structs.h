@@ -48,6 +48,8 @@ typedef unsigned char  uchar;
 
 /* Enum */
 enum { CurNormal, CurResize, CurMove, CurLast };
+typedef enum { Top, Bottom, Right, Left, Center, PositionLast } Position;
+
 /* Ewmh hints list */
 enum
 {
@@ -80,7 +82,6 @@ enum
      wmfs_current_layout,
      net_last
 };
-typedef enum { Top, Bottom, Right, Left, Center, PositionLast } Position;
 
 /*
  *  BarWindow Structure
@@ -201,9 +202,9 @@ typedef struct
 {
      /* Misc option */
      char *font;
-     bool raisefocus;
-     bool raiseswitch;
-     bool bartop;
+     Bool raisefocus;
+     Bool raiseswitch;
+     Bool bartop;
      struct
      {
           /*
@@ -247,7 +248,7 @@ typedef struct
      Alias alias[256];
      Layout layout[NUM_OF_LAYOUT];
      int *ntag;
-     bool tag_round;
+     Bool tag_round;
      int nkeybind;
      int nbutton;
      int nlayout;

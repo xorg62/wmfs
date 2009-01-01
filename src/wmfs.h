@@ -36,7 +36,6 @@
 /* Lib headers */
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <stdarg.h>
 #include <string.h>
 #include <signal.h>
@@ -128,7 +127,7 @@ void client_kill(Client *c);
 Bool ishide(Client *c);
 void client_map(Client *c);
 void client_manage(Window w, XWindowAttributes *wa);
-void client_moveresize(Client *c, XRectangle geo, bool r);
+void client_moveresize(Client *c, XRectangle geo, Bool r);
 void client_maximize(Client *c);
 void client_size_hints(Client *c);
 void client_raise(Client *c);

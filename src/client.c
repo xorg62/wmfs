@@ -432,7 +432,7 @@ client_manage(Window w, XWindowAttributes *wa)
  * \param r Bool for resize hint or not
 */
 void
-client_moveresize(Client *c, XRectangle geo, bool r)
+client_moveresize(Client *c, XRectangle geo, Bool r)
 {
      if(!c || c->state_dock)
           return;
@@ -511,12 +511,11 @@ client_moveresize(Client *c, XRectangle geo, bool r)
 void
 client_maximize(Client *c)
 {
-     CHECK(c);
-
      XRectangle geo;
 
+     CHECK(c);
 
-     client_raise(c);
+     client_focus(c);
 
      c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
 
@@ -532,7 +531,6 @@ client_maximize(Client *c)
      }
 
      client_moveresize(c, geo, False);
-
 
      return;
 }

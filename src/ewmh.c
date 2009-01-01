@@ -239,6 +239,7 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
                if(c->free)
                     c->ogeo = c->geo;
                client_maximize(c);
+               client_raise(c);
           }
           else if(data_l[0] == _NET_WM_STATE_REMOVE && c->state_fullscreen)
           {

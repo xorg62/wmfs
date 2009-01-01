@@ -491,15 +491,19 @@ uicb_togglemax(uicb_t cmd)
 
      if(!sel->max)
      {
-          sel->tile = sel->free = False;
+          sel->ogeo = sel->geo;
+          sel->tile = False;
           client_maximize(sel);
+          client_raise(sel);
           sel->max = True;
      }
-     else if(sel->max)
+     else
      {
           sel->max = False;
           tags[selscreen][seltag[selscreen]].layout.func();
      }
+
+
 
      return;
 }
