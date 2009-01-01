@@ -134,7 +134,7 @@ struct Client
           uint frame;
           uint resizecorner;
      } colors;
-     /* Client Layout Information */
+     /* Client Information */
      Bool max, tile, free, hide;
      Bool hint, lmax, unmapped;
      Bool state_dock, state_fullscreen;

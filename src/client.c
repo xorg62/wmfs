@@ -515,6 +515,9 @@ client_maximize(Client *c)
 
      XRectangle geo;
 
+
+     client_raise(c);
+
      c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
 
      geo.x = sgeo[c->screen].x;
@@ -524,15 +527,12 @@ client_maximize(Client *c)
 
      if(c->state_fullscreen)
      {
-          geo.y -= TBARH + INFOBARH + BORDH;
-          geo.height += TBARH + INFOBARH + (BORDH * 2);
-          client_moveresize(c, geo, False);
-          XMoveResizeWindow(dpy, c->win, 0, BORDH + TBARH, c->geo.width + BORDH * 2, c->geo.height);
+          geo.y -= INFOBARH;
+          geo.height += INFOBARH;
      }
-     else
-          client_moveresize(c, geo, False);
 
-     client_raise(c);
+     client_moveresize(c, geo, False);
+
 
      return;
 }
