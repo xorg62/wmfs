@@ -98,9 +98,10 @@ typedef struct
           /* Border color */
           uint dark, light;
      } border;
-     uint color;
+     uint bg;
+     char *fg;
      XRectangle geo;
-     Bool mapped;
+     Bool mapped, stipple;
 } BarWindow;
 
 /* Client Structure. */

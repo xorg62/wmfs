@@ -52,21 +52,26 @@ infobar_init(void)
 
           /* Create infobar barwindow */
           infobar[sc].bar = barwin_create(ROOT, sgeo[sc].x - BORDH, infobar[sc].geo.y,
-                                          sgeo[sc].width, infobar[sc].geo.height, conf.colors.bar, False);
+                                          sgeo[sc].width, infobar[sc].geo.height,
+                                          conf.colors.bar, conf.colors.text, False, False);
 
           /* Create tags window */
           for(i = 1; i < conf.ntag[sc] + 1; ++i)
           {
-               infobar[sc].tags[i] = barwin_create(infobar[sc].bar->win, j, 0, textw(tags[sc][i].name) + PAD,
-                                                infobar[sc].geo.height, conf.colors.bar, False);
+               infobar[sc].tags[i] = barwin_create(infobar[sc].bar->win, j, 0,
+                                                   textw(tags[sc][i].name) + PAD,
+                                                   infobar[sc].geo.height,
+                                                   conf.colors.bar, conf.colors.text, False, False);
                j += textw(tags[sc][i].name) + PAD;
                barwin_map_subwin(infobar[sc].tags[i]);
           }
 
           /* Create layout switch & layout type switch barwindow */
           infobar[sc].layout_button = barwin_create(infobar[sc].bar->win, j + PAD / 2, 0,
-                                         textw(tags[sc][seltag[sc]].layout.symbol) + PAD,
-                                         infobar[sc].geo.height, conf.colors.layout_bg, False);
+                                                    textw(tags[sc][seltag[sc]].layout.symbol) + PAD,
+                                                    infobar[sc].geo.height,
+                                                    conf.colors.layout_bg, conf.colors.layout_fg,
+                                                    False, False);
 
           /* Map/Refresh all */
           barwin_map(infobar[sc].bar);
@@ -91,15 +96,7 @@ infobar_draw(int sc)
      infobar_draw_taglist(sc);
      infobar_draw_layout(sc);
      barwin_refresh_color(infobar[sc].bar);
-
-     /* DRAW status text */
-     draw_text(infobar[sc].bar->dr,
-               (sgeo[sc].width - SHADH) - textw(statustext),
-               font->height,
-               conf.colors.text, 0,
-               statustext);
-
-     barwin_refresh(infobar[sc].bar);
+     barwin_draw_text(infobar[sc].bar, (sgeo[sc].width - SHADH) - textw(statustext), font->height, statustext);
 
      return;
 }
@@ -113,9 +110,7 @@ infobar_draw_layout(int sc)
      barwin_resize(infobar[sc].layout_button, textw(tags[sc][seltag[sc]].layout.symbol) + PAD, infobar[sc].geo.height);
      barwin_refresh_color(infobar[sc].layout_button);
      if(tags[sc][seltag[sc]].layout.symbol)
-     draw_text(infobar[sc].layout_button->dr, PAD / 2, font->height,
-               conf.colors.layout_fg, 0, tags[sc][seltag[sc]].layout.symbol);
-     barwin_refresh(infobar[sc].layout_button);
+          barwin_draw_text(infobar[sc].layout_button, PAD / 2, font->height, tags[sc][seltag[sc]].layout.symbol);
 
      return;
 }
@@ -131,7 +126,8 @@ infobar_draw_taglist(int sc)
 
      for(i = 1; i < conf.ntag[sc] + 1; ++i)
      {
-          infobar[sc].tags[i]->color = ((i == seltag[sc]) ? conf.colors.tagselbg : conf.colors.bar);
+          infobar[sc].tags[i]->bg = ((i == seltag[sc]) ? conf.colors.tagselbg : conf.colors.bar);
+          infobar[sc].tags[i]->fg = ((i == seltag[sc]) ? conf.colors.tagselfg : conf.colors.text);
           barwin_refresh_color(infobar[sc].tags[i]);
 
           /* Colorize a tag if there are clients in this */
@@ -139,19 +135,15 @@ infobar_draw_taglist(int sc)
           {
                if(c->screen == sc)
                {
-                   infobar[sc].tags[c->tag]->color = ((c->tag == seltag[sc])
-                                                      ? conf.colors.tagselbg
-                                                      : conf.colors.tag_occupied_bg);
-                   barwin_refresh_color(infobar[sc].tags[i]);
+                    infobar[sc].tags[c->tag]->bg = ((c->tag == seltag[sc])
+                                                    ? conf.colors.tagselbg
+                                                    : conf.colors.tag_occupied_bg);
+                    barwin_refresh_color(infobar[sc].tags[i]);
                }
           }
 
           if(tags[sc][i].name)
-               draw_text(infobar[sc].tags[i]->dr,
-                         PAD / 2, font->height,
-                         ((i == seltag[sc]) ? conf.colors.tagselfg : conf.colors.text),
-                         0, tags[sc][i].name);
-          barwin_refresh(infobar[sc].tags[i]);
+               barwin_draw_text(infobar[sc].tags[i], PAD / 2, font->height, tags[sc][i].name);
      }
 
      return;

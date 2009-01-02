@@ -48,8 +48,10 @@ barwin_create(Window parent,
               int y,
               uint w,
               uint h,
-              uint color,
-              Bool entermask)
+              uint bg,
+              char *fg,
+              Bool entermask,
+              Bool stipple)
 {
      XSetWindowAttributes at;
      BarWindow *bw;
@@ -74,8 +76,8 @@ barwin_create(Window parent,
      bw->dr = XCreatePixmap(dpy, parent, w, h, DefaultDepth(dpy, SCREEN));
 
      /* His border */
-     CWIN(bw->border.left, bw->win, 0, 0, SHADH, h, 0, CWBackPixel, color_enlight(color), &at);
-     CWIN(bw->border.top, bw->win, 0, 0, w, SHADH, 0, CWBackPixel, color_enlight(color), &at);
+     CWIN(bw->border.left, bw->win, 0, 0, SHADH, h, 0, CWBackPixel, color_enlight(bg), &at);
+     CWIN(bw->border.top, bw->win, 0, 0, w, SHADH, 0, CWBackPixel, color_enlight(bg), &at);
      CWIN(bw->border.bottom, bw->win, 0, h - SHADH, w, SHADH, 0, CWBackPixel, SHADC, &at);
      CWIN(bw->border.right, bw->win, w - SHADH, 0, SHADH, h, 0, CWBackPixel, SHADC, &at);
 
@@ -84,11 +86,30 @@ barwin_create(Window parent,
      bw->geo.y = y;
      bw->geo.width = w;
      bw->geo.height = h;
-     bw->color = color;
-     bw->border.light = color_enlight(color);
+     bw->bg = bg;
+     bw->fg = fg;
+     bw->border.light = color_enlight(bg);
      bw->border.dark = SHADC;
+     bw->stipple = stipple;
 
      return bw;
+}
+
+/** Draw text in a Barwindow
+*/
+void
+barwin_draw_text(BarWindow *bw, int x, int y, char *text)
+{
+     /* Background color of the text if there is stipple */
+     if(bw->stipple)
+          draw_rectangle(bw->dr, x - 4, 0, textw(text) + 8, bw->geo.height, bw->bg);
+
+     /* Draw text */
+     draw_text(bw->dr, x, y, bw->fg, 0, text);
+
+     barwin_refresh(bw);
+
+     return;
 }
 
 /** Delete a BarWindow
@@ -232,7 +253,13 @@ barwin_refresh_color(BarWindow *bw)
 {
      CHECK(bw);
 
-     draw_rectangle(bw->dr, 0, 0, bw->geo.width, bw->geo.height, bw->color);
+     draw_rectangle(bw->dr, 0, 0, bw->geo.width, bw->geo.height, bw->bg);
+
+     if(bw->stipple)
+     {
+          XSetForeground(dpy, gc_stipple, getcolor(bw->fg));
+          XFillRectangle(dpy, bw->dr, gc_stipple, 3, 2, bw->geo.width - 6, bw->geo.height - 4);
+     }
 
      XSetWindowBackground(dpy, bw->border.left, bw->border.light);
      XSetWindowBackground(dpy, bw->border.top, bw->border.light);

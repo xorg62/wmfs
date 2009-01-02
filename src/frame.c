@@ -70,7 +70,12 @@ frame_create(Client *c)
 
      /* Create titlebar window */
      if(TBARH)
-          c->titlebar = barwin_create(c->frame, 0, 0, c->frame_geo.width, TBARH + BORDH, c->colors.frame, True);
+          c->titlebar = barwin_create(c->frame, 0, 0,
+                                      c->frame_geo.width,
+                                      TBARH + BORDH,
+                                      c->colors.frame,
+                                      c->colors.fg,
+                                      True, True);
 
      at.event_mask &= ~(EnterWindowMask | LeaveWindowMask); /* <- Delete useless mask */
 
@@ -164,8 +169,11 @@ frame_update(Client *c)
 
      if(TBARH)
      {
-          c->titlebar->color = c->colors.frame;
+          c->titlebar->bg = c->colors.frame;
+          c->titlebar->fg = c->colors.fg;
+
           barwin_refresh_color(c->titlebar);
+          barwin_refresh(c->titlebar);
      }
 
      XSetWindowBackground(dpy, c->frame, c->colors.frame);
@@ -183,14 +191,10 @@ frame_update(Client *c)
      XClearWindow(dpy, c->bottom);
 
      if(TBARH && (TBARH + BORDH + 1) > font->height)
-     {
-
-          draw_text(c->titlebar->dr,
-                    (c->frame_geo.width / 2) - (textw(c->title) / 2),
-                    (font->height - (font->descent))  + (((TBARH + BORDH) - font->height) / 2),
-                    c->colors.fg, 0, c->title);
-          barwin_refresh(c->titlebar);
-     }
+          barwin_draw_text(c->titlebar,
+                           (c->frame_geo.width / 2) - (textw(c->title) / 2),
+                           (font->height - (font->descent)) + (((TBARH + BORDH) - font->height) / 2),
+                           c->title);
 
      return;
 }

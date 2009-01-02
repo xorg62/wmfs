@@ -38,7 +38,7 @@ void
 init(void)
 {
      /* First init */
-     gc = DefaultGC(dpy, SCREEN);
+     init_gc();
      init_font();
      init_cursor();
      init_key();
@@ -67,6 +67,32 @@ init_font(void)
           fprintf(stderr, "WMFS Error: Cannot initialize font\n");
           font = XftFontOpenName(dpy, SCREEN, "sans-10");
      }
+}
+
+/** Init the graphic context
+*/
+void
+init_gc(void)
+{
+     XGCValues gcv;
+
+     /* Bits sequences */
+     const char pix_bits[] =
+          {
+               0x55, 0x55, 0xAA, 0xAA, 0x55, 0x55, 0xAA, 0xAA, 0x55, 0x55,
+               0x55, 0x55, 0xAA, 0xAA, 0x55, 0x55, 0xAA, 0xAA, 0x55, 0x55,
+               0x55, 0x55, 0xAA, 0xAA, 0x55, 0x55, 0xAA, 0xAA, 0x55, 0x55,
+               0x55, 0x55, 0xAA, 0xAA, 0x55, 0x55, 0xAA, 0xAA, 0x55, 0x55
+          };
+
+     gc = DefaultGC(dpy, SCREEN);
+
+     gcv.function   = GXcopy;
+     gcv.fill_style = FillStippled;
+     gcv.stipple    = XCreateBitmapFromData(dpy, ROOT, pix_bits, 10, 4);
+     gc_stipple     = XCreateGC(dpy, ROOT, GCFunction|GCFillStyle|GCStipple, &gcv);
+
+     return;
 }
 
 /** Init WMFS cursor

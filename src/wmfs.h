@@ -85,7 +85,14 @@
 #define PAD          14
 
 /* barwin.c */
-BarWindow *barwin_create(Window parent, int x, int y, uint w, uint h, uint color, Bool entermask);
+BarWindow *barwin_create(Window parent,
+                         int x, int y,
+                         uint w, uint h,
+                         uint bg, char*fg,
+                         Bool entermask,
+                         Bool stipple);
+
+void barwin_draw_text(BarWindow *bw, int x, int y, char *text);
 void barwin_delete(BarWindow *bw);
 void barwin_delete_subwin(BarWindow *bw);
 void barwin_map(BarWindow *bw);
@@ -248,6 +255,7 @@ void uicb_set_nmaster(uicb_t);
 void init(void);
 void init_root(void);
 void init_font(void);
+void init_gc(void);
 void init_cursor(void);
 void init_key(void);
 void init_geometry(void);
@@ -266,7 +274,7 @@ void uicb_reload(uicb_t);
 
 /* Principal */
 Display *dpy;
-GC gc;
+GC gc, gc_stipple;
 int selscreen;
 Conf conf;
 Key *keys;
