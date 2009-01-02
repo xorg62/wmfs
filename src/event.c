@@ -118,7 +118,7 @@ clientmessageevent(XClientMessageEvent *ev)
 
           /* Manage _NET_ACTIVE_WINDOW */
           else if(mess_t == net_active_window)
-               if((c = client_gb_win((Window)ev->data.l[0])))
+               if((c = client_gb_win(ev->window)))
                     client_focus(c);
      }
 
@@ -180,9 +180,10 @@ configureevent(XEvent *ev)
           if(win_at.width != ev_at.width
              || win_at.height != ev_at.height)
           {
-               c->geo.width = geo.width = ev->xconfigure.width;
-               c->geo.height = geo.height = ev->xconfigure.height;
+               c->ogeo.width = c->geo.width = geo.width = ev->xconfigure.width;
+               c->ogeo.height = c->geo.height = geo.height = ev->xconfigure.height;
                frame_moveresize(c, geo);
+               client_moveresize(c, c->geo, False);
           }
 
           /* Win config (re-adjust it with the frame) */

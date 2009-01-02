@@ -503,7 +503,5 @@ uicb_togglemax(uicb_t cmd)
           tags[selscreen][seltag[selscreen]].layout.func();
      }
 
-
-
      return;
 }
