@@ -245,6 +245,7 @@ typedef struct
           int height;
           char *fg_normal;
           char *fg_focus;
+          Bool stipple;
           MouseBinding *mouse;
           int nmouse;
      } titlebar;

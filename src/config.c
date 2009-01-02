@@ -125,6 +125,7 @@ conf_client_section(cfg_t *cfg_c)
      /* Titlebar part */
      cfgtmp                  = cfg_getsec(cfg_c, "titlebar");
      conf.titlebar.height    = cfg_getint(cfgtmp, "height");
+     conf.titlebar.stipple   = cfg_getbool(cfgtmp, "stipple");
      conf.titlebar.fg_normal = alias_to_str(cfg_getstr(cfgtmp, "fg_normal"));
      conf.titlebar.fg_focus  = alias_to_str(cfg_getstr(cfgtmp, "fg_focus"));
      conf.titlebar.nmouse    = cfg_size(cfgtmp, "mouse");

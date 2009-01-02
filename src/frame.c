@@ -75,7 +75,7 @@ frame_create(Client *c)
                                       TBARH + BORDH,
                                       c->colors.frame,
                                       c->colors.fg,
-                                      True, True);
+                                      True, conf.titlebar.stipple);
 
      at.event_mask &= ~(EnterWindowMask | LeaveWindowMask); /* <- Delete useless mask */
 
