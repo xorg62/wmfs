@@ -143,6 +143,7 @@ client_focus(Client *c)
      if(sel && sel != c)
      {
           sel->colors.frame = conf.client.bordernormal;
+          sel->colors.fg = conf.titlebar.fg_normal;
           sel->colors.resizecorner = conf.client.resizecorner_normal;
           frame_update(sel);
           mouse_grabbuttons(sel, False);
@@ -153,6 +154,7 @@ client_focus(Client *c)
      if(c)
      {
           c->colors.frame = conf.client.borderfocus;
+          c->colors.fg = conf.titlebar.fg_focus;
           c->colors.resizecorner = conf.client.resizecorner_focus;
           frame_update(c);
           mouse_grabbuttons(c, True);

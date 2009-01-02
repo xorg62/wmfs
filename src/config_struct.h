@@ -72,9 +72,10 @@ cfg_opt_t root_opts[] =
 
 cfg_opt_t titlebar_opts[] =
 {
-     CFG_INT("height", 0,                 CFGF_NONE),
-     CFG_STR("fg",     "#FFFFFF",         CFGF_NONE),
-     CFG_SEC("mouse",  mouse_button_opts, CFGF_MULTI),
+     CFG_INT("height",     0,                 CFGF_NONE),
+     CFG_STR("fg_normal",  "#FFFFFF",         CFGF_NONE),
+     CFG_STR("fg_focus",   "#FFFFFF",         CFGF_NONE),
+     CFG_SEC("mouse",      mouse_button_opts, CFGF_MULTI),
      CFG_END()
 };
 

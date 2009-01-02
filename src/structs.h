@@ -133,6 +133,7 @@ struct Client
      struct
      {
           uint frame;
+          char *fg;
           uint resizecorner;
      } colors;
      /* Client Information */
@@ -241,7 +242,8 @@ typedef struct
      struct
      {
           int height;
-          char *fg;
+          char *fg_normal;
+          char *fg_focus;
           MouseBinding *mouse;
           int nmouse;
      } titlebar;

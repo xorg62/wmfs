@@ -55,6 +55,7 @@ frame_create(Client *c)
      c->frame_geo.y          = c->geo.y - TBARH;
      c->frame_geo.width      = FRAMEW(c->geo.width);
      c->frame_geo.height     = FRAMEH(c->geo.height);
+     c->colors.fg            = conf.titlebar.fg_normal;
      c->colors.frame         = conf.client.bordernormal;
      c->colors.resizecorner  = conf.client.resizecorner_normal;
 
@@ -187,7 +188,7 @@ frame_update(Client *c)
           draw_text(c->titlebar->dr,
                     (c->frame_geo.width / 2) - (textw(c->title) / 2),
                     (font->height - (font->descent))  + (((TBARH + BORDH) - font->height) / 2),
-                    conf.titlebar.fg, 0, c->title);
+                    c->colors.fg, 0, c->title);
           barwin_refresh(c->titlebar);
      }
 

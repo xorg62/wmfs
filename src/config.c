@@ -123,11 +123,12 @@ conf_client_section(cfg_t *cfg_c)
      mouse_section(conf.client.mouse, cfg_c, conf.client.nmouse);
 
      /* Titlebar part */
-     cfgtmp                = cfg_getsec(cfg_c, "titlebar");
-     conf.titlebar.height  = cfg_getint(cfgtmp, "height");
-     conf.titlebar.fg      = alias_to_str(cfg_getstr(cfgtmp, "fg"));
-     conf.titlebar.nmouse  = cfg_size(cfgtmp, "mouse");
-     conf.titlebar.mouse   = emalloc(conf.titlebar.nmouse, sizeof(MouseBinding));
+     cfgtmp                  = cfg_getsec(cfg_c, "titlebar");
+     conf.titlebar.height    = cfg_getint(cfgtmp, "height");
+     conf.titlebar.fg_normal = alias_to_str(cfg_getstr(cfgtmp, "fg_normal"));
+     conf.titlebar.fg_focus  = alias_to_str(cfg_getstr(cfgtmp, "fg_focus"));
+     conf.titlebar.nmouse    = cfg_size(cfgtmp, "mouse");
+     conf.titlebar.mouse     = emalloc(conf.titlebar.nmouse, sizeof(MouseBinding));
      mouse_section(conf.titlebar.mouse, cfgtmp, conf.titlebar.nmouse);
 
      return;
