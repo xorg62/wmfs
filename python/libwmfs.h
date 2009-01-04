@@ -53,6 +53,7 @@ PyObject* wmfs_tag_set(PyObject *self, PyObject *args);
 
 /* libwmfs.c */
 PyObject* wmfs_init(PyObject *self, PyObject *args);
+PyObject* wmfs_uicb(PyObject *self, PyObject *args);
 PyObject* wmfs_statustext(PyObject *self, PyObject *args);
 PyObject* wmfs_spawn(PyObject *self, PyObject *args);
 

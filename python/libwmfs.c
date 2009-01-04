@@ -36,6 +36,7 @@
 static PyMethodDef WmfsMethods[] =
 {
      {"init",               wmfs_init,           METH_VARARGS, "Init wmfs module"},
+     {"uicb",               wmfs_uicb,           METH_VARARGS, "Exec an uicb function"},
      {"statustext",         wmfs_statustext,     METH_VARARGS, "Wrote in the statustext"},
      {"tag_set",            wmfs_tag_set,        METH_VARARGS, "Set a tag"},
      {"screen_set",         wmfs_screen_set,     METH_VARARGS, "Set the selected screen"},
@@ -98,6 +99,32 @@ wmfs_init(PyObject *self, PyObject *args)
      XFree(ret);
 
      inited = True;
+
+     Py_INCREF(Py_None);
+
+     return Py_None;
+}
+
+PyObject*
+wmfs_uicb(PyObject *self, PyObject *args)
+{
+     long data[5];
+     char *func;
+     char *cmd;
+
+     if(!PyArg_ParseTuple(args, "ss", &func, &cmd))
+          return NULL;
+
+     data[4] = True;
+
+     XChangeProperty(dpy, ROOT, ATOM("_WMFS_FUNCTION"), ATOM("UTF8_STRING"),
+                     8, PropModeReplace, (unsigned char*)func, strlen(func));
+
+     XChangeProperty(dpy, ROOT, ATOM("_WMFS_CMD"), ATOM("UTF8_STRING"),
+                     8, PropModeReplace, (unsigned char*)cmd, strlen(cmd));
+
+     send_client_message("_WMFS_FUNCTION", data);
+     send_client_message("_WMFS_CMD", data);
 
      Py_INCREF(Py_None);
 
