@@ -124,7 +124,6 @@ wmfs_uicb(PyObject *self, PyObject *args)
                      8, PropModeReplace, (unsigned char*)cmd, strlen(cmd));
 
      send_client_message("_WMFS_FUNCTION", data);
-     send_client_message("_WMFS_CMD", data);
 
      Py_INCREF(Py_None);
 

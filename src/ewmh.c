@@ -79,9 +79,8 @@ ewmh_init_hints(void)
      net_atom[wmfs_current_screen]            = ATOM("_WMFS_CURRENT_SCREEN");
      net_atom[wmfs_current_layout]            = ATOM("_WMFS_CURRENT_LAYOUT");
      net_atom[wmfs_tag_names]                 = ATOM("_WMFS_TAG_NAMES");
-
-     net_atom[wmfs_function] = ATOM("_WMFS_FUNCTION");
-     net_atom[wmfs_cmd] = ATOM("_WMFS_CMD");
+     net_atom[wmfs_function]                  = ATOM("_WMFS_FUNCTION");
+     net_atom[wmfs_cmd]                       = ATOM("_WMFS_CMD");
 
      XChangeProperty(dpy, ROOT, net_atom[net_supported], XA_ATOM, 32,
                      PropModeReplace, (uchar*)net_atom, net_last);

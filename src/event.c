@@ -133,7 +133,6 @@ clientmessageevent(XClientMessageEvent *ev)
                     client_focus(c);
      }
 
-
      /* Manage _NET_WM_STATE */
      if(mess_t == net_wm_state)
           if((c = client_gb_win(ev->window)))
@@ -169,8 +168,9 @@ clientmessageevent(XClientMessageEvent *ev)
           }
      }
 
-
-     if(mess_t == wmfs_function && ev->data.l[4] == True)
+     /* Manage _WMFS_FUNCTION && _WMFS_CMD */
+     if((mess_t == wmfs_function && ev->data.l[4] == True)
+        || (mess_t == wmfs_cmd && ev->data.l[4] == True))
      {
           uchar *ret_func = NULL;
           uchar *ret_cmd = NULL;
