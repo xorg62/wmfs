@@ -33,6 +33,48 @@
 #include "config_struct.h"
 
 
+void
+conf_init_func_list(void)
+{
+     int i;
+
+     func_name_list_t tmp_list[] =
+          {
+               {"spawn",                   uicb_spawn },
+               {"client_kill",             uicb_client_kill },
+               {"client_prev",             uicb_client_prev },
+               {"client_next",             uicb_client_next },
+               {"toggle_max",              uicb_togglemax },
+               {"layout_next",             uicb_layout_next },
+               {"layout_prev",             uicb_layout_prev },
+               {"tag",                     uicb_tag },
+               {"tag_next",                uicb_tag_next },
+               {"tag_prev",                uicb_tag_prev },
+               {"tag_transfert",           uicb_tagtransfert },
+               {"set_mwfact",              uicb_set_mwfact },
+               {"set_nmaster",             uicb_set_nmaster },
+               {"quit",                    uicb_quit },
+               {"toggle_infobar_position", uicb_infobar_togglepos },
+               {"mouse_move",              uicb_mouse_move },
+               {"mouse_resize",            uicb_mouse_resize },
+               {"client_raise",            uicb_client_raise },
+               {"tile_switch",             uicb_tile_switch },
+               {"toggle_free",             uicb_togglefree },
+               {"screen_select",           uicb_screen_select },
+               {"screen_next",             uicb_screen_next },
+               {"screen_prev",             uicb_screen_prev },
+               {"reload",                  uicb_reload }
+          };
+
+     func_list = emalloc(LEN(tmp_list), sizeof(func_name_list_t));
+
+     for(i = 0; i < LEN(tmp_list); ++i)
+          func_list[i] = tmp_list[i];
+
+     return;
+}
+
+
 /* The following function are the
    different configuration section. {{{
 */
@@ -300,6 +342,8 @@ init_conf(void)
           cfg = cfg_init(opts, CFGF_NONE);
           ret = cfg_parse(cfg, final_path);
      }
+
+     conf_init_func_list();
 
      conf_alias_section(cfg_getsec(cfg, "alias"));
      conf_misc_section(cfg_getsec(cfg, "misc"));

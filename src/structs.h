@@ -78,8 +78,16 @@ enum
      net_wm_state_demands_attention,
      utf8_string,
      /* WMFS HINTS */
+     wmfs_running,
      wmfs_tag_names,
+     wmfs_current_tag,
+     wmfs_current_screen,
      wmfs_current_layout,
+     wmfs_set_screen,
+     wmfs_screen_count,
+     wmfs_statustext,
+     wmfs_function,
+     wmfs_cmd,
      net_last
 };
 

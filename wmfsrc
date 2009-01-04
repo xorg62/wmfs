@@ -82,8 +82,8 @@ client
         titlebar
         {
                 height     = 11
-                fg_normal  = "#003366"
-                fg_focus   = "#7E89A2"
+                fg_normal  = "#7E89A2"
+                fg_focus   = "#9F9AB3"
 
                 mouse { button = "1" func = "client_raise" }
                 mouse { button = "1" func = "mouse_move" }

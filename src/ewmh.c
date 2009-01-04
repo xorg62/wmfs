@@ -42,6 +42,8 @@
 void
 ewmh_init_hints(void)
 {
+     int i = 1;
+
      /* EWMH hints */
      net_atom[net_supported]                  = ATOM("_NET_SUPPORTED");
      net_atom[net_client_list]                = ATOM("_NET_CLIENT_LIST");
@@ -67,12 +69,25 @@ ewmh_init_hints(void)
      net_atom[net_wm_state_fullscreen]        = ATOM("_NET_WM_STATE_FULLSCREEN");
      net_atom[net_wm_state_demands_attention] = ATOM("_NET_WM_STATE_DEMANDS_ATTENTION");
      net_atom[utf8_string]                    = ATOM("UTF8_STRING");
+
      /* WMFS hints */
-     net_atom[wmfs_tag_names]                 = ATOM("_WMFS_TAG_NAMES");
+     net_atom[wmfs_running]                   = ATOM("_WMFS_RUNNING");
+     net_atom[wmfs_statustext]                = ATOM("_WMFS_STATUSTEXT");
+     net_atom[wmfs_set_screen]                = ATOM("_WMFS_SET_SCREEN");
+     net_atom[wmfs_screen_count]              = ATOM("_WMFS_SCREEN_COUNT");
+     net_atom[wmfs_current_tag]               = ATOM("_WMFS_CURRENT_TAG");
+     net_atom[wmfs_current_screen]            = ATOM("_WMFS_CURRENT_SCREEN");
      net_atom[wmfs_current_layout]            = ATOM("_WMFS_CURRENT_LAYOUT");
+     net_atom[wmfs_tag_names]                 = ATOM("_WMFS_TAG_NAMES");
+
+     net_atom[wmfs_function] = ATOM("_WMFS_FUNCTION");
+     net_atom[wmfs_cmd] = ATOM("_WMFS_CMD");
 
      XChangeProperty(dpy, ROOT, net_atom[net_supported], XA_ATOM, 32,
                      PropModeReplace, (uchar*)net_atom, net_last);
+
+     XChangeProperty(dpy, ROOT, net_atom[wmfs_running], XA_CARDINAL, 32,
+                     PropModeReplace, (uchar*)&i, 1);
 
      return;
 }
@@ -106,6 +121,11 @@ ewmh_get_current_desktop(void)
      /* Get current desktop (tag) */
      XChangeProperty(dpy, ROOT, net_atom[net_current_desktop], XA_CARDINAL, 32,
                      PropModeReplace, (uchar*)&t, 1);
+
+     /* Current tag name */
+     XChangeProperty(dpy, ROOT, net_atom[wmfs_current_tag], net_atom[utf8_string], 8,
+                     PropModeReplace, (uchar*)tags[selscreen][seltag[selscreen]].name,
+                     strlen(tags[selscreen][seltag[selscreen]].name));
 
      return;
 }
@@ -308,27 +328,3 @@ ewmh_manage_window_type(Client *c)
      return;
 }
 
-
-/** Get a Window WM State
- * \param win Window
- * \return The state
-*/
-long
-ewmh_get_wm_state(Window win)
-{
-     Atom rt;
-     int rf;
-     long ret = WithdrawnState;
-     ulong ir, il;
-     uchar *data;
-
-     if(XGetWindowProperty(dpy, win, net_atom[net_wm_state], 0L, 2L,
-                           False, net_atom[net_wm_state], &rt,
-                           &rf, &ir, &il, &data) == Success && ir)
-     {
-          ret = *(long *)data;
-          XFree(data);
-     }
-
-     return ret;
-}

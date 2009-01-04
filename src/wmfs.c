@@ -107,6 +107,7 @@ quit(void)
      free(infobar);
      free(seltag);
      free(keys);
+     free(func_list);
      free(conf.ntag);
      free(conf.titlebar.mouse);
      free(conf.client.mouse);
@@ -313,6 +314,8 @@ main(int argc, char **argv)
      XSetErrorHandler(errorhandler);
 
      /* Let's Go ! */
+
+     ewmh_init_hints();
      init_conf();
      init();
      scan();

@@ -135,13 +135,10 @@ infobar_draw_taglist(int sc)
           {
                if(c->screen == sc)
                {
-                    infobar[sc].tags[c->tag]->bg = ((c->tag == seltag[sc])
-                                                    ? conf.colors.tagselbg
-                                                    : conf.colors.tag_occupied_bg);
+                    infobar[sc].tags[c->tag]->bg = ((c->tag == seltag[sc]) ? conf.colors.tagselbg  : conf.colors.tag_occupied_bg);
                     barwin_refresh_color(infobar[sc].tags[i]);
                }
           }
-
           if(tags[sc][i].name)
                barwin_draw_text(infobar[sc].tags[i], PAD / 2, font->height, tags[sc][i].name);
      }

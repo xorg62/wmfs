@@ -44,7 +44,6 @@ init(void)
      init_key();
      init_root();
      screen_init_geo();
-     ewmh_init_hints();
      infobar_init();
      ewmh_get_current_desktop();
      grabkeys();

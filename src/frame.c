@@ -72,7 +72,7 @@ frame_create(Client *c)
      if(TBARH)
           c->titlebar = barwin_create(c->frame, 0, 0,
                                       c->frame_geo.width,
-                                      TBARH + BORDH,
+                                      TBARH + (c->geo.x - c->frame_geo.x),
                                       c->colors.frame,
                                       c->colors.fg,
                                       True, conf.titlebar.stipple);
@@ -191,8 +191,7 @@ frame_update(Client *c)
      XClearWindow(dpy, c->bottom);
 
      if(TBARH && (TBARH + BORDH + 1) > font->height)
-          barwin_draw_text(c->titlebar,
-                           (c->frame_geo.width / 2) - (textw(c->title) / 2),
+          barwin_draw_text(c->titlebar, (c->frame_geo.width / 2) - (textw(c->title) / 2),
                            (font->height - (font->descent)) + (((TBARH + BORDH) - font->height) / 2),
                            c->title);
 

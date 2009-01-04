@@ -80,7 +80,7 @@
 #define FRAMEH(h)    h + (BORDH * 2) + TBARH
 #define RESHW        5 * BORDH
 #define CHECK(x)     if(!x) return
-#define ITOA(p ,n)   sprintf(p, "%d", n)
+#define LEN(x)       (sizeof(x) / sizeof(x[0]))
 #define deb(p)       fprintf(stderr, "debug: %d\n", p)
 #define PAD          14
 
@@ -157,7 +157,6 @@ void ewmh_set_desktop_geometry(void);
 void ewmh_set_workarea(void);
 void ewmh_manage_net_wm_state(long data_l[], Client *c);
 void ewmh_manage_window_type(Client *c);
-long ewmh_get_wm_state(Window win);
 
 /* frame.c */
 void frame_create(Client *c);
@@ -203,7 +202,7 @@ void *emalloc(uint element, uint size);
 ulong getcolor(char *color);
 void setwinstate(Window win, long state);
 /* Conf usage {{{ */
-void* name_to_func(char *name, func_name_list_t l[]);
+void* name_to_func(char *name, func_name_list_t *l);
 ulong char_to_modkey(char *name, key_name_list_t key_l[]);
 uint char_to_button(char *name, name_to_uint_t blist[]);
 Layout layout_name_to_struct(Layout lt[], char *name, int n, func_name_list_t llist[]);
@@ -297,6 +296,7 @@ Client *clients;
 Client *sel;
 
 /* Other */
+func_name_list_t *func_list;
 uint numlockmask;
 
 #endif /* WMFS_H */

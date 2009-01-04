@@ -45,6 +45,10 @@ screen_count(void)
      else
           n = ScreenCount(dpy);
 
+     /* Set _WMFS_SCREEN_COUNT */
+     XChangeProperty(dpy, ROOT, net_atom[wmfs_screen_count], XA_CARDINAL, 32,
+                     PropModeReplace, (uchar*)&n, 1);
+
      return n;
 }
 
@@ -135,6 +139,10 @@ screen_get_sel(void)
           XQueryPointer(dpy, ROOT, &w, &w, &x, &y, &d, &d, (uint *)&u);
 
           selscreen = screen_get_with_geo(x, y);
+
+          /* Set _WMFS_CURRENT_SCREEN */
+          XChangeProperty(dpy, ROOT, net_atom[wmfs_current_screen], XA_CARDINAL, 32,
+                          PropModeReplace, (uchar*)&selscreen, 1);
      }
 
      return selscreen;

@@ -32,6 +32,8 @@
 
 #include "wmfs.h"
 
+//#include "config_struct.h"
+
 /** ButtonPress handle event
  * \param ev XButtonEvent pointer
 */
@@ -100,6 +102,9 @@ clientmessageevent(XClientMessageEvent *ev)
 {
      Client *c;
      int i, mess_t = 0;
+     Atom rt;
+     int rf;
+     ulong ir, il;
 
      if(ev->format != 32)
           return;
@@ -116,24 +121,86 @@ clientmessageevent(XClientMessageEvent *ev)
              && ev->data.l[0] < conf.ntag[selscreen])
                tag_set((int)(ev->data.l[0] + 1));
 
+          /* Manage _WMFS_SET_SCREEN */
+          if(mess_t == wmfs_set_screen
+             && ev->data.l[0] >= 0
+             && ev->data.l[0] <= screen_count())
+               screen_set_sel((int)(ev->data.l[0]));
+
           /* Manage _NET_ACTIVE_WINDOW */
           else if(mess_t == net_active_window)
                if((c = client_gb_win(ev->window)))
                     client_focus(c);
      }
 
+
      /* Manage _NET_WM_STATE */
      if(mess_t == net_wm_state)
           if((c = client_gb_win(ev->window)))
                ewmh_manage_net_wm_state(ev->data.l, c);
+
      /* Manage _NET_CLOSE_WINDOW */
      if(mess_t == net_close_window)
           if((c = client_gb_win(ev->window)))
                client_kill(c);
+
      /* Manage _NET_WM_DESKTOP */
      if(mess_t == net_wm_desktop)
           if((c = client_gb_win(ev->window)))
                tag_transfert(c, ev->data.l[0]);
+
+     /* Manage _WMFS_STATUSTEXT */
+     if(mess_t == wmfs_statustext && ev->data.l[4] == True)
+     {
+          uchar *ret;
+
+          if(XGetWindowProperty(dpy, ROOT, net_atom[wmfs_statustext], 0, 4096,
+                                False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret) == Success)
+          {
+               for(i = 0; i < LEN(statustext); ++i)
+                    statustext[i] = 0;
+
+               strcpy(statustext, (char*)ret);
+
+               for(i = 0; i < screen_count(); ++i)
+                    infobar_draw(i);
+
+               XFree(ret);
+          }
+     }
+
+
+     if(mess_t == wmfs_function && ev->data.l[4] == True)
+     {
+          uchar *ret_func = NULL;
+          uchar *ret_cmd = NULL;
+          char *cmd;
+
+          if(XGetWindowProperty(dpy, ROOT, net_atom[wmfs_function], 0, 4096,
+                                False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret_func) == Success)
+               printf("--> %s -> ", ret_func);
+
+          if(XGetWindowProperty(dpy, ROOT, net_atom[wmfs_cmd], 0, 4096,
+                                False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret_cmd) == Success)
+               printf("%s\n", ret_cmd);
+
+          if(strcmp((char*)ret_cmd, "NULL") == 0)
+               cmd = NULL;
+          else
+               strcpy(cmd, (char*)ret_cmd);
+
+          void (*func)(uicb_t) = name_to_func((char*)ret_func, func_list);
+
+               func(cmd);
+
+          if(ret_cmd)
+               XFree(ret_cmd);
+
+          if(ret_func)
+               XFree(ret_func);
+     }
+
+
 
 
      return;

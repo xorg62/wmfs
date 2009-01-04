@@ -172,34 +172,6 @@ cfg_opt_t opts[] =
      CFG_END()
 };
 
-func_name_list_t func_list[] =
-{
-     {"spawn",                   uicb_spawn },
-     {"client_kill",             uicb_client_kill },
-     {"client_prev",             uicb_client_prev },
-     {"client_next",             uicb_client_next },
-     {"toggle_max",              uicb_togglemax },
-     {"layout_next",             uicb_layout_next },
-     {"layout_prev",             uicb_layout_prev },
-     {"tag",                     uicb_tag },
-     {"tag_next",                uicb_tag_next },
-     {"tag_prev",                uicb_tag_prev },
-     {"tag_transfert",           uicb_tagtransfert },
-     {"set_mwfact",              uicb_set_mwfact },
-     {"set_nmaster",             uicb_set_nmaster },
-     {"quit",                    uicb_quit },
-     {"toggle_infobar_position", uicb_infobar_togglepos },
-     {"mouse_move",              uicb_mouse_move },
-     {"mouse_resize",            uicb_mouse_resize },
-     {"client_raise",            uicb_client_raise },
-     {"tile_switch",             uicb_tile_switch },
-     {"toggle_free",             uicb_togglefree },
-     {"screen_select",           uicb_screen_select },
-     {"screen_next",             uicb_screen_next },
-     {"screen_prev",             uicb_screen_prev },
-     {"reload",                  uicb_reload }
-};
-
 func_name_list_t layout_list[] =
 {
      {"tile_right",  tile },

@@ -108,7 +108,7 @@ setwinstate(Window win, long state)
    usage. {{{
 */
 void*
-name_to_func(char *name, func_name_list_t l[])
+name_to_func(char *name, func_name_list_t *l)
 {
      int i;
 
