@@ -174,21 +174,12 @@ clientmessageevent(XClientMessageEvent *ev)
      {
           uchar *ret_func = NULL;
           uchar *ret_cmd = NULL;
-          char *cmd = NULL;
 
-          if(XGetWindowProperty(dpy, ROOT, net_atom[wmfs_function], 0, 4096,
-                                False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret_func) == Success)
-               printf("--> %s -> ", ret_func);
+          XGetWindowProperty(dpy, ROOT, net_atom[wmfs_function], 0, 4096,
+                             False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret_func);
 
-          if(XGetWindowProperty(dpy, ROOT, net_atom[wmfs_cmd], 0, 4096,
-                                False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret_cmd) == Success)
-               printf("%s\n", ret_cmd);
-/*
-          if(strcmp((char*)ret_cmd, "NULL") == 0)
-               cmd = NULL;
-               else
-          if(ret_cmd != NULL)
-               strcpy(cmd, (char*)ret_cmd)*/
+          XGetWindowProperty(dpy, ROOT, net_atom[wmfs_cmd], 0, 4096,
+                             False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret_cmd);
 
           void (*func)(uicb_t) = name_to_func((char*)ret_func, func_list);
 
@@ -200,8 +191,6 @@ clientmessageevent(XClientMessageEvent *ev)
           if(ret_func)
                XFree(ret_func);
      }
-
-
 
 
      return;
