@@ -157,9 +157,11 @@ wmfs_spawn(PyObject *self, PyObject *args)
 {
      char *arg, *sh;
 
+     int t,tt,st;
+
      Py_INCREF(Py_None);
 
-     if(!PyArg_ParseTuple(args, "s", &arg))
+     if(!PyArg_ParseTuple(args, "(i|i)s", &t, &tt, &st, &arg))
           return NULL;
 
      if(!(sh = getenv("SHELL")))
@@ -177,6 +179,7 @@ wmfs_spawn(PyObject *self, PyObject *args)
           exit(EXIT_SUCCESS);
      }
 
+     printf("t: %d, tt: %d, st %d\n",t, tt, st);
 
      return Py_None;
 }

@@ -90,7 +90,8 @@ BarWindow *barwin_create(Window parent,
                          uint w, uint h,
                          uint bg, char*fg,
                          Bool entermask,
-                         Bool stipple);
+                         Bool stipple,
+                         Bool border);
 
 void barwin_draw_text(BarWindow *bw, int x, int y, char *text);
 void barwin_delete(BarWindow *bw);

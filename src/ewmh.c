@@ -271,11 +271,7 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
      else if(data_l[1] == net_atom[net_wm_state_demands_attention])
      {
           if(data_l[0] == _NET_WM_STATE_ADD)
-          {
-               screen_set_sel(c->screen);
-               tag_set(c->tag);
                client_focus(c);
-          }
           if(data_l[0] == _NET_WM_STATE_REMOVE)
                if(c == sel)
                     client_focus(NULL);

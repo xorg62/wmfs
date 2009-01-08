@@ -109,7 +109,7 @@ typedef struct
      uint bg;
      char *fg;
      XRectangle geo;
-     Bool mapped, stipple;
+     Bool mapped, stipple, bord;
 } BarWindow;
 
 /* Client Structure. */

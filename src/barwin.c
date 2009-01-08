@@ -51,7 +51,8 @@ barwin_create(Window parent,
               uint bg,
               char *fg,
               Bool entermask,
-              Bool stipple)
+              Bool stipple,
+              Bool border)
 {
      XSetWindowAttributes at;
      BarWindow *bw;
@@ -76,10 +77,15 @@ barwin_create(Window parent,
      bw->dr = XCreatePixmap(dpy, parent, w, h, DefaultDepth(dpy, SCREEN));
 
      /* His border */
-     CWIN(bw->border.left, bw->win, 0, 0, SHADH, h, 0, CWBackPixel, color_enlight(bg), &at);
-     CWIN(bw->border.top, bw->win, 0, 0, w, SHADH, 0, CWBackPixel, color_enlight(bg), &at);
-     CWIN(bw->border.bottom, bw->win, 0, h - SHADH, w, SHADH, 0, CWBackPixel, SHADC, &at);
-     CWIN(bw->border.right, bw->win, w - SHADH, 0, SHADH, h, 0, CWBackPixel, SHADC, &at);
+     if(border)
+     {
+          bw->bord = True;
+
+          CWIN(bw->border.left, bw->win, 0, 0, SHADH, h, 0, CWBackPixel, color_enlight(bg), &at);
+          CWIN(bw->border.top, bw->win, 0, 0, w, SHADH, 0, CWBackPixel, color_enlight(bg), &at);
+          CWIN(bw->border.bottom, bw->win, 0, h - SHADH, w, SHADH, 0, CWBackPixel, SHADC, &at);
+          CWIN(bw->border.right, bw->win, w - SHADH, 0, SHADH, h, 0, CWBackPixel, SHADC, &at);
+     }
 
      /* Property */
      bw->geo.x = x;
@@ -236,11 +242,13 @@ barwin_resize(BarWindow *bw, uint w, uint h)
      XResizeWindow(dpy, bw->win, w, h);
 
      /* Border */
-     XResizeWindow(dpy, bw->border.left, SHADH, h);
-     XResizeWindow(dpy, bw->border.top, w, SHADH);
-     XResizeWindow(dpy, bw->border.bottom, w, SHADH);
-     XMoveResizeWindow(dpy, bw->border.right, w - SHADH, 0, SHADH, h);
-
+     if(bw->bord)
+     {
+          XResizeWindow(dpy, bw->border.left, SHADH, h);
+          XResizeWindow(dpy, bw->border.top, w, SHADH);
+          XResizeWindow(dpy, bw->border.bottom, w, SHADH);
+          XMoveResizeWindow(dpy, bw->border.right, w - SHADH, 0, SHADH, h);
+     }
 
      return;
 }
@@ -261,15 +269,18 @@ barwin_refresh_color(BarWindow *bw)
           XFillRectangle(dpy, bw->dr, gc_stipple, 3, 2, bw->geo.width - 6, bw->geo.height - 4);
      }
 
-     XSetWindowBackground(dpy, bw->border.left, bw->border.light);
-     XSetWindowBackground(dpy, bw->border.top, bw->border.light);
-     XSetWindowBackground(dpy, bw->border.bottom, bw->border.dark);
-     XSetWindowBackground(dpy, bw->border.right, bw->border.dark);
+     if(bw->bord)
+     {
+          XSetWindowBackground(dpy, bw->border.left, bw->border.light);
+          XSetWindowBackground(dpy, bw->border.top, bw->border.light);
+          XSetWindowBackground(dpy, bw->border.bottom, bw->border.dark);
+          XSetWindowBackground(dpy, bw->border.right, bw->border.dark);
 
-     XClearWindow(dpy, bw->border.left);
-     XClearWindow(dpy, bw->border.top);
-     XClearWindow(dpy, bw->border.bottom);
-     XClearWindow(dpy, bw->border.right);
+          XClearWindow(dpy, bw->border.left);
+          XClearWindow(dpy, bw->border.top);
+          XClearWindow(dpy, bw->border.bottom);
+          XClearWindow(dpy, bw->border.right);
+     }
 
      return;
 }

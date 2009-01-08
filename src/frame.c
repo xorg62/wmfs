@@ -71,11 +71,11 @@ frame_create(Client *c)
      /* Create titlebar window */
      if(TBARH)
           c->titlebar = barwin_create(c->frame, 0, 0,
-                                      c->frame_geo.width,
+                                      c->frame_geo.width ,
                                       TBARH + (c->geo.x - c->frame_geo.x),
                                       c->colors.frame,
                                       c->colors.fg,
-                                      True, conf.titlebar.stipple);
+                                      True, conf.titlebar.stipple, False);
 
      at.event_mask &= ~(EnterWindowMask | LeaveWindowMask); /* <- Delete useless mask */
 

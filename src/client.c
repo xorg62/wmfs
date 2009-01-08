@@ -341,6 +341,7 @@ client_map(Client *c)
           barwin_map(c->titlebar);
           barwin_map_subwin(c->titlebar);
      }
+     XMapSubwindows(dpy, c->frame);
      c->unmapped = False;
 
      return;
