@@ -92,9 +92,9 @@ wmfs_init(PyObject *self, PyObject *args)
      /* Else, exit. */
      if(!ret)
      {
-          fprintf(stderr, "WMFS is not running.\n");
           XFree(ret);
-          exit(EXIT_FAILURE);
+          PyErr_SetString(WmfsInitError, "WMFS not running?");
+          return NULL;
      }
      XFree(ret);
 
