@@ -189,10 +189,10 @@ initwmfs(void)
      if(m == NULL)
           return;
 
-     WmfsInitError = PyErr_NewException("wmfs.error", NULL, NULL);
+     WmfsInitError = PyErr_NewException("wmfs.WmfsInitError", NULL, NULL);
 
      Py_INCREF(WmfsInitError);
-     PyModule_AddObject(m, "error", WmfsInitError);
+     PyModule_AddObject(m, "WmfsInitError", WmfsInitError);
 }
 
 int
