@@ -314,7 +314,6 @@ main(int argc, char **argv)
      XSetErrorHandler(errorhandler);
 
      /* Let's Go ! */
-
      ewmh_init_hints();
      init_conf();
      init();

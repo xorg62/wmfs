@@ -183,7 +183,8 @@ clientmessageevent(XClientMessageEvent *ev)
 
           void (*func)(uicb_t) = name_to_func((char*)ret_func, func_list);
 
-          func((uicb_t)ret_cmd);
+          if(func)
+               func((uicb_t)ret_cmd);
 
           if(ret_cmd)
                XFree(ret_cmd);

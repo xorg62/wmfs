@@ -1,4 +1,4 @@
-/*
+3*
  *      tag_func.c
  *      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.com>
  *      All rights reserved.

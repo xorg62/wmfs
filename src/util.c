@@ -75,7 +75,6 @@ color_enlight(ulong col)
           return col + 0x333333;
      else
           return col;
-
 }
 
 /** Round function

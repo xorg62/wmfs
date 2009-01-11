@@ -142,7 +142,7 @@ mouse_grabbuttons(Client *c, Bool focused)
 
      XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
      if(focused)
-          for(i = 0; i < (sizeof but / sizeof but[0]); ++i)
+          for(i = 0; i < LEN(but); ++i)
           {
                XGrabButton(dpy, but[i], conf.client.mod, c->win, False,
                            ButtonMask, GrabModeAsync,GrabModeSync, None, None);
