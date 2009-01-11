@@ -18,6 +18,7 @@
       exit, quit                       Quit wmfs-shell.\n\
       uicb_list                        Print all uicb wmfs function.\n\
       exec(<uicb func name>, <arg>)    Execute a Wmfs uicb function.\n\
+      statustext(text)                 Print text in the wmfs bar.\n\
       spawn(<command>)                 Execute a system command.\n\n"
 #define UICBLIST \
      "Here is a list of all wmfs's uicb functions that are usable with the exec function:   \n\

@@ -45,6 +45,21 @@ spawn(char* arg)
      return;
 }
 
+void
+statustext(char *text)
+{
+     long data[5];
+
+     data[4] = True;
+
+     XChangeProperty(dpy, ROOT, ATOM("_WMFS_STATUSTEXT"), ATOM("UTF8_STRING"),
+                     8, PropModeReplace, (unsigned char*)text, strlen(text));
+
+     send_client_message("_WMFS_STATUSTEXT", data);
+
+     return;
+}
+
 
 void
 exec_uicb_function(char *func, char *cmd)
@@ -130,6 +145,13 @@ manage_input(char *input)
                          args[1] = NULL;
                     exec_uicb_function(args[0], args[1]);
                }
+          }
+          else if(!strcmp(func, "statustext"))
+          {
+               if(v > 0 || !args[0])
+                    printf("Statustext: statustext(<text>), Print text in the wmfs bar.\n");
+               else
+                    statustext(args[0]);
           }
           else if(!strcmp(func, "spawn"))
           {
