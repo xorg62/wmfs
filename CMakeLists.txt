@@ -24,6 +24,7 @@ option(GENERATE_MANPAGES "generate manpages" ON)
 
 # Project name - wmfs
 set(PROJECT_NAME wmfs)
+set(PROJECT_NAME_SHELL wmfs-shell)
 project(${PROJECT_NAME} C)
 
 # Definition of the wmfs source
@@ -43,9 +44,12 @@ set(wmfs_src
   src/tag.c
   src/util.c
   src/wmfs.c)
+set(wmfs-shell_src
+  shell/wmfs-shell.c)
 
 # Set the executable from the wmfs_src
 add_executable(wmfs ${wmfs_src})
+add_executable(wmfs-shell ${wmfs-shell_src})
 
 # Set the version - NOT USED AT THE MOMENT
 set(VERSION "0.1rc3 (Empty Spaces)")
@@ -75,6 +79,18 @@ else (X11_FOUND)
   message(FATAL_ERROR "Could not find X11")
 endif (X11_FOUND)
 
+find_package(PythonInterp)
+if(PYTHONINTERP_FOUND)
+else(PYTHONINTERP_FOUND)
+  message(FATAL_ERROR "Could not find Python interpreter")
+endif(PYTHONINTERP_FOUND)
+
+find_package(PythonLibs)
+if(PYTHONLIBS_FOUND)
+else(PYTHONLIBS_FOUND)
+  message(FATAL_ERROR "Could not find Python libs")
+endif(PYTHONLIBS_FOUND)
+
 # Link Libraries
 set(LIBRARIES_TO_LINK
   ${FREETYPE_LIBRARIES}
@@ -82,8 +98,11 @@ set(LIBRARIES_TO_LINK
   confuse
   Xft
   Xinerama)
+set(SHELL_LINK_LIBS
+  ${X11_LIBRARIES})
 
 target_link_libraries(wmfs ${LIBRARIES_TO_LINK})
+target_link_libraries(wmfs-shell ${SHELL_LINK_LIBS})
 
 # Messages
 message("Project version: ${VERSION}")
@@ -146,6 +165,17 @@ execute_process(
   )
 
 endif()
+
+# Build python lib
+add_custom_command(
+  COMMAND ${PYTHON_EXECUTABLE}
+  ARGS    python/setup.py build
+  WORKING_DIRECTORY ${SOURCE_DIR}
+  COMMENT "Building python lib"
+  TARGET  ${SOURCE_DIR}
+  )
+add_custom_target(python_lib)
+add_dependencies(${PROJECT_NAME} python_lib)
 
 # {{{ Check if documentation can be build
 if(GENERATE_MANPAGES)
@@ -282,7 +312,7 @@ set(PROJECT_CHANGELOG ${SOURCE_DIR}/CHANGELOG)
 set(PROJECT_DEFAULT_CONF ${SOURCE_DIR}/wmfsrc)
 
 # installs
-install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME_SHELL} RUNTIME DESTINATION bin)
 if(WITH_LOGOS)
   set(PROJECT_LOGOS ${PROJECT_DATA_PATH}/logos)
   set(PROJECT_LOGOS_DIR ${SOURCE_DIR}/logos)
