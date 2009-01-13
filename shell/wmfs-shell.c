@@ -1,6 +1,35 @@
 #include "wmfs-shell.h"
 
 void
+init(void)
+{
+     Atom rt;
+     int rf;
+     unsigned long ir, il;
+     unsigned char *ret;
+
+     /* Init display */
+     if(!(dpy = XOpenDisplay(NULL)))
+     {
+          fprintf(stderr, "wmfs-shell: Wmfs is probably not running: cannot open X server. \n");
+          exit(EXIT_SUCCESS);
+     }
+
+     /* Check if wmfs is running */
+     XGetWindowProperty(dpy, ROOT, ATOM("_WMFS_RUNNING"), 0L, 4096,
+                        False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret);
+
+     if(!ret)
+     {
+          XFree(ret);
+          fprintf(stderr, "Wmfs is not running. ( _WMFS_RUNNING not present)\n");
+          exit(EXIT_FAILURE);
+     }
+
+     return;
+}
+
+void
 send_client_message(char* atom_name, long data_l[5])
 {
      XEvent ev;
@@ -89,12 +118,11 @@ manage_input(char *input)
      char **args;
      int i, v = 0;
 
-
      if(!strcmp(input, "clear"))
           printf(CLEAR);
      else if(!strcmp(input, "exit")
         || !strcmp(input, "quit"))
-          exit(EXIT_FAILURE);
+          exit(EXIT_SUCCESS);
      else if(!strcmp(input, "help")
              || !strcmp(input, "list"))
           printf(HELPSTR);
@@ -164,17 +192,15 @@ manage_input(char *input)
           free(args);
      }
 
-
      return;
 }
 
 int
 main(void)
 {
-     char *input, *p, c;
+    char *input, *p, c;
 
-     if(!(dpy = XOpenDisplay(NULL)))
-          fprintf(stderr, "wmfs-shell: Wmfs is probably not running: cannot open X server. \n");
+     init();
 
      for(;;)
      {
