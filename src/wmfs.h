@@ -61,27 +61,29 @@
 #define MouseMask    (ButtonMask | PointerMotionMask)
 #define KeyMask      (KeyPressMask | KeyReleaseMask)
 
-#define CWIN(win, parent, x, y, w, h, b, mask, col, at)                 \
-     win = XCreateWindow(dpy, parent, x, y, w, h, b, CopyFromParent,    \
-                         InputOutput, CopyFromParent, mask, at);        \
-     XSetWindowBackground(dpy, win, col);
+#define CWIN(win, parent, x, y, w, h, b, mask, col, at)                             \
+    do {                                                                            \
+        win = XCreateWindow(dpy, (parent), (x), (y), (w), (h), (b), CopyFromParent, \
+        InputOutput, CopyFromParent, (mask), (at));                                 \
+        XSetWindowBackground(dpy, win, (col));                                      \
+    } while (/*CONSTCOND*/0)
 
 #define SCREEN       DefaultScreen(dpy)
 #define ROOT         RootWindow(dpy, SCREEN)
 #define MAXH         DisplayHeight(dpy, DefaultScreen(dpy))
 #define MAXW         DisplayWidth(dpy, DefaultScreen(dpy))
-#define ATOM(a)      XInternAtom(dpy, a, False)
-#define INFOBARH     font->height * 1.5
+#define ATOM(a)      XInternAtom(dpy, (a), False)
+#define INFOBARH     (font->height * 1.5)
 #define SHADH        1
 #define SHADC        0x000000 /* 'Cause i don't know how darken a color yet */
 #define BORDH        conf.client.borderheight
 #define TBARH        conf.titlebar.height
-#define FRAMEW(w)    w + BORDH * 2
-#define FRAMEH(h)    h + (BORDH * 2) + TBARH
-#define RESHW        5 * BORDH
-#define CHECK(x)     if(!x) return
-#define LEN(x)       (sizeof(x) / sizeof(x[0]))
-#define deb(p)       fprintf(stderr, "debug: %d\n", p)
+#define FRAMEW(w)    ((w) + BORDH * 2)
+#define FRAMEH(h)    ((h) + (BORDH * 2) + TBARH)
+#define RESHW        (5 * BORDH)
+#define CHECK(x)     if(!(x)) return
+#define LEN(x)       (sizeof(x) / sizeof((x)[0]))
+#define deb(p)       fprintf(stderr, "debug: %d\n", (p))
 #define PAD          14
 
 /* barwin.c */
