@@ -66,7 +66,7 @@ infobar_init(void)
                barwin_map_subwin(infobar[sc].tags[i]);
           }
 
-          /* Create layout switch & layout type switch barwindow */
+          /* Create layout switch barwindow */
           infobar[sc].layout_button = barwin_create(infobar[sc].bar->win, j + PAD / 2, 0,
                                                     textw(tags[sc][seltag[sc]].layout.symbol) + PAD,
                                                     infobar[sc].geo.height,
@@ -199,3 +199,81 @@ uicb_infobar_togglepos(uicb_t cmd)
 
      return;
 }
+
+void
+uicb_launcher(uicb_t cmd)
+{
+     XEvent ev;
+     KeySym ks;
+     char tmp[32] = { 0 };
+     char buf[512] = { 0 };
+     int pos = 0;
+     int lrun = 1;
+     BarWindow *launch = barwin_create(infobar[screen_get_sel()].bar->win,
+                                       /* X */
+                                       (infobar[selscreen].layout_button->geo.x
+                                        + textw(tags[selscreen][seltag[selscreen]].layout.symbol) + PAD),
+                                       /* Y */
+                                       0,
+                                       /* WIDTH */
+                                       (sgeo[selscreen].width
+                                        - (infobar[selscreen].layout_button->geo.x
+                                           + textw(tags[selscreen][seltag[selscreen]].layout.symbol) + PAD)),
+                                       /* HEIGHT */
+                                       infobar[selscreen].geo.height,
+                                       /* COLOR */
+                                       conf.colors.bar, conf.colors.text,
+                                       /* OPTION */
+                                       False, False, False);
+     barwin_map(launch);
+     barwin_map_subwin(launch);
+     barwin_refresh_color(launch);
+     /* Draw Prompt */
+     barwin_draw_text(launch, 2, font->height, LPROMPT);
+     barwin_refresh(launch);
+
+     while(XGrabKeyboard(dpy, ROOT, True, GrabModeAsync,
+                         GrabModeAsync, CurrentTime) != GrabSuccess)
+          sleep(500);
+
+
+     while(lrun)
+     {
+          if(ev.type == KeyPress)
+          {
+               XLookupString(&ev.xkey, tmp, sizeof(tmp), &ks, 0);
+
+               switch(ks)
+               {
+               case XK_Return:
+                    uicb_spawn(buf);
+                    lrun = 0;
+                    break;
+               case XK_Escape:
+                    lrun = 0;
+                    break;
+               case XK_BackSpace:
+                    if(pos)
+                         buf[--pos] = 0;
+                    break;
+               default:
+                    strncat(buf, tmp, sizeof(buf));
+                    ++pos;
+                    break;
+               }
+               barwin_refresh_color(launch);
+               barwin_draw_text(launch, 2, font->height, LPROMPT);
+               barwin_draw_text(launch, textw(LPROMPT) + 2, font->height, buf);
+               barwin_refresh(launch);
+          }
+          /* else getevent(ev); */
+          XNextEvent(dpy, &ev);
+     }
+     XUngrabKeyboard(dpy, CurrentTime);
+     barwin_delete(launch);
+
+     return;
+}
+
+
+

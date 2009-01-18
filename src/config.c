@@ -63,7 +63,8 @@ conf_init_func_list(void)
                {"screen_select",           uicb_screen_select },
                {"screen_next",             uicb_screen_next },
                {"screen_prev",             uicb_screen_prev },
-               {"reload",                  uicb_reload }
+               {"reload",                  uicb_reload },
+               {"launcher",                uicb_launcher }
           };
 
      func_list = emalloc(LEN(tmp_list), sizeof(func_name_list_t));

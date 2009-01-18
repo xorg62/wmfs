@@ -118,6 +118,7 @@ keys
         key { mod = {"Alt", "Shift"} key = "l" func = "set_nmaster" cmd = "+1" }
         key { mod = {"Alt", "Shift"} key = "h" func = "set_nmaster" cmd = "-1" }
 
+        key { mod = { "Alt" } key = "p" func = "launcher" }
 
 # tag manipulation keybind
         key { mod = {"Alt"} key = "F1" func = "tag" cmd = "1" }

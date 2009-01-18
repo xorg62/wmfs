@@ -84,7 +84,8 @@
 #define CHECK(x)     if(!(x)) return
 #define LEN(x)       (sizeof(x) / sizeof((x)[0]))
 #define deb(p)       fprintf(stderr, "debug: %d\n", (p))
-#define PAD          14
+#define PAD          (14)
+#define LPROMPT      "Exec:  "
 
 /* barwin.c */
 BarWindow *barwin_create(Window parent,
@@ -119,6 +120,7 @@ void infobar_draw_layout(int sc);
 void infobar_draw_taglist(int sc);
 void infobar_destroy(void);
 void uicb_infobar_togglepos(uicb_t);
+void uicb_launcher(uicb_t);
 
 /* client.c */
 void client_attach(Client *c);
