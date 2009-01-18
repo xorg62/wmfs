@@ -200,6 +200,11 @@ uicb_infobar_togglepos(uicb_t cmd)
      return;
 }
 
+/** Create a launcher in the infobar for execute
+ *  a system command (with spawn)
+ * \param cmd uicb_t type unused
+ * \todo manage Home, End and arrows key
+ */
 void
 uicb_launcher(uicb_t cmd)
 {
@@ -235,12 +240,17 @@ uicb_launcher(uicb_t cmd)
                          GrabModeAsync, CurrentTime) != GrabSuccess)
           sleep(500);
 
-
      while(lrun)
      {
           if(ev.type == KeyPress)
           {
                XLookupString(&ev.xkey, tmp, sizeof(tmp), &ks, 0);
+
+               /* Check Ctrl-c / Ctrl-d */
+               if(ev.xkey.state & ControlMask)
+                    if(ks == XK_c
+                       || ks == XK_d)
+                         ks = XK_Escape;
 
                switch(ks)
                {
@@ -262,7 +272,7 @@ uicb_launcher(uicb_t cmd)
                }
                barwin_refresh_color(launch);
                barwin_draw_text(launch, 2, font->height, LPROMPT);
-               barwin_draw_text(launch, textw(LPROMPT) + 2, font->height, buf);
+               barwin_draw_text(launch, textw(LPROMPT) + textw(" "), font->height, buf);
                barwin_refresh(launch);
           }
           else
