@@ -18,6 +18,7 @@
       exit, quit                       Quit wmfs-shell.\n\
       uicb_list                        Print all uicb wmfs function.\n\
       exec(<uicb func name>, <arg>)    Execute a Wmfs uicb function.\n\
+      tag_set(<tag number>)            Change the current tag\n\
       statustext(text)                 Print text in the wmfs bar.\n\
       spawn(<command>)                 Execute a system command.\n\n"
 #define UICBLIST \

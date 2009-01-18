@@ -53,7 +53,7 @@ infobar_init(void)
           /* Create infobar barwindow */
           infobar[sc].bar = barwin_create(ROOT, sgeo[sc].x - BORDH, infobar[sc].geo.y,
                                           sgeo[sc].width, infobar[sc].geo.height,
-                                          conf.colors.bar, conf.colors.text, False, False, True);
+                                          conf.colors.bar, conf.colors.text, False, False, conf.border.bar);
 
           /* Create tags window */
           for(i = 1; i < conf.ntag[sc] + 1; ++i)
@@ -61,7 +61,7 @@ infobar_init(void)
                infobar[sc].tags[i] = barwin_create(infobar[sc].bar->win, j, 0,
                                                    textw(tags[sc][i].name) + PAD,
                                                    infobar[sc].geo.height,
-                                                   conf.colors.bar, conf.colors.text, False, False, True);
+                                                   conf.colors.bar, conf.colors.text, False, False, conf.border.tag);
                j += textw(tags[sc][i].name) + PAD;
                barwin_map_subwin(infobar[sc].tags[i]);
           }
@@ -71,7 +71,7 @@ infobar_init(void)
                                                     textw(tags[sc][seltag[sc]].layout.symbol) + PAD,
                                                     infobar[sc].geo.height,
                                                     conf.colors.layout_bg, conf.colors.layout_fg,
-                                                    False, False, True);
+                                                    False, False, conf.border.layout);
 
           /* Map/Refresh all */
           barwin_map(infobar[sc].bar);

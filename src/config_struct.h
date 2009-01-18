@@ -50,6 +50,7 @@ cfg_opt_t bar_opts[] =
      CFG_STR("bg",        "#090909", CFGF_NONE),
      CFG_STR("fg",        "#6289A1", CFGF_NONE),
      CFG_STR("position",  "top",     CFGF_NONE),
+     CFG_BOOL("border",   cfg_false, CFGF_NONE),
      CFG_END()
 };
 
@@ -105,6 +106,7 @@ cfg_opt_t layouts_opts[] =
 {
      CFG_STR("fg",           "#FFFFFF",   CFGF_NONE),
      CFG_STR("bg",           "#292929",   CFGF_NONE),
+     CFG_BOOL("border",       cfg_false,  CFGF_NONE),
      CFG_SEC("layout",       layout_opts, CFGF_MULTI),
      CFG_END()
 };
@@ -127,7 +129,7 @@ cfg_opt_t tags_opts[] =
      CFG_STR("occupied_bg",        "#003366", CFGF_NONE),
      CFG_STR("sel_fg",             "#FFFFFF", CFGF_NONE),
      CFG_STR("sel_bg",             "#354B5C", CFGF_NONE),
-     CFG_STR("border",             "#090909", CFGF_NONE),
+     CFG_BOOL("border",            cfg_false, CFGF_NONE),
      CFG_SEC("tag",                tag_opts,  CFGF_MULTI),
      CFG_END()
 };

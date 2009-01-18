@@ -131,6 +131,7 @@ conf_misc_section(cfg_t *cfg_m)
 void
 conf_bar_section(cfg_t *cfg_b)
 {
+     conf.border.bar  = cfg_getbool(cfg_b, "border");
      conf.colors.bar  = getcolor(alias_to_str(cfg_getstr(cfg_b, "bg")));
      conf.colors.text = strdup(alias_to_str(cfg_getstr(cfg_b, "fg")));
      conf.bartop      = (strcmp(strdup(cfg_getstr(cfg_b, "position")), "top") == 0) ? True : False;
@@ -189,6 +190,7 @@ conf_layout_section(cfg_t *cfg_l)
           conf.layout[i].func = NULL;
      }
 
+     conf.border.layout     = cfg_getbool(cfg_l, "border");
      conf.colors.layout_fg  = strdup(alias_to_str(cfg_getstr(cfg_l, "fg")));
      conf.colors.layout_bg  = getcolor(alias_to_str(cfg_getstr(cfg_l, "bg")));
 
@@ -237,7 +239,7 @@ conf_tag_section(cfg_t *cfg_t)
      conf.colors.tagselfg         = strdup(alias_to_str(cfg_getstr(cfg_t, "sel_fg")));
      conf.colors.tagselbg         = getcolor(alias_to_str(cfg_getstr(cfg_t, "sel_bg")));
      conf.colors.tag_occupied_bg  = getcolor(alias_to_str(cfg_getstr(cfg_t, "occupied_bg")));
-     conf.colors.tagbord          = getcolor(alias_to_str(cfg_getstr(cfg_t, "border")));
+     conf.border.tag              = cfg_getbool(cfg_t, "border");
 
      /* Alloc all */
      conf.ntag = emalloc(screen_count(), sizeof(int));

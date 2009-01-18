@@ -257,6 +257,12 @@ typedef struct
           MouseBinding *mouse;
           int nmouse;
      } titlebar;
+     struct
+     {
+          Bool bar;
+          Bool tag;
+          Bool layout;
+     } border;
      Alias alias[256];
      Layout layout[NUM_OF_LAYOUT];
      int *ntag;

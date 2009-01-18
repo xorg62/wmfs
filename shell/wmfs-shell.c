@@ -54,7 +54,7 @@ send_client_message(char* atom_name, long data_l[5])
 void
 spawn(char* arg)
 {
-     char  *sh;
+     char *sh;
 
      if(!(sh = getenv("SHELL")))
           sh = "/bin/sh";
@@ -111,10 +111,52 @@ exec_uicb_function(char *func, char *cmd)
 }
 
 void
+tag_get_current(char **name, int *num)
+{
+     Atom rt;
+     int rf;
+     unsigned long ir, il;
+     unsigned char *ret;
+
+     if(name && XGetWindowProperty(dpy, ROOT, ATOM("_WMFS_CURRENT_TAG"), 0L, 4096,
+                                   False, ATOM("UTF8_STRING"), &rt, &rf, &ir, &il, &ret) == Success)
+          *name = (char*)ret;
+
+     if(XGetWindowProperty(dpy, ROOT, ATOM("_NET_CURRENT_DESKTOP"), 0L, 4096,
+                           False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success)
+          *num = *(int*)ret;
+
+     if(ret)
+          XFree(ret);
+
+     return;
+}
+
+void
+tag_set(int tag)
+{
+     long data[5];
+     int t;
+     char *n;
+
+     if(tag >= 0)
+          data[0] = tag;
+
+     send_client_message("_NET_CURRENT_DESKTOP", data);
+
+     usleep(100000); /* For tag_get_current */
+
+     tag_get_current(&n, &t);
+     printf("Your now on '%s' (tag %d).\n", n, t);
+
+     return;
+}
+
+void
 manage_input(char *input)
 {
-     char *p = input;
-     char *q1, *q2, *tmp, *aargs = NULL, *func = input;
+     char *p = input, *func = input;
+     char *q1, *q2, *tmp, *aargs = NULL;
      char **args;
      int i, v = 0;
 
@@ -174,6 +216,13 @@ manage_input(char *input)
                     exec_uicb_function(args[0], args[1]);
                }
           }
+          else if(!strcmp(func, "tag_set"))
+          {
+               if(v > 0 || !args[0])
+                    printf("Tag_set: tag_set(<tag_number>), Set the current tag.\n");
+               else
+                    tag_set(atoi(args[0]));
+          }
           else if(!strcmp(func, "statustext"))
           {
                if(v > 0 || !args[0])
@@ -191,6 +240,8 @@ manage_input(char *input)
 
           free(args);
      }
+     else
+          printf("Unknow command '%s', try 'help'.\n", input);
 
      return;
 }
@@ -198,7 +249,8 @@ manage_input(char *input)
 int
 main(void)
 {
-    char *input, *p, c;
+     char *input, *p;
+     int c;
 
      init();
 
@@ -215,7 +267,8 @@ main(void)
           else
                while((c = fgetc(stdin)) != '\n' && c != EOF);
 
-          manage_input(input);
+          if(*input != '\0')
+               manage_input(input);
 
           free(input);
      }

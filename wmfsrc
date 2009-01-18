@@ -16,6 +16,7 @@ bar
 {
         bg       = "#191919"
         fg       = "#D4D4D4"
+        border   = true
         position = "top"
 }
 
@@ -23,6 +24,8 @@ layouts
 {
         fg = "#191919"
         bg = "#7E89A2"
+        # Border around the layout button
+        border = true
 
         # Tiling layouts
         layout { type = "tile_right"   symbol = "RIGHT" }
@@ -42,7 +45,8 @@ tags
         occupied_bg = "#003366"
         sel_fg       = "#191919"
         sel_bg       = "#7E89A2"
-        border       = "#3F485E"
+        # Border around the tag buttons
+        border       = true
 
         tag { screen = 1 name = "one" mwfact = 0.65 nmaster = 1 layout = "tile_right" resizehint = false }
         tag { name = "two"   }
