@@ -226,7 +226,6 @@ uicb_launcher(uicb_t cmd)
                                        /* OPTION */
                                        False, False, False);
      barwin_map(launch);
-     barwin_map_subwin(launch);
      barwin_refresh_color(launch);
      /* Draw Prompt */
      barwin_draw_text(launch, 2, font->height, LPROMPT);
@@ -266,7 +265,8 @@ uicb_launcher(uicb_t cmd)
                barwin_draw_text(launch, textw(LPROMPT) + 2, font->height, buf);
                barwin_refresh(launch);
           }
-          /* else getevent(ev); */
+          else
+               getevent(ev);
           XNextEvent(dpy, &ev);
      }
      XUngrabKeyboard(dpy, CurrentTime);
