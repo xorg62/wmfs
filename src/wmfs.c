@@ -108,6 +108,8 @@ quit(void)
      free(seltag);
      free(keys);
      free(func_list);
+     if(menulayout.item)
+          free(menulayout.item);
      free(conf.ntag);
      free(conf.titlebar.mouse);
      free(conf.client.mouse);

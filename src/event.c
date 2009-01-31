@@ -86,8 +86,7 @@ buttonpress(XButtonEvent *ev)
      /* Layout button */
      if(ev->window == infobar[selscreen].layout_button->win)
      {
-          if(conf.layout_system &&
-             (ev->button == Button1 || ev->button == Button3)) /* True -> menu */
+          if(conf.layout_system && (ev->button == Button1 || ev->button == Button3)) /* True -> menu */
           {
                int y = infobar[selscreen].layout_button->geo.y + INFOBARH;
                if(infobar[selscreen].geo.y != sgeo[selscreen].y - (INFOBARH + TBARH))
