@@ -39,6 +39,7 @@ set(wmfs_src
   src/infobar.c
   src/init.c
   src/layout.c
+  src/menu.c
   src/mouse.c
   src/screen.c
   src/tag.c

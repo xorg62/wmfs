@@ -95,7 +95,6 @@ BarWindow *barwin_create(Window parent,
                          Bool entermask,
                          Bool stipple,
                          Bool border);
-
 void barwin_draw_text(BarWindow *bw, int x, int y, char *text);
 void barwin_delete(BarWindow *bw);
 void barwin_delete_subwin(BarWindow *bw);
@@ -194,6 +193,12 @@ void maprequest(XMapRequestEvent *ev);
 void propertynotify(XPropertyEvent *ev);
 void getevent(XEvent ev);
 
+/* menu.c */
+void menu_init(Menu *menu, int nitem);
+void menu_new_item(MenuItem *mi, char *name, void *func, char *cmd);
+void menu_draw(Menu menu, int x, int y);
+int menu_get_longer_string(MenuItem *mt, int nitem);
+
 /* mouse.c */
 void mouse_move(Client *c);
 void mouse_resize(Client *c);
@@ -213,6 +218,7 @@ uint char_to_button(char *name, name_to_uint_t blist[]);
 Layout layout_name_to_struct(Layout lt[], char *name, int n, func_name_list_t llist[]);
 char* alias_to_str(char *conf_choice);
 /* }}} */
+XRectangle get_mouse_pos(void);
 void uicb_spawn(uicb_t);
 
 /* tag.c */
@@ -223,7 +229,7 @@ void uicb_tag_next(uicb_t);
 void uicb_tag_prev(uicb_t);
 void uicb_tagtransfert(uicb_t);
 
-/* screen */
+/* screen.c */
 int screen_count(void);
 XRectangle screen_get_geo(int s);
 int screen_get_with_geo(int x, int y);
@@ -254,6 +260,8 @@ void uicb_layout_prev(uicb_t);
 void uicb_layout_next(uicb_t);
 void uicb_set_mwfact(uicb_t);
 void uicb_set_nmaster(uicb_t);
+void uicb_set_layout(uicb_t cmd);
+
 
 /* init.c */
 void init(void);
@@ -295,6 +303,7 @@ Atom net_atom[net_last];
 InfoBar *infobar;
 Tag **tags;
 int *seltag;
+Menu menulayout;
 
 /* Important Client */
 Client *clients;

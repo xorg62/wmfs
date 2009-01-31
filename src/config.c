@@ -64,7 +64,8 @@ conf_init_func_list(void)
                {"screen_next",             uicb_screen_next },
                {"screen_prev",             uicb_screen_prev },
                {"reload",                  uicb_reload },
-               {"launcher",                uicb_launcher }
+               {"launcher",                uicb_launcher },
+               {"set_layout",              uicb_set_layout }
           };
 
      func_list = emalloc(LEN(tmp_list), sizeof(func_name_list_t));
@@ -154,7 +155,7 @@ conf_root_section(cfg_t *cfg_r)
 void
 conf_client_section(cfg_t *cfg_c)
 {
-     /* Client  misc */
+     /* Client misc */
      conf.client.borderheight        = (cfg_getint(cfg_c, "border_height")) ? cfg_getint(cfg_c, "border_height") : 1;
      conf.client.place_at_mouse      = cfg_getbool(cfg_c, "place_at_mouse");
      conf.client.bordernormal        = getcolor(alias_to_str(cfg_getstr(cfg_c, "border_normal")));
@@ -195,6 +196,9 @@ conf_layout_section(cfg_t *cfg_l)
      conf.colors.layout_fg  = strdup(alias_to_str(cfg_getstr(cfg_l, "fg")));
      conf.colors.layout_bg  = getcolor(alias_to_str(cfg_getstr(cfg_l, "bg")));
 
+     if(strcmp(strdup(alias_to_str(cfg_getstr(cfg_l, "system"))), "menu") == 0)
+          conf.layout_system = True;
+
      if((conf.nlayout = cfg_size(cfg_l, "layout")) > NUM_OF_LAYOUT
           || !(conf.nlayout = cfg_size(cfg_l, "layout")))
      {
@@ -203,6 +207,9 @@ conf_layout_section(cfg_t *cfg_l)
           conf.layout[0].symbol = strdup("TILE");
           conf.layout[0].func   = tile;
      }
+
+     if(conf.layout_system)
+          menu_init(&menulayout, conf.nlayout);
 
      if(!conf.layout[0].symbol
         && !conf.layout[0].func)
@@ -218,6 +225,11 @@ conf_layout_section(cfg_t *cfg_l)
                }
                else
                {
+                    if(conf.layout_system)
+                         menu_new_item(&menulayout.item[i],
+                                       strdup(alias_to_str(cfg_getstr(cfgtmp, "symbol"))),
+                                       uicb_set_layout, strdup(cfg_getstr(cfgtmp, "type")));
+
                     conf.layout[i].symbol = strdup(alias_to_str(cfg_getstr(cfgtmp, "symbol")));
                     conf.layout[i].func = name_to_func(strdup(cfg_getstr(cfgtmp, "type")), layout_list);
                }

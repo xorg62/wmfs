@@ -505,3 +505,37 @@ uicb_togglemax(uicb_t cmd)
 
      return;
 }
+
+/** Set the layout
+ * \param cmd uicb_t type
+*/
+void
+uicb_set_layout(uicb_t cmd)
+{
+     int i = -1;
+
+     screen_get_sel();
+
+     if(strcmp(cmd, "tile_right") == 0
+        || strcmp(cmd, "tile") == 0)
+          i = 0;
+     else if(strcmp(cmd, "tile_left") == 0)
+          i = 1;
+     else if(strcmp(cmd, "tile_top") == 0)
+          i = 2;
+     else if(strcmp(cmd, "tile_bottom") == 0)
+          i = 3;
+     else if(strcmp(cmd, "tile_grid") == 0)
+          i = 4;
+     else if(strcmp(cmd, "max") == 0)
+          i = 5;
+     else if(strcmp(cmd, "free") == 0)
+          i = 6;
+
+     if(i >= 0)
+          tags[selscreen][seltag[selscreen]].layout = conf.layout[i];
+
+     arrange(selscreen);
+
+     return;
+}

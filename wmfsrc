@@ -27,6 +27,9 @@ layouts
         # Border around the layout button
         border = true
 
+
+        system = "menu" # menu or switch
+
         # Tiling layouts
         layout { type = "tile_right"   symbol = "RIGHT" }
         layout { type = "tile_left"    symbol = "LEFT" }

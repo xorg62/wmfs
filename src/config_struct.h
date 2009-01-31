@@ -107,6 +107,7 @@ cfg_opt_t layouts_opts[] =
      CFG_STR("fg",           "#FFFFFF",   CFGF_NONE),
      CFG_STR("bg",           "#292929",   CFGF_NONE),
      CFG_BOOL("border",       cfg_false,  CFGF_NONE),
+     CFG_STR("system",       "menu",      CFGF_NONE),
      CFG_SEC("layout",       layout_opts, CFGF_MULTI),
      CFG_END()
 };

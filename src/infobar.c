@@ -214,22 +214,25 @@ uicb_launcher(uicb_t cmd)
      char buf[512] = { 0 };
      int pos = 0;
      int lrun = 1;
-     BarWindow *launch = barwin_create(infobar[screen_get_sel()].bar->win,
+
+     screen_get_sel();
+
+     BarWindow *launch = barwin_create(infobar[selscreen].bar->win,
                                        /* X */
                                        (infobar[selscreen].layout_button->geo.x
                                         + textw(tags[selscreen][seltag[selscreen]].layout.symbol) + PAD),
                                        /* Y */
-                                       0,
+                                       SHADH,
                                        /* WIDTH */
-                                       (sgeo[selscreen].width
+                                       (sgeo[0].width
                                         - (infobar[selscreen].layout_button->geo.x
-                                           + textw(tags[selscreen][seltag[selscreen]].layout.symbol) + PAD)),
+                                           + textw(tags[selscreen][seltag[selscreen]].layout.symbol) + PAD) - SHADH),
                                        /* HEIGHT */
-                                       infobar[selscreen].geo.height,
+                                       infobar[selscreen].geo.height - SHADH,
                                        /* COLOR */
                                        conf.colors.bar, conf.colors.text,
                                        /* OPTION */
-                                       False, False, False);
+                                       False, False, True);
      barwin_map(launch);
      barwin_refresh_color(launch);
      /* Draw Prompt */

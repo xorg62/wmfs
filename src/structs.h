@@ -200,6 +200,24 @@ typedef struct
      Layout layout;
 } Tag;
 
+/* Menu Item Struct */
+typedef struct
+{
+     char *name;
+     void (*func)(uicb_t);
+     uicb_t cmd;
+} MenuItem;
+
+/* Menu Struct */
+typedef struct
+{
+     int specified_pos, x, y;
+     /* Number of item */
+     int nitem;
+     /* Item */
+     MenuItem *item;
+} Menu;
+
 /* Alias struct */
 typedef struct
 {
@@ -267,6 +285,7 @@ typedef struct
      Layout layout[NUM_OF_LAYOUT];
      int *ntag;
      Bool tag_round;
+     Bool layout_system; /* Switch: False, Menu: True. */
      int nkeybind;
      int nbutton;
      int nlayout;

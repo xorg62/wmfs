@@ -85,11 +85,25 @@ buttonpress(XButtonEvent *ev)
 
      /* Layout button */
      if(ev->window == infobar[selscreen].layout_button->win)
-          switch(ev->button)
+     {
+          if(conf.layout_system &&
+             (ev->button == Button1 || ev->button == Button3)) /* True -> menu */
           {
-           case Button1: case Button4: layoutswitch(True);  break;
-           case Button3: case Button5: layoutswitch(False); break;
+               int y = infobar[selscreen].layout_button->geo.y + INFOBARH;
+               if(infobar[selscreen].geo.y != sgeo[selscreen].y - (INFOBARH + TBARH))
+                    y = infobar[selscreen].geo.y - (INFOBARH * menulayout.nitem) - SHADH;
+
+               menu_draw(menulayout, infobar[selscreen].layout_button->geo.x, y);
           }
+          else
+          {
+               switch(ev->button)
+               {
+               case Button1: case Button4: layoutswitch(True);  break;
+               case Button3: case Button5: layoutswitch(False); break;
+               }
+          }
+     }
 
      return;
 }

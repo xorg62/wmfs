@@ -180,6 +180,20 @@ alias_to_str(char *conf_choice)
 }
 /* }}} */
 
+/** Get the mouse pointer position.
+*/
+XRectangle
+get_mouse_pos(void)
+{
+     Window dum;
+     int d, u;
+     XRectangle ret;
+
+     XQueryPointer(dpy, ROOT, &dum, &dum, (int*)&ret.x, (int*)&ret.y, &d, &d, (uint *)&u);
+
+     return ret;
+}
+
 /** Execute a sh command
  * \param cmd Command
 */
