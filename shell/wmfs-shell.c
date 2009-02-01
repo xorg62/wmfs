@@ -247,12 +247,45 @@ manage_input(char *input)
 }
 
 int
-main(void)
+main(int argc, char *argv[])
 {
      char *input, *p;
      int c;
+     char opt;
+     const char *optstring = "hc";
+     static struct option shell_opts[] =
+     {
+        {"help", 0, NULL, 'h'},
+        {"cmd", 1, NULL, 'c'},
+        {0,0,0,0}
+     };
 
      init();
+     
+     /* get args from argv */
+     while(EOF != (opt = (char)getopt_long(argc, argv, optstring, shell_opts, NULL)))
+     {
+
+        /* Just print help */
+        if( (opt == 'h') || (opt == '?'))
+        {
+           printf("Usage : wmfs-shell [-c|--cmd cmd]\n");
+           exit(0);
+        }
+
+        else if(opt == 'c')
+        {
+           /* Run a single command */
+           if((argc >= 2)&&(argv[2] != '\0'))
+              manage_input(argv[2]);
+           else
+              printf("Run 'wmfs-shell --help' for help\n");
+           exit(0);
+        }
+
+     }
+
+
 
      for(;;)
      {
