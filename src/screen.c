@@ -55,6 +55,7 @@ screen_count(void)
 /** Get screen geometry by number
  *\param s Screen number
  *\return XRectangle struct
+ *\todo Set a pure screen geo (without change (- INFOBARH - TBAR etc..))
 */
 XRectangle
 screen_get_geo(int s)
@@ -99,8 +100,9 @@ screen_get_with_geo(int x, int y)
 
      for(i = 0; i < screen_count(); ++i)
           if((x >= sgeo[i].x && x < sgeo[i].x + sgeo[i].width)
-             && (y >= sgeo[i].y - INFOBARH - TBARH
-                 && y < sgeo[i].y - INFOBARH - TBARH + sgeo[i].height + INFOBARH))
+             && (y >= ((conf.bartop) ? (sgeo[i].y - INFOBARH - TBARH) : (sgeo[i].y - TBARH))
+                 && (y < ((conf.bartop) ? (sgeo[i].y - INFOBARH - TBARH) : (sgeo[i].y - TBARH))
+                     + sgeo[i].height + INFOBARH + TBARH)))
                r = i;
 
      return r;

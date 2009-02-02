@@ -209,7 +209,12 @@ conf_layout_section(cfg_t *cfg_l)
      }
 
      if(conf.layout_system)
-          menu_init(&menulayout, conf.nlayout);
+          menu_init(&menulayout, conf.nlayout,
+                    /* Colors */
+                    conf.colors.layout_bg,
+                    conf.colors.layout_fg,
+                    conf.colors.bar,
+                    conf.colors.text);
 
      if(!conf.layout[0].symbol
         && !conf.layout[0].func)

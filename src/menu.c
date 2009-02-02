@@ -33,10 +33,18 @@
 #include "wmfs.h"
 
 void
-menu_init(Menu *menu, int nitem)
+menu_init(Menu *menu, int nitem, uint bg_f, char *fg_f, uint bg_n, char *fg_n)
 {
+
+     /* Item */
      menu->nitem = nitem;
      menu->item = emalloc(sizeof(MenuItem), nitem);
+
+     /* Colors */
+     menu->colors.focus.bg = bg_f;
+     menu->colors.focus.fg = fg_f;
+     menu->colors.normal.bg = bg_n;
+     menu->colors.normal.fg = fg_n;
 
      return;
 }
@@ -55,7 +63,6 @@ void
 menu_draw(Menu menu, int x, int y)
 {
      int i, width;
-     int r = 1;
      XEvent ev;
      BarWindow *item[menu.nitem];
      BarWindow *frame;
@@ -63,10 +70,8 @@ menu_draw(Menu menu, int x, int y)
      width = menu_get_longer_string(menu.item, menu.nitem);
 
      /* Frame barwin */
-     frame = barwin_create(ROOT, x, y, width + SHADH,
-                           menu.nitem * INFOBARH + SHADH,
-                           conf.colors.bar, conf.colors.text,
-                           False, False, True);
+     frame = barwin_create(ROOT, x, y, width + SHADH, menu.nitem * INFOBARH + SHADH,
+                           menu.colors.normal.bg, menu.colors.normal.fg, False, False, True);
 
      barwin_map(frame);
      barwin_map_subwin(frame);
@@ -79,56 +84,24 @@ menu_draw(Menu menu, int x, int y)
                                   (i * INFOBARH) + SHADH,
                                   width - SHADH,
                                   INFOBARH,
-                                  conf.colors.bar,
-                                  conf.colors.text,
+                                  menu.colors.normal.bg,
+                                  menu.colors.normal.fg,
                                   True, False, False);
+
           barwin_map(item[i]);
-          barwin_map_subwin(frame);
           barwin_refresh_color(item[i]);
+          menu_draw_item_name(&menu, i, item);
           barwin_refresh(item[i]);
-
-          barwin_draw_text(item[i], ((width / 2) - (textw(menu.item[i].name) / 2)), font->height, menu.item[i].name);
      }
 
-     while(r)
-     {
-          switch(ev.type)
-          {
-          case ButtonPress:
-               /* Execute the function linked with the item */
-               for(i = 0; i < menu.nitem; ++i)
-                    if(ev.xbutton.window == item[i]->win
-                       && ev.xbutton.button == Button1)
-                         if(menu.item[i].func)
-                              menu.item[i].func(menu.item[i].cmd);
-               r = 0;
-               break;
-          case EnterNotify:
-               /* For focus an item with the mousw */
-               for(i = 0; i < menu.nitem; ++i)
-               {
-                    if(ev.xcrossing.window == item[i]->win)
-                    {
-                         item[i]->fg = conf.colors.tagselfg;
-                         item[i]->bg = conf.colors.tagselbg;
-                    }
-                    else
-                    {
-                         item[i]->fg = conf.colors.text;
-                         item[i]->bg = conf.colors.bar;
-                    }
+     /* Select the first item */
+     menu_focus_item(&menu, 0, item);
 
-                    barwin_refresh_color(item[i]);
-                    barwin_draw_text(item[i], ((width / 2) - (textw(menu.item[i].name) / 2)), font->height, menu.item[i].name);
-                    barwin_refresh(item[i]);
-               }
-               break;
-          default:
-               getevent(ev);
-               break;
-          }
-          XNextEvent(dpy, &ev);
-     }
+     XGrabKeyboard(dpy, ROOT, True, GrabModeAsync, GrabModeAsync, CurrentTime);
+
+     while(!menu_manage_event(&ev, &menu, item));
+
+     XUngrabKeyboard(dpy, CurrentTime);
 
      for(i = 0; i < menu.nitem; ++i)
           barwin_delete(item[i]);
@@ -136,6 +109,113 @@ menu_draw(Menu menu, int x, int y)
 
      return;
 }
+
+Bool
+menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
+{
+     int i;
+     KeySym ks;
+     Bool quit = False;
+
+     switch(ev->type)
+     {
+     /* Mouse Buttons */
+     case ButtonPress:
+          /* Execute the function linked with the item */
+          for(i = 0; i < menu->nitem; ++i)
+               if(ev->xbutton.window == winitem[i]->win
+                  && (ev->xbutton.button == Button1 || ev->xbutton.button == Button2))
+                    if(menu->item[i].func)
+                         menu->item[i].func(menu->item[i].cmd);
+               quit = True;
+          break;
+
+     /* Keys */
+     case KeyPress:
+          XLookupString(&ev->xkey, NULL, 0, &ks, 0);
+          switch(ks)
+          {
+          case XK_Up:
+               menu_focus_item(menu, menu->focus_item - 1, winitem);
+               break;
+          case XK_Down:
+               menu_focus_item(menu, menu->focus_item + 1, winitem);
+               break;
+          case XK_Return:
+               if(menu->item[menu->focus_item].func)
+                    menu->item[menu->focus_item].func(menu->item[menu->focus_item].cmd);
+               quit = True;
+               break;
+          case XK_Escape:
+               quit = True;
+               break;
+          }
+          break;
+
+     /* Focus (with mouse) management */
+     case EnterNotify:
+          /* For focus an item with the mouse */
+          for(i = 0; i < menu->nitem; ++i)
+               if(ev->xcrossing.window == winitem[i]->win)
+                    menu_focus_item(menu, i, winitem);
+          break;
+     default:
+          getevent(*ev);
+          break;
+     }
+     XNextEvent(dpy, ev);
+
+     return quit;
+}
+
+
+void
+menu_focus_item(Menu *menu, int item, BarWindow *winitem[])
+{
+     int i;
+
+     menu->focus_item = item;
+
+     if(menu->focus_item > menu->nitem - 1)
+          menu->focus_item = 0;
+     else if(menu->focus_item < 0)
+          menu->focus_item = menu->nitem - 1;
+
+     for(i = 0; i < menu->nitem; ++i)
+     {
+          if(i == menu->focus_item)
+          {
+               winitem[i]->fg = menu->colors.focus.fg;
+               winitem[i]->bg = menu->colors.focus.bg;
+          }
+          else
+          {
+               winitem[i]->fg = menu->colors.normal.fg;
+               winitem[i]->bg = menu->colors.normal.bg;
+          }
+
+          barwin_refresh_color(winitem[i]);
+          menu_draw_item_name(menu, i, winitem);
+          barwin_refresh(winitem[i]);
+     }
+
+     return;
+}
+
+void
+menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[])
+{
+     int width = menu_get_longer_string(menu->item, menu->nitem);
+
+     barwin_draw_text(winitem[item],
+                      ((width / 2) - (textw(menu->item[item].name) / 2)),
+                      font->height,
+                      menu->item[item].name);
+
+     return;
+}
+
+
 
 int
 menu_get_longer_string(MenuItem *mt, int nitem)

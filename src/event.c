@@ -89,17 +89,19 @@ buttonpress(XButtonEvent *ev)
           if(conf.layout_system && (ev->button == Button1 || ev->button == Button3)) /* True -> menu */
           {
                int y = infobar[selscreen].layout_button->geo.y + INFOBARH;
+               int x = infobar[selscreen].layout_button->geo.x + (sgeo[selscreen].x - BORDH);
+
                if(infobar[selscreen].geo.y != sgeo[selscreen].y - (INFOBARH + TBARH))
                     y = infobar[selscreen].geo.y - (INFOBARH * menulayout.nitem) - SHADH;
 
-               menu_draw(menulayout, infobar[selscreen].layout_button->geo.x, y);
+               menu_draw(menulayout, x, y);
           }
           else
           {
                switch(ev->button)
                {
-               case Button1: case Button4: layoutswitch(True);  break;
-               case Button3: case Button5: layoutswitch(False); break;
+                case Button1: case Button4: layoutswitch(True);  break;
+                case Button3: case Button5: layoutswitch(False); break;
                }
           }
      }
@@ -296,6 +298,7 @@ enternotify(XCrossingEvent *ev)
      if(ev->mode != NotifyNormal
         || ev->detail == NotifyInferior)
           return;
+
      if((c = client_gb_win(ev->window))
         || (c = client_gb_frame(ev->window))
         || (c = client_gb_titlebar(ev->window)))
@@ -360,9 +363,9 @@ grabkeys(void)
      {
           code = XKeysymToKeycode(dpy, keys[i].keysym);
           XGrabKey(dpy, code, keys[i].mod, ROOT, True, GrabModeAsync, GrabModeAsync);
-          XGrabKey(dpy, code, keys[i].mod|LockMask, ROOT, True, GrabModeAsync, GrabModeAsync);
-          XGrabKey(dpy, code, keys[i].mod|numlockmask, ROOT, True, GrabModeAsync, GrabModeAsync);
-          XGrabKey(dpy, code, keys[i].mod|LockMask|numlockmask, ROOT, True, GrabModeAsync, GrabModeAsync);
+          XGrabKey(dpy, code, keys[i].mod | LockMask, ROOT, True, GrabModeAsync, GrabModeAsync);
+          XGrabKey(dpy, code, keys[i].mod | numlockmask, ROOT, True, GrabModeAsync, GrabModeAsync);
+          XGrabKey(dpy, code, keys[i].mod | LockMask | numlockmask, ROOT, True, GrabModeAsync, GrabModeAsync);
      }
 
      return;

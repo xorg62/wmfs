@@ -211,9 +211,14 @@ typedef struct
 /* Menu Struct */
 typedef struct
 {
-     int specified_pos, x, y;
+     /* Color */
+     struct
+     {
+          struct { uint bg; char *fg; } focus;
+          struct { uint bg; char *fg; } normal;
+     } colors;
      /* Number of item */
-     int nitem;
+     int nitem, focus_item;
      /* Item */
      MenuItem *item;
 } Menu;
