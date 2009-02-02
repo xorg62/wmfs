@@ -33,12 +33,13 @@
 #include "wmfs.h"
 
 void
-menu_init(Menu *menu, int nitem, uint bg_f, char *fg_f, uint bg_n, char *fg_n)
+menu_init(Menu *menu, char *name, int nitem, uint bg_f, char *fg_f, uint bg_n, char *fg_n)
 {
 
      /* Item */
      menu->nitem = nitem;
      menu->item = emalloc(sizeof(MenuItem), nitem);
+     menu->name = name;
 
      /* Colors */
      menu->colors.focus.bg = bg_f;
@@ -215,8 +216,6 @@ menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[])
      return;
 }
 
-
-
 int
 menu_get_longer_string(MenuItem *mt, int nitem)
 {
@@ -227,4 +226,28 @@ menu_get_longer_string(MenuItem *mt, int nitem)
                l = textw(mt[i].name);
 
      return l + PAD;
+}
+
+void
+uicb_menu(uicb_t cmd)
+{
+     int i, d, u, x, y;
+     Window w;
+
+     for(i = 0; i < conf.nmenu; ++i)
+          if(!strcmp(cmd, conf.menu[i].name))
+          {
+               if(conf.menu[i].place_at_mouse)
+                    XQueryPointer(dpy, ROOT, &w, &w, &x, &y, &d, &d, (uint *)&u);
+               else
+               {
+                    screen_get_sel();
+                    x = sgeo[selscreen].x + conf.menu[i].x;
+                    y = sgeo[selscreen].y + conf.menu[i].y;
+               }
+
+               menu_draw(conf.menu[i], x, y);
+          }
+
+     return;
 }

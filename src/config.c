@@ -65,7 +65,8 @@ conf_init_func_list(void)
                {"screen_prev",             uicb_screen_prev },
                {"reload",                  uicb_reload },
                {"launcher",                uicb_launcher },
-               {"set_layout",              uicb_set_layout }
+               {"set_layout",              uicb_set_layout },
+               {"menu",                    uicb_menu }
           };
 
      func_list = emalloc(LEN(tmp_list), sizeof(func_name_list_t));
@@ -145,8 +146,8 @@ void
 conf_root_section(cfg_t *cfg_r)
 {
      conf.root.background_command = strdup(alias_to_str(cfg_getstr(cfg_r, "background_command")));
-     conf.root.nmouse = cfg_size(cfg_r, "mouse");
-     conf.root.mouse = emalloc(conf.root.nmouse, sizeof(MouseBinding));
+     conf.root.nmouse             = cfg_size(cfg_r, "mouse");
+     conf.root.mouse              = emalloc(conf.root.nmouse, sizeof(MouseBinding));
      mouse_section(conf.root.mouse, cfg_r, conf.root.nmouse);
 
      return;
@@ -209,7 +210,7 @@ conf_layout_section(cfg_t *cfg_l)
      }
 
      if(conf.layout_system)
-          menu_init(&menulayout, conf.nlayout,
+          menu_init(&menulayout, "menulayout", conf.nlayout,
                     /* Colors */
                     conf.colors.layout_bg,
                     conf.colors.layout_fg,
@@ -252,6 +253,9 @@ conf_tag_section(cfg_t *cfg_t)
      /* If there is no tag in the conf or more than
       * MAXTAG (32) print an error and create only one.
       */
+     Tag default_tag = { "WMFS",
+                         0.50, 1, False,
+                         layout_name_to_struct(conf.layout, "tile_right", conf.nlayout, layout_list) };
 
      conf.tag_round               = cfg_getbool(cfg_t, "tag_round");
      conf.colors.tagselfg         = strdup(alias_to_str(cfg_getstr(cfg_t, "sel_fg")));
@@ -294,19 +298,62 @@ conf_tag_section(cfg_t *cfg_t)
                        " (%d) in the screen %d\n", conf.ntag[i], i);
 
                conf.ntag[i] = 1;
-               tags[i][1].name       = strdup("WMFS");
-               tags[i][1].mwfact     = 0.50;
-               tags[i][1].nmaster    = 1;
-               tags[i][1].resizehint = False;
-               tags[i][1].layout     = layout_name_to_struct(conf.layout,
-                                                             "tile_right",
-                                                             conf.nlayout,
-                                                             layout_list);
+               tags[i][1] = default_tag;
           }
 
      seltag = emalloc(screen_count(), sizeof(int));
      for(j = 0; j < screen_count(); ++j)
           seltag[j] = 1;
+
+     return;
+}
+
+void
+conf_menu_section(cfg_t *cfg_m)
+{
+     cfg_t *cfgtmp2;
+     int i, j;
+
+     conf.nmenu = cfg_size(cfg_m, "set_menu");
+
+     if(!conf.nmenu)
+          return;
+
+     conf.menu  = emalloc(conf.nmenu, sizeof(Menu));
+
+     for(i = 0; i < conf.nmenu; ++i)
+     {
+          cfgtmp = cfg_getnsec(cfg_m, "set_menu", i);
+
+          conf.menu[i].name = strdup(cfg_getstr(cfgtmp, "name"));
+
+          if(!(conf.menu[i].place_at_mouse = cfg_getbool(cfgtmp, "place_at_mouse")))
+          {
+               conf.menu[i].x = cfg_getint(cfgtmp, "x");
+               conf.menu[i].y = cfg_getint(cfgtmp, "y");
+          }
+
+          conf.menu[i].colors.focus.bg  = getcolor(strdup(cfg_getstr(cfgtmp, "bg_focus")));
+          conf.menu[i].colors.focus.fg  = strdup(cfg_getstr(cfgtmp, "fg_focus"));
+          conf.menu[i].colors.normal.bg = getcolor(strdup(cfg_getstr(cfgtmp, "bg_normal")));
+          conf.menu[i].colors.normal.fg = strdup(cfg_getstr(cfgtmp, "fg_normal"));
+
+          conf.menu[i].nitem = cfg_size(cfgtmp, "item");
+
+          if(conf.menu[i].nitem)
+          {
+               conf.menu[i].item = emalloc(conf.menu[i].nitem, sizeof(MenuItem));
+               for(j = 0; j < cfg_size(cfgtmp, "item"); ++j)
+               {
+                    cfgtmp2 = cfg_getnsec(cfgtmp, "item", j);
+
+                    conf.menu[i].item[j].name = strdup(cfg_getstr(cfgtmp2, "name"));
+                    conf.menu[i].item[j].func = name_to_func(strdup(cfg_getstr(cfgtmp2, "func")), func_list);
+                    conf.menu[i].item[j].cmd  = (!strdup(alias_to_str((cfg_getstr(cfgtmp2, "cmd"))))
+                                                 ?  NULL : strdup(alias_to_str(cfg_getstr(cfgtmp2, "cmd"))));
+               }
+          }
+     }
 
      return;
 }
@@ -372,6 +419,7 @@ init_conf(void)
      conf_client_section(cfg_getsec(cfg, "client"));
      conf_layout_section(cfg_getsec(cfg, "layouts"));
      conf_tag_section(cfg_getsec(cfg, "tags"));
+     conf_menu_section(cfg_getsec(cfg, "menu"));
      conf_keybind_section(cfg_getsec(cfg, "keys"));
 
      cfg_free(cfg);

@@ -95,6 +95,8 @@ cfg_opt_t client_opts[]=
      CFG_END()
 };
 
+/* TAGS {{{ */
+
 cfg_opt_t layout_opts[] =
 {
      CFG_STR("type",   "", CFGF_NONE),
@@ -111,6 +113,10 @@ cfg_opt_t layouts_opts[] =
      CFG_SEC("layout",       layout_opts, CFGF_MULTI),
      CFG_END()
 };
+
+/* }}} */
+
+/* TAGS {{{ */
 
 cfg_opt_t tag_opts[] =
 {
@@ -135,6 +141,42 @@ cfg_opt_t tags_opts[] =
      CFG_END()
 };
 
+/* }}} */
+
+/* MENU {{{ */
+
+cfg_opt_t menu_items_opts[] =
+{
+     CFG_STR("name", "iten_wname", CFGF_NONE),
+     CFG_STR("func", "",           CFGF_NONE),
+     CFG_STR("cmd",  "",           CFGF_NONE),
+     CFG_END()
+};
+
+cfg_opt_t menus_opts[] =
+{
+     CFG_STR("name",            "menu_wname",     CFGF_NONE),
+     CFG_BOOL("place_at_mouse", cfg_true,         CFGF_NONE),
+     CFG_INT("x",               0,                CFGF_NONE),
+     CFG_INT("y",               0,                CFGF_NONE),
+     CFG_STR("fg_normal",       "#ffffff",        CFGF_NONE),
+     CFG_STR("bg_normal",       "#000000",        CFGF_NONE),
+     CFG_STR("fg_focus",        "#ffffff",        CFGF_NONE),
+     CFG_STR("bg_focus",        "#000000",        CFGF_NONE),
+     CFG_SEC("item",            menu_items_opts,  CFGF_MULTI),
+     CFG_END()
+};
+
+cfg_opt_t menu_opts[] =
+{
+     CFG_SEC("set_menu", menus_opts, CFGF_MULTI),
+     CFG_END()
+};
+
+/* }}} */
+
+/* KEYBIND {{{ */
+
 cfg_opt_t key_opts[] =
 {
      CFG_STR_LIST("mod", "{Control}", CFGF_NONE),
@@ -150,6 +192,10 @@ cfg_opt_t keys_opts[] =
      CFG_END()
 };
 
+/* }}} */
+
+/* ALIAS {{{ */
+
 cfg_opt_t _alias_opts[] =
 {
      CFG_STR("content", "", CFGF_NONE),
@@ -162,6 +208,8 @@ cfg_opt_t alias_opts[] =
      CFG_END()
 };
 
+/* }}} */
+
 cfg_opt_t opts[] =
 {
      CFG_SEC("misc",    misc_opts,      CFGF_NONE),
@@ -171,6 +219,7 @@ cfg_opt_t opts[] =
      CFG_SEC("bar",     bar_opts,       CFGF_NONE),
      CFG_SEC("layouts", layouts_opts,   CFGF_NONE),
      CFG_SEC("tags",    tags_opts,      CFGF_NONE),
+     CFG_SEC("menu",    menu_opts,      CFGF_NONE),
      CFG_SEC("keys",    keys_opts,      CFGF_NONE),
      CFG_END()
 };

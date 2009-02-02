@@ -211,6 +211,14 @@ typedef struct
 /* Menu Struct */
 typedef struct
 {
+     /* Name of the menu for call
+      * it in the conf (function = "menu"
+      * menu = "<name>").
+      */
+     char *name;
+     /* Placement */
+     Bool place_at_mouse;
+     int x, y;
      /* Color */
      struct
      {
@@ -288,12 +296,14 @@ typedef struct
      } border;
      Alias alias[256];
      Layout layout[NUM_OF_LAYOUT];
+     Menu *menu;
      int *ntag;
      Bool tag_round;
      Bool layout_system; /* Switch: False, Menu: True. */
      int nkeybind;
      int nbutton;
      int nlayout;
+     int nmenu;
 } Conf;
 
 /* Config.c struct */

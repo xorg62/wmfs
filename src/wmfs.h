@@ -176,6 +176,7 @@ void conf_root_section(cfg_t *cfg_r);
 void conf_client_section(cfg_t *cfg_c);
 void conf_layout_section(cfg_t *cfg_l);
 void conf_tag_section(cfg_t *cfg_t);
+void conf_menu_section(cfg_t *cfg_m);
 void conf_keybind_section(cfg_t *cfg_k);
 void init_conf(void);
 
@@ -194,14 +195,14 @@ void propertynotify(XPropertyEvent *ev);
 void getevent(XEvent ev);
 
 /* menu.c */
-void menu_init(Menu *menu, int nitem, uint bg_f, char *fg_f, uint bg_n, char *fg_n);
+void menu_init(Menu *menu, char *name, int nitem, uint bg_f, char *fg_f, uint bg_n, char *fg_n);
 void menu_new_item(MenuItem *mi, char *name, void *func, char *cmd);
 void menu_draw(Menu menu, int x, int y);
 Bool menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[]);
 void menu_focus_item(Menu *menu, int item, BarWindow *winitem[]);
 void menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[]);
 int menu_get_longer_string(MenuItem *mt, int nitem);
-
+void uicb_menu(uicb_t cmd);
 /* mouse.c */
 void mouse_move(Client *c);
 void mouse_resize(Client *c);
