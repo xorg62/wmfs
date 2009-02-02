@@ -68,7 +68,7 @@ root
 
         mouse { button = "4" func = "tag_next" }
         mouse { button = "5" func = "tag_prev" }
-        mouse { button = "3" func = "spawn" cmd = term }
+        mouse { button = "3" func = "menu" cmd = "rootmenu" }
 }
 
 client
@@ -97,6 +97,24 @@ client
                 mouse { button = "2" func = "tile_switch" }
                 mouse { button = "3" func = "client_raise" }
                 mouse { button = "3" func = "mouse_resize" }
+        }
+}
+
+menu
+{
+        set_menu
+        {
+                name = "rootmenu"
+
+                #place_at_mouse = false
+                #x = 40 y = 50
+
+                fg_focus  = "#000000" bg_focus  = "#ffffff"
+                fg_normal = "#ffffff" bg_normal = "#000000"
+
+                item { name = "Terminal" func = "spawn" cmd = term }
+                item { name = "Next tag" func = "tag_next" }
+                item { name = "Previous tag" func = "tag_prev" }
         }
 }
 
