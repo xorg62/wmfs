@@ -118,6 +118,22 @@ menu
         }
 }
 
+launcher
+{
+        set_launcher
+        {
+                name = "launcher_exec"
+                prompt = "Exec: "
+                command = "exec"
+        }
+        set_launcher
+        {
+                name = "launcher_ssh"
+                prompt = "ssh to: "
+                command = "urxvt -e ssh"
+        }
+}
+
 keys
 {
 # general keybind
@@ -139,7 +155,9 @@ keys
         key { mod = {"Alt", "Shift"} key = "l" func = "set_nmaster" cmd = "+1" }
         key { mod = {"Alt", "Shift"} key = "h" func = "set_nmaster" cmd = "-1" }
 
-        key { mod = { "Alt" } key = "p" func = "launcher" }
+        # Launchers
+        key { mod = { "Alt" } key = "p" func = "launcher" cmd = "launcher_exec" }
+        key { mod = { "Alt", "Control" } key = "p" func = "launcher" cmd = "launcher_ssh" }
 
 # tag manipulation keybind
         key { mod = {"Alt"} key = "F1" func = "tag" cmd = "1" }

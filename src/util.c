@@ -194,13 +194,20 @@ get_mouse_pos(void)
      return ret;
 }
 
+
 /** Execute a sh command
  * \param cmd Command
 */
 void
-uicb_spawn(uicb_t cmd)
+spawn(const char *format, ...)
 {
      char *sh = NULL;
+     char cmd[512];
+     va_list ap;
+
+     va_start(ap, format);
+     vsprintf(cmd, format, ap);
+     va_end(ap);
 
      if(!(sh = getenv("SHELL")))
           sh = "/bin/sh";
@@ -220,4 +227,13 @@ uicb_spawn(uicb_t cmd)
      }
 
      return;
+}
+
+/** Execute a sh command
+ * \param cmd Command (uicb_t type)
+*/
+void
+uicb_spawn(uicb_t cmd)
+{
+     spawn(cmd);
 }

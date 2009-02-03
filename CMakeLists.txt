@@ -38,6 +38,7 @@ set(wmfs_src
   src/frame.c
   src/infobar.c
   src/init.c
+  src/launcher.c
   src/layout.c
   src/menu.c
   src/mouse.c

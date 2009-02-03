@@ -175,6 +175,24 @@ cfg_opt_t menu_opts[] =
 
 /* }}} */
 
+/* LAUNCHER {{{ */
+
+cfg_opt_t launchers_opts[] =
+{
+     CFG_STR("name",    "launcher", CFGF_NONE),
+     CFG_STR("prompt",  "Execute:", CFGF_NONE),
+     CFG_STR("command", "exec",     CFGF_NONE),
+     CFG_END()
+};
+
+cfg_opt_t launcher_opts[] =
+{
+     CFG_SEC("set_launcher", launchers_opts, CFGF_MULTI),
+     CFG_END()
+};
+
+/* }}} */
+
 /* KEYBIND {{{ */
 
 cfg_opt_t key_opts[] =
@@ -212,15 +230,16 @@ cfg_opt_t alias_opts[] =
 
 cfg_opt_t opts[] =
 {
-     CFG_SEC("misc",    misc_opts,      CFGF_NONE),
-     CFG_SEC("alias",   alias_opts,     CFGF_NONE),
-     CFG_SEC("root",    root_opts,      CFGF_NONE),
-     CFG_SEC("client",  client_opts,    CFGF_NONE),
-     CFG_SEC("bar",     bar_opts,       CFGF_NONE),
-     CFG_SEC("layouts", layouts_opts,   CFGF_NONE),
-     CFG_SEC("tags",    tags_opts,      CFGF_NONE),
-     CFG_SEC("menu",    menu_opts,      CFGF_NONE),
-     CFG_SEC("keys",    keys_opts,      CFGF_NONE),
+     CFG_SEC("misc",     misc_opts,      CFGF_NONE),
+     CFG_SEC("alias",    alias_opts,     CFGF_NONE),
+     CFG_SEC("root",     root_opts,      CFGF_NONE),
+     CFG_SEC("client",   client_opts,    CFGF_NONE),
+     CFG_SEC("bar",      bar_opts,       CFGF_NONE),
+     CFG_SEC("layouts",  layouts_opts,   CFGF_NONE),
+     CFG_SEC("tags",     tags_opts,      CFGF_NONE),
+     CFG_SEC("menu",     menu_opts,      CFGF_NONE),
+     CFG_SEC("launcher", launcher_opts,  CFGF_NONE),
+     CFG_SEC("keys",     keys_opts,      CFGF_NONE),
      CFG_END()
 };
 

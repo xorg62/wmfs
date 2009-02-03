@@ -315,10 +315,7 @@ conf_menu_section(cfg_t *cfg_m)
      int i, j;
 
      conf.nmenu = cfg_size(cfg_m, "set_menu");
-
-     if(!conf.nmenu)
-          return;
-
+     CHECK(conf.nmenu);
      conf.menu  = emalloc(conf.nmenu, sizeof(Menu));
 
      for(i = 0; i < conf.nmenu; ++i)
@@ -353,6 +350,27 @@ conf_menu_section(cfg_t *cfg_m)
                                                  ?  NULL : strdup(alias_to_str(cfg_getstr(cfgtmp2, "cmd"))));
                }
           }
+     }
+
+     return;
+}
+
+void
+conf_launcher_section(cfg_t *cfg_l)
+{
+     int i;
+
+     conf.nlauncher = cfg_size(cfg_l, "set_launcher");
+     CHECK(conf.nlauncher);
+     conf.launcher = emalloc(conf.nlauncher, sizeof(Launcher));
+
+     for(i = 0; i < conf.nlauncher; ++i)
+     {
+          cfgtmp = cfg_getnsec(cfg_l, "set_launcher", i);
+
+          conf.launcher[i].name     = alias_to_str(strdup(cfg_getstr(cfgtmp, "name")));
+          conf.launcher[i].prompt   = alias_to_str(strdup(cfg_getstr(cfgtmp, "prompt")));
+          conf.launcher[i].command  = alias_to_str(strdup(cfg_getstr(cfgtmp, "command")));
      }
 
      return;
@@ -420,6 +438,7 @@ init_conf(void)
      conf_layout_section(cfg_getsec(cfg, "layouts"));
      conf_tag_section(cfg_getsec(cfg, "tags"));
      conf_menu_section(cfg_getsec(cfg, "menu"));
+     conf_launcher_section(cfg_getsec(cfg, "launcher"));
      conf_keybind_section(cfg_getsec(cfg, "keys"));
 
      cfg_free(cfg);

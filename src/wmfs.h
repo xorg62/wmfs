@@ -119,7 +119,6 @@ void infobar_draw_layout(int sc);
 void infobar_draw_taglist(int sc);
 void infobar_destroy(void);
 void uicb_infobar_togglepos(uicb_t);
-void uicb_launcher(uicb_t);
 
 /* client.c */
 void client_attach(Client *c);
@@ -203,6 +202,11 @@ void menu_focus_item(Menu *menu, int item, BarWindow *winitem[]);
 void menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[]);
 int menu_get_longer_string(MenuItem *mt, int nitem);
 void uicb_menu(uicb_t cmd);
+
+/* launcher.c */
+void launcher_execute(Launcher launcher);
+void uicb_launcher(uicb_t);
+
 /* mouse.c */
 void mouse_move(Client *c);
 void mouse_resize(Client *c);
@@ -223,6 +227,7 @@ Layout layout_name_to_struct(Layout lt[], char *name, int n, func_name_list_t ll
 char* alias_to_str(char *conf_choice);
 /* }}} */
 XRectangle get_mouse_pos(void);
+void spawn(const char *str, ...);
 void uicb_spawn(uicb_t);
 
 /* tag.c */
@@ -265,7 +270,6 @@ void uicb_layout_next(uicb_t);
 void uicb_set_mwfact(uicb_t);
 void uicb_set_nmaster(uicb_t);
 void uicb_set_layout(uicb_t cmd);
-
 
 /* init.c */
 void init(void);

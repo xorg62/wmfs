@@ -231,6 +231,14 @@ typedef struct
      MenuItem *item;
 } Menu;
 
+/* Launcher struct */
+typedef struct
+{
+     char *name;
+     char *prompt;
+     char *command;
+} Launcher;
+
 /* Alias struct */
 typedef struct
 {
@@ -297,13 +305,16 @@ typedef struct
      Alias alias[256];
      Layout layout[NUM_OF_LAYOUT];
      Menu *menu;
+     Launcher *launcher;
      int *ntag;
      Bool tag_round;
      Bool layout_system; /* Switch: False, Menu: True. */
+     /* Number of... */
      int nkeybind;
      int nbutton;
      int nlayout;
      int nmenu;
+     int nlauncher;
 } Conf;
 
 /* Config.c struct */
