@@ -108,12 +108,24 @@ quit(void)
      free(seltag);
      free(keys);
      free(func_list);
+
+     /* Clean conf alloced thing {{{ */
      if(menulayout.item)
           free(menulayout.item);
+     if(conf.menu)
+     {
+          for(i = 0; i < LEN(conf.menu); ++i)
+               free(conf.menu[i].item);
+          free(conf.menu);
+     }
+     if(conf.launcher)
+          free(conf.launcher);
      free(conf.ntag);
      free(conf.titlebar.mouse);
      free(conf.client.mouse);
      free(conf.root.mouse);
+     /* }}} */
+
      XSync(dpy, False);
 
      return;
