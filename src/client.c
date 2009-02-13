@@ -238,7 +238,7 @@ client_get_name(Client *c)
 {
      XFetchName(dpy, c->win, &(c->title));
      if(!c->title)
-          c->title = strdup("WMFS");
+          c->title = _strdup("WMFS");
 
      frame_update(c);
 

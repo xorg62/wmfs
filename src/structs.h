@@ -187,7 +187,7 @@ typedef struct
 typedef struct
 {
      char *symbol;
-     void (*func)(void);
+     void (*func)(int screen);
 } Layout;
 
 /* Tag Structure */

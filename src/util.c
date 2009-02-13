@@ -102,6 +102,24 @@ setwinstate(Window win, long state)
      return;
 }
 
+/** My strdup. the strdup of string.h isn't ansi compatible..
+ * \param str char pointer
+*/
+char*
+_strdup(char const *str)
+{
+     char *ret = NULL;
+
+     if (str != NULL)
+     {
+          ret = malloc((strlen(str) + 1) * sizeof *ret);
+          if (ret != NULL)
+               strcpy(ret, str);
+     }
+
+     return ret;
+}
+
 
 /* The following function are for configuration
    usage. {{{
@@ -172,9 +190,9 @@ alias_to_str(char *conf_choice)
                     tmpchar = conf.alias[i].content;
 
      if(tmpchar)
-          return strdup(tmpchar);
+          return _strdup(tmpchar);
      else
-          return strdup(conf_choice);
+          return _strdup(conf_choice);
 
      return NULL;
 }

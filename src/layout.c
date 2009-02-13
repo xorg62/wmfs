@@ -48,7 +48,7 @@ arrange(int screen)
                     client_hide(c);
           }
 
-     tags[screen][seltag[screen]].layout.func();
+     tags[screen][seltag[screen]].layout.func(screen);
      infobar_draw(screen);
      ewmh_get_current_layout();
 
@@ -58,7 +58,7 @@ arrange(int screen)
 /** The free layout function
 */
 void
-freelayout(void)
+freelayout(int screen)
 {
      Client *c;
 
@@ -100,7 +100,7 @@ layoutswitch(Bool b)
           }
      }
      ewmh_get_current_layout();
-     tags[selscreen][seltag[selscreen]].layout.func();
+     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
      infobar_draw(selscreen);
 
      return;
@@ -131,11 +131,11 @@ uicb_layout_prev(uicb_t cmd)
 /** Max layout function
 */
 void
-maxlayout(void)
+maxlayout(int screen)
 {
      Client *c;
 
-     for(c = nexttiled(clients); c; c = nexttiled(c->next))
+     for(c = nexttiled(screen, clients); c; c = nexttiled(screen, c->next))
      {
           c->tile = False;
           c->lmax = True;
@@ -151,11 +151,11 @@ maxlayout(void)
  * \return a client pointer
 */
 Client*
-nexttiled(Client *c)
+nexttiled(int screen, Client *c)
 {
      for(;c && (c->max
                 || c->free
-                || c->screen != selscreen
+                || c->screen != screen
                 || c->state_fullscreen
                 || ishide(c)); c = c->next);
 
@@ -179,7 +179,7 @@ uicb_set_mwfact(uicb_t cmd)
           return;
 
      tags[selscreen][seltag[selscreen]].mwfact += c;
-     tags[selscreen][seltag[selscreen]].layout.func();
+     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
 
      return;
 }
@@ -195,14 +195,14 @@ uicb_set_nmaster(uicb_t cmd)
 
      screen_get_sel();
 
-     for(nc = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++nc);
+     for(nc = 0, c = nexttiled(selscreen, clients); c; c = nexttiled(selscreen, c->next), ++nc);
 
      if(!nc || tags[selscreen][seltag[selscreen]].nmaster + n == 0
         || tags[selscreen][seltag[selscreen]].nmaster + n > nc)
           return;
 
      tags[selscreen][seltag[selscreen]].nmaster += n;
-     tags[selscreen][seltag[selscreen]].layout.func();
+     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
 
      return;
 }
@@ -210,15 +210,15 @@ uicb_set_nmaster(uicb_t cmd)
 /** Grid layout function
 */
 void
-grid(void)
+grid(int screen)
 {
      Client *c;
-     XRectangle sg = sgeo[selscreen];
+     XRectangle sg = sgeo[screen];
      XRectangle cgeo = {sg.x, sg.y, 0, 0};
      unsigned int i, n, cols, rows, cpcols = 0;
      unsigned int border = BORDH * 2;
 
-     for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++n);
+     for(n = 0, c = nexttiled(screen, clients); c; c = nexttiled(screen, c->next), ++n);
      CHECK(n);
 
      for(rows = 0; rows <= n / 2; ++rows)
@@ -229,7 +229,7 @@ grid(void)
           ? rows - 1
           : rows;
 
-     for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++i)
+     for(i = 0, c = nexttiled(screen, clients); c; c = nexttiled(screen, c->next), ++i)
      {
           /* Set client property */
           c->max = c->lmax = False;
@@ -247,7 +247,7 @@ grid(void)
                cgeo.width = sg.width - (cgeo.x - (sg.x - border));
 
           /* Resize */
-          client_moveresize(c, cgeo, tags[selscreen][seltag[selscreen]].resizehint);
+          client_moveresize(c, cgeo, tags[screen][seltag[screen]].resizehint);
 
           /* Set all the other size with current client info */
           cgeo.y = c->geo.y + c->geo.height + border + TBARH;
@@ -266,16 +266,16 @@ grid(void)
  * \param type Postion type { Top, Bottom, Left, Right }
 */
 void
-multi_tile(Position type)
+multi_tile(int screen, Position type)
 {
      Client *c;
-     XRectangle sg = sgeo[selscreen];
+     XRectangle sg = sgeo[screen];
      XRectangle mastergeo = {sg.x, sg.y, 0, 0};
      XRectangle cgeo = {sg.x, sg.y, 0, 0};
-     uint i , n, tilesize, mwfact, nmaster = tags[selscreen][seltag[selscreen]].nmaster;
+     uint i , n, tilesize, mwfact, nmaster = tags[screen][seltag[screen]].nmaster;
      uint border = BORDH * 2;
 
-     for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++n);
+     for(n = 0, c = nexttiled(screen, clients); c; c = nexttiled(screen, c->next), ++n);
      CHECK(n);
 
      /* FIX NMASTER */
@@ -283,8 +283,8 @@ multi_tile(Position type)
 
      /* SET MWFACT */
      mwfact = (type == Top || type == Bottom)
-          ? tags[selscreen][seltag[selscreen]].mwfact * sg.height
-          : tags[selscreen][seltag[selscreen]].mwfact * sg.width;
+          ? tags[screen][seltag[screen]].mwfact * sg.height
+          : tags[screen][seltag[screen]].mwfact * sg.width;
 
      /* MASTER SIZE */
      if(type == Top || type == Bottom)
@@ -312,7 +312,7 @@ multi_tile(Position type)
      }
 
 
-     for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), ++i)
+     for(i = 0, c = nexttiled(screen, clients); c; c = nexttiled(screen, c->next), ++i)
      {
           /* Set client property */
           c->max = c->lmax = False;
@@ -380,7 +380,7 @@ multi_tile(Position type)
           }
 
           /* Magic instant */
-          client_moveresize(c, cgeo, tags[selscreen][seltag[selscreen]].resizehint);
+          client_moveresize(c, cgeo, tags[screen][seltag[screen]].resizehint);
 
           /* Set the position of the next client */
           if(type == Top || type == Bottom)
@@ -395,9 +395,9 @@ multi_tile(Position type)
 /** Tile Right function
 */
 void
-tile(void)
+tile(int screen)
 {
-     multi_tile(Right);
+     multi_tile(screen, Right);
 
      return;
 }
@@ -405,9 +405,9 @@ tile(void)
 /** Tile Left function
 */
 void
-tile_left(void)
+tile_left(int screen)
 {
-     multi_tile(Left);
+     multi_tile(screen, Left);
 
      return;
 }
@@ -415,9 +415,9 @@ tile_left(void)
 /** Tile Top function
 */
 void
-tile_top(void)
+tile_top(int screen)
 {
-     multi_tile(Top);
+     multi_tile(screen, Top);
 
      return;
 }
@@ -426,9 +426,9 @@ tile_top(void)
 /** Tile Bottom function
 */
 void
-tile_bottom(void)
+tile_bottom(int screen)
 {
-     multi_tile(Bottom);
+     multi_tile(screen, Bottom);
 
      return;
 }
@@ -445,12 +445,12 @@ uicb_tile_switch(uicb_t cmd)
 
      if(!sel || sel->hint || !sel->tile || sel->state_fullscreen)
           return;
-     if((c = sel) == nexttiled(clients))
-          CHECK((c = nexttiled(c->next)));
+     if((c = sel) == nexttiled(selscreen, clients))
+          CHECK((c = nexttiled(selscreen, c->next)));
      client_detach(c);
      client_attach(c);
      client_focus(c);
-     tags[selscreen][seltag[selscreen]].layout.func();
+     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
 
      return;
 }
@@ -474,7 +474,7 @@ uicb_togglefree(uicb_t cmd)
      else
           sel->ogeo = sel->geo;
 
-     tags[selscreen][seltag[selscreen]].layout.func();
+     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
 
      return;
 }
@@ -500,7 +500,7 @@ uicb_togglemax(uicb_t cmd)
      else
      {
           sel->max = False;
-          tags[selscreen][seltag[selscreen]].layout.func();
+          tags[selscreen][seltag[selscreen]].layout.func(selscreen);
      }
 
      return;

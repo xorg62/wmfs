@@ -264,7 +264,7 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
           {
                c->state_fullscreen = False;
                client_moveresize(c, c->tmp_geo, False);
-               tags[selscreen][seltag[selscreen]].layout.func();
+               tags[selscreen][seltag[selscreen]].layout.func(selscreen);
           }
      }
      /* Manage _NET_WM_STATE_DEMANDS_ATTENTION */
@@ -314,7 +314,7 @@ ewmh_manage_window_type(Client *c)
                     sel->tile = sel->max = sel->lmax = False;
                     client_moveresize(sel, sel->ogeo, True);
                     client_focus(c);
-                    tags[selscreen][seltag[selscreen]].layout.func();
+                    tags[selscreen][seltag[selscreen]].layout.func(selscreen);
                }
           }
           XFree(data);

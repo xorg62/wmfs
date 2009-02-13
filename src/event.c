@@ -32,8 +32,6 @@
 
 #include "wmfs.h"
 
-//#include "config_struct.h"
-
 /** ButtonPress handle event
  * \param ev XButtonEvent pointer
 */
@@ -84,7 +82,7 @@ buttonpress(XButtonEvent *ev)
                }
 
      /* Layout button */
-     if(ev->window == infobar[selscreen].layout_button->win)
+     if(ev->window == infobar[selscreen].layout_button->win && conf.nlayout > 1)
      {
           if(conf.layout_system && (ev->button == Button1 || ev->button == Button3)) /* True -> menu */
           {

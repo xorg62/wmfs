@@ -40,22 +40,22 @@ errorhandler(Display *d, XErrorEvent *event)
 
      /* Check if there are another WM running */
      if(BadAccess == event->error_code
-        && DefaultRootWindow(dpy) == event->resourceid)
+        && ROOT == event->resourceid)
      {
           fprintf(stderr, "WMFS Error: Another Window Manager is already running.\n");
           exit(EXIT_FAILURE);
      }
 
      /* Ignore focus change error for unmapped client */
-     /* Too lemmy to add Xproto.h so:
+     /* Too lazy to add Xproto.h so:
       * 42 = X_SetInputFocus
       * 28 = X_GrabButton
       */
      if((c = client_gb_win(event->resourceid)))
           if(event->error_code == BadWindow
-             || (event->error_code == BadMatch && event->request_code == 42)
-             ||  event->request_code == 28)
-          return 0;
+             || event->request_code == 42
+               ||  event->request_code == 28)
+               return 0;
 
 
      XGetErrorText(d, event->error_code, mess, 128);
@@ -95,9 +95,11 @@ quit(void)
 
           client_unmanage(c);
      }
-     for(i = 0; i < screen_count(); ++i)
-          free(tags[i]);
-     free(tags);
+
+     if(tags)
+          free(tags);
+     free(seltag);
+
      XftFontClose(dpy, font);
      XFreeCursor(dpy, cursor[CurNormal]);
      XFreeCursor(dpy, cursor[CurMove]);
@@ -105,7 +107,6 @@ quit(void)
      infobar_destroy();
      free(sgeo);
      free(infobar);
-     free(seltag);
      free(keys);
      free(func_list);
 
@@ -121,9 +122,12 @@ quit(void)
      if(conf.launcher)
           free(conf.launcher);
      free(conf.ntag);
-     free(conf.titlebar.mouse);
-     free(conf.client.mouse);
-     free(conf.root.mouse);
+     if(conf.titlebar.nmouse)
+          free(conf.titlebar.mouse);
+     if(conf.client.nmouse)
+          free(conf.client.mouse);
+     if(conf.root.nmouse)
+          free(conf.root.mouse);
      /* }}} */
 
      XSync(dpy, False);

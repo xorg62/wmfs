@@ -42,6 +42,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <getopt.h>
+#include <sys/select.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <confuse.h>
@@ -219,6 +220,7 @@ ulong color_enlight(ulong col);
 void *emalloc(uint element, uint size);
 ulong getcolor(char *color);
 void setwinstate(Window win, long state);
+char* _strdup(char const *str);
 /* Conf usage {{{ */
 void* name_to_func(char *name, func_name_list_t *l);
 ulong char_to_modkey(char *name, key_name_list_t key_l[]);
@@ -251,16 +253,16 @@ void uicb_screen_prev(uicb_t cmd);
 
 /* layout.c */
 void arrange(int screen);
-void freelayout(void);
+void freelayout(int screen);
 void layoutswitch(Bool b);
-void maxlayout(void);
-Client *nexttiled(Client *c);
+void maxlayout(int screen);
+Client *nexttiled(int screen, Client *c);
 /* tile {{{ */
- void grid(void);
- void tile(void);
- void tile_left(void);
- void tile_top(void);
- void tile_bottom(void);
+ void grid(int screen);
+ void tile(int screen);
+ void tile_left(int screen);
+ void tile_top(int screen);
+ void tile_bottom(int screen);
 /* }}} */
 void uicb_tile_switch(uicb_t);
 void uicb_togglemax(uicb_t);
