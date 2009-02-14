@@ -194,7 +194,7 @@ frame_update(Client *c)
      {
           barwin_draw_text(c->titlebar, (c->frame_geo.width / 2) - (textw(c->title) / 2),
                            (font->height - (font->descent)) + (((TBARH + BORDH) - font->height) / 2),
-                           strdup(c->title));
+                           c->title);
      }
      return;
 }
