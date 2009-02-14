@@ -236,7 +236,16 @@ client_focus(Client *c)
 void
 client_get_name(Client *c)
 {
-     XFetchName(dpy, c->win, &(c->title));
+     Atom rt;
+     int rf;
+     ulong ir, il;
+
+     if(XGetWindowProperty(dpy, c->win, net_atom[net_wm_name], 0, 4096,
+                           False, net_atom[utf8_string], &rt, &rf, &ir, &il, (uchar**)&c->title) != Success)
+          XGetWindowProperty(dpy, c->win, ATOM("WM_NAME"), 0, 4096,
+                             False, net_atom[utf8_string], &rt, &rf, &ir, &il, (uchar**)&c->title);
+
+     /* If there is no title... */
      if(!c->title)
           c->title = _strdup("WMFS");
 
