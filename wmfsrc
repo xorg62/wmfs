@@ -24,11 +24,12 @@ layouts
 {
         fg = "#191919"
         bg = "#7E89A2"
+
         # Border around the layout button
         border = true
 
-
-        system = "menu" # menu or switch
+        # menu or switch
+        system = "menu"
 
         # Tiling layouts
         layout { type = "tile_right"   symbol = "RIGHT" }
@@ -45,9 +46,10 @@ layouts
 tags
 {
         tag_round    = false
-        occupied_bg = "#003366"
+        occupied_bg  = "#003366"
         sel_fg       = "#191919"
         sel_bg       = "#7E89A2"
+
         # Border around the tag buttons
         border       = true
 
@@ -64,6 +66,7 @@ tags
 
 root
 {
+        # Command you can execute for set the Wallpaper
         background_command = "xsetroot -solid black"
 
         mouse { button = "4" func = "tag_next" }
@@ -106,8 +109,8 @@ menu
         {
                 name = "rootmenu"
 
-                #place_at_mouse = false
-                #x = 40 y = 50
+                # place_at_mouse = false
+                # x = 40 y = 50
 
                 fg_focus  = "#000000" bg_focus  = "#ffffff"
                 fg_normal = "#ffffff" bg_normal = "#000000"
@@ -137,29 +140,66 @@ launcher
 keys
 {
 # general keybind
-        key { mod = {"Alt"} key = "r" func = "reload" }
+
+        # Reload the configuration of wmfs
+        key { mod = {"Alt", "Control"} key = "r" func = "reload" }
+
+        # Open a terminal
         key { mod = {"Control"} key = "Return" func = "spawn" cmd = term }
+
+        # Kill the selected client
         key { mod = {"Alt"} key = "q" func = "client_kill" }
+
+        # Quit wmfs :(
         key { mod = {"Control", "Alt", "Shift"} key = "q" func = "quit" }
-        key { mod = {"Control"} key = "m" func = "toggle_max" }
-        key { mod = {"Control"} key = "f" func = "toggle_free" }
-        key { mod = {"Control"} key = "b" func = "toggle_infobar_position" }
+
+        # Toggle maximum the selected client
+        key { mod = {"Alt"} key = "m" func = "toggle_max" }
+
+
+        # Toggle free the selected client
+        key { mod = {"Alt"} key = "f" func = "toggle_free" }
+
+        # Toggle the position of the infobar
+        key { mod = {"Alt"} key = "b" func = "toggle_infobar_position" }
+
+        # Select the next client
         key { mod = {"Alt"} key = "Tab" func = "client_next" }
-        key { mod = {"Alt","Shift"} key = "Tab" func = "client_prev" }
+
+        # Select the previous client
+        key { mod = {"Alt","Shift"} key = "Tab" func = "client_prev" }#
+
+        # Select the next tag
         key { mod = {"Control"} key = "Right" func = "tag_next" }
+
+        # Select the previous tag
         key { mod = {"Control"} key = "Left" func = "tag_prev" }
-        key { mod = {"Control"} key = "Up" func = "layout_next" }
-        key { mod = {"Control"} key = "Down" func = "layout_prev" }
-        key { mod = {"Alt"} key = "l" func = "set_mwfact" cmd = "+0.025" }
-        key { mod = {"Alt"} key = "h" func = "set_mwfact" cmd = "-0.025" }
-        key { mod = {"Alt", "Shift"} key = "l" func = "set_nmaster" cmd = "+1" }
-        key { mod = {"Alt", "Shift"} key = "h" func = "set_nmaster" cmd = "-1" }
+
+        # Set the next layout
+        key { mod = {"Alt"} key = "space" func = "layout_next" }
+
+        # Set the previous layout
+        key { mod = {"Alt", "Shift"} key = "space" func = "layout_prev" }
+
+        # Increase mwfact
+        key { mod = {"Alt", "Shift"} key = "l" func = "set_mwfact" cmd = "+0.025" }
+
+        # Decrease mwfact
+        key { mod = {"Alt", "Shift"} key = "h" func = "set_mwfact" cmd = "-0.025" }
+
+        # Increase nmaster
+        key { mod = {"Alt"} key = "d" func = "set_nmaster" cmd = "+1" }
+
+        # Decease nmaster
+        key { mod = {"Alt", "Shift"} key = "d" func = "set_nmaster" cmd = "-1" }
 
         # Launchers
         key { mod = { "Alt" } key = "p" func = "launcher" cmd = "launcher_exec" }
-        key { mod = { "Alt", "Control" } key = "p" func = "launcher" cmd = "launcher_ssh" }
+        key { mod = { "Alt", "Shift" } key = "p" func = "launcher" cmd = "launcher_ssh" }
 
 # tag manipulation keybind
+
+        # Set the tag x
         key { mod = {"Alt"} key = "F1" func = "tag" cmd = "1" }
         key { mod = {"Alt"} key = "F2" func = "tag" cmd = "2" }
         key { mod = {"Alt"} key = "F3" func = "tag" cmd = "3" }
@@ -170,13 +210,14 @@ keys
         key { mod = {"Alt"} key = "F8" func = "tag" cmd = "8" }
         key { mod = {"Alt"} key = "F9" func = "tag" cmd = "9" }
 
-        key { mod = {"Control", "Shift"} key = "F1" func = "tag_transfert" cmd ="1" }
-        key { mod = {"Control", "Shift"} key = "F2" func = "tag_transfert" cmd ="2" }
-        key { mod = {"Control", "Shift"} key = "F3" func = "tag_transfert" cmd ="3" }
-        key { mod = {"Control", "Shift"} key = "F4" func = "tag_transfert" cmd ="4" }
-        key { mod = {"Control", "Shift"} key = "F5" func = "tag_transfert" cmd ="5" }
-        key { mod = {"Control", "Shift"} key = "F6" func = "tag_transfert" cmd ="6" }
-        key { mod = {"Control", "Shift"} key = "F7" func = "tag_transfert" cmd ="7" }
-        key { mod = {"Control", "Shift"} key = "F8" func = "tag_transfert" cmd ="8" }
-        key { mod = {"Control", "Shift"} key = "F9" func = "tag_transfert" cmd ="9" }
+        # Transfert selected client to x
+        key { mod = {"Alt", "Shift"} key = "F1" func = "tag_transfert" cmd ="1" }
+        key { mod = {"Alt", "Shift"} key = "F2" func = "tag_transfert" cmd ="2" }
+        key { mod = {"Alt", "Shift"} key = "F3" func = "tag_transfert" cmd ="3" }
+        key { mod = {"Alt", "Shift"} key = "F4" func = "tag_transfert" cmd ="4" }
+        key { mod = {"Alt", "Shift"} key = "F5" func = "tag_transfert" cmd ="5" }
+        key { mod = {"Alt", "Shift"} key = "F6" func = "tag_transfert" cmd ="6" }
+        key { mod = {"Alt", "Shift"} key = "F7" func = "tag_transfert" cmd ="7" }
+        key { mod = {"Alt", "Shift"} key = "F8" func = "tag_transfert" cmd ="8" }
+        key { mod = {"Alt", "Shift"} key = "F9" func = "tag_transfert" cmd ="9" }
 }

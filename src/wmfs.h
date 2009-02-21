@@ -86,7 +86,6 @@
 #define LEN(x)       (sizeof(x) / sizeof((x)[0]))
 #define deb(p)       fprintf(stderr, "debug: %d\n", (p))
 #define PAD          (14)
-#define LPROMPT      "Exec: "
 
 /* barwin.c */
 BarWindow *barwin_create(Window parent,

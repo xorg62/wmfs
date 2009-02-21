@@ -54,7 +54,7 @@ add_executable(wmfs ${wmfs_src})
 add_executable(wmfs-shell ${wmfs-shell_src})
 
 # Set the version - NOT USED AT THE MOMENT
-set(VERSION "0.1rc3 (Empty Spaces)")
+set(VERSION "0.1rc4 (On The Run)")
 
 # FLAGS
 set(CFLAGS "-g -Wall")

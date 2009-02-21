@@ -240,6 +240,7 @@ client_get_name(Client *c)
      int rf;
      ulong ir, il;
 
+     /* This one instead XFetchName for utf8 name support */
      if(XGetWindowProperty(dpy, c->win, net_atom[net_wm_name], 0, 4096,
                            False, net_atom[utf8_string], &rt, &rf, &ir, &il, (uchar**)&c->title) != Success)
           XGetWindowProperty(dpy, c->win, ATOM("WM_NAME"), 0, 4096,

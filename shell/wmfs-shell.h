@@ -54,6 +54,7 @@
       tag_set(<tag number>)            Change the current tag\n\
       statustext(text)                 Print text in the wmfs bar.\n\
       spawn(<command>)                 Execute a system command.\n\n"
+
 #define UICBLIST \
      "Here is a list of all wmfs's uicb functions that are usable with the exec function:   \n\
      spawn                         Exec a system command.                                   \n\
@@ -80,7 +81,6 @@
      screen_next                   Select the next screen.                                  \n\
      screen_prev                   Select the previous screen.                              \n\
      reload                        Reload the WMFS configuration.                           \n\n"
-
 
 /* Xlib util macro */
 #define ROOT    RootWindow(dpy, SCREEN)

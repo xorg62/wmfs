@@ -284,18 +284,19 @@ main(int argc, char *argv[])
      char *input, *p;
      int c;
      char opt;
-     const char *optstring = "hc";
+
      static struct option shell_opts[] =
      {
-        {"help", 0, NULL, 'h'},
-        {"cmd", 1, NULL, 'c'},
-        {0,0,0,0}
+        {"help",  0, NULL, 'h'},
+        {"cmd",   1, NULL, 'c'},
+        {0}
      };
 
+     /* Initialisation */
      init();
 
      /* get args from argv */
-     while(EOF != (opt = (char)getopt_long(argc, argv, optstring, shell_opts, NULL)))
+     while(EOF != (opt = (char)getopt_long(argc, argv, "hc", shell_opts, NULL)))
      {
 
         /* Just print help */
@@ -317,8 +318,6 @@ main(int argc, char *argv[])
 
      }
 
-
-
      for(;;)
      {
           printf(PROMPT);
@@ -337,8 +336,6 @@ main(int argc, char *argv[])
 
           free(input);
      }
-
-
 
      return 0;
 }

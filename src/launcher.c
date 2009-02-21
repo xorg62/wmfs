@@ -78,6 +78,7 @@ launcher_execute(Launcher launcher)
                     ++pos;
                     break;
                }
+
                barwin_refresh_color(infobar[selscreen].bar);
                barwin_draw_text(infobar[selscreen].bar, x, font->height, launcher.prompt);
                barwin_draw_text(infobar[selscreen].bar, x + textw(launcher.prompt) + textw(" "), font->height, buf);
