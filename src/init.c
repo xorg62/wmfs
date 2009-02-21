@@ -132,9 +132,8 @@ init_root(void)
 {
      XSetWindowAttributes at;
 
-     at.event_mask = KeyMask|ButtonMask|MouseMask
-          |SubstructureRedirectMask|SubstructureNotifyMask
-          |EnterWindowMask|LeaveWindowMask|StructureNotifyMask;
+     at.event_mask = KeyMask | ButtonMask | MouseMask
+          | SubstructureRedirectMask | SubstructureNotifyMask |StructureNotifyMask;
 
      at.cursor = cursor[CurNormal];
      XChangeWindowAttributes(dpy, ROOT, CWEventMask | CWCursor, &at);

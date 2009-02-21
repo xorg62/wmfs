@@ -40,7 +40,9 @@ mouse_move(Client *c)
 {
      int ocx = c->geo.x;
      int ocy = c->geo.y;
-     int mx = 0, my = 0, dint;
+     int mx = c->geo.x;
+     int my = c->geo.y;
+     int dint;
      uint duint;
      Window dw;
      XRectangle geo = c->geo;
@@ -56,27 +58,25 @@ mouse_move(Client *c)
 
      XQueryPointer(dpy, ROOT, &dw, &dw, &mx, &my, &dint, &dint, &duint);
 
-     for(;;)
+     do
      {
           XMaskEvent(dpy, MouseMask | ExposureMask | SubstructureRedirectMask, &ev);
 
-          if(ev.type == ButtonRelease)
-          {
-               XUngrabPointer(dpy, CurrentTime);
-               return;
-          }
-          else if(ev.type == MotionNotify)
+          if(ev.type == MotionNotify)
           {
                geo.x = (ocx + (ev.xmotion.x - mx));
                geo.y = (ocy + (ev.xmotion.y - my));
 
                client_moveresize(c, geo, True);
-
-               XSync(dpy, False);
           }
-          else if(ev.type == Expose)
-               expose(&ev.xexpose);
+          else if(ev.type == MapRequest
+                  || ev.type == Expose
+                  || ev.type == ConfigureRequest)
+               getevent(ev);
      }
+     while(ev.type != ButtonRelease);
+
+     XUngrabPointer(dpy, CurrentTime);
 
      return;
 }

@@ -77,16 +77,6 @@ color_enlight(ulong col)
           return col;
 }
 
-/** Round function
- * \param x double type
- * \return the round of x
-*/
-double
-round(double x)
-{
-     return (x > 0) ? x + 0.5 : x - 0.5;
-}
-
 /** Set the window WM State
  * \param win Window target
  * \param state WM State
@@ -110,10 +100,10 @@ _strdup(char const *str)
 {
      char *ret = NULL;
 
-     if (str != NULL)
+     if(str != NULL)
      {
           ret = malloc((strlen(str) + 1) * sizeof *ret);
-          if (ret != NULL)
+          if(ret != NULL)
                strcpy(ret, str);
      }
 

@@ -506,7 +506,7 @@ uicb_togglemax(uicb_t cmd)
      return;
 }
 
-/** Set the layout
+/** Set the layout *CRAP*
  * \param cmd uicb_t type
 */
 void

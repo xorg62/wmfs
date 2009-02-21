@@ -75,10 +75,10 @@ buttonpress(XButtonEvent *ev)
           if(ev->window == infobar[selscreen].tags[i]->win)
                switch(ev->button)
                {
-                case Button1: tag_set(i);                     break;
-                case Button3: tag_transfert(sel, i);          break;
-                case Button4: tag_set(seltag[selscreen] + 1); break;
-                case Button5: tag_set(seltag[selscreen] - 1); break;
+               case Button1: tag_set(i);                     break;
+               case Button3: tag_transfert(sel, i);          break;
+               case Button4: tag_set(seltag[selscreen] + 1); break;
+               case Button5: tag_set(seltag[selscreen] - 1); break;
                }
 
      /* Layout button */
@@ -98,8 +98,8 @@ buttonpress(XButtonEvent *ev)
           {
                switch(ev->button)
                {
-                case Button1: case Button4: layoutswitch(True);  break;
-                case Button3: case Button5: layoutswitch(False); break;
+               case Button1: case Button4: layoutswitch(True);  break;
+               case Button3: case Button5: layoutswitch(False); break;
                }
           }
      }
@@ -293,8 +293,9 @@ enternotify(XCrossingEvent *ev)
 {
      Client *c;
 
-     if(ev->mode != NotifyNormal
-        || ev->detail == NotifyInferior)
+     if((ev->mode != NotifyNormal
+         || ev->detail == NotifyInferior)
+        && ev->window != ROOT)
           return;
 
      if((c = client_gb_win(ev->window))
@@ -482,18 +483,18 @@ getevent(XEvent ev)
 
      switch (ev.type)
      {
-      case ButtonPress:      buttonpress(&ev.xbutton);          break;
-      case ClientMessage:    clientmessageevent(&ev.xclient);   break;
-      case ConfigureRequest: configureevent(&ev);               break;
-      case DestroyNotify:    destroynotify(&ev.xdestroywindow); break;
-      case EnterNotify:      enternotify(&ev.xcrossing);        break;
-      case Expose:           expose(&ev.xexpose);               break;
-      case FocusIn:          focusin(&ev.xfocus);               break;
-      case KeyPress:         keypress(&ev.xkey);                break;
-      case MapRequest:       maprequest(&ev.xmaprequest);       break;
-      case MappingNotify:    mappingnotify(&ev.xmapping);       break;
-      case PropertyNotify:   propertynotify(&ev.xproperty);     break;
-      case UnmapNotify:      unmapnotify(&ev.xunmap);           break;
+     case ButtonPress:      buttonpress(&ev.xbutton);          break;
+     case ClientMessage:    clientmessageevent(&ev.xclient);   break;
+     case ConfigureRequest: configureevent(&ev);               break;
+     case DestroyNotify:    destroynotify(&ev.xdestroywindow); break;
+     case EnterNotify:      enternotify(&ev.xcrossing);        break;
+     case Expose:           expose(&ev.xexpose);               break;
+     case FocusIn:          focusin(&ev.xfocus);               break;
+     case KeyPress:         keypress(&ev.xkey);                break;
+     case MapRequest:       maprequest(&ev.xmaprequest);       break;
+     case MappingNotify:    mappingnotify(&ev.xmapping);       break;
+     case PropertyNotify:   propertynotify(&ev.xproperty);     break;
+     case UnmapNotify:      unmapnotify(&ev.xunmap);           break;
      }
 
      wait(&st);
