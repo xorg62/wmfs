@@ -54,16 +54,16 @@ client_configure(Client *c)
 {
      XConfigureEvent ev;
 
-     ev.type               = ConfigureNotify;
-     ev.event              = c->win;
-     ev.window             = c->win;
-     ev.x                  = c->geo.x;
-     ev.y                  = c->geo.y;
-     ev.width              = c->geo.width;
-     ev.height             = c->geo.height;
-     ev.above              = None;
-     ev.border_width       = 0;
-     ev.override_redirect  = 0;
+     ev.type              = ConfigureNotify;
+     ev.event             = c->win;
+     ev.window            = c->win;
+     ev.x                 = c->geo.x;
+     ev.y                 = c->geo.y;
+     ev.width             = c->geo.width;
+     ev.height            = c->geo.height;
+     ev.above             = None;
+     ev.border_width      = 0;
+     ev.override_redirect = 0;
 
      XSendEvent(dpy, c->win, False, StructureNotifyMask, (XEvent *)&ev);
 
@@ -301,6 +301,7 @@ client_kill(Client *c)
                if(atom[proto] == ATOM("WM_DELETE_WINDOW"))
                     ++canbedel;
           XFree(atom);
+
           if(canbedel)
           {
                ev.type = ClientMessage;
@@ -511,6 +512,8 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
 
           frame_moveresize(c, c->geo);
           XMoveResizeWindow(dpy, c->win, BORDH, BORDH + TBARH, c->geo.width, c->geo.height);
+
+          client_configure(c);
 
           XSync(dpy, False);
      }
