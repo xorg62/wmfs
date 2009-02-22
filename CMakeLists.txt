@@ -197,6 +197,15 @@ if(GENERATE_MANPAGES)
     endif()
 endif()
 
+# sets
+# {{{ Install path and configuration variables
+if(DEFINED PREFIX)
+    set(PREFIX ${PREFIX} CACHE PATH "install prefix")
+    set(CMAKE_INSTALL_PREFIX ${PREFIX})
+else()
+    set(PREFIX ${CMAKE_INSTALL_PREFIX} CACHE PATH "install prefix")
+endif()
+
 #If a sysconfdir is specified, use it instead
 #of the default configuration dir.
 if(DEFINED SYSCONFDIR)
@@ -213,13 +222,11 @@ else()
     set(XDG_CONFIG_DIR ${SYSCONFDIR}/xdg CACHE PATH "xdg config directory")
 endif()
 
-# sets
-# {{{ Install path and configuration variables
-if(DEFINED PREFIX)
-    set(PREFIX ${PREFIX} CACHE PATH "install prefix")
-    set(CMAKE_INSTALL_PREFIX ${PREFIX})
+# setting WMFS_XSESSION_PATH
+if(DEFINED WMFS_XSESSION_PATH)
+    set(WMFS_XSESSION_PATH ${WMFS_XSESSION_PATH} CACHE PATH "wmfs xsessions directory")
 else()
-    set(PREFIX ${CMAKE_INSTALL_PREFIX} CACHE PATH "install prefix")
+    set(WMFS_XSESSION_PATH ${PREFIX}/share/xsessions CACHE PATH "wmfs xsessions directory")
 endif()
 
 # set man path
@@ -327,3 +334,4 @@ endif()
 install(FILES ${PROJECT_TODO} ${PROJECT_README} ${PROJECT_CHANGELOG}
   ${PROJECT_DEFAULT_CONF} DESTINATION ${PROJECT_DATA_PATH})
 install(FILES ${PROJECT_DEFAULT_CONF} DESTINATION ${WMFS_SYSCONFDIR})
+install(FILES "wmfs.desktop" DESTINATION ${WMFS_XSESSION_PATH})
