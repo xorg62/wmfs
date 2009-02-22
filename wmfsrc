@@ -7,7 +7,7 @@ alias
 
 misc
 {
-        font        = "dejavu-9"
+        font        = "dejavu-10"
         raisefocus  = false
         raiseswitch = true
 }
@@ -32,15 +32,15 @@ layouts
         system = "menu"
 
         # Tiling layouts
-        layout { type = "tile_right"   symbol = "RIGHT" }
-        layout { type = "tile_left"    symbol = "LEFT" }
-        layout { type = "tile_top"     symbol = "TOP" }
-        layout { type = "tile_bottom"  symbol = "BOTTOM" }
-        layout { type = "tile_grid"    symbol = "GRID" }
+        layout { type = "tile_right"  symbol = "RIGHT" }
+        layout { type = "tile_left"   symbol = "LEFT" }
+        layout { type = "tile_top"    symbol = "TOP" }
+        layout { type = "tile_bottom" symbol = "BOTTOM" }
+        layout { type = "tile_grid"   symbol = "GRID" }
 
         # Other
-        layout { type = "max"          symbol = "MAX"  }
-        layout { type = "free"         symbol = "FREE" }
+        layout { type = "max"         symbol = "MAX"  }
+        layout { type = "free"        symbol = "FREE" }
 }
 
 tags
@@ -89,8 +89,10 @@ client
         mouse { button = "3" func = "client_raise" }
         mouse { button = "3" func = "mouse_resize" }
 
+        # Remove this section for delete the titlebar
         titlebar
         {
+                stipple    = false
                 height     = 11
                 fg_normal  = "#7E89A2"
                 fg_focus   = "#9F9AB3"
@@ -103,8 +105,10 @@ client
         }
 }
 
+
 menu
 {
+        # Default menu, binded on the root window.
         set_menu
         {
                 name = "rootmenu"
@@ -112,12 +116,16 @@ menu
                 # place_at_mouse = false
                 # x = 40 y = 50
 
-                fg_focus  = "#000000" bg_focus  = "#ffffff"
-                fg_normal = "#ffffff" bg_normal = "#000000"
+                fg_focus  = "#191919" bg_focus  = "#7E89A2"
+                fg_normal = "#D4D4D4" bg_normal = "#191919"
 
-                item { name = "Terminal" func = "spawn" cmd = term }
-                item { name = "Next tag" func = "tag_next" }
-                item { name = "Previous tag" func = "tag_prev" }
+                item { name = "Terminal"        func = "spawn" cmd = term }
+                item { name = "Next tag"        func = "tag_next" }
+                item { name = "Previous tag"    func = "tag_prev" }
+                item { name = "Next layout"     func = "layout_next" }
+                item { name = "Previous layout" func = "layout_prev" }
+                item { name = "Toggle infobar"  func = "toggle_infobar_position" }
+                item { name = "Quit WMFS"       func = "quit" }
         }
 }
 
@@ -139,8 +147,6 @@ launcher
 
 keys
 {
-# general keybind
-
         # Reload the configuration of wmfs
         key { mod = {"Alt", "Control"} key = "r" func = "reload" }
 
@@ -156,7 +162,6 @@ keys
         # Toggle maximum the selected client
         key { mod = {"Alt"} key = "m" func = "toggle_max" }
 
-
         # Toggle free the selected client
         key { mod = {"Alt"} key = "f" func = "toggle_free" }
 
@@ -167,7 +172,7 @@ keys
         key { mod = {"Alt"} key = "Tab" func = "client_next" }
 
         # Select the previous client
-        key { mod = {"Alt","Shift"} key = "Tab" func = "client_prev" }#
+        key { mod = {"Alt","Shift"} key = "Tab" func = "client_prev" }
 
         # Select the next tag
         key { mod = {"Control"} key = "Right" func = "tag_next" }
@@ -196,8 +201,6 @@ keys
         # Launchers
         key { mod = { "Alt" } key = "p" func = "launcher" cmd = "launcher_exec" }
         key { mod = { "Alt", "Shift" } key = "p" func = "launcher" cmd = "launcher_ssh" }
-
-# tag manipulation keybind
 
         # Set the tag x
         key { mod = {"Alt"} key = "F1" func = "tag" cmd = "1" }

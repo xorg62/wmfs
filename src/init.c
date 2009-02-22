@@ -101,7 +101,7 @@ init_cursor(void)
 {
      cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
      cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
-     cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
+     cursor[CurMove]   = XCreateFontCursor(dpy, XC_fleur);
 
      return;
 }

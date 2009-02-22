@@ -120,7 +120,7 @@ menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
 
      switch(ev->type)
      {
-     /* Mouse Buttons */
+          /* Mouse Buttons */
      case ButtonPress:
           /* Execute the function linked with the item */
           for(i = 0; i < menu->nitem; ++i)
@@ -128,10 +128,10 @@ menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
                   && (ev->xbutton.button == Button1 || ev->xbutton.button == Button2))
                     if(menu->item[i].func)
                          menu->item[i].func(menu->item[i].cmd);
-               quit = True;
+          quit = True;
           break;
 
-     /* Keys */
+          /* Keys */
      case KeyPress:
           XLookupString(&ev->xkey, NULL, 0, &ks, 0);
           switch(ks)
@@ -153,7 +153,7 @@ menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
           }
           break;
 
-     /* Focus (with mouse) management */
+          /* Focus (with mouse) management */
      case EnterNotify:
           /* For focus an item with the mouse */
           for(i = 0; i < menu->nitem; ++i)

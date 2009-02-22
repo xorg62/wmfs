@@ -72,7 +72,7 @@ frame_create(Client *c)
      if(TBARH)
           c->titlebar = barwin_create(c->frame, 0, 0,
                                       c->frame_geo.width ,
-                                      TBARH + (c->geo.x - c->frame_geo.x),
+                                      TBARH + BORDH * 2,
                                       c->colors.frame,
                                       c->colors.fg,
                                       True, conf.titlebar.stipple, False);
@@ -144,7 +144,7 @@ frame_moveresize(Client *c, XRectangle geo)
 
      /* Titlebar */
      if(TBARH)
-          barwin_resize(c->titlebar, c->frame_geo.width, TBARH + BORDH);
+          barwin_resize(c->titlebar, c->frame_geo.width, TBARH + BORDH * 2);
 
      /* Resize area */
      XMoveWindow(dpy, c->resize, c->frame_geo.width - RESHW, c->frame_geo.height - RESHW);
