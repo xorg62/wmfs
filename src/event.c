@@ -227,6 +227,7 @@ configureevent(XEvent *ev)
      {
           CHECK(!c->tile);
           CHECK(!c->lmax);
+          CHECK(!c->state_fullscreen);
      }
 
      /* Configure Request Part {{{ */

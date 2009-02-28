@@ -135,7 +135,7 @@ maxlayout(int screen)
 {
      Client *c;
 
-     for(c = nexttiled(screen, clients); c; c = nexttiled(screen, c->next))
+     for(c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next))
      {
           c->tile = False;
           c->lmax = True;
@@ -151,7 +151,7 @@ maxlayout(int screen)
  * \return a client pointer
 */
 Client*
-nexttiled(int screen, Client *c)
+tiled_client(int screen, Client *c)
 {
      for(;c && (c->max
                 || c->free
@@ -195,7 +195,7 @@ uicb_set_nmaster(uicb_t cmd)
 
      screen_get_sel();
 
-     for(nc = 0, c = nexttiled(selscreen, clients); c; c = nexttiled(selscreen, c->next), ++nc);
+     for(nc = 0, c = tiled_client(selscreen, clients); c; c = tiled_client(selscreen, c->next), ++nc);
 
      if(!nc || tags[selscreen][seltag[selscreen]].nmaster + n == 0
         || tags[selscreen][seltag[selscreen]].nmaster + n > nc)
@@ -218,7 +218,7 @@ grid(int screen)
      unsigned int i, n, cols, rows, cpcols = 0;
      unsigned int border = BORDH * 2;
 
-     for(n = 0, c = nexttiled(screen, clients); c; c = nexttiled(screen, c->next), ++n);
+     for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
      CHECK(n);
 
      for(rows = 0; rows <= n / 2; ++rows)
@@ -229,7 +229,7 @@ grid(int screen)
           ? rows - 1
           : rows;
 
-     for(i = 0, c = nexttiled(screen, clients); c; c = nexttiled(screen, c->next), ++i)
+     for(i = 0, c =tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
      {
           /* Set client property */
           c->max = c->lmax = False;
@@ -275,7 +275,7 @@ multi_tile(int screen, Position type)
      uint i , n, tilesize, mwfact, nmaster = tags[screen][seltag[screen]].nmaster;
      uint border = BORDH * 2;
 
-     for(n = 0, c = nexttiled(screen, clients); c; c = nexttiled(screen, c->next), ++n);
+     for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
      CHECK(n);
 
      /* FIX NMASTER */
@@ -312,7 +312,7 @@ multi_tile(int screen, Position type)
      }
 
 
-     for(i = 0, c = nexttiled(screen, clients); c; c = nexttiled(screen, c->next), ++i)
+     for(i = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
      {
           /* Set client property */
           c->max = c->lmax = False;
@@ -445,8 +445,8 @@ uicb_tile_switch(uicb_t cmd)
 
      if(!sel || sel->hint || !sel->tile || sel->state_fullscreen)
           return;
-     if((c = sel) == nexttiled(selscreen, clients))
-          CHECK((c = nexttiled(selscreen, c->next)));
+     if((c = sel) == tiled_client(selscreen, clients))
+          CHECK((c = tiled_client(selscreen, c->next)));
      client_detach(c);
      client_attach(c);
      client_focus(c);
@@ -470,9 +470,11 @@ uicb_togglefree(uicb_t cmd)
      {
           sel->tile = sel->max = sel->lmax = False;
           client_moveresize(sel, sel->ogeo, True);
+          client_raise(sel);
      }
      else
           sel->ogeo = sel->geo;
+
 
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);
 
@@ -493,6 +495,7 @@ uicb_togglemax(uicb_t cmd)
      {
           sel->ogeo = sel->geo;
           sel->tile = False;
+          sel->free = False;
           client_maximize(sel);
           client_raise(sel);
           sel->max = True;

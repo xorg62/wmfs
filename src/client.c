@@ -509,8 +509,10 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
 
           /* Set the client screen */
           c->screen = screen_get_with_geo(geo.x, geo.y);
+          c->tag = seltag[c->screen];
 
           frame_moveresize(c, c->geo);
+
           XMoveResizeWindow(dpy, c->win, BORDH, BORDH + TBARH, c->geo.width, c->geo.height);
 
           client_configure(c);
@@ -537,8 +539,9 @@ client_maximize(Client *c)
 
      geo.x = sgeo[c->screen].x;
      geo.y = sgeo[c->screen].y;
-     geo.width = sgeo[c->screen].width - BORDH * 2;
+     geo.width  = sgeo[c->screen].width  - BORDH * 2;
      geo.height = sgeo[c->screen].height - BORDH * 2;
+
 
      if(c->state_fullscreen)
      {
@@ -562,6 +565,7 @@ client_size_hints(Client *c)
 
      if(!XGetWMNormalHints(dpy, c->win, &size, &msize) || !size.flags)
           size.flags = PSize;
+
      /* base */
      if(size.flags & PBaseSize)
      {
@@ -618,6 +622,7 @@ client_size_hints(Client *c)
      }
      else
           c->minax = c->maxax = c->minay = c->maxay = 0;
+
      c->hint = (c->maxw && c->minw && c->maxh && c->minh
                 && c->maxw == c->minw && c->maxh == c->minh);
 

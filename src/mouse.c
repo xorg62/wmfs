@@ -42,6 +42,7 @@ mouse_move(Client *c)
      int ocy = c->geo.y;
      int mx = c->geo.x;
      int my = c->geo.y;
+     int oscreen = c->screen;
      int dint;
      uint duint;
      Window dw;
@@ -67,7 +68,15 @@ mouse_move(Client *c)
                geo.x = (ocx + (ev.xmotion.x - mx));
                geo.y = (ocy + (ev.xmotion.y - my));
 
-               client_moveresize(c, geo, True);
+
+               if(c->screen != oscreen)
+                    arrange(c->screen);
+
+               if(c->free || tags[c->screen][c->tag].layout.func == freelayout)
+                    client_moveresize(c, geo, True);
+               else
+                    break;
+
           }
           else if(ev.type == MapRequest
                   || ev.type == Expose

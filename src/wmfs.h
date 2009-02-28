@@ -255,7 +255,7 @@ void arrange(int screen);
 void freelayout(int screen);
 void layoutswitch(Bool b);
 void maxlayout(int screen);
-Client *nexttiled(int screen, Client *c);
+Client *tiled_client(int screen, Client *c);
 /* tile {{{ */
  void grid(int screen);
  void tile(int screen);
