@@ -629,6 +629,66 @@ client_size_hints(Client *c)
      return;
 }
 
+/** Swap 2 clients
+ * \param a First client
+ * \param b Second client
+ */
+void
+client_swap(Client *a, Client *b)
+{
+     Client *an, *bn, *ap, *bp;
+
+     if(!a || !b)
+          return;
+
+     ap = a->prev;
+     an = a->next;
+     bp = b->prev;
+     bn = b->next;
+
+     if(a == b->next)
+     {
+          a->next = b;
+          b->prev = a;
+
+          if((a->prev = bp))
+               bp->next = a;
+          if((b->next = an))
+               an->prev = b;
+     }
+     else if(b == a->next)
+     {
+          a->prev = b;
+          b->next = a;
+
+          if((b->prev = ap))
+               ap->next = b;
+          if((a->next = bn))
+               bn->prev = a;
+     }
+     else
+     {
+          if((a->next = bn))
+               a->next->prev = a;
+          if((a->prev = bp))
+               a->prev->next = a;
+          if((b->prev = ap))
+               b->prev->next = b;
+          if((b->next = an))
+               b->next->prev = b;
+     }
+
+     if(clients == a)
+          clients = b;
+     else if(clients == b)
+          clients = a;
+
+     arrange(a->screen);
+     arrange(b->screen);
+
+     return;
+}
+
 /** Raise a client
  * \param c Client pointer
 */

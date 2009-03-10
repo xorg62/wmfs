@@ -140,6 +140,7 @@ void client_manage(Window w, XWindowAttributes *wa);
 void client_moveresize(Client *c, XRectangle geo, Bool r);
 void client_maximize(Client *c);
 void client_size_hints(Client *c);
+void client_swap(Client *a, Client *b);
 void client_raise(Client *c);
 void client_unhide(Client *c);
 void client_unmanage(Client *c);

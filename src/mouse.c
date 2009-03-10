@@ -45,12 +45,12 @@ mouse_move(Client *c)
      int oscreen = c->screen;
      int dint;
      uint duint;
-     Window dw;
+     Window dw, sw;
+     Client *sclient;
      XRectangle geo = c->geo;
      XEvent ev;
 
-     if(c->max || c->tile || c->lmax
-        || c->state_fullscreen || c->state_dock)
+     if(c->max ||  c->lmax || c->state_fullscreen || c->state_dock)
           return;
 
      if(XGrabPointer(dpy, ROOT, False, MouseMask, GrabModeAsync, GrabModeAsync,
@@ -65,18 +65,30 @@ mouse_move(Client *c)
 
           if(ev.type == MotionNotify)
           {
-               geo.x = (ocx + (ev.xmotion.x - mx));
-               geo.y = (ocy + (ev.xmotion.y - my));
+               /* To move the client in the tile grid */
+               if(c->tile)
+               {
+                    XQueryPointer(dpy, ROOT, &dw, &sw, &mx, &my, &dint, &dint, &duint);
 
-
-               if(c->screen != oscreen)
-                    arrange(c->screen);
-
-               if(c->free || tags[c->screen][c->tag].layout.func == freelayout)
-                    client_moveresize(c, geo, True);
+                    if((sclient = client_gb_win(sw))
+                       || (sclient = client_gb_frame(sw))
+                       || (sclient = client_gb_titlebar(sw)))
+                         client_swap(c, sclient);
+               }
+               /* To move a client normally, in freelayout */
                else
-                    break;
+               {
+                    geo.x = (ocx + (ev.xmotion.x - mx));
+                    geo.y = (ocy + (ev.xmotion.y - my));
 
+                    if(c->screen != oscreen)
+                         arrange(c->screen);
+
+                    if(c->free || tags[c->screen][c->tag].layout.func == freelayout)
+                         client_moveresize(c, geo, True);
+                    else
+                         break;
+               }
           }
           else if(ev.type == MapRequest
                   || ev.type == Expose
