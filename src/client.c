@@ -637,6 +637,7 @@ void
 client_swap(Client *a, Client *b)
 {
      Client *an, *bn, *ap, *bp;
+     int ts;
 
      if(!a || !b)
           return;
@@ -645,6 +646,7 @@ client_swap(Client *a, Client *b)
      an = a->next;
      bp = b->prev;
      bn = b->next;
+     ts = a->screen;
 
      if(a == b->next)
      {
@@ -682,6 +684,9 @@ client_swap(Client *a, Client *b)
           clients = b;
      else if(clients == b)
           clients = a;
+
+     a->screen = b->screen;
+     b->screen = ts;
 
      arrange(a->screen);
      arrange(b->screen);

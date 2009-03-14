@@ -247,9 +247,9 @@ int screen_get_with_geo(int x, int y);
 int screen_get_sel(void);
 void screen_set_sel(int screen);
 void screen_init_geo(void);
-void uicb_screen_select(uicb_t cmd);
-void uicb_screen_next(uicb_t cmd);
-void uicb_screen_prev(uicb_t cmd);
+void uicb_screen_select(uicb_t);
+void uicb_screen_next(uicb_t);
+void uicb_screen_prev(uicb_t);
 
 /* layout.c */
 void arrange(int screen);
@@ -271,7 +271,7 @@ void uicb_layout_prev(uicb_t);
 void uicb_layout_next(uicb_t);
 void uicb_set_mwfact(uicb_t);
 void uicb_set_nmaster(uicb_t);
-void uicb_set_layout(uicb_t cmd);
+void uicb_set_layout(uicb_t);
 
 /* init.c */
 void init(void);
