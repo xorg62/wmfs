@@ -637,17 +637,22 @@ void
 client_swap(Client *a, Client *b)
 {
      Client *an, *bn, *ap, *bp;
-     int ts;
+     int i, ts, tt;
+     XRectangle tgeo;
 
-     if(!a || !b)
+     if(!a || !b || !a->tile || !b->tile)
           return;
 
+     /* Set temp variable */
      ap = a->prev;
      an = a->next;
      bp = b->prev;
      bn = b->next;
      ts = a->screen;
+     tt = a->tag;
+     tgeo = a->geo;
 
+     /* Swap client in the double linked list */
      if(a == b->next)
      {
           a->next = b;
@@ -685,11 +690,15 @@ client_swap(Client *a, Client *b)
      else if(clients == b)
           clients = a;
 
+     /* Swap tag/screen property */
+     a->tag = b->tag;
+     b->tag = tt;
      a->screen = b->screen;
      b->screen = ts;
 
-     arrange(a->screen);
-     arrange(b->screen);
+     /* Swap position/size an move them */
+     client_moveresize(a, b->geo, False);
+     client_moveresize(b, tgeo, False);
 
      return;
 }
