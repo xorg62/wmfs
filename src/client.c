@@ -295,7 +295,7 @@ client_kill(Client *c)
      XEvent ev;
      Atom *atom = NULL;
      int proto;
-     Bool canbedel = 0;
+     int canbedel = 0;
 
      CHECK(c);
 
@@ -641,7 +641,7 @@ void
 client_swap(Client *a, Client *b)
 {
      Client *an, *bn, *ap, *bp;
-     int i, ts, tt;
+     int ts, tt;
      XRectangle tgeo;
 
      if(!a || !b || !a->tile || !b->tile)
