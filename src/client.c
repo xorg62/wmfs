@@ -248,7 +248,11 @@ client_get_name(Client *c)
 
      /* If there is no title... */
      if(!c->title)
-          c->title = _strdup("WMFS");
+     {
+          XFetchName(dpy, c->win, &(c->title));
+          if(!c->title)
+               c->title = _strdup("WMFS");
+     }
 
      frame_update(c);
 
@@ -783,6 +787,7 @@ client_unmap(Client *c)
           barwin_unmap_subwin(c->titlebar);
           barwin_unmap(c->titlebar);
      }
+
      XUnmapWindow(dpy, c->frame);
      XUnmapSubwindows(dpy, c->frame);
      c->unmapped = True;
