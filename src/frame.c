@@ -70,12 +70,21 @@ frame_create(Client *c)
 
      /* Create titlebar window */
      if(TBARH)
+     {
           c->titlebar = barwin_create(c->frame, 0, 0,
                                       c->frame_geo.width ,
                                       TBARH + BORDH * 2,
                                       c->colors.frame,
                                       c->colors.fg,
                                       True, conf.titlebar.stipple, False);
+
+          /*
+          CWIN(c->button, c->titlebar->win, 2, 2, TBARH - 3, TBARH - 3, 1,
+               CWOverrideRedirect|CWBackPixmap, c->colors.frame, &at);
+          XSetWindowBorder(dpy, c->button,  getcolor(c->colors.fg));
+          */
+
+     }
 
      at.event_mask &= ~(EnterWindowMask | LeaveWindowMask); /* <- Delete useless mask */
 
@@ -173,7 +182,14 @@ frame_update(Client *c)
           c->titlebar->fg = c->colors.fg;
 
           barwin_refresh_color(c->titlebar);
+
+/*
+          draw_rectangle(c->titlebar->dr, 0, 0, TBARH + 4, TBARH + BORDH * 2, c->colors.frame);
           barwin_refresh(c->titlebar);
+          XSetWindowBackground(dpy, c->button, c->colors.frame);
+          XClearWindow(dpy, c->button);
+          XSetWindowBorder(dpy, c->button, getcolor(c->colors.fg));
+*/
      }
 
      XSetWindowBackground(dpy, c->frame, c->colors.frame);

@@ -137,7 +137,16 @@ conf_bar_section(cfg_t *cfg_b)
      conf.border.bar  = cfg_getbool(cfg_b, "border");
      conf.colors.bar  = getcolor(alias_to_str(cfg_getstr(cfg_b, "bg")));
      conf.colors.text = _strdup(alias_to_str(cfg_getstr(cfg_b, "fg")));
-     conf.bartop      = (strcmp(_strdup(cfg_getstr(cfg_b, "position")), "top") == 0) ? True : False;
+
+     if(!strcmp(_strdup(cfg_getstr(cfg_b, "position")),"none")
+        || !strcmp(_strdup(cfg_getstr(cfg_b, "position")), "hide")
+        || !strcmp(_strdup(cfg_getstr(cfg_b, "position")), "hidden"))
+          conf.barpos = 0;
+     else if(!strcmp(_strdup(cfg_getstr(cfg_b, "position")), "bottom")
+             || !strcmp(_strdup(cfg_getstr(cfg_b, "position")), "down"))
+          conf.barpos = 1;
+     else
+          conf.barpos = 2;
 
      return;
 }

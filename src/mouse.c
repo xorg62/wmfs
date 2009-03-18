@@ -38,10 +38,7 @@
 void
 mouse_move(Client *c)
 {
-     int ocx = c->geo.x;
-     int ocy = c->geo.y;
-     int mx = c->geo.x;
-     int my = c->geo.y;
+     int ocx, ocy, mx, my;
      int oscreen = c->screen;
      int dint;
      uint duint;
@@ -50,8 +47,11 @@ mouse_move(Client *c)
      XRectangle geo = c->geo;
      XEvent ev;
 
-     if(c->max ||  c->lmax || c->state_fullscreen || c->state_dock)
+     if(c->max || c->lmax || c->state_fullscreen || c->state_dock)
           return;
+
+     ocx =  c->geo.x;
+     ocy =  c->geo.y;
 
      if(XGrabPointer(dpy, ROOT, False, MouseMask, GrabModeAsync, GrabModeAsync,
                      None, cursor[CurMove], CurrentTime) != GrabSuccess)
@@ -75,19 +75,14 @@ mouse_move(Client *c)
                        || (sclient = client_gb_titlebar(sw)))
                          client_swap(c, sclient);
                }
+
                /* To move a client normally, in freelayout */
                else
                {
                     geo.x = (ocx + (ev.xmotion.x - mx));
                     geo.y = (ocy + (ev.xmotion.y - my));
 
-                    if(c->screen != oscreen)
-                         arrange(c->screen);
-
-                    if(c->free || tags[c->screen][c->tag].layout.func == freelayout)
-                         client_moveresize(c, geo, True);
-                    else
-                         break;
+                    client_moveresize(c, geo, False);
                }
           }
           else if(ev.type == MapRequest

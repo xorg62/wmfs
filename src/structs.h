@@ -134,6 +134,7 @@ struct Client
      int minax, maxax, minay, maxay;
      /* Client composant {{{ */
      Window win;
+     Window button;
      BarWindow *titlebar;
      Window frame, resize;
      /* Border */
@@ -253,7 +254,7 @@ typedef struct
      char *font;
      Bool raisefocus;
      Bool raiseswitch;
-     Bool bartop;
+     int barpos;
      struct
      {
           /*

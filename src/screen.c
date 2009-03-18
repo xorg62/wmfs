@@ -69,9 +69,10 @@ screen_get_geo(int s)
 
           xsi = XineramaQueryScreens(dpy, &n);
           geo.x = xsi[s].x_org + BORDH;
-          geo.y = (conf.bartop)
-               ? xsi[s].y_org + INFOBARH + TBARH
-               : xsi[s].y_org + TBARH;
+          if(!conf.barpos || conf.barpos == 1)
+               geo.y = TBARH;
+          else
+               geo.y = xsi[s].y_org + INFOBARH + TBARH;
           geo.height = xsi[s].height - INFOBARH - TBARH;
           geo.width = xsi[s].width;
 
@@ -80,7 +81,10 @@ screen_get_geo(int s)
      else
      {
           geo.x = BORDH;
-          geo.y = (conf.bartop) ? INFOBARH + TBARH : TBARH;
+          if(!conf.barpos || conf.barpos == 1)
+               geo.y = TBARH;
+          else
+               geo.y = INFOBARH + TBARH;
           geo.height = MAXH - INFOBARH - TBARH;
           geo.width = MAXW;
      }
@@ -97,13 +101,22 @@ int
 screen_get_with_geo(int x, int y)
 {
      int i, r = 0;
+     int yh;
+
+     if(!conf.barpos || conf.barpos == 1)
+          yh = (sgeo[i].y - TBARH);
 
      for(i = 0; i < screen_count(); ++i)
+     {
+          if(!conf.barpos || conf.barpos == 1)
+               yh = (sgeo[i].y - TBARH);
+          else
+               yh = (sgeo[i].y - INFOBARH - TBARH);
+
           if((x >= sgeo[i].x && x < sgeo[i].x + sgeo[i].width)
-             && (y >= ((conf.bartop) ? (sgeo[i].y - INFOBARH - TBARH) : (sgeo[i].y - TBARH))
-                 && (y < ((conf.bartop) ? (sgeo[i].y - INFOBARH - TBARH) : (sgeo[i].y - TBARH))
-                     + sgeo[i].height + INFOBARH + TBARH)))
+             && y >= yh && y < yh + (sgeo[i].height + INFOBARH + TBARH))
                r = i;
+     }
 
      return r;
 }

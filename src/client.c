@@ -502,27 +502,19 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
      /* }}} */
 
      c->max = False;
-     if(c->geo.x != geo.x
-        || c->geo.y != geo.y
-        || c->geo.width != geo.width
-        || c->geo.height != geo.height)
-     {
-          if(tags[selscreen][seltag[selscreen]].layout.func == freelayout
-             || c->free);
-          c->geo = c->ogeo = geo;
 
-          /* Set the client screen */
-          c->screen = screen_get_with_geo(geo.x, geo.y);
-          c->tag = seltag[c->screen];
+     if(tags[selscreen][seltag[selscreen]].layout.func == freelayout
+        || c->free);
+     c->geo = c->ogeo = geo;
 
-          frame_moveresize(c, c->geo);
+     c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
+     c->tag = seltag[c->screen];
 
-          XMoveResizeWindow(dpy, c->win, BORDH, BORDH + TBARH, c->geo.width, c->geo.height);
+     frame_moveresize(c, c->geo);
 
-          client_configure(c);
+     XMoveResizeWindow(dpy, c->win, BORDH, BORDH + TBARH, c->geo.width, c->geo.height);
 
-          XSync(dpy, False);
-     }
+     client_configure(c);
 
      return;
 }
@@ -695,10 +687,10 @@ client_swap(Client *a, Client *b)
           clients = a;
 
      /* Swap tag/screen property */
-     a->tag = b->tag;
-     b->tag = tt;
      a->screen = b->screen;
      b->screen = ts;
+     a->tag = b->tag;
+     b->tag = tt;
 
      /* Swap position/size an move them */
      client_moveresize(a, b->geo, False);

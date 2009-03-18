@@ -46,9 +46,23 @@ infobar_init(void)
      {
           j = 0;
           infobar[sc].geo.height = INFOBARH;
-          infobar[sc].geo.y = (conf.bartop)
-               ? sgeo[sc].y - INFOBARH - TBARH
-               : sgeo[sc].height - INFOBARH;
+
+          if(!conf.barpos)
+          {
+               sgeo[sc].y =  TBARH;
+               sgeo[selscreen].height += INFOBARH;
+               infobar[selscreen].geo.y = -(infobar[selscreen].geo.height) * 2;
+          }
+          else if(conf.barpos == 1)
+          {
+               sgeo[selscreen].y = TBARH;
+               infobar[selscreen].geo.y = sgeo[selscreen].height + TBARH;
+          }
+          else
+          {
+               sgeo[sc].y = INFOBARH + TBARH;
+               infobar[selscreen].geo.y = sgeo[selscreen].y - (INFOBARH + TBARH);
+          }
 
           /* Create infobar barwindow */
           infobar[sc].bar = barwin_create(ROOT, sgeo[sc].x - BORDH, infobar[sc].geo.y,
@@ -178,17 +192,27 @@ uicb_infobar_togglepos(uicb_t cmd)
 {
      screen_get_sel();
 
-     conf.bartop = !conf.bartop;
+     conf.barpos = (conf.barpos < 2) ? conf.barpos + 1 : 0;
 
-     if(conf.bartop)
+     /* Hidden position */
+     if(!conf.barpos)
+     {
+          sgeo[selscreen].y = TBARH;
+          sgeo[selscreen].height += INFOBARH;
+          infobar[selscreen].geo.y = -(infobar[selscreen].geo.height) * 2;
+     }
+     /* Bottom position */
+     else if(conf.barpos == 1)
+     {
+          sgeo[selscreen].y = TBARH;
+          sgeo[selscreen].height -= INFOBARH;
+          infobar[selscreen].geo.y = sgeo[selscreen].height + TBARH;
+     }
+     /* Top position */
+     else
      {
           sgeo[selscreen].y = INFOBARH + TBARH;
           infobar[selscreen].geo.y = sgeo[selscreen].y - (INFOBARH + TBARH);
-     }
-     else
-     {
-          sgeo[selscreen].y = TBARH;
-          infobar[selscreen].geo.y = sgeo[selscreen].height + TBARH;
      }
 
      barwin_move(infobar[selscreen].bar, sgeo[selscreen].x - BORDH, infobar[selscreen].geo.y);

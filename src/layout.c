@@ -50,7 +50,6 @@ arrange(int screen)
 
      tags[screen][seltag[screen]].layout.func(screen);
      infobar_draw(screen);
-     ewmh_get_current_layout();
 
      return;
 }
@@ -68,6 +67,8 @@ freelayout(int screen)
                client_moveresize(c, c->ogeo, True);
                c->tile = c->lmax = False;
           }
+
+     ewmh_get_current_layout();
 
      return;
 }
@@ -141,6 +142,8 @@ maxlayout(int screen)
           c->lmax = True;
           client_maximize(c);
      }
+
+     ewmh_get_current_layout();
 
      return;
 }
@@ -258,6 +261,8 @@ grid(int screen)
                cgeo.y = sg.y;
           }
      }
+
+     ewmh_get_current_layout();
 
      return;
 }
@@ -388,6 +393,8 @@ multi_tile(int screen, Position type)
           else
                cgeo.y = c->geo.y + c->geo.height + border + TBARH;
      }
+
+     ewmh_get_current_layout();
 
      return;
 }

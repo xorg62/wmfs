@@ -17,6 +17,8 @@ bar
         bg       = "#191919"
         fg       = "#D4D4D4"
         border   = true
+
+        # Infobar position : top, bottom or hide.
         position = "top"
 }
 
