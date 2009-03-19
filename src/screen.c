@@ -61,7 +61,9 @@ XRectangle
 screen_get_geo(int s)
 {
      int n = 0;
+     int barpos = tags[selscreen][seltag[selscreen]].barpos;
      XRectangle geo;
+
 
      if(XineramaIsActive(dpy))
      {
@@ -69,7 +71,7 @@ screen_get_geo(int s)
 
           xsi = XineramaQueryScreens(dpy, &n);
           geo.x = xsi[s].x_org + BORDH;
-          if(!conf.barpos || conf.barpos == 1)
+          if(barpos == IB_Hide || barpos == IB_Bottom)
                geo.y = TBARH;
           else
                geo.y = xsi[s].y_org + INFOBARH + TBARH;
@@ -81,7 +83,7 @@ screen_get_geo(int s)
      else
      {
           geo.x = BORDH;
-          if(!conf.barpos || conf.barpos == 1)
+          if(barpos == IB_Hide || barpos == IB_Bottom)
                geo.y = TBARH;
           else
                geo.y = INFOBARH + TBARH;
@@ -101,14 +103,15 @@ int
 screen_get_with_geo(int x, int y)
 {
      int i, r = 0;
+     int barpos = tags[selscreen][seltag[selscreen]].barpos;
      int yh;
 
-     if(!conf.barpos || conf.barpos == 1)
+     if(barpos == IB_Hide || barpos == IB_Bottom)
           yh = (sgeo[i].y - TBARH);
 
      for(i = 0; i < screen_count(); ++i)
      {
-          if(!conf.barpos || conf.barpos == 1)
+          if(barpos == IB_Hide || barpos == IB_Bottom)
                yh = (sgeo[i].y - TBARH);
           else
                yh = (sgeo[i].y - INFOBARH - TBARH);

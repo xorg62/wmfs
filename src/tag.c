@@ -61,6 +61,7 @@ tag_set(int tag)
           seltag[selscreen] = tag;
      }
      ewmh_get_current_desktop();
+     infobar_set_position(tags[selscreen][seltag[selscreen]].barpos);
      arrange(selscreen);
      client_focus(NULL);
 

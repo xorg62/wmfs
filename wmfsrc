@@ -17,9 +17,6 @@ bar
         bg       = "#191919"
         fg       = "#D4D4D4"
         border   = true
-
-        # Infobar position : top, bottom or hide.
-        position = "top"
 }
 
 layouts
@@ -55,7 +52,7 @@ tags
         # Border around the tag buttons
         border       = true
 
-        tag { screen = 1 name = "one" mwfact = 0.65 nmaster = 1 layout = "tile_right" resizehint = false }
+        tag { screen = 1 name = "one" mwfact = 0.65 nmaster = 1 layout = "tile_right" resizehint = false infobar_position = "top" }
         tag { name = "two"   }
         tag { name = "three" }
         tag { name = "four"  }

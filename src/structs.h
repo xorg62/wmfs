@@ -48,7 +48,10 @@ typedef unsigned char  uchar;
 
 /* Enum */
 enum { CurNormal, CurResize, CurMove, CurLast };
+/* Infobar position */
+enum { IB_Hide = 0, IB_Bottom = 1, IB_Top = 2 };
 typedef enum { Top, Bottom, Right, Left, Center, PositionLast } Position;
+
 
 /* Ewmh hints list */
 enum
@@ -181,6 +184,7 @@ typedef struct
      BarWindow *layout_button;
      BarWindow *tags[MAXTAG];
      XRectangle geo;
+     int position;
      char statustext[1024];
 } InfoBar;
 
@@ -198,6 +202,7 @@ typedef struct
      float mwfact;
      int nmaster;
      Bool resizehint;
+     int barpos;
      Layout layout;
 } Tag;
 
@@ -254,7 +259,6 @@ typedef struct
      char *font;
      Bool raisefocus;
      Bool raiseswitch;
-     int barpos;
      struct
      {
           /*

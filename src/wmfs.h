@@ -118,6 +118,7 @@ void infobar_draw(int sc);
 void infobar_draw_layout(int sc);
 void infobar_draw_taglist(int sc);
 void infobar_destroy(void);
+void infobar_set_position(int pos);
 void uicb_infobar_togglepos(uicb_t);
 
 /* client.c */

@@ -39,7 +39,6 @@ void
 mouse_move(Client *c)
 {
      int ocx, ocy, mx, my;
-     int oscreen = c->screen;
      int dint;
      uint duint;
      Window dw, sw;

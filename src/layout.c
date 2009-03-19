@@ -50,6 +50,7 @@ arrange(int screen)
 
      tags[screen][seltag[screen]].layout.func(screen);
      infobar_draw(screen);
+//     infobar_set_position(tags[screen][seltag[screen]].barpos);
 
      return;
 }

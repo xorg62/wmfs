@@ -49,7 +49,6 @@ cfg_opt_t bar_opts[] =
 {
      CFG_STR("bg",        "#090909", CFGF_NONE),
      CFG_STR("fg",        "#6289A1", CFGF_NONE),
-     CFG_STR("position",  "top",     CFGF_NONE),
      CFG_BOOL("border",   cfg_false, CFGF_NONE),
      CFG_END()
 };
@@ -120,12 +119,13 @@ cfg_opt_t layouts_opts[] =
 
 cfg_opt_t tag_opts[] =
 {
-     CFG_INT("screen",      -1,           CFGF_NONE),
-     CFG_STR("name",        "",           CFGF_NONE),
-     CFG_FLOAT("mwfact",    0.65,         CFGF_NONE),
-     CFG_INT("nmaster",     1,            CFGF_NONE),
-     CFG_STR("layout",      "tile_right", CFGF_NONE),
-     CFG_BOOL("resizehint", cfg_false,    CFGF_NONE),
+     CFG_INT("screen",           -1,           CFGF_NONE),
+     CFG_STR("name",             "",           CFGF_NONE),
+     CFG_FLOAT("mwfact",         0.65,         CFGF_NONE),
+     CFG_INT("nmaster",          1,            CFGF_NONE),
+     CFG_STR("layout",           "tile_right", CFGF_NONE),
+     CFG_STR("infobar_position", "top",        CFGF_NONE),
+     CFG_BOOL("resizehint",      cfg_false,    CFGF_NONE),
      CFG_END()
 };
 

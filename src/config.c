@@ -138,16 +138,6 @@ conf_bar_section(cfg_t *cfg_b)
      conf.colors.bar  = getcolor(alias_to_str(cfg_getstr(cfg_b, "bg")));
      conf.colors.text = _strdup(alias_to_str(cfg_getstr(cfg_b, "fg")));
 
-     if(!strcmp(_strdup(cfg_getstr(cfg_b, "position")),"none")
-        || !strcmp(_strdup(cfg_getstr(cfg_b, "position")), "hide")
-        || !strcmp(_strdup(cfg_getstr(cfg_b, "position")), "hidden"))
-          conf.barpos = 0;
-     else if(!strcmp(_strdup(cfg_getstr(cfg_b, "position")), "bottom")
-             || !strcmp(_strdup(cfg_getstr(cfg_b, "position")), "down"))
-          conf.barpos = 1;
-     else
-          conf.barpos = 2;
-
      return;
 }
 
@@ -264,12 +254,13 @@ void
 conf_tag_section(cfg_t *cfg_t)
 {
      int i, j, k, l = 0;
+     char *tmp;
 
      /* If there is no tag in the conf or more than
       * MAXTAG (32) print an error and create only one.
       */
      Tag default_tag = { "WMFS",
-                         0.50, 1, False,
+                         0.50, 1, False, IB_Top,
                          layout_name_to_struct(conf.layout, "tile_right", conf.nlayout, layout_list) };
 
      conf.tag_round               = cfg_getbool(cfg_t, "tag_round");
@@ -301,6 +292,19 @@ conf_tag_section(cfg_t *cfg_t)
                tags[k][conf.ntag[k]].mwfact     = cfg_getfloat(cfgtmp, "mwfact");
                tags[k][conf.ntag[k]].nmaster    = cfg_getint(cfgtmp, "nmaster");
                tags[k][conf.ntag[k]].resizehint = cfg_getbool(cfgtmp, "resizehint");
+
+               tmp = _strdup(cfg_getstr(cfgtmp, "infobar_position"));
+
+               if(!strcmp(tmp ,"none")
+                  || !strcmp(tmp, "hide")
+                  || !strcmp(tmp, "hidden"))
+                    tags[k][conf.ntag[k]].barpos = IB_Hide;
+               else if(!strcmp(tmp, "bottom")
+                       || !strcmp(tmp, "down"))
+                    tags[k][conf.ntag[k]].barpos = IB_Bottom;
+               else
+                    tags[k][conf.ntag[k]].barpos = IB_Top;
+
                tags[k][conf.ntag[k]].layout     = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"),
                                                                         conf.nlayout, layout_list);
           }
@@ -318,6 +322,7 @@ conf_tag_section(cfg_t *cfg_t)
           }
 
      seltag = emalloc(screen_count(), sizeof(int));
+
      for(j = 0; j < screen_count(); ++j)
           seltag[j] = 1;
 

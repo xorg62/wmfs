@@ -47,21 +47,22 @@ infobar_init(void)
           j = 0;
           infobar[sc].geo.height = INFOBARH;
 
-          if(!conf.barpos)
+          switch(tags[sc][seltag[sc]].barpos)
           {
+          case IB_Hide:
                sgeo[sc].y =  TBARH;
                sgeo[selscreen].height += INFOBARH;
                infobar[selscreen].geo.y = -(infobar[selscreen].geo.height) * 2;
-          }
-          else if(conf.barpos == 1)
-          {
+               break;
+          case IB_Bottom:
                sgeo[selscreen].y = TBARH;
                infobar[selscreen].geo.y = sgeo[selscreen].height + TBARH;
-          }
-          else
-          {
+               break;
+          default:
+          case IB_Top:
                sgeo[sc].y = INFOBARH + TBARH;
                infobar[selscreen].geo.y = sgeo[selscreen].y - (INFOBARH + TBARH);
+               break;
           }
 
           /* Create infobar barwindow */
@@ -94,6 +95,7 @@ infobar_init(void)
           barwin_refresh_color(infobar[sc].bar);
           barwin_refresh(infobar[sc].bar);
 
+          /* Default statustext is set here */
           strcpy(statustext, "WMFS-" WMFS_VERSION);
           infobar_draw(sc);
      }
@@ -183,6 +185,56 @@ infobar_destroy(void)
      return;
 }
 
+/* Set the infobar position
+ * \param pos Position of the bar
+ */
+void
+infobar_set_position(int pos)
+{
+     int th;
+
+     screen_get_sel();
+
+     if(XineramaIsActive(dpy))
+     {
+          int n = 0;
+          XineramaScreenInfo *xsi = XineramaQueryScreens(dpy, &n);
+
+          th = xsi[selscreen].height;
+          XFree(xsi);
+     }
+     else
+          th = MAXH;
+
+     switch(pos)
+     {
+     case IB_Hide:
+          sgeo[selscreen].y = TBARH;
+          sgeo[selscreen].height = th - TBARH;
+          infobar[selscreen].geo.y = -(infobar[selscreen].geo.height) * 2;
+          break;
+     case IB_Bottom:
+          sgeo[selscreen].y = TBARH;
+          sgeo[selscreen].height = th - INFOBARH - TBARH;
+          infobar[selscreen].geo.y = sgeo[selscreen].height + TBARH;
+          break;
+     default:
+     case IB_Top:
+          sgeo[selscreen].y = INFOBARH + TBARH;
+          sgeo[selscreen].height = th - INFOBARH - TBARH;
+          infobar[selscreen].geo.y = sgeo[selscreen].y - (INFOBARH + TBARH);
+          break;
+     }
+
+     tags[selscreen][seltag[selscreen]].barpos = pos;
+
+     barwin_move(infobar[selscreen].bar, sgeo[selscreen].x - BORDH, infobar[selscreen].geo.y);
+     infobar_draw(selscreen);
+     ewmh_set_workarea();
+     arrange(selscreen);
+
+     return;
+}
 
 /** Toggle the infobar position
  * \param cmd uicb_t type unused
@@ -190,36 +242,10 @@ infobar_destroy(void)
 void
 uicb_infobar_togglepos(uicb_t cmd)
 {
-     screen_get_sel();
-
-     conf.barpos = (conf.barpos < 2) ? conf.barpos + 1 : 0;
-
-     /* Hidden position */
-     if(!conf.barpos)
-     {
-          sgeo[selscreen].y = TBARH;
-          sgeo[selscreen].height += INFOBARH;
-          infobar[selscreen].geo.y = -(infobar[selscreen].geo.height) * 2;
-     }
-     /* Bottom position */
-     else if(conf.barpos == 1)
-     {
-          sgeo[selscreen].y = TBARH;
-          sgeo[selscreen].height -= INFOBARH;
-          infobar[selscreen].geo.y = sgeo[selscreen].height + TBARH;
-     }
-     /* Top position */
-     else
-     {
-          sgeo[selscreen].y = INFOBARH + TBARH;
-          infobar[selscreen].geo.y = sgeo[selscreen].y - (INFOBARH + TBARH);
-     }
-
-     barwin_move(infobar[selscreen].bar, sgeo[selscreen].x - BORDH, infobar[selscreen].geo.y);
-     infobar_draw(selscreen);
-     ewmh_set_workarea();
-
-     arrange(selscreen);
+     infobar_set_position((tags[selscreen][seltag[selscreen]].barpos
+                           = (tags[selscreen][seltag[selscreen]].barpos < 2)
+                           ? tags[selscreen][seltag[selscreen]].barpos + 1
+                           : 0));
 
      return;
 }
