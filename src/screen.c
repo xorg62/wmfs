@@ -106,9 +106,6 @@ screen_get_with_geo(int x, int y)
      int barpos = tags[selscreen][seltag[selscreen]].barpos;
      int yh;
 
-     if(barpos == IB_Hide || barpos == IB_Bottom)
-          yh = (sgeo[i].y - TBARH);
-
      for(i = 0; i < screen_count(); ++i)
      {
           if(barpos == IB_Hide || barpos == IB_Bottom)
