@@ -224,6 +224,7 @@ scan(void)
                   && !(wa.override_redirect || XGetTransientForHint(dpy, w[i], &usl))
                   && wa.map_state == IsViewable)
                     client_manage(w[i], &wa);
+
      XFree(w);
      arrange(screen_get_sel());
 
@@ -299,9 +300,7 @@ main(int argc, char **argv)
                exit(EXIT_SUCCESS);
                break;
           case 'i':
-               printf("WMFS - Window Manager From Scratch. By :\n"
-                      "   - Martin Duquesnoy (code)\n"
-                      "   - Marc Lagrange (build system)\n");
+               printf("WMFS - Window Manager From Scratch By Martin Duquesnoy \n");
                exit(EXIT_SUCCESS);
                break;
           case 'v':
