@@ -178,10 +178,10 @@ frame_moveresize(Client *c, XRectangle geo)
      /* Border */
      if(conf.client.border_shadow)
      {
-     XResizeWindow(dpy, c->left, SHADH, c->frame_geo.height - SHADH);
-     XResizeWindow(dpy, c->top, c->frame_geo.width, SHADH);
-     XMoveResizeWindow(dpy, c->bottom, 0, c->frame_geo.height - SHADH, c->frame_geo.width, SHADH);
-     XMoveResizeWindow(dpy, c->right, c->frame_geo.width - SHADH, 0, SHADH, c->frame_geo.height);
+          XResizeWindow(dpy, c->left, SHADH, c->frame_geo.height - SHADH);
+          XResizeWindow(dpy, c->top, c->frame_geo.width, SHADH);
+          XMoveResizeWindow(dpy, c->bottom, 0, c->frame_geo.height - SHADH, c->frame_geo.width, SHADH);
+          XMoveResizeWindow(dpy, c->right, c->frame_geo.width - SHADH, 0, SHADH, c->frame_geo.height);
      }
 
      return;
