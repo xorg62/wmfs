@@ -1,4 +1,7 @@
-# WMFS config file
+#
+# This is the default wmfs config file, copy it to
+# ~/.config/wmfs/wmfsrc and edit it.
+#
 
 alias
 {
@@ -24,20 +27,20 @@ layouts
         fg = "#191919"
         bg = "#7E89A2"
 
-        # Border around the layout button
+        # Border around the layout button.
         border = true
 
-        # menu or switch
+        # Value menu or switch.
         system = "menu"
 
-        # Tiling layouts
+        # Tiling layouts.
         layout { type = "tile_right"  symbol = "RIGHT" }
         layout { type = "tile_left"   symbol = "LEFT" }
         layout { type = "tile_top"    symbol = "TOP" }
         layout { type = "tile_bottom" symbol = "BOTTOM" }
         layout { type = "tile_grid"   symbol = "GRID" }
 
-        # Other
+        # Other.
         layout { type = "max"         symbol = "MAX"  }
         layout { type = "free"        symbol = "FREE" }
 }
@@ -49,7 +52,7 @@ tags
         sel_fg       = "#191919"
         sel_bg       = "#7E89A2"
 
-        # Border around the tag buttons
+        # Border around the tag buttons.
         border       = true
 
         tag { screen = 1 name = "one" mwfact = 0.65 nmaster = 1 layout = "tile_right" resizehint = false infobar_position = "top" }
@@ -65,7 +68,7 @@ tags
 
 root
 {
-        # Command you can execute for set the Wallpaper
+        # Command you can execute to set the background.
         background_command = "xsetroot -solid black"
 
         mouse { button = "4" func = "tag_next" }
@@ -89,7 +92,7 @@ client
         mouse { button = "3" func = "client_raise" }
         mouse { button = "3" func = "mouse_resize" }
 
-        # Remove this section for delete the titlebar
+        # Remove this section to delete the titlebar.
         titlebar
         {
                 stipple    = false
@@ -149,62 +152,62 @@ launcher
 
 keys
 {
-        # Reload the configuration of wmfs
+        # Reload the configuration of wmfs.
         key { mod = {"Alt", "Control"} key = "r" func = "reload" }
 
-        # Open a terminal
+        # Open a terminal.
         key { mod = {"Control"} key = "Return" func = "spawn" cmd = term }
 
-        # Kill the selected client
+        # Kill the selected client.
         key { mod = {"Alt"} key = "q" func = "client_kill" }
 
-        # Quit wmfs :(
+        # Quit wmfs.
         key { mod = {"Control", "Alt", "Shift"} key = "q" func = "quit" }
 
-        # Toggle maximum the selected client
+        # Toggle maximum the selected client.
         key { mod = {"Alt"} key = "m" func = "toggle_max" }
 
-        # Toggle free the selected client
+        # Toggle free the selected client.
         key { mod = {"Alt"} key = "f" func = "toggle_free" }
 
-        # Toggle the position of the infobar
+        # Toggle the position of the infobar.
         key { mod = {"Alt"} key = "b" func = "toggle_infobar_position" }
 
-        # Select the next client
+        # Select the next client.
         key { mod = {"Alt"} key = "Tab" func = "client_next" }
 
-        # Select the previous client
+        # Select the previous client.
         key { mod = {"Alt","Shift"} key = "Tab" func = "client_prev" }
 
-        # Select the next tag
+        # Select the next tag.
         key { mod = {"Control"} key = "Right" func = "tag_next" }
 
-        # Select the previous tag
+        # Select the previous tag.
         key { mod = {"Control"} key = "Left" func = "tag_prev" }
 
-        # Set the next layout
+        # Set the next layout.
         key { mod = {"Alt"} key = "space" func = "layout_next" }
 
-        # Set the previous layout
+        # Set the previous layout.
         key { mod = {"Alt", "Shift"} key = "space" func = "layout_prev" }
 
-        # Increase mwfact
+        # Increase mwfact.
         key { mod = {"Alt", "Shift"} key = "l" func = "set_mwfact" cmd = "+0.025" }
 
-        # Decrease mwfact
+        # Decrease mwfact.
         key { mod = {"Alt", "Shift"} key = "h" func = "set_mwfact" cmd = "-0.025" }
 
-        # Increase nmaster
+        # Increase nmaster.
         key { mod = {"Alt"} key = "d" func = "set_nmaster" cmd = "+1" }
 
-        # Decease nmaster
+        # Decease nmaster.
         key { mod = {"Alt", "Shift"} key = "d" func = "set_nmaster" cmd = "-1" }
 
-        # Launchers
+        # Launchers.
         key { mod = { "Alt" } key = "p" func = "launcher" cmd = "launcher_exec" }
         key { mod = { "Alt", "Shift" } key = "p" func = "launcher" cmd = "launcher_ssh" }
 
-        # Set the tag x
+        # Set the tag x.
         key { mod = {"Alt"} key = "F1" func = "tag" cmd = "1" }
         key { mod = {"Alt"} key = "F2" func = "tag" cmd = "2" }
         key { mod = {"Alt"} key = "F3" func = "tag" cmd = "3" }
@@ -215,7 +218,7 @@ keys
         key { mod = {"Alt"} key = "F8" func = "tag" cmd = "8" }
         key { mod = {"Alt"} key = "F9" func = "tag" cmd = "9" }
 
-        # Transfert selected client to x
+        # Transfert selected client to x.
         key { mod = {"Alt", "Shift"} key = "F1" func = "tag_transfert" cmd ="1" }
         key { mod = {"Alt", "Shift"} key = "F2" func = "tag_transfert" cmd ="2" }
         key { mod = {"Alt", "Shift"} key = "F3" func = "tag_transfert" cmd ="3" }
