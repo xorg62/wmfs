@@ -81,18 +81,6 @@ else (X11_FOUND)
   message(FATAL_ERROR "Could not find X11")
 endif (X11_FOUND)
 
-find_package(PythonInterp)
-if(PYTHONINTERP_FOUND)
-else(PYTHONINTERP_FOUND)
-  message(FATAL_ERROR "Could not find Python interpreter")
-endif(PYTHONINTERP_FOUND)
-
-find_package(PythonLibs)
-if(PYTHONLIBS_FOUND)
-else(PYTHONLIBS_FOUND)
-  message(FATAL_ERROR "Could not find Python libs")
-endif(PYTHONLIBS_FOUND)
-
 # Link Libraries
 set(LIBRARIES_TO_LINK
   ${FREETYPE_LIBRARIES}
@@ -167,17 +155,6 @@ execute_process(
   )
 
 endif()
-
-# Build python lib
-add_custom_command(
-  COMMAND ${PYTHON_EXECUTABLE}
-  ARGS    python/setup.py build
-  WORKING_DIRECTORY ${SOURCE_DIR}
-  COMMENT "Building python lib"
-  TARGET  ${SOURCE_DIR}
-  )
-add_custom_target(python_lib)
-add_dependencies(${PROJECT_NAME} python_lib)
 
 # {{{ Check if documentation can be build
 if(GENERATE_MANPAGES)

@@ -82,7 +82,9 @@
 #define FRAMEW(w)    ((w) + BORDH * 2)
 #define FRAMEH(h)    ((h) + (BORDH * 2) + TBARH)
 #define RESHW        (5 * BORDH)
+#define BUTTONWH     (TBARH - 4)
 #define CHECK(x)     if(!(x)) return
+#define IFREE(x)     if(x) free(x)
 #define LEN(x)       (sizeof(x) / sizeof((x)[0]))
 #define deb(p)       fprintf(stderr, "debug: %d\n", (p))
 #define PAD          (14)
@@ -131,6 +133,7 @@ Client* client_gb_win(Window w);
 Client* client_gb_frame(Window w);
 Client* client_gb_titlebar(Window w);
 Client* client_gb_resize(Window w);
+Client* client_gb_button(Window w, int *n);
 /* }}} */
 void client_get_name(Client *c);
 void client_hide(Client *c);

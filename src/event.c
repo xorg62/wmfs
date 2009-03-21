@@ -39,7 +39,7 @@ void
 buttonpress(XButtonEvent *ev)
 {
      Client *c;
-     int i, x, y;
+     int i, n, x, y;
 
      screen_get_sel();
 
@@ -49,6 +49,13 @@ buttonpress(XButtonEvent *ev)
                 if(ev->button == conf.titlebar.mouse[i].button)
                     if(conf.titlebar.mouse[i].func)
                          conf.titlebar.mouse[i].func(conf.titlebar.mouse[i].cmd);
+
+     /* Titlebar buttons */
+     if((c = client_gb_button(ev->window, &n)))
+          for(i = 0; i < conf.titlebar.button[n].nmouse; ++i)
+               if(ev->button == conf.titlebar.button[n].mouse[i].button)
+                    if(conf.titlebar.button[n].mouse[i].func)
+                         conf.titlebar.button[n].mouse[i].func(conf.titlebar.button[n].mouse[i].cmd);
 
      /* Frame Resize Area */
      if((c = client_gb_resize(ev->window)))
@@ -293,6 +300,7 @@ void
 enternotify(XCrossingEvent *ev)
 {
      Client *c;
+     int n;
 
      if((ev->mode != NotifyNormal
          || ev->detail == NotifyInferior)
@@ -301,7 +309,8 @@ enternotify(XCrossingEvent *ev)
 
      if((c = client_gb_win(ev->window))
         || (c = client_gb_frame(ev->window))
-        || (c = client_gb_titlebar(ev->window)))
+        || (c = client_gb_titlebar(ev->window))
+        || (c = client_gb_button(ev->window, &n)))
           client_focus(c);
      else
           client_focus(NULL);

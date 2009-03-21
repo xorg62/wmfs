@@ -70,6 +70,14 @@ cfg_opt_t root_opts[] =
      CFG_END()
 };
 
+/* CLIENT {{{ */
+
+cfg_opt_t button_opts[] =
+{
+     CFG_SEC("mouse", mouse_button_opts, CFGF_MULTI),
+     CFG_END()
+};
+
 cfg_opt_t titlebar_opts[] =
 {
      CFG_INT("height",     0,                 CFGF_NONE),
@@ -77,6 +85,7 @@ cfg_opt_t titlebar_opts[] =
      CFG_STR("fg_normal",  "#FFFFFF",         CFGF_NONE),
      CFG_STR("fg_focus",   "#FFFFFF",         CFGF_NONE),
      CFG_SEC("mouse",      mouse_button_opts, CFGF_MULTI),
+     CFG_SEC("button",     button_opts,       CFGF_MULTI),
      CFG_END()
 };
 
@@ -93,6 +102,8 @@ cfg_opt_t client_opts[]=
      CFG_SEC("titlebar",              titlebar_opts,      CFGF_NONE),
      CFG_END()
 };
+
+/* }}} */
 
 /* TAGS {{{ */
 
@@ -147,7 +158,7 @@ cfg_opt_t tags_opts[] =
 
 cfg_opt_t menu_items_opts[] =
 {
-     CFG_STR("name", "iten_wname", CFGF_NONE),
+     CFG_STR("name", "item_wname", CFGF_NONE),
      CFG_STR("func", "",           CFGF_NONE),
      CFG_STR("cmd",  "",           CFGF_NONE),
      CFG_END()

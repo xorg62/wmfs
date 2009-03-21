@@ -228,6 +228,27 @@ client_focus(Client *c)
           return c;
      }
 
+/** Get a client->button[button_num] with a window
+ * \param w Window
+ * \param n Pointer who return the button_num
+ * \return The client
+*/
+     Client* client_gb_button(Window w, int *n)
+     {
+          Client *c;
+          int i;
+
+          for(c = clients; c; c = c->next)
+               for(i = 0; i < conf.titlebar.nbutton; ++i)
+                    if(c->button[i] == w)
+                    {
+                         *n = i;
+                         return c;
+                    }
+
+          return NULL;
+     }
+
 /* }}} */
 
 /** Get a client name

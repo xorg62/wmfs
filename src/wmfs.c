@@ -96,38 +96,37 @@ quit(void)
           client_unmanage(c);
      }
 
-     if(tags)
-          free(tags);
-     free(seltag);
+     IFREE(tags);
+     IFREE(seltag);
 
      XftFontClose(dpy, font);
      XFreeCursor(dpy, cursor[CurNormal]);
      XFreeCursor(dpy, cursor[CurMove]);
      XFreeCursor(dpy, cursor[CurResize]);
      infobar_destroy();
-     free(sgeo);
-     free(infobar);
-     free(keys);
-     free(func_list);
+     IFREE(sgeo);
+     IFREE(infobar);
+     IFREE(keys);
+     IFREE(func_list);
 
      /* Clean conf alloced thing {{{ */
-     if(menulayout.item)
-          free(menulayout.item);
+     IFREE(menulayout.item);
+
      if(conf.menu)
      {
           for(i = 0; i < LEN(conf.menu); ++i)
-               free(conf.menu[i].item);
-          free(conf.menu);
+               IFREE(conf.menu[i].item);
+          IFREE(conf.menu);
      }
-     if(conf.launcher)
-          free(conf.launcher);
-     free(conf.ntag);
-     if(conf.titlebar.nmouse)
-          free(conf.titlebar.mouse);
-     if(conf.client.nmouse)
-          free(conf.client.mouse);
-     if(conf.root.nmouse)
-          free(conf.root.mouse);
+
+     IFREE(conf.launcher);
+     IFREE(conf.ntag);
+     IFREE(conf.titlebar.mouse);
+     for(i = 0; i < conf.titlebar.nbutton; ++i)
+          IFREE(conf.titlebar.button[i].mouse);
+     IFREE(conf.titlebar.button);
+     IFREE(conf.client.mouse);
+     IFREE(conf.root.mouse);
      /* }}} */
 
      XSync(dpy, False);

@@ -158,6 +158,9 @@ conf_root_section(cfg_t *cfg_r)
 void
 conf_client_section(cfg_t *cfg_c)
 {
+     int i;
+     cfg_t *cfgtmp2;
+
      /* Client misc */
      conf.client.borderheight        = (cfg_getint(cfg_c, "border_height")) ? cfg_getint(cfg_c, "border_height") : 1;
      conf.client.place_at_mouse      = cfg_getbool(cfg_c, "place_at_mouse");
@@ -166,23 +169,42 @@ conf_client_section(cfg_t *cfg_c)
      conf.client.resizecorner_normal = getcolor(alias_to_str(cfg_getstr(cfg_c, "resize_corner_normal")));
      conf.client.resizecorner_focus  = getcolor(alias_to_str(cfg_getstr(cfg_c, "resize_corner_focus")));
      conf.client.mod                |= char_to_modkey(cfg_getstr(cfg_c, "modifier"), key_list);
+
      if((conf.client.nmouse = cfg_size(cfg_c, "mouse")))
      {
           conf.client.mouse = emalloc(conf.client.nmouse, sizeof(MouseBinding));
           mouse_section(conf.client.mouse, cfg_c, conf.client.nmouse);
      }
 
-     /* Titlebar part */
+     /* Titlebar part {{ */
      cfgtmp                  = cfg_getsec(cfg_c, "titlebar");
      conf.titlebar.height    = cfg_getint(cfgtmp, "height");
      conf.titlebar.stipple   = cfg_getbool(cfgtmp, "stipple");
      conf.titlebar.fg_normal = alias_to_str(cfg_getstr(cfgtmp, "fg_normal"));
      conf.titlebar.fg_focus  = alias_to_str(cfg_getstr(cfgtmp, "fg_focus"));
+
      if((conf.titlebar.nmouse = cfg_size(cfgtmp, "mouse")))
      {
           conf.titlebar.mouse = emalloc(conf.titlebar.nmouse, sizeof(MouseBinding));
           mouse_section(conf.titlebar.mouse, cfgtmp, conf.titlebar.nmouse);
      }
+
+     /* Multi button part */
+     if((conf.titlebar.nbutton = cfg_size(cfgtmp, "button")))
+     {
+          conf.titlebar.button = emalloc(conf.titlebar.nbutton, sizeof(Button));
+          for(i = 0; i < conf.titlebar.nbutton; ++i)
+          {
+               cfgtmp2 = cfg_getnsec(cfgtmp, "button", i);
+               if((conf.titlebar.button[i].nmouse = cfg_size(cfgtmp2, "mouse")))
+               {
+                    conf.titlebar.button[i].mouse = emalloc(conf.titlebar.button[i].nmouse, sizeof(MouseBinding));
+                    mouse_section(conf.titlebar.button[i].mouse, cfgtmp2, conf.titlebar.button[i].nmouse);
+               }
+          }
+     }
+     /* }} */
+
      return;
 }
 

@@ -137,7 +137,8 @@ struct Client
      int minax, maxax, minay, maxay;
      /* Client composant {{{ */
      Window win;
-     Window button;
+     Window *button;
+     int button_last_x;
      BarWindow *titlebar;
      Window frame, resize;
      /* Border */
@@ -245,6 +246,13 @@ typedef struct
      char *command;
 } Launcher;
 
+/* Button struct */
+typedef struct
+{
+     MouseBinding *mouse;
+     int nmouse;
+} Button;
+
 /* Alias struct */
 typedef struct
 {
@@ -300,6 +308,8 @@ typedef struct
           Bool stipple;
           MouseBinding *mouse;
           int nmouse;
+          Button *button;
+          int nbutton;
      } titlebar;
      struct
      {
@@ -316,7 +326,6 @@ typedef struct
      Bool layout_system; /* Switch: False, Menu: True. */
      /* Number of... */
      int nkeybind;
-     int nbutton;
      int nlayout;
      int nmenu;
      int nlauncher;

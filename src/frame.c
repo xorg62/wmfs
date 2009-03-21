@@ -40,6 +40,7 @@ void
 frame_create(Client *c)
 {
      XSetWindowAttributes at;
+     int i;
 
      at.background_pixel  = conf.client.bordernormal;
      at.background_pixmap = ParentRelative;
@@ -78,12 +79,25 @@ frame_create(Client *c)
                                       c->colors.fg,
                                       True, conf.titlebar.stipple, False);
 
-          /*
-          CWIN(c->button, c->titlebar->win, 2, 2, TBARH - 3, TBARH - 3, 1,
-               CWOverrideRedirect|CWBackPixmap, c->colors.frame, &at);
-          XSetWindowBorder(dpy, c->button,  getcolor(c->colors.fg));
-          */
+          /* Buttons */
+          if(BUTTONWH)
+          {
+               c->button = emalloc(conf.titlebar.nbutton, sizeof(Window));
+               for(i = 0; i < conf.titlebar.nbutton; ++i)
+               {
+                    CWIN(c->button[i], c->titlebar->win,
+                         (BORDH + (BUTTONWH * i) + (4 * i)),
+                         (((TBARH + BORDH) - BUTTONWH) / 2), BUTTONWH, BUTTONWH,
+                         1, CWEventMask|CWOverrideRedirect|CWBackPixmap,
+                         c->colors.frame, &at);
 
+                    XSetWindowBorder(dpy, c->button[i], getcolor(c->colors.fg));
+
+                    /* Save the position of the last button to draw the font rectangle (frame_update) */
+                    if(i == conf.titlebar.nbutton - 1)
+                         c->button_last_x = (BORDH + (BUTTONWH * i) + (4 * i)) + TBARH + 1;
+               }
+          }
      }
 
      at.event_mask &= ~(EnterWindowMask | LeaveWindowMask); /* <- Delete useless mask */
@@ -174,6 +188,8 @@ frame_moveresize(Client *c, XRectangle geo)
 void
 frame_update(Client *c)
 {
+     int i ;
+
      CHECK(c);
 
      if(TBARH)
@@ -183,13 +199,21 @@ frame_update(Client *c)
 
           barwin_refresh_color(c->titlebar);
 
-/*
-          draw_rectangle(c->titlebar->dr, 0, 0, TBARH + 4, TBARH + BORDH * 2, c->colors.frame);
+          /* Buttons */
+          if(conf.titlebar.nbutton && BUTTONWH)
+          {
+               draw_rectangle(c->titlebar->dr, 0, 0, c->button_last_x,
+                              TBARH + BORDH * 2, c->colors.frame);
+
+               for(i = 0; i < conf.titlebar.nbutton; ++i)
+               {
+                    XSetWindowBackground(dpy, c->button[i], c->colors.frame);
+                    XClearWindow(dpy, c->button[i]);
+                    XSetWindowBorder(dpy, c->button[i], getcolor(c->colors.fg));
+               }
+          }
+
           barwin_refresh(c->titlebar);
-          XSetWindowBackground(dpy, c->button, c->colors.frame);
-          XClearWindow(dpy, c->button);
-          XSetWindowBorder(dpy, c->button, getcolor(c->colors.fg));
-*/
      }
 
      XSetWindowBackground(dpy, c->frame, c->colors.frame);
