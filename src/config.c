@@ -163,6 +163,7 @@ conf_client_section(cfg_t *cfg_c)
 
      /* Client misc */
      conf.client.borderheight        = (cfg_getint(cfg_c, "border_height")) ? cfg_getint(cfg_c, "border_height") : 1;
+     conf.client.border_shadow       = cfg_getbool(cfg_c, "border_shadow");
      conf.client.place_at_mouse      = cfg_getbool(cfg_c, "place_at_mouse");
      conf.client.bordernormal        = getcolor(alias_to_str(cfg_getstr(cfg_c, "border_normal")));
      conf.client.borderfocus         = getcolor(alias_to_str(cfg_getstr(cfg_c, "border_focus")));

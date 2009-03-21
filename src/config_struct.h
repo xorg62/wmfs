@@ -92,6 +92,7 @@ cfg_opt_t titlebar_opts[] =
 cfg_opt_t client_opts[]=
 {
      CFG_BOOL("place_at_mouse",       cfg_false,          CFGF_NONE),
+     CFG_BOOL("border_shadow",        cfg_false,          CFGF_NONE),
      CFG_INT("border_height",         1,                  CFGF_NONE),
      CFG_STR("border_normal",         "#354B5C",          CFGF_NONE),
      CFG_STR("border_focus",          "#6286A1",          CFGF_NONE),

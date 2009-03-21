@@ -76,6 +76,7 @@ root
 client
 {
         border_height         = 3
+        border_shadow         = true
         border_normal         = "#191919"
         border_focus          = "#003366"
         resize_corner_normal  = "#191919"

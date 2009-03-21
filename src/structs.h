@@ -291,6 +291,7 @@ typedef struct
      struct
      {
           Bool place_at_mouse;
+          Bool border_shadow;
           int borderheight;
           uint bordernormal;
           uint borderfocus;
