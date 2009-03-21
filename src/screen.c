@@ -1,13 +1,3 @@
-
-
-
-
-
-
-
-
-
-
 /*
 *      screen.c
 *      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.com>
