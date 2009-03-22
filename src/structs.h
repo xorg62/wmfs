@@ -250,6 +250,8 @@ typedef struct
 typedef struct
 {
      MouseBinding *mouse;
+     XSegment *linecoord;
+     int nlines;
      int nmouse;
 } Button;
 

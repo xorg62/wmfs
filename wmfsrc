@@ -106,7 +106,13 @@ client
                 mouse { button = "3" func = "client_raise" }
                 mouse { button = "3" func = "mouse_resize" }
 
-                button { mouse { button = "1" func = "client_kill" } }
+                button
+                {
+                        mouse { button = "1" func = "client_kill" }
+                        # Make a cross with line
+                        line { coord = {1, 1, 4, 4} }
+                        line { coord = {4, 1, 1, 4} }
+                }
         }
 }
 

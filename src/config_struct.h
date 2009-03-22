@@ -72,9 +72,16 @@ cfg_opt_t root_opts[] =
 
 /* CLIENT {{{ */
 
+cfg_opt_t line_opts[] =
+{
+     CFG_INT_LIST("coord", "{0, 0, 0, 0}", CFGF_MULTI),
+     CFG_END()
+};
+
 cfg_opt_t button_opts[] =
 {
      CFG_SEC("mouse", mouse_button_opts, CFGF_MULTI),
+     CFG_SEC("line", line_opts, CFGF_MULTI),
      CFG_END()
 };
 

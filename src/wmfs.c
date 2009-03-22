@@ -123,7 +123,11 @@ quit(void)
      IFREE(conf.ntag);
      IFREE(conf.titlebar.mouse);
      for(i = 0; i < conf.titlebar.nbutton; ++i)
+     {
           IFREE(conf.titlebar.button[i].mouse);
+          IFREE(conf.titlebar.button[i].linecoord);
+     }
+
      IFREE(conf.titlebar.button);
      IFREE(conf.client.mouse);
      IFREE(conf.root.mouse);

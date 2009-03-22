@@ -191,7 +191,7 @@ frame_moveresize(Client *c, XRectangle geo)
 void
 frame_update(Client *c)
 {
-    int i ;
+     int i, j;
 
      CHECK(c);
 
@@ -214,6 +214,26 @@ frame_update(Client *c)
                     XSetWindowBackground(dpy, c->button[i], c->colors.frame);
                     XClearWindow(dpy, c->button[i]);
                     XSetWindowBorder(dpy, c->button[i], getcolor(c->colors.fg));
+
+                    /* Button's lines */
+                    if(conf.titlebar.button[i].nlines)
+                    {
+                         XSetForeground(dpy, gc, getcolor(c->colors.fg));
+                         XDrawSegments(dpy, c->button[i], gc,
+                                       conf.titlebar.button[i].linecoord,
+                                       conf.titlebar.button[i].nlines);
+/*
+                         for(j = 0; j < conf.titlebar.button[i].nlines; ++j)
+                         {
+
+                              XDrawLine(dpy, c->button[i], gc,
+                                        conf.titlebar.button[i].linecoord[j].x1,
+                                        conf.titlebar.button[i].linecoord[j].y1,
+                                        conf.titlebar.button[i].linecoord[j].x2,
+                                        conf.titlebar.button[i].linecoord[j].y2);
+
+                                        } */
+                    }
                }
           }
 

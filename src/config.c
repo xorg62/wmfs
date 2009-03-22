@@ -158,8 +158,8 @@ conf_root_section(cfg_t *cfg_r)
 void
 conf_client_section(cfg_t *cfg_c)
 {
-     int i;
-     cfg_t *cfgtmp2;
+     int i, j;
+     cfg_t *cfgtmp2, *cfgtmp3;
 
      /* Client misc */
      conf.client.borderheight        = (cfg_getint(cfg_c, "border_height")) ? cfg_getint(cfg_c, "border_height") : 1;
@@ -197,10 +197,27 @@ conf_client_section(cfg_t *cfg_c)
           for(i = 0; i < conf.titlebar.nbutton; ++i)
           {
                cfgtmp2 = cfg_getnsec(cfgtmp, "button", i);
+
+               /* Multi mouse section */
                if((conf.titlebar.button[i].nmouse = cfg_size(cfgtmp2, "mouse")))
                {
                     conf.titlebar.button[i].mouse = emalloc(conf.titlebar.button[i].nmouse, sizeof(MouseBinding));
                     mouse_section(conf.titlebar.button[i].mouse, cfgtmp2, conf.titlebar.button[i].nmouse);
+               }
+
+               /* Multi line section */
+               if((conf.titlebar.button[i].nlines = cfg_size(cfgtmp2, "line")))
+               {
+                    conf.titlebar.button[i].linecoord = emalloc(conf.titlebar.button[i].nlines, sizeof(XSegment));
+
+                    for(j = 0; j < conf.titlebar.button[i].nlines; ++j)
+                    {
+                         cfgtmp3 = cfg_getnsec(cfgtmp2, "line", j);
+                         conf.titlebar.button[i].linecoord[j].x1 = cfg_getnint(cfgtmp3, "coord", 0);
+                         conf.titlebar.button[i].linecoord[j].y1 = cfg_getnint(cfgtmp3, "coord", 1);
+                         conf.titlebar.button[i].linecoord[j].x2 = cfg_getnint(cfgtmp3, "coord", 2);
+                         conf.titlebar.button[i].linecoord[j].y2 = cfg_getnint(cfgtmp3, "coord", 3);
+                    }
                }
           }
      }
