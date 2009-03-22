@@ -110,7 +110,6 @@ client
         }
 }
 
-
 menu
 {
         # Default menu, binded on the root window.

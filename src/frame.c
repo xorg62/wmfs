@@ -69,25 +69,26 @@ frame_create(Client *c)
           CWOverrideRedirect|CWBackPixmap|CWEventMask,
           c->colors.frame, &at);
 
+
      /* Create titlebar window */
-     if(TBARH)
+     if(TBARH - BORDH)
      {
           c->titlebar = barwin_create(c->frame, 0, 0,
                                       c->frame_geo.width ,
-                                      TBARH + BORDH * 2,
+                                      TBARH,
                                       c->colors.frame,
                                       c->colors.fg,
                                       True, conf.titlebar.stipple, False);
 
           /* Buttons */
-          if(BUTTONWH)
+          if(BUTTONWH >= 1)
           {
                c->button = emalloc(conf.titlebar.nbutton, sizeof(Window));
                for(i = 0; i < conf.titlebar.nbutton; ++i)
                {
                     CWIN(c->button[i], c->titlebar->win,
                          (BORDH + (BUTTONWH * i) + (4 * i)),
-                         (((TBARH + BORDH) - BUTTONWH) / 2), BUTTONWH, BUTTONWH,
+                         ((BUTTONWH - 1) / 2), BUTTONWH, BUTTONWH,
                          1, CWEventMask|CWOverrideRedirect|CWBackPixmap,
                          c->colors.frame, &at);
 
@@ -95,7 +96,7 @@ frame_create(Client *c)
 
                     /* Save the position of the last button to draw the font rectangle (frame_update) */
                     if(i == conf.titlebar.nbutton - 1)
-                         c->button_last_x = (BORDH + (BUTTONWH * i) + (4 * i)) + TBARH + 1;
+                         c->button_last_x = (BORDH + (BUTTONWH * i) + (4 * i)) + TBARH;
                }
           }
      }
@@ -122,7 +123,7 @@ frame_create(Client *c)
      }
 
      /* Reparent window with the frame */
-     XReparentWindow(dpy, c->win, c->frame, BORDH, BORDH + TBARH);
+     XReparentWindow(dpy, c->win, c->frame, BORDH, TBARH);
 
      return;
 }
@@ -134,7 +135,7 @@ void
 frame_delete(Client *c)
 {
      /* If there is, delete the titlebar */
-     if(TBARH)
+     if(TBARH - BORDH)
      {
           barwin_delete_subwin(c->titlebar);
           barwin_delete(c->titlebar);
@@ -169,8 +170,8 @@ frame_moveresize(Client *c, XRectangle geo)
                        c->frame_geo.height);
 
      /* Titlebar */
-     if(TBARH)
-          barwin_resize(c->titlebar, c->frame_geo.width, TBARH + BORDH * 2);
+     if(TBARH - BORDH)
+          barwin_resize(c->titlebar, c->frame_geo.width, TBARH);
 
      /* Resize area */
      XMoveWindow(dpy, c->resize, c->frame_geo.width - RESHW, c->frame_geo.height - RESHW);
@@ -194,11 +195,11 @@ frame_moveresize(Client *c, XRectangle geo)
 void
 frame_update(Client *c)
 {
-     int i ;
+    int i ;
 
      CHECK(c);
 
-     if(TBARH)
+     if(TBARH - BORDH)
      {
           c->titlebar->bg = c->colors.frame;
           c->titlebar->fg = c->colors.fg;
@@ -206,7 +207,7 @@ frame_update(Client *c)
           barwin_refresh_color(c->titlebar);
 
           /* Buttons */
-          if(conf.titlebar.nbutton && BUTTONWH)
+          if(conf.titlebar.nbutton && BUTTONWH >= 1)
           {
                draw_rectangle(c->titlebar->dr, 0, 0, c->button_last_x,
                               TBARH + BORDH * 2, c->colors.frame);
@@ -241,10 +242,10 @@ frame_update(Client *c)
           XClearWindow(dpy, c->bottom);
      }
 
-     if(TBARH && (TBARH + BORDH + 1) > font->height)
+     if((TBARH - BORDH) && (TBARH + BORDH + 1) > font->height)
           barwin_draw_text(c->titlebar,
                            (c->frame_geo.width / 2) - (textw(c->title) / 2),
-                           (font->height - (font->descent)) + (((TBARH + BORDH) - font->height) / 2),
+                           ((font->height - font->descent) + (TBARH - font->height) / 2),
                            c->title);
 
      return;

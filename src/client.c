@@ -207,7 +207,7 @@ client_focus(Client *c)
      {
           Client *c;
 
-          if(!TBARH)
+          if(!(TBARH - BORDH))
                return NULL;
 
           for(c = clients; c && c->titlebar->win != w; c = c->next);
@@ -237,6 +237,9 @@ client_focus(Client *c)
      {
           Client *c;
           int i;
+
+          if(!BUTTONWH)
+               return NULL;
 
           for(c = clients; c; c = c->next)
                for(i = 0; i < conf.titlebar.nbutton; ++i)
@@ -372,7 +375,7 @@ client_map(Client *c)
 
      XMapWindow(dpy, c->frame);
      XMapSubwindows(dpy, c->frame);
-     if(TBARH)
+     if(TBARH - BORDH)
      {
           barwin_map(c->titlebar);
           barwin_map_subwin(c->titlebar);
@@ -533,7 +536,8 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
 
      frame_moveresize(c, c->geo);
 
-     XMoveResizeWindow(dpy, c->win, BORDH, BORDH + TBARH, c->geo.width, c->geo.height);
+     XMoveResizeWindow(dpy, c->win, BORDH, TBARH, c->geo.width,
+                       c->geo.height);
 
      client_configure(c);
 
@@ -557,7 +561,7 @@ client_maximize(Client *c)
      geo.x = sgeo[c->screen].x;
      geo.y = sgeo[c->screen].y;
      geo.width  = sgeo[c->screen].width  - BORDH * 2;
-     geo.height = sgeo[c->screen].height - BORDH * 2;
+     geo.height = sgeo[c->screen].height - BORDH;
 
 
      if(c->state_fullscreen)
@@ -795,7 +799,7 @@ client_unmap(Client *c)
 {
      CHECK(c);
 
-     if(TBARH)
+     if(TBARH - BORDH)
      {
           barwin_unmap_subwin(c->titlebar);
           barwin_unmap(c->titlebar);

@@ -78,11 +78,11 @@
 #define SHADH        1
 #define SHADC        0x000000 /* 'Cause i don't know how darken a color yet */
 #define BORDH        conf.client.borderheight
-#define TBARH        conf.titlebar.height
+#define TBARH        ((conf.titlebar.height < BORDH) ? BORDH : conf.titlebar.height)
 #define FRAMEW(w)    ((w) + BORDH * 2)
-#define FRAMEH(h)    ((h) + (BORDH * 2) + TBARH)
+#define FRAMEH(h)    ((h) + (BORDH  + TBARH))
 #define RESHW        (5 * BORDH)
-#define BUTTONWH     (TBARH - 4)
+#define BUTTONWH     (TBARH / 2)
 #define CHECK(x)     if(!(x)) return
 #define IFREE(x)     if(x) free(x)
 #define LEN(x)       (sizeof(x) / sizeof((x)[0]))
