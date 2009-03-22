@@ -96,7 +96,7 @@ client
         titlebar
         {
                 stipple    = false
-                height     = 11
+                height     = 12
                 fg_normal  = "#7E89A2"
                 fg_focus   = "#9F9AB3"
 

@@ -87,16 +87,12 @@ frame_create(Client *c)
                for(i = 0; i < conf.titlebar.nbutton; ++i)
                {
                     CWIN(c->button[i], c->titlebar->win,
-                         (BORDH + (BUTTONWH * i) + (4 * i)),
+                         (c->button_last_x = (BORDH + (BUTTONWH * i) + (4 * i))),
                          ((BUTTONWH - 1) / 2), BUTTONWH, BUTTONWH,
                          1, CWEventMask|CWOverrideRedirect|CWBackPixmap,
                          c->colors.frame, &at);
 
                     XSetWindowBorder(dpy, c->button[i], getcolor(c->colors.fg));
-
-                    /* Save the position of the last button to draw the font rectangle (frame_update) */
-                    if(i == conf.titlebar.nbutton - 1)
-                         c->button_last_x = (BORDH + (BUTTONWH * i) + (4 * i)) + TBARH;
                }
           }
      }
@@ -209,8 +205,9 @@ frame_update(Client *c)
           /* Buttons */
           if(conf.titlebar.nbutton && BUTTONWH >= 1)
           {
-               draw_rectangle(c->titlebar->dr, 0, 0, c->button_last_x,
-                              TBARH + BORDH * 2, c->colors.frame);
+               if(conf.titlebar.stipple)
+                    draw_rectangle(c->titlebar->dr, 0, 0, c->button_last_x + TBARH,
+                                   TBARH + BORDH * 2, c->colors.frame);
 
                for(i = 0; i < conf.titlebar.nbutton; ++i)
                {

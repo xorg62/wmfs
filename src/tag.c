@@ -39,7 +39,11 @@
 void
 tag_set(int tag)
 {
+     int otag;
+
      screen_get_sel();
+
+     otag = seltag[selscreen];
 
      if(!tag)
           tag = 1;
@@ -61,7 +65,10 @@ tag_set(int tag)
           seltag[selscreen] = tag;
      }
      ewmh_get_current_desktop();
-     infobar_set_position(tags[selscreen][seltag[selscreen]].barpos);
+
+     if(tags[selscreen][otag].barpos != tags[selscreen][seltag[selscreen]].barpos)
+          infobar_set_position(tags[selscreen][seltag[selscreen]].barpos);
+
      arrange(selscreen);
      client_focus(NULL);
 
