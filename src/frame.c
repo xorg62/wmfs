@@ -222,17 +222,6 @@ frame_update(Client *c)
                          XDrawSegments(dpy, c->button[i], gc,
                                        conf.titlebar.button[i].linecoord,
                                        conf.titlebar.button[i].nlines);
-/*
-                         for(j = 0; j < conf.titlebar.button[i].nlines; ++j)
-                         {
-
-                              XDrawLine(dpy, c->button[i], gc,
-                                        conf.titlebar.button[i].linecoord[j].x1,
-                                        conf.titlebar.button[i].linecoord[j].y1,
-                                        conf.titlebar.button[i].linecoord[j].x2,
-                                        conf.titlebar.button[i].linecoord[j].y2);
-
-                                        } */
                     }
                }
           }
