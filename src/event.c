@@ -268,7 +268,7 @@ configureevent(XEvent *ev)
           /* Win config (re-adjust it with the frame) */
           if(ev->xconfigure.x != BORDH
              || ev->xconfigure.y != BORDH + TBARH)
-               XMoveWindow(dpy, ev->xconfigure.window, BORDH, BORDH + TBARH);
+               XMoveWindow(dpy, ev->xconfigure.window, BORDH, TBARH);
      }
      /* }}} */
 

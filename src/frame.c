@@ -191,7 +191,7 @@ frame_moveresize(Client *c, XRectangle geo)
 void
 frame_update(Client *c)
 {
-     int i, j;
+     int i;
 
      CHECK(c);
 
