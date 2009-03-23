@@ -206,7 +206,7 @@ frame_update(Client *c)
           if(conf.titlebar.nbutton && BUTTONWH >= 1)
           {
                if(conf.titlebar.stipple)
-                    draw_rectangle(c->titlebar->dr, 0, 0, c->button_last_x + TBARH,
+                    draw_rectangle(c->titlebar->dr, 0, 0, c->button_last_x + TBARH - (TBARH / 4),
                                    TBARH + BORDH * 2, c->colors.frame);
 
                for(i = 0; i < conf.titlebar.nbutton; ++i)

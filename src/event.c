@@ -423,6 +423,7 @@ maprequest(XMapRequestEvent *ev)
 
      CHECK(XGetWindowAttributes(dpy, ev->window, &at));
      CHECK(!at.override_redirect);
+
      if(!(c = client_gb_win(ev->window)))
           client_manage(ev->window, &at);
 
@@ -440,6 +441,7 @@ propertynotify(XPropertyEvent *ev)
 
      if(ev->state == PropertyDelete)
           return;
+
      if((c = client_gb_win(ev->window)))
      {
           switch(ev->atom)
@@ -453,9 +455,11 @@ propertynotify(XPropertyEvent *ev)
           case XA_WM_NORMAL_HINTS:
                client_size_hints(c);
                break;
+          case XA_WM_NAME:
+               client_get_name(c);
+               break;
           }
-          if(ev->atom == XA_WM_NAME
-             || ev->atom == net_atom[net_wm_name])
+          if(ev->atom == net_atom[net_wm_name])
                client_get_name(c);
      }
 

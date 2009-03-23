@@ -238,7 +238,7 @@ client_focus(Client *c)
           Client *c;
           int i;
 
-          if(!BUTTONWH)
+          if(!BUTTONWH || !(TBARH - BORDH))
                return NULL;
 
           for(c = clients; c; c = c->next)
