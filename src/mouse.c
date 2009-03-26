@@ -136,18 +136,11 @@ mouse_resize(Client *c)
 
      XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
 
-     for(;;)
+     do
      {
           XMaskEvent(dpy, MouseMask | ExposureMask | SubstructureRedirectMask, &ev);
 
-          if(ev.type == ButtonRelease)
-          {
-               if(!c->tile)
-                    XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
-               XUngrabPointer(dpy, CurrentTime);
-               return;
-          }
-          else if(ev.type == MotionNotify)
+          if(ev.type == MotionNotify)
           {
                geo.width = ((ev.xmotion.x - ocx < 1) ? 1 : ev.xmotion.x - ocx);
                geo.height = ((ev.xmotion.y - ocy < 1) ? 1 : ev.xmotion.y - ocy);
@@ -160,6 +153,11 @@ mouse_resize(Client *c)
                expose(&ev.xexpose);
 
      }
+     while(ev.type != ButtonRelease);
+
+     XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
+     XUngrabPointer(dpy, CurrentTime);
+
 
      return;
 }
