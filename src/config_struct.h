@@ -74,7 +74,7 @@ cfg_opt_t root_opts[] =
 
 cfg_opt_t line_opts[] =
 {
-     CFG_INT_LIST("coord", "{0, 0, 0, 0}", CFGF_MULTI),
+     CFG_INT_LIST("coord", "{0, 0, 0, 0}", CFGF_NONE),
      CFG_END()
 };
 
@@ -124,11 +124,11 @@ cfg_opt_t layout_opts[] =
 
 cfg_opt_t layouts_opts[] =
 {
-     CFG_STR("fg",           "#FFFFFF",   CFGF_NONE),
-     CFG_STR("bg",           "#292929",   CFGF_NONE),
-     CFG_BOOL("border",       cfg_false,  CFGF_NONE),
-     CFG_STR("system",       "menu",      CFGF_NONE),
-     CFG_SEC("layout",       layout_opts, CFGF_MULTI),
+     CFG_STR("fg",      "#FFFFFF",   CFGF_NONE),
+     CFG_STR("bg",      "#292929",   CFGF_NONE),
+     CFG_BOOL("border", cfg_false,   CFGF_NONE),
+     CFG_STR("system",  "menu",      CFGF_NONE),
+     CFG_SEC("layout",  layout_opts, CFGF_MULTI),
      CFG_END()
 };
 
@@ -260,17 +260,6 @@ cfg_opt_t opts[] =
      CFG_SEC("launcher", launcher_opts,  CFGF_NONE),
      CFG_SEC("keys",     keys_opts,      CFGF_NONE),
      CFG_END()
-};
-
-func_name_list_t layout_list[] =
-{
-     {"tile_right",  tile },
-     {"tile_left",   tile_left },
-     {"tile_top",    tile_top },
-     {"tile_bottom", tile_bottom },
-     {"tile_grid",   grid },
-     {"max",         maxlayout },
-     {"free",        freelayout }
 };
 
 key_name_list_t key_list[] =

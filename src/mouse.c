@@ -43,7 +43,7 @@ mouse_move(Client *c)
      uint duint;
      Window dw, sw;
      Client *sclient;
-     XRectangle geo = c->geo;
+     XRectangle geo = c->geo, ogeo;
      XEvent ev;
 
      if(c->max || c->lmax || c->state_fullscreen || c->state_dock)
@@ -72,7 +72,11 @@ mouse_move(Client *c)
                     if((sclient = client_gb_win(sw))
                        || (sclient = client_gb_frame(sw))
                        || (sclient = client_gb_titlebar(sw)))
-                         client_swap(c, sclient);
+                    {
+                         ogeo = c->geo;
+                         client_moveresize(c, sclient->geo, False);
+                         client_moveresize(sclient, ogeo, False);
+                    }
                }
 
                /* To move a client normally, in freelayout */
@@ -99,48 +103,45 @@ mouse_move(Client *c)
 /** Resize a client with the mouse
  * \param c Client pointer
 */
+
 void
 mouse_resize(Client *c)
 {
      int ocx = c->geo.x;
      int ocy = c->geo.y;
-     XRectangle geo = c->geo;
+     XRectangle geo;
      XEvent ev;
 
      if(c->max || c->lmax || c->tile
         || c->state_fullscreen || c->state_dock)
           return;
 
-    if(XGrabPointer(dpy, ROOT, False, MouseMask, GrabModeAsync, GrabModeAsync,
-                    None, cursor[CurResize], CurrentTime) != GrabSuccess)
+     if(XGrabPointer(dpy, ROOT, False, MouseMask, GrabModeAsync, GrabModeAsync,
+                     None, cursor[CurResize], CurrentTime) != GrabSuccess)
           return;
 
-     XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
+     XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + BORDH, c->geo.height);
 
-     for(;;)
+     do
      {
           XMaskEvent(dpy, MouseMask | ExposureMask | SubstructureRedirectMask, &ev);
 
-          if(ev.type == ButtonRelease)
+          if(ev.type == MotionNotify)
           {
-               if(!c->tile)
-                    XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
-               XUngrabPointer(dpy, CurrentTime);
-               return;
-          }
-          else if(ev.type == MotionNotify)
-          {
-               geo.width = ((ev.xmotion.x - ocx < 1) ? 1 : ev.xmotion.x - ocx);
+               geo.width  = ((ev.xmotion.x - ocx < 1) ? 1 : ev.xmotion.x - ocx);
                geo.height = ((ev.xmotion.y - ocy < 1) ? 1 : ev.xmotion.y - ocy);
 
                client_moveresize(c, geo, True);
-
-               XSync(dpy, False);
           }
           else if(ev.type == Expose)
                expose(&ev.xexpose);
 
      }
+     while(ev.type != ButtonRelease);
+
+     XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
+
+     XUngrabPointer(dpy, CurrentTime);
 
      return;
 }

@@ -38,6 +38,9 @@ void
 init(void)
 {
      /* First init */
+     ewmh_init_hints();
+     init_layout();
+     init_conf();
      init_gc();
      init_font();
      init_cursor();
@@ -143,6 +146,36 @@ init_root(void)
      ewmh_init_hints();
      ewmh_get_number_of_desktop();
      ewmh_get_desktop_names();
+
+     return;
+}
+
+/** Init layout
+ */
+void
+init_layout(void)
+{
+     int i;
+
+     const func_name_list_t layout_list_tmp[] =
+          {
+               {"tile_right",  tile },
+               {"tile_left",   tile_left },
+               {"tile_top",    tile_top },
+               {"tile_bottom", tile_bottom },
+               {"tile_grid",   grid },
+               {"grid",        grid },
+               {"max",         maxlayout },
+               {"maxlayout",   maxlayout },
+               {"freelayout",  freelayout },
+               {"free",        freelayout }
+          };
+
+     layout_list = emalloc(LEN(layout_list_tmp), sizeof(func_name_list_t));
+     memset(layout_list, 0, LEN(layout_list_tmp));
+
+     for(i = 0; i < LEN(layout_list_tmp); ++i)
+          layout_list[i] = layout_list_tmp[i];
 
      return;
 }

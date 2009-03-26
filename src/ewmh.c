@@ -302,8 +302,6 @@ ewmh_manage_window_type(Client *c)
                   || atom[i] == net_atom[net_wm_window_type_splash])
                {
                     XReparentWindow(dpy, c->win, ROOT, c->geo.x, c->geo.y);
-                    XUnmapSubwindows(dpy, c->frame);
-                    XUnmapWindow(dpy, c->frame);
                     XRaiseWindow(dpy, c->win);
                     c->state_dock = True;
                }

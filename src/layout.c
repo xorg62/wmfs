@@ -513,34 +513,24 @@ uicb_togglemax(uicb_t cmd)
      return;
 }
 
-/** Set the layout *CRAP*
+/** Set the layout
  * \param cmd uicb_t type
 */
 void
 uicb_set_layout(uicb_t cmd)
 {
-     int i = -1;
+     int i, j, n;
 
      screen_get_sel();
 
-     if(strcmp(cmd, "tile_right") == 0
-        || strcmp(cmd, "tile") == 0)
-          i = 0;
-     else if(strcmp(cmd, "tile_left") == 0)
-          i = 1;
-     else if(strcmp(cmd, "tile_top") == 0)
-          i = 2;
-     else if(strcmp(cmd, "tile_bottom") == 0)
-          i = 3;
-     else if(strcmp(cmd, "tile_grid") == 0)
-          i = 4;
-     else if(strcmp(cmd, "max") == 0)
-          i = 5;
-     else if(strcmp(cmd, "free") == 0)
-          i = 6;
+     /* Set layout_list lenght */
+     for(n = 0; layout_list[n].name != NULL && layout_list[n].func != NULL; ++n);
 
-     if(i >= 0)
-          tags[selscreen][seltag[selscreen]].layout = conf.layout[i];
+     for(i = 0; i < n; ++i)
+          if(!strcmp(cmd, _strdup(layout_list[i].name)))
+               for(j = 0; j < LEN(conf.layout); ++j)
+                    if(layout_list[i].func == conf.layout[j].func)
+                         tags[selscreen][seltag[selscreen]].layout = conf.layout[j];
 
      arrange(selscreen);
 

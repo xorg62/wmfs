@@ -81,6 +81,7 @@
 #define TBARH        ((conf.titlebar.height < BORDH) ? BORDH : conf.titlebar.height)
 #define FRAMEW(w)    ((w) + BORDH * 2)
 #define FRAMEH(h)    ((h) + (BORDH  + TBARH))
+#define ROUND(x)     (float)((x > 0) ? x + (float)0.5 : x - (float)0.5)
 #define RESHW        (5 * BORDH)
 #define BUTTONWH     (TBARH / 2)
 #define CHECK(x)     if(!(x)) return
@@ -144,7 +145,6 @@ void client_manage(Window w, XWindowAttributes *wa);
 void client_moveresize(Client *c, XRectangle geo, Bool r);
 void client_maximize(Client *c);
 void client_size_hints(Client *c);
-void client_swap(Client *a, Client *b);
 void client_raise(Client *c);
 void client_unhide(Client *c);
 void client_unmanage(Client *c);
@@ -280,6 +280,7 @@ void uicb_set_layout(uicb_t);
 /* init.c */
 void init(void);
 void init_root(void);
+void init_layout(void);
 void init_font(void);
 void init_gc(void);
 void init_cursor(void);
@@ -325,6 +326,7 @@ Client *sel;
 
 /* Other */
 func_name_list_t *func_list;
+func_name_list_t *layout_list;
 uint numlockmask;
 
 #endif /* WMFS_H */

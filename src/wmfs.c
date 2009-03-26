@@ -108,6 +108,7 @@ quit(void)
      IFREE(infobar);
      IFREE(keys);
      IFREE(func_list);
+     IFREE(layout_list);
 
      /* Clean conf alloced thing {{{ */
      IFREE(menulayout.item);
@@ -334,8 +335,6 @@ main(int argc, char **argv)
      XSetErrorHandler(errorhandler);
 
      /* Let's Go ! */
-     ewmh_init_hints();
-     init_conf();
      init();
      scan();
      mainloop();
