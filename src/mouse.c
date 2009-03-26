@@ -38,8 +38,8 @@
 void
 mouse_move(Client *c)
 {
-     int ocx, ocy, mx, my;
-     int dint;
+     int ocx, ocy, mx, my, i;
+     int dint, oscreen = c->screen;
      uint duint;
      Window dw, sw;
      Client *sclient;
@@ -61,14 +61,15 @@ mouse_move(Client *c)
      do
      {
           XMaskEvent(dpy, MouseMask | ExposureMask | SubstructureRedirectMask, &ev);
+          screen_get_sel();
 
           if(ev.type == MotionNotify)
           {
-               /* To move the client in the tile grid */
                if(c->tile)
                {
                     XQueryPointer(dpy, ROOT, &dw, &sw, &mx, &my, &dint, &dint, &duint);
 
+                    /* To move the client in the tile grid */
                     if((sclient = client_gb_win(sw))
                        || (sclient = client_gb_frame(sw))
                        || (sclient = client_gb_titlebar(sw)))
@@ -77,6 +78,19 @@ mouse_move(Client *c)
                          client_moveresize(c, sclient->geo, False);
                          client_moveresize(sclient, ogeo, False);
                     }
+
+                    /* To move a client of one tag to another */
+                    XQueryPointer(dpy, infobar[selscreen].bar->win, &dw, &sw, &mx, &my, &dint, &dint, &duint);
+
+                    for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
+                         if(infobar[selscreen].tags[i]->win == sw)
+                         {
+                              c->screen = selscreen;
+                              tag_transfert(c, i);
+                              arrange(selscreen);
+                              if(c->screen != oscreen)
+                                   arrange(oscreen);
+                         }
                }
 
                /* To move a client normally, in freelayout */

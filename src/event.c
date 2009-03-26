@@ -485,7 +485,6 @@ unmapnotify(XUnmapEvent *ev)
      return;
 }
 
-
 /** Event handle function: execute every function
  * handle by event
  * \param ev Event
