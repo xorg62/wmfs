@@ -48,7 +48,7 @@ cfg_opt_t misc_opts[] =
 cfg_opt_t mouse_button_opts[] =
 {
      CFG_INT("tag",    -1,        CFGF_NONE),
-     CFG_INT("screen", 0,         CFGF_NONE),
+     CFG_INT("screen", -1,         CFGF_NONE),
      CFG_STR("button", "Button1", CFGF_NONE),
      CFG_STR("func",   "",        CFGF_NONE),
      CFG_STR("cmd",    "",        CFGF_NONE),

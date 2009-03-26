@@ -82,7 +82,8 @@ buttonpress(XButtonEvent *ev)
      for(i = 0; i < screen_count(); ++i)
           if(ev->window == infobar[i].bar->win)
                for(j = 0; j < conf.bars.nmouse; ++j)
-                    if(conf.bars.mouse[j].screen == i)
+                    if(conf.bars.mouse[j].screen == i
+                       || conf.bars.mouse[j].screen < 0)
                          if(conf.bars.mouse[j].tag == seltag[i]
                             || conf.bars.mouse[j].tag < 0)
                               if(ev->button == conf.bars.mouse[j].button)
