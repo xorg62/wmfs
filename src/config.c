@@ -138,6 +138,13 @@ conf_bar_section(cfg_t *cfg_b)
      conf.colors.bar  = getcolor(alias_to_str(cfg_getstr(cfg_b, "bg")));
      conf.colors.text = _strdup(alias_to_str(cfg_getstr(cfg_b, "fg")));
 
+     if((conf.bars.nmouse = cfg_size(cfg_b, "mouse")))
+     {
+          conf.bars.mouse = emalloc(conf.bars.nmouse, sizeof(MouseBinding));
+          mouse_section(conf.bars.mouse, cfg_b, conf.bars.nmouse);
+     }
+
+
      return;
 }
 
@@ -145,8 +152,8 @@ void
 conf_root_section(cfg_t *cfg_r)
 {
      conf.root.background_command = _strdup(alias_to_str(cfg_getstr(cfg_r, "background_command")));
-     conf.root.nmouse             = cfg_size(cfg_r, "mouse");
-     if(conf.root.nmouse)
+
+     if((conf.root.nmouse = cfg_size(cfg_r, "mouse")))
      {
           conf.root.mouse = emalloc(conf.root.nmouse, sizeof(MouseBinding));
           mouse_section(conf.root.mouse, cfg_r, conf.root.nmouse);

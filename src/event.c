@@ -39,7 +39,7 @@ void
 buttonpress(XButtonEvent *ev)
 {
      Client *c;
-     int i, n, x, y;
+     int i, j, n, x, y;
 
      screen_get_sel();
 
@@ -76,6 +76,18 @@ buttonpress(XButtonEvent *ev)
                     if(ev->button == conf.root.mouse[i].button)
                          if(conf.root.mouse[i].func)
                               conf.root.mouse[i].func(conf.root.mouse[i].cmd);
+
+
+     /* Infobars */
+     for(i = 0; i < screen_count(); ++i)
+          if(ev->window == infobar[i].bar->win)
+               for(j = 0; j < conf.bars.nmouse; ++j)
+                    if(conf.bars.mouse[j].screen == i)
+                         if(conf.bars.mouse[j].tag == seltag[i]
+                            || conf.bars.mouse[j].tag < 0)
+                              if(ev->button == conf.bars.mouse[j].button)
+                                   if(conf.bars.mouse[j].func)
+                                        conf.bars.mouse[j].func(conf.bars.mouse[j].cmd);
 
      /* Tags */
      for(i = 1; i < conf.ntag[selscreen] + 1; ++i)

@@ -45,14 +45,6 @@ cfg_opt_t misc_opts[] =
      CFG_END()
 };
 
-cfg_opt_t bar_opts[] =
-{
-     CFG_STR("bg",        "#090909", CFGF_NONE),
-     CFG_STR("fg",        "#6289A1", CFGF_NONE),
-     CFG_BOOL("border",   cfg_false, CFGF_NONE),
-     CFG_END()
-};
-
 cfg_opt_t mouse_button_opts[] =
 {
      CFG_INT("tag",    -1,        CFGF_NONE),
@@ -60,6 +52,15 @@ cfg_opt_t mouse_button_opts[] =
      CFG_STR("button", "Button1", CFGF_NONE),
      CFG_STR("func",   "",        CFGF_NONE),
      CFG_STR("cmd",    "",        CFGF_NONE),
+     CFG_END()
+};
+
+cfg_opt_t bar_opts[] =
+{
+     CFG_STR("bg",        "#090909",         CFGF_NONE),
+     CFG_STR("fg",        "#6289A1",         CFGF_NONE),
+     CFG_BOOL("border",   cfg_false,         CFGF_NONE),
+     CFG_SEC("mouse",     mouse_button_opts, CFGF_MULTI),
      CFG_END()
 };
 

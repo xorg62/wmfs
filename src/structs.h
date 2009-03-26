@@ -286,6 +286,11 @@ typedef struct
      } colors;
      struct
      {
+          MouseBinding *mouse;
+          int nmouse;
+     } bars;
+     struct
+     {
           char *background_command;
           MouseBinding *mouse;
           int nmouse;

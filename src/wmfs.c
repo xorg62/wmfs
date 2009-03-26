@@ -129,6 +129,7 @@ quit(void)
           IFREE(conf.titlebar.button[i].linecoord);
      }
 
+     IFREE(conf.bars.mouse);
      IFREE(conf.titlebar.button);
      IFREE(conf.client.mouse);
      IFREE(conf.root.mouse);
