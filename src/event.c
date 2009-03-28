@@ -62,11 +62,21 @@ buttonpress(XButtonEvent *ev)
           mouse_resize(c);
 
      /* Client */
-     if((c = client_gb_win(ev->window)))
+     if((c = client_gb_win(ev->window)) && c == sel)
           for(i = 0; i < conf.client.nmouse; ++i)
                if(ev->button == conf.client.mouse[i].button)
                     if(conf.client.mouse[i].func)
                          conf.client.mouse[i].func(conf.client.mouse[i].cmd);
+
+     /* If the mouse is on a client that is not selected
+        and you click on it. */
+     if((c = client_gb_win(ev->window)) && c != sel
+        && ev->button == Button1)
+     {
+          client_focus(c);
+          if(conf.raisefocus)
+               client_raise(c);
+     }
 
      /* Root */
      if(ev->window == ROOT)
@@ -315,9 +325,9 @@ enternotify(XCrossingEvent *ev)
      Client *c;
      int n;
 
-     if((ev->mode != NotifyNormal
-         || ev->detail == NotifyInferior)
-        && ev->window != ROOT)
+     if((ev->mode != NotifyNormal))
+         //   || ev->detail == NotifyInferior)
+         // && ev->window != ROOT)
           return;
 
      if((c = client_gb_win(ev->window))

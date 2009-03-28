@@ -217,10 +217,12 @@ spawn(const char *format, ...)
      vsprintf(cmd, format, ap);
      va_end(ap);
 
-     if(!(sh = getenv("SHELL")))
-          sh = "/bin/sh";
      if(!strlen(cmd))
           return;
+
+     if(!(sh = getenv("SHELL")))
+          sh = "/bin/sh";
+
      if(fork() == 0)
      {
           if(fork() == 0)
@@ -229,7 +231,7 @@ spawn(const char *format, ...)
                     close(ConnectionNumber(dpy));
                setsid();
                execl(sh, sh, "-c", cmd, (char*)NULL);
-               exit(EXIT_FAILURE);
+               exit(EXIT_SUCCESS);
           }
           exit(EXIT_SUCCESS);
      }
