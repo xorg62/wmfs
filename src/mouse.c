@@ -125,16 +125,22 @@ mouse_resize(Client *c)
      int ocy = c->geo.y;
      XRectangle geo = c->geo;
      XEvent ev;
+     Window w;
+     int d, u, omx, omy;
+     float mwf = tags[selscreen][seltag[selscreen]].mwfact;
 
-     if(c->max || c->lmax || c->tile
+     if(c->max || c->lmax
         || c->state_fullscreen || c->state_dock)
           return;
+
+     XQueryPointer(dpy, ROOT, &w, &w, &omx, &omy, &d, &d, (uint *)&u);
 
      if(XGrabPointer(dpy, ROOT, False, MouseMask, GrabModeAsync, GrabModeAsync,
                      None, cursor[CurResize], CurrentTime) != GrabSuccess)
           return;
 
-     XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
+     if(!c->tile)
+          XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
 
      do
      {
@@ -142,12 +148,31 @@ mouse_resize(Client *c)
 
           if(ev.type == MotionNotify)
           {
-               geo.width = ((ev.xmotion.x - ocx < 1) ? 1 : ev.xmotion.x - ocx);
-               geo.height = ((ev.xmotion.y - ocy < 1) ? 1 : ev.xmotion.y - ocy);
+               if(c->tile && tags[selscreen][seltag[selscreen]].layout.func != grid)
+               {
+                    if(tags[selscreen][seltag[selscreen]].layout.func == tile)
+                         mwf += (ROUND(ev.xmotion.x_root) - omx) / (sgeo[c->screen].width);
+                    else if(tags[selscreen][seltag[selscreen]].layout.func == tile_left)
+                         mwf -= (ROUND(ev.xmotion.x_root) - omx) / (sgeo[c->screen].width);
+                    else if(tags[selscreen][seltag[selscreen]].layout.func == tile_top)
+                         mwf -= (ROUND(ev.xmotion.y_root) - omy) / (sgeo[c->screen].height);
+                    else
+                         mwf += (ROUND(ev.xmotion.y_root) - omy) / (sgeo[c->screen].height);
 
-               client_moveresize(c, geo, True);
+                    omx = ROUND(ev.xmotion.x_root);
+                    omy = ROUND(ev.xmotion.y_root);
 
-               XSync(dpy, False);
+                    tags[selscreen][seltag[selscreen]].mwfact = (mwf < 0.05) ? 0.05 : ((mwf > 0.95) ? 0.95 : mwf);
+               }
+               else
+               {
+                    geo.width = ((ev.xmotion.x - ocx < 1) ? 1 : ev.xmotion.x - ocx);
+                    geo.height = ((ev.xmotion.y - ocy < 1) ? 1 : ev.xmotion.y - ocy);
+
+                    client_moveresize(c, geo, True);
+
+                    XSync(dpy, False);
+               }
           }
           else if(ev.type == Expose)
                expose(&ev.xexpose);
@@ -155,7 +180,10 @@ mouse_resize(Client *c)
      }
      while(ev.type != ButtonRelease);
 
-     XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
+     if(!c->tile)
+          XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
+     else
+          tags[selscreen][seltag[selscreen]].layout.func(c->screen);
      XUngrabPointer(dpy, CurrentTime);
 
 
