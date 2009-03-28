@@ -71,12 +71,10 @@ buttonpress(XButtonEvent *ev)
      /* If the mouse is on a client that is not selected
         and you click on it. */
      if((c = client_gb_win(ev->window)) && c != sel
-        && ev->button == Button1)
-     {
+        && (ev->button == Button1
+            || ev->button == Button2
+            || ev->button == Button3))
           client_focus(c);
-          if(conf.raisefocus)
-               client_raise(c);
-     }
 
      /* Root */
      if(ev->window == ROOT)
