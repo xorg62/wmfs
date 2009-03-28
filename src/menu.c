@@ -245,7 +245,6 @@ uicb_menu(uicb_t cmd)
                     x = sgeo[selscreen].x + conf.menu[i].x;
                     y = sgeo[selscreen].y + conf.menu[i].y;
                }
-
                menu_draw(conf.menu[i], x, y);
           }
 

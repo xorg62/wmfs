@@ -696,6 +696,8 @@ client_unhide(Client *c)
 void
 client_unmanage(Client *c)
 {
+     Client *c_next = NULL;
+
      XGrabServer(dpy);
      XSetErrorHandler(errorhandlerdummy);
      XReparentWindow(dpy, c->win, ROOT, c->geo.x, c->geo.y);
@@ -712,6 +714,15 @@ client_unmanage(Client *c)
      ewmh_get_client_list();
      arrange(c->screen);
      XFree(c->title);
+
+     /* To focus the previous client */
+     for(c_next = clients;
+         c_next && c_next != c->prev && c_next->tag != c->tag && c_next->screen != c->screen;
+         c_next = c_next->next);
+
+     if(c_next && c_next->tag == seltag[selscreen] && c_next->screen == selscreen)
+          client_focus(c_next);
+
      free(c);
 
      return;
