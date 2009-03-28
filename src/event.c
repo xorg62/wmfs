@@ -325,9 +325,9 @@ enternotify(XCrossingEvent *ev)
      Client *c;
      int n;
 
-     if((ev->mode != NotifyNormal))
-         //   || ev->detail == NotifyInferior)
-         // && ev->window != ROOT)
+     if((ev->mode != NotifyNormal
+         || ev->detail == NotifyInferior)
+        && ev->window != ROOT)
           return;
 
      if((c = client_gb_win(ev->window))

@@ -234,7 +234,6 @@ char* alias_to_str(char *conf_choice);
 /* }}} */
 XRectangle get_mouse_pos(void);
 void spawn(const char *str, ...);
-Pixmap get_root_pixmap(void);
 void uicb_spawn(uicb_t);
 
 /* tag.c */
