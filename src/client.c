@@ -98,6 +98,7 @@ uicb_client_prev(uicb_t cmd)
      for(d = clients; d != sel; d = d->next)
           if(!ishide(d))
                c = d;
+
      if(!c)
           for(; d; d = d->next)
                if(!ishide(d))
@@ -305,7 +306,10 @@ client_hide(Client *c)
 Bool
 ishide(Client *c)
 {
-     if(c->tag && c->tag == seltag[screen_get_sel()])
+     screen_get_sel();
+
+     if(c->tag && c->tag == seltag[selscreen]
+        && c->screen == selscreen)
           return False;
      return True;
 }
