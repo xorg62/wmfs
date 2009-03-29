@@ -104,6 +104,7 @@ quit(void)
      XFreeCursor(dpy, cursor[CurMove]);
      XFreeCursor(dpy, cursor[CurResize]);
      infobar_destroy();
+
      IFREE(sgeo);
      IFREE(infobar);
      IFREE(keys);

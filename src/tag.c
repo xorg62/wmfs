@@ -40,6 +40,7 @@ void
 tag_set(int tag)
 {
      int otag;
+     Client *c;
 
      screen_get_sel();
 
@@ -70,7 +71,14 @@ tag_set(int tag)
           infobar_set_position(tags[selscreen][seltag[selscreen]].barpos);
 
      arrange(selscreen);
-     client_focus(NULL);
+
+     /* To focus the first client in the new tag */
+     for(c = clients; c; c = c->next)
+          if(c->tag == seltag[selscreen] && c->screen == selscreen)
+               break;
+
+     client_focus((c) ? c : NULL);
+
 
      return;
 }
