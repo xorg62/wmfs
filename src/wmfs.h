@@ -276,6 +276,7 @@ void uicb_layout_next(uicb_t);
 void uicb_set_mwfact(uicb_t);
 void uicb_set_nmaster(uicb_t);
 void uicb_set_layout(uicb_t);
+void uicb_toggle_resizehint(uicb_t);
 
 /* init.c */
 void init(void);

@@ -55,6 +55,7 @@ conf_init_func_list(void)
                {"set_nmaster",             uicb_set_nmaster },
                {"quit",                    uicb_quit },
                {"toggle_infobar_position", uicb_infobar_togglepos },
+               {"toggle_resizehint",       uicb_toggle_resizehint },
                {"mouse_move",              uicb_mouse_move },
                {"mouse_resize",            uicb_mouse_resize },
                {"client_raise",            uicb_client_raise },

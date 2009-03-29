@@ -178,6 +178,9 @@ keys
         # Toggle the position of the infobar.
         key { mod = {"Alt"} key = "b" func = "toggle_infobar_position" }
 
+        # Toggle the resizehint of the current tag/screen
+        key { mod = { "Shift", "Control" } key = "r" func = "toggle_resizehint" }
+
         # Select the next client.
         key { mod = {"Alt"} key = "Tab" func = "client_next" }
 

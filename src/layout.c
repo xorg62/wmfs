@@ -513,6 +513,19 @@ uicb_togglemax(uicb_t cmd)
      return;
 }
 
+/** Toggle the resizehint
+ * \param cmd uicb_t type
+ */
+void
+uicb_toggle_resizehint(uicb_t cmd)
+{
+     tags[selscreen][seltag[selscreen]].resizehint = !tags[selscreen][seltag[selscreen]].resizehint;
+
+     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
+
+     return;
+}
+
 /** Set the layout
  * \param cmd uicb_t type
 */
