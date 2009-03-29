@@ -39,6 +39,7 @@ layouts
         layout { type = "tile_top"    symbol = "TOP" }
         layout { type = "tile_bottom" symbol = "BOTTOM" }
         layout { type = "tile_grid"   symbol = "GRID" }
+        layout { type = "tile_mirror"  symbol = "MIRROR" }
 
         # Other.
         layout { type = "max"         symbol = "MAX"  }

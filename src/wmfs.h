@@ -264,6 +264,7 @@ Client *tiled_client(int screen, Client *c);
 /* tile {{{ */
  void grid(int screen);
  void tile(int screen);
+ void mirror(int screen);
  void tile_left(int screen);
  void tile_top(int screen);
  void tile_bottom(int screen);

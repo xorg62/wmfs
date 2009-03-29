@@ -166,6 +166,8 @@ init_layout(void)
                {"tile_bottom", tile_bottom },
                {"tile_grid",   grid },
                {"grid",        grid },
+               {"mirror",      mirror },
+               {"tile_mirror", mirror },
                {"max",         maxlayout },
                {"maxlayout",   maxlayout },
                {"freelayout",  freelayout },
