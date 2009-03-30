@@ -543,11 +543,20 @@ mirror(int screen, Bool horizontal)
           /* Next y/x position */
           if(i >= nmaster - 1)
           {
-
-               if(i == nmaster || i == nmaster - 1)
-                    cgeo.x = (horizontal) ? sg.x : nextg[isp].y + nextg[isp].height + BORDH + TBARH;
+               if(horizontal)
+               {
+                    if(i == nmaster || i == nmaster - 1)
+                         cgeo.x = sg.x;
+                    else
+                         cgeo.x = nextg[isp].x + nextg[isp].width + BORDH * 2;
+               }
                else
-                    cgeo.y = (horizontal) ? nextg[isp].x + nextg[isp].width + BORDH * 2 : sg.y;
+               {
+                    if(i == nmaster || i == nmaster - 1)
+                         cgeo.y = sg.y;
+                    else
+                         cgeo.y = nextg[isp].y + nextg[isp].height + BORDH + TBARH;
+               }
           }
           else if (i <= nmaster - 1)
           {
