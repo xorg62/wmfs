@@ -104,20 +104,11 @@ int
 screen_get_with_geo(int x, int y)
 {
      int i, r = 0;
-     int barpos = tags[selscreen][seltag[selscreen]].barpos;
-     int yh;
 
      for(i = 0; i < screen_count(); ++i)
-     {
-          if(barpos == IB_Hide || barpos == IB_Bottom)
-               yh = (sgeo[i].y - TBARH);
-          else
-               yh = (sgeo[i].y - INFOBARH - TBARH);
-
-          if((x >= sgeo[i].x && x < sgeo[i].x + sgeo[i].width)
-             && y >= yh && y < yh + (sgeo[i].height + INFOBARH + TBARH))
+          if((x >= spgeo[i].x && x < spgeo[i].x + spgeo[i].width)
+             && y >= spgeo[i].y && y < spgeo[i].y + spgeo[i].height)
                r = i;
-     }
 
      return r;
 }

@@ -435,8 +435,8 @@ client_manage(Window w, XWindowAttributes *wa)
            * screen, else place the client in it */
           if(screen_get_with_geo(mx, my) != selscreen)
           {
-               mx += sgeo[selscreen].x - BORDH;
-               my += sgeo[selscreen].y - TBARH - INFOBARH;
+               mx += spgeo[selscreen].x;
+               my += spgeo[selscreen].y;
           }
      }
      c->ogeo.x = c->geo.x = mx;
