@@ -142,7 +142,7 @@ init_root(void)
      XChangeWindowAttributes(dpy, ROOT, CWEventMask | CWCursor, &at);
 
      if(conf.root.background_command)
-          uicb_spawn(conf.root.background_command);
+          spawn(conf.root.background_command);
 
      ewmh_init_hints();
      ewmh_get_number_of_desktop();
