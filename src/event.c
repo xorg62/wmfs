@@ -114,7 +114,7 @@ buttonpress(XButtonEvent *ev)
      {
           if(conf.layout_system && (ev->button == Button1 || ev->button == Button3)) /* True -> menu */
           {
-               y = spgeo[selscreen].y + infobar[selscreen].layout_button->geo.y;
+               y = spgeo[selscreen].y + infobar[selscreen].layout_button->geo.y + INFOBARH;
                x = infobar[selscreen].layout_button->geo.x + (sgeo[selscreen].x - BORDH);
 
                if(infobar[selscreen].geo.y != spgeo[selscreen].y)
