@@ -34,12 +34,13 @@ layouts
         system = "menu"
 
         # Tiling layouts.
-        layout { type = "tile_right"  symbol = "RIGHT" }
-        layout { type = "tile_left"   symbol = "LEFT" }
-        layout { type = "tile_top"    symbol = "TOP" }
-        layout { type = "tile_bottom" symbol = "BOTTOM" }
-        layout { type = "tile_grid"   symbol = "GRID" }
-        layout { type = "tile_mirror"  symbol = "MIRROR" }
+        layout { type = "tile_right"        symbol = "RIGHT" }
+        layout { type = "tile_left"         symbol = "LEFT" }
+        layout { type = "tile_top"          symbol = "TOP" }
+        layout { type = "tile_bottom"       symbol = "BOTTOM" }
+        layout { type = "tile_grid"         symbol = "GRID" }
+        layout { type = "mirror_vertical"   symbol = "MIRROR_V" }
+        layout { type = "mirror_horizontal" symbol = "MIRROR_H" }
 
         # Other.
         layout { type = "max"         symbol = "MAX"  }

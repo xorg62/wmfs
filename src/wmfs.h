@@ -264,10 +264,11 @@ Client *tiled_client(int screen, Client *c);
 /* tile {{{ */
  void grid(int screen);
  void tile(int screen);
- void mirror(int screen);
  void tile_left(int screen);
  void tile_top(int screen);
  void tile_bottom(int screen);
+ void mirror_vertical(int screen);
+ void mirror_horizontal(int screen);
 /* }}} */
 void uicb_tile_switch(uicb_t);
 void uicb_togglemax(uicb_t);

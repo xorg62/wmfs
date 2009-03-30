@@ -37,7 +37,7 @@
 
 #define NBUTTON        8
 #define MAXTAG         36
-#define NUM_OF_LAYOUT  8
+#define NUM_OF_LAYOUT  9
 
 /* Typedef */
 typedef const char*    uicb_t;

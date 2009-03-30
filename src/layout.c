@@ -399,14 +399,14 @@ multi_tile(int screen, Position type)
  * \param screen Screen to execute this function
  */
 void
-mirror(int screen)
+mirror(int screen, Bool horizontal)
 {
      Client *c;
      XRectangle sg = sgeo[screen];
-     XRectangle mastergeo = {sg.x, sg.y, sg.width - (BORDH * 2), sg.height - BORDH};
+     XRectangle mastergeo = {sg.x, sg.y, sg.width, sg.height};
      XRectangle cgeo = {sg.x, sg.y , sg.width, sg.height};
      XRectangle nextg[2] = { {0} };
-     uint i, n, tilewidth, mwfact;
+     uint i, n, tilesize, mwfact;
      uint nmaster = tags[screen][seltag[screen]].nmaster;
      int pa, imp;
      Bool isp = 0;
@@ -421,23 +421,50 @@ mirror(int screen)
      pa = ((n - (nmaster - 1)) / 2) - (((n - (nmaster - 1)) % 2) ? 0 : 1);
 
      /* Set mwfact */
-     if(tags[screen][seltag[screen]].mwfact < 0.51)
-          tags[screen][seltag[screen]].mwfact = 0.51;
-     mwfact = tags[screen][seltag[screen]].mwfact * sg.width;
+     if(tags[screen][seltag[screen]].mwfact < 0.55)
+          tags[screen][seltag[screen]].mwfact = 0.55;
+
+     mwfact = tags[screen][seltag[screen]].mwfact * ((horizontal) ? sg.height : sg.width);
 
      /* Master size */
-     mastergeo.height = (sg.height / nmaster) - (TBARH + (BORDH * 2));
+     if(horizontal)
+     {
+          mastergeo.width = (sg.width / nmaster) - (BORDH * 2);
+          mastergeo.height -= BORDH;
+     }
+     else
+     {
+          mastergeo.width -= BORDH * 2;
+          mastergeo.height = (sg.height / nmaster) - (TBARH + (BORDH * 2));
+     }
 
      if(n == nmaster + 1)
      {
-          mastergeo.width = mwfact - (BORDH * 3);
-          tilewidth = (sg.width - mastergeo.width) - (BORDH * 4);
+          if(horizontal)
+          {
+               mastergeo.height = mwfact - ((BORDH * 2) + TBARH);
+               tilesize = (sg.height - mastergeo.height) - ((BORDH * 2) + TBARH);
+          }
+          else
+          {
+               mastergeo.width = mwfact - (BORDH * 3);
+               tilesize = (sg.width - mastergeo.width) - (BORDH * 4);
+          }
      }
      if(n > nmaster + 1)
      {
-          mastergeo.x = (sg.x + (sg.width - mwfact)) + BORDH;
-          mastergeo.width = ((2 * mwfact - sg.width) - (BORDH * 4));
-          tilewidth = (mwfact - mastergeo.width) - ((BORDH * 4) + BORDH);
+          if(horizontal)
+          {
+               mastergeo.y = (sg.y + (sg.height - mwfact)) + TBARH + BORDH;
+               mastergeo.height = (2 * mwfact - sg.height) - ((BORDH * 3) + (TBARH * 2));
+               tilesize = (mwfact - mastergeo.height) - ((BORDH * 3) + (TBARH * 2));
+          }
+          else
+          {
+               mastergeo.x = (sg.x + (sg.width - mwfact)) + BORDH;
+               mastergeo.width = ((2 * mwfact - sg.width) - (BORDH * 4));
+               tilesize = (mwfact - mastergeo.width) - (BORDH * 5);
+          }
      }
 
      for(i = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
@@ -452,28 +479,59 @@ mirror(int screen)
 
                /* Master remainder */
                if(i + 1 == nmaster)
-                    cgeo.height = (sg.y + sg.height) - (cgeo.y + BORDH);
+               {
+                    if(horizontal)
+                         cgeo.width = (sg.x + sg.width) - (cgeo.x + (BORDH * 2));
+                    else
+                         cgeo.height = (sg.y + sg.height) - (cgeo.y + BORDH);
+               }
           }
           else
           {
-               cgeo.width = tilewidth;
+               if(horizontal)
+                    cgeo.height = tilesize;
+               else
+                    cgeo.width = tilesize;
 
                if((i + nmaster) % 2)
                {
                     isp = 1;
-                    cgeo.x = sg.x;
-                    cgeo.height = (sg.height / pa) - (TBARH + (BORDH * 2));
+
+                    if(horizontal)
+                    {
+                         cgeo.y = sg.y;
+                         cgeo.width = (sg.width / pa) - (BORDH * 2);
+                    }
+                    else
+                    {
+                         cgeo.x = sg.x;
+                         cgeo.height = (sg.height / pa) - (TBARH + (BORDH * 2));
+                    }
                }
                else
                {
                     isp = 0;
-                    cgeo.x = (sg.x + mwfact) - BORDH;
-                    cgeo.height = (sg.height / imp) - (TBARH + (BORDH * 2));
+
+                    if(horizontal)
+                    {
+                         cgeo.y = (sg.y + mwfact) - BORDH;
+                         cgeo.width = (sg.width / imp) - (BORDH * 2);
+                    }
+                    else
+                    {
+                         cgeo.x = (sg.x + mwfact) - BORDH;
+                         cgeo.height = (sg.height / imp) - (TBARH + (BORDH * 2));
+                    }
                }
 
                /* Remainder */
                if(i + 1 == n || i + 1 == n - 1)
-                    cgeo.height = (sg.y + sg.height) - (cgeo.y + BORDH);
+               {
+                    if(horizontal)
+                         cgeo.width = (sg.x + sg.width) - (cgeo.x + (BORDH * 2));
+                    else
+                         cgeo.height = (sg.y + sg.height) - (cgeo.y + BORDH);
+               }
           }
 
           client_moveresize(c, cgeo, tags[screen][seltag[screen]].resizehint);
@@ -481,16 +539,31 @@ mirror(int screen)
           if(i >= nmaster)
                nextg[!isp] = c->geo;
 
-          /* Next y position */
+          /* Next y/x position */
           if(i >= nmaster - 1)
           {
-               if(i == nmaster || i == nmaster - 1)
-                    cgeo.y = sg.y;
+               if(horizontal)
+               {
+                    if(i == nmaster || i == nmaster - 1)
+                         cgeo.x = sg.x;
+                    else
+                         cgeo.x = nextg[isp].x + nextg[isp].width + BORDH * 2;
+               }
                else
-                    cgeo.y = nextg[isp].y + nextg[isp].height + BORDH + TBARH;
+               {
+                    if(i == nmaster || i == nmaster - 1)
+                         cgeo.y = sg.y;
+                    else
+                         cgeo.y = nextg[isp].y + nextg[isp].height + BORDH + TBARH;
+               }
           }
           else if (i <= nmaster - 1)
-               mastergeo.y = c->geo.y + c->geo.height + BORDH + TBARH;
+          {
+               if(horizontal)
+                    mastergeo.x = c->geo.x + c->geo.width + BORDH * 2;
+               else
+                    mastergeo.y = c->geo.y + c->geo.height + BORDH + TBARH;
+          }
 
      }
 
@@ -529,13 +602,32 @@ tile_top(int screen)
      return;
 }
 
-
 /** Tile Bottom function
 */
 void
 tile_bottom(int screen)
 {
      multi_tile(screen, Bottom);
+
+     return;
+}
+
+/** Mirror tile vertical function
+ */
+void
+mirror_vertical(int screen)
+{
+     mirror(screen, False);
+
+     return;
+}
+
+/** Mirror tile horizontal function
+ */
+void
+mirror_horizontal(int screen)
+{
+     mirror(screen, True);
 
      return;
 }

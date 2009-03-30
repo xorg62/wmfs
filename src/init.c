@@ -160,18 +160,20 @@ init_layout(void)
 
      const func_name_list_t layout_list_tmp[] =
           {
-               {"tile_right",  tile },
-               {"tile_left",   tile_left },
-               {"tile_top",    tile_top },
-               {"tile_bottom", tile_bottom },
-               {"tile_grid",   grid },
-               {"grid",        grid },
-               {"mirror",      mirror },
-               {"tile_mirror", mirror },
-               {"max",         maxlayout },
-               {"maxlayout",   maxlayout },
-               {"freelayout",  freelayout },
-               {"free",        freelayout }
+               {"tile_right",              tile },
+               {"tile_left",               tile_left },
+               {"tile_top",                tile_top },
+               {"tile_bottom",             tile_bottom },
+               {"tile_grid",               grid },
+               {"grid",                    grid },
+               {"mirror_vertical",         mirror_vertical },
+               {"tile_mirror_vertical",    mirror_vertical },
+               {"mirror_horizontal",       mirror_horizontal },
+               {"tile_mirror_horizontal",  mirror_horizontal },
+               {"max",                     maxlayout },
+               {"maxlayout",               maxlayout },
+               {"freelayout",              freelayout },
+               {"free",                    freelayout }
           };
 
      layout_list = emalloc(LEN(layout_list_tmp), sizeof(func_name_list_t));
