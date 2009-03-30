@@ -311,6 +311,7 @@ Key *keys;
 Bool exiting;
 char statustext[1024];
 XRectangle *sgeo;
+XRectangle *spgeo;
 Cursor cursor[CurLast];
 
 /* Fonts */

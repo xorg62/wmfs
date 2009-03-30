@@ -397,6 +397,7 @@ multi_tile(int screen, Position type)
 
 /** Mirror layout function
  * \param screen Screen to execute this function
+ * \param horizont To specify the mirror mode (vertical/horizontal)
  */
 void
 mirror(int screen, Bool horizontal)

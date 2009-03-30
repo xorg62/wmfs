@@ -106,6 +106,7 @@ quit(void)
      infobar_destroy();
 
      IFREE(sgeo);
+     IFREE(spgeo);
      IFREE(infobar);
      IFREE(keys);
      IFREE(func_list);

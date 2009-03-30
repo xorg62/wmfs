@@ -70,6 +70,7 @@ screen_get_geo(int s)
           XineramaScreenInfo *xsi;
 
           xsi = XineramaQueryScreens(dpy, &n);
+
           geo.x = xsi[s].x_org + BORDH;
           if(barpos == IB_Hide || barpos == IB_Bottom)
                geo.y = TBARH;
@@ -168,12 +169,34 @@ screen_get_sel(void)
 void
 screen_init_geo(void)
 {
-     int i;
+     int i, n;
+     XineramaScreenInfo *xsi;
 
      sgeo = emalloc(screen_count(), sizeof(XRectangle));
+     spgeo = emalloc(screen_count(), sizeof(XRectangle));
 
      for(i = 0; i < screen_count(); ++i)
           sgeo[i] = screen_get_geo(i);
+
+     if(XineramaIsActive(dpy))
+     {
+          xsi = XineramaQueryScreens(dpy, &n);
+          for(i = 0; i < n; ++i)
+          {
+               spgeo[i].x = xsi[i].x_org;
+               spgeo[i].y = xsi[i].y_org;
+               spgeo[i].width = xsi[i].width;
+               spgeo[i].height = xsi[i].height;
+          }
+          XFree(xsi);
+     }
+     else
+     {
+          spgeo[0].x = 0;
+          spgeo[0].y = 0;
+          spgeo[0].width = MAXW;
+          spgeo[0].height = MAXH;
+     }
 
      ewmh_set_desktop_geometry();
      ewmh_set_workarea();

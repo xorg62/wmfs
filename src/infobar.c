@@ -50,18 +50,18 @@ infobar_init(void)
           switch(tags[sc][seltag[sc]].barpos)
           {
           case IB_Hide:
-               sgeo[sc].y =  TBARH;
-               sgeo[selscreen].height += INFOBARH;
-               infobar[selscreen].geo.y = -(infobar[selscreen].geo.height) * 2;
+               sgeo[sc].y = spgeo[sc].y + TBARH;
+               sgeo[sc].height += INFOBARH;
+               infobar[sc].geo.y = -(infobar[sc].geo.height) * 2;
                break;
           case IB_Bottom:
-               sgeo[selscreen].y = TBARH;
-               infobar[selscreen].geo.y = sgeo[selscreen].height + TBARH;
+               sgeo[sc].y = TBARH;
+               infobar[sc].geo.y = spgeo[sc].y + sgeo[sc].height + TBARH;
                break;
           default:
           case IB_Top:
-               sgeo[sc].y = INFOBARH + TBARH;
-               infobar[selscreen].geo.y = sgeo[selscreen].y - (INFOBARH + TBARH);
+               sgeo[sc].y = spgeo[sc].y + INFOBARH + TBARH;
+               infobar[sc].geo.y = spgeo[sc].y;
                break;
           }
 
@@ -191,38 +191,26 @@ infobar_destroy(void)
 void
 infobar_set_position(int pos)
 {
-     int th;
-
      screen_get_sel();
 
-     if(XineramaIsActive(dpy))
-     {
-          int n = 0;
-          XineramaScreenInfo *xsi = XineramaQueryScreens(dpy, &n);
-
-          th = xsi[selscreen].height;
-          XFree(xsi);
-     }
-     else
-          th = MAXH;
 
      switch(pos)
      {
      case IB_Hide:
-          sgeo[selscreen].y = TBARH;
-          sgeo[selscreen].height = th - TBARH;
+          sgeo[selscreen].y = spgeo[selscreen].y + TBARH;
+          sgeo[selscreen].height = spgeo[selscreen].height - TBARH;
           infobar[selscreen].geo.y = -(infobar[selscreen].geo.height) * 2;
           break;
      case IB_Bottom:
-          sgeo[selscreen].y = TBARH;
-          sgeo[selscreen].height = th - INFOBARH - TBARH;
-          infobar[selscreen].geo.y = sgeo[selscreen].height + TBARH;
+          sgeo[selscreen].y = spgeo[selscreen].y + TBARH;
+          sgeo[selscreen].height = spgeo[selscreen].height - INFOBARH - TBARH;
+          infobar[selscreen].geo.y = spgeo[selscreen].y + sgeo[selscreen].height + TBARH;
           break;
      default:
      case IB_Top:
-          sgeo[selscreen].y = INFOBARH + TBARH;
-          sgeo[selscreen].height = th - INFOBARH - TBARH;
-          infobar[selscreen].geo.y = sgeo[selscreen].y - (INFOBARH + TBARH);
+          sgeo[selscreen].y = spgeo[selscreen].y + INFOBARH + TBARH;
+          sgeo[selscreen].height = spgeo[selscreen].height - INFOBARH - TBARH;
+          infobar[selscreen].geo.y = spgeo[selscreen].y;
           break;
      }
 
