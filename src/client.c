@@ -92,16 +92,16 @@ uicb_client_prev(uicb_t cmd)
 {
      Client *c = NULL, *d;
 
-     if(!sel || ishide(sel))
+     if(!sel || ishide(sel, selscreen))
           return;
 
      for(d = clients; d != sel; d = d->next)
-          if(!ishide(d))
+          if(!ishide(d, selscreen))
                c = d;
 
      if(!c)
           for(; d; d = d->next)
-               if(!ishide(d))
+               if(!ishide(d, selscreen))
                     c = d;
      if(c)
      {
@@ -120,12 +120,12 @@ uicb_client_next(uicb_t cmd)
 {
      Client *c = NULL;
 
-     if(!sel || ishide(sel))
+     if(!sel || ishide(sel, selscreen))
           return;
 
-     for(c = sel->next; c && ishide(c); c = c->next);
+     for(c = sel->next; c && ishide(c, selscreen); c = c->next);
      if(!c)
-          for(c = clients; c && ishide(c); c = c->next);
+          for(c = clients; c && ishide(c, selscreen); c = c->next);
      if(c)
      {
           client_focus(c);
@@ -304,12 +304,12 @@ client_hide(Client *c)
  * \return True if the client is hide; False if not
 */
 Bool
-ishide(Client *c)
+ishide(Client *c, int screen)
 {
      screen_get_sel();
 
-     if(c->tag && c->tag == seltag[selscreen]
-        && c->screen == selscreen)
+     if(c->tag == seltag[screen]
+        && c->screen == screen)
           return False;
      return True;
 }

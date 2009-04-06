@@ -139,7 +139,7 @@ Client* client_gb_button(Window w, int *n);
 void client_get_name(Client *c);
 void client_hide(Client *c);
 void client_kill(Client *c);
-Bool ishide(Client *c);
+Bool ishide(Client *c, int screen);
 void client_map(Client *c);
 void client_manage(Window w, XWindowAttributes *wa);
 void client_moveresize(Client *c, XRectangle geo, Bool r);

@@ -42,7 +42,7 @@ arrange(int screen)
      for(c = clients; c; c = c->next)
           if(c->screen == screen)
           {
-               if(!ishide(c))
+               if(!ishide(c, screen))
                     client_unhide(c);
                else
                     client_hide(c);
@@ -62,7 +62,7 @@ freelayout(int screen)
      Client *c;
 
      for(c = clients; c; c = c->next)
-          if(!ishide(c) && c->screen == screen_get_sel())
+          if(!ishide(c, selscreen) && c->screen == screen_get_sel())
           {
                client_moveresize(c, c->ogeo, True);
                c->tile = c->lmax = False;
@@ -160,7 +160,7 @@ tiled_client(int screen, Client *c)
                 || c->free
                 || c->screen != screen
                 || c->state_fullscreen
-                || ishide(c)); c = c->next);
+                || ishide(c, screen)); c = c->next);
 
      return c;
 }
@@ -231,7 +231,7 @@ grid(int screen)
           ? rows - 1
           : rows;
 
-     for(i = 0, c =tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
+     for(i = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
      {
           /* Set client property */
           c->max = c->lmax = False;
@@ -688,7 +688,7 @@ uicb_togglefree(uicb_t cmd)
 void
 uicb_togglemax(uicb_t cmd)
 {
-     if(!sel || ishide(sel) || sel->hint || sel->state_fullscreen)
+     if(!sel || ishide(sel, selscreen) || sel->hint || sel->state_fullscreen)
           return;
 
      if(!sel->max)

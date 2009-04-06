@@ -86,7 +86,7 @@ mouse_move(Client *c)
                          if(infobar[selscreen].tags[i]->win == sw)
                          {
                               c->screen = selscreen;
-                              tag_transfert(c, i);
+                              c->tag = i;
                               arrange(selscreen);
                               if(c->screen != oscreen)
                                    arrange(oscreen);
