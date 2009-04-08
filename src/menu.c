@@ -71,7 +71,7 @@ menu_draw(Menu menu, int x, int y)
      width = menu_get_longer_string(menu.item, menu.nitem);
 
      /* Frame barwin */
-     frame = barwin_create(ROOT, x, y, width + SHADH, menu.nitem * INFOBARH + SHADH,
+     frame = barwin_create(ROOT, x, y, width + SHADH, menu.nitem * (INFOBARH - SHADH) + SHADH * 2,
                            menu.colors.normal.bg, menu.colors.normal.fg, False, False, True);
 
      barwin_map(frame);
@@ -82,7 +82,7 @@ menu_draw(Menu menu, int x, int y)
      {
           item[i] = barwin_create(frame->win,
                                   SHADH,
-                                  (i * INFOBARH) + SHADH,
+                                  (i * (INFOBARH - SHADH) + SHADH),
                                   width - SHADH,
                                   INFOBARH,
                                   menu.colors.normal.bg,
