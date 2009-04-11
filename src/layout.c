@@ -172,6 +172,8 @@ void
 uicb_set_mwfact(uicb_t cmd)
 {
      double c;
+     char infostr[20] = { 0 };
+     BarWindow *infowin;
 
      screen_get_sel();
 
@@ -183,6 +185,21 @@ uicb_set_mwfact(uicb_t cmd)
 
      tags[selscreen][seltag[selscreen]].mwfact += c;
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);
+
+     sprintf(infostr, "Mwfact: %.3lf", tags[selscreen][seltag[selscreen]].mwfact);
+
+     infowin = barwin_create(ROOT,
+                             spgeo[selscreen].x + (spgeo[selscreen].width / 2) - (textw(infostr) / 2),
+                             spgeo[selscreen].y + (spgeo[selscreen].height / 2) - (INFOBARH / 2),
+                             textw(infostr) + PAD,
+
+                             INFOBARH, conf.colors.bar, conf.colors.text, False, False, False);
+
+     barwin_map(infowin);
+     barwin_refresh_color(infowin);
+     barwin_draw_text(infowin, PAD / 2, font->height, infostr);
+     usleep(50000);
+     // barwin_delete(infowin);
 
      return;
 }

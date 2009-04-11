@@ -2,18 +2,16 @@ ABOUT :
 WMFS Window Manager.
   * Window Manager From Scratch
 
-A small Window Manager created from /dev/null. (;-))
+A small Window Manager created from scratch
 
 AUTHORS :
-  * Code : Martin Duquesnoy <xorg62@gmail.com>
-  * Build System & other : Marc Lagrange <markocpc@gmail.com>
+  Martin Duquesnoy <xorg62@gmail.com>
 
 LICENSE : BSD
 
 REQUIREMENT :
   · libconfuse
   · freetype2
-  · xpm
   · xft
   · libx11
   · CMake >= 2.6
@@ -28,12 +26,9 @@ INSTALL :
   · cmake ..
   · make
   · sudo make install
-  · sudo make uninstall if you would to remove it.
-
-By default, wmfs logos are'nt installed. You can install it with : cmake -DWITH_LOGOS=ON ..
+  · sudo make uninstall # if you would to remove it.
 
 If you have doxygen installed you can generate doxygen documentation via custom target 'make doc' in the build dir.
 
 DISTROS :
-  · wmfs ebuild for Gentoo is available in the Sangor's overlay. More infos at http://wmfs.sangor.net/view/download/
   · wmfs port for FreeBSD at x11-wm/wmfs
