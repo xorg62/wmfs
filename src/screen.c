@@ -55,7 +55,6 @@ screen_count(void)
 /** Get screen geometry by number
  *\param s Screen number
  *\return XRectangle struct
- *\todo Set a pure screen geo (without change (- INFOBARH - TBAR etc..))
 */
 XRectangle
 screen_get_geo(int s)
