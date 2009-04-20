@@ -149,6 +149,7 @@ void client_raise(Client *c);
 void client_unhide(Client *c);
 void client_unmanage(Client *c);
 void client_unmap(Client *c);
+void client_set_wanted_tag(Client *c);
 void uicb_client_raise(uicb_t);
 void uicb_client_prev(uicb_t);
 void uicb_client_next(uicb_t);

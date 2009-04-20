@@ -401,8 +401,7 @@ client_manage(Window w, XWindowAttributes *wa)
      Window trans;
      Status rettrans;
      XSetWindowAttributes at;
-     XClassHint xch;
-     int mx, my, i, j, k;
+     int mx, my;
 
      screen_get_sel();
 
@@ -460,30 +459,18 @@ client_manage(Window w, XWindowAttributes *wa)
      if(!c->free) c->free = (rettrans == Success) || c->hint;
      free(t);
 
-     XGetClassHint(dpy, c->win, &xch);
-     for(i = 0; i < screen_count(); ++i)
-          for(j = 1; j < conf.ntag[i] + 1; ++j)
-               if(tags[i][j].clients != NULL)
-                    for(k = 0; k < tags[i][j].nclients; ++k)
-                         if((xch.res_name && !strcmp(tags[i][j].clients[k], xch.res_name))
-                            || (xch.res_class && !strcmp(tags[i][j].clients[k], xch.res_class)))
-                         {
-                              printf("class: %s name: %s\n", xch.res_class, xch.res_name);
-                              c->screen = i;
-                              c->tag = j;
-                         }
-
      client_attach(c);
-     client_map(c);
      client_get_name(c);
+     client_map(c);
      client_raise(c);
      client_focus(c);
      setwinstate(c->win, NormalState);
      ewmh_get_client_list();
      ewmh_manage_window_type(c);
      arrange(c->screen);
+     client_set_wanted_tag(c);
 
-     return;
+        return;
 }
 
 /** Move and Resize a client
@@ -665,6 +652,32 @@ client_size_hints(Client *c)
 
      c->hint = (c->maxw && c->minw && c->maxh && c->minh
                 && c->maxw == c->minw && c->maxh == c->minh);
+
+     return;
+}
+
+/** Set the wanted tag of a client
+ *\param c Client pointer
+*/
+void
+client_set_wanted_tag(Client *c)
+{
+     XClassHint xch;
+     int i, j, k;
+
+     XGetClassHint(dpy, c->win, &xch);
+
+     for(i = 0; i < screen_count(); ++i)
+          for(j = 1; j < conf.ntag[i] + 1; ++j)
+               if(tags[i][j].clients)
+                    for(k = 0; k < tags[i][j].nclients; ++k)
+                         if((xch.res_name && strstr(xch.res_name, tags[i][j].clients[k]))
+                            || (xch.res_class && strstr(xch.res_class, tags[i][j].clients[k])))
+                         {
+                              c->screen = i;
+                              c->tag = j;
+                              arrange(i);
+                         }
 
      return;
 }
