@@ -200,6 +200,8 @@ typedef struct
 typedef struct
 {
      char *name;
+     char **clients;
+     int nclients;
      float mwfact;
      int nmaster;
      Bool resizehint;
@@ -225,6 +227,7 @@ typedef struct
      char *name;
      /* Placement */
      Bool place_at_mouse;
+     Bool special;
      int x, y;
      /* Color */
      struct

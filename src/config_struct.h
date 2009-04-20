@@ -146,6 +146,7 @@ cfg_opt_t tag_opts[] =
      CFG_STR("layout",           "tile_right", CFGF_NONE),
      CFG_STR("infobar_position", "top",        CFGF_NONE),
      CFG_BOOL("resizehint",      cfg_false,    CFGF_NONE),
+     CFG_STR_LIST("clients",     "{}",     CFGF_NONE),
      CFG_END()
 };
 

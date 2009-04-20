@@ -270,6 +270,8 @@ conf_layout_section(cfg_t *cfg_l)
                     conf.colors.bar,
                     conf.colors.text);
 
+     menulayout.special = True;
+
      if(!conf.layout[0].symbol
         && !conf.layout[0].func)
      {
@@ -301,13 +303,13 @@ conf_layout_section(cfg_t *cfg_l)
 void
 conf_tag_section(cfg_t *cfg_t)
 {
-     int i, j, k, l = 0;
+     int i, j, k, l = 0, m, n;
      char *tmp;
 
      /* If there is no tag in the conf or more than
       * MAXTAG (32) print an error and create only one.
       */
-     Tag default_tag = { "WMFS",
+     Tag default_tag = { "WMFS", NULL, 0,
                          0.50, 1, False, IB_Top,
                          layout_name_to_struct(conf.layout, "tile_right", conf.nlayout, layout_list) };
 
@@ -353,8 +355,18 @@ conf_tag_section(cfg_t *cfg_t)
                else
                     tags[k][conf.ntag[k]].barpos = IB_Top;
 
-               tags[k][conf.ntag[k]].layout     = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"),
-                                                                        conf.nlayout, layout_list);
+               tags[k][conf.ntag[k]].layout = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"),
+                                                                    conf.nlayout, layout_list);
+
+               /* Clients list */
+               if((n = cfg_size(cfgtmp, "clients")))
+               {
+                    tags[k][conf.ntag[k]].nclients = n;
+                    tags[k][conf.ntag[k]].clients = emalloc(n, sizeof(char *));
+                    for(m = 0; m < n; ++m)
+                         tags[k][conf.ntag[k]].clients[m] = _strdup(cfg_getnstr(cfgtmp, "clients", m));
+               }
+
           }
           l = 0;
      }
@@ -385,7 +397,9 @@ conf_menu_section(cfg_t *cfg_m)
 
      conf.nmenu = cfg_size(cfg_m, "set_menu");
      CHECK(conf.nmenu);
-     conf.menu  = emalloc(conf.nmenu, sizeof(Menu));
+     conf.menu  = emalloc(conf.nmenu + 1, sizeof(Menu));
+
+     conf.menu[conf.nmenu] = menulayout;
 
      for(i = 0; i < conf.nmenu; ++i)
      {
@@ -399,10 +413,10 @@ conf_menu_section(cfg_t *cfg_m)
                conf.menu[i].y = cfg_getint(cfgtmp, "y");
           }
 
-          conf.menu[i].colors.focus.bg  = getcolor(_strdup(cfg_getstr(cfgtmp, "bg_focus")));
-          conf.menu[i].colors.focus.fg  = _strdup(cfg_getstr(cfgtmp, "fg_focus"));
-          conf.menu[i].colors.normal.bg = getcolor(_strdup(cfg_getstr(cfgtmp, "bg_normal")));
-          conf.menu[i].colors.normal.fg = _strdup(cfg_getstr(cfgtmp, "fg_normal"));
+          conf.menu[i].colors.focus.bg  = getcolor(alias_to_str(_strdup(cfg_getstr(cfgtmp, "bg_focus"))));
+          conf.menu[i].colors.focus.fg  = _strdup(alias_to_str(cfg_getstr(cfgtmp, "fg_focus")));
+          conf.menu[i].colors.normal.bg = getcolor(alias_to_str(_strdup(cfg_getstr(cfgtmp, "bg_normal"))));
+          conf.menu[i].colors.normal.fg = _strdup(alias_to_str(cfg_getstr(cfgtmp, "fg_normal")));
 
           conf.menu[i].nitem = cfg_size(cfgtmp, "item");
 

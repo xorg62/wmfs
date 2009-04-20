@@ -401,7 +401,8 @@ client_manage(Window w, XWindowAttributes *wa)
      Window trans;
      Status rettrans;
      XSetWindowAttributes at;
-     int mx, my;
+     XClassHint xch;
+     int mx, my, i, j, k;
 
      screen_get_sel();
 
@@ -443,8 +444,8 @@ client_manage(Window w, XWindowAttributes *wa)
      c->ogeo.y = c->geo.y = my;
      c->ogeo.width = c->geo.width = wa->width;
      c->ogeo.height = c->geo.height = wa->height;
-
      c->tag = seltag[c->screen];
+
      at.event_mask = PropertyChangeMask;
 
      frame_create(c);
@@ -452,11 +453,25 @@ client_manage(Window w, XWindowAttributes *wa)
      XChangeWindowAttributes(dpy, c->win, CWEventMask, &at);
      XSetWindowBorderWidth(dpy, c->win, 0); /* client win sould _not_ have borders */
      mouse_grabbuttons(c, False);
+
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
           for(t = clients; t && t->win != trans; t = t->next);
      if(t) c->tag = t->tag;
      if(!c->free) c->free = (rettrans == Success) || c->hint;
      free(t);
+
+     XGetClassHint(dpy, c->win, &xch);
+     for(i = 0; i < screen_count(); ++i)
+          for(j = 1; j < conf.ntag[i] + 1; ++j)
+               if(tags[i][j].clients != NULL)
+                    for(k = 0; k < tags[i][j].nclients; ++k)
+                         if((xch.res_name && !strcmp(tags[i][j].clients[k], xch.res_name))
+                            || (xch.res_class && !strcmp(tags[i][j].clients[k], xch.res_class)))
+                         {
+                              printf("class: %s name: %s\n", xch.res_class, xch.res_name);
+                              c->screen = i;
+                              c->tag = j;
+                         }
 
      client_attach(c);
      client_map(c);
