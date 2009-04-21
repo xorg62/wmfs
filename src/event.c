@@ -39,7 +39,7 @@ void
 buttonpress(XButtonEvent *ev)
 {
      Client *c;
-     int i, j, n, x, y;
+     int i, j, n;
 
      screen_get_sel();
 
