@@ -265,7 +265,7 @@ barwin_refresh_color(BarWindow *bw)
 
      if(bw->stipple)
      {
-          XSetForeground(dpy, gc_stipple, getcolor(bw->fg));
+          XSetForeground(dpy, gc_stipple, ((bw->stipple_color) ? bw->stipple_color : getcolor(bw->fg)));
           XFillRectangle(dpy, bw->dr, gc_stipple, 3, 2, bw->geo.width - 6, bw->geo.height - 4);
      }
 

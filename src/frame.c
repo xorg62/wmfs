@@ -78,7 +78,7 @@ frame_create(Client *c)
                                       TBARH,
                                       c->colors.frame,
                                       c->colors.fg,
-                                      True, conf.titlebar.stipple, False);
+                                      True, conf.titlebar.stipple.active, False);
 
           /* Buttons */
           if(BUTTONWH >= 1)
@@ -205,7 +205,7 @@ frame_update(Client *c)
           /* Buttons */
           if(conf.titlebar.nbutton && BUTTONWH >= 1)
           {
-               if(conf.titlebar.stipple)
+               if(conf.titlebar.stipple.active)
                     draw_rectangle(c->titlebar->dr, 0, 0, c->button_last_x + TBARH - (TBARH / 4),
                                    TBARH + BORDH * 2, c->colors.frame);
 

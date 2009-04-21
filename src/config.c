@@ -188,9 +188,21 @@ conf_client_section(cfg_t *cfg_c)
      /* Titlebar part {{ */
      cfgtmp                  = cfg_getsec(cfg_c, "titlebar");
      conf.titlebar.height    = cfg_getint(cfgtmp, "height");
-     conf.titlebar.stipple   = cfg_getbool(cfgtmp, "stipple");
      conf.titlebar.fg_normal = alias_to_str(cfg_getstr(cfgtmp, "fg_normal"));
      conf.titlebar.fg_focus  = alias_to_str(cfg_getstr(cfgtmp, "fg_focus"));
+
+     /* Stipple */
+     conf.titlebar.stipple.active        = cfg_getbool(cfgtmp, "stipple");
+
+     if(!strcmp(alias_to_str(cfg_getstr(cfgtmp, "stipple_normal")), "-1"))
+          conf.titlebar.stipple.colors.normal = getcolor(conf.titlebar.fg_normal);
+     else
+          conf.titlebar.stipple.colors.normal = getcolor(alias_to_str(cfg_getstr(cfgtmp, "stipple_normal")));
+
+     if(!strcmp(alias_to_str(cfg_getstr(cfgtmp, "stipple_focus")), "-1"))
+          conf.titlebar.stipple.colors.focus = getcolor(conf.titlebar.fg_focus);
+     else
+          conf.titlebar.stipple.colors.focus = getcolor(alias_to_str(cfg_getstr(cfgtmp, "stipple_focus")));
 
      if((conf.titlebar.nmouse = cfg_size(cfgtmp, "mouse")))
      {

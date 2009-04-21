@@ -146,6 +146,8 @@ client_focus(Client *c)
           sel->colors.frame = conf.client.bordernormal;
           sel->colors.fg = conf.titlebar.fg_normal;
           sel->colors.resizecorner = conf.client.resizecorner_normal;
+          if(TBARH - BORDH && sel->titlebar->stipple)
+               sel->titlebar->stipple_color = conf.titlebar.stipple.colors.normal;
           frame_update(sel);
           mouse_grabbuttons(sel, False);
      }
@@ -157,6 +159,8 @@ client_focus(Client *c)
           c->colors.frame = conf.client.borderfocus;
           c->colors.fg = conf.titlebar.fg_focus;
           c->colors.resizecorner = conf.client.resizecorner_focus;
+          if(TBARH - BORDH && c->titlebar->stipple)
+               c->titlebar->stipple_color = conf.titlebar.stipple.colors.focus;
           frame_update(c);
           mouse_grabbuttons(c, True);
           if(conf.raisefocus)

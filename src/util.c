@@ -52,13 +52,14 @@ emalloc(uint element, uint size)
  * \param color Color string
  * \return Color pixel
 */
-ulong
+long
 getcolor(char *color)
 {
      XColor xcolor;
 
      if(!XAllocNamedColor(dpy, DefaultColormap(dpy, SCREEN), color, &xcolor, &xcolor))
           fprintf(stderr,"WMFS Error: cannot allocate color \"%s\"\n", color);
+
      return xcolor.pixel;
 }
 

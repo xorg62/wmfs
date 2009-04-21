@@ -223,7 +223,7 @@ void uicb_mouse_resize(uicb_t);
 /* util.c */
 ulong color_enlight(ulong col);
 void *emalloc(uint element, uint size);
-ulong getcolor(char *color);
+long getcolor(char *color);
 void setwinstate(Window win, long state);
 char* _strdup(char const *str);
 /* Conf usage {{{ */

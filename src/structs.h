@@ -108,9 +108,11 @@ typedef struct
           Window left, right, top, bottom;
           /* Border color */
           uint dark, light;
+
      } border;
      uint bg;
      char *fg;
+     uint stipple_color;
      XRectangle geo;
      Bool mapped, stipple, bord;
 } BarWindow;
@@ -316,7 +318,11 @@ typedef struct
           int height;
           char *fg_normal;
           char *fg_focus;
-          Bool stipple;
+          struct
+          {
+               Bool active;
+               struct { uint normal, focus; } colors;
+          } stipple;
           MouseBinding *mouse;
           int nmouse;
           Button *button;

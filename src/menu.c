@@ -184,16 +184,8 @@ menu_focus_item(Menu *menu, int item, BarWindow *winitem[])
 
      for(i = 0; i < menu->nitem; ++i)
      {
-          if(i == menu->focus_item)
-          {
-               winitem[i]->fg = menu->colors.focus.fg;
-               winitem[i]->bg = menu->colors.focus.bg;
-          }
-          else
-          {
-               winitem[i]->fg = menu->colors.normal.fg;
-               winitem[i]->bg = menu->colors.normal.bg;
-          }
+          winitem[i]->fg = ((i == menu->focus_item) ? menu->colors.focus.fg : menu->colors.normal.fg);
+          winitem[i]->bg = ((i == menu->focus_item) ? menu->colors.focus.bg : menu->colors.normal.bg);
 
           barwin_refresh_color(winitem[i]);
           menu_draw_item_name(menu, i, winitem);
