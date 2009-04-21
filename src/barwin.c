@@ -97,6 +97,7 @@ barwin_create(Window parent,
      bw->border.light = color_enlight(bg);
      bw->border.dark = SHADC;
      bw->stipple = stipple;
+     bw->stipple_color = -1;
 
      return bw;
 }
@@ -265,7 +266,7 @@ barwin_refresh_color(BarWindow *bw)
 
      if(bw->stipple)
      {
-          XSetForeground(dpy, gc_stipple, ((bw->stipple_color) ? bw->stipple_color : getcolor(bw->fg)));
+          XSetForeground(dpy, gc_stipple, ((bw->stipple_color != -1) ? bw->stipple_color : getcolor(bw->fg)));
           XFillRectangle(dpy, bw->dr, gc_stipple, 3, 2, bw->geo.width - 6, bw->geo.height - 4);
      }
 
