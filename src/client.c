@@ -381,15 +381,20 @@ client_map(Client *c)
 {
      CHECK(c);
 
-     XMapWindow(dpy, c->frame);
-     XMapSubwindows(dpy, c->frame);
-     if(TBARH - BORDH)
+     if(c->state_fullscreen)
+          XMapWindow(dpy, c->win);
+     else
      {
-          barwin_map(c->titlebar);
-          barwin_map_subwin(c->titlebar);
+          XMapWindow(dpy, c->frame);
+          XMapSubwindows(dpy, c->frame);
+          if(TBARH - BORDH)
+          {
+               barwin_map(c->titlebar);
+               barwin_map_subwin(c->titlebar);
+          }
+          XMapSubwindows(dpy, c->frame);
+          c->unmapped = False;
      }
-     XMapSubwindows(dpy, c->frame);
-     c->unmapped = False;
 
      return;
 }
@@ -562,7 +567,8 @@ client_maximize(Client *c)
 {
      XRectangle geo;
 
-     CHECK(c);
+     if(!c || c->state_fullscreen)
+          return;
 
      client_focus(c);
 
@@ -572,13 +578,6 @@ client_maximize(Client *c)
      geo.y = sgeo[c->screen].y;
      geo.width  = sgeo[c->screen].width  - BORDH * 2;
      geo.height = sgeo[c->screen].height - BORDH;
-
-
-     if(c->state_fullscreen)
-     {
-          geo.y -= INFOBARH;
-          geo.height += INFOBARH;
-     }
 
      client_moveresize(c, geo, False);
 
@@ -772,15 +771,20 @@ client_unmap(Client *c)
 {
      CHECK(c);
 
-     if(TBARH - BORDH)
+     if(c->state_fullscreen)
+          XUnmapWindow(dpy, c->win);
+     else
      {
-          barwin_unmap_subwin(c->titlebar);
-          barwin_unmap(c->titlebar);
-     }
+          if(TBARH - BORDH)
+          {
+               barwin_unmap_subwin(c->titlebar);
+               barwin_unmap(c->titlebar);
+          }
 
-     XUnmapWindow(dpy, c->frame);
-     XUnmapSubwindows(dpy, c->frame);
-     c->unmapped = True;
+          XUnmapWindow(dpy, c->frame);
+          XUnmapSubwindows(dpy, c->frame);
+          c->unmapped = True;
+     }
 
      return;
 }

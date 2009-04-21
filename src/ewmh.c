@@ -253,16 +253,23 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
      {
           if(data_l[0] == _NET_WM_STATE_ADD && !c->state_fullscreen)
           {
+               client_unmap(c);
+               c->unmapped = False;
+               XMapWindow(dpy, c->win);
+               XReparentWindow(dpy, c->win, ROOT, spgeo[selscreen].x, spgeo[selscreen].y);
+               XResizeWindow(dpy, c->win, spgeo[selscreen].x + spgeo[selscreen].width, spgeo[selscreen].y + spgeo[selscreen].height);
                c->state_fullscreen = True;
                c->tmp_geo = c->geo;
                if(c->free)
                     c->ogeo = c->geo;
-               client_maximize(c);
+               c->max = True;
                client_raise(c);
           }
           else if(data_l[0] == _NET_WM_STATE_REMOVE && c->state_fullscreen)
           {
                c->state_fullscreen = False;
+               client_map(c);
+               XReparentWindow(dpy, c->win, c->frame, BORDH, TBARH);
                client_moveresize(c, c->tmp_geo, False);
                tags[selscreen][seltag[selscreen]].layout.func(selscreen);
           }

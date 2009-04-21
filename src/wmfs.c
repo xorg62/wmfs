@@ -286,24 +286,16 @@ main(int argc, char **argv)
      int i;
      struct sigaction sig;
 
-     static struct option long_options[] = {
-
-          {"help",	 	0, NULL, 'h'},
-          {"info",		0, NULL, 'i'},
-          {"version",     	0, NULL, 'v'},
-          {NULL,		0, NULL, 0}
-     };
-
-     while ((i = getopt_long(argc, argv, "hvi", long_options, NULL)) != -1)
+     while ((i = getopt(argc, argv, "hvi")) != -1)
      {
           switch (i)
           {
           case 'h':
           default:
-               printf("Usage: wmfs [OPTION]\n"
-                      "   -h, --help         show this page\n"
-                      "   -i, --info         show informations\n"
-                      "   -v, --version      show WMFS version\n");
+               printf("usage: %s [-ihv]\n"
+                      "   -h    show this page\n"
+                      "   -i    show informations\n"
+                      "   -v    show WMFS version\n", argv[0]);
                exit(EXIT_SUCCESS);
                break;
           case 'i':
