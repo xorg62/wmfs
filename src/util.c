@@ -93,23 +93,19 @@ setwinstate(Window win, long state)
 }
 
 /** My strdup. the strdup of string.h isn't ansi compatible..
+ * Thanks linkkd.
  * \param str char pointer
 */
 char*
 _strdup(char const *str)
 {
-     char *ret = NULL;
+     char *ret = emalloc(strlen(str) + 1, sizeof(char));
 
-     if(str != NULL)
-     {
-          ret = malloc((strlen(str) + 1) * sizeof *ret);
-          if(ret != NULL)
-               strcpy(ret, str);
-     }
+     memset(ret, strlen(str) + 1, 0);
+     strcpy(ret, str);
 
      return ret;
 }
-
 
 /* The following function are for configuration
    usage. {{{
