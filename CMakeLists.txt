@@ -20,11 +20,9 @@ set(BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 #set(CMAKE_BUILD_TYPE RELEASE)
 option(WITH_LOGOS "install wmfs logos")
-option(GENERATE_MANPAGES "generate manpages" ON)
 
 # Project name - wmfs
 set(PROJECT_NAME wmfs)
-set(PROJECT_NAME_SHELL wmfs-shell)
 project(${PROJECT_NAME} C)
 
 # Definition of the wmfs source
@@ -121,12 +119,6 @@ macro(a_find_program var prg req)
 endmacro()
 find_program(GIT_EXECUTABLE git)
 
-# programs needed for man pages
-a_find_program(ASCIIDOC_EXECUTABLE asciidoc FALSE)
-a_find_program(XMLTO_EXECUTABLE xmlto FALSE)
-a_find_program(GZIP_EXECUTABLE gzip FALSE)
-a_find_program(CAT_EXECUTABLE cat TRUE)
-
 # Generating CHANGELOG
 
 if(EXISTS ${SOURCE_DIR}/.git/HEAD AND GIT_EXECUTABLE)
@@ -148,24 +140,6 @@ execute_process(
   COMMAND touch ${SOURCE_DIR}/CHANGELOG
   )
 
-endif()
-
-# {{{ Check if documentation can be build
-if(GENERATE_MANPAGES)
-    if(NOT ASCIIDOC_EXECUTABLE OR NOT XMLTO_EXECUTABLE OR NOT GZIP_EXECUTABLE)
-        if(NOT ASCIIDOC_EXECUTABLE)
-            SET(missing "asciidoc")
-        endif()
-        if(NOT XMLTO_EXECUTABLE)
-            SET(missing ${missing} " xmlto")
-        endif()
-        if(NOT GZIP_EXECUTABLE)
-            SET(missing ${missing} " gzip")
-        endif()
-
-        message(STATUS "Not generating manpages. Missing: " ${missing})
-        set(GENERATE_MANPAGES OFF)
-    endif()
 endif()
 
 # sets
@@ -200,54 +174,11 @@ else()
     set(WMFS_XSESSION_PATH ${PREFIX}/share/xsessions CACHE PATH "wmfs xsessions directory")
 endif()
 
-# set man path
-set(WMFS_MAN_SRCS
-  ${SOURCE_DIR}/wmfs.1.txt)
-
 if(DEFINED WMFS_MAN_PATH)
    set(WMFS_MAN_PATH ${WMFS_MAN_PATH} CACHE PATH "wmfs manpage directory")
 else()
    set(WMFS_MAN_PATH ${PREFIX}/share/man CACHE PATH "wmfs manpage directory")
 endif()
-
-# {{{ Manpages
-if(GENERATE_MANPAGES)
-    foreach(txtfile ${WMFS_MAN_SRCS})
-        string(REGEX REPLACE ".txt\$" ".xml" xmlfile ${txtfile})
-        string(REPLACE ${SOURCE_DIR}
-                       ${BUILD_DIR} xmlfile ${xmlfile})
-        string(REGEX REPLACE ".xml\$" ".gz" gzfile ${xmlfile})
-        string(REGEX REPLACE ".gz\$" "" manfile ${gzfile})
-
-        add_custom_command(
-            COMMAND ${CAT_EXECUTABLE} ${txtfile}
-                    | ${ASCIIDOC_EXECUTABLE} -d manpage -b docbook -o ${xmlfile} -
-            WORKING_DIRECTORY ${BUILD_DIR}
-            OUTPUT  ${xmlfile}
-            DEPENDS ${txtfile}
-            VERBATIM)
-        add_custom_command(
-            COMMAND ${XMLTO_EXECUTABLE} man ${xmlfile}
-            OUTPUT  ${manfile}
-            DEPENDS ${xmlfile})
-        add_custom_command(
-            COMMAND ${CAT_EXECUTABLE} ${manfile}
-                    | ${GZIP_EXECUTABLE}
-                    > ${gzfile}
-            OUTPUT  ${gzfile}
-            DEPENDS ${manfile}
-            VERBATIM)
-
-        set(MAN_FILES ${MAN_FILES} ${gzfile})
-
-        # figure out in what section to install to from filename
-        string(REGEX REPLACE "^.*\\.([0-9])\\.gz\$" "\\1" section ${gzfile})
-        set(WMFS_MAN${section}_FILES ${WMFS_MAN${section}_FILES} ${gzfile})
-    endforeach()
-
-    add_custom_target(man ALL DEPENDS ${MAN_FILES})
-endif()
-# }}}
 
 # {{ Doxygen
 if(DOXYGEN_EXECUTABLE)
@@ -269,7 +200,6 @@ set(WMFS_SOURCE_DIR ${SOURCE_DIR})
 # Configure files
 set(wmfs_configure_files
   src/config.h.in
-  wmfs.1.txt.in
   wmfs.doxygen.in)
 
 macro(a_configure_file file)
@@ -290,6 +220,7 @@ set(PROJECT_TODO ${SOURCE_DIR}/TODO)
 set(PROJECT_README ${SOURCE_DIR}/README)
 set(PROJECT_CHANGELOG ${SOURCE_DIR}/CHANGELOG)
 set(PROJECT_DEFAULT_CONF ${SOURCE_DIR}/wmfsrc)
+set(WMFS_MAN1_FILES ${SOURCE_DIR}/wmfs.1.gz)
 
 # installs
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
@@ -299,9 +230,9 @@ if(WITH_LOGOS)
   install(DIRECTORY ${PROJECT_LOGOS_DIR} DESTINATION ${PROJECT_DATA_PATH})
   message("Install With logos")
 endif()
-if(GENERATE_MANPAGES)
-      install(FILES ${WMFS_MAN1_FILES} DESTINATION ${WMFS_MAN_PATH}/man1)
-endif()
+
+install(FILES ${WMFS_MAN1_FILES} DESTINATION ${WMFS_MAN_PATH}/man1)
+
 install(FILES ${PROJECT_TODO} ${PROJECT_README} ${PROJECT_CHANGELOG}
   ${PROJECT_DEFAULT_CONF} DESTINATION ${PROJECT_DATA_PATH})
 install(FILES ${PROJECT_DEFAULT_CONF} DESTINATION ${WMFS_SYSCONFDIR})

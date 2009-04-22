@@ -1,4 +1,4 @@
-:man source: wmfs @WMFS_VERSION@
+:man source: wmfs 0.1rc4 (On The Run)
 :man manual: manual of wmfs
 wmfs(1)
 =======
@@ -93,16 +93,12 @@ WMFS isn't stable for now. So it certainly contains some bugs.
 
 AUTHORS
 -------
-Marc Lagrange <markocpc@gmail.com> for the build system and Gentoo ebuilds.
-
 Martin Duquesnoy <xorg62@gmail.com> for the code.
-
-Youssef Bocus <ydb.feu@gmail.com> for hard testing.
 
 WWW
 ---
-Main site: http://wmfs.sangor.net/
-Bug tracker: https://dev.tux-atome.fr/projects/show/wmfs
+Main site: http://wmfs.malikania.org
+Bug tracker: http://wmfs.malikania.org/projects/wmfs/issues
 
 COPYING
 -------

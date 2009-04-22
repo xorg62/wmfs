@@ -12,7 +12,8 @@ LICENSE : BSD
 REQUIREMENT :
   · libconfuse
   · freetype2
-  · xft
+  · libxinerama
+  · libxft
   · libx11
   · CMake >= 2.6
 
