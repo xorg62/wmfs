@@ -119,11 +119,11 @@ macro(a_find_program var prg req)
 endmacro()
 find_program(GIT_EXECUTABLE git)
 
+# program needed for man pages
+a_find_program(GZIP_EXECUTABLE gzip TRUE)
+
 # Generating CHANGELOG
-
 if(EXISTS ${SOURCE_DIR}/.git/HEAD AND GIT_EXECUTABLE)
-
-  # generate
 message("Git dir -- Generating changelog...")
 execute_process(
   COMMAND ${GIT_EXECUTABLE} log
@@ -141,6 +141,14 @@ execute_process(
   )
 
 endif()
+
+# gzip man pages
+execute_process(
+   COMMAND ${GZIP_EXECUTABLE} -c ${SOURCE_DIR}/wmfs.1
+   OUTPUT_FILE ${BUILD_DIR}/wmfs.1.gz
+  )
+
+
 
 # sets
 # {{{ Install path and configuration variables
@@ -220,7 +228,7 @@ set(PROJECT_TODO ${SOURCE_DIR}/TODO)
 set(PROJECT_README ${SOURCE_DIR}/README)
 set(PROJECT_CHANGELOG ${SOURCE_DIR}/CHANGELOG)
 set(PROJECT_DEFAULT_CONF ${SOURCE_DIR}/wmfsrc)
-set(WMFS_MAN1_FILES ${SOURCE_DIR}/wmfs.1.gz)
+set(WMFS_MAN1_FILES ${BUILD_DIR}/wmfs.1.gz)
 
 # installs
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
