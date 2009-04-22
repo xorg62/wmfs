@@ -274,6 +274,7 @@ typedef struct
      char *font;
      Bool raisefocus;
      Bool raiseswitch;
+     Bool resize_transparent;
      struct
      {
           /*

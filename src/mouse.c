@@ -169,7 +169,8 @@ mouse_resize(Client *c)
                     geo.width = ((ev.xmotion.x - ocx < 1) ? 1 : ev.xmotion.x - ocx);
                     geo.height = ((ev.xmotion.y - ocy < 1) ? 1 : ev.xmotion.y - ocy);
 
-                    client_moveresize(c, geo, True);
+                    if(!conf.resize_transparent)
+                         client_moveresize(c, geo, True);
 
                     XSync(dpy, False);
                }
@@ -181,9 +182,13 @@ mouse_resize(Client *c)
      while(ev.type != ButtonRelease);
 
      if(!c->tile)
+     {
           XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
+          client_moveresize(c, geo, True);
+     }
      else
           tags[selscreen][seltag[selscreen]].layout.func(c->screen);
+
      XUngrabPointer(dpy, CurrentTime);
 
 
