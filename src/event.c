@@ -146,6 +146,9 @@ clientmessageevent(XClientMessageEvent *ev)
      Atom rt;
      int rf;
      ulong ir, il;
+     uchar *ret = NULL;
+     uchar *ret_cmd = NULL;
+     void (*func)(uicb_t);
 
      if(ev->format != 32)
           return;
@@ -192,15 +195,10 @@ clientmessageevent(XClientMessageEvent *ev)
      /* Manage _WMFS_STATUSTEXT */
      if(mess_t == wmfs_statustext && ev->data.l[4] == True)
      {
-          uchar *ret;
-
           if(XGetWindowProperty(dpy, ROOT, net_atom[wmfs_statustext], 0, 4096,
                                 False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret) == Success)
           {
-               for(i = 0; i < LEN(statustext); ++i)
-                    statustext[i] = 0;
-
-               strcpy(statustext, (char*)ret);
+               statustext = _strdup((char*)ret);
 
                for(i = 0; i < screen_count(); ++i)
                     infobar_draw(i);
@@ -213,25 +211,17 @@ clientmessageevent(XClientMessageEvent *ev)
      if((mess_t == wmfs_function && ev->data.l[4] == True)
         || (mess_t == wmfs_cmd && ev->data.l[4] == True))
      {
-          uchar *ret_func = NULL;
-          uchar *ret_cmd = NULL;
-
           XGetWindowProperty(dpy, ROOT, net_atom[wmfs_function], 0, 4096,
-                             False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret_func);
+                             False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret);
 
           XGetWindowProperty(dpy, ROOT, net_atom[wmfs_cmd], 0, 4096,
                              False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret_cmd);
 
-          void (*func)(uicb_t) = name_to_func((char*)ret_func, func_list);
-
-          if(func)
+          if((func = name_to_func((char*)ret, func_list)))
                func((uicb_t)ret_cmd);
 
-          if(ret_cmd)
-               XFree(ret_cmd);
-
-          if(ret_func)
-               XFree(ret_func);
+          XFree(ret_cmd);
+          XFree(ret);
      }
 
 

@@ -96,7 +96,7 @@ infobar_init(void)
           barwin_refresh(infobar[sc].bar);
 
           /* Default statustext is set here */
-          strcpy(statustext, "WMFS-" WMFS_VERSION);
+          statustext = _strdup("WMFS-" WMFS_VERSION);
           infobar_draw(sc);
      }
 

@@ -313,7 +313,7 @@ int selscreen;
 Conf conf;
 Key *keys;
 Bool exiting;
-char statustext[1024];
+char *statustext;
 XRectangle *sgeo;
 XRectangle *spgeo;
 Cursor cursor[CurLast];
