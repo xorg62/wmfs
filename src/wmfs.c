@@ -148,55 +148,23 @@ quit(void)
 void
 mainloop(void)
 {
-     fd_set fd;
-     int len, r, offset = 0, i;
-     char sbuf[sizeof statustext], *p;
-     Bool readstdin = True;
      XEvent ev;
-
-     len = sizeof statustext - 1;
-     sbuf[len] = statustext[len] = '\0';
+     fd_set fd;
 
      while(!exiting)
      {
-          FD_ZERO(&fd);
-          if(readstdin)
-               FD_SET(STDIN_FILENO, &fd);
-          FD_SET(ConnectionNumber(dpy), &fd);
-          if(select(ConnectionNumber(dpy) + 1, &fd, NULL, NULL, NULL) == -1)
-               fprintf(stderr, "WMFS Warning: Select failed\n");
-          if(FD_ISSET(STDIN_FILENO, &fd))
-          {
-               if((r = read(STDIN_FILENO, sbuf + offset, len - offset)))
-               {
-                    for(p = sbuf + offset; r > 0; ++p, --r, ++offset)
-                    {
-                         if(*p == '\n')
-                         {
-                              *p = '\0';
-                              strncpy(statustext, sbuf, len);
-                              p += r - 1;
-                              for(r = 0; *(p - r) && *(p - r) != '\n'; ++r);
-                              offset = r;
-                              if(r)
-                                   memmove(sbuf, p - r + 1, r);
-                              break;
-                         }
-                    }
-               }
-               else
-               {
-                    strncpy(statustext, sbuf, strlen(sbuf));
-                    readstdin = False;
-               }
-               for(i = 0; i < screen_count(); ++i)
-                    infobar_draw(i);
-          }
-          while(XPending(dpy))
-          {
+          if(QLength(dpy) > 0)
                XNextEvent(dpy, &ev);
-               getevent(ev);
+          else
+          {
+               XFlush(dpy);
+               FD_ZERO(&fd);
+               FD_SET(ConnectionNumber(dpy), &fd);
+               ev.type = LASTEvent;
+               if(select(FD_SETSIZE, &fd, NULL, NULL, NULL) > 0)
+                    XNextEvent(dpy, &ev);
           }
+          getevent(ev);
      }
 
      return;
