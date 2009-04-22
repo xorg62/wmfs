@@ -260,6 +260,111 @@ uicb_reload(uicb_t cmd)
      return;
 }
 
+/** Check if wmfs is running (for function that will be
+    execute when wmfs will be already running).
+    \return False if wmfs is not running
+*/
+Bool
+check_wmfs_running(void)
+{
+      Atom rt;
+      int rf;
+      ulong ir, il;
+      uchar *ret;
+
+     XGetWindowProperty(dpy, ROOT, ATOM("_WMFS_RUNNING"), 0L, 4096,
+                        False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret);
+
+     if(!ret)
+     {
+          XFree(ret);
+
+          fprintf(stderr, "Wmfs is not running. ( _WMFS_RUNNING not present)\n");
+
+          return False;
+     }
+
+     XFree(ret);
+
+     return True;
+}
+
+/** Execute an uicb function
+ *\param func Function name
+ *\param cmd Function's command
+ *\return 0 if there is an error
+*/
+void
+exec_uicb_function(char *func, char *cmd)
+{
+     XEvent ev;
+     int i;
+     long data[5];
+
+     /* Check if wmfs is running (this function is executed when wmfs
+      is already running normally...) */
+     if(!check_wmfs_running())
+          return;
+
+     data[4] = True;
+
+     XChangeProperty(dpy, ROOT, ATOM("_WMFS_FUNCTION"), ATOM("UTF8_STRING"),
+                     8, PropModeReplace, (uchar*)func, strlen(func));
+
+     if(cmd == NULL)
+          cmd = "";
+
+     XChangeProperty(dpy, ROOT, ATOM("_WMFS_CMD"), ATOM("UTF8_STRING"),
+                     8, PropModeReplace, (uchar*)cmd, strlen(cmd));
+
+
+     ev.xclient.type = ClientMessage;
+     ev.xclient.serial = 0;
+     ev.xclient.send_event = True;
+     ev.xclient.message_type = ATOM("_WMFS_FUNCTION");
+     ev.xclient.window = ROOT;
+     ev.xclient.format = 32;
+
+     for(i = 0; i < 6; ++i)
+          ev.xclient.data.l[i] = data[i];
+
+     XSendEvent(dpy, ROOT, False, SubstructureRedirectMask | SubstructureNotifyMask, &ev);
+     XSync(dpy, False);
+
+     return;
+}
+
+/** Set statustext
+ *\param str Statustext string
+*/
+void
+set_statustext(char *str)
+{
+     XEvent ev;
+     int i;
+     long data[5];
+
+     data[4] = True;
+
+     XChangeProperty(dpy, ROOT, ATOM("_WMFS_STATUSTEXT"), ATOM("UTF8_STRING"),
+                     8, PropModeReplace, (unsigned char*)str, strlen(str));
+
+     ev.xclient.type = ClientMessage;
+     ev.xclient.serial = 0;
+     ev.xclient.send_event = True;
+     ev.xclient.message_type = ATOM("_WMFS_STATUSTEXT");
+     ev.xclient.window = ROOT;
+     ev.xclient.format = 32;
+
+     for(i = 0; i < 6; ++i)
+          ev.xclient.data.l[i] = data[i];
+
+     XSendEvent(dpy, ROOT, False, SubstructureRedirectMask | SubstructureNotifyMask, &ev);
+     XSync(dpy, False);
+
+     return;
+}
+
 /** Signal handle function
  * \param signum Signal number
 */
@@ -286,16 +391,25 @@ main(int argc, char **argv)
      int i;
      struct sigaction sig;
 
-     while ((i = getopt(argc, argv, "hvi")) != -1)
+     while ((i = getopt(argc, argv, "hvic:s:")) != -1)
      {
+          if(i == 'c' || i == 's')
+               if(!(dpy = XOpenDisplay(NULL)))
+               {
+                    fprintf(stderr, "WMFS: cannot open X server.\n");
+                    exit(EXIT_FAILURE);
+               }
+
           switch (i)
           {
           case 'h':
           default:
-               printf("usage: %s [-ihv]\n"
-                      "   -h    show this page\n"
-                      "   -i    show informations\n"
-                      "   -v    show WMFS version\n", argv[0]);
+               printf("usage: %s [-ihv] [-c <uicb function> <cmd> ] [-s <string>]\n"
+                      "   -c <uicb_function> <cmd>  Execute an uicb function to control WMFS\n"
+                      "   -s <string>               Set the bar(s) statustext\n"
+                      "   -h                        Show this page\n"
+                      "   -i                        Show informations\n"
+                      "   -v                        Show WMFS version\n", argv[0]);
                exit(EXIT_SUCCESS);
                break;
           case 'i':
@@ -308,6 +422,16 @@ main(int argc, char **argv)
                       "    - Flags : "WMFS_COMPILE_FLAGS"\n"
                       "    - Linked Libs : "WMFS_LINKED_LIBS"\n"
                       "    - On "WMFS_COMPILE_MACHINE" by "WMFS_COMPILE_BY".\n");
+               exit(EXIT_SUCCESS);
+               break;
+          case 'c':
+               exec_uicb_function(argv[2], ((argv[3]) ? argv[3] : NULL));
+               XCloseDisplay(dpy);
+               exit(EXIT_SUCCESS);
+               break;
+          case 's':
+               set_statustext(optarg);
+               XCloseDisplay(dpy);
                exit(EXIT_SUCCESS);
                break;
           }

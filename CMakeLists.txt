@@ -46,12 +46,9 @@ set(wmfs_src
   src/tag.c
   src/util.c
   src/wmfs.c)
-set(wmfs-shell_src
-  shell/wmfs-shell.c)
 
 # Set the executable from the wmfs_src
 add_executable(wmfs ${wmfs_src})
-add_executable(wmfs-shell ${wmfs-shell_src})
 
 # Set the version - NOT USED AT THE MOMENT
 set(VERSION "0.1rc4 (On The Run)")
@@ -88,11 +85,8 @@ set(LIBRARIES_TO_LINK
   confuse
   Xft
   Xinerama)
-set(SHELL_LINK_LIBS
-  ${X11_LIBRARIES})
 
 target_link_libraries(wmfs ${LIBRARIES_TO_LINK})
-target_link_libraries(wmfs-shell ${SHELL_LINK_LIBS})
 
 # Messages
 message("Project version: ${VERSION}")
@@ -298,7 +292,7 @@ set(PROJECT_CHANGELOG ${SOURCE_DIR}/CHANGELOG)
 set(PROJECT_DEFAULT_CONF ${SOURCE_DIR}/wmfsrc)
 
 # installs
-install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME_SHELL} RUNTIME DESTINATION bin)
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 if(WITH_LOGOS)
   set(PROJECT_LOGOS ${PROJECT_DATA_PATH}/logos)
   set(PROJECT_LOGOS_DIR ${SOURCE_DIR}/logos)
