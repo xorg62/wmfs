@@ -183,8 +183,8 @@ mouse_resize(Client *c)
 
      if(!c->tile)
      {
-          XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
           client_moveresize(c, geo, True);
+          XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
      }
      else
           tags[selscreen][seltag[selscreen]].layout.func(c->screen);
