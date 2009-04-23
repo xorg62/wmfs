@@ -237,18 +237,12 @@ scan(void)
 void
 uicb_reload(uicb_t cmd)
 {
+     quit();
+     XCloseDisplay(dpy);
 
-     XSetErrorHandler(errorhandlerdummy);
+     for(; argv_global[0] && argv_global[0] == ' '; argv_global++);
 
-     XftFontClose(dpy, font);
-     infobar_destroy();
-
-     init();
-     scan();
-
-     XSetErrorHandler(errorhandler);
-     mainloop();
-     raise(SIGTERM);
+     execlp(argv_global, argv_global, NULL);
 
      return;
 }
@@ -383,6 +377,8 @@ main(int argc, char **argv)
 {
      int i;
      struct sigaction sig;
+
+     argv_global = _strdup(argv[0]);
 
      while ((i = getopt(argc, argv, "hvic:s:")) != -1)
      {

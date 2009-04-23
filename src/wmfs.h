@@ -318,6 +318,7 @@ char *statustext;
 XRectangle *sgeo;
 XRectangle *spgeo;
 Cursor cursor[CurLast];
+char *argv_global;
 
 /* Fonts */
 XftFont *font;
