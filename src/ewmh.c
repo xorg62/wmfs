@@ -64,8 +64,6 @@ ewmh_init_hints(void)
      net_atom[net_wm_window_type_dialog]      = ATOM("_NET_WM_WINDOW_TYPE_DIALOG");
      net_atom[net_wm_icon]                    = ATOM("_NET_WM_ICON");
      net_atom[net_wm_state]                   = ATOM("_NET_WM_STATE");
-     net_atom[net_wm_state_sticky]            = ATOM("_NET_WM_STATE_STICKY");
-     net_atom[net_wm_state_skip_taskbar]      = ATOM("_NET_WM_STATE_SKIP_TASKBAR");
      net_atom[net_wm_state_fullscreen]        = ATOM("_NET_WM_STATE_FULLSCREEN");
      net_atom[net_wm_state_demands_attention] = ATOM("_NET_WM_STATE_DEMANDS_ATTENTION");
      net_atom[utf8_string]                    = ATOM("UTF8_STRING");

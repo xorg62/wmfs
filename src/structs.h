@@ -75,8 +75,6 @@ enum
      net_wm_desktop,
      net_wm_icon,
      net_wm_state,
-     net_wm_state_sticky,
-     net_wm_state_skip_taskbar,
      net_wm_state_fullscreen,
      net_wm_state_demands_attention,
      utf8_string,

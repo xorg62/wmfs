@@ -225,11 +225,13 @@ scan(void)
                     if(screen != -1)
                          c->screen = screen;
 
-                    arrange(c->screen);
+                    client_update_attributes(c);
                }
 
+     for(i = 0; i < screen_count(); ++i)
+          arrange(i);
+
      XFree(w);
-     arrange(screen_get_sel());
 
      return;
 }
