@@ -402,8 +402,9 @@ client_map(Client *c)
 /** Manage a client with a window and his attributes
  * \param w Cient's futur Window
  * \param wa XWindowAttributes pointer, Window w attributes
+ * \return The managed client
 */
-void
+Client*
 client_manage(Window w, XWindowAttributes *wa)
 {
      Client *c, *t = NULL;
@@ -476,11 +477,12 @@ client_manage(Window w, XWindowAttributes *wa)
      setwinstate(c->win, NormalState);
      ewmh_get_client_list();
      ewmh_manage_window_type(c);
-     arrange(c->screen);
      client_set_wanted_tag(c);
      client_update_attributes(c);
 
-        return;
+     arrange(c->screen);
+
+     return c;
 }
 
 /** Move and Resize a client

@@ -192,13 +192,38 @@ scan(void)
      uint i, n;
      XWindowAttributes wa;
      Window usl, usl2, *w = NULL;
+     Atom rt;
+     int rf, tag = -1, screen = -1;
+     ulong ir, il;
+     uchar *ret;
+     Client *c;
 
      if(XQueryTree(dpy, ROOT, &usl, &usl2, &w, &n))
           for(i = 0; i < n; ++i)
                if(XGetWindowAttributes(dpy, w[i], &wa)
                   && !(wa.override_redirect || XGetTransientForHint(dpy, w[i], &usl))
                   && wa.map_state == IsViewable)
-                    client_manage(w[i], &wa);
+               {
+                    if(XGetWindowProperty(dpy, w[i], ATOM("_WMFS_TAG"), 0, 32,
+                                          False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success)
+                         tag = *ret;
+
+                    if(XGetWindowProperty(dpy, w[i], ATOM("_WMFS_SCREEN"), 0, 32,
+                                          False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success)
+                         screen = *ret;
+
+                    c = client_manage(w[i], &wa);
+
+                    if(tag != -1)
+                         c->tag = tag;
+                    if(screen != -1)
+                         c->screen = screen;
+
+                    arrange(c->screen);
+               }
+
+     if(ret)
+          XFree(ret);
 
      XFree(w);
      arrange(screen_get_sel());
@@ -212,12 +237,12 @@ scan(void)
 void
 uicb_reload(uicb_t cmd)
 {
+
      XSetErrorHandler(errorhandlerdummy);
 
      XftFontClose(dpy, font);
      infobar_destroy();
 
-     init_conf();
      init();
      scan();
 
@@ -240,21 +265,21 @@ check_wmfs_running(void)
       ulong ir, il;
       uchar *ret;
 
-     XGetWindowProperty(dpy, ROOT, ATOM("_WMFS_RUNNING"), 0L, 4096,
-                        False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret);
+      XGetWindowProperty(dpy, ROOT, ATOM("_WMFS_RUNNING"), 0L, 4096,
+                         False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret);
 
-     if(!ret)
-     {
-          XFree(ret);
+      if(!ret)
+      {
+           XFree(ret);
 
-          fprintf(stderr, "Wmfs is not running. ( _WMFS_RUNNING not present)\n");
+           fprintf(stderr, "Wmfs is not running. ( _WMFS_RUNNING not present)\n");
 
-          return False;
-     }
+           return False;
+      }
 
-     XFree(ret);
+      XFree(ret);
 
-     return True;
+      return True;
 }
 
 /** Execute an uicb function
