@@ -121,8 +121,6 @@ mouse_move(Client *c)
 void
 mouse_resize(Client *c)
 {
-     int ocx = c->geo.x;
-     int ocy = c->geo.y;
      XRectangle geo = c->geo;
      XEvent ev;
      Window w;
@@ -138,10 +136,6 @@ mouse_resize(Client *c)
      if(XGrabPointer(dpy, ROOT, False, MouseMask, GrabModeAsync, GrabModeAsync,
                      None, cursor[CurResize], CurrentTime) != GrabSuccess)
           return;
-
-     if(!c->tile)
-          XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
-
      do
      {
           XMaskEvent(dpy, MouseMask | ExposureMask | SubstructureRedirectMask, &ev);
@@ -166,11 +160,23 @@ mouse_resize(Client *c)
                }
                else if(!c->tile)
                {
-                    geo.width = ((ev.xmotion.x - ocx < 1) ? 1 : ev.xmotion.x - ocx);
-                    geo.height = ((ev.xmotion.y - ocy < 1) ? 1 : ev.xmotion.y - ocy);
+                    if((geo.width + ev.xmotion.x_root - omx) > 1)
+                         geo.width += ev.xmotion.x_root - omx;
+                    if((geo.height + ev.xmotion.y_root - omy) > 1)
+                         geo.height += ev.xmotion.y_root - omy;
+
+                    omx = ev.xmotion.x_root;
+                    omy = ev.xmotion.y_root;
 
                     if(!conf.resize_transparent)
                          client_moveresize(c, geo, True);
+                    else
+                    {
+                         XClearWindow(dpy, c->win);
+                         XClearWindow(dpy, ROOT);
+                         frame_update(c);
+                         XDrawRectangles(dpy, ROOT, gc_reverse, &geo, 1);
+                    }
 
                     XSync(dpy, False);
                }
@@ -182,10 +188,7 @@ mouse_resize(Client *c)
      while(ev.type != ButtonRelease);
 
      if(!c->tile)
-     {
           client_moveresize(c, geo, True);
-          XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
-     }
      else
           tags[selscreen][seltag[selscreen]].layout.func(c->screen);
 

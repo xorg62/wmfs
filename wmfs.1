@@ -1,5 +1,5 @@
 .\"     Title: wmfs
-.\"    Author: 
+.\"    Author:
 .\" Generator: DocBook XSL Stylesheets v1.73.2 <http://docbook.sf.net/>
 .\"      Date: 04/22/2009
 .\"    Manual: manual of wmfs
@@ -13,24 +13,34 @@
 .SH "NAME"
 wmfs \- Window Manager From Scratch
 .SH "SYNOPSIS"
-\fBwmfs\fR [\fB\-v\fR | \fB\-\-version\fR] [\fB\-h\fR | \fB\-\-help\fR] [ \fB\-i\fR | \fB\-\-info\fR]
+\fBwmfs\fR [\fB\-v\fR] [\fB\-h\fR] [\fB\-i\fR] [\fB\-c <uicb_function> <cmd>\fR] [\fB\-s <string>\fR]
 .sp
 .SH "DESCRIPTION"
 \fBWMFS\fR is a basic, lightweight and dynamic tiling windows manager for X\&.
 .sp
 .SH "OPTIONS"
 .PP
-\fB\-v\fR, \fB\-\-version\fR
+\fB\-c <uicb_function> <cmd>\fR
+.RS 4
+Execute an uicb function to control WMFS\&.
+.RE
+.PP
+\fB\-s <string>\fR
+.RS 4
+Set the bar(s) statustext\&.
+.RE
+.PP
+\fB\-v\fR
 .RS 4
 Print version information to standard output, then exit\&.
 .RE
 .PP
-\fB\-h\fR, \fB\-\-help\fR
+\fB\-h\fR
 .RS 4
 Print help information, then exit\&.
 .RE
 .PP
-\fB\-i\fR, \fB\-\-info\fR
+\fB\-i\fR
 .RS 4
 Print WMFS informations
 .RE
@@ -157,7 +167,7 @@ WMFS is configured by \fI$HOME/\&.config/wmfs/wmfsrc\fR\&.
 WMFS isn\'t stable for now\&. So it certainly contains some bugs\&.
 .sp
 .SH "AUTHORS"
-Martin Duquesnoy <\fIxorg62@gmail\&.com\fR\&[1]> for the code\&.
+Martin Duquesnoy <\fIxorg62@gmail\&.com\fR\&[1]>\&.
 .sp
 .SH "WWW"
 Main site: \fIhttp://wmfs\&.malikania\&.org\fR Bug tracker: \fIhttp://wmfs\&.malikania\&.org/projects/wmfs/issues\fR

@@ -89,10 +89,17 @@ init_gc(void)
 
      gc = DefaultGC(dpy, SCREEN);
 
+     /* Stipple GC */
      gcv.function   = GXcopy;
      gcv.fill_style = FillStippled;
      gcv.stipple    = XCreateBitmapFromData(dpy, ROOT, pix_bits, 10, 4);
-     gc_stipple     = XCreateGC(dpy, ROOT, GCFunction|GCFillStyle|GCStipple, &gcv);
+     gc_stipple     = XCreateGC(dpy, ROOT, GCFunction | GCFillStyle | GCStipple, &gcv);
+
+     /* Reverse GC */
+     gcv.function       = GXinvert;
+     gcv.line_width     = BORDH;
+     gcv.subwindow_mode = IncludeInferiors;
+     gc_reverse = XCreateGC(dpy, ROOT, GCFunction | GCLineWidth | GCSubwindowMode, &gcv);
 
      return;
 }
@@ -135,7 +142,7 @@ init_root(void)
 {
      XSetWindowAttributes at;
 
-     at.event_mask = KeyMask | ButtonMask | MouseMask
+     at.event_mask = KeyMask | ButtonMask | MouseMask | PropertyChangeMask
           | SubstructureRedirectMask | SubstructureNotifyMask | StructureNotifyMask;
 
      at.cursor = cursor[CurNormal];
