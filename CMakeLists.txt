@@ -14,7 +14,7 @@ CONFIGURE_FILE(
 ADD_CUSTOM_TARGET(uninstall
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
 
-# Source dir
+# Source and build dirs
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -104,51 +104,34 @@ pkg_check_modules(wmfs_required
   xinerama
   xft)
 
-# Find exterbal programs
-macro(a_find_program var prg req)
-    set(required ${req})
-    find_program(${var} ${prg})
-    if(NOT ${var})
-        message(STATUS "${prg} not found.")
-        if(required)
-            message(FATAL_ERROR "${prg} is required to build wmfs")
-        endif()
-    else()
-        message(STATUS "${prg} -> ${${var}}")
-    endif()
-endmacro()
-find_program(GIT_EXECUTABLE git)
-
-# program needed for man pages
-a_find_program(GZIP_EXECUTABLE gzip TRUE)
-
-# Generating CHANGELOG
-if(EXISTS ${SOURCE_DIR}/.git/HEAD AND GIT_EXECUTABLE)
-message("Git dir -- Generating changelog...")
-execute_process(
-  COMMAND ${GIT_EXECUTABLE} log
-  WORKING_DIRECTORY ${SOURCE_DIR}
-  OUTPUT_VARIABLE WMFS_CHANGELOG
-  )
-set(CHANGELOG_FILE ${SOURCE_DIR}/CHANGELOG)
-file(WRITE ${CHANGELOG_FILE} ${WMFS_CHANGELOG})
-
+# Generating man page
+find_program(GZIP_EXECUTABLE gzip)
+if(NOT GZIP_EXECUTABLE)
+   message(STATUS "Looking for gzip -- not found")
+   message(STATUS "Could not generating man page")
 else()
-
-message("Non-Git dir -- Generating fake changelog")
-execute_process(
-  COMMAND touch ${SOURCE_DIR}/CHANGELOG
-  )
-
+   message(STATUS "Looking for gzip -- ${GZIP_EXECUTABLE}")
+   message(STATUS "Generating man page")
+   set(WMFS_MAN1_FILES ${BUILD_DIR}/wmfs.1.gz)
+   execute_process(
+      COMMAND ${GZIP_EXECUTABLE} -c wmfs.1
+      WORKING_DIRECTORY ${SOURCE_DIR}
+      OUTPUT_FILE ${WMFS_MAN1_FILES})
 endif()
 
-# gzip man pages
-execute_process(
-   COMMAND ${GZIP_EXECUTABLE} -c ${SOURCE_DIR}/wmfs.1
-   OUTPUT_FILE ${BUILD_DIR}/wmfs.1.gz
-  )
-
-
+# Generating CHANGELOG
+find_program(GIT_EXECUTABLE git)
+if(EXISTS ${SOURCE_DIR}/.git/HEAD AND GIT_EXECUTABLE)
+   message(STATUS "Looking for git -- ${GIT_EXECUTABLE}")
+   message(STATUS "Git dir -- Generating changelog...")
+   execute_process(
+      COMMAND ${GIT_EXECUTABLE} log
+      WORKING_DIRECTORY ${SOURCE_DIR}
+      OUTPUT_FILE ${SOURCE_DIR}/changelog)
+else()
+   message(STATUS "Looking for git -- not found")
+   message(STATUS "Could not generating changelog")
+endif()
 
 # sets
 # {{{ Install path and configuration variables
@@ -228,7 +211,6 @@ set(PROJECT_TODO ${SOURCE_DIR}/TODO)
 set(PROJECT_README ${SOURCE_DIR}/README)
 set(PROJECT_CHANGELOG ${SOURCE_DIR}/CHANGELOG)
 set(PROJECT_DEFAULT_CONF ${SOURCE_DIR}/wmfsrc)
-set(WMFS_MAN1_FILES ${BUILD_DIR}/wmfs.1.gz)
 
 # installs
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
@@ -239,7 +221,9 @@ if(WITH_LOGOS)
   message("Install With logos")
 endif()
 
-install(FILES ${WMFS_MAN1_FILES} DESTINATION ${WMFS_MAN_PATH}/man1)
+if(WMFS_MAN1_FILES)
+   install(FILES ${WMFS_MAN1_FILES} DESTINATION ${WMFS_MAN_PATH}/man1)
+endif()
 
 install(FILES ${PROJECT_TODO} ${PROJECT_README} ${PROJECT_CHANGELOG}
   ${PROJECT_DEFAULT_CONF} DESTINATION ${PROJECT_DATA_PATH})
