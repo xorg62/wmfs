@@ -193,7 +193,7 @@ scan(void)
      XWindowAttributes wa;
      Window usl, usl2, *w = NULL;
      Atom rt;
-     int rf, tag = -1, screen = -1;
+     int rf, tag = -1, screen = -1, free = -1;
      ulong ir, il;
      uchar *ret;
      Client *c;
@@ -218,12 +218,21 @@ scan(void)
                          XFree(ret);
                     }
 
+                    if(XGetWindowProperty(dpy, w[i], ATOM("_WMFS_ISFREE"), 0, 32,
+                                          False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
+                    {
+                         free = *ret;
+                         XFree(ret);
+                    }
+
                     c = client_manage(w[i], &wa, False);
 
                     if(tag != -1)
                          c->tag = tag;
                     if(screen != -1 && screen <= screen_count() - 1)
                          c->screen = screen;
+                    if(free != -1)
+                         c->free = free;
 
                     client_update_attributes(c);
                }

@@ -678,6 +678,7 @@ uicb_togglefree(uicb_t cmd)
      else
           sel->ogeo = sel->geo;
 
+     client_update_attributes(sel);
 
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);
 

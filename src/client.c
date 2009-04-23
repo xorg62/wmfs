@@ -703,6 +703,9 @@ client_update_attributes(Client *c)
      XChangeProperty(dpy, c->win, ATOM("_WMFS_SCREEN"), XA_CARDINAL, 32,
                      PropModeReplace, (uchar*)&(c->screen), 1);
 
+     XChangeProperty(dpy, c->win, ATOM("_WMFS_ISFREE"), XA_CARDINAL, 32,
+                     PropModeReplace, (uchar*)&(c->free), 1);
+
      return;
 }
 
