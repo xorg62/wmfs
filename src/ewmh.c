@@ -308,6 +308,8 @@ ewmh_manage_window_type(Client *c)
                if(atom[i] == net_atom[net_wm_window_type_dock]
                   || atom[i] == net_atom[net_wm_window_type_splash])
                {
+                    client_unmap(c);
+                    XMapWindow(dpy, c->win);
                     XReparentWindow(dpy, c->win, ROOT, c->geo.x, c->geo.y);
                     XRaiseWindow(dpy, c->win);
                     c->state_dock = True;
