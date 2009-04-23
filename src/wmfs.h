@@ -308,7 +308,7 @@ void uicb_reload(uicb_t);
 
 /* Principal */
 Display *dpy;
-GC gc, gc_stipple, gc_reverse;
+GC gc, gc_stipple;
 int selscreen;
 Conf conf;
 Key *keys;

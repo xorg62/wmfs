@@ -95,12 +95,6 @@ init_gc(void)
      gcv.stipple    = XCreateBitmapFromData(dpy, ROOT, pix_bits, 10, 4);
      gc_stipple     = XCreateGC(dpy, ROOT, GCFunction | GCFillStyle | GCStipple, &gcv);
 
-     /* Reverse GC */
-     gcv.function       = GXinvert;
-     gcv.line_width     = BORDH;
-     gcv.subwindow_mode = IncludeInferiors;
-     gc_reverse = XCreateGC(dpy, ROOT, GCFunction | GCLineWidth | GCSubwindowMode, &gcv);
-
      return;
 }
 

@@ -138,7 +138,7 @@ mouse_resize(Client *c)
           return;
      do
      {
-          XMaskEvent(dpy, MouseMask | ExposureMask | SubstructureRedirectMask, &ev);
+          XMaskEvent(dpy, MouseMask | SubstructureRedirectMask, &ev);
 
           if(ev.type == MotionNotify)
           {
@@ -170,13 +170,6 @@ mouse_resize(Client *c)
 
                     if(!conf.resize_transparent)
                          client_moveresize(c, geo, True);
-                    else
-                    {
-                         XClearWindow(dpy, c->win);
-                         XClearWindow(dpy, ROOT);
-                         frame_update(c);
-                         XDrawRectangles(dpy, ROOT, gc_reverse, &geo, 1);
-                    }
 
                     XSync(dpy, False);
                }
