@@ -405,7 +405,7 @@ client_map(Client *c)
  * \return The managed client
 */
 Client*
-client_manage(Window w, XWindowAttributes *wa)
+client_manage(Window w, XWindowAttributes *wa, Bool ar)
 {
      Client *c, *t = NULL;
      Window trans;
@@ -480,7 +480,8 @@ client_manage(Window w, XWindowAttributes *wa)
      client_set_wanted_tag(c);
      client_update_attributes(c);
 
-     arrange(c->screen);
+     if(ar)
+          arrange(c->screen);
 
      return c;
 }

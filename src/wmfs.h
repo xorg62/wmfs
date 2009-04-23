@@ -141,7 +141,7 @@ void client_hide(Client *c);
 void client_kill(Client *c);
 Bool ishide(Client *c, int screen);
 void client_map(Client *c);
-Client* client_manage(Window w, XWindowAttributes *wa);
+Client* client_manage(Window w, XWindowAttributes *wa, Bool ar);
 void client_moveresize(Client *c, XRectangle geo, Bool r);
 void client_maximize(Client *c);
 void client_size_hints(Client *c);

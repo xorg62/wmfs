@@ -218,7 +218,7 @@ scan(void)
                          XFree(ret);
                     }
 
-                    c = client_manage(w[i], &wa);
+                    c = client_manage(w[i], &wa, False);
 
                     if(tag != -1)
                          c->tag = tag;

@@ -436,7 +436,7 @@ maprequest(XMapRequestEvent *ev)
      CHECK(!at.override_redirect);
 
      if(!(c = client_gb_win(ev->window)))
-          client_manage(ev->window, &at);
+          client_manage(ev->window, &at, True);
 
      return;
 }
