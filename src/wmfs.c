@@ -245,7 +245,7 @@ uicb_reload(uicb_t cmd)
      quit();
      XCloseDisplay(dpy);
 
-     for(; argv_global[0] && argv_global[0] == ' '; argv_global++);
+     for(; argv_global[0] && argv_global[0] == ' '; ++argv_global);
 
      execlp(argv_global, argv_global, NULL);
 
@@ -451,7 +451,7 @@ main(int argc, char **argv)
      init();
      scan();
      mainloop();
-     raise(SIGTERM);
+     quit();
 
      XCloseDisplay(dpy);
 

@@ -402,6 +402,7 @@ client_map(Client *c)
 /** Manage a client with a window and his attributes
  * \param w Cient's futur Window
  * \param wa XWindowAttributes pointer, Window w attributes
+ * \param ar Do arrange() or not (Bool)
  * \return The managed client
 */
 Client*
