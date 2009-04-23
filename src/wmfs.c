@@ -205,11 +205,11 @@ scan(void)
                   && wa.map_state == IsViewable)
                {
                     if(XGetWindowProperty(dpy, w[i], ATOM("_WMFS_TAG"), 0, 32,
-                                          False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success)
+                                          False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
                          tag = *ret;
 
                     if(XGetWindowProperty(dpy, w[i], ATOM("_WMFS_SCREEN"), 0, 32,
-                                          False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success)
+                                          False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
                          screen = *ret;
 
                     c = client_manage(w[i], &wa);
