@@ -39,6 +39,9 @@ arrange(int screen)
 {
      Client *c;
 
+     if(screen < 0 || screen > screen_count())
+          screen = screen_get_sel();
+
      for(c = clients; c; c = c->next)
           if(c->screen == screen)
           {

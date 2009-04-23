@@ -222,7 +222,7 @@ scan(void)
 
                     if(tag != -1)
                          c->tag = tag;
-                    if(screen != -1)
+                    if(screen != -1 && screen <= screen_count() - 1)
                          c->screen = screen;
 
                     client_update_attributes(c);
