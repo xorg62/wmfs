@@ -124,10 +124,11 @@ find_program(GIT_EXECUTABLE git)
 if(EXISTS ${SOURCE_DIR}/.git/HEAD AND GIT_EXECUTABLE)
    message(STATUS "Looking for git -- ${GIT_EXECUTABLE}")
    message(STATUS "Git dir -- Generating changelog...")
+   set(PROJECT_CHANGELOG ${SOURCE_DIR}/changelog)
    execute_process(
       COMMAND ${GIT_EXECUTABLE} log
       WORKING_DIRECTORY ${SOURCE_DIR}
-      OUTPUT_FILE ${SOURCE_DIR}/changelog)
+      OUTPUT_FILE ${PROJECT_CHANGELOG})
 else()
    message(STATUS "Looking for git -- not found")
    message(STATUS "Could not generating changelog")
@@ -209,7 +210,6 @@ endforeach()
 set(PROJECT_DATA_PATH share/${PROJECT_NAME})
 set(PROJECT_TODO ${SOURCE_DIR}/TODO)
 set(PROJECT_README ${SOURCE_DIR}/README)
-set(PROJECT_CHANGELOG ${SOURCE_DIR}/CHANGELOG)
 set(PROJECT_DEFAULT_CONF ${SOURCE_DIR}/wmfsrc)
 
 # installs
@@ -225,7 +225,11 @@ if(WMFS_MAN1_FILES)
    install(FILES ${WMFS_MAN1_FILES} DESTINATION ${WMFS_MAN_PATH}/man1)
 endif()
 
-install(FILES ${PROJECT_TODO} ${PROJECT_README} ${PROJECT_CHANGELOG}
+if(PROJECT_CHANGELOG)
+   install(FILES ${PROJECT_CHANGELOG} DESTINATION ${PROJECT_DATA_PATH})
+endif()
+
+install(FILES ${PROJECT_TODO} ${PROJECT_README} 
   ${PROJECT_DEFAULT_CONF} DESTINATION ${PROJECT_DATA_PATH})
 install(FILES ${PROJECT_DEFAULT_CONF} DESTINATION ${WMFS_SYSCONFDIR})
 install(FILES "wmfs.desktop" DESTINATION ${WMFS_XSESSION_PATH})
