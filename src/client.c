@@ -478,6 +478,7 @@ client_manage(Window w, XWindowAttributes *wa)
      ewmh_manage_window_type(c);
      arrange(c->screen);
      client_set_wanted_tag(c);
+     client_update_attributes(c);
 
         return;
 }
@@ -555,6 +556,7 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
                        c->geo.height);
 
      client_configure(c);
+     client_update_attributes(c);
 
      return;
 }
@@ -681,6 +683,21 @@ client_set_wanted_tag(Client *c)
                               c->tag = j;
                               arrange(i);
                          }
+
+     return;
+}
+
+/** Update client attributes (_WMFS_TAG _WMFS_SCREEN)
+ *\param c Client pointer
+*/
+void
+client_update_attributes(Client *c)
+{
+     XChangeProperty(dpy, c->win, ATOM("_WMFS_TAG"), XA_CARDINAL, 32,
+                     PropModeReplace, (uchar*)&(c->tag), 1);
+
+     XChangeProperty(dpy, c->win, ATOM("_WMFS_SCREEN"), XA_CARDINAL, 32,
+                     PropModeReplace, (uchar*)&(c->screen), 1);
 
      return;
 }

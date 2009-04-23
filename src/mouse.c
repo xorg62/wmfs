@@ -109,6 +109,7 @@ mouse_move(Client *c)
      }
      while(ev.type != ButtonRelease);
 
+     client_update_attributes(c);
      XUngrabPointer(dpy, CurrentTime);
 
      return;
@@ -138,7 +139,7 @@ mouse_resize(Client *c)
           return;
      do
      {
-          XMaskEvent(dpy, MouseMask | SubstructureRedirectMask, &ev);
+          XMaskEvent(dpy, MouseMask | ExposureMask | SubstructureRedirectMask, &ev);
 
           if(ev.type == MotionNotify)
           {
@@ -185,6 +186,7 @@ mouse_resize(Client *c)
      else
           tags[selscreen][seltag[selscreen]].layout.func(c->screen);
 
+     client_update_attributes(c);
      XUngrabPointer(dpy, CurrentTime);
 
 

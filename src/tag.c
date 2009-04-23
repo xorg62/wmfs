@@ -79,7 +79,6 @@ tag_set(int tag)
 
      client_focus((c) ? c : NULL);
 
-
      return;
 }
 
@@ -104,6 +103,8 @@ tag_transfert(Client *c, int tag)
 
      if(c == sel)
           client_focus(NULL);
+
+     client_update_attributes(c);
 
      return;
 }
