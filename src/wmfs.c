@@ -38,7 +38,7 @@ errorhandler(Display *d, XErrorEvent *event)
      char mess[256];
      Client *c;
 
-     /* Check if there are another WM running */
+     /* Check if there is another WM running */
      if(BadAccess == event->error_code
         && ROOT == event->resourceid)
      {
@@ -149,23 +149,9 @@ void
 mainloop(void)
 {
      XEvent ev;
-     fd_set fd;
 
-     while(!exiting)
-     {
-          if(QLength(dpy) > 0)
-               XNextEvent(dpy, &ev);
-          else
-          {
-               XFlush(dpy);
-               FD_ZERO(&fd);
-               FD_SET(ConnectionNumber(dpy), &fd);
-               ev.type = LASTEvent;
-               if(select(FD_SETSIZE, &fd, NULL, NULL, NULL) > 0)
-                    XNextEvent(dpy, &ev);
-          }
+     while(!exiting && !XNextEvent(dpy, &ev))
           getevent(ev);
-     }
 
      return;
 }
@@ -280,7 +266,7 @@ check_wmfs_running(void)
       {
            XFree(ret);
 
-           fprintf(stderr, "Wmfs is not running. ( _WMFS_RUNNING not present)\n");
+           fprintf(stderr, "Wmfs is not running. (_WMFS_RUNNING not present)\n");
 
            return False;
       }
@@ -317,7 +303,6 @@ exec_uicb_function(char *func, char *cmd)
 
      XChangeProperty(dpy, ROOT, ATOM("_WMFS_CMD"), ATOM("UTF8_STRING"),
                      8, PropModeReplace, (uchar*)cmd, strlen(cmd));
-
 
      ev.xclient.type = ClientMessage;
      ev.xclient.serial = 0;

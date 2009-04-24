@@ -409,10 +409,11 @@ Client*
 client_manage(Window w, XWindowAttributes *wa, Bool ar)
 {
      Client *c, *t = NULL;
-     Window trans;
+     Window trans, dw;
      Status rettrans;
      XSetWindowAttributes at;
-     int mx, my;
+     int mx, my, dint;
+     uint duint;
 
      screen_get_sel();
 
@@ -422,10 +423,6 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
 
      if(conf.client.place_at_mouse)
      {
-          int dint;
-          uint duint;
-          Window dw;
-
           XQueryPointer(dpy, ROOT, &dw, &dw, &mx, &my, &dint, &dint, &duint);
 
           mx += BORDH;
@@ -466,8 +463,10 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
 
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
           for(t = clients; t && t->win != trans; t = t->next);
-     if(t) c->tag = t->tag;
-     if(!c->free) c->free = (rettrans == Success) || c->hint;
+     if(t)
+          c->tag = t->tag;
+     if(!c->free)
+          c->free = (rettrans == Success) || c->hint;
      free(t);
 
      client_attach(c);
@@ -812,3 +811,4 @@ client_unmap(Client *c)
 
      return;
 }
+
