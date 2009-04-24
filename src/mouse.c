@@ -99,7 +99,8 @@ mouse_move(Client *c)
                     geo.x = (ocx + (ev.xmotion.x - mx));
                     geo.y = (ocy + (ev.xmotion.y - my));
 
-                    client_moveresize(c, geo, False);
+                    if(!conf.move_transparent)
+                         client_moveresize(c, geo, False);
                }
           }
           else if(ev.type == MapRequest
@@ -108,6 +109,9 @@ mouse_move(Client *c)
                getevent(ev);
      }
      while(ev.type != ButtonRelease);
+
+     if(!c->tile)
+          client_moveresize(c, geo, False);
 
      client_update_attributes(c);
      XUngrabPointer(dpy, CurrentTime);

@@ -273,6 +273,7 @@ typedef struct
      Bool raisefocus;
      Bool raiseswitch;
      Bool resize_transparent;
+     Bool move_transparent;
      struct
      {
           /*
