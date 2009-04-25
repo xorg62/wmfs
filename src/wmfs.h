@@ -160,7 +160,6 @@ void uicb_client_kill(uicb_t);
 void ewmh_init_hints(void);
 void ewmh_get_number_of_desktop(void);
 void ewmh_update_current_tag_prop(void);
-void ewmh_get_current_layout(void);
 void ewmh_get_client_list(void);
 void ewmh_get_desktop_names(void);
 void ewmh_set_desktop_geometry(void);

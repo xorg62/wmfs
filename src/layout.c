@@ -71,7 +71,7 @@ freelayout(int screen)
                c->tile = c->lmax = False;
           }
 
-     ewmh_get_current_layout();
+     ewmh_update_current_tag_prop();
 
      return;
 }
@@ -103,7 +103,8 @@ layoutswitch(Bool b)
                break;
           }
      }
-     ewmh_get_current_layout();
+
+     ewmh_update_current_tag_prop();
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);
      infobar_draw(selscreen);
 
@@ -146,7 +147,7 @@ maxlayout(int screen)
           client_maximize(c);
      }
 
-     ewmh_get_current_layout();
+     ewmh_update_current_tag_prop();
 
      return;
 }
@@ -268,7 +269,7 @@ grid(int screen)
           }
      }
 
-     ewmh_get_current_layout();
+     ewmh_update_current_tag_prop();
 
      return;
 }
@@ -397,7 +398,6 @@ multi_tile(int screen, Position type)
                cgeo.y = c->geo.y + c->geo.height + BORDH + TBARH;
      }
 
-     ewmh_get_current_layout();
      ewmh_update_current_tag_prop();
 
      return;
@@ -576,7 +576,6 @@ mirror(int screen, Bool horizontal)
 
      }
 
-     ewmh_get_current_layout();
      ewmh_update_current_tag_prop();
 
      return;

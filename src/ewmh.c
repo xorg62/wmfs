@@ -137,21 +137,13 @@ ewmh_update_current_tag_prop(void)
      XChangeProperty(dpy, ROOT, net_atom[wmfs_nmaster], XA_CARDINAL, 32,
                      PropModeReplace, (uchar*)&tags[selscreen][t + 1].nmaster, 1);
 
-     return;
-}
-
-/** Manage _WMFS_CURRENT_LAYOUT
-*/
-void
-ewmh_get_current_layout(void)
-{
+     /* Current layout */
      XChangeProperty(dpy, ROOT, net_atom[wmfs_current_layout], XA_STRING, 8,
                      PropModeReplace, (uchar*)tags[selscreen][seltag[selscreen]].layout.symbol,
                      strlen(tags[selscreen][seltag[selscreen]].layout.symbol));
 
      return;
 }
-
 
 /** Get _NET_CLIENT_LIST
 */
