@@ -48,7 +48,7 @@ init(void)
      init_root();
      screen_init_geo();
      infobar_init();
-     ewmh_get_current_desktop();
+     ewmh_update_current_tag_prop();
      grabkeys();
 
      /* Warning about font */

@@ -65,7 +65,8 @@ tag_set(int tag)
                return;
           seltag[selscreen] = tag;
      }
-     ewmh_get_current_desktop();
+
+     ewmh_update_current_tag_prop();
 
      if(tags[selscreen][otag].barpos != tags[selscreen][seltag[selscreen]].barpos)
           infobar_set_position(tags[selscreen][seltag[selscreen]].barpos);

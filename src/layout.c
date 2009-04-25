@@ -187,6 +187,8 @@ uicb_set_mwfact(uicb_t cmd)
      tags[selscreen][seltag[selscreen]].mwfact += c;
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);
 
+     ewmh_update_current_tag_prop();
+
      return;
 }
 
@@ -209,6 +211,8 @@ uicb_set_nmaster(uicb_t cmd)
 
      tags[selscreen][seltag[selscreen]].nmaster += n;
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);
+
+     ewmh_update_current_tag_prop();
 
      return;
 }
@@ -394,6 +398,7 @@ multi_tile(int screen, Position type)
      }
 
      ewmh_get_current_layout();
+     ewmh_update_current_tag_prop();
 
      return;
 }
@@ -572,6 +577,7 @@ mirror(int screen, Bool horizontal)
      }
 
      ewmh_get_current_layout();
+     ewmh_update_current_tag_prop();
 
      return;
 }

@@ -76,6 +76,8 @@ ewmh_init_hints(void)
      net_atom[wmfs_current_tag]               = ATOM("_WMFS_CURRENT_TAG");
      net_atom[wmfs_current_screen]            = ATOM("_WMFS_CURRENT_SCREEN");
      net_atom[wmfs_current_layout]            = ATOM("_WMFS_CURRENT_LAYOUT");
+     net_atom[wmfs_mwfact]                    = ATOM("_WMFS_MWFACT");
+     net_atom[wmfs_nmaster]                   = ATOM("_WMFS_NMASTER");
      net_atom[wmfs_tag_names]                 = ATOM("_WMFS_TAG_NAMES");
      net_atom[wmfs_function]                  = ATOM("_WMFS_FUNCTION");
      net_atom[wmfs_cmd]                       = ATOM("_WMFS_CMD");
@@ -108,9 +110,10 @@ ewmh_get_number_of_desktop(void)
 /** Get the current desktop
 */
 void
-ewmh_get_current_desktop(void)
+ewmh_update_current_tag_prop(void)
 {
      int t;
+     char s[10] = { 0 };
 
      screen_get_sel();
      t = seltag[selscreen] - 1;
@@ -123,6 +126,16 @@ ewmh_get_current_desktop(void)
      XChangeProperty(dpy, ROOT, net_atom[wmfs_current_tag], net_atom[utf8_string], 8,
                      PropModeReplace, (uchar*)tags[selscreen][seltag[selscreen]].name,
                      strlen(tags[selscreen][seltag[selscreen]].name));
+
+     sprintf(s, "%.3f", tags[selscreen][t + 1].mwfact);
+
+     /* Current tag mwfact */
+     XChangeProperty(dpy, ROOT, net_atom[wmfs_mwfact], XA_STRING, 8,
+                     PropModeReplace, (uchar*)&s, strlen(s));
+
+     /* Current nmaster */
+     XChangeProperty(dpy, ROOT, net_atom[wmfs_nmaster], XA_CARDINAL, 32,
+                     PropModeReplace, (uchar*)&tags[selscreen][t + 1].nmaster, 1);
 
      return;
 }

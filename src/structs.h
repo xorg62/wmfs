@@ -84,6 +84,8 @@ enum
      wmfs_current_tag,
      wmfs_current_screen,
      wmfs_current_layout,
+     wmfs_mwfact,
+     wmfs_nmaster,
      wmfs_set_screen,
      wmfs_screen_count,
      wmfs_statustext,
