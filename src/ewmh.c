@@ -70,15 +70,16 @@ ewmh_init_hints(void)
 
      /* WMFS hints */
      net_atom[wmfs_running]                   = ATOM("_WMFS_RUNNING");
+     net_atom[wmfs_update_hints]              = ATOM("_WMFS_UPDATE_HINTS");
      net_atom[wmfs_statustext]                = ATOM("_WMFS_STATUSTEXT");
      net_atom[wmfs_set_screen]                = ATOM("_WMFS_SET_SCREEN");
      net_atom[wmfs_screen_count]              = ATOM("_WMFS_SCREEN_COUNT");
      net_atom[wmfs_current_tag]               = ATOM("_WMFS_CURRENT_TAG");
+     net_atom[wmfs_tag_list]                  = ATOM("_WMFS_TAG_LIST");
      net_atom[wmfs_current_screen]            = ATOM("_WMFS_CURRENT_SCREEN");
      net_atom[wmfs_current_layout]            = ATOM("_WMFS_CURRENT_LAYOUT");
      net_atom[wmfs_mwfact]                    = ATOM("_WMFS_MWFACT");
      net_atom[wmfs_nmaster]                   = ATOM("_WMFS_NMASTER");
-     net_atom[wmfs_tag_names]                 = ATOM("_WMFS_TAG_NAMES");
      net_atom[wmfs_function]                  = ATOM("_WMFS_FUNCTION");
      net_atom[wmfs_cmd]                       = ATOM("_WMFS_CMD");
 
@@ -138,7 +139,7 @@ ewmh_update_current_tag_prop(void)
                      PropModeReplace, (uchar*)&tags[selscreen][t + 1].nmaster, 1);
 
      /* Current layout */
-     XChangeProperty(dpy, ROOT, net_atom[wmfs_current_layout], XA_STRING, 8,
+     XChangeProperty(dpy, ROOT, net_atom[wmfs_current_layout], net_atom[utf8_string], 8,
                      PropModeReplace, (uchar*)tags[selscreen][seltag[selscreen]].layout.symbol,
                      strlen(tags[selscreen][seltag[selscreen]].layout.symbol));
 
@@ -193,8 +194,11 @@ ewmh_get_desktop_names(void)
      XChangeProperty(dpy, ROOT, net_atom[net_desktop_names], net_atom[utf8_string], 8,
                      PropModeReplace, (uchar*)str, pos);
 
-     /* _WMFS_TAG_NAMES */
-     XChangeProperty(dpy, ROOT, net_atom[wmfs_tag_names], XA_STRING, 8,
+     for(i = 0; i < pos; ++i)
+          if(str[i] == '\0' && i < pos - 1)
+               str[i] = ' ';
+
+     XChangeProperty(dpy, ROOT, net_atom[wmfs_tag_list], net_atom[utf8_string], 8,
                      PropModeReplace, (uchar*)str, pos);
 
      free(str);
@@ -232,10 +236,10 @@ ewmh_set_workarea(void)
      for(i = 0; i < screen_count(); ++i)
           for(j = 0; j < conf.ntag[i]; ++j)
           {
-               data[pos++] = sgeo[i].x - BORDH;
-               data[pos++] = sgeo[i].y - TBARH;
-               data[pos++] = sgeo[i].width;
-               data[pos++] = sgeo[i].height;
+               data[pos++] = spgeo[i].x;
+               data[pos++] = spgeo[i].y;
+               data[pos++] = spgeo[i].width;
+               data[pos++] = spgeo[i].height;
           }
 
      XChangeProperty(dpy, ROOT, net_atom[net_workarea], XA_CARDINAL, 32,

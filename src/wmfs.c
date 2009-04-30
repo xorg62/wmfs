@@ -284,8 +284,6 @@ check_wmfs_running(void)
 void
 exec_uicb_function(char *func, char *cmd)
 {
-     XEvent ev;
-     int i;
      long data[5];
 
      /* Check if wmfs is running (this function is executed when wmfs
@@ -304,18 +302,7 @@ exec_uicb_function(char *func, char *cmd)
      XChangeProperty(dpy, ROOT, ATOM("_WMFS_CMD"), ATOM("UTF8_STRING"),
                      8, PropModeReplace, (uchar*)cmd, strlen(cmd));
 
-     ev.xclient.type = ClientMessage;
-     ev.xclient.serial = 0;
-     ev.xclient.send_event = True;
-     ev.xclient.message_type = ATOM("_WMFS_FUNCTION");
-     ev.xclient.window = ROOT;
-     ev.xclient.format = 32;
-
-     for(i = 0; i < 6; ++i)
-          ev.xclient.data.l[i] = data[i];
-
-     XSendEvent(dpy, ROOT, False, SubstructureRedirectMask | SubstructureNotifyMask, &ev);
-     XSync(dpy, False);
+     send_client_event(data, "_WMFS_FUNCTION");
 
      return;
 }
@@ -326,27 +313,14 @@ exec_uicb_function(char *func, char *cmd)
 void
 set_statustext(char *str)
 {
-     XEvent ev;
-     int i;
      long data[5];
 
      data[4] = True;
 
      XChangeProperty(dpy, ROOT, ATOM("_WMFS_STATUSTEXT"), ATOM("UTF8_STRING"),
-                     8, PropModeReplace, (unsigned char*)str, strlen(str));
+                     8, PropModeReplace, (uchar*)str, strlen(str));
 
-     ev.xclient.type = ClientMessage;
-     ev.xclient.serial = 0;
-     ev.xclient.send_event = True;
-     ev.xclient.message_type = ATOM("_WMFS_STATUSTEXT");
-     ev.xclient.window = ROOT;
-     ev.xclient.format = 32;
-
-     for(i = 0; i < 6; ++i)
-          ev.xclient.data.l[i] = data[i];
-
-     XSendEvent(dpy, ROOT, False, SubstructureRedirectMask | SubstructureNotifyMask, &ev);
-     XSync(dpy, False);
+     send_client_event(data, "_WMFS_STATUSTEXT");
 
      return;
 }
@@ -379,21 +353,22 @@ main(int argc, char **argv)
 
      argv_global = _strdup(argv[0]);
 
-     while ((i = getopt(argc, argv, "hvic:s:")) != -1)
+     while ((i = getopt(argc, argv, "hvic:s:g:")) != -1)
      {
-          if(i == 'c' || i == 's')
+          if(i == 'c' || i == 's' || i == 'g')
                if(!(dpy = XOpenDisplay(NULL)))
                {
                     fprintf(stderr, "WMFS: cannot open X server.\n");
                     exit(EXIT_FAILURE);
                }
 
-          switch (i)
+          switch(i)
           {
           case 'h':
           default:
-               printf("usage: %s [-ihv] [-c <uicb function> <cmd> ] [-s <string>]\n"
+               printf("usage: %s [-ihv] [-c <uicb function> <cmd> ] [-g <argument>] [-s <string>]\n"
                       "   -c <uicb_function> <cmd>  Execute an uicb function to control WMFS\n"
+                      "   -g <argument>             Show information about wmfs status\n"
                       "   -s <string>               Set the bar(s) statustext\n"
                       "   -h                        Show this page\n"
                       "   -i                        Show informations\n"
@@ -401,7 +376,7 @@ main(int argc, char **argv)
                exit(EXIT_SUCCESS);
                break;
           case 'i':
-               printf("WMFS - Window Manager From Scratch By Martin Duquesnoy \n");
+               printf("WMFS - Window Manager From Scratch By Martin Duquesnoy\n");
                exit(EXIT_SUCCESS);
                break;
           case 'v':
@@ -419,6 +394,11 @@ main(int argc, char **argv)
                break;
           case 's':
                set_statustext(optarg);
+               XCloseDisplay(dpy);
+               exit(EXIT_SUCCESS);
+               break;
+          case 'g':
+               getinfo(optarg);
                XCloseDisplay(dpy);
                exit(EXIT_SUCCESS);
                break;

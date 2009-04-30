@@ -224,11 +224,23 @@ clientmessageevent(XClientMessageEvent *ev)
           XFree(ret);
      }
 
+     /* Manage _WMFS_UPDATE_HINTS */
+     if(mess_t == wmfs_update_hints)
+     {
+          ewmh_get_number_of_desktop();
+          ewmh_update_current_tag_prop();
+          ewmh_get_client_list();
+          ewmh_get_desktop_names();
+          ewmh_set_desktop_geometry();
+          ewmh_set_workarea();
+          screen_count();
+          screen_get_sel();
+     }
 
      return;
 }
 
-/** ConfigureRequest & ConfigureNotify handle event
+/** ConfigureRequest & ConfigureNotify handle events
  * \param ev XEvent pointer
 */
 void
@@ -496,6 +508,32 @@ unmapnotify(XUnmapEvent *ev)
      return;
 }
 
+/** Send a client event
+ *\param data Event data
+ *\param atom_name Event atom name
+ */
+void
+send_client_event(long data[5], char *atom_name)
+{
+     XEvent ev;
+     int i;
+
+     ev.xclient.type = ClientMessage;
+     ev.xclient.serial = 0;
+     ev.xclient.send_event = True;
+     ev.xclient.message_type = ATOM(atom_name);
+     ev.xclient.window = ROOT;
+     ev.xclient.format = 32;
+
+     for(i = 0; i < 5; ++i, ev.xclient.data.l[i] = data[i]);
+
+     XSendEvent(dpy, ROOT, False, SubstructureRedirectMask | SubstructureNotifyMask, &ev);
+     XSync(dpy, False);
+
+
+     return;
+}
+
 /** Event handle function: execute every function
  * handle by event
  * \param ev Event
@@ -505,7 +543,7 @@ getevent(XEvent ev)
 {
      int st;
 
-     switch (ev.type)
+     switch(ev.type)
      {
      case ButtonPress:      buttonpress(&ev.xbutton);          break;
      case ClientMessage:    clientmessageevent(&ev.xclient);   break;

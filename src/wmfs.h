@@ -188,6 +188,7 @@ void init_conf(void);
 /* event.c */
 void buttonpress(XButtonEvent *ev);
 void configureevent(XEvent *ev);
+void clientmessageevent(XClientMessageEvent *ev);
 void destroynotify(XDestroyWindowEvent *ev);
 void enternotify(XCrossingEvent *ev);
 void expose(XExposeEvent *ev);
@@ -197,6 +198,7 @@ void keypress(XKeyPressedEvent *ev);
 void mappingnotify(XMappingEvent *ev);
 void maprequest(XMapRequestEvent *ev);
 void propertynotify(XPropertyEvent *ev);
+void send_client_event(long data[5], char *atom_name);
 void getevent(XEvent ev);
 
 /* menu.c */
@@ -290,6 +292,14 @@ void init_gc(void);
 void init_cursor(void);
 void init_key(void);
 void init_geometry(void);
+
+/* getinfo.c */
+void getinfo_tag(void);
+void getinfo_screen(void);
+void getinfo_layout(void);
+void getinfo_mwfact(void);
+void getinfo_nmaster(void);
+void getinfo(char *info);
 
 /* wmfs.c */
 int errorhandler(Display *d, XErrorEvent *event);

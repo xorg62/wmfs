@@ -34,6 +34,7 @@ set(wmfs_src
   src/event.c
   src/ewmh.c
   src/frame.c
+  src/getinfo.c
   src/infobar.c
   src/init.c
   src/launcher.c
@@ -229,7 +230,7 @@ if(PROJECT_CHANGELOG)
    install(FILES ${PROJECT_CHANGELOG} DESTINATION ${PROJECT_DATA_PATH})
 endif()
 
-install(FILES ${PROJECT_TODO} ${PROJECT_README} 
+install(FILES ${PROJECT_TODO} ${PROJECT_README}
   ${PROJECT_DEFAULT_CONF} DESTINATION ${PROJECT_DATA_PATH})
 install(FILES ${PROJECT_DEFAULT_CONF} DESTINATION ${WMFS_SYSCONFDIR})
 install(FILES "wmfs.desktop" DESTINATION ${WMFS_XSESSION_PATH})

@@ -80,10 +80,11 @@ enum
      utf8_string,
      /* WMFS HINTS */
      wmfs_running,
-     wmfs_tag_names,
+     wmfs_update_hints,
      wmfs_current_tag,
      wmfs_current_screen,
      wmfs_current_layout,
+     wmfs_tag_list,
      wmfs_mwfact,
      wmfs_nmaster,
      wmfs_set_screen,
