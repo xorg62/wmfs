@@ -40,6 +40,8 @@ int rf;
 ulong ir, il;
 uchar *ret;
 
+/** Get information about tag (current, list, names)
+ */
 void
 getinfo_tag(void)
 {
@@ -78,6 +80,8 @@ getinfo_tag(void)
      return;
 }
 
+/** Get information about screens
+ */
 void
 getinfo_screen(void)
 {
@@ -102,6 +106,8 @@ getinfo_screen(void)
      return;
 }
 
+/** Get current layout name
+ */
 void
 getinfo_layout(void)
 {
@@ -121,6 +127,8 @@ getinfo_layout(void)
      return;
 }
 
+/** Get information about current mwfact
+ */
 void
 getinfo_mwfact(void)
 {
@@ -140,6 +148,8 @@ getinfo_mwfact(void)
      return;
 }
 
+/** Get information about current nmaster
+ */
 void
 getinfo_nmaster(void)
 {
@@ -157,6 +167,9 @@ getinfo_nmaster(void)
      return;
 }
 
+/** Get information about wmfs
+ *\param info Type of information in a string
+ */
 void
 getinfo(char *info)
 {
