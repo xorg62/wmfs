@@ -46,8 +46,8 @@ void
 getinfo_tag(void)
 {
      int tag = 0;
-     char *tag_name;
-     char *tag_list;
+     char *tag_name = NULL;
+     char *tag_list = NULL;
 
 
      if(XGetWindowProperty(dpy, ROOT, ATOM("_NET_CURRENT_DESKTOP"), 0L, 4096,
@@ -111,7 +111,7 @@ getinfo_screen(void)
 void
 getinfo_layout(void)
 {
-     char *layout;
+     char *layout = NULL;
 
      if(XGetWindowProperty(dpy, ROOT, ATOM("_WMFS_CURRENT_LAYOUT"), 0L, 4096,
                            False, ATOM("UTF8_STRING"), &rt, &rf, &ir, &il, &ret) == Success && ret)
@@ -132,7 +132,7 @@ getinfo_layout(void)
 void
 getinfo_mwfact(void)
 {
-     char *mwfact;
+     char *mwfact = NULL;
 
      if(XGetWindowProperty(dpy, ROOT, ATOM("_WMFS_MWFACT"), 0L, 4096,
                            False, XA_STRING, &rt, &rf, &ir, &il, &ret) == Success && ret)
