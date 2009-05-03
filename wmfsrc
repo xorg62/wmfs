@@ -111,9 +111,10 @@ client
                 button
                 {
                         mouse { button = "1" func = "client_kill" }
-                        # Make a cross with line
-                        line { coord = {1, 1, 4, 4} }
-                        line { coord = {4, 1, 1, 4} }
+                        mouse { button = "3" func = "menu" cmd = "clientmenu" }
+                        line { coord = {1, 1, 4, 1} }
+                        line { coord = {1, 1, 1, 4} }
+                        line { coord = {1, 4, 4, 4} }
                 }
         }
 }
@@ -129,7 +130,7 @@ menu
                 # x = 40 y = 50
 
                 fg_focus  = "#191919" bg_focus  = "#7E89A2"
-                fg_normal = "#D4D4D4" bg_normal = "#191919"
+                fg_normal = "#9F9AB3" bg_normal = "#191919"
 
                 item { name = "Terminal"        func = "spawn" cmd = term }
                 item { name = "Next tag"        func = "tag_next" }
@@ -138,6 +139,18 @@ menu
                 item { name = "Previous layout" func = "layout_prev" }
                 item { name = "Toggle infobar"  func = "toggle_infobar_position" }
                 item { name = "Quit WMFS"       func = "quit" }
+        }
+
+        set_menu
+        {
+                name = "clientmenu"
+
+                fg_focus  = "#D4D4D4" bg_focus  = "#003366"
+                fg_normal = "#D4D4D4" bg_normal = "#191919"
+
+                item { name = "Close"    func = "client_kill" }
+                item { name = "Maximize" func = "toggle_max" }
+                item { name = "Free"     func = "toggle_free" }
         }
 }
 
