@@ -173,13 +173,18 @@ else()
    set(WMFS_MAN_PATH ${PREFIX}/share/man CACHE PATH "wmfs manpage directory")
 endif()
 
-# {{ Doxygen
 if(DOXYGEN_EXECUTABLE)
   add_custom_target(doc
     COMMAND ${DOXYGEN_EXECUTABLE} ${SOURCE_DIR}/wmfs.doxygen
     WORKING_DIRECTORY ${BUILD_DIR})
 endif()
-# }}
+
+find_program(URXVT_EXECUTABLE urxvt)
+if(URXVT_EXECUTABLE)
+   set(WMFS_TERM urxvt)
+else()
+   set(WMFS_TERM xterm)
+endif()
 
 # Remplace strings in configs
 set(WMFS_VERSION ${VERSION})
@@ -193,7 +198,8 @@ set(WMFS_SOURCE_DIR ${SOURCE_DIR})
 # Configure files
 set(wmfs_configure_files
   src/config.h.in
-  wmfs.doxygen.in)
+  wmfs.doxygen.in
+  wmfsrc.in)
 
 macro(a_configure_file file)
     string(REGEX REPLACE ".in\$" "" outfile ${file})

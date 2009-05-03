@@ -5,7 +5,7 @@
 
 alias
 {
-        alias term { content = "urxvt" }
+        alias term { content = "@WMFS_TERM@" }
 }
 
 misc
@@ -166,7 +166,7 @@ launcher
         {
                 name = "launcher_ssh"
                 prompt = "ssh to: "
-                command = "urxvt -e ssh"
+                command = "@WMFS_TERM@ -e ssh"
         }
 }
 
