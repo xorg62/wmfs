@@ -51,6 +51,11 @@ Print WMFS informations
 .RE
 .SH "DEFAULT KEY BINDINGS"
 .PP
+\fBControl\-Alt + r\fR
+.RS 4
+Reload WMFS binary
+.RE
+.PP
 \fBControl + Return\fR
 .RS 4
 Run a terminal (urxvt by default)
@@ -66,14 +71,14 @@ Quit the selected client
 Exit WMFS
 .RE
 .PP
-\fBControl + m \fR
+\fBAlt + m \fR
 .RS 4
 Toggle maximize the selected client
 .RE
 .PP
-\fBControl + b \fR
+\fBAlt + b \fR
 .RS 4
-Toggle the bar position between top and bottom
+Toggle the bar position between top, hide and bottom
 .RE
 .PP
 \fBAlt + Tab\fR
@@ -96,12 +101,12 @@ Next tag
 Previous tag
 .RE
 .PP
-\fBControl + Up\fR
+\fBAlt + Space\fR
 .RS 4
 Next layout
 .RE
 .PP
-\fBControl + Down\fR
+\fBAlt\-Shift + Space\fR
 .RS 4
 Previous layout
 .RE
@@ -116,44 +121,24 @@ Increase the mwfact (+0\&.025)
 Decrease the mwfact (\-0\&.025)
 .RE
 .PP
-\fBControl\-Alt + Left\fR
+\fBAlt + d\fR
 .RS 4
-Move the selected client to the left
+Increase the nmaster (+1)\fR
 .RE
 .PP
-\fBControl\-Alt + Right\fR
+\fBAlt\-Shift + d\fR
 .RS 4
-Move the selected client to the right
+Decrease the nmaster (-1)\fR
 .RE
 .PP
-\fBControl\-Alt + Up\fR
+\fBAlt + p\fR
 .RS 4
-Up the selected client
+Make a launcher in the infobar to run an unix command\fR
 .RE
 .PP
-\fBControl\-Alt + Down\fR
+\fBAlt\-Shift + p\fR
 .RS 4
-Down the selected client
-.RE
-.PP
-\fBShift+Alt + Left\fR
-.RS 4
-Decrease the selected client size (horizontally)
-.RE
-.PP
-\fBShift+Alt + Right\fR
-.RS 4
-Increase the selected client size (horizontally)
-.RE
-.PP
-\fBShift+Alt + Up\fR
-.RS 4
-Decrease the selected client size (vertically)
-.RE
-.PP
-\fBShift+Alt + Down\fR
-.RS 4
-Increase the selected client size (vertically)
+Make a launcher in the infobar to run an ssh session\fR
 .RE
 .PP
 \fBAlt + F[1\&.\&.9]\fR
