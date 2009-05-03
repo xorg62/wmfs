@@ -32,7 +32,7 @@
 
 #include "wmfs.h"
 
-/* Took From standards.freedesktop.org */
+/* Taken From standards.freedesktop.org */
 #define _NET_WM_STATE_REMOVE        0    /* remove/unset property */
 #define _NET_WM_STATE_ADD           1    /* add/set property */
 #define _NET_WM_STATE_TOGGLE        2    /* toggle property  */
