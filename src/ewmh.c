@@ -42,7 +42,9 @@
 void
 ewmh_init_hints(void)
 {
-     int i = 1;
+     int i = 1, showing_desk = 0;
+     char root_name[] = "WMFS "WMFS_VERSION;
+     long pid = (long)getpid();
 
      /* EWMH hints */
      net_atom[net_supported]                  = ATOM("_NET_SUPPORTED");
@@ -55,9 +57,12 @@ ewmh_init_hints(void)
      net_atom[net_active_window]              = ATOM("_NET_ACTIVE_WINDOW");
      net_atom[net_close_window]               = ATOM("_NET_CLOSE_WINDOW");
      net_atom[net_wm_name]                    = ATOM("_NET_WM_NAME");
+     net_atom[net_wm_pid]                     = ATOM("_NET_WM_PID");
      net_atom[net_wm_desktop]                 = ATOM("_NET_WM_DESKTOP");
+     net_atom[net_showing_desktop]            = ATOM("_NET_SHOWING_DESKTOP");
      net_atom[net_wm_icon_name]               = ATOM("_NET_WM_ICON_NAME");
      net_atom[net_wm_window_type]             = ATOM("_NET_WM_WINDOW_TYPE");
+     net_atom[net_supporting_wm_check]        = ATOM("_NET_SUPPORTING_WM_CHECK");
      net_atom[net_wm_window_type_normal]      = ATOM("_NET_WM_WINDOW_TYPE_NORMAL");
      net_atom[net_wm_window_type_dock]        = ATOM("_NET_WM_WINDOW_TYPE_DOCK");
      net_atom[net_wm_window_type_splash]      = ATOM("_NET_WM_WINDOW_TYPE_SPLASH");
@@ -88,6 +93,22 @@ ewmh_init_hints(void)
 
      XChangeProperty(dpy, ROOT, net_atom[wmfs_running], XA_CARDINAL, 32,
                      PropModeReplace, (uchar*)&i, 1);
+
+     /* Set _NET_SUPPORTING_WM_CHECK */
+     XChangeProperty(dpy, ROOT, net_atom[net_supporting_wm_check], XA_WINDOW, 32,
+                     PropModeReplace, (uchar*)&ROOT, 1);
+
+     XChangeProperty(dpy, ROOT, net_atom[net_wm_name], net_atom[utf8_string], 8,
+                     PropModeReplace, (uchar*)&root_name, strlen(root_name));
+
+
+     /* Set _NET_WM_PID */
+     XChangeProperty(dpy, ROOT, net_atom[net_wm_pid], XA_CARDINAL, 32,
+                     PropModeReplace, (uchar*)&pid, 1);
+
+     /* Set _NET_SHOWING_DESKTOP */
+     XChangeProperty(dpy, ROOT, net_atom[net_showing_desktop], XA_CARDINAL, 32,
+                     PropModeReplace, (uchar*)&showing_desk, 1);
 
      return;
 }
