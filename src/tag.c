@@ -46,12 +46,9 @@ tag_set(int tag)
 
      otag = seltag[selscreen];
 
-     if(!tag)
-          tag = 1;
-
      if(conf.tag_round)
      {
-          if(tag < 1)
+          if(tag <= 0)
                seltag[selscreen] = conf.ntag[selscreen];
           else if(tag  > conf.ntag[selscreen])
                seltag[selscreen] = 1;
@@ -60,7 +57,7 @@ tag_set(int tag)
      }
      else
      {
-          if(tag == seltag[selscreen]
+          if(!tag || tag == seltag[selscreen]
              || tag > conf.ntag[selscreen])
                return;
           seltag[selscreen] = tag;
