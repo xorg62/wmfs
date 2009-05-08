@@ -40,16 +40,29 @@ launcher_execute(Launcher launcher)
      char tmp[32] = { 0 };
      char buf[512] = { 0 };
      int pos = 0;
-     Bool run = True;
+     BarWindow *bw;
+     Bool my_guitar_gently_wheeps = True;
 
      int x = (infobar[selscreen].layout_button->geo.x
               + textw(tags[selscreen][seltag[selscreen]].layout.symbol) + PAD);
 
      XGrabKeyboard(dpy, ROOT, True, GrabModeAsync, GrabModeAsync, CurrentTime);
 
-     barwin_draw_text(infobar[selscreen].bar, x, font->height, launcher.prompt);
 
-     while(run)
+     bw = barwin_create(infobar[selscreen].bar->win, x, 0,
+                        infobar[selscreen].bar->geo.width - x,
+                        infobar[selscreen].bar->geo.height - 1,
+                        infobar[selscreen].bar->bg,
+                        infobar[selscreen].bar->fg,
+                        False, False, False);
+
+     barwin_map(bw);
+     barwin_refresh_color(bw);
+     barwin_refresh(bw);
+
+     barwin_draw_text(bw, 1, font->height, launcher.prompt);
+
+     while(my_guitar_gently_wheeps)
      {
           if(ev.type == KeyPress)
           {
@@ -64,10 +77,10 @@ launcher_execute(Launcher launcher)
                {
                case XK_Return:
                     spawn("%s %s", launcher.command, buf);
-                    run = 0;
+                    my_guitar_gently_wheeps = 0;
                     break;
                case XK_Escape:
-                    run = 0;
+                    my_guitar_gently_wheeps = 0;
                     break;
                case XK_BackSpace:
                     if(pos)
@@ -79,16 +92,18 @@ launcher_execute(Launcher launcher)
                     break;
                }
 
-               barwin_refresh_color(infobar[selscreen].bar);
-               barwin_draw_text(infobar[selscreen].bar, x, font->height, launcher.prompt);
-               barwin_draw_text(infobar[selscreen].bar, x + textw(launcher.prompt) + textw(" "), font->height, buf);
-               barwin_refresh(infobar[selscreen].bar);
+               barwin_refresh_color(bw);
+               barwin_draw_text(bw, 1, font->height, launcher.prompt);
+               barwin_draw_text(bw, 1 + textw(launcher.prompt) + textw(" "), font->height, buf);
+               barwin_refresh(bw);
           }
           else
                getevent(ev);
           XNextEvent(dpy, &ev);
      }
 
+     barwin_unmap(bw);
+     barwin_delete(bw);
      infobar_draw(selscreen);
 
      XUngrabKeyboard(dpy, CurrentTime);
