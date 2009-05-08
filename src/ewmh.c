@@ -44,6 +44,7 @@ ewmh_init_hints(void)
 {
      int i = 1, showing_desk = 0;
      char root_name[] = "WMFS "WMFS_VERSION;
+     char class[] = "wmfs";
      long pid = (long)getpid();
 
      /* EWMH hints */
@@ -101,6 +102,8 @@ ewmh_init_hints(void)
      XChangeProperty(dpy, ROOT, net_atom[net_wm_name], net_atom[utf8_string], 8,
                      PropModeReplace, (uchar*)&root_name, strlen(root_name));
 
+     XChangeProperty(dpy, ROOT, ATOM("WM_CLASS"), XA_STRING, 8,
+                     PropModeReplace, (uchar*)&class, strlen(class));
 
      /* Set _NET_WM_PID */
      XChangeProperty(dpy, ROOT, net_atom[net_wm_pid], XA_CARDINAL, 32,
