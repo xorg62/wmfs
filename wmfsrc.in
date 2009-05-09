@@ -184,6 +184,9 @@ keys
         # Quit wmfs.
         key { mod = {"Control", "Alt", "Shift"} key = "q" func = "quit" }
 
+        # Switch current client with master client.
+        key { mod = {"Alt"} key = "t" func = "tile_switch" }
+
         # Toggle maximum the selected client.
         key { mod = {"Alt"} key = "m" func = "toggle_max" }
 

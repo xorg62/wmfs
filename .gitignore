@@ -14,3 +14,4 @@ config.h
 build/
 doc/
 wmfs.doxygen
+wmfsrc
