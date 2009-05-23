@@ -82,7 +82,7 @@ infobar_init(void)
           }
 
           /* Create layout switch barwindow */
-          infobar[sc].layout_button = barwin_create(infobar[sc].bar->win, j + PAD / 2, 0,
+          infobar[sc].layout_button = barwin_create(infobar[sc].bar->win, j + PAD / 2 , 0,
                                                     textw(tags[sc][seltag[sc]].layout.symbol) + PAD,
                                                     infobar[sc].geo.height,
                                                     conf.colors.layout_bg, conf.colors.layout_fg,
@@ -91,7 +91,8 @@ infobar_init(void)
           /* Map/Refresh all */
           barwin_map(infobar[sc].bar);
           barwin_map_subwin(infobar[sc].bar);
-          barwin_map_subwin(infobar[sc].layout_button);
+          if(conf.border.layout)
+               barwin_map_subwin(infobar[sc].layout_button);
           barwin_refresh_color(infobar[sc].bar);
           barwin_refresh(infobar[sc].bar);
 

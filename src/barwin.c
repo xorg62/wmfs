@@ -239,7 +239,11 @@ barwin_resize(BarWindow *bw, uint w, uint h)
      XFreePixmap(dpy, bw->dr);
 
      /* Frame */
-     bw->dr = XCreatePixmap(dpy, ROOT, w - SHADH, h - SHADH, DefaultDepth(dpy, SCREEN));
+     bw->dr = XCreatePixmap(dpy, ROOT,
+                            w - ((bw->bord) ? SHADH : 0),
+                            h - ((bw->bord) ? SHADH : 0),
+                            DefaultDepth(dpy, SCREEN));
+
      XResizeWindow(dpy, bw->win, w, h);
 
      /* Border */
@@ -295,7 +299,7 @@ barwin_refresh(BarWindow *bw)
      if(!bw || !bw->dr || !bw->win)
           return;
 
-     XCopyArea(dpy, bw->dr, bw->win, gc, 0, 0, bw->geo.width, bw->geo.height, 0, 0);
+     XCopyArea(dpy, bw->dr, bw->win, gc, 0, 0, bw->geo.width , bw->geo.height, 0, 0);
 
      return;
 }
