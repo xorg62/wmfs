@@ -299,7 +299,7 @@ barwin_refresh(BarWindow *bw)
      if(!bw || !bw->dr || !bw->win)
           return;
 
-     XCopyArea(dpy, bw->dr, bw->win, gc, 0, 0, bw->geo.width , bw->geo.height, 0, 0);
+     XCopyArea(dpy, bw->dr, bw->win, gc, 0, 0, bw->geo.width, bw->geo.height, 0, 0);
 
      return;
 }

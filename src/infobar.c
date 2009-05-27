@@ -82,7 +82,7 @@ infobar_init(void)
           }
 
           /* Create layout switch barwindow */
-          infobar[sc].layout_button = barwin_create(infobar[sc].bar->win, j + PAD / 2 , 0,
+          infobar[sc].layout_button = barwin_create(infobar[sc].bar->win, j + PAD / 2, 0,
                                                     textw(tags[sc][seltag[sc]].layout.symbol) + PAD,
                                                     infobar[sc].geo.height,
                                                     conf.colors.layout_bg, conf.colors.layout_fg,
