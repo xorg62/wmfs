@@ -138,7 +138,7 @@ screen_get_sel(void)
 {
      if(XineramaIsActive(dpy))
      {
-          /* Unused variables */
+          /* Unused variables (except x/y) */
           Window w;
           int d, u, x, y;
 

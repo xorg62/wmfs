@@ -43,6 +43,8 @@ launcher_execute(Launcher launcher)
      BarWindow *bw;
      Bool my_guitar_gently_wheeps = True;
 
+     screen_get_sel();
+
      int x = (infobar[selscreen].layout_button->geo.x
               + textw(tags[selscreen][seltag[selscreen]].layout.symbol) + PAD);
 
