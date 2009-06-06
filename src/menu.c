@@ -202,7 +202,7 @@ menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[])
 
      barwin_draw_text(winitem[item],
                       ((width / 2) - (textw(menu->item[item].name) / 2)),
-                      font->height,
+                      FHINFOBAR,
                       menu->item[item].name);
 
      return;
