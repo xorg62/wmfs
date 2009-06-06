@@ -297,6 +297,7 @@ typedef struct
      } colors;
      struct
      {
+          int height;
           MouseBinding *mouse;
           int nmouse;
      } bars;

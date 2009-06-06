@@ -139,8 +139,10 @@ void
 conf_bar_section(cfg_t *cfg_b)
 {
      conf.border.bar  = cfg_getbool(cfg_b, "border");
+     conf.bars.height = cfg_getint(cfg_b, "height");
      conf.colors.bar  = getcolor(alias_to_str(cfg_getstr(cfg_b, "bg")));
      conf.colors.text = _strdup(alias_to_str(cfg_getstr(cfg_b, "fg")));
+
 
      if((conf.bars.nmouse = cfg_size(cfg_b, "mouse")))
      {

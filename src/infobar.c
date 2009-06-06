@@ -113,7 +113,7 @@ infobar_draw(int sc)
      infobar_draw_taglist(sc);
      infobar_draw_layout(sc);
      barwin_refresh_color(infobar[sc].bar);
-     barwin_draw_text(infobar[sc].bar, (sgeo[sc].width - SHADH) - textw(statustext), font->height, statustext);
+     barwin_draw_text(infobar[sc].bar, (sgeo[sc].width - SHADH) - textw(statustext), FHINFOBAR, statustext);
 
      return;
 }
@@ -127,7 +127,7 @@ infobar_draw_layout(int sc)
      barwin_resize(infobar[sc].layout_button, textw(tags[sc][seltag[sc]].layout.symbol) + PAD, infobar[sc].geo.height);
      barwin_refresh_color(infobar[sc].layout_button);
      if(tags[sc][seltag[sc]].layout.symbol)
-          barwin_draw_text(infobar[sc].layout_button, PAD / 2, font->height, tags[sc][seltag[sc]].layout.symbol);
+          barwin_draw_text(infobar[sc].layout_button, PAD / 2, FHINFOBAR, tags[sc][seltag[sc]].layout.symbol);
 
      return;
 }
@@ -157,7 +157,7 @@ infobar_draw_taglist(int sc)
                }
           }
           if(tags[sc][i].name)
-               barwin_draw_text(infobar[sc].tags[i], PAD / 2, font->height, tags[sc][i].name);
+               barwin_draw_text(infobar[sc].tags[i], PAD / 2, FHINFOBAR, tags[sc][i].name);
      }
 
      return;

@@ -74,7 +74,8 @@
 #define MAXH         DisplayHeight(dpy, DefaultScreen(dpy))
 #define MAXW         DisplayWidth(dpy, DefaultScreen(dpy))
 #define ATOM(a)      XInternAtom(dpy, (a), False)
-#define INFOBARH     (font->height * 1.5)
+#define INFOBARH     ((conf.bars.height != -1) ? conf.bars.height : (font->height * 1.5))
+#define FHINFOBAR    ((font->height - font->descent) + (INFOBARH - font->height) / 2)
 #define SHADH        1
 #define SHADC        0x000000 /* 'Cause i don't know how darken a color yet */
 #define BORDH        conf.client.borderheight

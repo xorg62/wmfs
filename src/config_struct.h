@@ -61,6 +61,7 @@ cfg_opt_t bar_opts[] =
 {
      CFG_STR("bg",        "#090909",         CFGF_NONE),
      CFG_STR("fg",        "#6289A1",         CFGF_NONE),
+     CFG_INT("height",    -1,                CFGF_NONE),
      CFG_BOOL("border",   cfg_false,         CFGF_NONE),
      CFG_SEC("mouse",     mouse_button_opts, CFGF_MULTI),
      CFG_END()
