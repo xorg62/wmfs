@@ -43,7 +43,7 @@ launcher_execute(Launcher launcher)
      char buf[512] = { 0 };
      char tabbuf[512] = { 0 };
      int pos = 0;
-     DIR           *dir;
+     DIR *dir;
      struct dirent *dirent;
      char *searchpath;
      char *start, *end;
@@ -98,73 +98,66 @@ launcher_execute(Launcher launcher)
                     my_guitar_gently_wheeps = 0;
                     break;
                case XK_Tab:
-                    stop = False;
-                    found = False;
+                    stop = found = False;
 
                     searchpath = getenv("PATH");
                     start = searchpath;
 
                     if (lastwastab)
                     {
-                       strcpy(buf, tabbuf);
-                       tabhits++;
+                         strcpy(buf, tabbuf);
+                         tabhits++;
                     }
                     else
-                    {
-                       tabhits = 1;
-                    }
+                         tabhits = 1;
+
                     searchhits = 0;
 
                     do
                     {
-                       end = strchr(start, ':');
-                       if (end == NULL)
-                       {
-                          stop = True;
-                          strncpy(currentpath, start, PATH_MAX);
-                       }
-                       else
-                       {
-                          strncpy(currentpath, start, end - start);
-                          currentpath[end - start] = '\0';
-                       }
-                       if (!stop)
-                       {
-                          start = end + 1;
-                       }
+                         end = strchr(start, ':');
+                         if (end == NULL)
+                         {
+                              stop = True;
+                              strncpy(currentpath, start, PATH_MAX);
+                         }
+                         else
+                         {
+                              strncpy(currentpath, start, end - start);
+                              currentpath[end - start] = '\0';
+                         }
+                         if (!stop)
+                              start = end + 1;
 
+                         dir = opendir(currentpath);
+                         if (dir)
+                         {
+                              while ((dirent = readdir(dir)) != NULL)
+                              {
+                                   if (!strncmp(dirent->d_name, buf, strlen(buf)))
+                                   {
+                                        searchhits++;
+                                        if (searchhits == tabhits)
+                                        {
+                                             strcpy(tabbuf, buf);
+                                             strcpy(buf, dirent->d_name);
+                                             pos = strlen(dirent->d_name);
+                                             buf[pos] = '\0';
+                                             found = stop = True;
+                                        }
+                                   }
+                              }
 
-                       dir = opendir(currentpath);
-                       if (dir)
-                       {
-                          while ((dirent = readdir(dir)) != NULL)
-                          {
-                             if (!strncmp(dirent->d_name, buf, strlen(buf)))
-                             {
-                                searchhits++;
-                                if (searchhits == tabhits)
-                                {
-                                   strcpy(tabbuf, buf);
-                                   strcpy(buf, dirent->d_name);
-                                   pos = strlen(dirent->d_name);
-                                   buf[pos] = '\0';
-                                   found = True;
-                                   stop = True;
-                                }
-                             }
-                          }
-
-                          closedir(dir);
-                       }
+                              closedir(dir);
+                         }
                     }
                     while (!stop);
 
                     lastwastab = True;
 
                     if (!found)
-                    {
-                       tabhits = 0; /* start a new round of tabbing */
-                    }
+                         tabhits = 0; /* start a new round of tabbing */
+
                     pos = strlen(buf);
 
                     break;
