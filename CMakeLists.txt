@@ -18,9 +18,6 @@ ADD_CUSTOM_TARGET(uninstall
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
-#set(CMAKE_BUILD_TYPE RELEASE)
-option(WITH_LOGOS "install wmfs logos")
-
 # Project name - wmfs
 set(PROJECT_NAME wmfs)
 project(${PROJECT_NAME} C)
@@ -221,12 +218,6 @@ set(PROJECT_DEFAULT_CONF ${SOURCE_DIR}/wmfsrc)
 
 # installs
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
-if(WITH_LOGOS)
-  set(PROJECT_LOGOS ${PROJECT_DATA_PATH}/logos)
-  set(PROJECT_LOGOS_DIR ${SOURCE_DIR}/logos)
-  install(DIRECTORY ${PROJECT_LOGOS_DIR} DESTINATION ${PROJECT_DATA_PATH})
-  message("Install With logos")
-endif()
 
 if(WMFS_MAN1_FILES)
    install(FILES ${WMFS_MAN1_FILES} DESTINATION ${WMFS_MAN_PATH}/man1)
