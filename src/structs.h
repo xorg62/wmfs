@@ -59,6 +59,7 @@ enum
      net_supported,
      net_wm_name,
      net_client_list,
+     net_frame_extents,
      net_number_of_desktops,
      net_current_desktop,
      net_desktop_names,

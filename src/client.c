@@ -670,7 +670,7 @@ client_size_hints(Client *c)
 void
 client_set_wanted_tag(Client *c)
 {
-     XClassHint xch;
+     XClassHint xch = { 0 };
      int i, j, k;
 
      XGetClassHint(dpy, c->win, &xch);
@@ -696,6 +696,7 @@ client_set_wanted_tag(Client *c)
 void
 client_update_attributes(Client *c)
 {
+     /* For reload use */
      XChangeProperty(dpy, c->win, ATOM("_WMFS_TAG"), XA_CARDINAL, 32,
                      PropModeReplace, (uchar*)&(c->tag), 1);
 

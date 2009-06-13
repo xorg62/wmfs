@@ -50,6 +50,7 @@ ewmh_init_hints(void)
      /* EWMH hints */
      net_atom[net_supported]                  = ATOM("_NET_SUPPORTED");
      net_atom[net_client_list]                = ATOM("_NET_CLIENT_LIST");
+     net_atom[net_frame_extents]              = ATOM("_NET_FRAME_EXTENTS");
      net_atom[net_number_of_desktops]         = ATOM("_NET_NUMBER_OF_DESKTOPS");
      net_atom[net_current_desktop]            = ATOM("_NET_CURRENT_DESKTOP");
      net_atom[net_desktop_names]              = ATOM("_NET_DESKTOP_NAMES");

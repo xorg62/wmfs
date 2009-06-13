@@ -69,7 +69,7 @@ launcher_execute(Launcher launcher)
                         infobar[selscreen].bar->geo.height - 1,
                         infobar[selscreen].bar->bg,
                         infobar[selscreen].bar->fg,
-                        False, False, False);
+                        False, False, conf.border.bar);
 
      barwin_map(bw);
      barwin_refresh_color(bw);
