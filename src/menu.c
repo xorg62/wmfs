@@ -226,7 +226,7 @@ uicb_menu(uicb_t cmd)
      int i, d, u, x, y;
      Window w;
 
-     for(i = 0; i < conf.nmenu + 1; ++i)
+     for(i = 0; i < conf.nmenu + conf.layout_system; ++i)
           if(!strcmp(cmd, conf.menu[i].name))
           {
                if(conf.menu[i].place_at_mouse)
