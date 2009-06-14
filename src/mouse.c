@@ -64,6 +64,12 @@ mouse_move(Client *c)
      xgc.line_width = BORDH;
      gci = XCreateGC(dpy, ROOT, GCFunction|GCSubwindowMode|GCLineWidth, &xgc);
 
+     XDrawRectangle(dpy, ROOT, gci,
+                    c->geo.x,
+                    c->geo.y - (TBARH - BORDH),
+                    c->geo.width,
+                    c->geo.height + (TBARH - BORDH));
+
      XQueryPointer(dpy, ROOT, &dw, &dw, &mx, &my, &dint, &dint, &duint);
 
      do
@@ -122,8 +128,6 @@ mouse_move(Client *c)
                                    (ogeo.y = geo.y - (TBARH - BORDH)),
                                    (ogeo.width = geo.width),
                                    (ogeo.height = geo.height + (TBARH - BORDH)));
-
-                    frame_update(c);
                }
           }
           else if(ev.type == MapRequest
@@ -174,6 +178,12 @@ mouse_resize(Client *c)
      xgc.line_width = BORDH;
      gci = XCreateGC(dpy, ROOT, GCFunction|GCSubwindowMode|GCLineWidth, &xgc);
 
+     XDrawRectangle(dpy, ROOT, gci,
+                    c->geo.x - BORDH / 2,
+                    c->geo.y - (TBARH - (BORDH / 2)),
+                    c->geo.width,
+                    c->geo.height + (TBARH - BORDH));
+
      do
      {
           XMaskEvent(dpy, MouseMask | ExposureMask | SubstructureRedirectMask, &ev);
@@ -217,8 +227,6 @@ mouse_resize(Client *c)
                                    (ogeo.y = geo.y - (TBARH - (BORDH / 2))),
                                    (ogeo.width = geo.width),
                                    (ogeo.height = geo.height + (TBARH - BORDH)));
-
-                    frame_update(c);
 
                     XSync(dpy, False);
                }
