@@ -44,6 +44,8 @@ mouse_move(Client *c)
      Window dw, sw;
      Client *sclient;
      XRectangle geo = c->geo, ogeo;
+     XGCValues xgc;
+     GC gci;
      XEvent ev;
 
      if(c->max || c->lmax || c->state_fullscreen || c->state_dock)
@@ -55,6 +57,12 @@ mouse_move(Client *c)
      if(XGrabPointer(dpy, ROOT, False, MouseMask, GrabModeAsync, GrabModeAsync,
                      None, cursor[CurMove], CurrentTime) != GrabSuccess)
           return;
+
+     /* Set the GC for the rectangle */
+     xgc.function = GXinvert;
+     xgc.subwindow_mode = IncludeInferiors;
+     xgc.line_width = BORDH;
+     gci = XCreateGC(dpy, ROOT, GCFunction|GCSubwindowMode|GCLineWidth, &xgc);
 
      XQueryPointer(dpy, ROOT, &dw, &dw, &mx, &my, &dint, &dint, &duint);
 
@@ -79,7 +87,7 @@ mouse_move(Client *c)
                          client_moveresize(sclient, ogeo, False);
                     }
 
-                    /* To move a client of one tag to another */
+                    /* To move a client from one tag to another */
                     XQueryPointer(dpy, infobar[selscreen].bar->win, &dw, &sw, &mx, &my, &dint, &dint, &duint);
 
                     for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
@@ -96,11 +104,26 @@ mouse_move(Client *c)
                /* To move a client normally, in freelayout */
                else
                {
+                    XDrawRectangle(dpy, ROOT, gci,
+                                   geo.x,
+                                   geo.y - (TBARH - BORDH),
+                                   geo.width,
+                                   geo.height + (TBARH - BORDH));
+
                     geo.x = (ocx + (ev.xmotion.x - mx));
                     geo.y = (ocy + (ev.xmotion.y - my));
 
-                    if(!conf.move_transparent)
-                         client_moveresize(c, geo, False);
+                    /*
+                     * Need to draw 2 times the same rectangle because
+                     * it is draw with the revert color; revert + revert = normal
+                     */
+                    XDrawRectangle(dpy, ROOT, gci,
+                                   (ogeo.x = geo.x),
+                                   (ogeo.y = geo.y - (TBARH - BORDH)),
+                                   (ogeo.width = geo.width),
+                                   (ogeo.height = geo.height + (TBARH - BORDH)));
+
+                    frame_update(c);
                }
           }
           else if(ev.type == MapRequest
@@ -110,9 +133,10 @@ mouse_move(Client *c)
      }
      while(ev.type != ButtonRelease);
 
-     if(!c->tile)
-          client_moveresize(c, geo, False);
-
+     /* One time again to delete all the trace on the window */
+     XDrawRectangle(dpy, ROOT, gci, ogeo.x, ogeo.y, ogeo.width, ogeo.height);
+     client_moveresize(c, geo, False);
+     frame_update(c);
      client_update_attributes(c);
      XUngrabPointer(dpy, CurrentTime);
 
@@ -126,10 +150,12 @@ mouse_move(Client *c)
 void
 mouse_resize(Client *c)
 {
-     XRectangle geo = c->geo;
+     XRectangle geo = c->geo, ogeo = c->geo;
      XEvent ev;
      Window w;
      int d, u, omx, omy;
+     XGCValues xgc;
+     GC gci;
      float mwf = tags[selscreen][seltag[selscreen]].mwfact;
 
      if(c->max || c->lmax
@@ -141,6 +167,13 @@ mouse_resize(Client *c)
      if(XGrabPointer(dpy, ROOT, False, MouseMask, GrabModeAsync, GrabModeAsync,
                      None, cursor[CurResize], CurrentTime) != GrabSuccess)
           return;
+
+     /* Set the GC for the rectangle */
+     xgc.function = GXinvert;
+     xgc.subwindow_mode = IncludeInferiors;
+     xgc.line_width = BORDH;
+     gci = XCreateGC(dpy, ROOT, GCFunction|GCSubwindowMode|GCLineWidth, &xgc);
+
      do
      {
           XMaskEvent(dpy, MouseMask | ExposureMask | SubstructureRedirectMask, &ev);
@@ -165,6 +198,12 @@ mouse_resize(Client *c)
                }
                else if(!c->tile)
                {
+                    XDrawRectangle(dpy, ROOT, gci,
+                                   geo.x - BORDH / 2,
+                                   geo.y - (TBARH - (BORDH / 2)),
+                                   geo.width,
+                                   geo.height + (TBARH - BORDH));
+
                     if((geo.width + ev.xmotion.x_root - omx) > 1)
                          geo.width += ev.xmotion.x_root - omx;
                     if((geo.height + ev.xmotion.y_root - omy) > 1)
@@ -173,8 +212,13 @@ mouse_resize(Client *c)
                     omx = ev.xmotion.x_root;
                     omy = ev.xmotion.y_root;
 
-                    if(!conf.resize_transparent)
-                         client_moveresize(c, geo, True);
+                    XDrawRectangle(dpy, ROOT, gci,
+                                   (ogeo.x = geo.x - BORDH / 2),
+                                   (ogeo.y = geo.y - (TBARH - (BORDH / 2))),
+                                   (ogeo.width = geo.width),
+                                   (ogeo.height = geo.height + (TBARH - BORDH)));
+
+                    frame_update(c);
 
                     XSync(dpy, False);
                }
@@ -186,7 +230,11 @@ mouse_resize(Client *c)
      while(ev.type != ButtonRelease);
 
      if(!c->tile)
+     {
           client_moveresize(c, geo, True);
+          XDrawRectangle(dpy, ROOT, gci, ogeo.x, ogeo.y, ogeo.width, ogeo.height);
+          frame_update(c);
+     }
      else
           tags[selscreen][seltag[selscreen]].layout.func(c->screen);
 

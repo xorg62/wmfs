@@ -42,8 +42,6 @@ cfg_opt_t misc_opts[] =
      CFG_STR("font",                "sans-9",  CFGF_NONE),
      CFG_BOOL("raisefocus",         cfg_false, CFGF_NONE),
      CFG_BOOL("raiseswitch",        cfg_true,  CFGF_NONE),
-     CFG_BOOL("resize_transparent", cfg_false, CFGF_NONE),
-     CFG_BOOL("move_transparent",   cfg_false, CFGF_NONE),
      CFG_END()
 };
 

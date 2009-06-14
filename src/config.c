@@ -128,9 +128,6 @@ conf_misc_section(cfg_t *cfg_m)
      conf.font               = alias_to_str(_strdup(cfg_getstr(cfg_m, "font")));
      conf.raisefocus         = cfg_getbool(cfg_m, "raisefocus");
      conf.raiseswitch        = cfg_getbool(cfg_m, "raiseswitch");
-     conf.resize_transparent = cfg_getbool(cfg_m, "resize_transparent");
-     conf.move_transparent   = cfg_getbool(cfg_m, "move_transparent");
-
 
      return;
 }

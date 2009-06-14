@@ -259,7 +259,6 @@ configureevent(XConfigureRequestEvent *ev)
           CHECK(!c->state_fullscreen);
      }
 
-     /* Configure Request Part {{{ */
      if((c= client_gb_win(ev->window)))
      {
           if(ev->value_mask & CWX)
