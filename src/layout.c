@@ -67,7 +67,7 @@ freelayout(int screen)
      for(c = clients; c; c = c->next)
           if(!ishide(c, selscreen)
              && c->screen == screen_get_sel()
-             && !c->state_fullscreen)
+             && !c->max)
           {
                client_moveresize(c, c->ogeo, True);
                c->tile = c->lmax = False;
