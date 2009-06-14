@@ -244,57 +244,47 @@ clientmessageevent(XClientMessageEvent *ev)
  * \param ev XEvent pointer
 */
 void
-configureevent(XEvent *ev)
+configureevent(XConfigureRequestEvent *ev)
 {
      XWindowChanges wc;
-     XWindowAttributes win_at, ev_at;
-     XRectangle geo = { 0 };
      Client *c;
 
      /* Check part */
-     if((c = client_gb_win(ev->xconfigurerequest.window))
-        || (c = client_gb_win(ev->xconfigure.window)))
+     if((c = client_gb_win(ev->window))
+        || (c = client_gb_win(ev->window)))
      {
           CHECK(!c->tile);
           CHECK(!c->lmax);
+          CHECK(!c->max);
           CHECK(!c->state_fullscreen);
      }
 
      /* Configure Request Part {{{ */
-     wc.x = ev->xconfigurerequest.x;
-     wc.y = ev->xconfigurerequest.y;
-     wc.width = ev->xconfigurerequest.width;
-     wc.height = ev->xconfigurerequest.height;
-     wc.border_width = ev->xconfigurerequest.border_width;
-     wc.sibling = ev->xconfigurerequest.above;
-     wc.stack_mode = ev->xconfigurerequest.detail;
-     XConfigureWindow(dpy, ev->xconfigurerequest.window,
-                      ev->xconfigurerequest.value_mask, &wc);
-     /* }}} */
-
-     /* Configure Notify Part  {{{*/
-     if((c = client_gb_win(ev->xconfigure.window)))
+     if((c= client_gb_win(ev->window)))
      {
-          XGetWindowAttributes(dpy, ev->xconfigure.window, &win_at);
-          XGetWindowAttributes(dpy, ev->xconfigure.event, &ev_at);
+          if(ev->value_mask & CWX)
+               c->geo.x = ev->x + BORDH;
+          if(ev->value_mask & CWY)
+               c->geo.y = ev->y + TBARH;
+          if(ev->value_mask & CWWidth)
+               c->geo.width = ev->width;
+          if(ev->value_mask & CWHeight)
+               c->geo.height = ev->height;
 
-          /* Frame config */
-          if(win_at.width != ev_at.width
-             || win_at.height != ev_at.height)
-          {
-               c->ogeo.width = c->geo.width = geo.width = ev->xconfigure.width;
-               c->ogeo.height = c->geo.height = geo.height = ev->xconfigure.height;
-               frame_moveresize(c, geo);
-               client_moveresize(c, c->geo, False);
-          }
-
-          /* Win config (re-adjust it with the frame) */
-          if(ev->xconfigure.x != BORDH
-             || ev->xconfigure.y != BORDH + TBARH)
-               XMoveWindow(dpy, ev->xconfigure.window, BORDH, TBARH);
+          client_moveresize(c, c->geo, False);
      }
-     /* }}} */
+     else
+     {
+          wc.x            = ev->x;
+          wc.y            = ev->y;
+          wc.width        = ev->width;
+          wc.height       = ev->height;
+          wc.border_width = ev->border_width;
+          wc.sibling      = ev->above;
+          wc.stack_mode   = ev->detail;
 
+          XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
+     }
 
      return;
 }
@@ -545,18 +535,18 @@ getevent(XEvent ev)
 
      switch(ev.type)
      {
-     case ButtonPress:      buttonpress(&ev.xbutton);          break;
-     case ClientMessage:    clientmessageevent(&ev.xclient);   break;
-     case ConfigureRequest: configureevent(&ev);               break;
-     case DestroyNotify:    destroynotify(&ev.xdestroywindow); break;
-     case EnterNotify:      enternotify(&ev.xcrossing);        break;
-     case Expose:           expose(&ev.xexpose);               break;
-     case FocusIn:          focusin(&ev.xfocus);               break;
-     case KeyPress:         keypress(&ev.xkey);                break;
-     case MapRequest:       maprequest(&ev.xmaprequest);       break;
-     case MappingNotify:    mappingnotify(&ev.xmapping);       break;
-     case PropertyNotify:   propertynotify(&ev.xproperty);     break;
-     case UnmapNotify:      unmapnotify(&ev.xunmap);           break;
+     case ButtonPress:      buttonpress(&ev.xbutton);              break;
+     case ClientMessage:    clientmessageevent(&ev.xclient);       break;
+     case ConfigureRequest: configureevent(&ev.xconfigurerequest); break;
+     case DestroyNotify:    destroynotify(&ev.xdestroywindow);     break;
+     case EnterNotify:      enternotify(&ev.xcrossing);            break;
+     case Expose:           expose(&ev.xexpose);                   break;
+     case FocusIn:          focusin(&ev.xfocus);                   break;
+     case KeyPress:         keypress(&ev.xkey);                    break;
+     case MapRequest:       maprequest(&ev.xmaprequest);           break;
+     case MappingNotify:    mappingnotify(&ev.xmapping);           break;
+     case PropertyNotify:   propertynotify(&ev.xproperty);         break;
+     case UnmapNotify:      unmapnotify(&ev.xunmap);               break;
      }
 
      wait(&st);

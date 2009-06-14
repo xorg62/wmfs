@@ -304,7 +304,6 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
                client_map(c);
                XReparentWindow(dpy, c->win, c->frame, BORDH, TBARH);
                client_moveresize(c, c->tmp_geo, False);
-               tags[selscreen][seltag[selscreen]].layout.func(selscreen);
           }
      }
      /* Manage _NET_WM_STATE_DEMANDS_ATTENTION */
@@ -316,6 +315,7 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
                if(c == sel)
                     client_focus(NULL);
      }
+
      return;
 }
 

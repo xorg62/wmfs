@@ -188,7 +188,7 @@ void init_conf(void);
 
 /* event.c */
 void buttonpress(XButtonEvent *ev);
-void configureevent(XEvent *ev);
+void configureevent(XConfigureRequestEvent *ev);
 void clientmessageevent(XClientMessageEvent *ev);
 void destroynotify(XDestroyWindowEvent *ev);
 void enternotify(XCrossingEvent *ev);

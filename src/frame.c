@@ -248,7 +248,7 @@ frame_update(Client *c)
           XClearWindow(dpy, c->bottom);
      }
 
-     if((TBARH - BORDH) && (TBARH + BORDH + 1) > font->height)
+     if(TBARH - BORDH)
           barwin_draw_text(c->titlebar,
                            (c->frame_geo.width / 2) - (textw(c->title) / 2),
                            ((font->height - font->descent) + (TBARH - font->height) / 2),

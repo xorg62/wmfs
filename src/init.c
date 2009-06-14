@@ -51,10 +51,6 @@ init(void)
      ewmh_update_current_tag_prop();
      grabkeys();
 
-     /* Warning about font */
-     if(TBARH + BORDH < font->height)
-          fprintf(stderr, "WMFS Warning: Font too big, can't draw any text in the titlebar.\n");
-
      return;
 }
 
