@@ -32,6 +32,18 @@
 
 #include "wmfs.h"
 
+void
+mouse_dragborder(XRectangle geo, GC g)
+{
+     XDrawRectangle(dpy, ROOT, g,
+                    geo.x,
+                    geo.y - (TBARH - BORDH),
+                    geo.width + BORDH,
+                    geo.height + (TBARH - BORDH));
+
+     return;
+}
+
 /** Move the client with the mouse
  * \param c Client pointer
 */
@@ -64,11 +76,8 @@ mouse_move(Client *c)
      xgc.line_width = BORDH;
      gci = XCreateGC(dpy, ROOT, GCFunction|GCSubwindowMode|GCLineWidth, &xgc);
 
-     XDrawRectangle(dpy, ROOT, gci,
-                    c->geo.x,
-                    c->geo.y - (TBARH - BORDH),
-                    c->geo.width,
-                    c->geo.height + (TBARH - BORDH));
+     if(!c->tile)
+          mouse_dragborder(c->geo, gci);
 
      XQueryPointer(dpy, ROOT, &dw, &dw, &mx, &my, &dint, &dint, &duint);
 
@@ -110,11 +119,7 @@ mouse_move(Client *c)
                /* To move a client normally, in freelayout */
                else
                {
-                    XDrawRectangle(dpy, ROOT, gci,
-                                   geo.x,
-                                   geo.y - (TBARH - BORDH),
-                                   geo.width,
-                                   geo.height + (TBARH - BORDH));
+                    mouse_dragborder(geo, gci);
 
                     geo.x = (ocx + (ev.xmotion.x - mx));
                     geo.y = (ocy + (ev.xmotion.y - my));
@@ -123,11 +128,7 @@ mouse_move(Client *c)
                      * Need to draw 2 times the same rectangle because
                      * it is draw with the revert color; revert + revert = normal
                      */
-                    XDrawRectangle(dpy, ROOT, gci,
-                                   (ogeo.x = geo.x),
-                                   (ogeo.y = geo.y - (TBARH - BORDH)),
-                                   (ogeo.width = geo.width),
-                                   (ogeo.height = geo.height + (TBARH - BORDH)));
+                    mouse_dragborder(geo, gci);
                }
           }
           else if(ev.type == MapRequest
@@ -138,7 +139,8 @@ mouse_move(Client *c)
      while(ev.type != ButtonRelease);
 
      /* One time again to delete all the trace on the window */
-     XDrawRectangle(dpy, ROOT, gci, ogeo.x, ogeo.y, ogeo.width, ogeo.height);
+     if(!c->tile)
+          mouse_dragborder(geo, gci);
      client_moveresize(c, geo, False);
      frame_update(c);
      client_update_attributes(c);
@@ -178,11 +180,8 @@ mouse_resize(Client *c)
      xgc.line_width = BORDH;
      gci = XCreateGC(dpy, ROOT, GCFunction|GCSubwindowMode|GCLineWidth, &xgc);
 
-     XDrawRectangle(dpy, ROOT, gci,
-                    c->geo.x - BORDH / 2,
-                    c->geo.y - (TBARH - (BORDH / 2)),
-                    c->geo.width,
-                    c->geo.height + (TBARH - BORDH));
+     if(!c->tile)
+          mouse_dragborder(c->geo, gci);
 
      do
      {
@@ -208,11 +207,7 @@ mouse_resize(Client *c)
                }
                else if(!c->tile)
                {
-                    XDrawRectangle(dpy, ROOT, gci,
-                                   geo.x - BORDH / 2,
-                                   geo.y - (TBARH - (BORDH / 2)),
-                                   geo.width,
-                                   geo.height + (TBARH - BORDH));
+                    mouse_dragborder(geo, gci);
 
                     if((geo.width + ev.xmotion.x_root - omx) > 1)
                          geo.width += ev.xmotion.x_root - omx;
@@ -222,11 +217,7 @@ mouse_resize(Client *c)
                     omx = ev.xmotion.x_root;
                     omy = ev.xmotion.y_root;
 
-                    XDrawRectangle(dpy, ROOT, gci,
-                                   (ogeo.x = geo.x - BORDH / 2),
-                                   (ogeo.y = geo.y - (TBARH - (BORDH / 2))),
-                                   (ogeo.width = geo.width),
-                                   (ogeo.height = geo.height + (TBARH - BORDH)));
+                    mouse_dragborder((ogeo = geo), gci);
 
                     XSync(dpy, False);
                }
@@ -239,8 +230,9 @@ mouse_resize(Client *c)
 
      if(!c->tile)
      {
+          ogeo.x = c->geo.x; ogeo.y = c->geo.y;
           client_moveresize(c, geo, True);
-          XDrawRectangle(dpy, ROOT, gci, ogeo.x, ogeo.y, ogeo.width, ogeo.height);
+          mouse_dragborder(geo, gci);
           frame_update(c);
      }
      else
