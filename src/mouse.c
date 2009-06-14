@@ -32,14 +32,16 @@
 
 #include "wmfs.h"
 
+/** Draw the border when a client in dragging/resizing with mouse
+ */
 void
 mouse_dragborder(XRectangle geo, GC g)
 {
      XDrawRectangle(dpy, ROOT, g,
-                    geo.x,
-                    geo.y - (TBARH - BORDH),
+                    geo.x - BORDH / 2,
+                    geo.y - (TBARH - (BORDH / 2)),
                     geo.width + BORDH,
-                    geo.height + (TBARH - BORDH));
+                    geo.height + TBARH);
 
      return;
 }
@@ -141,6 +143,7 @@ mouse_move(Client *c)
      /* One time again to delete all the trace on the window */
      if(!c->tile)
           mouse_dragborder(geo, gci);
+
      client_moveresize(c, geo, False);
      frame_update(c);
      client_update_attributes(c);
@@ -230,9 +233,8 @@ mouse_resize(Client *c)
 
      if(!c->tile)
      {
-          ogeo.x = c->geo.x; ogeo.y = c->geo.y;
+          mouse_dragborder(ogeo, gci);
           client_moveresize(c, geo, True);
-          mouse_dragborder(geo, gci);
           frame_update(c);
      }
      else

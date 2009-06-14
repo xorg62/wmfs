@@ -217,6 +217,7 @@ void launcher_execute(Launcher launcher);
 void uicb_launcher(uicb_t);
 
 /* mouse.c */
+void mouse_dragborder(XRectangle geo, GC g);
 void mouse_move(Client *c);
 void mouse_resize(Client *c);
 void mouse_grabbuttons(Client *c, Bool focused);
