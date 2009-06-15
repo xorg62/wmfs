@@ -142,10 +142,11 @@ mouse_move(Client *c)
 
      /* One time again to delete all the trace on the window */
      if(!c->tile)
+     {
           mouse_dragborder(geo, gci);
-
-     client_moveresize(c, geo, False);
-     frame_update(c);
+          client_moveresize(c, geo, False);
+          frame_update(c);
+     }
      client_update_attributes(c);
      XUngrabPointer(dpy, CurrentTime);
 
