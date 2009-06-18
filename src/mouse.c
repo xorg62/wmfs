@@ -72,6 +72,8 @@ mouse_move(Client *c)
                      None, cursor[CurMove], CurrentTime) != GrabSuccess)
           return;
 
+     XGrabServer(dpy);
+
      /* Set the GC for the rectangle */
      xgc.function = GXinvert;
      xgc.subwindow_mode = IncludeInferiors;
@@ -85,7 +87,7 @@ mouse_move(Client *c)
 
      do
      {
-          XMaskEvent(dpy, MouseMask | ExposureMask | SubstructureRedirectMask, &ev);
+          XMaskEvent(dpy, MouseMask | SubstructureRedirectMask, &ev);
           screen_get_sel();
 
           if(ev.type == MotionNotify)
@@ -134,7 +136,6 @@ mouse_move(Client *c)
                }
           }
           else if(ev.type == MapRequest
-                  || ev.type == Expose
                   || ev.type == ConfigureRequest)
                getevent(ev);
      }
@@ -149,6 +150,7 @@ mouse_move(Client *c)
      }
      client_update_attributes(c);
      XUngrabPointer(dpy, CurrentTime);
+     XUngrabServer(dpy);
 
      return;
 }
@@ -178,6 +180,8 @@ mouse_resize(Client *c)
                      None, cursor[CurResize], CurrentTime) != GrabSuccess)
           return;
 
+     XGrabServer(dpy);
+
      /* Set the GC for the rectangle */
      xgc.function = GXinvert;
      xgc.subwindow_mode = IncludeInferiors;
@@ -189,7 +193,7 @@ mouse_resize(Client *c)
 
      do
      {
-          XMaskEvent(dpy, MouseMask | ExposureMask | SubstructureRedirectMask, &ev);
+          XMaskEvent(dpy, MouseMask | SubstructureRedirectMask, &ev);
 
           if(ev.type == MotionNotify)
           {
@@ -226,9 +230,6 @@ mouse_resize(Client *c)
                     XSync(dpy, False);
                }
           }
-          else if(ev.type == Expose)
-               expose(&ev.xexpose);
-
      }
      while(ev.type != ButtonRelease);
 
@@ -243,7 +244,7 @@ mouse_resize(Client *c)
 
      client_update_attributes(c);
      XUngrabPointer(dpy, CurrentTime);
-
+     XUngrabServer(dpy);
 
      return;
 }
