@@ -57,7 +57,7 @@ mouse_move(Client *c)
      uint duint;
      Window dw, sw;
      Client *sclient;
-     XRectangle geo = c->geo, ogeo;
+     XRectangle geo = c->geo;
      XGCValues xgc;
      GC gci;
      XEvent ev;
@@ -101,9 +101,11 @@ mouse_move(Client *c)
                        || (sclient = client_gb_frame(sw))
                        || (sclient = client_gb_titlebar(sw)))
                     {
-                         ogeo = c->geo;
-                         client_moveresize(c, sclient->geo, False);
-                         client_moveresize(sclient, ogeo, False);
+                         if(c != sclient)
+                         {
+                              client_swap(c, sclient);
+                              break;
+                         }
                     }
 
                     /* To move a client from one tag to another */

@@ -236,6 +236,21 @@ spawn(const char *format, ...)
      return;
 }
 
+/** Swap two pointer.
+ *\param x First pointer
+ *\param y Second pointer
+*/
+void
+swap_ptr(void **x, void **y)
+{
+     void *t = *x;
+
+     *x = *y;
+     *y = t;
+
+     return;
+}
+
 /** Execute a sh command
  * \param cmd Command (uicb_t type)
 */

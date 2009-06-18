@@ -664,6 +664,38 @@ client_size_hints(Client *c)
      return;
 }
 
+/** Swap two clients
+ *\param 1 c1 First client
+ *\param 2 c2 Second client
+*/
+void
+client_swap(Client *c1, Client *c2)
+{
+     /* Swap juste the window */
+     swap_ptr((void**)&c1->win, (void**)&c2->win);
+     swap_ptr((void**)&c1->title, (void**)&c2->title);
+
+     /* Re-adapt the window position with its new frame */
+     XReparentWindow(dpy, c1->win, c1->frame, BORDH, TBARH);
+     XReparentWindow(dpy, c2->win, c2->frame, BORDH, TBARH);
+
+     /* Resize the window */
+     XResizeWindow(dpy, c1->win, c2->geo.width, c2->geo.height);
+     XResizeWindow(dpy, c2->win, c1->geo.width, c1->geo.height);
+
+     /* Re-get the client size hints */
+     client_size_hints(c1);
+     client_size_hints(c2);
+
+
+     /* Arrange */
+     arrange(c1->screen);
+     if(c1->screen != c2->screen)
+          arrange(c2->screen);
+
+     return;
+}
+
 /** Set the wanted tag of a client
  *\param c Client pointer
 */
