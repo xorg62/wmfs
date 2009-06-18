@@ -13,6 +13,7 @@ misc
         font        = "dejavu-10"
         raisefocus  = false
         raiseswitch = true
+        pad         = 12
 }
 
 bar

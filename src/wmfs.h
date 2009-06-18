@@ -75,8 +75,8 @@
 #define ATOM(a)      XInternAtom(dpy, (a), False)
 #define INFOBARH     ((conf.bars.height > 0) ? conf.bars.height : (font->height * 1.5))
 #define FHINFOBAR    ((font->height - font->descent) + (INFOBARH - font->height) / 2)
-#define SHADH        1
-#define SHADC        0x000000 /* 'Cause i don't know how darken a color yet */
+#define SHADH        (1)
+#define SHADC        (0x000000) /* 'Cause i don't know how darken a color yet */
 #define BORDH        conf.client.borderheight
 #define TBARH        ((conf.titlebar.height < BORDH) ? BORDH : conf.titlebar.height)
 #define FRAMEW(w)    ((w) + BORDH * 2)
@@ -88,7 +88,7 @@
 #define IFREE(x)     if(x) free(x)
 #define LEN(x)       (sizeof(x) / sizeof((x)[0]))
 #define deb(p)       fprintf(stderr, "debug: %d\n", (p))
-#define PAD          (14)
+#define PAD          conf.pad
 
 /* barwin.c */
 BarWindow *barwin_create(Window parent,

@@ -129,6 +129,16 @@ conf_misc_section(cfg_t *cfg_m)
      conf.raisefocus         = cfg_getbool(cfg_m, "raisefocus");
      conf.raiseswitch        = cfg_getbool(cfg_m, "raiseswitch");
 
+     if(cfg_getint(cfg_m, "pad") > 24 || cfg_getint(cfg_m, "pad") < 1)
+     {
+          fprintf(stderr, "WMFS Configuration: pad value (%ld) incorrect.\n",
+                  cfg_getint(cfg_m, "pad"));
+
+          conf.pad = 12;
+     }
+     else
+          conf.pad = cfg_getint(cfg_m, "pad");
+
      return;
 }
 
