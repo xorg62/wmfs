@@ -153,6 +153,7 @@ mouse_move(Client *c)
      client_update_attributes(c);
      XUngrabPointer(dpy, CurrentTime);
      XUngrabServer(dpy);
+     XFreeGC(dpy, gci);
 
      return;
 }
@@ -204,6 +205,7 @@ mouse_resize(Client *c)
 
           if(ev.type == MotionNotify)
           {
+               /* To resize MWFACT in tile mode */
                if(c->tile && tags[selscreen][seltag[selscreen]].layout.func != grid)
                {
                     if(tags[selscreen][seltag[selscreen]].layout.func == tile)
@@ -220,6 +222,7 @@ mouse_resize(Client *c)
 
                     tags[selscreen][seltag[selscreen]].mwfact = (mwf < 0.05) ? 0.05 : ((mwf > 0.95) ? 0.95 : mwf);
                }
+               /* Free mode */
                else if(!c->tile)
                {
                     mouse_dragborder(geo, gci);
@@ -249,6 +252,7 @@ mouse_resize(Client *c)
      client_update_attributes(c);
      XUngrabPointer(dpy, CurrentTime);
      XUngrabServer(dpy);
+     XFreeGC(dpy, gci);
 
      return;
 }
