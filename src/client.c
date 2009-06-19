@@ -671,7 +671,7 @@ client_size_hints(Client *c)
 void
 client_swap(Client *c1, Client *c2)
 {
-     /* Swap juste the window */
+     /* Swap only the window */
      swap_ptr((void**)&c1->win, (void**)&c2->win);
      swap_ptr((void**)&c1->title, (void**)&c2->title);
 
@@ -692,6 +692,10 @@ client_swap(Client *c1, Client *c2)
      arrange(c1->screen);
      if(c1->screen != c2->screen)
           arrange(c2->screen);
+
+     /* Update frame to draw the right title */
+     frame_update(c1);
+     frame_update(c2);
 
      return;
 }
