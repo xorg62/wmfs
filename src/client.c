@@ -641,16 +641,16 @@ client_size_hints(Client *c)
      /* min */
      if(size.flags & PMinSize)
      {
-          c->minw = size.min_width;
-          c->minh = size.min_height;
+          c->minw = (size.min_width ? size.min_width : 1);
+          c->minh = (size.min_height ? size.min_height: 1);
      }
      else if(size.flags & PBaseSize)
      {
-          c->minw = size.base_width;
-          c->minh = size.base_height;
+          c->minw = (size.base_width ? size.base_width : 1);
+          c->minh = (size.base_height ? size.base_height : 1);
      }
      else
-          c->minw = c->minh = 0;
+          c->minw = c->minh = 1;
 
      /* aspect */
      if(size.flags & PAspect)
