@@ -257,5 +257,5 @@ swap_ptr(void **x, void **y)
 void
 uicb_spawn(uicb_t cmd)
 {
-     spawn(cmd);
+     spawn("%s", cmd);
 }

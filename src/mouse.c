@@ -180,7 +180,6 @@ mouse_resize(Client *c)
         || c->state_fullscreen || c->state_dock)
           return;
 
-
      XQueryPointer(dpy, ROOT, &w, &w, &omx, &omy, &d, &d, (uint *)&u);
 
      if((omx - c->geo.x) < (c->geo.width / 2))
