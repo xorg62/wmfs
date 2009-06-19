@@ -165,6 +165,8 @@ void
 mouse_resize(Client *c)
 {
      XRectangle geo = c->geo, ogeo = c->geo;
+     int ocx = c->geo.x;
+     int ocy = c->geo.y;
      XEvent ev;
      Window w;
      int d, u, omx, omy;
@@ -191,7 +193,10 @@ mouse_resize(Client *c)
      gci = XCreateGC(dpy, ROOT, GCFunction|GCSubwindowMode|GCLineWidth, &xgc);
 
      if(!c->tile)
+     {
+          XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
           mouse_dragborder(c->geo, gci);
+     }
 
      do
      {
@@ -219,13 +224,10 @@ mouse_resize(Client *c)
                {
                     mouse_dragborder(geo, gci);
 
-                    if((geo.width + ev.xmotion.x_root - omx) > 1)
-                         geo.width += ev.xmotion.x_root - omx;
-                    if((geo.height + ev.xmotion.y_root - omy) > 1)
-                         geo.height += ev.xmotion.y_root - omy;
+                    geo.width = ((ev.xmotion.x - ocx <= 1) ? 1 : ev.xmotion.x - ocx);
+                    geo.height = ((ev.xmotion.y - ocy <= 1) ? 1 : ev.xmotion.y - ocy);
 
-                    omx = ev.xmotion.x_root;
-                    omy = ev.xmotion.y_root;
+                    client_geo_hints(&geo, c);
 
                     mouse_dragborder((ogeo = geo), gci);
 

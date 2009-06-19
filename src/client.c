@@ -486,6 +486,55 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      return c;
 }
 
+/** Set a geometry with the client size hints
+ *\param geo Geometry pointer
+ *\param c Client pointer
+*/
+void
+client_geo_hints(XRectangle *geo, Client *c)
+{
+     /* minimum possible */
+     if(geo->width < 1)
+          geo->width = 1;
+     if(geo->height < 1)
+          geo->height = 1;
+
+     /* base */
+     geo->width -= c->basew;
+     geo->height -= c->baseh;
+
+     /* aspect */
+     if(c->minay > 0 && c->maxay > 0
+        && c->minax > 0 && c->maxax > 0)
+     {
+          if(geo->width * c->maxay > geo->height * c->maxax)
+               geo->width = geo->height * c->maxax / c->maxay;
+          else if(geo->width * c->minay < geo->height * c->minax)
+               geo->height = geo->width * c->minay / c->minax;
+     }
+
+     /* incremental */
+     if(c->incw)
+          geo->width -= geo->width % c->incw;
+     if(c->inch)
+          geo->height -= geo->height % c->inch;
+
+     /* base dimension */
+     geo->width += c->basew;
+     geo->height += c->baseh;
+
+     if(c->minw > 0 && geo->width < c->minw)
+          geo->width = c->minw;
+     if(c->minh > 0 && geo->height < c->minh)
+          geo->height = c->minh;
+     if(c->maxw > 0 && geo->width > c->maxw)
+          geo->width = c->maxw;
+     if(c->maxh > 0 && geo->height > c->maxh)
+          geo->height = c->maxh;
+
+     return;
+}
+
 /** Move and Resize a client
  * \param c Client pointer
  * \param geo Coordinate info for the future size
@@ -498,56 +547,12 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
      if(!c || c->state_dock)
           return;
 
-     /* Resize hints {{{ */
      if(r)
-     {
-          /* minimum possible */
-          if(geo.width < 1)
-               geo.width = 1;
-          if(geo.height < 1)
-               geo.height = 1;
-
-          /* base */
-          geo.width -= c->basew;
-          geo.height -= c->baseh;
-
-          /* aspect */
-          if(c->minay > 0 && c->maxay > 0
-              && c->minax > 0 && c->maxax > 0)
-          {
-               if(geo.width * c->maxay > geo.height * c->maxax)
-                    geo.width = geo.height * c->maxax / c->maxay;
-               else if(geo.width * c->minay < geo.height * c->minax)
-                    geo.height = geo.width * c->minay / c->minax;
-          }
-
-          /* incremental */
-          if(c->incw)
-               geo.width -= geo.width % c->incw;
-          if(c->inch)
-               geo.height -= geo.height % c->inch;
-
-          /* base dimension */
-          geo.width += c->basew;
-          geo.height += c->baseh;
-
-          if(c->minw > 0 && geo.width < c->minw)
-               geo.width = c->minw;
-          if(c->minh > 0 && geo.height < c->minh)
-               geo.height = c->minh;
-          if(c->maxw > 0 && geo.width > c->maxw)
-               geo.width = c->maxw;
-          if(c->maxh > 0 && geo.height > c->maxh)
-               geo.height = c->maxh;
-          if(geo.width <= 0 || geo.height <= 0)
-               return;
-     }
-     /* }}} */
+          client_geo_hints(&geo, c);
 
      c->max = False;
 
-     if(tags[selscreen][seltag[selscreen]].layout.func == freelayout
-        || c->free);
+     if(r && (tags[selscreen][seltag[selscreen]].layout.func == freelayout || c->free));
      c->geo = c->ogeo = geo;
 
      c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
@@ -693,9 +698,9 @@ client_swap(Client *c1, Client *c2)
      if(c1->screen != c2->screen)
           arrange(c2->screen);
 
-     /* Update frame to draw the right title */
-     frame_update(c1);
-     frame_update(c2);
+     /* Get the new client name */
+     client_get_name(c1);
+     client_get_name(c2);
 
      return;
 }
