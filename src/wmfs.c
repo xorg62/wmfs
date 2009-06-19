@@ -103,7 +103,6 @@ quit(void)
      XFreeCursor(dpy, cursor[CurNormal]);
      XFreeCursor(dpy, cursor[CurMove]);
      XFreeCursor(dpy, cursor[CurResize]);
-     XFreeGC(dpy, gc);
      XFreeGC(dpy, gc_stipple);
      infobar_destroy();
 
