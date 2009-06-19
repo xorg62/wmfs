@@ -47,10 +47,12 @@ typedef unsigned short ushort;
 typedef unsigned char  uchar;
 
 /* Enum */
-enum { CurNormal, CurResize, CurMove, CurLast };
+enum { CurNormal, CurResize, CurRightResize, CurLeftResize, CurMove, CurLast };
+
 /* Infobar position */
 enum { IB_Hide = 0, IB_Bottom = 1, IB_Top = 2 };
-typedef enum { Top, Bottom, Right, Left, Center, PositionLast } Position;
+
+typedef enum { Right, Left, Top, Bottom, Center, PositionLast } Position;
 
 
 /* Ewmh hints list */
@@ -147,7 +149,7 @@ struct Client
      Window *button;
      int button_last_x;
      BarWindow *titlebar;
-     Window frame, resize;
+     Window frame, resize[2];
      /* Border */
      Window right, left, top, bottom;
      /* }}} */

@@ -100,13 +100,19 @@ frame_create(Client *c)
      at.event_mask &= ~(EnterWindowMask | LeaveWindowMask); /* <- Delete useless mask */
 
      /* Create resize area */
-     at.cursor = cursor[CurResize];
-     CWIN(c->resize, c->frame,
+     at.cursor = cursor[CurRightResize];
+     CWIN(c->resize[Right], c->frame,
           c->frame_geo.width - RESHW,
           c->frame_geo.height - RESHW,
-          RESHW,
-          RESHW, 0,
-          CWEventMask|CWBackPixel|CWCursor,
+          RESHW, RESHW, 0,
+          CWEventMask | CWBackPixel | CWCursor,
+          c->colors.resizecorner, &at);
+
+     at.cursor = cursor[CurLeftResize];
+     CWIN(c->resize[Left], c->frame,
+          0, c->frame_geo.height - RESHW,
+          RESHW, RESHW, 0,
+          CWEventMask | CWBackPixel | CWCursor,
           c->colors.resizecorner, &at);
 
      /* Border (for shadow) */
@@ -170,7 +176,8 @@ frame_moveresize(Client *c, XRectangle geo)
           barwin_resize(c->titlebar, c->frame_geo.width, TBARH);
 
      /* Resize area */
-     XMoveWindow(dpy, c->resize, c->frame_geo.width - RESHW, c->frame_geo.height - RESHW);
+     XMoveWindow(dpy, c->resize[Right], c->frame_geo.width - RESHW, c->frame_geo.height - RESHW);
+     XMoveWindow(dpy, c->resize[Left], 0, c->frame_geo.height - RESHW);
 
      /* Border */
      if(conf.client.border_shadow)
@@ -230,9 +237,11 @@ frame_update(Client *c)
      }
 
      XSetWindowBackground(dpy, c->frame, c->colors.frame);
-     XSetWindowBackground(dpy, c->resize, c->colors.resizecorner);
+     XSetWindowBackground(dpy, c->resize[Right], c->colors.resizecorner);
+     XSetWindowBackground(dpy, c->resize[Left], c->colors.resizecorner);
      XClearWindow(dpy, c->frame);
-     XClearWindow(dpy, c->resize);
+     XClearWindow(dpy, c->resize[Right]);
+     XClearWindow(dpy, c->resize[Left]);
 
 
      if(conf.client.border_shadow)

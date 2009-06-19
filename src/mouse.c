@@ -168,6 +168,7 @@ mouse_resize(Client *c)
      XRectangle geo = c->geo, ogeo = c->geo;
      int ocx = c->geo.x;
      int ocy = c->geo.y;
+     Position pos = Right;
      XEvent ev;
      Window w;
      int d, u, omx, omy;
@@ -179,10 +180,15 @@ mouse_resize(Client *c)
         || c->state_fullscreen || c->state_dock)
           return;
 
+
      XQueryPointer(dpy, ROOT, &w, &w, &omx, &omy, &d, &d, (uint *)&u);
 
-     if(XGrabPointer(dpy, ROOT, False, MouseMask, GrabModeAsync, GrabModeAsync,
-                     None, cursor[CurResize], CurrentTime) != GrabSuccess)
+     if((omx - c->geo.x) < (c->geo.width / 2))
+          pos = Left;
+
+     if(XGrabPointer(dpy, ROOT, False, MouseMask, GrabModeAsync, GrabModeAsync, None,
+                     cursor[((c->tile) ? CurResize : ((pos == Right) ? CurRightResize : CurLeftResize))],
+                     CurrentTime) != GrabSuccess)
           return;
 
      XGrabServer(dpy);
@@ -195,7 +201,10 @@ mouse_resize(Client *c)
 
      if(!c->tile)
      {
-          XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
+          if(pos == Right)
+               XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
+          else
+               XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, 0, c->geo.height);
           mouse_dragborder(c->geo, gci);
      }
 
@@ -227,8 +236,19 @@ mouse_resize(Client *c)
                {
                     mouse_dragborder(geo, gci);
 
-                    geo.width = ((ev.xmotion.x - ocx <= 1) ? 1 : ev.xmotion.x - ocx);
-                    geo.height = ((ev.xmotion.y - ocy <= 1) ? 1 : ev.xmotion.y - ocy);
+                    if(pos == Right)
+                    {
+                         geo.width = ((ev.xmotion.x - ocx < c->minw) ? c->minw : ev.xmotion.x - ocx);
+                         geo.height = ((ev.xmotion.y - ocy < c->minh) ? c->minh : ev.xmotion.y - ocy);
+                    }
+                    else
+                    {
+                         geo.x      = ocx - (ocx - ev.xmotion.x);
+                         geo.width  = ((c->geo.width + (ocx - geo.x) < c->minw)
+                                       ? c->minw && (geo.x = (c->geo.x + c->geo.width) - c->minw)
+                                       : c->geo.width + (ocx - geo.x));
+                         geo.height = ((ev.xmotion.y - ocy <= 1) ? 1 : ev.xmotion.y - ocy);
+                    }
 
                     client_geo_hints(&geo, c);
 

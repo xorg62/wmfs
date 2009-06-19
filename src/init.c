@@ -99,9 +99,11 @@ init_gc(void)
 void
 init_cursor(void)
 {
-     cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
-     cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
-     cursor[CurMove]   = XCreateFontCursor(dpy, XC_fleur);
+     cursor[CurNormal]     = XCreateFontCursor(dpy, XC_left_ptr);
+     cursor[CurResize]     = XCreateFontCursor(dpy, XC_sizing);
+     cursor[CurRightResize] = XCreateFontCursor(dpy, XC_lr_angle);
+     cursor[CurLeftResize] = XCreateFontCursor(dpy, XC_ll_angle);
+     cursor[CurMove]       = XCreateFontCursor(dpy, XC_fleur);
 
      return;
 }

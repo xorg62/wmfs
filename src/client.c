@@ -228,7 +228,7 @@ client_focus(Client *c)
      {
           Client *c;
 
-          for(c = clients; c && c->resize != w; c = c->next);
+          for(c = clients; (c && c->resize[Right] != w) && (c && c->resize[Left] != w); c = c->next);
 
           return c;
      }

@@ -82,7 +82,7 @@
 #define FRAMEW(w)    ((w) + BORDH * 2)
 #define FRAMEH(h)    ((h) + (BORDH  + TBARH))
 #define ROUND(x)     (float)((x > 0) ? x + (float)0.5 : x - (float)0.5)
-#define RESHW        (5 * BORDH)
+#define RESHW        (6 * BORDH)
 #define BUTTONWH     (TBARH / 2)
 #define CHECK(x)     if(!(x)) return
 #define IFREE(x)     if(x) free(x)

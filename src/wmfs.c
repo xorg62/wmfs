@@ -100,9 +100,8 @@ quit(void)
      IFREE(seltag);
 
      XftFontClose(dpy, font);
-     XFreeCursor(dpy, cursor[CurNormal]);
-     XFreeCursor(dpy, cursor[CurMove]);
-     XFreeCursor(dpy, cursor[CurResize]);
+     for(i = 0; i < CurLast; ++i)
+          XFreeCursor(dpy, cursor[i]);
      XFreeGC(dpy, gc_stipple);
      infobar_destroy();
 
