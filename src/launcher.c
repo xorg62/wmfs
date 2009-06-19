@@ -53,7 +53,6 @@ launcher_execute(Launcher launcher)
      Bool lastwastab = False;
      int tabhits = 0;
      int searchhits = 0;
-
      BarWindow *bw;
      Bool my_guitar_gently_wheeps = True;
 
@@ -67,16 +66,22 @@ launcher_execute(Launcher launcher)
 
      bw = barwin_create(infobar[selscreen].bar->win, x, 0,
                         infobar[selscreen].bar->geo.width - x,
-                        infobar[selscreen].bar->geo.height - 1,
+                        infobar[selscreen].bar->geo.height,
                         infobar[selscreen].bar->bg,
                         infobar[selscreen].bar->fg,
                         False, False, conf.border.bar);
 
      barwin_map(bw);
      barwin_refresh_color(bw);
+
+     /* First draw of the cursor */
+     XSetForeground(dpy, gc, getcolor(infobar[selscreen].bar->fg));
+     XDrawLine(dpy, bw->dr, gc, textw(launcher.prompt) + textw(" "),
+               2, textw(launcher.prompt) + textw(" "), INFOBARH - 2);
+
      barwin_refresh(bw);
 
-     barwin_draw_text(bw, 1, font->height, launcher.prompt);
+     barwin_draw_text(bw, 1, FHINFOBAR, launcher.prompt);
 
      while(my_guitar_gently_wheeps)
      {
@@ -176,8 +181,15 @@ launcher_execute(Launcher launcher)
                }
 
                barwin_refresh_color(bw);
-               barwin_draw_text(bw, 1, font->height, launcher.prompt);
-               barwin_draw_text(bw, 1 + textw(launcher.prompt) + textw(" "), font->height, buf);
+
+               /* Update cursor position */
+               XSetForeground(dpy, gc, getcolor(infobar[selscreen].bar->fg));
+               XDrawLine(dpy, bw->dr, gc,
+                         1 + textw(launcher.prompt) + textw(" ") + textw(buf), 2,
+                         1 + textw(launcher.prompt) + textw(" ") + textw(buf), INFOBARH - 2);
+
+               barwin_draw_text(bw, 1, FHINFOBAR, launcher.prompt);
+               barwin_draw_text(bw, 1 + textw(launcher.prompt) + textw(" "), FHINFOBAR, buf);
                barwin_refresh(bw);
           }
           else
