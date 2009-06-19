@@ -242,7 +242,7 @@ mouse_resize(Client *c)
                     }
                     else
                     {
-                         geo.x      = ocx - (ocx - ev.xmotion.x);
+                         geo.x  = (geo.width != c->maxw) ? ocx - (ocx - ev.xmotion.x) : geo.x;
                          geo.width  = ((c->geo.width + (ocx - geo.x) < c->minw)
                                        ? c->minw && (geo.x = (c->geo.x + c->geo.width) - c->minw)
                                        : c->geo.width + (ocx - geo.x));

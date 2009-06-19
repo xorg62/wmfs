@@ -32,7 +32,8 @@
 
 #include "wmfs.h"
 #include <dirent.h>
-#include <limits.h>
+
+#define PATH_MAX 4095
 
 void
 launcher_execute(Launcher launcher)

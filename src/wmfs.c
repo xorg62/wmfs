@@ -138,6 +138,7 @@ quit(void)
      /* }}} */
 
      XSync(dpy, False);
+     XCloseDisplay(dpy);
 
      return;
 }
@@ -238,7 +239,6 @@ void
 uicb_reload(uicb_t cmd)
 {
      quit();
-     XCloseDisplay(dpy);
 
      for(; argv_global[0] && argv_global[0] == ' '; ++argv_global);
 
@@ -326,16 +326,11 @@ set_statustext(char *str)
 }
 
 /** Signal handle function
- * \param signum Signal number
 */
 void
-handle_signal(int signum)
+signal_handle(int sig)
 {
-     if(signum == SIGTERM || signum == SIGINT)
-     {
-          quit();
-          exit(EXIT_FAILURE);
-     }
+     exiting = True;
 
      return;
 }
@@ -349,7 +344,6 @@ int
 main(int argc, char **argv)
 {
      int i;
-     struct sigaction sig;
 
      argv_global = _strdup(argv[0]);
 
@@ -411,12 +405,9 @@ main(int argc, char **argv)
           exit(EXIT_FAILURE);
      }
 
-     /* Set signal handle */
-     sig.sa_handler = handle_signal;
-     sig.sa_flags   = 0;
-     memset(&sig.sa_mask, 0, sizeof(sigset_t));
-     sigaction(SIGTERM, &sig, NULL);
-     sigaction(SIGINT, &sig, NULL);
+     /* Set signal handler */
+     (void)signal(SIGTERM, &signal_handle);
+     (void)signal(SIGINT, &signal_handle);
 
      /* Check if an other WM is already running; set the error handler */
      XSetErrorHandler(errorhandler);
@@ -426,8 +417,6 @@ main(int argc, char **argv)
      scan();
      mainloop();
      quit();
-
-     XCloseDisplay(dpy);
 
      return 0;
 }

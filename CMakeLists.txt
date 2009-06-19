@@ -50,7 +50,7 @@ add_executable(wmfs ${wmfs_src})
 set(VERSION "0.1rc4 (On The Run)")
 
 # FLAGS
-set(CFLAGS "-g -Wall")
+set(CFLAGS "-g -Wall -ansi")
 set(CMAKE_C_FLAGS ${CFLAGS})
 set(LDFLAGS "-L /usr/local/lib")
 set_target_properties(wmfs PROPERTIES LINK_FLAGS ${LDFLAGS})
