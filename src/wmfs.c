@@ -334,7 +334,6 @@ set_statustext(char *str)
 void
 signal_handle(int sig)
 {
-     printf("pwet\n");
      exiting = True;
      quit();
      exit(EXIT_SUCCESS);

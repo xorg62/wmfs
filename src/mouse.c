@@ -118,6 +118,8 @@ mouse_move(Client *c)
                               c->tag = i;
                               tags[c->screen][c->tag].request_update = True;
                               arrange(oscreen);
+                              if(oscreen != c->screen)
+                                   arrange(c->screen);
                          }
                }
 
