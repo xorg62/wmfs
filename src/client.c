@@ -551,8 +551,6 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
           client_geo_hints(&geo, c);
 
      c->max = False;
-
-     if(r && (tags[selscreen][seltag[selscreen]].layout.func == freelayout || c->free));
      c->geo = c->ogeo = geo;
 
      c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
@@ -676,27 +674,16 @@ client_size_hints(Client *c)
 void
 client_swap(Client *c1, Client *c2)
 {
-     /* Swap only the window */
+     /* Swap only the windows */
      swap_ptr((void**)&c1->win, (void**)&c2->win);
-     swap_ptr((void**)&c1->title, (void**)&c2->title);
 
-     /* Re-adapt the window position with its new frame */
+     /* Re-adapt the windows position with its new frame */
      XReparentWindow(dpy, c1->win, c1->frame, BORDH, TBARH);
      XReparentWindow(dpy, c2->win, c2->frame, BORDH, TBARH);
 
-     /* Resize the window */
-     XResizeWindow(dpy, c1->win, c2->geo.width, c2->geo.height);
-     XResizeWindow(dpy, c2->win, c1->geo.width, c1->geo.height);
-
-     /* Re-get the client size hints */
-     client_size_hints(c1);
-     client_size_hints(c2);
-
-
-     /* Arrange */
-     arrange(c1->screen);
-     if(c1->screen != c2->screen)
-          arrange(c2->screen);
+     /* Resize the windows */
+     client_moveresize(c1, c1->geo, False);
+     client_moveresize(c2, c2->geo, False);
 
      /* Get the new client name */
      client_get_name(c1);
