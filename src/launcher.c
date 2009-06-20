@@ -33,7 +33,7 @@
 #include "wmfs.h"
 #include <dirent.h>
 
-#define PATH_MAX 4095
+#define PATHMAX 4095
 
 void
 launcher_execute(Launcher launcher)
@@ -49,7 +49,7 @@ launcher_execute(Launcher launcher)
      char *searchpath;
      char *start, *end;
      Bool stop, found;
-     char currentpath[PATH_MAX];
+     char currentpath[PATHMAX];
      Bool lastwastab = False;
      int tabhits = 0;
      int searchhits = 0;
@@ -125,7 +125,7 @@ launcher_execute(Launcher launcher)
                          if (end == NULL)
                          {
                               stop = True;
-                              strncpy(currentpath, start, PATH_MAX);
+                              strncpy(currentpath, start, PATHMAX);
                          }
                          else
                          {
