@@ -72,7 +72,8 @@ mouse_move(Client *c)
                      None, cursor[CurMove], CurrentTime) != GrabSuccess)
           return;
 
-     XGrabServer(dpy);
+     if(!c->tile)
+          XGrabServer(dpy);
 
      /* Set the GC for the rectangle */
      xgc.function = GXinvert;
@@ -150,10 +151,10 @@ mouse_move(Client *c)
           mouse_dragborder(geo, gci);
           client_moveresize(c, geo, False);
           frame_update(c);
+          XUngrabServer(dpy);
      }
      client_update_attributes(c);
      XUngrabPointer(dpy, CurrentTime);
-     XUngrabServer(dpy);
      XFreeGC(dpy, gci);
 
      return;
@@ -167,8 +168,6 @@ void
 mouse_resize(Client *c)
 {
      XRectangle geo = c->geo, ogeo = c->geo;
-     int ocx = c->geo.x;
-     int ocy = c->geo.y;
      Position pos = Right;
      XEvent ev;
      Window w;
@@ -191,7 +190,8 @@ mouse_resize(Client *c)
                      CurrentTime) != GrabSuccess)
           return;
 
-     XGrabServer(dpy);
+     if(!c->tile)
+          XGrabServer(dpy);
 
      /* Set the GC for the rectangle */
      xgc.function = GXinvert;
@@ -238,16 +238,16 @@ mouse_resize(Client *c)
 
                     if(pos == Right)
                     {
-                         geo.width = ((ev.xmotion.x - ocx < c->minw) ? c->minw : ev.xmotion.x - ocx);
-                         geo.height = ((ev.xmotion.y - ocy < c->minh) ? c->minh : ev.xmotion.y - ocy);
+                         geo.width = ((ev.xmotion.x - c->geo.x < c->minw) ? c->minw : ev.xmotion.x - c->geo.x);
+                         geo.height = ((ev.xmotion.y - c->geo.y < c->minh) ? c->minh : ev.xmotion.y - c->geo.y);
                     }
                     else
                     {
-                         geo.x  = (geo.width != c->maxw) ? ocx - (ocx - ev.xmotion.x) : geo.x;
-                         geo.width  = ((c->geo.width + (ocx - geo.x) < c->minw)
+                         geo.x = (geo.width != c->maxw) ? c->geo.x - (c->geo.x - ev.xmotion.x) : geo.x;
+                         geo.width  = ((c->geo.width + (c->geo.x - geo.x) < c->minw)
                                        ? c->minw && (geo.x = (c->geo.x + c->geo.width) - c->minw)
-                                       : c->geo.width + (ocx - geo.x));
-                         geo.height = ((ev.xmotion.y - ocy <= 1) ? 1 : ev.xmotion.y - ocy);
+                                       : c->geo.width + (c->geo.x - geo.x));
+                         geo.height = ((ev.xmotion.y - c->geo.y <= 1) ? 1 : ev.xmotion.y - c->geo.y);
                     }
 
                     client_geo_hints(&geo, c);
@@ -265,13 +265,13 @@ mouse_resize(Client *c)
           mouse_dragborder(ogeo, gci);
           client_moveresize(c, geo, True);
           frame_update(c);
+          XUngrabServer(dpy);
      }
      else
           tags[selscreen][seltag[selscreen]].layout.func(c->screen);
 
      client_update_attributes(c);
      XUngrabPointer(dpy, CurrentTime);
-     XUngrabServer(dpy);
      XFreeGC(dpy, gci);
 
      return;

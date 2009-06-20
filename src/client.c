@@ -674,12 +674,20 @@ client_size_hints(Client *c)
 void
 client_swap(Client *c1, Client *c2)
 {
+     /* Check if no one of these clients are free */
+     CHECK(!c1->free);
+     CHECK(!c2->free);
+
      /* Swap only the windows */
      swap_ptr((void**)&c1->win, (void**)&c2->win);
 
      /* Re-adapt the windows position with its new frame */
      XReparentWindow(dpy, c1->win, c1->frame, BORDH, TBARH);
      XReparentWindow(dpy, c2->win, c2->frame, BORDH, TBARH);
+
+     /* Re-set size hints properties */
+     client_size_hints(c1);
+     client_size_hints(c2);
 
      /* Resize the windows */
      client_moveresize(c1, c1->geo, False);
