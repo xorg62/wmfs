@@ -351,7 +351,6 @@ Client *sel;
 func_name_list_t *func_list;
 func_name_list_t *layout_list;
 uint numlockmask;
-int layout_update_request[2];
 
 #endif /* WMFS_H */
 
