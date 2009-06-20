@@ -725,7 +725,11 @@ client_set_wanted_tag(Client *c)
                          {
                               c->screen = i;
                               c->tag = j;
-                              arrange(i);
+
+                              if(c->tag != seltag[selscreen])
+                                   tags[c->screen][c->tag].request_update = True;
+
+                              tags[c->screen][c->tag].layout.func(c->screen);
                          }
 
      return;
@@ -812,7 +816,13 @@ client_unmanage(Client *c)
      XSync(dpy, False);
      XUngrabServer(dpy);
      ewmh_get_client_list();
-     arrange(c->screen);
+
+     /* Arrange */
+     if(c->tag != seltag[selscreen])
+          tags[c->screen][c->tag].request_update = True;
+     else
+          tags[c->screen][c->tag].layout.func(c->screen);
+
      XFree(c->title);
 
      /* To focus the previous client */

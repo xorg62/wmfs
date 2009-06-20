@@ -224,6 +224,10 @@ scan(void)
                     client_update_attributes(c);
                }
 
+     /* Set update layout request */
+     for(c = clients; c; c = c->next)
+          tags[c->screen][c->tag].request_update = True;
+
      for(i = 0; i < screen_count(); ++i)
           arrange(i);
 
@@ -330,7 +334,10 @@ set_statustext(char *str)
 void
 signal_handle(int sig)
 {
+     printf("pwet\n");
      exiting = True;
+     quit();
+     exit(EXIT_SUCCESS);
 
      return;
 }

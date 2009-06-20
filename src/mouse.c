@@ -116,9 +116,8 @@ mouse_move(Client *c)
                          {
                               c->screen = selscreen;
                               c->tag = i;
-                              arrange(selscreen);
-                              if(c->screen != oscreen)
-                                   arrange(oscreen);
+                              tags[c->screen][c->tag].request_update = True;
+                              arrange(oscreen);
                          }
                }
 

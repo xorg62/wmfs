@@ -334,7 +334,7 @@ conf_tag_section(cfg_t *cfg_t)
       * MAXTAG (32) print an error and create only one.
       */
      Tag default_tag = { "WMFS", NULL, 0,
-                         0.50, 1, False, IB_Top,
+                         0.50, 1, False, False, IB_Top,
                          layout_name_to_struct(conf.layout, "tile_right", conf.nlayout, layout_list) };
 
      conf.tag_round               = cfg_getbool(cfg_t, "tag_round");

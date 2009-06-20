@@ -214,6 +214,7 @@ typedef struct
      float mwfact;
      int nmaster;
      Bool resizehint;
+     Bool request_update;
      int barpos;
      Layout layout;
 } Tag;

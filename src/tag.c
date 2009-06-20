@@ -68,7 +68,23 @@ tag_set(int tag)
      if(tags[selscreen][otag].barpos != tags[selscreen][seltag[selscreen]].barpos)
           infobar_set_position(tags[selscreen][seltag[selscreen]].barpos);
 
-     arrange(selscreen);
+     /* arrange(selscreen); */
+     for(c = clients; c; c = c->next)
+          if(c->screen == selscreen)
+          {
+               if(!ishide(c, selscreen))
+                    client_unhide(c);
+               else
+                    client_hide(c);
+          }
+
+     infobar_draw(selscreen);
+
+     if(tags[selscreen][tag].request_update)
+     {
+          tags[selscreen][seltag[selscreen]].layout.func(selscreen);
+          tags[selscreen][tag].request_update = False;
+     }
 
      /* To focus the first client in the new tag */
      for(c = clients; c; c = c->next)
@@ -103,6 +119,8 @@ tag_transfert(Client *c, int tag)
           client_focus(NULL);
 
      client_update_attributes(c);
+
+     tags[c->screen][tag].request_update = True;
 
      return;
 }
