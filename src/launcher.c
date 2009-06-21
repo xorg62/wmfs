@@ -77,7 +77,7 @@ launcher_execute(Launcher launcher)
      /* First draw of the cursor */
      XSetForeground(dpy, gc, getcolor(infobar[selscreen].bar->fg));
      XDrawLine(dpy, bw->dr, gc, textw(launcher.prompt) + textw(" "),
-               2, textw(launcher.prompt) + textw(" "), INFOBARH - 2);
+               2, textw(launcher.prompt) + textw(" "), INFOBARH - 4);
 
      barwin_refresh(bw);
 
@@ -97,6 +97,7 @@ launcher_execute(Launcher launcher)
                switch(ks)
                {
                case XK_Return:
+               case XK_KP_Enter:
                     spawn("%s %s", launcher.command, buf);
                     my_guitar_gently_wheeps = 0;
                     break;
@@ -186,7 +187,7 @@ launcher_execute(Launcher launcher)
                XSetForeground(dpy, gc, getcolor(infobar[selscreen].bar->fg));
                XDrawLine(dpy, bw->dr, gc,
                          1 + textw(launcher.prompt) + textw(" ") + textw(buf), 2,
-                         1 + textw(launcher.prompt) + textw(" ") + textw(buf), INFOBARH - 2);
+                         1 + textw(launcher.prompt) + textw(" ") + textw(buf), INFOBARH - 4);
 
                barwin_draw_text(bw, 1, FHINFOBAR, launcher.prompt);
                barwin_draw_text(bw, 1 + textw(launcher.prompt) + textw(" "), FHINFOBAR, buf);
