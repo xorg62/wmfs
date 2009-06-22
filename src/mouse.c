@@ -247,7 +247,7 @@ mouse_resize(Client *c)
                          geo.width  = ((c->geo.width + (c->geo.x - geo.x) < c->minw)
                                        ? c->minw && (geo.x = (c->geo.x + c->geo.width) - c->minw)
                                        : c->geo.width + (c->geo.x - geo.x));
-                         geo.height = ((ev.xmotion.y - c->geo.y <= 1) ? 1 : ev.xmotion.y - c->geo.y);
+                         geo.height = ((ev.xmotion.y - c->geo.y <= c->minh) ? c->minh : ev.xmotion.y - c->geo.y);
                     }
 
                     client_geo_hints(&geo, c);

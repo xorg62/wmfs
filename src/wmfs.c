@@ -143,8 +143,7 @@ quit(void)
      return;
 }
 
-/** WMFS main loop: Check stdin and
- *  execute the event loop
+/** WMFS main loop.
  */
 void
 mainloop(void)
