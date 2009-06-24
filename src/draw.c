@@ -53,30 +53,6 @@ draw_text(Drawable d, int x, int y, char* fg, int pad, char *str)
      XftColorAllocName(dpy, DefaultVisual(dpy, SCREEN),
                        DefaultColormap(dpy, SCREEN), fg, &xftcolor);
 
-     /* Draw the text */
-     /* DEV
-        int i, j;
-        char s[2] = { 0 };
-        char col[8] = { 0 };
-
-     for(i = 0; i < strlen(str); ++i)
-     {
-          if(str[i] == '\\' && str[i + 1] == '#' &&)
-          {
-               ++i;
-               for(j = 0; str[i + j] != '\\'; col[j++] = str[i + j]);
-               i += j;
-               printf("-> %s\n", col);
-          }
-          else
-          {
-               s[0] = str[i];
-               XftDrawStringUtf8(xftd, &xftcolor, font, x, y, (FcChar8 *)s, strlen(s));
-               x += textw(s);
-          }
-     }
-     */
-
      XftDrawStringUtf8(xftd, &xftcolor, font, x, y, (FcChar8 *)str, strlen(str));
 
      /* Free the text color and XftDraw */

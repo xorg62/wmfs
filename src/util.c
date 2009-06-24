@@ -199,6 +199,20 @@ get_mouse_pos(void)
      return ret;
 }
 
+/** Transform one character to string
+ *\param ch The character that will be tranforming
+ *\return The string.
+ */
+char*
+char_to_str(const char c)
+{
+     static char s[2];
+
+     s[0] = c;
+     s[1] = '\0';
+
+     return s;
+}
 
 /** Execute a sh command
  * \param cmd Command

@@ -198,11 +198,8 @@ clientmessageevent(XClientMessageEvent *ev)
           if(XGetWindowProperty(dpy, ROOT, net_atom[wmfs_statustext], 0, 4096,
                                 False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret) == Success)
           {
-               statustext = _strdup((char*)ret);
-
                for(i = 0; i < screen_count(); ++i)
-                    infobar_draw(i);
-
+                    infobar_draw_statustext(i, _strdup((char*)ret));
                XFree(ret);
           }
      }

@@ -113,7 +113,7 @@ infobar_draw(int sc)
      infobar_draw_taglist(sc);
      infobar_draw_layout(sc);
      barwin_refresh_color(infobar[sc].bar);
-     barwin_draw_text(infobar[sc].bar, (sgeo[sc].width - SHADH) - textw(statustext), FHINFOBAR, statustext);
+     infobar_draw_statustext(sc, statustext);
 
      return;
 }
@@ -159,6 +159,74 @@ infobar_draw_taglist(int sc)
           if(tags[sc][i].name)
                barwin_draw_text(infobar[sc].tags[i], PAD / 2, FHINFOBAR, tags[sc][i].name);
      }
+
+     return;
+}
+
+/** Draw text in the statustext and parse color format
+ *\param sc Screen
+ *\param str String
+*/
+void
+infobar_draw_statustext(int sc, char *str)
+{
+     int i, j, k, c = 0;
+     char col[8] = { 0 };
+     char *buf = NULL;
+     char *strwc = NULL;
+     int pos = 0;
+
+     if(!str)
+          return;
+
+     barwin_refresh_color(infobar[sc].bar);
+     statustext = _strdup(str);
+     strwc = _strdup(statustext);
+
+     /* Count how many color block there is */
+     for(i = 0; i < strlen(str); ++i)
+          if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
+               ++c;
+
+
+     for(i = j = 0; i < strlen(str); ++i, ++j)
+          if(strwc[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
+          {
+               i += 8;
+               --j;
+          }
+          else
+               strwc[j] = str[i];
+
+     strwc[j] = '\0';
+
+     if(c)
+     {
+          buf = _strdup(strwc);
+          for(k = i = 0; k < c; ++k)
+          {
+               for(; i < strlen(str); ++i)
+                    if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
+                    {
+                         for(j = 0, ++i; str[i + j] != '\\'; col[j] = str[i + j], ++j);
+                         printf("%s, i: %d\n", buf, i);
+                         pos = i;
+                         break;
+                    }
+
+               draw_text(infobar[sc].bar->dr,
+                         (sgeo[sc].width - SHADH) - textw(buf),
+                         FHINFOBAR, ((col[0]) ? col : infobar[sc].bar->fg), 0, buf);
+
+               buf += 0;
+          }
+     }
+     else
+          draw_text(infobar[sc].bar->dr,
+                    (sgeo[sc].width - SHADH) - textw(strwc),
+                    FHINFOBAR, infobar[sc].bar->fg, 0, strwc);
+
+     barwin_refresh(infobar[sc].bar);
 
      return;
 }

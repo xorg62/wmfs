@@ -120,6 +120,7 @@ void infobar_init(void);
 void infobar_draw(int sc);
 void infobar_draw_layout(int sc);
 void infobar_draw_taglist(int sc);
+void infobar_draw_statustext(int sc, char *str);
 void infobar_destroy(void);
 void infobar_set_position(int pos);
 void uicb_infobar_togglepos(uicb_t);
@@ -239,6 +240,7 @@ Layout layout_name_to_struct(Layout lt[], char *name, int n, func_name_list_t ll
 char* alias_to_str(char *conf_choice);
 /* }}} */
 XRectangle get_mouse_pos(void);
+char *char_to_str(const char c);
 void spawn(const char *str, ...);
 void swap_ptr(void **x, void **y);
 void uicb_spawn(uicb_t);
