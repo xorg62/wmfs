@@ -239,7 +239,7 @@ infobar_draw_statustext(int sc, char *str)
           }
 
           /* Free them */
-          for(i = 0; i < c; ++i, free(col[i]));
+          for(i = 0; i < c; free(col[i++]));
           IFREE(col);
           IFREE(wp);
      }
