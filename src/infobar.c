@@ -170,61 +170,79 @@ infobar_draw_taglist(int sc)
 void
 infobar_draw_statustext(int sc, char *str)
 {
-     int i, j, k, c = 0;
-     char col[8] = { 0 };
      char *buf = NULL;
      char *strwc = NULL;
-     int pos = 0;
+     char **col = NULL;
+     int i, j, k, c, d;
+     int *wp = NULL;
 
+     /* If the str == the current statustext, return (not needed) */
      if(!str)
           return;
 
      barwin_refresh_color(infobar[sc].bar);
      statustext = _strdup(str);
-     strwc = _strdup(statustext);
+     strwc = _strdup(str);
 
-     /* Count how many color block there is */
-     for(i = 0; i < strlen(str); ++i)
+     /* Count how many color block there is and make a string without color block (\#....\)*/
+     for(i = j = c = 0; i < strlen(str); ++i, ++j)
+     {
           if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
-               ++c;
-
-
-     for(i = j = 0; i < strlen(str); ++i, ++j)
-          if(strwc[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
           {
+               ++c;
                i += 8;
                --j;
           }
           else
                strwc[j] = str[i];
+     }
 
      strwc[j] = '\0';
 
+     /* Draw a first time the statustext for non colorized text */
+     draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(strwc),
+               FHINFOBAR, infobar[sc].bar->fg, 0, strwc);
+
+     /* Draw text with its color */
      if(c)
      {
+          /* Alloc variables */
+          wp = emalloc(c + 1, sizeof(int));
+          col = emalloc(c + 1, sizeof(char*));
           buf = _strdup(strwc);
-          for(k = i = 0; k < c; ++k)
-          {
-               for(; i < strlen(str); ++i)
-                    if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
-                    {
-                         for(j = 0, ++i; str[i + j] != '\\'; col[j] = str[i + j], ++j);
-                         printf("%s, i: %d\n", buf, i);
-                         pos = i;
-                         break;
-                    }
 
+          for(i = k = d = 0; i < strlen(str); ++i, ++k)
+          {
+               if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
+               {
+                    col[d] = emalloc(8, sizeof(char));
+                    for(j = 0, ++i; str[i + j] != '\\'; col[d][j] = str[i + j], ++j);
+                    wp[d] = --k + 1;
+                    ++d;
+                    i += 8;
+               }
+          }
+
+          for(k = i = 0; k < c; ++k, buf = _strdup(strwc))
+          {
+               buf += wp[k] + k;
+
+               /* Draw a rectangle with the bar color to draw the text properly */
+               draw_rectangle(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(buf), 0,
+                              INFOBARH - (sgeo[sc].width - SHADH) - textw(buf),
+                              INFOBARH, conf.colors.bar);
+
+               /* Draw text with its color */
                draw_text(infobar[sc].bar->dr,
                          (sgeo[sc].width - SHADH) - textw(buf),
-                         FHINFOBAR, ((col[0]) ? col : infobar[sc].bar->fg), 0, buf);
-
-               buf += 0;
+                         FHINFOBAR,  col[k], 0, buf);
           }
+
+          /* Free them */
+          for(i = 0; i < c; ++i, free(col[c]));
+          IFREE(col);
+          IFREE(wp);
      }
-     else
-          draw_text(infobar[sc].bar->dr,
-                    (sgeo[sc].width - SHADH) - textw(strwc),
-                    FHINFOBAR, infobar[sc].bar->fg, 0, strwc);
 
      barwin_refresh(infobar[sc].bar);
 
