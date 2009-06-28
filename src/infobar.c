@@ -173,7 +173,7 @@ infobar_draw_statustext(int sc, char *str)
      char *buf = NULL;
      char *strwc = NULL;
      char col[8] = { 0 };
-     int i, j, k, c;
+     int i, j, c, k = 0;
 
      /* If the str == the current statustext, return (not needed) */
      if(!str)
@@ -205,7 +205,6 @@ infobar_draw_statustext(int sc, char *str)
      /* Draw text with its color */
      if(c)
      {
-          /* Alloc variables */
           buf = _strdup(strwc);
 
           for(i = k; i < strlen(str); ++i, ++k)
