@@ -172,9 +172,8 @@ infobar_draw_statustext(int sc, char *str)
 {
      char *buf = NULL;
      char *strwc = NULL;
-     char **col = NULL;
-     int i, j, k, c, d;
-     int *wp = NULL;
+     char col[8] = { 0 };
+     int i, j, k, c;
 
      /* If the str == the current statustext, return (not needed) */
      if(!str)
@@ -207,41 +206,27 @@ infobar_draw_statustext(int sc, char *str)
      if(c)
      {
           /* Alloc variables */
-          wp = emalloc(c + 1, sizeof(int));
-          col = emalloc(c + 1, sizeof(char*));
           buf = _strdup(strwc);
 
-          for(i = k = d = 0; i < strlen(str); ++i, ++k)
-          {
+          for(i = k; i < strlen(str); ++i, ++k)
                if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
                {
-                    col[d] = emalloc(8, sizeof(char));
-                    for(j = 0, ++i; str[i + j] != '\\'; col[d][j] = str[i + j], ++j);
-                    wp[d] = --k + 1;
-                    ++d;
+                    /* Store current color in col[] */
+                    for(j = 0, ++i; str[i + j] != '\\'; col[j] = str[i + j], ++j);
                     i += 8;
+                    buf += k;
+
+                    /* Draw a rectangle with the bar color to draw the text properly */
+                    draw_rectangle(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(buf),
+                                   0, INFOBARH - (sgeo[sc].width - SHADH) - textw(buf),
+                                   INFOBARH, conf.colors.bar);
+
+                    /* Draw text with its color */
+                    draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(buf),
+                              FHINFOBAR,  col, 0, buf);
+
+                    buf = _strdup(strwc);
                }
-          }
-
-          for(k = i = 0; k < c; ++k, buf = _strdup(strwc))
-          {
-               buf += wp[k] + k;
-
-               /* Draw a rectangle with the bar color to draw the text properly */
-               draw_rectangle(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(buf), 0,
-                              INFOBARH - (sgeo[sc].width - SHADH) - textw(buf),
-                              INFOBARH, conf.colors.bar);
-
-               /* Draw text with its color */
-               draw_text(infobar[sc].bar->dr,
-                         (sgeo[sc].width - SHADH) - textw(buf),
-                         FHINFOBAR,  col[k], 0, buf);
-          }
-
-          /* Free them */
-          for(i = 0; i < c; free(col[i++]));
-          IFREE(col);
-          IFREE(wp);
      }
 
      barwin_refresh(infobar[sc].bar);

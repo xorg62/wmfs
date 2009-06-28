@@ -199,7 +199,7 @@ clientmessageevent(XClientMessageEvent *ev)
                                 False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret) == Success)
           {
                for(i = 0; i < screen_count(); ++i)
-                    infobar_draw_statustext(i, _strdup((char*)ret));
+                    infobar_draw_statustext(i, (char*)ret);
                XFree(ret);
           }
      }
