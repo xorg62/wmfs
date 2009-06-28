@@ -211,8 +211,7 @@ infobar_draw_statustext(int sc, char *str)
                if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
                {
                     /* Store current color in col[] */
-                    for(j = 0, ++i; str[i + j] != '\\'; col[j] = str[i + j], ++j);
-                    i += 8;
+                    for(j = 0, ++i; str[i] != '\\'; col[j++] = str[i++]);
                     buf += k;
 
                     /* Draw a rectangle with the bar color to draw the text properly */
@@ -225,6 +224,7 @@ infobar_draw_statustext(int sc, char *str)
                               FHINFOBAR,  col, 0, buf);
 
                     buf = _strdup(strwc);
+                    ++i;
                }
      }
 

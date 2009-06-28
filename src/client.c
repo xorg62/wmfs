@@ -141,6 +141,9 @@ uicb_client_next(uicb_t cmd)
 void
 client_focus(Client *c)
 {
+     Window w;
+     int d;
+
      if(sel && sel != c)
      {
           sel->colors.frame = conf.client.bordernormal;
@@ -163,8 +166,17 @@ client_focus(Client *c)
                c->titlebar->stipple_color = conf.titlebar.stipple.colors.focus;
           frame_update(c);
           mouse_grabbuttons(c, True);
+
           if(conf.raisefocus)
-               client_raise(c);
+          {
+               XQueryPointer(dpy, ROOT, &w, &w, &d, &d, &d, &d, (uint *)&d);
+
+               if(c == client_gb_win(w)
+                  || c == client_gb_frame(w)
+                  || c == client_gb_titlebar(w))
+                    client_raise(c);
+          }
+
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
      }
      else
