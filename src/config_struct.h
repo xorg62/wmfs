@@ -43,6 +43,7 @@ cfg_opt_t misc_opts[] =
      CFG_INT("pad",                 12,        CFGF_NONE),
      CFG_BOOL("raisefocus",         cfg_false, CFGF_NONE),
      CFG_BOOL("raiseswitch",        cfg_true,  CFGF_NONE),
+     CFG_BOOL("focus_follow_mouse", cfg_true,  CFGF_NONE),
      CFG_END()
 };
 

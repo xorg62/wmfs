@@ -224,6 +224,12 @@ spawn(const char *format, ...)
      char cmd[512];
      va_list ap;
 
+     if(strlen(format) > 511)
+     {
+          fprintf(stderr, "WMFS spawn(): Error, command too long.\n");
+          return;
+     }
+
      va_start(ap, format);
      vsprintf(cmd, format, ap);
      va_end(ap);

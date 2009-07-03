@@ -10,9 +10,10 @@ alias
 
 misc
 {
-        font        = "dejavu-10"
-        raisefocus  = false
-        raiseswitch = true
+        font                = "dejavu-10"
+        raisefocus         = false
+        raiseswitch        = true
+        focus_follow_mouse = true
         pad         = 12
 }
 

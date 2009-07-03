@@ -282,6 +282,7 @@ typedef struct
      char *font;
      Bool raisefocus;
      Bool raiseswitch;
+     Bool focus_fmouse;
      uint pad;
      struct
      {

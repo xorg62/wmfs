@@ -125,9 +125,10 @@ conf_alias_section(cfg_t *cfg_a)
 void
 conf_misc_section(cfg_t *cfg_m)
 {
-     conf.font               = alias_to_str(_strdup(cfg_getstr(cfg_m, "font")));
-     conf.raisefocus         = cfg_getbool(cfg_m, "raisefocus");
-     conf.raiseswitch        = cfg_getbool(cfg_m, "raiseswitch");
+     conf.font          = alias_to_str(_strdup(cfg_getstr(cfg_m, "font")));
+     conf.raisefocus    = cfg_getbool(cfg_m, "raisefocus");
+     conf.raiseswitch   = cfg_getbool(cfg_m, "raiseswitch");
+     conf.focus_fmouse  = cfg_getbool(cfg_m, "focus_follow_mouse");
 
      if(cfg_getint(cfg_m, "pad") > 24 || cfg_getint(cfg_m, "pad") < 1)
      {
