@@ -119,7 +119,7 @@ cfg_opt_t client_opts[]=
 
 /* }}} */
 
-/* TAGS {{{ */
+/* LAYOUTS {{{ */
 
 cfg_opt_t layout_opts[] =
 {

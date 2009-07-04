@@ -264,7 +264,6 @@ infobar_set_position(int pos)
 {
      screen_get_sel();
 
-
      switch(pos)
      {
      case IB_Hide:
@@ -301,6 +300,8 @@ infobar_set_position(int pos)
 void
 uicb_infobar_togglepos(uicb_t cmd)
 {
+     screen_get_sel();
+
      infobar_set_position((tags[selscreen][seltag[selscreen]].barpos
                            = (tags[selscreen][seltag[selscreen]].barpos < 2)
                            ? tags[selscreen][seltag[selscreen]].barpos + 1
