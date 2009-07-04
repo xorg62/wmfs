@@ -51,6 +51,7 @@
 #include <X11/cursorfont.h>
 #include <X11/Xft/Xft.h>
 #include <X11/extensions/Xinerama.h>
+#include <X11/extensions/Xrandr.h>
 
 /* Local headers */
 #include "config.h"
@@ -201,6 +202,8 @@ void keypress(XKeyPressedEvent *ev);
 void mappingnotify(XMappingEvent *ev);
 void maprequest(XMapRequestEvent *ev);
 void propertynotify(XPropertyEvent *ev);
+void unmapnotify(XUnmapEvent *ev);
+void xrandrnotify(XEvent *ev);
 void send_client_event(long data[5], char *atom_name);
 void getevent(XEvent ev);
 
@@ -334,12 +337,15 @@ XRectangle *sgeo;
 XRectangle *spgeo;
 Cursor cursor[CurLast];
 char *argv_global;
+int xrandr_event;
 
 /* Fonts */
 XftFont *font;
+
+/* Atoms list */
 Atom net_atom[net_last];
 
-/* InfoBar */
+/* InfoBar/Tags */
 InfoBar *infobar;
 Tag **tags;
 int *seltag;

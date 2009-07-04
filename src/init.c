@@ -60,11 +60,14 @@ void
 init_font(void)
 {
      font = XftFontOpenName(dpy, SCREEN, conf.font);
+
      if(!font)
      {
           fprintf(stderr, "WMFS Error: Cannot initialize font\n");
           font = XftFontOpenName(dpy, SCREEN, "sans-10");
      }
+
+     return;
 }
 
 /** Init the graphic context
@@ -99,11 +102,11 @@ init_gc(void)
 void
 init_cursor(void)
 {
-     cursor[CurNormal]     = XCreateFontCursor(dpy, XC_left_ptr);
-     cursor[CurResize]     = XCreateFontCursor(dpy, XC_sizing);
+     cursor[CurNormal]      = XCreateFontCursor(dpy, XC_left_ptr);
+     cursor[CurResize]      = XCreateFontCursor(dpy, XC_sizing);
      cursor[CurRightResize] = XCreateFontCursor(dpy, XC_lr_angle);
-     cursor[CurLeftResize] = XCreateFontCursor(dpy, XC_ll_angle);
-     cursor[CurMove]       = XCreateFontCursor(dpy, XC_fleur);
+     cursor[CurLeftResize]  = XCreateFontCursor(dpy, XC_ll_angle);
+     cursor[CurMove]        = XCreateFontCursor(dpy, XC_fleur);
 
      return;
 }
@@ -159,6 +162,7 @@ init_layout(void)
 
      const func_name_list_t layout_list_tmp[] =
           {
+               {"tile",                    tile },
                {"tile_right",              tile },
                {"tile_left",               tile_left },
                {"tile_top",                tile_top },

@@ -80,7 +80,8 @@ set(LIBRARIES_TO_LINK
   ${X11_LIBRARIES}
   confuse
   Xft
-  Xinerama)
+  Xinerama
+  Xrandr)
 
 target_link_libraries(wmfs ${LIBRARIES_TO_LINK})
 

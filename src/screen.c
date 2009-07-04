@@ -63,7 +63,6 @@ screen_get_geo(int s)
      int barpos = tags[selscreen][seltag[selscreen]].barpos;
      XRectangle geo;
 
-
      if(XineramaIsActive(dpy))
      {
           XineramaScreenInfo *xsi;
@@ -159,7 +158,7 @@ screen_get_sel(void)
 void
 screen_init_geo(void)
 {
-     int i, n;
+     int i, n, randr_e, d;
      XineramaScreenInfo *xsi;
 
      sgeo = emalloc(screen_count(), sizeof(XRectangle));
@@ -187,6 +186,12 @@ screen_init_geo(void)
           spgeo[0].width = MAXW;
           spgeo[0].height = MAXH;
      }
+
+     /* Init Xrandr stuff for event */
+     if(XRRQueryExtension(dpy, &randr_e, &d))
+          xrandr_event = randr_e + RRScreenChangeNotify;
+     else
+          xrandr_event = -1;
 
      ewmh_set_desktop_geometry();
      ewmh_set_workarea();

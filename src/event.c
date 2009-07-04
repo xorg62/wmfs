@@ -497,6 +497,22 @@ unmapnotify(XUnmapEvent *ev)
      return;
 }
 
+/** Xrandr screen change notify handle event
+ *\ param ev XEvent pointer
+ */
+void
+xrandrnotify(XEvent *ev)
+{
+     XRRUpdateConfiguration(ev);
+
+     /* Reload WMFS to update the screen(s) geometry changement */
+     quit();
+     for(; argv_global[0] && argv_global[0] == ' '; ++argv_global);
+     execlp(argv_global, argv_global, NULL);
+
+     return;
+}
+
 /** Send a client event
  *\param data Event data
  *\param atom_name Event atom name
@@ -547,6 +563,10 @@ getevent(XEvent ev)
      case PropertyNotify:   propertynotify(&ev.xproperty);         break;
      case UnmapNotify:      unmapnotify(&ev.xunmap);               break;
      }
+
+     /* Check Xrandr event */
+     if(ev.type == xrandr_event)
+          xrandrnotify(&ev);
 
      wait(&st);
 
