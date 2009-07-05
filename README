@@ -1,6 +1,6 @@
 ABOUT :
 WMFS Window Manager.
-  * Window Manager From Scratch
+   * Window Manager From Scratch
 
 A small Window Manager created from scratch
 
@@ -10,26 +10,28 @@ AUTHORS :
 LICENSE : BSD
 
 REQUIREMENT :
-  · libconfuse
-  · freetype2
-  · libxinerama
-  · libxft
-  · libx11
-  · CMake >= 2.6
+  - libconfuse
+  - freetype2
+  - libxinerama
+  - libxrandr
+  - libxft
+  - libx11
+  - CMake >= 2.6
 
 OS :
-  · GNU/Linux : Supported.
-  · FreeBSD : Supported.
+  - GNU/Linux : Supported.
+  - FreeBSD : Supported.
 
 INSTALL :
-  · mkdir build
-  · cd build
-  · cmake ..
-  · make
-  · sudo make install
-  · sudo make uninstall # if you would to remove it.
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - sudo make install
+  - sudo make uninstall # if you would to remove it.
 
 If you have doxygen installed you can generate doxygen documentation via custom target 'make doc' in the build dir.
 
 DISTROS :
-  · wmfs port for FreeBSD at x11-wm/wmfs
+  - wmfs port for FreeBSD at x11-wm/wmfs
+  - wmfs is available with AUR in ArchLinux
