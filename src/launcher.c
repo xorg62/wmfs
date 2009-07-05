@@ -63,9 +63,9 @@ launcher_execute(Launcher launcher)
 
      XGrabKeyboard(dpy, ROOT, True, GrabModeAsync, GrabModeAsync, CurrentTime);
 
-     bw = barwin_create(infobar[selscreen].bar->win, x, 0,
-                        infobar[selscreen].bar->geo.width - x,
-                        infobar[selscreen].bar->geo.height,
+     bw = barwin_create(infobar[selscreen].bar->win, x, 1,
+                        infobar[selscreen].bar->geo.width - x - 1,
+                        infobar[selscreen].bar->geo.height - 2,
                         infobar[selscreen].bar->bg,
                         infobar[selscreen].bar->fg,
                         False, False, conf.border.bar);
