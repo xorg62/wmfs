@@ -38,31 +38,30 @@
 void
 launcher_execute(Launcher launcher)
 {
-     XEvent ev;
-     KeySym ks;
+     BarWindow *bw;
+     Bool stop, found;
+     Bool lastwastab = False;
+     Bool my_guitar_gently_wheeps = True;
      char tmp[32] = { 0 };
      char buf[512] = { 0 };
      char tabbuf[512] = { 0 };
-     int pos = 0;
-     DIR *dir;
-     struct dirent *dirent;
      char *searchpath;
      char *start, *end;
-     Bool stop, found;
      char currentpath[PATHMAX];
-     Bool lastwastab = False;
+     DIR *dir;
+     struct dirent *dirent;
+     int pos = 0, x;
      int tabhits = 0;
      int searchhits = 0;
-     BarWindow *bw;
-     Bool my_guitar_gently_wheeps = True;
+     KeySym ks;
+     XEvent ev;
 
      screen_get_sel();
 
-     int x = (infobar[selscreen].layout_button->geo.x
-              + textw(tags[selscreen][seltag[selscreen]].layout.symbol) + PAD);
+     x = (infobar[selscreen].layout_button->geo.x
+          + textw(tags[selscreen][seltag[selscreen]].layout.symbol) + PAD);
 
      XGrabKeyboard(dpy, ROOT, True, GrabModeAsync, GrabModeAsync, CurrentTime);
-
 
      bw = barwin_create(infobar[selscreen].bar->win, x, 0,
                         infobar[selscreen].bar->geo.width - x,
@@ -91,13 +90,16 @@ launcher_execute(Launcher launcher)
 
                /* Check Ctrl-c / Ctrl-d */
                if(ev.xkey.state & ControlMask)
-                    if(ks == XK_c
-                       || ks == XK_d)
+                    if(ks == XK_c || ks == XK_d)
                          ks = XK_Escape;
+
+               /* Check if there is a keypad */
+               if(IsKeypadKey(ks) && ks == XK_KP_Enter)
+                    ks = XK_Return;
+
                switch(ks)
                {
                case XK_Return:
-               case XK_KP_Enter:
                     spawn("%s %s", launcher.command, buf);
                     my_guitar_gently_wheeps = 0;
                     break;
@@ -162,8 +164,9 @@ launcher_execute(Launcher launcher)
 
                     lastwastab = True;
 
+                    /* start a new round of tabbing */
                     if (!found)
-                         tabhits = 0; /* start a new round of tabbing */
+                         tabhits = 0;
 
                     pos = strlen(buf);
 
