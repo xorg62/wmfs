@@ -46,9 +46,8 @@ set(wmfs_src
 # Set the executable from the wmfs_src
 add_executable(wmfs ${wmfs_src})
 
-# Set the version - Get YEAR and MONTH (YYYYmm)
-EXEC_PROGRAM("date '+%Y%m'" OUTPUT_VARIABLE YEAR_MONTH)
-set(VERSION "WMFS-${YEAR_MONTH}")
+# Set the version
+set(VERSION "WMFS-200907")
 
 # FLAGS
 set(CFLAGS "-g -Wall -ansi")
