@@ -503,6 +503,7 @@ unmapnotify(XUnmapEvent *ev)
 void
 xrandrnotify(XEvent *ev)
 {
+     /* Update configuration */
      XRRUpdateConfiguration(ev);
 
      /* Reload WMFS to update the screen(s) geometry changement */
@@ -562,11 +563,12 @@ getevent(XEvent ev)
      case MappingNotify:    mappingnotify(&ev.xmapping);           break;
      case PropertyNotify:   propertynotify(&ev.xproperty);         break;
      case UnmapNotify:      unmapnotify(&ev.xunmap);               break;
+     default:
+          /* Check Xrandr event */
+          if(ev.type == xrandr_event)
+               xrandrnotify(&ev);
+          break;
      }
-
-     /* Check Xrandr event */
-     if(ev.type == xrandr_event)
-          xrandrnotify(&ev);
 
      wait(&st);
 
