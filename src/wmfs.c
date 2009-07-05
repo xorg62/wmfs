@@ -228,7 +228,7 @@ scan(void)
           tags[c->screen][c->tag].request_update = True;
 
      for(i = 0; i < screen_count(); ++i)
-          arrange(i);
+          arrange(i, True);
 
      XFree(w);
 

@@ -462,7 +462,7 @@ propertynotify(XPropertyEvent *ev)
           case XA_WM_TRANSIENT_FOR:
                XGetTransientForHint(dpy, c->win, &trans);
                if((c->tile || c->max) && (c->hint = (client_gb_win(trans) != NULL)))
-                    arrange(c->screen);
+                    arrange(c->screen, True);
                break;
           case XA_WM_NORMAL_HINTS:
                client_size_hints(c);

@@ -35,7 +35,7 @@
 /** Arrange All
 */
 void
-arrange(int screen)
+arrange(int screen, Bool update_layout)
 {
      Client *c;
 
@@ -51,7 +51,9 @@ arrange(int screen)
                     client_hide(c);
           }
 
-     tags[screen][seltag[screen]].layout.func(screen);
+     if(update_layout)
+          tags[screen][seltag[screen]].layout.func(screen);
+
      infobar_draw(screen);
 
      return;
@@ -752,7 +754,7 @@ uicb_set_layout(uicb_t cmd)
                     if(layout_list[i].func == conf.layout[j].func)
                          tags[selscreen][seltag[selscreen]].layout = conf.layout[j];
 
-     arrange(selscreen);
+     arrange(selscreen, True);
 
      return;
 }

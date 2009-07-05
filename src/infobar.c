@@ -289,7 +289,7 @@ infobar_set_position(int pos)
      barwin_move(infobar[selscreen].bar, sgeo[selscreen].x - BORDH, infobar[selscreen].geo.y);
      infobar_draw(selscreen);
      ewmh_set_workarea();
-     arrange(selscreen);
+     arrange(selscreen, True);
 
      return;
 }

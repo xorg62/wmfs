@@ -65,20 +65,11 @@ tag_set(int tag)
 
      ewmh_update_current_tag_prop();
 
+     /* Arrange infobar position */
      if(tags[selscreen][otag].barpos != tags[selscreen][seltag[selscreen]].barpos)
           infobar_set_position(tags[selscreen][seltag[selscreen]].barpos);
 
-     /* arrange(selscreen); */
-     for(c = clients; c; c = c->next)
-          if(c->screen == selscreen)
-          {
-               if(!ishide(c, selscreen))
-                    client_unhide(c);
-               else
-                    client_hide(c);
-          }
-
-     infobar_draw(selscreen);
+     arrange(selscreen, False);
 
      if(tags[selscreen][tag].request_update)
      {
@@ -113,7 +104,7 @@ tag_transfert(Client *c, int tag)
 
      c->tag = tag;
 
-     arrange(c->screen);
+     arrange(c->screen, True);
 
      if(c == sel)
           client_focus(NULL);

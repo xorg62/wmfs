@@ -268,7 +268,7 @@ void uicb_screen_next(uicb_t);
 void uicb_screen_prev(uicb_t);
 
 /* layout.c */
-void arrange(int screen);
+void arrange(int screen, Bool update_layout);
 void freelayout(int screen);
 void layoutswitch(Bool b);
 void maxlayout(int screen);

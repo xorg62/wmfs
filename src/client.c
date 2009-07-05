@@ -493,7 +493,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      client_update_attributes(c);
 
      if(ar)
-          arrange(c->screen);
+          arrange(c->screen, True);
 
      return c;
 }
