@@ -74,7 +74,10 @@ buttonpress(XButtonEvent *ev)
         && (ev->button == Button1
             || ev->button == Button2
             || ev->button == Button3))
+     {
           client_focus(c);
+          client_raise(c);
+     }
 
      /* Root */
      if(ev->window == ROOT)
