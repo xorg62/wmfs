@@ -79,17 +79,7 @@ set(LIBRARIES_TO_LINK
   ${FREETYPE_LIBRARIES}
   ${X11_LIBRARIES}
   confuse
-  Xft
-  Xinerama
-  Xrandr)
-
-target_link_libraries(wmfs ${LIBRARIES_TO_LINK})
-
-# Messages
-message("Project version: ${VERSION}")
-message("Using these CFLAGS: ${CFLAGS}")
-message("Using these LDFLAGS: ${LDFLAGS}")
-message("Linking with theses libraries : ${LIBRARIES_TO_LINK}")
+  Xft)
 
 # Includes
 include(FindDoxygen)
@@ -106,17 +96,27 @@ pkg_check_modules(WMFS_REQUIRED REQUIRED
 pkg_check_modules(HAVE_XINERAMA xinerama)
 if(HAVE_XINERAMA_FOUND)
     set(WMFS_HAVE_XINERAMA "#define HAVE_XINERAMA")
+    set(LIBRARIES_TO_LINK ${LIBRARIES_TO_LINK} Xinerama)
 else()
     set(WMFS_HAVE_XINERAMA "")
 endif()
 
 # Check for xrandr
-pkg_check_modules(HAVE_XRANDR xrandre)
+pkg_check_modules(HAVE_XRANDR xrandr)
 if(HAVE_XRANDR_FOUND)
     set(WMFS_HAVE_XRANDR "#define HAVE_XRANDR")
+    set(LIBRARIES_TO_LINK ${LIBRARIES_TO_LINK} Xrandr)
 else()
     set(WMFS_HAVE_XRANDR "")
 endif()
+
+target_link_libraries(wmfs ${LIBRARIES_TO_LINK})
+
+# Messages
+message("Project version: ${VERSION}")
+message("Using these CFLAGS: ${CFLAGS}")
+message("Using these LDFLAGS: ${LDFLAGS}")
+message("Linking with theses libraries : ${LIBRARIES_TO_LINK}")
 
 # Generating man page
 find_program(GZIP_EXECUTABLE gzip)

@@ -7,7 +7,7 @@ Makefile
 .*.sw?
 wmfs
 src/config.h
-CHANGELOG
+changelog
 config.h
 #*
 \#*
