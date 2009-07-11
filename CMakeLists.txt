@@ -96,13 +96,27 @@ include(FindDoxygen)
 include(FindPkgConfig)
 
 # Use pkgconfig to get required libraries
-pkg_check_modules(wmfs_required
+pkg_check_modules(WMFS_REQUIRED REQUIRED
   x11
   libconfuse
   freetype2
-  xinerama
-  xrandr
   xft)
+
+# Check for xinerama
+pkg_check_modules(HAVE_XINERAMA xinerama)
+if(HAVE_XINERAMA_FOUND)
+    set(WMFS_HAVE_XINERAMA "#define HAVE_XINERAMA")
+else()
+    set(WMFS_HAVE_XINERAMA "")
+endif()
+
+# Check for xrandr
+pkg_check_modules(HAVE_XRANDR xrandre)
+if(HAVE_XRANDR_FOUND)
+    set(WMFS_HAVE_XRANDR "#define HAVE_XRANDR")
+else()
+    set(WMFS_HAVE_XRANDR "")
+endif()
 
 # Generating man page
 find_program(GZIP_EXECUTABLE gzip)
