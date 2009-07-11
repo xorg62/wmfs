@@ -265,6 +265,7 @@ grid(int screen)
 
           /* Set all the other size with current client info */
           cgeo.y = c->geo.y + c->geo.height + BORDH + TBARH;
+
           if(cpcols + 1 > rows)
           {
                cpcols = 0;

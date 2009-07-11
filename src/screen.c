@@ -40,10 +40,12 @@ screen_count(void)
 {
      int n = 0;
 
+     n = ScreenCount(dpy);
+
+#ifdef HAVE_XINERAMA
      if(XineramaIsActive(dpy))
           XineramaQueryScreens(dpy, &n);
-     else
-          n = ScreenCount(dpy);
+#endif
 
      /* Set _WMFS_SCREEN_COUNT */
      XChangeProperty(dpy, ROOT, net_atom[wmfs_screen_count], XA_CARDINAL, 32,
@@ -59,13 +61,22 @@ screen_count(void)
 XRectangle
 screen_get_geo(int s)
 {
-     int n = 0;
      int barpos = tags[selscreen][seltag[selscreen]].barpos;
      XRectangle geo;
 
+     geo.x = BORDH;
+     if(barpos == IB_Hide || barpos == IB_Bottom)
+          geo.y = TBARH;
+     else
+          geo.y = INFOBARH + TBARH;
+     geo.height = MAXH - INFOBARH - TBARH;
+     geo.width = MAXW;
+
+#ifdef HAVE_XINERAMA
      if(XineramaIsActive(dpy))
      {
           XineramaScreenInfo *xsi;
+          int n = 0;
 
           xsi = XineramaQueryScreens(dpy, &n);
 
@@ -79,16 +90,7 @@ screen_get_geo(int s)
 
           XFree(xsi);
      }
-     else
-     {
-          geo.x = BORDH;
-          if(barpos == IB_Hide || barpos == IB_Bottom)
-               geo.y = TBARH;
-          else
-               geo.y = INFOBARH + TBARH;
-          geo.height = MAXH - INFOBARH - TBARH;
-          geo.width = MAXW;
-     }
+#endif
 
      return geo;
 }
@@ -135,20 +137,24 @@ screen_set_sel(int screen)
 int
 screen_get_sel(void)
 {
+     selscreen = 0;
+
+#ifdef HAVE_XINERAMA
      if(XineramaIsActive(dpy))
      {
           /* Unused variables (except x/y) */
           Window w;
-          int d, u, x, y;
+          int d, x, y;
 
-          XQueryPointer(dpy, ROOT, &w, &w, &x, &y, &d, &d, (uint *)&u);
+          XQueryPointer(dpy, ROOT, &w, &w, &x, &y, &d, &d, (uint *)&d);
 
           selscreen = screen_get_with_geo(x, y);
-
-          /* Set _WMFS_CURRENT_SCREEN */
-          XChangeProperty(dpy, ROOT, net_atom[wmfs_current_screen], XA_CARDINAL, 32,
-                          PropModeReplace, (uchar*)&selscreen, 1);
      }
+#endif
+
+     /* Set _WMFS_CURRENT_SCREEN */
+     XChangeProperty(dpy, ROOT, net_atom[wmfs_current_screen], XA_CARDINAL, 32,
+                     PropModeReplace, (uchar*)&selscreen, 1);
 
      return selscreen;
 }
@@ -158,14 +164,22 @@ screen_get_sel(void)
 void
 screen_init_geo(void)
 {
-     int i, n, d;
-     XineramaScreenInfo *xsi;
+     int i;
 
      sgeo = emalloc(screen_count(), sizeof(XRectangle));
      spgeo = emalloc(screen_count(), sizeof(XRectangle));
 
      for(i = 0; i < screen_count(); ++i)
           sgeo[i] = screen_get_geo(i);
+
+     spgeo[0].x = 0;
+     spgeo[0].y = 0;
+     spgeo[0].width = MAXW;
+     spgeo[0].height = MAXH;
+
+#ifdef HAVE_XINERAMA
+     XineramaScreenInfo *xsi;
+     int n;
 
      if(XineramaIsActive(dpy))
      {
@@ -179,17 +193,15 @@ screen_init_geo(void)
           }
           XFree(xsi);
      }
-     else
-     {
-          spgeo[0].x = 0;
-          spgeo[0].y = 0;
-          spgeo[0].width = MAXW;
-          spgeo[0].height = MAXH;
-     }
+#endif
 
-     /* Init Xrandr stuff */
+#ifdef HAVE_XRANDR
+     /* Init xrandr stuff */
+     int d;
+
      XRRSelectInput(dpy, ROOT, 1);
      XRRQueryExtension(dpy, &xrandr_event, &d);
+#endif
 
      ewmh_set_desktop_geometry();
      ewmh_set_workarea();

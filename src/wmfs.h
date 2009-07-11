@@ -50,12 +50,19 @@
 #include <X11/Xatom.h>
 #include <X11/cursorfont.h>
 #include <X11/Xft/Xft.h>
-#include <X11/extensions/Xinerama.h>
-#include <X11/extensions/Xrandr.h>
 
 /* Local headers */
 #include "config.h"
 #include "structs.h"
+
+#ifdef HAVE_XINERAMA
+#include <X11/extensions/Xinerama.h>
+#endif
+
+#ifdef HAVE_XRANDR
+#include <X11/extensions/Xrandr.h>
+#endif
+
 
 /* MACRO */
 #define ButtonMask   (ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
@@ -203,7 +210,6 @@ void mappingnotify(XMappingEvent *ev);
 void maprequest(XMapRequestEvent *ev);
 void propertynotify(XPropertyEvent *ev);
 void unmapnotify(XUnmapEvent *ev);
-void xrandrnotify(XEvent *ev);
 void send_client_event(long data[5], char *atom_name);
 void getevent(XEvent ev);
 

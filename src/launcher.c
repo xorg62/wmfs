@@ -80,7 +80,7 @@ launcher_execute(Launcher launcher)
 
      barwin_refresh(bw);
 
-     barwin_draw_text(bw, 1, FHINFOBAR, launcher.prompt);
+     barwin_draw_text(bw, 1, FHINFOBAR - 1, launcher.prompt);
 
      while(my_guitar_gently_wheeps)
      {
@@ -192,8 +192,8 @@ launcher_execute(Launcher launcher)
                          1 + textw(launcher.prompt) + textw(" ") + textw(buf), 2,
                          1 + textw(launcher.prompt) + textw(" ") + textw(buf), INFOBARH - 4);
 
-               barwin_draw_text(bw, 1, FHINFOBAR, launcher.prompt);
-               barwin_draw_text(bw, 1 + textw(launcher.prompt) + textw(" "), FHINFOBAR, buf);
+               barwin_draw_text(bw, 1, FHINFOBAR - 1, launcher.prompt);
+               barwin_draw_text(bw, 1 + textw(launcher.prompt) + textw(" "), FHINFOBAR - 1, buf);
                barwin_refresh(bw);
           }
           else

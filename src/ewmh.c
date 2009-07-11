@@ -139,10 +139,12 @@ void
 ewmh_update_current_tag_prop(void)
 {
      int t;
-     char s[10] = { 0 };
+     char *s = NULL;
 
      screen_get_sel();
      t = seltag[selscreen] - 1;
+
+     s = emalloc(8, sizeof(char));
 
      /* Get current desktop (tag) */
      XChangeProperty(dpy, ROOT, net_atom[net_current_desktop], XA_CARDINAL, 32,
@@ -167,6 +169,8 @@ ewmh_update_current_tag_prop(void)
      XChangeProperty(dpy, ROOT, net_atom[wmfs_current_layout], net_atom[utf8_string], 8,
                      PropModeReplace, (uchar*)tags[selscreen][seltag[selscreen]].layout.symbol,
                      strlen(tags[selscreen][seltag[selscreen]].layout.symbol));
+
+     free(s);
 
      return;
 }
