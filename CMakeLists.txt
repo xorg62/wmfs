@@ -52,7 +52,18 @@ set(VERSION "WMFS-200907")
 # FLAGS
 set(CFLAGS "-g -Wall -ansi")
 set(CMAKE_C_FLAGS ${CFLAGS})
-set(LDFLAGS "-L /usr/local/lib")
+
+# Linker FLAGS
+
+set(DEFAULT_LDFLAGS "-L /usr/local/lib")
+
+if(CMAKE_SYSTEM_NAME MATCHES NetBSD)
+    message("-- NetBSD system found - Using /usr/pkg/lib for linker")
+    set(LDFLAGS "${DEFAULT_LDFLAGS} -L /usr/pkg/lib")
+else(CMAKE_SYSTEM_NAME MATCHES NetBSD)
+    set(LDFLAGS "-L /usr/local/lib")
+endif(CMAKE_SYSTEM_NAME MATCHES NetBSD)
+
 set_target_properties(wmfs PROPERTIES LINK_FLAGS ${LDFLAGS})
 # Includes dir for libs in build_dir
 include_directories(
