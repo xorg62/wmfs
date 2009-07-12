@@ -61,7 +61,7 @@ if(CMAKE_SYSTEM_NAME MATCHES NetBSD)
     message("-- NetBSD system found - Using /usr/pkg/lib for linker")
     set(LDFLAGS "${DEFAULT_LDFLAGS} -L /usr/pkg/lib")
 else(CMAKE_SYSTEM_NAME MATCHES NetBSD)
-    set(LDFLAGS "-L /usr/local/lib")
+    set(LDFLAGS ${DEFAULT_LDFLAGS})
 endif(CMAKE_SYSTEM_NAME MATCHES NetBSD)
 
 set_target_properties(wmfs PROPERTIES LINK_FLAGS ${LDFLAGS})
