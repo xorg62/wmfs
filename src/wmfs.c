@@ -112,7 +112,7 @@ quit(void)
      IFREE(func_list);
      IFREE(layout_list);
 
-     /* Clean conf alloced thing {{{ */
+     /* Clean conf alloced thing */
      IFREE(menulayout.item);
 
      if(conf.menu)
@@ -135,7 +135,6 @@ quit(void)
      IFREE(conf.titlebar.button);
      IFREE(conf.client.mouse);
      IFREE(conf.root.mouse);
-     /* }}} */
 
      XSync(dpy, False);
      XCloseDisplay(dpy);

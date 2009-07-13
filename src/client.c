@@ -871,3 +871,48 @@ client_unmap(Client *c)
      return;
 }
 
+/** Change client of screen to next screen
+ * \cmd uicb_t type unused
+*/
+void
+uicb_client_screen_next(uicb_t cmd)
+{
+     int os;
+
+     CHECK(sel);
+
+     /* Save old client screen to arrange */
+     os = sel->screen;
+
+     /* Set the new client screen */
+     sel->screen = (sel->screen + 1 > screen_count() - 1) ? 0 : sel->screen + 1;
+
+     /* Arrange */
+     arrange(os, True);
+     arrange(sel->screen, True);
+
+     return;
+}
+
+/** Change client of screen to prev screen
+ * \cmd uicb_t type unused
+*/
+void
+uicb_client_screen_prev(uicb_t cmd)
+{
+     int os;
+
+     CHECK(sel);
+
+     /* Save old client screen to arrange */
+     os = sel->screen;
+
+     /* Set the new client screen */
+     sel->screen = (sel->screen - 1 < 0) ? screen_count() - 1 : sel->screen - 1;
+
+     /* Arrange */
+     arrange(os, True);
+     arrange(sel->screen, True);
+
+     return;
+}

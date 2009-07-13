@@ -44,6 +44,8 @@ conf_init_func_list(void)
                {"client_kill",             uicb_client_kill },
                {"client_prev",             uicb_client_prev },
                {"client_next",             uicb_client_next },
+               {"client_screen_next",      uicb_client_screen_next },
+               {"client_screen_prev",      uicb_client_screen_prev },
                {"toggle_max",              uicb_togglemax },
                {"layout_next",             uicb_layout_next },
                {"layout_prev",             uicb_layout_prev },

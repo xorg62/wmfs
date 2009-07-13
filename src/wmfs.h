@@ -55,6 +55,7 @@
 #include "config.h"
 #include "structs.h"
 
+/* Optional dependences */
 #ifdef HAVE_XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif
@@ -166,6 +167,8 @@ void uicb_client_raise(uicb_t);
 void uicb_client_prev(uicb_t);
 void uicb_client_next(uicb_t);
 void uicb_client_kill(uicb_t);
+void uicb_client_screen_next(uicb_t cmd);
+void uicb_client_screen_prev(uicb_t cmd);
 
 /* ewmh.c */
 void ewmh_init_hints(void);
