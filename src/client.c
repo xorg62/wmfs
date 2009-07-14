@@ -886,6 +886,7 @@ uicb_client_screen_next(uicb_t cmd)
 
      /* Set the new client screen */
      sel->screen = (sel->screen + 1 > screen_count() - 1) ? 0 : sel->screen + 1;
+     sel->tag = seltag[sel->screen];
 
      /* Arrange */
      arrange(os, True);
@@ -909,6 +910,7 @@ uicb_client_screen_prev(uicb_t cmd)
 
      /* Set the new client screen */
      sel->screen = (sel->screen - 1 < 0) ? screen_count() - 1 : sel->screen - 1;
+     sel->tag = seltag[sel->screen];
 
      /* Arrange */
      arrange(os, True);
