@@ -79,7 +79,7 @@ mouse_move(Client *c)
      xgc.function = GXinvert;
      xgc.subwindow_mode = IncludeInferiors;
      xgc.line_width = BORDH;
-     gci = XCreateGC(dpy, ROOT, GCFunction|GCSubwindowMode|GCLineWidth, &xgc);
+     gci = XCreateGC(dpy, ROOT, GCFunction | GCSubwindowMode | GCLineWidth, &xgc);
 
      if(!c->tile && !c->lmax)
           mouse_dragborder(c->geo, gci);
@@ -105,7 +105,7 @@ mouse_move(Client *c)
                          if(c != sclient)
                          {
                               client_swap(c, sclient);
-                              break;
+                              /* break; */
                          }
                     }
 
@@ -199,7 +199,7 @@ mouse_resize(Client *c)
      xgc.function = GXinvert;
      xgc.subwindow_mode = IncludeInferiors;
      xgc.line_width = BORDH;
-     gci = XCreateGC(dpy, ROOT, GCFunction|GCSubwindowMode|GCLineWidth, &xgc);
+     gci = XCreateGC(dpy, ROOT, GCFunction | GCSubwindowMode | GCLineWidth, &xgc);
 
      if(!c->tile)
      {

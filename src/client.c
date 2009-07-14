@@ -135,6 +135,61 @@ uicb_client_next(uicb_t cmd)
      return;
 }
 
+/** Swap the current client with the next one
+ *\param cmd uicb_t type unused
+ */
+void
+uicb_client_swap_next(uicb_t cmd)
+{
+     Client *c = NULL;
+
+     if(!sel && !sel->tile)
+          return;
+
+     /* Find the next client */
+     for(c = sel->next; c && ishide(c, selscreen); c = c->next);
+     if(!c)
+          for(c = clients; c && ishide(c, selscreen); c = c->next);
+
+     if(c)
+     {
+          client_swap(sel, c);
+          client_focus(c);
+     }
+
+     return;
+}
+
+/** Swap the current client with the previous one
+ *\param cmd uicb_t type unused
+ */
+void
+uicb_client_swap_prev(uicb_t cmd)
+{
+     Client *c = NULL, *d;
+
+     if(!sel && !sel->tile)
+          return;
+
+     /* Find the previous client */
+     for(d = clients; d != sel; d = d->next)
+          if(!ishide(d, selscreen))
+               c = d;
+
+     if(!c)
+          for(; d; d = d->next)
+               if(!ishide(d, selscreen))
+                    c = d;
+
+     if(c)
+     {
+          client_swap(sel, c);
+          client_focus(c);
+     }
+
+     return;
+}
+
 /** Set the focus to a client
  * \param c Client pointer
 */
@@ -570,8 +625,8 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
 
      frame_moveresize(c, c->geo);
 
-     XMoveResizeWindow(dpy, c->win, BORDH, TBARH, c->geo.width,
-                       c->geo.height);
+     XMoveResizeWindow(dpy, c->win, BORDH, TBARH,
+                       c->geo.width, c->geo.height);
 
      client_configure(c);
      client_update_attributes(c);
@@ -628,7 +683,7 @@ client_size_hints(Client *c)
           c->baseh = size.min_height;
      }
      else
-          c->basew = c->baseh = 0;
+          c->basew = c->baseh = 1;
 
      /* inc */
      if(size.flags & PResizeInc)
@@ -637,7 +692,7 @@ client_size_hints(Client *c)
           c->inch = size.height_inc;
      }
      else
-          c->incw = c->inch = 0;
+          c->incw = c->inch = 1;
 
      /* max */
      if(size.flags & PMaxSize)
@@ -646,7 +701,7 @@ client_size_hints(Client *c)
           c->maxh = size.max_height;
      }
      else
-          c->maxw = c->maxh = 0;
+          c->maxw = c->maxh = 1;
 
      /* min */
      if(size.flags & PMinSize)
@@ -690,8 +745,7 @@ client_swap(Client *c1, Client *c2)
      CHECK(!c1->free);
      CHECK(!c2->free);
 
-     if((c1->screen == c2->screen
-         && c1->tag != c2->tag))
+     if(c1 == c2 || (c1->screen == c2->screen && c1->tag != c2->tag))
           return;
 
      /* Swap only the windows */

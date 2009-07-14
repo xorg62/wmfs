@@ -164,11 +164,13 @@ void client_unmap(Client *c);
 void client_set_wanted_tag(Client *c);
 void client_update_attributes(Client *c);
 void uicb_client_raise(uicb_t);
-void uicb_client_prev(uicb_t);
 void uicb_client_next(uicb_t);
+void uicb_client_prev(uicb_t);
+void uicb_client_swap_next(uicb_t);
+void uicb_client_swap_prev(uicb_t);
 void uicb_client_kill(uicb_t);
-void uicb_client_screen_next(uicb_t cmd);
-void uicb_client_screen_prev(uicb_t cmd);
+void uicb_client_screen_next(uicb_t);
+void uicb_client_screen_prev(uicb_t);
 
 /* ewmh.c */
 void ewmh_init_hints(void);
@@ -291,7 +293,6 @@ Client *tiled_client(int screen, Client *c);
  void mirror_vertical(int screen);
  void mirror_horizontal(int screen);
 /* }}} */
-void uicb_tile_switch(uicb_t);
 void uicb_togglemax(uicb_t);
 void uicb_togglefree(uicb_t);
 void uicb_layout_prev(uicb_t);
