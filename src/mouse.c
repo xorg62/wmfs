@@ -105,7 +105,7 @@ mouse_move(Client *c)
                          if(c != sclient)
                          {
                               client_swap(c, sclient);
-                              /* break; */
+                              break;
                          }
                     }
 
