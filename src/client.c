@@ -683,7 +683,7 @@ client_size_hints(Client *c)
           c->baseh = size.min_height;
      }
      else
-          c->basew = c->baseh = 1;
+          c->basew = c->baseh = 0;
 
      /* inc */
      if(size.flags & PResizeInc)
@@ -692,7 +692,7 @@ client_size_hints(Client *c)
           c->inch = size.height_inc;
      }
      else
-          c->incw = c->inch = 1;
+          c->incw = c->inch = 0;
 
      /* max */
      if(size.flags & PMaxSize)
@@ -701,7 +701,7 @@ client_size_hints(Client *c)
           c->maxh = size.max_height;
      }
      else
-          c->maxw = c->maxh = 1;
+          c->maxw = c->maxh = 0;
 
      /* min */
      if(size.flags & PMinSize)
@@ -715,7 +715,7 @@ client_size_hints(Client *c)
           c->minh = (size.base_height ? size.base_height : 1);
      }
      else
-          c->minw = c->minh = 1;
+          c->minw = c->minh = 0;
 
      /* aspect */
      if(size.flags & PAspect)
