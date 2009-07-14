@@ -690,6 +690,10 @@ client_swap(Client *c1, Client *c2)
      CHECK(!c1->free);
      CHECK(!c2->free);
 
+     if(c1->screen == c2->screen
+        && c1->tag != c2->tag)
+          return;
+
      /* Swap only the windows */
      swap_ptr((void**)&c1->win, (void**)&c2->win);
 
