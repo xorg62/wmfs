@@ -143,7 +143,7 @@ uicb_client_swap_next(uicb_t cmd)
 {
      Client *c = NULL;
 
-     if(!sel && !sel->tile)
+     if(!sel || !sel->tile)
           return;
 
      /* Find the next client */
@@ -168,7 +168,7 @@ uicb_client_swap_prev(uicb_t cmd)
 {
      Client *c = NULL, *d;
 
-     if(!sel && !sel->tile)
+     if(!sel || !sel->tile)
           return;
 
      /* Find the previous client */

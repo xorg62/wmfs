@@ -92,7 +92,6 @@ client
         modifier              = "Alt"
         mouse { button = "1" func = "client_raise" }
         mouse { button = "1" func = "mouse_move" }
-        mouse { button = "2" func = "tile_switch" }
         mouse { button = "3" func = "client_raise" }
         mouse { button = "3" func = "mouse_resize" }
 
@@ -106,7 +105,6 @@ client
 
                 mouse { button = "1" func = "client_raise" }
                 mouse { button = "1" func = "mouse_move" }
-                mouse { button = "2" func = "tile_switch" }
                 mouse { button = "3" func = "client_raise" }
                 mouse { button = "3" func = "mouse_resize" }
 
