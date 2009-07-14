@@ -88,12 +88,8 @@ quit(void)
      /* Unmanage all clients */
      for(c = clients; c; c = c->next)
      {
-          if(c->hide)
-               client_unhide(c);
-          if(c->unmapped)
-               client_map(c);
-
-          client_unmanage(c);
+          client_unhide(c);
+          XReparentWindow(dpy, c->win, ROOT, c->geo.x, c->geo.y);
      }
 
      IFREE(tags);
