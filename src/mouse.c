@@ -62,7 +62,7 @@ mouse_move(Client *c)
      GC gci;
      XEvent ev;
 
-     if(c->max || c->lmax || c->state_fullscreen || c->state_dock)
+     if(c->max || c->state_fullscreen || c->state_dock)
           return;
 
      ocx =  c->geo.x;
@@ -72,7 +72,7 @@ mouse_move(Client *c)
                      None, cursor[CurMove], CurrentTime) != GrabSuccess)
           return;
 
-     if(!c->tile)
+     if(!c->tile && !c->lmax)
           XGrabServer(dpy);
 
      /* Set the GC for the rectangle */
@@ -81,7 +81,7 @@ mouse_move(Client *c)
      xgc.line_width = BORDH;
      gci = XCreateGC(dpy, ROOT, GCFunction|GCSubwindowMode|GCLineWidth, &xgc);
 
-     if(!c->tile)
+     if(!c->tile && !c->lmax)
           mouse_dragborder(c->geo, gci);
 
      XQueryPointer(dpy, ROOT, &dw, &dw, &mx, &my, &dint, &dint, &duint);
@@ -93,7 +93,7 @@ mouse_move(Client *c)
 
           if(ev.type == MotionNotify)
           {
-               if(c->tile)
+               if(c->tile || c->lmax)
                {
                     XQueryPointer(dpy, ROOT, &dw, &sw, &mx, &my, &dint, &dint, &duint);
 
@@ -113,7 +113,9 @@ mouse_move(Client *c)
                     XQueryPointer(dpy, infobar[selscreen].bar->win, &dw, &sw, &mx, &my, &dint, &dint, &duint);
 
                     for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
-                         if(infobar[selscreen].tags[i]->win == sw)
+                         if(infobar[selscreen].tags[i]->win == sw
+                            && tags[selscreen][i].layout.func != freelayout
+                            && tags[selscreen][i].layout.func != maxlayout)
                          {
                               c->screen = selscreen;
                               c->tag = i;
@@ -146,7 +148,7 @@ mouse_move(Client *c)
      while(ev.type != ButtonRelease);
 
      /* One time again to delete all the trace on the window */
-     if(!c->tile)
+     if(!c->tile && !c->lmax)
      {
           mouse_dragborder(geo, gci);
           client_moveresize(c, geo, False);

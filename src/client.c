@@ -690,8 +690,8 @@ client_swap(Client *c1, Client *c2)
      CHECK(!c1->free);
      CHECK(!c2->free);
 
-     if(c1->screen == c2->screen
-        && c1->tag != c2->tag)
+     if((c1->screen == c2->screen
+         && c1->tag != c2->tag))
           return;
 
      /* Swap only the windows */
@@ -875,50 +875,71 @@ client_unmap(Client *c)
      return;
 }
 
+/** Set the client screen
+ *\param c Client pointer
+ *\param s Screen id
+ */
+void
+client_set_screen(Client *c, int s)
+{
+     int os;
+     XRectangle geo;
+
+     if(!c || s < 0 || s > screen_count() - 1 || s == c->screen)
+          return;
+
+     /* Save old client screen/geo to arrange */
+     geo = c->geo;
+     os = c->screen;
+
+     c->screen = s;
+     c->tag = seltag[s];
+
+     /* Arrange */
+     if(tags[s][seltag[s]].layout.func == freelayout
+        || tags[s][seltag[s]].layout.func == maxlayout
+        || tags[os][seltag[os]].layout.func == freelayout
+        || tags[os][seltag[os]].layout.func == maxlayout)
+     {
+          geo.x = (sgeo[s].x + sgeo[s].width / 2) - (c->geo.width / 2);
+          geo.y = (sgeo[s].y + sgeo[s].height / 2) - (c->geo.height / 2);
+          client_moveresize(c, geo, False);
+     }
+
+     arrange(s, True);
+     arrange(os, True);
+
+     if(!c->tile)
+     {
+          client_focus(c);
+          client_raise(c);
+     }
+
+     return;
+}
+
 /** Change client of screen to next screen
- * \cmd uicb_t type unused
+ * \param cmd uicb_t type unused
 */
 void
 uicb_client_screen_next(uicb_t cmd)
 {
-     int os;
-
      CHECK(sel);
 
-     /* Save old client screen to arrange */
-     os = sel->screen;
-
-     /* Set the new client screen */
-     sel->screen = (sel->screen + 1 > screen_count() - 1) ? 0 : sel->screen + 1;
-     sel->tag = seltag[sel->screen];
-
-     /* Arrange */
-     arrange(os, True);
-     arrange(sel->screen, True);
+     client_set_screen(sel, (sel->screen + 1 > screen_count() - 1) ? 0 : sel->screen + 1);
 
      return;
 }
 
 /** Change client of screen to prev screen
- * \cmd uicb_t type unused
+ * \param cmd uicb_t type unused
 */
 void
 uicb_client_screen_prev(uicb_t cmd)
 {
-     int os;
-
      CHECK(sel);
 
-     /* Save old client screen to arrange */
-     os = sel->screen;
-
-     /* Set the new client screen */
-     sel->screen = (sel->screen - 1 < 0) ? screen_count() - 1 : sel->screen - 1;
-     sel->tag = seltag[sel->screen];
-
-     /* Arrange */
-     arrange(os, True);
-     arrange(sel->screen, True);
+     client_set_screen(sel, (sel->screen - 1 < 0) ? screen_count() - 1 : sel->screen - 1);
 
      return;
 }
