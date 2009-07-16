@@ -96,13 +96,13 @@ tag_transfert(Client *c, int tag)
 {
      screen_get_sel();
 
-     if(!c || c->tag == tag)
-          return;
+     CHECK(c);
 
      if(!tag)
           tag = 1;
 
      c->tag = tag;
+     c->screen = selscreen;
 
      arrange(c->screen, True);
 
