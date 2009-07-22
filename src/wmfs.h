@@ -139,6 +139,8 @@ void client_attach(Client *c);
 void client_configure(Client *c);
 void client_detach(Client *c);
 void client_focus(Client *c);
+Client* client_get_next(void);
+Client* client_get_prev(void);
 /* client_gb_*() {{{ */
 Client* client_gb_win(Window w);
 Client* client_gb_frame(Window w);

@@ -43,8 +43,16 @@ buttonpress(XButtonEvent *ev)
 
      screen_get_sel();
 
+     /* If the mouse is on a not selected client and you click on it. */
+     if(((c = client_gb_win(ev->window)) || (c = client_gb_titlebar(ev->window))) && c != sel
+        && (ev->button == Button1 || ev->button == Button2 || ev->button == Button3))
+     {
+          client_focus(c);
+          client_raise(c);
+     }
+
      /* Titlebar */
-     if((c = client_gb_titlebar(ev->window)))
+     if((c = client_gb_titlebar(ev->window)) && c == sel)
           for(i = 0; i < conf.titlebar.nmouse; ++i)
                 if(ev->button == conf.titlebar.mouse[i].button)
                     if(conf.titlebar.mouse[i].func)
@@ -67,18 +75,6 @@ buttonpress(XButtonEvent *ev)
                if(ev->button == conf.client.mouse[i].button)
                     if(conf.client.mouse[i].func)
                          conf.client.mouse[i].func(conf.client.mouse[i].cmd);
-
-     /* If the mouse is on a client that is not selected
-        and you click on it. */
-     if((c = client_gb_win(ev->window)) && c != sel
-        && (ev->button == Button1
-            || ev->button == Button2
-            || ev->button == Button3))
-     {
-          client_focus(c);
-          client_raise(c);
-     }
-
      /* Root */
      if(ev->window == ROOT)
           for(i = 0; i < conf.root.nmouse; ++i)

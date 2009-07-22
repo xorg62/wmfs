@@ -84,16 +84,34 @@ client_detach(Client *c)
      return;
 }
 
-/** Switch to the previous client
- * \param cmd uicb_t type unused
-*/
-void
-uicb_client_prev(uicb_t cmd)
+/** Get the next client
+ *\return The next client or NULL
+ */
+Client*
+client_get_next(void)
+{
+     Client *c = NULL;
+
+     if(!sel || ishide(sel, selscreen))
+          return NULL;
+
+     for(c = sel->next; c && ishide(c, selscreen); c = c->next);
+     if(!c)
+          for(c = clients; c && ishide(c, selscreen); c = c->next);
+
+     return c;
+}
+
+/** Get the previous client
+ *\return The previous client or NULL
+ */
+Client*
+client_get_prev(void)
 {
      Client *c = NULL, *d;
 
      if(!sel || ishide(sel, selscreen))
-          return;
+          return NULL;
 
      for(d = clients; d != sel; d = d->next)
           if(!ishide(d, selscreen))
@@ -103,7 +121,19 @@ uicb_client_prev(uicb_t cmd)
           for(; d; d = d->next)
                if(!ishide(d, selscreen))
                     c = d;
-     if(c)
+
+     return c;
+}
+
+/** Switch to the previous client
+ * \param cmd uicb_t type unused
+*/
+void
+uicb_client_prev(uicb_t cmd)
+{
+     Client *c;
+
+     if((c = client_get_prev()))
      {
           client_focus(c);
           client_raise(c);
@@ -118,15 +148,9 @@ uicb_client_prev(uicb_t cmd)
 void
 uicb_client_next(uicb_t cmd)
 {
-     Client *c = NULL;
+     Client *c;
 
-     if(!sel || ishide(sel, selscreen))
-          return;
-
-     for(c = sel->next; c && ishide(c, selscreen); c = c->next);
-     if(!c)
-          for(c = clients; c && ishide(c, selscreen); c = c->next);
-     if(c)
+     if((c = client_get_next()))
      {
           client_focus(c);
           client_raise(c);
@@ -141,17 +165,9 @@ uicb_client_next(uicb_t cmd)
 void
 uicb_client_swap_next(uicb_t cmd)
 {
-     Client *c = NULL;
+     Client *c;
 
-     if(!sel || !sel->tile)
-          return;
-
-     /* Find the next client */
-     for(c = sel->next; c && ishide(c, selscreen); c = c->next);
-     if(!c)
-          for(c = clients; c && ishide(c, selscreen); c = c->next);
-
-     if(c)
+    if((c = client_get_next()))
      {
           client_swap(sel, c);
           client_focus(c);
@@ -166,22 +182,9 @@ uicb_client_swap_next(uicb_t cmd)
 void
 uicb_client_swap_prev(uicb_t cmd)
 {
-     Client *c = NULL, *d;
+     Client *c;
 
-     if(!sel || !sel->tile)
-          return;
-
-     /* Find the previous client */
-     for(d = clients; d != sel; d = d->next)
-          if(!ishide(d, selscreen))
-               c = d;
-
-     if(!c)
-          for(; d; d = d->next)
-               if(!ishide(d, selscreen))
-                    c = d;
-
-     if(c)
+     if((c = client_get_prev()))
      {
           client_swap(sel, c);
           client_focus(c);

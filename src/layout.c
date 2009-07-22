@@ -151,9 +151,9 @@ maxlayout(int screen)
           c->lmax = True;
           client_maximize(c);
 
-          /* Focus the first client */
+          /* Focus the first client
           if(!i)
-               client_focus(c);
+          client_focus(c); */
      }
 
      ewmh_update_current_tag_prop();
