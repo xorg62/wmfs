@@ -645,8 +645,6 @@ client_maximize(Client *c)
      if(!c || c->state_fullscreen)
           return;
 
-     client_focus(c);
-
      c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
 
      geo.x = sgeo[c->screen].x;

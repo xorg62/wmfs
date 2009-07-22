@@ -66,7 +66,7 @@ frame_create(Client *c)
           c->frame_geo.y,
           c->frame_geo.width,
           c->frame_geo.height, 0,
-          CWOverrideRedirect|CWBackPixmap|CWEventMask,
+          CWOverrideRedirect | CWBackPixmap | CWEventMask,
           c->colors.frame, &at);
 
 

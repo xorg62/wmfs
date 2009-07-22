@@ -143,12 +143,17 @@ void
 maxlayout(int screen)
 {
      Client *c;
+     int i;
 
-     for(c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next))
+     for(i = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
      {
           c->tile = False;
           c->lmax = True;
           client_maximize(c);
+
+          /* Focus the first client */
+          if(!i)
+               client_focus(c);
      }
 
      ewmh_update_current_tag_prop();

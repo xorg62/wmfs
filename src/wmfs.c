@@ -245,7 +245,7 @@ uicb_reload(uicb_t cmd)
      return;
 }
 
-/** Check if wmfs is running (for function that will be
+/** Check if wmfs is running (for functions that will be
     execute when wmfs will be already running).
     \return False if wmfs is not running
 */

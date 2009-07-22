@@ -18,7 +18,7 @@
 *        this software without specific prior written permission.
 *
 *      THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-*      "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+5B*      "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *      LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
 *      A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
 *      OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
@@ -197,21 +197,6 @@ get_mouse_pos(void)
      XQueryPointer(dpy, ROOT, &dum, &dum, (int*)&ret.x, (int*)&ret.y, &d, &d, (uint *)&u);
 
      return ret;
-}
-
-/** Transform one character to string
- *\param ch The character that will be tranforming
- *\return The string.
- */
-char*
-char_to_str(const char c)
-{
-     static char s[2];
-
-     s[0] = c;
-     s[1] = '\0';
-
-     return s;
 }
 
 /** Execute a sh command
