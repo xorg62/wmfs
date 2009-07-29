@@ -349,12 +349,14 @@ main(int argc, char **argv)
 
      while ((i = getopt(argc, argv, "hvic:s:g:")) != -1)
      {
-          if(i == 'c' || i == 's' || i == 'g')
-               if(!(dpy = XOpenDisplay(NULL)))
-               {
-                    fprintf(stderr, "WMFS: cannot open X server.\n");
-                    exit(EXIT_FAILURE);
-               }
+
+          /* For options who need WMFS running */
+          if((i == 'c' || i == 's' || i == 'g')
+             && !(dpy = XOpenDisplay(NULL)))
+          {
+               fprintf(stderr, "WMFS: cannot open X server.\n");
+               exit(EXIT_FAILURE);
+          }
 
           switch(i)
           {
@@ -369,10 +371,12 @@ main(int argc, char **argv)
                       "   -v                        Show WMFS version\n", argv[0]);
                exit(EXIT_SUCCESS);
                break;
+
           case 'i':
                printf("WMFS - Window Manager From Scratch By Martin Duquesnoy\n");
                exit(EXIT_SUCCESS);
                break;
+
           case 'v':
                printf("WMFS version : "WMFS_VERSION".\n"
                       "  Compilation settings :\n"
@@ -381,16 +385,19 @@ main(int argc, char **argv)
                       "    - On "WMFS_COMPILE_MACHINE" by "WMFS_COMPILE_BY".\n");
                exit(EXIT_SUCCESS);
                break;
+
           case 'c':
                exec_uicb_function(argv[2], ((argv[3]) ? argv[3] : NULL));
                XCloseDisplay(dpy);
                exit(EXIT_SUCCESS);
                break;
+
           case 's':
                set_statustext(optarg);
                XCloseDisplay(dpy);
                exit(EXIT_SUCCESS);
                break;
+
           case 'g':
                getinfo(optarg);
                XCloseDisplay(dpy);
@@ -399,6 +406,7 @@ main(int argc, char **argv)
           }
      }
 
+     /* Check if WMFS can open X server */
      if(!(dpy = XOpenDisplay(NULL)))
      {
           fprintf(stderr, "WMFS: cannot open X server.\n");

@@ -339,17 +339,26 @@ ewmh_manage_window_type(Client *c)
                            False, XA_ATOM, &rf, &f, &n, &il, &data) == Success && n)
      {
           atom = (Atom*)data;
+
           for(i = 0; i < n; ++i)
           {
                /* Manage _NET_WM_WINDOW_TYPE_DOCK & _NET_WM_WINDOW_TYPE_SPLASH */
                if(atom[i] == net_atom[net_wm_window_type_dock]
                   || atom[i] == net_atom[net_wm_window_type_splash])
                {
+                    /* Unmap frame, decoration.. */
                     client_unmap(c);
+
+                    /* Map only window */
                     XMapWindow(dpy, c->win);
+
+                    /* Reparent it to ROOT win */
                     XReparentWindow(dpy, c->win, ROOT, c->geo.x, c->geo.y);
                     XRaiseWindow(dpy, c->win);
-                    c->state_dock = True;
+
+                    /* This window will not be managed anymore,
+                     * so let's detach it. */
+                    client_detach(c);
                }
                /* MANAGE _NET_WM_WINDOW_TYPE_DIALOG */
                else if(atom[i] == net_atom[net_wm_window_type_dialog])

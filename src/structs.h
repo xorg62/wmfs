@@ -162,7 +162,7 @@ struct Client
      /* Client Information */
      Bool max, tile, free, hide;
      Bool hint, lmax, unmapped;
-     Bool state_dock, state_fullscreen;
+     Bool state_fullscreen;
      /* Struct in chains */
      Client *next;
      Client *prev;

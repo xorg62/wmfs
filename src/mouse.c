@@ -62,7 +62,7 @@ mouse_move(Client *c)
      GC gci;
      XEvent ev;
 
-     if(c->max || c->state_fullscreen || c->state_dock)
+     if(c->max || c->state_fullscreen)
           return;
 
      ocx =  c->geo.x;
@@ -179,8 +179,7 @@ mouse_resize(Client *c)
      GC gci;
      float mwf = tags[selscreen][seltag[selscreen]].mwfact;
 
-     if(c->max || c->lmax
-        || c->state_fullscreen || c->state_dock)
+     if(c->max || c->lmax || c->state_fullscreen)
           return;
 
      XQueryPointer(dpy, ROOT, &w, &w, &omx, &omy, &d, &d, (uint *)&u);

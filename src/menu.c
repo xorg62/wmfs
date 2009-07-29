@@ -114,21 +114,37 @@ menu_draw(Menu menu, int x, int y)
 Bool
 menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
 {
-     int i;
+     int i, c = 0;
      KeySym ks;
      Bool quit = False;
 
      switch(ev->type)
      {
-          /* Mouse Buttons */
+     /* Mouse events */
      case ButtonPress:
           /* Execute the function linked with the item */
           for(i = 0; i < menu->nitem; ++i)
+          {
                if(ev->xbutton.window == winitem[i]->win
                   && (ev->xbutton.button == Button1 || ev->xbutton.button == Button2))
+               {
                     if(menu->item[i].func)
                          menu->item[i].func(menu->item[i].cmd);
-          quit = True;
+
+                    quit = True;
+               }
+               else if(ev->xbutton.window != winitem[i]->win)
+                    ++c;
+               else if(ev->xbutton.button == Button4)
+                    menu_focus_item(menu, menu->focus_item - 1, winitem);
+               else if(ev->xbutton.button == Button5)
+                    menu_focus_item(menu, menu->focus_item + 1, winitem);
+          }
+
+          /* If the clicked window is not one of menu wins (items), quit. */
+          if(c == i)
+               quit = True;
+
           break;
 
           /* Keys */
@@ -139,17 +155,21 @@ menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
           case XK_Up:
                menu_focus_item(menu, menu->focus_item - 1, winitem);
                break;
+
           case XK_Down:
                menu_focus_item(menu, menu->focus_item + 1, winitem);
                break;
+
           case XK_Return:
                if(menu->item[menu->focus_item].func)
                     menu->item[menu->focus_item].func(menu->item[menu->focus_item].cmd);
                quit = True;
                break;
+
           case XK_Escape:
                quit = True;
                break;
+
           }
           break;
 
@@ -160,6 +180,7 @@ menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
                if(ev->xcrossing.window == winitem[i]->win)
                     menu_focus_item(menu, i, winitem);
           break;
+
      default:
           getevent(*ev);
           break;

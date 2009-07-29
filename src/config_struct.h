@@ -32,7 +32,7 @@
 
 #include "wmfs.h"
 
-#define FILE_NAME   ".config/wmfs/wmfsrc"
+#define FILE_NAME ".config/wmfs/wmfsrc"
 
 cfg_t *cfg, *cfgtmp;
 char final_path[128];
@@ -50,7 +50,7 @@ cfg_opt_t misc_opts[] =
 cfg_opt_t mouse_button_opts[] =
 {
      CFG_INT("tag",    -1,        CFGF_NONE),
-     CFG_INT("screen", -1,         CFGF_NONE),
+     CFG_INT("screen", -1,        CFGF_NONE),
      CFG_STR("button", "Button1", CFGF_NONE),
      CFG_STR("func",   "",        CFGF_NONE),
      CFG_STR("cmd",    "",        CFGF_NONE),
@@ -85,7 +85,7 @@ cfg_opt_t line_opts[] =
 cfg_opt_t button_opts[] =
 {
      CFG_SEC("mouse", mouse_button_opts, CFGF_MULTI),
-     CFG_SEC("line", line_opts, CFGF_MULTI),
+     CFG_SEC("line",  line_opts,         CFGF_MULTI),
      CFG_END()
 };
 
@@ -104,16 +104,16 @@ cfg_opt_t titlebar_opts[] =
 
 cfg_opt_t client_opts[]=
 {
-     CFG_BOOL("place_at_mouse",       cfg_false,          CFGF_NONE),
-     CFG_BOOL("border_shadow",        cfg_false,          CFGF_NONE),
-     CFG_INT("border_height",         1,                  CFGF_NONE),
-     CFG_STR("border_normal",         "#354B5C",          CFGF_NONE),
-     CFG_STR("border_focus",          "#6286A1",          CFGF_NONE),
-     CFG_STR("resize_corner_normal",  "#ff0000",          CFGF_NONE),
-     CFG_STR("resize_corner_focus",   "#ff0000",          CFGF_NONE),
-     CFG_STR("modifier",              "Alt",              CFGF_NONE),
-     CFG_SEC("mouse",                 mouse_button_opts,  CFGF_MULTI),
-     CFG_SEC("titlebar",              titlebar_opts,      CFGF_NONE),
+     CFG_BOOL("place_at_mouse",       cfg_false,         CFGF_NONE),
+     CFG_BOOL("border_shadow",        cfg_false,         CFGF_NONE),
+     CFG_INT("border_height",         1,                 CFGF_NONE),
+     CFG_STR("border_normal",         "#354B5C",         CFGF_NONE),
+     CFG_STR("border_focus",          "#6286A1",         CFGF_NONE),
+     CFG_STR("resize_corner_normal",  "#ff0000",         CFGF_NONE),
+     CFG_STR("resize_corner_focus",   "#ff0000",         CFGF_NONE),
+     CFG_STR("modifier",              "Alt",             CFGF_NONE),
+     CFG_SEC("mouse",                 mouse_button_opts, CFGF_MULTI),
+     CFG_SEC("titlebar",              titlebar_opts,     CFGF_NONE),
      CFG_END()
 };
 
@@ -151,7 +151,7 @@ cfg_opt_t tag_opts[] =
      CFG_STR("layout",           "tile_right", CFGF_NONE),
      CFG_STR("infobar_position", "top",        CFGF_NONE),
      CFG_BOOL("resizehint",      cfg_false,    CFGF_NONE),
-     CFG_STR_LIST("clients",     "{}",     CFGF_NONE),
+     CFG_STR_LIST("clients",     "{}",         CFGF_NONE),
      CFG_END()
 };
 
@@ -181,15 +181,15 @@ cfg_opt_t menu_items_opts[] =
 
 cfg_opt_t menus_opts[] =
 {
-     CFG_STR("name",            "menu_wname",     CFGF_NONE),
-     CFG_BOOL("place_at_mouse", cfg_true,         CFGF_NONE),
-     CFG_INT("x",               0,                CFGF_NONE),
-     CFG_INT("y",               0,                CFGF_NONE),
-     CFG_STR("fg_normal",       "#ffffff",        CFGF_NONE),
-     CFG_STR("bg_normal",       "#000000",        CFGF_NONE),
-     CFG_STR("fg_focus",        "#ffffff",        CFGF_NONE),
-     CFG_STR("bg_focus",        "#000000",        CFGF_NONE),
-     CFG_SEC("item",            menu_items_opts,  CFGF_MULTI),
+     CFG_STR("name",            "menu_wname",    CFGF_NONE),
+     CFG_BOOL("place_at_mouse", cfg_true,        CFGF_NONE),
+     CFG_INT("x",               0,               CFGF_NONE),
+     CFG_INT("y",               0,               CFGF_NONE),
+     CFG_STR("fg_normal",       "#ffffff",       CFGF_NONE),
+     CFG_STR("bg_normal",       "#000000",       CFGF_NONE),
+     CFG_STR("fg_focus",        "#ffffff",       CFGF_NONE),
+     CFG_STR("bg_focus",        "#000000",       CFGF_NONE),
+     CFG_SEC("item",            menu_items_opts, CFGF_MULTI),
      CFG_END()
 };
 

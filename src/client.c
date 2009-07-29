@@ -614,7 +614,7 @@ client_geo_hints(XRectangle *geo, Client *c)
 void
 client_moveresize(Client *c, XRectangle geo, Bool r)
 {
-     if(!c || c->state_dock)
+     if(!c)
           return;
 
      if(r)
@@ -890,10 +890,13 @@ client_unmanage(Client *c)
 
      /* To focus the previous client */
      for(c_next = clients;
-         c_next && c_next != c->prev && c_next->tag != c->tag && c_next->screen != c->screen;
+         c_next && c_next != c->prev
+              && c_next->tag != c->tag
+              && c_next->screen != c->screen;
          c_next = c_next->next);
 
-     if(c_next && c_next->tag == seltag[selscreen] && c_next->screen == selscreen)
+     if(c_next && c_next->tag == seltag[selscreen]
+        && c_next->screen == selscreen)
           client_focus(c_next);
 
      free(c);
