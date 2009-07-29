@@ -347,10 +347,14 @@ conf_tag_section(cfg_t *cfg_t)
 
      /* Alloc all */
      conf.ntag = emalloc(screen_count(), sizeof(int));
-     tags = emalloc(screen_count(), sizeof(Tag*));
+     tags      = emalloc(screen_count(), sizeof(Tag*));
+     seltag    = emalloc(screen_count(), sizeof(int));
 
      for(i = 0; i < screen_count(); ++i)
-          tags[i] = emalloc(cfg_size(cfg_t, "tag") + 1, sizeof(Tag));
+          seltag[i] = 1;
+
+     for(i = 0; i < screen_count(); ++i)
+          tags[i] = emalloc(cfg_size(cfg_t, "tag") + 2, sizeof(Tag));
 
      for(i = 0; i < cfg_size(cfg_t, "tag"); ++i)
      {
@@ -407,11 +411,6 @@ conf_tag_section(cfg_t *cfg_t)
                tags[i][1] = default_tag;
           }
 
-     seltag = emalloc(screen_count(), sizeof(int));
-
-     for(j = 0; j < screen_count(); ++j)
-          seltag[j] = 1;
-
      return;
 }
 
@@ -423,8 +422,7 @@ conf_menu_section(cfg_t *cfg_m)
 
      conf.nmenu = cfg_size(cfg_m, "set_menu");
      CHECK(conf.nmenu);
-     conf.menu  = emalloc(conf.nmenu, sizeof(Menu));
-
+     conf.menu = calloc(conf.nmenu, sizeof(Menu));
 
      for(i = 0; i < conf.nmenu; ++i)
      {
