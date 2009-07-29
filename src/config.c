@@ -298,8 +298,6 @@ conf_layout_section(cfg_t *cfg_l)
                     conf.colors.bar,
                     conf.colors.text);
 
-     menulayout.special = True;
-
      if(!conf.layout[0].symbol
         && !conf.layout[0].func)
      {
@@ -425,9 +423,8 @@ conf_menu_section(cfg_t *cfg_m)
 
      conf.nmenu = cfg_size(cfg_m, "set_menu");
      CHECK(conf.nmenu);
-     conf.menu  = emalloc(conf.nmenu + 1, sizeof(Menu));
+     conf.menu  = emalloc(conf.nmenu, sizeof(Menu));
 
-     conf.menu[conf.nmenu] = menulayout;
 
      for(i = 0; i < conf.nmenu; ++i)
      {

@@ -237,7 +237,6 @@ typedef struct
      char *name;
      /* Placement */
      Bool place_at_mouse;
-     Bool special;
      int x, y;
      /* Color */
      struct

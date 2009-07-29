@@ -113,11 +113,11 @@ buttonpress(XButtonEvent *ev)
      {
           if(conf.layout_system && (ev->button == Button1 || ev->button == Button3)) /* True -> menu */
           {
-               conf.menu[conf.nmenu].y = spgeo[selscreen].y + infobar[selscreen].layout_button->geo.y + INFOBARH;
-               conf.menu[conf.nmenu].x = infobar[selscreen].layout_button->geo.x + (sgeo[selscreen].x - BORDH);
+               menulayout.y = spgeo[selscreen].y + infobar[selscreen].layout_button->geo.y + INFOBARH;
+               menulayout.x = infobar[selscreen].layout_button->geo.x + (sgeo[selscreen].x - BORDH);
 
                if(infobar[selscreen].geo.y != spgeo[selscreen].y)
-                    conf.menu[conf.nmenu].y = infobar[selscreen].geo.y - (INFOBARH * menulayout.nitem) - SHADH;
+                    menulayout.y = infobar[selscreen].geo.y - (INFOBARH * menulayout.nitem) - SHADH;
 
                uicb_menu("menulayout");
           }

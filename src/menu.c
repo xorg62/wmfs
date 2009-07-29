@@ -247,7 +247,10 @@ uicb_menu(uicb_t cmd)
      int i, d, u, x, y;
      Window w;
 
-     for(i = 0; i < conf.nmenu + conf.layout_system; ++i)
+     if(!strcmp(cmd, "menulayout"))
+          menu_draw(menulayout, menulayout.x, menulayout.y);
+
+     for(i = 0; i < conf.nmenu; ++i)
           if(!strcmp(cmd, conf.menu[i].name))
           {
                if(conf.menu[i].place_at_mouse)
@@ -255,8 +258,8 @@ uicb_menu(uicb_t cmd)
                else
                {
                     screen_get_sel();
-                    x = conf.menu[i].x + ((conf.menu[i].special) ? 0 : spgeo[selscreen].x);
-                    y = conf.menu[i].y + ((conf.menu[i].special) ? 0 : spgeo[selscreen].y);;
+                    x = conf.menu[i].x + spgeo[selscreen].x;
+                    y = conf.menu[i].y + spgeo[selscreen].y;
                }
                menu_draw(conf.menu[i], x, y);
           }
