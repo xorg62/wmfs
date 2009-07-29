@@ -32,10 +32,7 @@
 
 #include "wmfs.h"
 
-#define FILE_NAME ".config/wmfs/wmfsrc"
-
 cfg_t *cfg, *cfgtmp;
-char final_path[128];
 
 cfg_opt_t misc_opts[] =
 {

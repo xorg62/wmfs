@@ -525,18 +525,16 @@ init_conf(void)
 {
      int ret;
 
-     sprintf(final_path, "%s/%s", _strdup(getenv("HOME")), _strdup(FILE_NAME));
-
      cfg = cfg_init(opts, CFGF_NONE);
-     ret = cfg_parse(cfg, final_path);
+     ret = cfg_parse(cfg, conf.confpath);
 
      if(ret == CFG_FILE_ERROR || ret == CFG_PARSE_ERROR)
      {
-          fprintf(stderr, "WMFS: parsing configuration file (%s) failed\n", final_path);
-          sprintf(final_path, "%s/wmfs/wmfsrc", XDG_CONFIG_DIR);
-          fprintf(stderr, "Use the default configuration (%s).\n", final_path);
+          fprintf(stderr, "WMFS: parsing configuration file (%s) failed\n", conf.confpath);
+          sprintf(conf.confpath, "%s/wmfs/wmfsrc", XDG_CONFIG_DIR);
+          fprintf(stderr, "Use the default configuration (%s).\n", conf.confpath);
           cfg = cfg_init(opts, CFGF_NONE);
-          ret = cfg_parse(cfg, final_path);
+          ret = cfg_parse(cfg, conf.confpath);
      }
 
      conf_init_func_list();

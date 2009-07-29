@@ -97,6 +97,7 @@
 #define IFREE(x)     if(x) free(x)
 #define LEN(x)       (sizeof(x) / sizeof((x)[0]))
 #define deb(p)       fprintf(stderr, "debug: %d\n", (p))
+#define DEF_CONF     ".config/wmfs/wmfsrc"
 #define PAD          conf.pad
 
 /* barwin.c */

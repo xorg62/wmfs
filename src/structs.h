@@ -278,6 +278,9 @@ typedef struct
 /* Configuration structure */
 typedef struct
 {
+     /* Configuration file path */
+     char confpath[512];
+
      /* Misc option */
      char *font;
      Bool raisefocus;
