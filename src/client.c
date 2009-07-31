@@ -998,3 +998,56 @@ uicb_client_screen_prev(uicb_t cmd)
 
      return;
 }
+
+
+/** Move a client
+ *\param cmd uicb_t type
+ */
+void
+uicb_client_move(uicb_t cmd)
+{
+     XRectangle geo;
+     int xi = 0, yi = 0;
+
+     if(!sel || sel->tile || sel->max
+        || sel->lmax || sel->state_fullscreen)
+          return;
+
+     geo = sel->geo;
+
+     if(sscanf(cmd, "%d %d", &xi, &yi))
+     {
+          geo.x += xi;
+          geo.y += yi;
+
+          client_moveresize(sel, geo, False);
+     }
+
+     return;
+}
+
+/** Resize a client
+ *\param cmd uicb_t type
+ */
+void
+uicb_client_resize(uicb_t cmd)
+{
+     XRectangle geo;
+     int wi = 0, hi = 0;
+
+     if(!sel || sel->tile || sel->max
+        || sel->lmax || sel->state_fullscreen)
+          return;
+
+     geo = sel->geo;
+
+     if(sscanf(cmd, "%d %d", &wi, &hi))
+     {
+          geo.width += wi;
+          geo.height += hi;
+
+          client_moveresize(sel, geo, False);
+     }
+
+     return;
+}

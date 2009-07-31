@@ -174,6 +174,8 @@ void uicb_client_swap_prev(uicb_t);
 void uicb_client_kill(uicb_t);
 void uicb_client_screen_next(uicb_t);
 void uicb_client_screen_prev(uicb_t);
+void uicb_client_move(uicb_t cmd);
+void uicb_client_resize(uicb_t cmd);
 
 /* ewmh.c */
 void ewmh_init_hints(void);

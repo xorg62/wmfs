@@ -44,6 +44,8 @@ conf_init_func_list(void)
                {"client_kill",             uicb_client_kill },
                {"client_prev",             uicb_client_prev },
                {"client_next",             uicb_client_next },
+               {"client_move",             uicb_client_move },
+               {"client_resize",           uicb_client_resize },
                {"client_swap_next",        uicb_client_swap_next },
                {"client_swap_prev",        uicb_client_swap_prev },
                {"client_screen_next",      uicb_client_screen_next },
@@ -422,7 +424,7 @@ conf_menu_section(cfg_t *cfg_m)
 
      conf.nmenu = cfg_size(cfg_m, "set_menu");
      CHECK(conf.nmenu);
-     conf.menu = calloc(conf.nmenu, sizeof(Menu));
+     conf.menu = emalloc(conf.nmenu, sizeof(Menu));
 
      for(i = 0; i < conf.nmenu; ++i)
      {
