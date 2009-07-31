@@ -1043,10 +1043,10 @@ uicb_client_resize(uicb_t cmd)
 
      if(sscanf(cmd, "%d %d", &wi, &hi))
      {
-          geo.width += wi;
-          geo.height += hi;
+          geo.width += ((geo.width + wi > 0) ? wi : 0);
+          geo.height += ((geo.height + hi > 0) ? hi : 0);
 
-          client_moveresize(sel, geo, False);
+          client_moveresize(sel, geo, True);
      }
 
      return;
