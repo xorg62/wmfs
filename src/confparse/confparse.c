@@ -35,7 +35,7 @@
 char*
 file_to_str(char *path)
 {
-     char *ret, *p;
+     char *buf, *ret, *p;
      int fd, i;
      struct stat st;
 
@@ -46,7 +46,14 @@ file_to_str(char *path)
      stat(path, &st);
 
      /* Bufferize file */
-     ret = _strdup((char*)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, SEEK_SET));
+     buf = (char*)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, SEEK_SET);
+
+     /* Copy buffer in return value */
+     ret = _strdup(buf);
+
+     /* Unmap buffer, thanks linkdd. */
+     munmap(buf, st.st_size);
+     close(fd);
 
      /* Erase comment line from return value */
      for(i = 0; (p = strchr(erase_delim_content(ret + i), COMMENT_CHAR));)
