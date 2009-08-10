@@ -33,21 +33,26 @@
 #include "confparse.h"
 
 char*
-file_to_str(FILE *f)
+file_to_str(char *path)
 {
-     char c;
-     char *ret;
-     int i;
+     char *ret, *p;
+     int fd, i;
+     struct stat st;
 
-     for(i = 1; fgetc(f) != EOF; ++i);
+     if(!path || !(fd = open(path, O_RDONLY)))
+          return NULL;
 
-     ret = emalloc(i, sizeof(char));
+     /* To get the file size */
+     stat(path, &st);
 
-     rewind(f);
+     /* Bufferize file */
+     ret = _strdup((char*)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, SEEK_SET));
 
-     for(i = 0; (c = fgetc(f)) != EOF; ret[i++] = c);
+     /* Erase comment line from return value */
+     for(i = 0; (p = strchr(erase_delim_content(ret + i), COMMENT_CHAR));)
+          for(i = st.st_size - strlen(p); ret[i] && ret[i] != '\n'; ret[i++] = ' ');
 
-     fclose(f);
+     fprintf(stderr, "WMFS Configuration info: '%s' read.\n", path);
 
      return ret;
 }
@@ -108,7 +113,7 @@ get_nsec(char *src, char *name, int n)
      buf = erase_delim_content(src);
      buf2 = erase_sec_content(buf);
 
-     for(i = 0; i < n * 2 && (buf = strstr(buf, secn)); ++i, buf += strlen(secn));
+     for(i = 0; i < (n * 2) && (buf = strstr(buf, secn)); ++i, buf += strlen(secn));
 
      ret = get_sec(src + strlen(src) - strlen(buf), name);
 
@@ -181,11 +186,11 @@ get_list_opt(char *src, char *def, char *name, int *n)
      if(!(p = get_opt(src, def, name).str))
           return NULL;
 
-     for(i = 0; p[i] && (p[i] != '}' || is_in_delimiter(p, i)); ++i);
+     for(i = 0; p[i] && (p[i] != LIST_DEL_E || is_in_delimiter(p, i)); ++i);
      p[i + 1] = '\0';
 
-     /* Syntax of list (val1, val2, ..., valx) */
-     if(*p != '{' || *(p + strlen(p) - 1) != '}')
+     /* Syntax of list {val1, val2, ..., valx} */
+     if(*p != LIST_DEL_S || *(p + strlen(p) - 1) != LIST_DEL_E)
           return NULL;
 
      /* Erase ( ) */
@@ -215,10 +220,8 @@ get_list_opt(char *src, char *def, char *name, int *n)
      }
      else
      {
-          ret = emalloc(1, sizeof(opt_type));
+          ret = emalloc((*n = 1), sizeof(opt_type));
           *ret = str_to_opt(clean_value(p));
-
-          *n = 1;
      }
 
      return ret;

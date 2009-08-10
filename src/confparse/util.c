@@ -38,15 +38,13 @@ erase_delim_content(char *buf)
      int i, j;
      char *str, c;
 
-     if(!buf)
+     if(!buf || !(str = _strdup(buf)))
           return NULL;
-
-     str = _strdup(buf);
 
      for(i = 0; i < strlen(str); ++i)
           if((c = str[i]) == '"' || (c = str[i]) == '\'')
           {
-               for(str[(j = i)] = ' '; str[j] && str[j] != c; str[j++] = ' ');
+               for(*(str + (j = i)) = ' '; str[j] && str[j] != c; str[j++] = ' ');
                str[j] = ' ';
           }
 
@@ -70,10 +68,9 @@ erase_sec_content(char *buf)
      int i, j;
      char *p, *str, *name, *ret;
 
-     if(!buf)
+     if(!buf || !(str = erase_delim_content(buf)))
           return NULL;
 
-     str = erase_delim_content(buf);
      ret = _strdup(buf);
 
      for(i = 1, name = _strdup(str + i); strchr(str + i, SEC_DEL_S); ++i, name = _strdup(str + i))
@@ -97,20 +94,15 @@ erase_sec_content(char *buf)
 char*
 opt_srch(char *buf, char *opt)
 {
-     char *p, c1, c2;
+     char *p;
 
      if(!buf || !opt)
           return NULL;
 
      if((p = strstr(erase_delim_content(buf), opt)))
-     {
-          c1 = *(p + strlen(opt));
-          c2 = *(p - 1);
-
-          if((c1 == ' ' || c1 == '=')
-             && (c2 == ' ' || c2 == '\n' || c2 == '\t' || !c2))
-               return _strdup(buf + (strlen(buf) - strlen(p)));
-     }
+          if((*(p + strlen(opt)) == ' ' || *(p + strlen(opt)) == '=')
+             && (*(p - 1) == ' ' || *(p - 1) == '\n' || *(p - 1) == '\t' || !(*(p - 1))))
+             return _strdup(buf + (strlen(buf) - strlen(p)));
 
      return NULL;
 }
@@ -146,18 +138,15 @@ clean_value(char *str)
      int i;
      char c, *p;
 
-     if(!str)
+     if(!str || !(p = _strdup(str)))
           return NULL;
-
-     p = _strdup(str);
 
      /* Remove useless spaces */
      for(; *p == ' '; ++p);
      for(; *(p + strlen(p) - 1) == ' '; *(p + strlen(p) - 1) = '\0');
 
      /* For string delimiter (" or ') */
-     if(((c = *p) == '"' || (c = *p) == '\'')
-        && strchr(p + 1, c))
+     if(((c = *p) == '"' || (c = *p) == '\'') && strchr(p + 1, c))
      {
           for(++p, i = 0; p[i] && p[i] != c; ++i);
           p[i] = '\0';

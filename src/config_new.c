@@ -30,55 +30,70 @@
 *      OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "config_struct.h"
+#include "wmfs.h"
 
-void
-conf_init_func_list(void)
+func_name_list_t tmp_func_list[] =
 {
-     int i;
+     {"spawn",                   uicb_spawn },
+     {"client_kill",             uicb_client_kill },
+     {"client_prev",             uicb_client_prev },
+     {"client_next",             uicb_client_next },
+     {"client_swap_next",        uicb_client_swap_next },
+     {"client_swap_prev",        uicb_client_swap_prev },
+     {"client_screen_next",      uicb_client_screen_next },
+     {"client_screen_prev",      uicb_client_screen_prev },
+     {"toggle_max",              uicb_togglemax },
+     {"layout_next",             uicb_layout_next },
+     {"layout_prev",             uicb_layout_prev },
+     {"tag",                     uicb_tag },
+     {"tag_next",                uicb_tag_next },
+     {"tag_prev",                uicb_tag_prev },
+     {"tag_transfert",           uicb_tagtransfert },
+     {"set_mwfact",              uicb_set_mwfact },
+     {"set_nmaster",             uicb_set_nmaster },
+     {"quit",                    uicb_quit },
+     {"toggle_infobar_position", uicb_infobar_togglepos },
+     {"toggle_resizehint",       uicb_toggle_resizehint },
+     {"mouse_move",              uicb_mouse_move },
+     {"mouse_resize",            uicb_mouse_resize },
+     {"client_raise",            uicb_client_raise },
+     {"toggle_free",             uicb_togglefree },
+     {"screen_select",           uicb_screen_select },
+     {"screen_next",             uicb_screen_next },
+     {"screen_prev",             uicb_screen_prev },
+     {"reload",                  uicb_reload },
+     {"launcher",                uicb_launcher },
+     {"set_layout",              uicb_set_layout },
+     {"menu",                    uicb_menu }
+};
 
-     func_name_list_t tmp_list[] =
-          {
-               {"spawn",                   uicb_spawn },
-               {"client_kill",             uicb_client_kill },
-               {"client_prev",             uicb_client_prev },
-               {"client_next",             uicb_client_next },
-               {"client_swap_next",        uicb_client_swap_next },
-               {"client_swap_prev",        uicb_client_swap_prev },
-               {"client_screen_next",      uicb_client_screen_next },
-               {"client_screen_prev",      uicb_client_screen_prev },
-               {"toggle_max",              uicb_togglemax },
-               {"layout_next",             uicb_layout_next },
-               {"layout_prev",             uicb_layout_prev },
-               {"tag",                     uicb_tag },
-               {"tag_next",                uicb_tag_next },
-               {"tag_prev",                uicb_tag_prev },
-               {"tag_transfert",           uicb_tagtransfert },
-               {"set_mwfact",              uicb_set_mwfact },
-               {"set_nmaster",             uicb_set_nmaster },
-               {"quit",                    uicb_quit },
-               {"toggle_infobar_position", uicb_infobar_togglepos },
-               {"toggle_resizehint",       uicb_toggle_resizehint },
-               {"mouse_move",              uicb_mouse_move },
-               {"mouse_resize",            uicb_mouse_resize },
-               {"client_raise",            uicb_client_raise },
-               {"toggle_free",             uicb_togglefree },
-               {"screen_select",           uicb_screen_select },
-               {"screen_next",             uicb_screen_next },
-               {"screen_prev",             uicb_screen_prev },
-               {"reload",                  uicb_reload },
-               {"launcher",                uicb_launcher },
-               {"set_layout",              uicb_set_layout },
-               {"menu",                    uicb_menu }
-          };
+key_name_list_t key_list[] =
+{
+     {"Control", ControlMask },
+     {"Shift",   ShiftMask },
+     {"Lock",    LockMask },
+     {"Alt",     Mod1Mask },
+     {"Mod2",    Mod2Mask },
+     {"Mod3",    Mod3Mask },
+     {"Mod4",    Mod4Mask },
+     {"Super",   Mod4Mask },
+     {"Mod5",    Mod5Mask },
+     {NULL,      NoSymbol }
+};
 
-     func_list = emalloc(LEN(tmp_list), sizeof(func_name_list_t));
-
-     for(i = 0; i < LEN(tmp_list); ++i)
-          func_list[i] = tmp_list[i];
-
-     return;
-}
+name_to_uint_t mouse_button_list[] =
+{
+     {"Button1", Button1 },
+     {"Button2", Button2 },
+     {"Button3", Button3 },
+     {"Button4", Button4 },
+     {"Button5", Button5 },
+     {"1", Button1 },
+     {"2", Button2 },
+     {"3", Button3 },
+     {"4", Button4 },
+     {"5", Button5 },
+};
 
 void
 mouse_section(MouseBinding mb[], char *src, int ns)
@@ -172,7 +187,6 @@ conf_client_section(char *src)
 
      if((conf.client.nmouse = get_size_sec(src, "mouse")))
      {
-          printf("conf.client.nmouse = %d\n", conf.client.nmouse);
           conf.client.mouse = emalloc(conf.client.nmouse, sizeof(MouseBinding));
           mouse_section(conf.client.mouse, src, conf.client.nmouse);
      }
@@ -416,8 +430,8 @@ conf_menu_section(char *src)
 
           if(!(conf.menu[i].place_at_mouse = get_opt(tmp, "true", "place_at_mouse").bool))
           {
-               conf.menu[i].x = get_opt(cfgtmp, "0", "x").num;
-               conf.menu[i].y = get_opt(cfgtmp, "0", "y").num;
+               conf.menu[i].x = get_opt(tmp, "0", "x").num;
+               conf.menu[i].y = get_opt(tmp, "0", "y").num;
           }
 
           conf.menu[i].colors.focus.bg  = getcolor(get_opt(tmp, "#000000", "bg_focus").str);
@@ -487,7 +501,7 @@ conf_keybind_section(char *src)
 
           if(keys[i].func == NULL)
           {
-               fprintf(stderr, "WMFS Configuration error: Unknow Function \"%s\"\n", get_opt(tmp, "", "func").str);
+               fprintf(stderr, "WMFS Configuration warning: Unknow Function \"%s\"\n", get_opt(tmp, "", "func").str);
                keys[i].func = uicb_spawn;
           }
           keys[i].cmd = (!get_opt(tmp, "", "cmd").str) ? NULL : get_opt(tmp, "", "cmd").str;
@@ -502,22 +516,19 @@ conf_keybind_section(char *src)
 void
 init_conf(void)
 {
-     FILE *f;
      char *file;
 
-     if(!(f = fopen(conf.confpath, "r")))
+     if(!(file = file_to_str(conf.confpath)))
      {
           fprintf(stderr, "WMFS: parsing configuration file (%s) failed\n", conf.confpath);
           sprintf(conf.confpath, "%s/wmfs/wmfsrc", XDG_CONFIG_DIR);
           fprintf(stderr, "Use the default configuration (%s).\n", conf.confpath);
-          f = fopen(conf.confpath, "r");
+          file = file_to_str(conf.confpath);
      }
 
-     file = file_to_str(f);
-
-     conf_init_func_list();
-
-     /* conf_alias_section(get_sec(file, "alias")); */
+     /* Set func_list */
+     func_list = emalloc(LEN(tmp_func_list), sizeof(func_name_list_t));
+     memcpy(func_list, tmp_func_list, LEN(tmp_func_list) * sizeof(func_name_list_t));
 
      conf_misc_section(get_sec(file, "misc"));
      conf_bar_section(get_sec(file, "bar"));

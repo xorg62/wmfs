@@ -52,6 +52,7 @@
 #include <X11/Xft/Xft.h>
 
 /* Local headers */
+#include "confparse/confparse.h"
 #include "config.h"
 #include "structs.h"
 
@@ -195,15 +196,6 @@ void frame_moveresize(Client *c, XRectangle geo);
 void frame_update(Client *c);
 
 /* config.c */
-void conf_alias_section(cfg_t *cfg_a);
-void conf_misc_section(cfg_t *cfg_m);
-void conf_bar_section(cfg_t *cfg_b);
-void conf_root_section(cfg_t *cfg_r);
-void conf_client_section(cfg_t *cfg_c);
-void conf_layout_section(cfg_t *cfg_l);
-void conf_tag_section(cfg_t *cfg_t);
-void conf_menu_section(cfg_t *cfg_m);
-void conf_keybind_section(cfg_t *cfg_k);
 void init_conf(void);
 
 /* event.c */

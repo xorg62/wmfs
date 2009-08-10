@@ -33,14 +33,22 @@
 #ifndef CONFPARSE_H
 #define CONFPARSE_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include "../wmfs.h"
 
+/* Section delimiter */
 #define SEC_DEL_S '['
 #define SEC_DEL_E ']'
+
+/* List delimiter */
+#define LIST_DEL_S '{'
+#define LIST_DEL_E '}'
+
+/* Comment character */
+#define COMMENT_CHAR '#'
 
 typedef struct
 {
@@ -59,7 +67,7 @@ opt_type str_to_opt(char *str);
 char *clean_value(char *str);
 
 /* confparse.c */
-char *file_to_str(FILE *f);
+char *file_to_str(char *path);
 char *get_sec(char *src, char *name);
 char *get_nsec(char *src, char *name, int n);
 int get_size_sec(char *src, char *name);
