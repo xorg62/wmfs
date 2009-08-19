@@ -28,7 +28,7 @@ set(wmfs_src
   src/confparse/confparse.c
   src/barwin.c
   src/client.c
-#  src/config_new.c
+# src/config_new.c
   src/config.c
   src/
   src/draw.c

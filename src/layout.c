@@ -734,6 +734,8 @@ uicb_togglemax(uicb_t cmd)
 void
 uicb_toggle_resizehint(uicb_t cmd)
 {
+     screen_get_sel();
+
      tags[selscreen][seltag[selscreen]].resizehint = !tags[selscreen][seltag[selscreen]].resizehint;
 
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);

@@ -68,7 +68,7 @@ char*
 get_sec(char *src, char *name)
 {
      char *ret, *p;
-     char *secn;
+     char **sec;
 
      if(!src)
           return NULL;
@@ -76,16 +76,15 @@ get_sec(char *src, char *name)
      if(!name)
           return src;
 
-     secn = emalloc((strlen(name) + 2), sizeof(char));
-     sprintf(secn, "%c%s%c", SEC_DEL_S, name, SEC_DEL_E);
+     sec = secname(name);
 
      ret = _strdup(src);
 
-     if((p = strstr(erase_delim_content(src), secn)))
+     if((p = strstr(erase_delim_content(src), sec[SecStart])))
      {
-          ret += strlen(ret) - strlen(p) + strlen(secn) + 1;
+          ret += strlen(ret) - strlen(p) + strlen(sec[SecStart]) + 1;
 
-          if((p = strstr(erase_delim_content(ret), secn)))
+          if((p = strstr(erase_delim_content(ret), sec[SecEnd])))
                *(ret + (strlen(ret) - strlen(p))) = '\0';
           else
                ret = NULL;
@@ -93,7 +92,7 @@ get_sec(char *src, char *name)
      else
           ret = NULL;
 
-     free(secn);
+     free(sec);
 
      return ret;
 }

@@ -50,6 +50,8 @@
 /* Comment character */
 #define COMMENT_CHAR '#'
 
+enum { SecStart, SecEnd, SecLast };
+
 typedef struct
 {
      long int num;
@@ -65,6 +67,7 @@ char *erase_sec_content(char *buf);
 char *opt_srch(char *buf, char *opt);
 opt_type str_to_opt(char *str);
 char *clean_value(char *str);
+char **secname(char *name);
 
 /* confparse.c */
 char *file_to_str(char *path);

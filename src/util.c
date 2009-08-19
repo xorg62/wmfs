@@ -102,7 +102,6 @@ _strdup(const char *str)
 {
      char *ret = emalloc(strlen(str) + 1, sizeof(char));
 
-     memset(ret, strlen(str) + 1, 0);
      strcpy(ret, str);
 
      return ret;

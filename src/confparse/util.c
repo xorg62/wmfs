@@ -67,6 +67,7 @@ erase_sec_content(char *buf)
 {
      int i, j;
      char *p, *str, *name, *ret;
+     char *sname;
 
      if(!buf || !(str = erase_delim_content(buf)))
           return NULL;
@@ -79,7 +80,11 @@ erase_sec_content(char *buf)
           for(j = 0; str[i] && str[i - 1] != SEC_DEL_E; name[j++] = str[i++]);
           name[j] = '\0';
 
-          if((p = strstr(str + i, name)))
+          sname = emalloc(strlen(name) + 1, sizeof(char));
+
+          sprintf(sname, "[/%s]", name);
+
+          if((p = strstr(str + i, sname)))
                for(++i; i < strlen(ret) - strlen(p); ret[i++] = ' ');
           else
                return ret;
@@ -153,4 +158,26 @@ clean_value(char *str)
      }
 
      return p;
+}
+
+char**
+secname(char *name)
+{
+     char **ret = NULL;
+
+     if(!name)
+          return NULL;
+
+     ret = emalloc(SecLast, sizeof(char*));
+
+     /* Len of name + '[' + ']' */
+     ret[SecStart] = emalloc(strlen(name) + 2, sizeof(char));
+
+     /* Len of name + '[' + '/' + ']' */
+     ret[SecEnd] = emalloc(strlen(name) + 3, sizeof(char));
+
+     sprintf(ret[SecStart], "%c%s%c", SEC_DEL_S, name, SEC_DEL_E);
+     sprintf(ret[SecEnd], "%c/%s%c", SEC_DEL_S, name, SEC_DEL_E);
+
+     return ret;
 }

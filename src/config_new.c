@@ -355,6 +355,7 @@ conf_tag_section(char *src)
 
      for(i = 0; i < get_size_sec(src, "tag"); ++i)
      {
+          /* printf("%d -> %s\n", i, (cfgtmp = get_nsec(src, "tag", i)));*/
           cfgtmp = get_nsec(src, "tag", i);
           j = get_opt(cfgtmp, "-1", "screen").num;
 
@@ -529,6 +530,10 @@ init_conf(void)
      /* Set func_list */
      func_list = emalloc(LEN(tmp_func_list), sizeof(func_name_list_t));
      memcpy(func_list, tmp_func_list, LEN(tmp_func_list) * sizeof(func_name_list_t));
+
+     printf("-> %s\n", erase_sec_content(" [pwet] tagada = prout hihi=tralalère [uh] wpwer [/uh] [uh] pwefvbg [/uh] [/pwet] "));
+
+     return;
 
      conf_misc_section(get_sec(file, "misc"));
      conf_bar_section(get_sec(file, "bar"));
