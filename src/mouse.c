@@ -115,8 +115,7 @@ mouse_move(Client *c)
 
                     for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
                          if(infobar[selscreen].tags[i]->win == sw
-                            && tags[selscreen][i].layout.func != freelayout
-                            && tags[selscreen][i].layout.func != maxlayout)
+                            && tags[selscreen][i].layout.func != freelayout)
                          {
                               c->screen = selscreen;
                               c->tag = i;
