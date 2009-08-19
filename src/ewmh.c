@@ -159,7 +159,7 @@ ewmh_update_current_tag_prop(void)
 
      /* Current tag mwfact */
      XChangeProperty(dpy, ROOT, net_atom[wmfs_mwfact], XA_STRING, 8,
-                     PropModeReplace, (uchar*)&s, strlen(s));
+                     PropModeReplace, (uchar*)s, strlen(s));
 
      /* Current nmaster */
      XChangeProperty(dpy, ROOT, net_atom[wmfs_nmaster], XA_CARDINAL, 32,

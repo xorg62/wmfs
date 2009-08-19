@@ -51,7 +51,7 @@ set(wmfs_src
 add_executable(wmfs ${wmfs_src})
 
 # Set the version
-set(VERSION "WMFS-200907")
+set(VERSION "WMFS-200908")
 
 # FLAGS
 set(CFLAGS "-g -Wall -ansi")
