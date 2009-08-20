@@ -531,10 +531,6 @@ init_conf(void)
      func_list = emalloc(LEN(tmp_func_list), sizeof(func_name_list_t));
      memcpy(func_list, tmp_func_list, LEN(tmp_func_list) * sizeof(func_name_list_t));
 
-     printf("-> %s\n", erase_sec_content(" [pwet] tagada = prout hihi=tralalère [uh] wpwer [/uh] [uh] pwefvbg [/uh] [/pwet] "));
-
-     return;
-
      conf_misc_section(get_sec(file, "misc"));
      conf_bar_section(get_sec(file, "bar"));
      conf_root_section(get_sec(file, "root"));

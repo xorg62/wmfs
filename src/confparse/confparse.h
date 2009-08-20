@@ -68,6 +68,7 @@ char *opt_srch(char *buf, char *opt);
 opt_type str_to_opt(char *str);
 char *clean_value(char *str);
 char **secname(char *name);
+void free_secname(char **secname);
 
 /* confparse.c */
 char *file_to_str(char *path);

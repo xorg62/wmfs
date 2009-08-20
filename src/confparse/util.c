@@ -67,7 +67,7 @@ erase_sec_content(char *buf)
 {
      int i, j;
      char *p, *str, *name, *ret;
-     char *sname;
+     char **sec;
 
      if(!buf || !(str = erase_delim_content(buf)))
           return NULL;
@@ -77,18 +77,22 @@ erase_sec_content(char *buf)
      for(i = 1, name = _strdup(str + i); strchr(str + i, SEC_DEL_S); ++i, name = _strdup(str + i))
      {
           for(; str[i] && str[i] != SEC_DEL_S; ++i);
-          for(j = 0; str[i] && str[i - 1] != SEC_DEL_E; name[j++] = str[i++]);
-          name[j] = '\0';
+          for(j = 0; str[i] && str[i] != SEC_DEL_E; name[j++] = str[i++]);
+          ++name;
+          name[j - 1] = '\0';
 
-          sname = emalloc(strlen(name) + 1, sizeof(char));
+          if(*name == '/')
+               continue;
 
-          sprintf(sname, "[/%s]", name);
+          sec = secname(name);
 
-          if((p = strstr(str + i, sname)))
+          if((p = strstr(str + i, sec[SecEnd])))
                for(++i; i < strlen(ret) - strlen(p); ret[i++] = ' ');
           else
-               return ret;
+               break;
      }
+
+     free_secname(sec);
 
      return ret;
 }
@@ -180,4 +184,20 @@ secname(char *name)
      sprintf(ret[SecEnd], "%c/%s%c", SEC_DEL_S, name, SEC_DEL_E);
 
      return ret;
+}
+
+void
+free_secname(char **secname)
+{
+     if(!secname || LEN(secname) != SecLast)
+          return;
+
+     if(secname[SecStart])
+          free(secname[SecStart]);
+     if(secname[SecEnd])
+          free(secname[SecEnd]);
+
+     free(secname);
+
+     return;
 }

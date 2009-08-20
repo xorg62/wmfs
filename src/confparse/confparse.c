@@ -92,7 +92,7 @@ get_sec(char *src, char *name)
      else
           ret = NULL;
 
-     free(sec);
+     free_secname(sec);
 
      return ret;
 }
@@ -101,7 +101,7 @@ char*
 get_nsec(char *src, char *name, int n)
 {
      int i;
-     char *ret, *buf, *secn;
+     char *ret, *buf, **sec;
      char *buf2;
 
      if(!src)
@@ -113,17 +113,16 @@ get_nsec(char *src, char *name, int n)
      if(!n)
           return get_sec(src, name);
 
-     secn = emalloc((strlen(name) + 2), sizeof(char));
-     sprintf(secn, "%c%s%c", SEC_DEL_S, name, SEC_DEL_E);
+     sec = secname(name);
 
      buf = erase_delim_content(src);
      buf2 = erase_sec_content(buf);
 
-     for(i = 0; i < (n * 2) && (buf = strstr(buf, secn)); ++i, buf += strlen(secn));
+     for(i = 0; i < n && (buf = strstr(buf, sec[SecStart])); ++i, buf += strlen(sec[SecStart]));
 
      ret = get_sec(src + strlen(src) - strlen(buf), name);
 
-     free(secn);
+     free_secname(sec);
 
      return ret;
 }
@@ -132,24 +131,20 @@ int
 get_size_sec(char *src, char *name)
 {
      int ret;
-     char *secn, *buf;
+     char **sec, *buf;
 
      if(!src || !name)
           return 0;
 
-     secn = emalloc(strlen(name), sizeof(char));
-     sprintf(secn, "%c%s%c", SEC_DEL_S, name, SEC_DEL_E);
+     sec = secname(name);
 
      buf = erase_sec_content(src);
 
-     for(ret = 0; (buf = strstr(buf, secn)); ++ret, buf += strlen(secn));
+     for(ret = 0; (buf = strstr(buf, sec[SecStart])); ++ret, buf += strlen(sec[SecStart]));
 
-     /* If a section is not closed */
-     for(; ret % 2; --ret);
+     free_secname(sec);
 
-     free(secn);
-
-     return ret / 2;
+     return ret;
 }
 
 opt_type
