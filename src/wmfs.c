@@ -208,7 +208,7 @@ scan(void)
 
                     c = client_manage(w[i], &wa, False);
 
-                    if(tag != -1)
+                    if(tag != -1 )
                          c->tag = tag;
                     if(screen != -1 && screen <= screen_count() - 1)
                          c->screen = screen;
@@ -220,7 +220,11 @@ scan(void)
 
      /* Set update layout request */
      for(c = clients; c; c = c->next)
+     {
+          if(c->tag > conf.ntag[c->screen])
+               c->tag = conf.ntag[c->screen];
           tags[c->screen][c->tag].request_update = True;
+     }
 
      for(i = 0; i < screen_count(); ++i)
           arrange(i, True);
