@@ -69,10 +69,10 @@ freelayout(int screen)
      for(c = clients; c; c = c->next)
           if(!ishide(c, selscreen)
              && c->screen == screen_get_sel()
-             && !c->max)
+             && !(c->flags & MaxFlag))
           {
                client_moveresize(c, c->ogeo, True);
-               c->tile = c->lmax = False;
+               c->flags &= ~(TileFlag | LMaxFlag);
           }
 
      ewmh_update_current_tag_prop();
@@ -147,13 +147,9 @@ maxlayout(int screen)
 
      for(i = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
      {
-          c->tile = False;
-          c->lmax = True;
+          c->flags &= ~TileFlag;
+          c->flags |= LMaxFlag;
           client_maximize(c);
-
-          /* Focus the first client
-          if(!i)
-          client_focus(c); */
      }
 
      ewmh_update_current_tag_prop();
@@ -169,10 +165,10 @@ maxlayout(int screen)
 Client*
 tiled_client(int screen, Client *c)
 {
-     for(;c && (c->max
-                || c->free
+     for(;c && ((c->flags & MaxFlag)
+                || (c->flags & FreeFlag)
+                || (c->flags & FSSFlag)
                 || c->screen != screen
-                || c->state_fullscreen
                 || ishide(c, screen)); c = c->next);
 
      return c;
@@ -251,8 +247,8 @@ grid(int screen)
      for(i = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
      {
           /* Set client property */
-          c->max = c->lmax = False;
-          c->tile = True;
+          c->flags &= ~(MaxFlag | LMaxFlag);
+          c->flags |= TileFlag;
           ++cpcols;
           cgeo.width = (sg.width / cols) - (BORDH * 2);
           cgeo.height = (sg.height / rows) - BORDH;
@@ -336,8 +332,8 @@ multi_tile(int screen, Position type)
      for(i = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
      {
           /* Set client property */
-          c->max = c->lmax = False;
-          c->tile = True;
+          c->flags &= ~(MaxFlag | LMaxFlag);
+          c->flags |= TileFlag;
 
           /* MASTER */
           if(i < nmaster)
@@ -489,8 +485,8 @@ mirror(int screen, Bool horizontal)
      for(i = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
      {
           /* Set client property */
-          c->max = c->lmax = False;
-          c->tile = True;
+          c->flags &= ~(MaxFlag | LMaxFlag);
+          c->flags |= TileFlag;
 
           if(i < nmaster)
           {
@@ -661,8 +657,12 @@ uicb_tile_switch(uicb_t cmd)
 
      screen_get_sel();
 
-     if(!sel || sel->hint || !sel->tile || sel->state_fullscreen)
+     if(!sel
+        || (sel->flags & HintFlag)
+        || !(sel->flags & TileFlag)
+        || (sel->flags & FSSFlag))
           return;
+
      if((c = sel) == tiled_client(selscreen, clients))
           CHECK((c = tiled_client(selscreen, c->next)));
      client_detach(c);
@@ -679,14 +679,14 @@ uicb_tile_switch(uicb_t cmd)
 void
 uicb_togglefree(uicb_t cmd)
 {
-     if(!sel || sel->screen != screen_get_sel() || sel->state_fullscreen)
+     if(!sel || sel->screen != screen_get_sel() || (sel->flags & FSSFlag))
           return;
 
-     sel->free = !sel->free;
+     sel->flags ^= FreeFlag;
 
-     if(sel->free)
+     if((sel->flags & FreeFlag))
      {
-          sel->tile = sel->max = sel->lmax = False;
+          sel->flags &= ~(TileFlag | MaxFlag | LMaxFlag);
           client_moveresize(sel, sel->ogeo, True);
           client_raise(sel);
      }
@@ -707,21 +707,21 @@ uicb_togglefree(uicb_t cmd)
 void
 uicb_togglemax(uicb_t cmd)
 {
-     if(!sel || ishide(sel, selscreen) || sel->hint || sel->state_fullscreen)
+     if(!sel || ishide(sel, selscreen)
+        || (sel->flags & HintFlag)|| (sel->flags & FSSFlag))
           return;
 
-     if(!sel->max)
+     if(!(sel->flags & MaxFlag))
      {
           sel->ogeo = sel->geo;
-          sel->tile = False;
-          sel->free = False;
+          sel->flags &= ~(TileFlag | FreeFlag);
           client_maximize(sel);
           client_raise(sel);
-          sel->max = True;
+          sel->flags |= MaxFlag;
      }
      else
      {
-          sel->max = False;
+          sel->flags &= ~MaxFlag;
           tags[selscreen][seltag[selscreen]].layout.func(selscreen);
      }
 

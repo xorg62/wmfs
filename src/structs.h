@@ -39,6 +39,16 @@
 #define MAXTAG         36
 #define NUM_OF_LAYOUT  9
 
+/* Clients flags definition */
+#define FreeFlag  (1 << 1)
+#define MaxFlag   (1 << 2)
+#define TileFlag  (1 << 3)
+#define HideFlag  (1 << 4)
+#define LMaxFlag  (1 << 5)
+#define UnmapFlag (1 << 6)
+#define HintFlag  (1 << 7)
+#define FSSFlag   (1 << 8)
+
 /* Typedef */
 typedef const char*    uicb_t;
 typedef unsigned int   uint;
@@ -159,10 +169,8 @@ struct Client
           char *fg;
           uint resizecorner;
      } colors;
-     /* Client Information */
-     Bool max, tile, free, hide;
-     Bool hint, lmax, unmapped;
-     Bool state_fullscreen;
+     /* Client Information by flags */
+     uint flags;
      /* Struct in chains */
      Client *next;
      Client *prev;

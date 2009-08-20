@@ -364,10 +364,10 @@ client_get_name(Client *c)
 void
 client_hide(Client *c)
 {
-     CHECK(!c->hide);
+     CHECK(!(c->flags & HideFlag));
 
      client_unmap(c);
-     c->hide = True;
+     c->flags |= HideFlag;
      setwinstate(c->win, IconicState);
 
      return;
@@ -451,7 +451,7 @@ client_map(Client *c)
 {
      CHECK(c);
 
-     if(c->state_fullscreen)
+     if(c->flags & FSSFlag)
           XMapWindow(dpy, c->win);
      else
      {
@@ -463,7 +463,7 @@ client_map(Client *c)
                barwin_map_subwin(c->titlebar);
           }
           XMapSubwindows(dpy, c->frame);
-          c->unmapped = False;
+          c->flags &= ~UnmapFlag;
      }
 
      return;
@@ -490,6 +490,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      c = emalloc(1, sizeof(Client));
      c->win = w;
      c->screen = selscreen;
+     c->flags = 0;
 
      if(conf.client.place_at_mouse)
      {
@@ -535,8 +536,6 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
           for(t = clients; t && t->win != trans; t = t->next);
      if(t)
           c->tag = t->tag;
-     if(!c->free)
-          c->free = (rettrans == Success) || c->hint;
      free(t);
 
      client_attach(c);
@@ -620,7 +619,7 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
      if(r)
           client_geo_hints(&geo, c);
 
-     c->max = False;
+     c->flags &= ~MaxFlag;
      c->geo = c->ogeo = geo;
 
      c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
@@ -645,7 +644,7 @@ client_maximize(Client *c)
 {
      XRectangle geo;
 
-     if(!c || c->state_fullscreen)
+     if(!c || c->flags & FSSFlag)
           return;
 
      c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
@@ -729,8 +728,9 @@ client_size_hints(Client *c)
      else
           c->minax = c->maxax = c->minay = c->maxay = 0;
 
-     c->hint = (c->maxw && c->minw && c->maxh && c->minh
-                && c->maxw == c->minw && c->maxh == c->minh);
+     if(c->maxw && c->minw && c->maxh && c->minh
+        && c->maxw == c->minw && c->maxh == c->minh)
+          c->flags |= HintFlag;
 
      return;
 }
@@ -743,8 +743,8 @@ void
 client_swap(Client *c1, Client *c2)
 {
      /* Check if no one of these clients are free */
-     CHECK(!c1->free);
-     CHECK(!c2->free);
+     CHECK(!(c1->flags & FreeFlag));
+     CHECK(!(c2->flags & FreeFlag));
 
      if(c1 == c2 || (c1->screen == c2->screen && c1->tag != c2->tag))
           return;
@@ -807,6 +807,8 @@ client_set_wanted_tag(Client *c)
 void
 client_update_attributes(Client *c)
 {
+     Bool f;
+
      /* For reload use */
      XChangeProperty(dpy, c->win, ATOM("_WMFS_TAG"), XA_CARDINAL, 32,
                      PropModeReplace, (uchar*)&(c->tag), 1);
@@ -814,8 +816,10 @@ client_update_attributes(Client *c)
      XChangeProperty(dpy, c->win, ATOM("_WMFS_SCREEN"), XA_CARDINAL, 32,
                      PropModeReplace, (uchar*)&(c->screen), 1);
 
+     f = (c->flags & FreeFlag) ? True : False;
+
      XChangeProperty(dpy, c->win, ATOM("_WMFS_ISFREE"), XA_CARDINAL, 32,
-                     PropModeReplace, (uchar*)&(c->free), 1);
+                     PropModeReplace, (uchar*)&f, 1);
 
      return;
 }
@@ -826,7 +830,7 @@ client_update_attributes(Client *c)
 void
 client_raise(Client *c)
 {
-     if(!c || c->tile)
+     if(!c || (c->flags & TileFlag))
           return;
 
      XRaiseWindow(dpy, c->frame);
@@ -851,10 +855,10 @@ uicb_client_raise(uicb_t cmd)
 void
 client_unhide(Client *c)
 {
-     CHECK(c->hide);
+     CHECK(c->flags & HideFlag);
 
      client_map(c);
-     c->hide = False;
+     c->flags &= ~HideFlag;
      setwinstate(c->win, NormalState);
 
      return;
@@ -912,7 +916,7 @@ client_unmap(Client *c)
 {
      CHECK(c);
 
-     if(c->state_fullscreen)
+     if(c->flags & FSSFlag)
           XUnmapWindow(dpy, c->win);
      else
      {
@@ -924,7 +928,7 @@ client_unmap(Client *c)
 
           XUnmapWindow(dpy, c->frame);
           XUnmapSubwindows(dpy, c->frame);
-          c->unmapped = True;
+          c->flags |= UnmapFlag;
      }
 
      return;
@@ -964,7 +968,7 @@ client_set_screen(Client *c, int s)
      arrange(s, True);
      arrange(os, True);
 
-     if(!c->tile)
+     if(!(c->flags & TileFlag))
      {
           client_focus(c);
           client_raise(c);
@@ -1009,8 +1013,11 @@ uicb_client_move(uicb_t cmd)
      XRectangle geo;
      int xi = 0, yi = 0;
 
-     if(!sel || sel->tile || sel->max
-        || sel->lmax || sel->state_fullscreen)
+     if((sel->flags & TileFlag)
+        || (sel->flags & MaxFlag)
+        || (sel->flags & LMaxFlag)
+        || (sel->flags & FSSFlag)
+        || !sel)
           return;
 
      geo = sel->geo;
@@ -1035,8 +1042,11 @@ uicb_client_resize(uicb_t cmd)
      XRectangle geo;
      int wi = 0, hi = 0;
 
-     if(!sel || sel->tile || sel->max
-        || sel->lmax || sel->state_fullscreen)
+     if((sel->flags & TileFlag)
+        || (sel->flags & MaxFlag)
+        || (sel->flags & LMaxFlag)
+        || (sel->flags & FSSFlag)
+        || !sel)
           return;
 
      geo = sel->geo;

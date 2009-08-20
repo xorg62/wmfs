@@ -62,7 +62,7 @@ mouse_move(Client *c)
      GC gci;
      XEvent ev;
 
-     if(c->max || c->state_fullscreen)
+     if((c->flags & MaxFlag) || (c->flags & FSSFlag))
           return;
 
      ocx =  c->geo.x;
@@ -72,7 +72,7 @@ mouse_move(Client *c)
                      None, cursor[CurMove], CurrentTime) != GrabSuccess)
           return;
 
-     if(!c->tile && !c->lmax)
+     if(!(c->flags & TileFlag) && !(c->flags & LMaxFlag))
           XGrabServer(dpy);
 
      /* Set the GC for the rectangle */
@@ -81,7 +81,7 @@ mouse_move(Client *c)
      xgc.line_width = BORDH;
      gci = XCreateGC(dpy, ROOT, GCFunction | GCSubwindowMode | GCLineWidth, &xgc);
 
-     if(!c->tile && !c->lmax)
+     if(!(c->flags & TileFlag) && !(c->flags & LMaxFlag))
           mouse_dragborder(c->geo, gci);
 
      XQueryPointer(dpy, ROOT, &dw, &dw, &mx, &my, &dint, &dint, &duint);
@@ -93,7 +93,7 @@ mouse_move(Client *c)
 
           if(ev.type == MotionNotify)
           {
-               if(c->tile || c->lmax)
+               if((c->flags & TileFlag) || (c->flags & LMaxFlag))
                {
                     XQueryPointer(dpy, ROOT, &dw, &sw, &mx, &my, &dint, &dint, &duint);
 
@@ -148,7 +148,7 @@ mouse_move(Client *c)
      while(ev.type != ButtonRelease);
 
      /* One time again to delete all the trace on the window */
-     if(!c->tile && !c->lmax)
+     if(!(c->flags & TileFlag) && !(c->flags & LMaxFlag))
      {
           mouse_dragborder(geo, gci);
           client_moveresize(c, geo, False);
@@ -178,7 +178,9 @@ mouse_resize(Client *c)
      GC gci;
      float mwf = tags[selscreen][seltag[selscreen]].mwfact;
 
-     if(c->max || c->lmax || c->state_fullscreen)
+     if((c->flags & MaxFlag)
+        || (c->flags & LMaxFlag)
+        || (c->flags & FSSFlag))
           return;
 
      XQueryPointer(dpy, ROOT, &w, &w, &omx, &omy, &d, &d, (uint *)&u);
@@ -187,11 +189,11 @@ mouse_resize(Client *c)
           pos = Left;
 
      if(XGrabPointer(dpy, ROOT, False, MouseMask, GrabModeAsync, GrabModeAsync, None,
-                     cursor[((c->tile) ? CurResize : ((pos == Right) ? CurRightResize : CurLeftResize))],
+                     cursor[((c->flags & TileFlag) ? CurResize : ((pos == Right) ? CurRightResize : CurLeftResize))],
                      CurrentTime) != GrabSuccess)
           return;
 
-     if(!c->tile)
+     if(!(c->flags & TileFlag))
           XGrabServer(dpy);
 
      /* Set the GC for the rectangle */
@@ -200,7 +202,7 @@ mouse_resize(Client *c)
      xgc.line_width = BORDH;
      gci = XCreateGC(dpy, ROOT, GCFunction | GCSubwindowMode | GCLineWidth, &xgc);
 
-     if(!c->tile)
+     if(!(c->flags & TileFlag))
      {
           if(pos == Right)
                XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->geo.width + conf.client.borderheight, c->geo.height);
@@ -216,7 +218,8 @@ mouse_resize(Client *c)
           if(ev.type == MotionNotify)
           {
                /* To resize MWFACT in tile mode */
-               if(c->tile && tags[selscreen][seltag[selscreen]].layout.func != grid)
+               if((c->flags & TileFlag)
+                  && tags[selscreen][seltag[selscreen]].layout.func != grid)
                {
                     if(tags[selscreen][seltag[selscreen]].layout.func == tile)
                          mwf += (ROUND(ev.xmotion.x_root) - omx) / (sgeo[c->screen].width);
@@ -233,7 +236,7 @@ mouse_resize(Client *c)
                     tags[selscreen][seltag[selscreen]].mwfact = (mwf < 0.05) ? 0.05 : ((mwf > 0.95) ? 0.95 : mwf);
                }
                /* Free mode */
-               else if(!c->tile)
+               else if(!(c->flags & TileFlag))
                {
                     mouse_dragborder(geo, gci);
 
@@ -261,7 +264,7 @@ mouse_resize(Client *c)
      }
      while(ev.type != ButtonRelease);
 
-     if(!c->tile)
+     if(!(c->flags & TileFlag))
      {
           mouse_dragborder(ogeo, gci);
           client_moveresize(c, geo, True);

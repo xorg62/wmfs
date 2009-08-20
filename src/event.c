@@ -249,10 +249,10 @@ configureevent(XConfigureRequestEvent *ev)
      if((c = client_gb_win(ev->window))
         || (c = client_gb_win(ev->window)))
      {
-          CHECK(!c->tile);
-          CHECK(!c->lmax);
-          CHECK(!c->max);
-          CHECK(!c->state_fullscreen);
+          CHECK(!(c->flags & TileFlag));
+          CHECK(!(c->flags & LMaxFlag));
+          CHECK(!(c->flags & MaxFlag));
+          CHECK(!(c->flags & FSSFlag));
      }
 
      if((c= client_gb_win(ev->window)))
@@ -460,8 +460,10 @@ propertynotify(XPropertyEvent *ev)
           default: break;
           case XA_WM_TRANSIENT_FOR:
                XGetTransientForHint(dpy, c->win, &trans);
-               if((c->tile || c->max) && (c->hint = (client_gb_win(trans) != NULL)))
-                    arrange(c->screen, True);
+               if((c->flags & TileFlag || c->flags & MaxFlag))
+                    if(((c->flags & HintFlag && (client_gb_win(trans) != NULL)))
+                       || (!(c->flags & HintFlag && (client_gb_win(trans) != NULL))))
+                         arrange(c->screen, True);
                break;
           case XA_WM_NORMAL_HINTS:
                client_size_hints(c);
@@ -487,7 +489,7 @@ unmapnotify(XUnmapEvent *ev)
 
      if((c = client_gb_win(ev->window))
         && ev->send_event
-        && !c->hide)
+        && !(c->flags & HideFlag))
      {
           client_unmanage(c);
           XSetErrorHandler(errorhandler);

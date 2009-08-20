@@ -213,7 +213,7 @@ scan(void)
                     if(screen != -1 && screen <= screen_count() - 1)
                          c->screen = screen;
                     if(free != -1)
-                         c->free = free;
+                         c->flags |= (free) ? FreeFlag : 0;
 
                     client_update_attributes(c);
                }

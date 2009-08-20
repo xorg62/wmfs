@@ -287,29 +287,30 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
      /* Manage _NET_WM_STATE_FULLSCREEN */
      if(data_l[1] == net_atom[net_wm_state_fullscreen])
      {
-          if(data_l[0] == _NET_WM_STATE_ADD && !c->state_fullscreen)
+          if(data_l[0] == _NET_WM_STATE_ADD && !(c->flags & FSSFlag))
           {
                c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
                client_unmap(c);
-               c->unmapped = False;
+               c->flags &= ~UnmapFlag;
                XMapWindow(dpy, c->win);
                XReparentWindow(dpy, c->win, ROOT, spgeo[c->screen].x, spgeo[c->screen].y);
-               XResizeWindow(dpy, c->win, spgeo[c->screen].x + spgeo[c->screen].width,
-                             spgeo[c->screen].y + spgeo[c->screen].height);
+               XResizeWindow(dpy, c->win,
+                             spgeo[c->screen].width,
+                             spgeo[c->screen].height);
+
                c->tmp_geo = c->geo;
 
-               if(c->free)
+               if(c->flags & FreeFlag)
                     c->ogeo = c->geo;
 
-               c->state_fullscreen = True;
-               c->max = True;
+               c->flags |= (FSSFlag | MaxFlag);
 
                client_raise(c);
                client_focus(c);
           }
-          else if(data_l[0] == _NET_WM_STATE_REMOVE && c->state_fullscreen)
+          else if(data_l[0] == _NET_WM_STATE_REMOVE && (c->flags & FSSFlag))
           {
-               c->state_fullscreen = False;
+               c->flags &= ~(FSSFlag | MaxFlag);
                client_map(c);
                XReparentWindow(dpy, c->win, c->frame, BORDH, TBARH);
                client_moveresize(c, c->tmp_geo, False);
@@ -368,8 +369,8 @@ ewmh_manage_window_type(Client *c)
                /* MANAGE _NET_WM_WINDOW_TYPE_DIALOG */
                else if(atom[i] == net_atom[net_wm_window_type_dialog])
                {
-                    c->free = True;
-                    sel->tile = sel->max = sel->lmax = False;
+                    c->flags |= FreeFlag;
+                    c->flags &= ~(TileFlag | MaxFlag | LMaxFlag);
                     client_moveresize(sel, sel->ogeo, True);
                     client_focus(c);
                     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
