@@ -289,16 +289,21 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
      {
           if(data_l[0] == _NET_WM_STATE_ADD && !c->state_fullscreen)
           {
+               c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
                client_unmap(c);
                c->unmapped = False;
                XMapWindow(dpy, c->win);
-               XReparentWindow(dpy, c->win, ROOT, spgeo[selscreen].x, spgeo[selscreen].y);
-               XResizeWindow(dpy, c->win, spgeo[selscreen].x + spgeo[selscreen].width, spgeo[selscreen].y + spgeo[selscreen].height);
-               c->state_fullscreen = True;
+               XReparentWindow(dpy, c->win, ROOT, spgeo[c->screen].x, spgeo[c->screen].y);
+               XResizeWindow(dpy, c->win, spgeo[c->screen].x + spgeo[c->screen].width,
+                             spgeo[c->screen].y + spgeo[c->screen].height);
                c->tmp_geo = c->geo;
+
                if(c->free)
                     c->ogeo = c->geo;
+
+               c->state_fullscreen = True;
                c->max = True;
+
                client_raise(c);
                client_focus(c);
           }
