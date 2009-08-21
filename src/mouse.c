@@ -55,6 +55,7 @@ mouse_move(Client *c)
      int ocx, ocy, mx, my, i;
      int dint, oscreen = c->screen;
      uint duint;
+     Bool busy[2];
      Window dw, sw;
      Client *sclient;
      XRectangle geo = c->geo;
@@ -102,11 +103,12 @@ mouse_move(Client *c)
                        || (sclient = client_gb_frame(sw))
                        || (sclient = client_gb_titlebar(sw)))
                     {
-                         if(c->win != sclient->win)
+                         if(c->win != sclient->win && !busy[1])
                          {
                               client_swap(sclient, c);
                               client_focus(sclient);
                               swap_ptr((void**)&c, (void**)&sclient);
+                              busy[0] = True;
                          }
                     }
 
@@ -115,7 +117,8 @@ mouse_move(Client *c)
 
                     for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
                          if(infobar[selscreen].tags[i]->win == sw
-                            && tags[selscreen][i].layout.func != freelayout)
+                            && tags[selscreen][i].layout.func != freelayout
+                              && !busy[0])
                          {
                               c->screen = selscreen;
                               c->tag = i;
@@ -123,6 +126,7 @@ mouse_move(Client *c)
                               arrange(oscreen, True);
                               if(oscreen != c->screen)
                                    arrange(c->screen, True);
+                              busy[1] = True;
                          }
                }
 
