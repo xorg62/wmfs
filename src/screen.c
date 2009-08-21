@@ -45,7 +45,7 @@ screen_count(void)
 #ifdef HAVE_XINERAMA
      if(XineramaIsActive(dpy))
           XineramaQueryScreens(dpy, &n);
-#endif
+#endif /* HAVE_XINERAMA */
 
      /* Set _WMFS_SCREEN_COUNT */
      XChangeProperty(dpy, ROOT, net_atom[wmfs_screen_count], XA_CARDINAL, 32,
@@ -90,7 +90,7 @@ screen_get_geo(int s)
 
           XFree(xsi);
      }
-#endif
+#endif /* HAVE_XINERAMA */
 
      return geo;
 }
@@ -150,7 +150,7 @@ screen_get_sel(void)
 
           selscreen = screen_get_with_geo(x, y);
      }
-#endif
+#endif /* HAVE_XINERAMA */
 
      /* Set _WMFS_CURRENT_SCREEN */
      XChangeProperty(dpy, ROOT, net_atom[wmfs_current_screen], XA_CARDINAL, 32,
@@ -193,7 +193,7 @@ screen_init_geo(void)
           }
           XFree(xsi);
      }
-#endif
+#endif /* HAVE_XINERAMA */
 
 #ifdef HAVE_XRANDR
      /* Init xrandr stuff */
@@ -201,7 +201,7 @@ screen_init_geo(void)
 
      XRRSelectInput(dpy, ROOT, 1);
      XRRQueryExtension(dpy, &xrandr_event, &d);
-#endif
+#endif /* HAVE_XRANDR */
 
      ewmh_set_desktop_geometry();
      ewmh_set_workarea();

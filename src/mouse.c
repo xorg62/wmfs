@@ -102,11 +102,11 @@ mouse_move(Client *c)
                        || (sclient = client_gb_frame(sw))
                        || (sclient = client_gb_titlebar(sw)))
                     {
-                         if(c != sclient)
+                         if(c->win != sclient->win)
                          {
-                              client_swap(c, sclient);
+                              client_swap(sclient, c);
                               client_focus(sclient);
-                              break;
+                              swap_ptr((void**)&c, (void**)&sclient);
                          }
                     }
 

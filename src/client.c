@@ -380,11 +380,9 @@ client_hide(Client *c)
 Bool
 ishide(Client *c, int screen)
 {
-     screen_get_sel();
-
-     if(c->tag == seltag[screen]
-        && c->screen == screen)
+     if(c->tag == seltag[screen] && c->screen == screen)
           return False;
+
      return True;
 }
 

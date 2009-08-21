@@ -59,47 +59,45 @@
 /* Optional dependences */
 #ifdef HAVE_XINERAMA
 #include <X11/extensions/Xinerama.h>
-#endif
+#endif /* HAVE_XINERAMA */
 
 #ifdef HAVE_XRANDR
 #include <X11/extensions/Xrandr.h>
-#endif
-
+#endif /* HAVE_XINERAMA */
 
 /* MACRO */
 #define ButtonMask   (ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
 #define MouseMask    (ButtonMask | PointerMotionMask)
 #define KeyMask      (KeyPressMask | KeyReleaseMask)
-
-#define CWIN(win, parent, x, y, w, h, b, mask, col, at)                             \
-    do {                                                                            \
-        win = XCreateWindow(dpy, (parent), (x), (y), (w), (h), (b), CopyFromParent, \
-        InputOutput, CopyFromParent, (mask), (at));                                 \
-        XSetWindowBackground(dpy, win, (col));                                      \
-    } while (/*CONSTCOND*/0)
-
 #define SCREEN       DefaultScreen(dpy)
 #define ROOT         RootWindow(dpy, SCREEN)
 #define MAXH         DisplayHeight(dpy, DefaultScreen(dpy))
 #define MAXW         DisplayWidth(dpy, DefaultScreen(dpy))
-#define ATOM(a)      XInternAtom(dpy, (a), False)
 #define INFOBARH     ((conf.bars.height > 0) ? conf.bars.height : (font->height * 1.5))
 #define FHINFOBAR    ((font->height - font->descent) + (INFOBARH - font->height) / 2)
 #define SHADH        (1)
 #define SHADC        (0x000000) /* 'Cause i don't know how darken a color yet */
 #define BORDH        conf.client.borderheight
 #define TBARH        ((conf.titlebar.height < BORDH) ? BORDH : conf.titlebar.height)
+#define RESHW        (6 * BORDH)
+#define BUTTONWH     (TBARH / 2)
+#define DEF_CONF     ".config/wmfs/wmfsrc"
+#define PAD          conf.pad
+
+#define CWIN(win, parent, x, y, w, h, b, mask, col, at)                             \
+    do {                                                                            \
+        win = XCreateWindow(dpy, (parent), (x), (y), (w), (h), (b), CopyFromParent, \
+        InputOutput, CopyFromParent, (mask), (at));                                 \
+        XSetWindowBackground(dpy, win, (col));                                      \
+    } while (/* CONSTCOND */ 0)
+
+#define ATOM(a)      XInternAtom(dpy, (a), False)
 #define FRAMEW(w)    ((w) + BORDH * 2)
 #define FRAMEH(h)    ((h) + (BORDH  + TBARH))
 #define ROUND(x)     (float)((x > 0) ? x + (float)0.5 : x - (float)0.5)
-#define RESHW        (6 * BORDH)
-#define BUTTONWH     (TBARH / 2)
 #define CHECK(x)     if(!(x)) return
 #define IFREE(x)     if(x) free(x)
 #define LEN(x)       (sizeof(x) / sizeof((x)[0]))
-#define deb(p)       fprintf(stderr, "debug: %d\n", (p))
-#define DEF_CONF     ".config/wmfs/wmfsrc"
-#define PAD          conf.pad
 
 /* barwin.c */
 BarWindow *barwin_create(Window parent,

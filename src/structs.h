@@ -141,7 +141,7 @@ struct Client
      /* Client title */
      char *title;
      /* Tag num */
-     int tag;
+     uint tag;
      /* Screen */
      int screen;
      /* Window attribute */

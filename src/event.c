@@ -84,7 +84,6 @@ buttonpress(XButtonEvent *ev)
                          if(conf.root.mouse[i].func)
                               conf.root.mouse[i].func(conf.root.mouse[i].cmd);
 
-
      /* Infobars */
      for(i = 0; i < screen_count(); ++i)
           if(ev->window == infobar[i].bar->win)
@@ -561,7 +560,7 @@ getevent(XEvent ev)
                for(; argv_global[0] && argv_global[0] == ' '; ++argv_global);
                execlp(argv_global, argv_global, NULL);
           }
-#endif
+#endif /* HAVE_XRANDR */
           break;
      }
 
