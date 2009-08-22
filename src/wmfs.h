@@ -229,6 +229,8 @@ void uicb_launcher(uicb_t);
 
 /* mouse.c */
 void mouse_dragborder(XRectangle geo, GC g);
+void mouse_move_tile_client(Client **c);
+void mouse_move_tag_client(Client *c);
 void mouse_move(Client *c);
 void mouse_resize(Client *c);
 void mouse_grabbuttons(Client *c, Bool focused);

@@ -46,18 +46,75 @@ mouse_dragborder(XRectangle geo, GC g)
      return;
 }
 
+/** Move a client in tile grid with the mouse
+ *\param c Client double pointer
+ */
+void
+mouse_move_tile_client(Client **c)
+{
+     Client *sc;
+     Window w;
+     int d;
+
+     if(!((*c)->flags & TileFlag) && !((*c)->flags & LMaxFlag))
+          return;
+
+     XQueryPointer(dpy, ROOT, &w, &w, &d, &d, &d, &d, (uint*)&d);
+
+     if(((sc = client_gb_win(w)) || (sc = client_gb_frame(w)) || (sc = client_gb_titlebar(w)))
+        && (*c)->win != sc->win && !((*c)->flags & HideFlag) && !(sc->flags & HideFlag))
+     {
+          client_swap(sc, *c);
+          client_focus(sc);
+          swap_ptr((void**)c, (void**)&sc);
+     }
+
+     return;
+
+}
+
+/** Move a client from one tag to another with dah mouse
+ *\param c client pointer
+ */
+void
+mouse_move_tag_client(Client *c)
+{
+     Window w;
+     int i, d, s;
+
+     if(!(c->flags & TileFlag) && !(c->flags & LMaxFlag))
+          return;
+
+     s = c->screen;
+
+     XQueryPointer(dpy, infobar[selscreen].bar->win, &w, &w, &d, &d, &d, &d, (uint*)&d);
+
+     for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
+          if(infobar[selscreen].tags[i]->win == w
+             && tags[selscreen][i].layout.func != freelayout)
+          {
+               c->screen = selscreen;
+               c->tag = i;
+               tags[c->screen][c->tag].request_update = True;
+               arrange(s, True);
+
+               if(s != c->screen)
+                    arrange(c->screen, True);
+          }
+
+     return;
+}
+
 /** Move the client with the mouse
  * \param c Client pointer
 */
 void
 mouse_move(Client *c)
 {
-     int ocx, ocy, mx, my, i;
-     int dint, oscreen = c->screen;
+     int ocx, ocy, mx, my;
+     int dint;
      uint duint;
-     Bool busy[2];
-     Window dw, sw;
-     Client *sclient;
+     Window dw;
      XRectangle geo = c->geo;
      XGCValues xgc;
      GC gci;
@@ -94,44 +151,11 @@ mouse_move(Client *c)
 
           if(ev.type == MotionNotify)
           {
-               if((c->flags & TileFlag) || (c->flags & LMaxFlag))
-               {
-                    XQueryPointer(dpy, ROOT, &dw, &sw, &mx, &my, &dint, &dint, &duint);
-
-                    /* To move the client in the tile grid */
-                    if((sclient = client_gb_win(sw))
-                       || (sclient = client_gb_frame(sw))
-                       || (sclient = client_gb_titlebar(sw)))
-                    {
-                         if(c->win != sclient->win && !busy[1])
-                         {
-                              client_swap(sclient, c);
-                              client_focus(sclient);
-                              swap_ptr((void**)&c, (void**)&sclient);
-                              busy[0] = True;
-                         }
-                    }
-
-                    /* To move a client from one tag to another */
-                    XQueryPointer(dpy, infobar[selscreen].bar->win, &dw, &sw, &mx, &my, &dint, &dint, &duint);
-
-                    for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
-                         if(infobar[selscreen].tags[i]->win == sw
-                            && tags[selscreen][i].layout.func != freelayout
-                              && !busy[0])
-                         {
-                              c->screen = selscreen;
-                              c->tag = i;
-                              tags[c->screen][c->tag].request_update = True;
-                              arrange(oscreen, True);
-                              if(oscreen != c->screen)
-                                   arrange(c->screen, True);
-                              busy[1] = True;
-                         }
-               }
+              mouse_move_tile_client(&c);
+              mouse_move_tag_client(c);
 
                /* To move a client normally, in freelayout */
-               else
+               if(!(c->flags & TileFlag) && !(c->flags & LMaxFlag))
                {
                     mouse_dragborder(geo, gci);
 
