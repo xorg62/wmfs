@@ -42,11 +42,12 @@ file_to_str(char *path)
      if(!path || !(fd = open(path, O_RDONLY)))
           return NULL;
 
-     /* To get the file size */
+     /* Get the file size */
      stat(path, &st);
 
      /* Bufferize file */
-     buf = (char*)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, SEEK_SET);
+     if((buf = (char*)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, SEEK_SET)) == (char*) -1)
+          return NULL;
 
      /* Copy buffer in return value */
      ret = _strdup(buf);

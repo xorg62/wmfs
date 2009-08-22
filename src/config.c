@@ -30,231 +30,221 @@
 *      OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "config_struct.h"
+#include "wmfs.h"
 
+func_name_list_t tmp_func_list[] =
+{
+     {"spawn",                   uicb_spawn },
+     {"client_kill",             uicb_client_kill },
+     {"client_prev",             uicb_client_prev },
+     {"client_next",             uicb_client_next },
+     {"client_swap_next",        uicb_client_swap_next },
+     {"client_swap_prev",        uicb_client_swap_prev },
+     {"client_screen_next",      uicb_client_screen_next },
+     {"client_screen_prev",      uicb_client_screen_prev },
+     {"toggle_max",              uicb_togglemax },
+     {"layout_next",             uicb_layout_next },
+     {"layout_prev",             uicb_layout_prev },
+     {"tag",                     uicb_tag },
+     {"tag_next",                uicb_tag_next },
+     {"tag_prev",                uicb_tag_prev },
+     {"tag_transfert",           uicb_tagtransfert },
+     {"set_mwfact",              uicb_set_mwfact },
+     {"set_nmaster",             uicb_set_nmaster },
+     {"quit",                    uicb_quit },
+     {"toggle_infobar_position", uicb_infobar_togglepos },
+     {"toggle_resizehint",       uicb_toggle_resizehint },
+     {"mouse_move",              uicb_mouse_move },
+     {"mouse_resize",            uicb_mouse_resize },
+     {"client_raise",            uicb_client_raise },
+     {"toggle_free",             uicb_togglefree },
+     {"screen_select",           uicb_screen_select },
+     {"screen_next",             uicb_screen_next },
+     {"screen_prev",             uicb_screen_prev },
+     {"reload",                  uicb_reload },
+     {"launcher",                uicb_launcher },
+     {"set_layout",              uicb_set_layout },
+     {"menu",                    uicb_menu }
+};
+
+key_name_list_t key_list[] =
+{
+     {"Control", ControlMask },
+     {"Shift",   ShiftMask },
+     {"Lock",    LockMask },
+     {"Alt",     Mod1Mask },
+     {"Mod2",    Mod2Mask },
+     {"Mod3",    Mod3Mask },
+     {"Mod4",    Mod4Mask },
+     {"Super",   Mod4Mask },
+     {"Mod5",    Mod5Mask },
+     {NULL,      NoSymbol }
+};
+
+name_to_uint_t mouse_button_list[] =
+{
+     {"Button1", Button1 },
+     {"Button2", Button2 },
+     {"Button3", Button3 },
+     {"Button4", Button4 },
+     {"Button5", Button5 },
+     {"1", Button1 },
+     {"2", Button2 },
+     {"3", Button3 },
+     {"4", Button4 },
+     {"5", Button5 },
+};
 
 void
-conf_init_func_list(void)
+mouse_section(MouseBinding mb[], char *src, int ns)
 {
      int i;
-
-     func_name_list_t tmp_list[] =
-          {
-               {"spawn",                   uicb_spawn },
-               {"client_kill",             uicb_client_kill },
-               {"client_prev",             uicb_client_prev },
-               {"client_next",             uicb_client_next },
-               {"client_move",             uicb_client_move },
-               {"client_resize",           uicb_client_resize },
-               {"client_swap_next",        uicb_client_swap_next },
-               {"client_swap_prev",        uicb_client_swap_prev },
-               {"client_screen_next",      uicb_client_screen_next },
-               {"client_screen_prev",      uicb_client_screen_prev },
-               {"toggle_max",              uicb_togglemax },
-               {"layout_next",             uicb_layout_next },
-               {"layout_prev",             uicb_layout_prev },
-               {"tag",                     uicb_tag },
-               {"tag_next",                uicb_tag_next },
-               {"tag_prev",                uicb_tag_prev },
-               {"tag_transfert",           uicb_tagtransfert },
-               {"set_mwfact",              uicb_set_mwfact },
-               {"set_nmaster",             uicb_set_nmaster },
-               {"quit",                    uicb_quit },
-               {"toggle_infobar_position", uicb_infobar_togglepos },
-               {"toggle_resizehint",       uicb_toggle_resizehint },
-               {"mouse_move",              uicb_mouse_move },
-               {"mouse_resize",            uicb_mouse_resize },
-               {"client_raise",            uicb_client_raise },
-               {"toggle_free",             uicb_togglefree },
-               {"screen_select",           uicb_screen_select },
-               {"screen_next",             uicb_screen_next },
-               {"screen_prev",             uicb_screen_prev },
-               {"reload",                  uicb_reload },
-               {"launcher",                uicb_launcher },
-               {"set_layout",              uicb_set_layout },
-               {"menu",                    uicb_menu }
-          };
-
-     func_list = emalloc(LEN(tmp_list), sizeof(func_name_list_t));
-
-     for(i = 0; i < LEN(tmp_list); ++i)
-          func_list[i] = tmp_list[i];
-
-     return;
-}
-
-
-/* The following function are the
-   different configuration section. {{{
-*/
-void
-mouse_section(MouseBinding mb[], cfg_t *cfg, int ns)
-{
-     int i;
-     cfg_t *tmp;
+     char *tmp;
 
      for(i = 0; i < ns; ++i)
      {
-          tmp          = cfg_getnsec(cfg, "mouse", i);
-          mb[i].tag    = cfg_getint(tmp, "tag");
-          mb[i].screen = cfg_getint(tmp, "screen");
-          mb[i].button = char_to_button(cfg_getstr(tmp, "button"), mouse_button_list);
-          mb[i].func   = name_to_func(cfg_getstr(tmp, "func"), func_list);
-          mb[i].cmd    = _strdup(alias_to_str(cfg_getstr(tmp, "cmd")));
+          tmp          = get_nsec(src, "mouse", i);
+          mb[i].tag    = get_opt(tmp, "-1", "tag").num;
+          mb[i].screen = get_opt(tmp, "-1", "screen").num;
+          mb[i].button = char_to_button(get_opt(tmp, "1", "button").str, mouse_button_list);
+          mb[i].func   = name_to_func(get_opt(tmp, "", "func").str, func_list);
+          mb[i].cmd    = get_opt(tmp, "", "cmd").str;
      }
 
      return;
 }
 
 void
-conf_alias_section(cfg_t *cfg_a)
+conf_misc_section(char *src)
 {
-     int i;
+     int pad = 12;
 
-     if(cfg_size(cfg_a, "alias") < 256)
-          for(i = 0; i < cfg_size(cfg_a, "alias"); ++i)
-          {
-               cfgtmp                = cfg_getnsec(cfg_a, "alias", i);
-               conf.alias[i].name    = _strdup(cfg_title(cfgtmp));
-               conf.alias[i].content = _strdup(cfg_getstr(cfgtmp, "content"));
-          }
-     else
+     conf.font          = get_opt(src, "sans-9", "font").str;
+     conf.raisefocus    = get_opt(src, "false", "raisefocus").bool;
+     conf.raiseswitch   = get_opt(src, "false", "raiseswitch").bool;
+     conf.focus_fmouse  = get_opt(src, "true", "focus_follow_mouse").bool;
+     pad = get_opt(src, "12", "pad").num;
+
+     if(pad > 24 || pad < 1)
      {
-          fprintf(stderr,"WMFS Configuration: Too many alias (%d) !\n", cfg_size(cfg_a, "alias"));
-          exit(EXIT_FAILURE);
+          fprintf(stderr, "WMFS Configuration: pad value (%d) incorrect.\n", pad);
+
+          pad = 12;
      }
+
+     conf.pad = pad;
 
      return;
 }
 
 void
-conf_misc_section(cfg_t *cfg_m)
+conf_bar_section(char *src)
 {
-     conf.font          = alias_to_str(_strdup(cfg_getstr(cfg_m, "font")));
-     conf.raisefocus    = cfg_getbool(cfg_m, "raisefocus");
-     conf.raiseswitch   = cfg_getbool(cfg_m, "raiseswitch");
-     conf.focus_fmouse  = cfg_getbool(cfg_m, "focus_follow_mouse");
+     conf.border.bar  = get_opt(src, "false", "border").bool;
+     conf.bars.height = get_opt(src, "-1", "height").num;
+     conf.colors.bar  = getcolor(get_opt(src, "#000000", "bg").str);
+     conf.colors.text = get_opt(src, "#ffffff", "fg").str;
 
-     if(cfg_getint(cfg_m, "pad") > 24 || cfg_getint(cfg_m, "pad") < 1)
-     {
-          fprintf(stderr, "WMFS Configuration: pad value (%ld) incorrect.\n",
-                  cfg_getint(cfg_m, "pad"));
-
-          conf.pad = 12;
-     }
-     else
-          conf.pad = cfg_getint(cfg_m, "pad");
-
-     return;
-}
-
-void
-conf_bar_section(cfg_t *cfg_b)
-{
-     conf.border.bar  = cfg_getbool(cfg_b, "border");
-     conf.bars.height = cfg_getint(cfg_b, "height");
-     conf.colors.bar  = getcolor(alias_to_str(cfg_getstr(cfg_b, "bg")));
-     conf.colors.text = _strdup(alias_to_str(cfg_getstr(cfg_b, "fg")));
-
-
-     if((conf.bars.nmouse = cfg_size(cfg_b, "mouse")))
+     if((conf.bars.nmouse = get_size_sec(src, "mouse")))
      {
           conf.bars.mouse = emalloc(conf.bars.nmouse, sizeof(MouseBinding));
-          mouse_section(conf.bars.mouse, cfg_b, conf.bars.nmouse);
+          mouse_section(conf.bars.mouse, src, conf.bars.nmouse);
      }
-
 
      return;
 }
 
 void
-conf_root_section(cfg_t *cfg_r)
+conf_root_section(char *src)
 {
-     conf.root.background_command = _strdup(alias_to_str(cfg_getstr(cfg_r, "background_command")));
+     conf.root.background_command = get_opt(src, "", "background_command").str;
 
-     if((conf.root.nmouse = cfg_size(cfg_r, "mouse")))
+     if((conf.root.nmouse = get_size_sec(src, "mouse")))
      {
           conf.root.mouse = emalloc(conf.root.nmouse, sizeof(MouseBinding));
-          mouse_section(conf.root.mouse, cfg_r, conf.root.nmouse);
+          mouse_section(conf.root.mouse, src, conf.root.nmouse);
      }
 
      return;
 }
 
 void
-conf_client_section(cfg_t *cfg_c)
+conf_client_section(char *src)
 {
-     int i, j;
-     cfg_t *cfgtmp2, *cfgtmp3;
+     int i, j, d;
+     char *tmp, *tmp2, *tmp3;
+     opt_type *buf;
 
      /* Client misc */
-     conf.client.borderheight        = (cfg_getint(cfg_c, "border_height")) ? cfg_getint(cfg_c, "border_height") : 1;
-     conf.client.border_shadow       = cfg_getbool(cfg_c, "border_shadow");
-     conf.client.place_at_mouse      = cfg_getbool(cfg_c, "place_at_mouse");
-     conf.client.bordernormal        = getcolor(alias_to_str(cfg_getstr(cfg_c, "border_normal")));
-     conf.client.borderfocus         = getcolor(alias_to_str(cfg_getstr(cfg_c, "border_focus")));
-     conf.client.resizecorner_normal = getcolor(alias_to_str(cfg_getstr(cfg_c, "resize_corner_normal")));
-     conf.client.resizecorner_focus  = getcolor(alias_to_str(cfg_getstr(cfg_c, "resize_corner_focus")));
-     conf.client.mod                |= char_to_modkey(cfg_getstr(cfg_c, "modifier"), key_list);
+     conf.client.borderheight        = (get_opt(src, "1", "border_height").num) ? get_opt(src, "1", "border_height").num : 1;
+     conf.client.border_shadow       = get_opt(src, "false", "border_shadow").bool;
+     conf.client.place_at_mouse      = get_opt(src, "false", "place_at_mouse").bool;
+     conf.client.bordernormal        = getcolor(get_opt(src, "#000000", "border_normal").str);
+     conf.client.borderfocus         = getcolor(get_opt(src, "#ffffff", "border_focus").str);
+     conf.client.resizecorner_normal = getcolor(get_opt(src, "#222222", "resize_corner_normal").str);
+     conf.client.resizecorner_focus  = getcolor(get_opt(src, "#DDDDDD", "resize_corner_focus").str);
+     conf.client.mod                 |= char_to_modkey(get_opt(src, "Alt", "modifier").str, key_list);
 
-     if((conf.client.nmouse = cfg_size(cfg_c, "mouse")))
+     if((conf.client.nmouse = get_size_sec(src, "mouse")))
      {
           conf.client.mouse = emalloc(conf.client.nmouse, sizeof(MouseBinding));
-          mouse_section(conf.client.mouse, cfg_c, conf.client.nmouse);
+          mouse_section(conf.client.mouse, src, conf.client.nmouse);
      }
 
      /* Titlebar part {{ */
-     cfgtmp                  = cfg_getsec(cfg_c, "titlebar");
-     conf.titlebar.height    = cfg_getint(cfgtmp, "height");
-     conf.titlebar.fg_normal = alias_to_str(cfg_getstr(cfgtmp, "fg_normal"));
-     conf.titlebar.fg_focus  = alias_to_str(cfg_getstr(cfgtmp, "fg_focus"));
+     tmp                     = get_sec(src, "titlebar");
+     conf.titlebar.height    = get_opt(tmp, "0", "height").num;
+     conf.titlebar.fg_normal = get_opt(tmp, "#ffffff", "fg_normal").str;
+     conf.titlebar.fg_focus  = get_opt(tmp, "#000000", "fg_focus").str;
 
      /* Stipple */
-     conf.titlebar.stipple.active        = cfg_getbool(cfgtmp, "stipple");
+     conf.titlebar.stipple.active = get_opt(tmp, "false", "stipple").bool;
 
-     if(!strcmp(alias_to_str(cfg_getstr(cfgtmp, "stipple_normal")), "-1"))
+     if(!strcmp(get_opt(tmp, "-1", "stipple_normal").str, "-1"))
           conf.titlebar.stipple.colors.normal = getcolor(conf.titlebar.fg_normal);
      else
-          conf.titlebar.stipple.colors.normal = getcolor(alias_to_str(cfg_getstr(cfgtmp, "stipple_normal")));
+          conf.titlebar.stipple.colors.normal = getcolor(get_opt(tmp, "-1", "stipple_normal").str);
 
-     if(!strcmp(alias_to_str(cfg_getstr(cfgtmp, "stipple_focus")), "-1"))
+     if(!strcmp(get_opt(tmp, "-1", "stipple_focus").str, "-1"))
           conf.titlebar.stipple.colors.focus = getcolor(conf.titlebar.fg_focus);
      else
-          conf.titlebar.stipple.colors.focus = getcolor(alias_to_str(cfg_getstr(cfgtmp, "stipple_focus")));
+          conf.titlebar.stipple.colors.focus = getcolor(get_opt(tmp, "-1", "stipple_focus").str);
 
-     if((conf.titlebar.nmouse = cfg_size(cfgtmp, "mouse")))
+     if((conf.titlebar.nmouse = get_size_sec(tmp, "mouse")))
      {
           conf.titlebar.mouse = emalloc(conf.titlebar.nmouse, sizeof(MouseBinding));
-          mouse_section(conf.titlebar.mouse, cfgtmp, conf.titlebar.nmouse);
+          mouse_section(conf.titlebar.mouse, tmp, conf.titlebar.nmouse);
      }
 
      /* Multi button part */
-     if((conf.titlebar.nbutton = cfg_size(cfgtmp, "button")))
+     if((conf.titlebar.nbutton = get_size_sec(tmp, "button")))
      {
           conf.titlebar.button = emalloc(conf.titlebar.nbutton, sizeof(Button));
           for(i = 0; i < conf.titlebar.nbutton; ++i)
           {
-               cfgtmp2 = cfg_getnsec(cfgtmp, "button", i);
+               tmp2 = get_nsec(tmp, "button", i);
 
                /* Multi mouse section */
-               if((conf.titlebar.button[i].nmouse = cfg_size(cfgtmp2, "mouse")))
+               if((conf.titlebar.button[i].nmouse = get_size_sec(tmp2, "mouse")))
                {
                     conf.titlebar.button[i].mouse = emalloc(conf.titlebar.button[i].nmouse, sizeof(MouseBinding));
-                    mouse_section(conf.titlebar.button[i].mouse, cfgtmp2, conf.titlebar.button[i].nmouse);
+                    mouse_section(conf.titlebar.button[i].mouse, tmp2, conf.titlebar.button[i].nmouse);
                }
 
                /* Multi line section */
-               if((conf.titlebar.button[i].nlines = cfg_size(cfgtmp2, "line")))
+               if((conf.titlebar.button[i].nlines = get_size_sec(tmp2, "line")))
                {
                     conf.titlebar.button[i].linecoord = emalloc(conf.titlebar.button[i].nlines, sizeof(XSegment));
 
                     for(j = 0; j < conf.titlebar.button[i].nlines; ++j)
                     {
-                         cfgtmp3 = cfg_getnsec(cfgtmp2, "line", j);
-                         conf.titlebar.button[i].linecoord[j].x1 = cfg_getnint(cfgtmp3, "coord", 0);
-                         conf.titlebar.button[i].linecoord[j].y1 = cfg_getnint(cfgtmp3, "coord", 1);
-                         conf.titlebar.button[i].linecoord[j].x2 = cfg_getnint(cfgtmp3, "coord", 2);
-                         conf.titlebar.button[i].linecoord[j].y2 = cfg_getnint(cfgtmp3, "coord", 3);
+                         tmp3 = get_nsec(tmp2, "line", j);
+                         buf = get_list_opt(tmp3, "{0, 0, 0, 0}", "coord", &d);
+
+                         conf.titlebar.button[i].linecoord[j].x1 = buf[0].num;
+                         conf.titlebar.button[i].linecoord[j].y1 = buf[1].num;
+                         conf.titlebar.button[i].linecoord[j].x2 = buf[2].num;
+                         conf.titlebar.button[i].linecoord[j].y2 = buf[3].num;
                     }
                }
           }
@@ -265,9 +255,10 @@ conf_client_section(cfg_t *cfg_c)
 }
 
 void
-conf_layout_section(cfg_t *cfg_l)
+conf_layout_section(char *src)
 {
      int i;
+     char *tmp = NULL;
 
      /* Set conf.layout NULL for conf reload */
      for(i = 0; i < NUM_OF_LAYOUT; ++i)
@@ -276,15 +267,15 @@ conf_layout_section(cfg_t *cfg_l)
           conf.layout[i].func = NULL;
      }
 
-     conf.border.layout     = cfg_getbool(cfg_l, "border");
-     conf.colors.layout_fg  = _strdup(alias_to_str(cfg_getstr(cfg_l, "fg")));
-     conf.colors.layout_bg  = getcolor(alias_to_str(cfg_getstr(cfg_l, "bg")));
+     conf.border.layout     = get_opt(src, "false", "border").bool;
+     conf.colors.layout_fg  = get_opt(src, "#ffffff", "fg").str;
+     conf.colors.layout_bg  = getcolor((get_opt(src, "#000000", "bg").str));
 
-     if(strcmp(_strdup(alias_to_str(cfg_getstr(cfg_l, "system"))), "menu") == 0)
+     if(strcmp(get_opt(src, "menu", "system").str, "menu") == 0)
           conf.layout_system = True;
 
-     if((conf.nlayout = cfg_size(cfg_l, "layout")) > NUM_OF_LAYOUT
-          || !(conf.nlayout = cfg_size(cfg_l, "layout")))
+     if((conf.nlayout = get_size_sec(src, "layout")) > NUM_OF_LAYOUT
+          || !(conf.nlayout = get_size_sec(src, "layout")))
      {
           fprintf(stderr, "WMFS Configuration: Too many or no layouts (%d)\n", conf.nlayout);
           conf.nlayout          = 1;
@@ -293,6 +284,7 @@ conf_layout_section(cfg_t *cfg_l)
      }
 
      if(conf.layout_system && conf.nlayout > 1)
+     {
           menu_init(&menulayout, "menulayout", conf.nlayout,
                     /* Colors */
                     conf.colors.layout_bg,
@@ -300,27 +292,29 @@ conf_layout_section(cfg_t *cfg_l)
                     conf.colors.bar,
                     conf.colors.text);
 
-     if(!conf.layout[0].symbol
-        && !conf.layout[0].func)
-     {
-          for(i = 0; i < conf.nlayout; ++i)
+          if(!conf.layout[0].symbol
+             && !conf.layout[0].func)
           {
-               cfgtmp = cfg_getnsec(cfg_l, "layout", i);
-               if(!name_to_func(_strdup(cfg_getstr(cfgtmp, "type")), layout_list))
+               for(i = 0; i < conf.nlayout; ++i)
                {
-                    fprintf(stderr, "WMFS Configuration: Unknow Layout type: \"%s\"\n",
-                            _strdup(cfg_getstr(cfgtmp, "type")));
-                    exit(EXIT_FAILURE);
-               }
-               else
-               {
-                    if(conf.layout_system && conf.nlayout > 1)
-                         menu_new_item(&menulayout.item[i],
-                                       _strdup(alias_to_str(cfg_getstr(cfgtmp, "symbol"))),
-                                       uicb_set_layout, _strdup(cfg_getstr(cfgtmp, "type")));
+                    tmp = get_nsec(src, "layout", i);
 
-                    conf.layout[i].symbol = _strdup(alias_to_str(cfg_getstr(cfgtmp, "symbol")));
-                    conf.layout[i].func = name_to_func(_strdup(cfg_getstr(cfgtmp, "type")), layout_list);
+                    if(!name_to_func(get_opt(tmp, "", "type").str, layout_list))
+                    {
+                         fprintf(stderr, "WMFS Configuration: Unknow Layout type: \"%s\"\n",
+                                 get_opt(tmp, "", "type").str);
+                         /* exit(EXIT_FAILURE); */
+                    }
+                    else
+                    {
+                         if(conf.layout_system && conf.nlayout > 1)
+                              menu_new_item(&menulayout.item[i], get_opt(tmp, "", "symbol").str,
+                                            uicb_set_layout,
+                                            get_opt(tmp, "", "type").str);
+
+                         conf.layout[i].symbol = get_opt(tmp, "", "symbol").str;
+                         conf.layout[i].func = name_to_func(get_opt(tmp, "", "type").str, layout_list);
+                    }
                }
           }
      }
@@ -329,10 +323,11 @@ conf_layout_section(cfg_t *cfg_l)
 }
 
 void
-conf_tag_section(cfg_t *cfg_t)
+conf_tag_section(char *src)
 {
      int i, j, k, l = 0, m, n;
-     char *tmp;
+     char *cfgtmp, *tmp;
+     opt_type *buf;
 
      /* If there is no tag in the conf or more than
       * MAXTAG (32) print an error and create only one.
@@ -341,11 +336,11 @@ conf_tag_section(cfg_t *cfg_t)
                          0.50, 1, False, False, IB_Top,
                          layout_name_to_struct(conf.layout, "tile_right", conf.nlayout, layout_list) };
 
-     conf.tag_round               = cfg_getbool(cfg_t, "tag_round");
-     conf.colors.tagselfg         = _strdup(alias_to_str(cfg_getstr(cfg_t, "sel_fg")));
-     conf.colors.tagselbg         = getcolor(alias_to_str(cfg_getstr(cfg_t, "sel_bg")));
-     conf.colors.tag_occupied_bg  = getcolor(alias_to_str(cfg_getstr(cfg_t, "occupied_bg")));
-     conf.border.tag              = cfg_getbool(cfg_t, "border");
+     conf.tag_round               = get_opt(src, "false", "tag_round").bool;
+     conf.colors.tagselfg         = get_opt(src, "#ffffff", "sel_fg").str;
+     conf.colors.tagselbg         = getcolor(get_opt(src, "#000000", "sel_bg").str);
+     conf.colors.tag_occupied_bg  = getcolor(get_opt(src, "#222222", "occupied_bg").str);
+     conf.border.tag              = get_opt(src, "false", "border").bool;
 
      /* Alloc all */
      conf.ntag = emalloc(screen_count(), sizeof(int));
@@ -356,12 +351,14 @@ conf_tag_section(cfg_t *cfg_t)
           seltag[i] = 1;
 
      for(i = 0; i < screen_count(); ++i)
-          tags[i] = emalloc(cfg_size(cfg_t, "tag") + 2, sizeof(Tag));
+          tags[i] = emalloc(get_size_sec(src, "tag") + 2, sizeof(Tag));
 
-     for(i = 0; i < cfg_size(cfg_t, "tag"); ++i)
+     for(i = 0; i < get_size_sec(src, "tag"); ++i)
      {
-          cfgtmp = cfg_getnsec(cfg_t, "tag", i);
-          j = cfg_getint(cfgtmp, "screen");
+          /* printf("%d -> %s\n", i, (cfgtmp = get_nsec(src, "tag", i)));*/
+          cfgtmp = get_nsec(src, "tag", i);
+          j = get_opt(cfgtmp, "-1", "screen").num;
+
           if(j < 0 || j > screen_count() - 1)
                j = -1;
 
@@ -370,33 +367,33 @@ conf_tag_section(cfg_t *cfg_t)
               ((j == -1) ? ++k : --l))
           {
                ++conf.ntag[k];
-               tags[k][conf.ntag[k]].name       = _strdup(cfg_getstr(cfgtmp, "name"));
-               tags[k][conf.ntag[k]].mwfact     = cfg_getfloat(cfgtmp, "mwfact");
-               tags[k][conf.ntag[k]].nmaster    = cfg_getint(cfgtmp, "nmaster");
-               tags[k][conf.ntag[k]].resizehint = cfg_getbool(cfgtmp, "resizehint");
+               tags[k][conf.ntag[k]].name       = get_opt(cfgtmp, "", "name").str;
+               tags[k][conf.ntag[k]].mwfact     = get_opt(cfgtmp, "0.65", "mwfact").fnum;
+               tags[k][conf.ntag[k]].nmaster    = get_opt(cfgtmp, "1", "nmaster").num;
+               tags[k][conf.ntag[k]].resizehint = get_opt(cfgtmp, "false", "resizehint").bool;
 
-               tmp = _strdup(cfg_getstr(cfgtmp, "infobar_position"));
+               tmp = _strdup(get_opt(cfgtmp, "top", "infobar_position").str);
 
-               if(!strcmp(tmp ,"none")
-                  || !strcmp(tmp, "hide")
-                  || !strcmp(tmp, "hidden"))
+               if(!strcmp(tmp ,"none") || !strcmp(tmp, "hide") || !strcmp(tmp, "hidden"))
                     tags[k][conf.ntag[k]].barpos = IB_Hide;
-               else if(!strcmp(tmp, "bottom")
-                       || !strcmp(tmp, "down"))
+               else if(!strcmp(tmp, "bottom") || !strcmp(tmp, "down"))
                     tags[k][conf.ntag[k]].barpos = IB_Bottom;
                else
                     tags[k][conf.ntag[k]].barpos = IB_Top;
 
-               tags[k][conf.ntag[k]].layout = layout_name_to_struct(conf.layout, cfg_getstr(cfgtmp, "layout"),
-                                                                    conf.nlayout, layout_list);
+               tags[k][conf.ntag[k]].layout = layout_name_to_struct(conf.layout,
+                                                                    get_opt(cfgtmp, "tile_right", "layout").str,
+                                                                    conf.nlayout,
+                                                                    layout_list);
 
                /* Clients list */
-               if((n = cfg_size(cfgtmp, "clients")))
+               buf = get_list_opt(cfgtmp, "", "clients", &n);
+               if(n)
                {
                     tags[k][conf.ntag[k]].nclients = n;
                     tags[k][conf.ntag[k]].clients = emalloc(n, sizeof(char *));
                     for(m = 0; m < n; ++m)
-                         tags[k][conf.ntag[k]].clients[m] = _strdup(cfg_getnstr(cfgtmp, "clients", m));
+                         tags[k][conf.ntag[k]].clients[m] = (buf[m].str) ? buf[m].str : NULL;
                }
 
           }
@@ -417,45 +414,42 @@ conf_tag_section(cfg_t *cfg_t)
 }
 
 void
-conf_menu_section(cfg_t *cfg_m)
+conf_menu_section(char *src)
 {
-     cfg_t *cfgtmp2;
+     char *tmp, *tmp2;
      int i, j;
 
-     conf.nmenu = cfg_size(cfg_m, "set_menu");
-     CHECK(conf.nmenu);
-     conf.menu = emalloc(conf.nmenu, sizeof(Menu));
+     CHECK((conf.nmenu = get_size_sec(src, "set_menu")));
+
+     conf.menu = calloc(conf.nmenu, sizeof(Menu));
 
      for(i = 0; i < conf.nmenu; ++i)
      {
-          cfgtmp = cfg_getnsec(cfg_m, "set_menu", i);
+          tmp = get_nsec(src, "set_menu", i);
 
-          conf.menu[i].name = _strdup(cfg_getstr(cfgtmp, "name"));
+          conf.menu[i].name = get_opt(tmp, "menu_wname", "name").str;
 
-          if(!(conf.menu[i].place_at_mouse = cfg_getbool(cfgtmp, "place_at_mouse")))
+          if(!(conf.menu[i].place_at_mouse = get_opt(tmp, "true", "place_at_mouse").bool))
           {
-               conf.menu[i].x = cfg_getint(cfgtmp, "x");
-               conf.menu[i].y = cfg_getint(cfgtmp, "y");
+               conf.menu[i].x = get_opt(tmp, "0", "x").num;
+               conf.menu[i].y = get_opt(tmp, "0", "y").num;
           }
 
-          conf.menu[i].colors.focus.bg  = getcolor(alias_to_str(_strdup(cfg_getstr(cfgtmp, "bg_focus"))));
-          conf.menu[i].colors.focus.fg  = _strdup(alias_to_str(cfg_getstr(cfgtmp, "fg_focus")));
-          conf.menu[i].colors.normal.bg = getcolor(alias_to_str(_strdup(cfg_getstr(cfgtmp, "bg_normal"))));
-          conf.menu[i].colors.normal.fg = _strdup(alias_to_str(cfg_getstr(cfgtmp, "fg_normal")));
+          conf.menu[i].colors.focus.bg  = getcolor(get_opt(tmp, "#000000", "bg_focus").str);
+          conf.menu[i].colors.focus.fg  = get_opt(tmp, "#ffffff", "fg_focus").str;
+          conf.menu[i].colors.normal.bg = getcolor(get_opt(tmp, "#000000", "bg_normal").str);
+          conf.menu[i].colors.normal.fg = get_opt(tmp, "#ffffff", "fg_normal").str;
 
-          conf.menu[i].nitem = cfg_size(cfgtmp, "item");
-
-          if(conf.menu[i].nitem)
+          if((conf.menu[i].nitem = get_size_sec(tmp, "item")))
           {
                conf.menu[i].item = emalloc(conf.menu[i].nitem, sizeof(MenuItem));
-               for(j = 0; j < cfg_size(cfgtmp, "item"); ++j)
+               for(j = 0; j < get_size_sec(tmp, "item"); ++j)
                {
-                    cfgtmp2 = cfg_getnsec(cfgtmp, "item", j);
+                    tmp2 = get_nsec(tmp, "item", j);
 
-                    conf.menu[i].item[j].name = _strdup(cfg_getstr(cfgtmp2, "name"));
-                    conf.menu[i].item[j].func = name_to_func(_strdup(cfg_getstr(cfgtmp2, "func")), func_list);
-                    conf.menu[i].item[j].cmd  = (!_strdup(alias_to_str((cfg_getstr(cfgtmp2, "cmd"))))
-                                                 ?  NULL : _strdup(alias_to_str(cfg_getstr(cfgtmp2, "cmd"))));
+                    conf.menu[i].item[j].name = get_opt(tmp2, "item_wname", "name").str;
+                    conf.menu[i].item[j].func = name_to_func(get_opt(tmp2, "", "func").str, func_list);
+                    conf.menu[i].item[j].cmd  = (!get_opt(tmp2, "", "cmd").str) ? NULL : get_opt(tmp2, "", "cmd").str;
                }
           }
      }
@@ -464,90 +458,94 @@ conf_menu_section(cfg_t *cfg_m)
 }
 
 void
-conf_launcher_section(cfg_t *cfg_l)
+conf_launcher_section(char *src)
 {
      int i;
+     char *tmp;
 
-     conf.nlauncher = cfg_size(cfg_l, "set_launcher");
-     CHECK(conf.nlauncher);
+     CHECK((conf.nlauncher = get_size_sec(src, "set_launcher")));
+
      conf.launcher = emalloc(conf.nlauncher, sizeof(Launcher));
 
      for(i = 0; i < conf.nlauncher; ++i)
      {
-          cfgtmp = cfg_getnsec(cfg_l, "set_launcher", i);
+          tmp = get_nsec(src, "set_launcher", i);
 
-          conf.launcher[i].name     = alias_to_str(_strdup(cfg_getstr(cfgtmp, "name")));
-          conf.launcher[i].prompt   = alias_to_str(_strdup(cfg_getstr(cfgtmp, "prompt")));
-          conf.launcher[i].command  = alias_to_str(_strdup(cfg_getstr(cfgtmp, "command")));
+          conf.launcher[i].name    = get_opt(tmp, "launcher", "name").str;
+          conf.launcher[i].prompt  = get_opt(tmp, "Exec:", "prompt").str;
+          conf.launcher[i].command = get_opt(tmp, "exec", "command").str;
      }
 
      return;
 }
 
 void
-conf_keybind_section(cfg_t *cfg_k)
+conf_keybind_section(char *src)
 {
-     int i, j;
+     int i, j, n = 0;
+     char *tmp;
+     opt_type *buf;
 
-     conf.nkeybind = cfg_size(cfg_k, "key");
+     conf.nkeybind = get_size_sec(src, "key");
      keys = emalloc(conf.nkeybind, sizeof(Key));
 
      for(i = 0; i < conf.nkeybind; ++i)
      {
-          cfgtmp = cfg_getnsec(cfg_k, "key", i);
+          tmp = get_nsec(src, "key", i);
+          buf = get_list_opt(tmp, "{Control}", "mod", &n);
 
-          for(j = 0; j < cfg_size(cfgtmp, "mod"); ++j)
-               keys[i].mod |= char_to_modkey(cfg_getnstr(cfgtmp, "mod", j), key_list);
+          for(j = 0; j < n; ++j)
+               keys[i].mod |= char_to_modkey(buf[j].str, key_list);
 
-          keys[i].keysym = XStringToKeysym(cfg_getstr(cfgtmp, "key"));
-          keys[i].func = name_to_func(cfg_getstr(cfgtmp, "func"), func_list);
+          keys[i].keysym = XStringToKeysym(get_opt(tmp, "None", "key").str);
+          keys[i].func = name_to_func(get_opt(tmp, "", "func").str, func_list);
+
           if(keys[i].func == NULL)
           {
-               fprintf(stderr, "WMFS Configuration error: Unknow Function \"%s\"\n",
-                       cfg_getstr(cfgtmp, "func"));
-               exit(EXIT_FAILURE);
+               fprintf(stderr, "WMFS Configuration warning: Unknow Function \"%s\"\n", get_opt(tmp, "", "func").str);
+               keys[i].func = uicb_spawn;
           }
-          keys[i].cmd = (!_strdup(alias_to_str((cfg_getstr(cfgtmp, "cmd"))))
-                                 ?  NULL : _strdup(alias_to_str(cfg_getstr(cfgtmp, "cmd"))));
+          keys[i].cmd = (!get_opt(tmp, "", "cmd").str) ? NULL : get_opt(tmp, "", "cmd").str;
+
      }
+
      return;
 }
-
-/* }}} */
 
 /** Configuration initialization
 */
 void
 init_conf(void)
 {
-     int ret;
+     char *file;
 
-     cfg = cfg_init(opts, CFGF_NONE);
-     ret = cfg_parse(cfg, conf.confpath);
-
-     if(ret == CFG_FILE_ERROR || ret == CFG_PARSE_ERROR)
+     if(!(file = file_to_str(conf.confpath)))
      {
           fprintf(stderr, "WMFS: parsing configuration file (%s) failed\n", conf.confpath);
           sprintf(conf.confpath, "%s/wmfs/wmfsrc", XDG_CONFIG_DIR);
           fprintf(stderr, "Use the default configuration (%s).\n", conf.confpath);
-          cfg = cfg_init(opts, CFGF_NONE);
-          ret = cfg_parse(cfg, conf.confpath);
+          file = file_to_str(conf.confpath);
      }
 
-     conf_init_func_list();
+     /* Set func_list */
+     func_list = emalloc(LEN(tmp_func_list), sizeof(func_name_list_t));
+     memcpy(func_list, tmp_func_list, LEN(tmp_func_list) * sizeof(func_name_list_t));
 
-     conf_alias_section(cfg_getsec(cfg, "alias"));
-     conf_misc_section(cfg_getsec(cfg, "misc"));
-     conf_bar_section(cfg_getsec(cfg, "bar"));
-     conf_root_section(cfg_getsec(cfg, "root"));
-     conf_client_section(cfg_getsec(cfg, "client"));
-     conf_layout_section(cfg_getsec(cfg, "layouts"));
-     conf_tag_section(cfg_getsec(cfg, "tags"));
-     conf_menu_section(cfg_getsec(cfg, "menu"));
-     conf_launcher_section(cfg_getsec(cfg, "launcher"));
-     conf_keybind_section(cfg_getsec(cfg, "keys"));
+     conf_misc_section(get_sec(file, "misc"));
+     conf_bar_section(get_sec(file, "bar"));
+     conf_root_section(get_sec(file, "root"));
+     conf_client_section(get_sec(file, "client"));
+     conf_layout_section(get_sec(file, "layouts"));
+     conf_tag_section(get_sec(file, "tags"));
+     conf_menu_section(get_sec(file, "menu"));
+     conf_launcher_section(get_sec(file, "launcher"));
+     conf_keybind_section(get_sec(file, "keys"));
 
-     cfg_free(cfg);
+     free(file);
 
      return;
 }
+
+
+
+

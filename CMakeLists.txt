@@ -28,7 +28,6 @@ set(wmfs_src
   src/confparse/confparse.c
   src/barwin.c
   src/client.c
-# src/config_new.c
   src/config.c
   src/
   src/draw.c
@@ -93,7 +92,6 @@ endif (X11_FOUND)
 set(LIBRARIES_TO_LINK
   ${FREETYPE_LIBRARIES}
   ${X11_LIBRARIES}
-  confuse
   Xft)
 
 # Includes
@@ -103,7 +101,6 @@ include(FindPkgConfig)
 # Use pkgconfig to get required libraries
 pkg_check_modules(WMFS_REQUIRED REQUIRED
   x11
-  libconfuse
   freetype2
   xft)
 

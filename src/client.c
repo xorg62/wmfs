@@ -534,8 +534,8 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
           for(t = clients; t && t->win != trans; t = t->next);
      if(t)
           c->tag = t->tag;
-     if(!(c->flags & FreeFlag))
-          if(rettrans == Success || (c->flags & HintFlag))
+     if(!(c->flags & FreeFlag)
+          && (rettrans == Success || (c->flags & HintFlag)))
                c->flags |= FreeFlag;
 
      free(t);
@@ -576,7 +576,7 @@ client_geo_hints(XRectangle *geo, Client *c)
 
      /* aspect */
      if(c->minay > 0 && c->maxay > 0
-        && c->minax > 0 && c->maxax > 0)
+               && c->minax > 0 && c->maxax > 0)
      {
           if(geo->width * c->maxay > geo->height * c->maxax)
                geo->width = geo->height * c->maxax / c->maxay;
