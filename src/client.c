@@ -534,6 +534,10 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
           for(t = clients; t && t->win != trans; t = t->next);
      if(t)
           c->tag = t->tag;
+     if(!(c->flags & FreeFlag))
+          if(rettrans == Success || (c->flags & HintFlag))
+               c->flags |= FreeFlag;
+
      free(t);
 
      client_attach(c);
