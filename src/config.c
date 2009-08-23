@@ -174,7 +174,7 @@ void
 conf_client_section(char *src)
 {
      int i, j, d;
-     char *tmp, *tmp2, *tmp3;
+     char *tmp, *tmp2, *tmp3, *p;
      opt_type *buf;
 
      /* Client misc */
@@ -202,15 +202,15 @@ conf_client_section(char *src)
      /* Stipple */
      conf.titlebar.stipple.active = get_opt(tmp, "false", "stipple").bool;
 
-     if(!strcmp(get_opt(tmp, "-1", "stipple_normal").str, "-1"))
+     if(!strcmp((p = get_opt(tmp, "-1", "stipple_normal").str), "-1"))
           conf.titlebar.stipple.colors.normal = getcolor(conf.titlebar.fg_normal);
      else
-          conf.titlebar.stipple.colors.normal = getcolor(get_opt(tmp, "-1", "stipple_normal").str);
+          conf.titlebar.stipple.colors.normal = getcolor(p);
 
-     if(!strcmp(get_opt(tmp, "-1", "stipple_focus").str, "-1"))
+     if(!strcmp((p = get_opt(tmp, "-1", "stipple_focus").str), "-1"))
           conf.titlebar.stipple.colors.focus = getcolor(conf.titlebar.fg_focus);
      else
-          conf.titlebar.stipple.colors.focus = getcolor(get_opt(tmp, "-1", "stipple_focus").str);
+          conf.titlebar.stipple.colors.focus = getcolor(p);
 
      if((conf.titlebar.nmouse = get_size_sec(tmp, "mouse")))
      {
@@ -302,9 +302,7 @@ conf_layout_section(char *src)
                     tmp = get_nsec(src, "layout", i);
 
                     if(!name_to_func((p = get_opt(tmp, "tile", "type").str), layout_list))
-                    {
                          fprintf(stderr, "WMFS Configuration: Unknow Layout type: \"%s\"\n", p);
-                    }
                     else
                     {
                          if(conf.layout_system && conf.nlayout > 1)

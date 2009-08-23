@@ -2,7 +2,7 @@ ABOUT :
 WMFS Window Manager.
    * Window Manager From Scratch
 
-A small Window Manager created from scratch
+A highly configurable and manageable tiling Window Manager created from scratch
 
 AUTHORS :
   Martin Duquesnoy <xorg62@gmail.com>
@@ -10,10 +10,9 @@ AUTHORS :
 LICENSE : BSD
 
 REQUIREMENT :
-  - libconfuse
   - freetype2
-  - libxinerama
-  - libxrandr
+  - libxinerama (optional)
+  - libxrandr   (optional)
   - libxft
   - libx11
   - CMake >= 2.6
