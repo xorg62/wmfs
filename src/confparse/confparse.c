@@ -218,8 +218,6 @@ get_list_opt(char *src, char *def, char *name, int *n)
                p2[j] = '\0';
 
                ret[i] = str_to_opt(clean_value(p2));
-
-               printf("---> %s\n", p2);
           }
      }
      else
