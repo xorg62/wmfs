@@ -174,7 +174,11 @@ get_opt(char *src, char *def, char *name)
                 * between option name and '=' */
                for(i = 0; i < strlen(p2); ++i)
                     if(p2[i] != ' ')
+                    {
+                         fprintf(stderr, "WMFS Configuration warning: Missing '=' after option: '%s'"
+                                   " and before expression: '%s'\n", name, p2);
                          return str_to_opt(def);
+                    }
 
                ret = str_to_opt(clean_value(++p));
           }

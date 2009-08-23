@@ -260,7 +260,7 @@ void
 conf_layout_section(char *src)
 {
      int i;
-     char *tmp = NULL;
+     char *tmp = NULL, *p;
 
      /* Set conf.layout NULL for conf reload */
      for(i = 0; i < NUM_OF_LAYOUT; ++i)
@@ -301,20 +301,18 @@ conf_layout_section(char *src)
                {
                     tmp = get_nsec(src, "layout", i);
 
-                    if(!name_to_func(get_opt(tmp, "tile", "type").str, layout_list))
+                    if(!name_to_func((p = get_opt(tmp, "tile", "type").str), layout_list))
                     {
-                         fprintf(stderr, "WMFS Configuration: Unknow Layout type: \"%s\"\n",
-                                 get_opt(tmp, "tile", "type").str);
+                         fprintf(stderr, "WMFS Configuration: Unknow Layout type: \"%s\"\n", p);
                     }
                     else
                     {
                          if(conf.layout_system && conf.nlayout > 1)
                               menu_new_item(&menulayout.item[i], get_opt(tmp, "", "symbol").str,
-                                            uicb_set_layout,
-                                            get_opt(tmp, "tile", "type").str);
+                                            uicb_set_layout, p);
 
                          conf.layout[i].symbol = get_opt(tmp, "TILE (default)", "symbol").str;
-                         conf.layout[i].func = name_to_func(get_opt(tmp, "tile", "type").str, layout_list);
+                         conf.layout[i].func = name_to_func(p, layout_list);
                     }
                }
           }
