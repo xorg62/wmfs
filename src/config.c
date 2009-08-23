@@ -301,21 +301,20 @@ conf_layout_section(char *src)
                {
                     tmp = get_nsec(src, "layout", i);
 
-                    if(!name_to_func(get_opt(tmp, "", "type").str, layout_list))
+                    if(!name_to_func(get_opt(tmp, "tile", "type").str, layout_list))
                     {
                          fprintf(stderr, "WMFS Configuration: Unknow Layout type: \"%s\"\n",
-                                 get_opt(tmp, "", "type").str);
-                         /* exit(EXIT_FAILURE); */
+                                 get_opt(tmp, "tile", "type").str);
                     }
                     else
                     {
                          if(conf.layout_system && conf.nlayout > 1)
                               menu_new_item(&menulayout.item[i], get_opt(tmp, "", "symbol").str,
                                             uicb_set_layout,
-                                            get_opt(tmp, "", "type").str);
+                                            get_opt(tmp, "tile", "type").str);
 
-                         conf.layout[i].symbol = get_opt(tmp, "", "symbol").str;
-                         conf.layout[i].func = name_to_func(get_opt(tmp, "", "type").str, layout_list);
+                         conf.layout[i].symbol = get_opt(tmp, "TILE (default)", "symbol").str;
+                         conf.layout[i].func = name_to_func(get_opt(tmp, "tile", "type").str, layout_list);
                     }
                }
           }
@@ -507,8 +506,8 @@ conf_keybind_section(char *src)
                fprintf(stderr, "WMFS Configuration warning: Unknow Function \"%s\"\n", get_opt(tmp, "", "func").str);
                keys[i].func = uicb_spawn;
           }
-          keys[i].cmd = (!get_opt(tmp, "", "cmd").str) ? NULL : get_opt(tmp, "", "cmd").str;
 
+          keys[i].cmd = (!get_opt(tmp, "", "cmd").str) ? NULL : get_opt(tmp, "", "cmd").str;
      }
 
      return;

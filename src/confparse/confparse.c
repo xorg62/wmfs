@@ -152,7 +152,7 @@ opt_type
 get_opt(char *src, char *def, char *name)
 {
      int i;
-     char *p = NULL;
+     char *p = NULL, *p2 = NULL;
      opt_type ret = null_opt_type;
 
      if(!src || !name)
@@ -163,8 +163,21 @@ get_opt(char *src, char *def, char *name)
           for(i = 0; p[i] && p[i] != '\n'; ++i);
           p[i] = '\0';
 
+          p2 = _strdup(p + strlen(name));
+
           if((p = strchr(p, '=')) && !is_in_delimiter(p, 0))
+          {
+               for(i = 0; p2[i] && p2[i] != '='; ++i);
+               p2[i] = '\0';
+
+               /* Check if there is anything else that spaces
+                * between option name and '=' */
+               for(i = 0; i < strlen(p2); ++i)
+                    if(p2[i] != ' ')
+                         return str_to_opt(def);
+
                ret = str_to_opt(clean_value(++p));
+          }
      }
      else
           ret = str_to_opt(def);
@@ -214,7 +227,7 @@ get_list_opt(char *src, char *def, char *name, int *n)
           /* Set all value in return array */
           for(i = j = 0; i < *n; ++i, p2 += ++j)
           {
-               for(j = 0; j < strlen(p2) && (p2[j] != ',' || is_in_delimiter(p2, j)); j++);
+               for(j = 0; j < strlen(p2) && (p2[j] != ',' || is_in_delimiter(p2, j)); ++j);
                p2[j] = '\0';
 
                ret[i] = str_to_opt(clean_value(p2));
