@@ -212,12 +212,14 @@ get_list_opt(char *src, char *def, char *name, int *n)
           p2 = _strdup(p);
 
           /* Set all value in return array */
-          for(i = j = 0; i < *n; ++i, p2 += ++j + 1)
+          for(i = j = 0; i < *n; ++i, p2 += ++j)
           {
-               for(j = 0; j < strlen(p2) && (p2[j] != ',' || is_in_delimiter(p2, j)); ++j);
+               for(j = 0; j < strlen(p2) && (p2[j] != ',' || is_in_delimiter(p2, j)); j++);
                p2[j] = '\0';
 
                ret[i] = str_to_opt(clean_value(p2));
+
+               printf("---> %s\n", p2);
           }
      }
      else
