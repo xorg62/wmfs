@@ -155,10 +155,11 @@
                 command = "exec"
         [/set_launcher]
 
+        #ViWMFS : manage wmfs with vi-based command.
         [set_launcher]
-                name = "launcher_ssh"
-                prompt = "ssh to: "
-                command = "@WMFS_TERM@ -e ssh"
+                name = "viwmfs"
+                prompt = "> "
+                command = "wmfs -V"
         [/set_launcher]
 [/launcher]
 
@@ -223,9 +224,11 @@
         # Decease nmaster.
         [key] mod = {"Alt", "Shift"} key = "d" func = "set_nmaster" cmd = "-1" [/key]
 
-        #Launchers.
+        #Launcher.
         [key] mod = {"Alt"} key = "p" func = "launcher" cmd = "launcher_exec" [/key]
-        [key] mod = {"Alt", "Shift"} key = "p" func = "launcher" cmd = "launcher_ssh" [/key]
+
+        #ViWMFS
+        [key] mod = {"Alt"} key = "Escape" func = "launcher" cmd = "viwmfs" [/key]
 
         # Set the tag x.
         [key] mod = {"Alt"} key = "F1" func = "tag" cmd = "1" [/key]

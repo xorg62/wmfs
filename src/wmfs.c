@@ -415,7 +415,7 @@ main(int argc, char **argv)
                exit(EXIT_SUCCESS);
                break;
           case 'V':
-               viwmfs(optarg);
+               viwmfs(argc, argv);
                XCloseDisplay(dpy);
                exit(EXIT_SUCCESS);
                break;

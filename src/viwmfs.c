@@ -57,20 +57,42 @@ vicmd_to_uicb vicmd[] =
 };
 
 void
-viwmfs(char *str)
+viwmfs_help(void)
+{
+     printf("ViWMFS commands list:\n");
+
+     return;
+}
+
+void
+viwmfs(int argc, char **argv)
 {
      int i;
-     char *cmd;
+     char *cmd, str[256] = { 0 };
      Bool e;
 
-     if(!str)
+     if(!argc)
           return;
+
+     if(argc > 3)
+     {
+          for(i = 2; i < argc; ++i)
+          {
+               strcat(str, argv[i]);
+
+               if(*(str + strlen(str) - 1) != ':')
+                    strcat(str, " ");
+          }
+     }
+     else
+          strcpy(str, argv[2]);
 
      if(*str == ':')
      {
-          ++str;
+          for(i = 0; i < strlen(str); str[i] = str[i + 1], ++i);
 
           cmd = _strdup(str);
+
           for(i = 0; cmd[i] && cmd[i] != ' '; ++i);
           cmd[i] = '\0';
 
