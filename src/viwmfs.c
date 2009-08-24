@@ -71,7 +71,7 @@ viwmfs(char *str)
           ++str;
 
           cmd = _strdup(str);
-          for(i = 0; cmd[i] != ' ' && cmd[i] != '\0'; ++i);
+          for(i = 0; cmd[i] && cmd[i] != ' '; ++i);
           cmd[i] = '\0';
 
           for(i = 0; i < LEN(vicmd); ++i)
@@ -82,14 +82,9 @@ viwmfs(char *str)
                     break;
                }
 
+          /* For uicb function with normal name specified */
           if(!e)
-          {
-               cmd = _strdup(str);
-               for(i = 0; cmd[i] != ' '; ++i);
-               cmd[i] = '\0';
-
-               exec_uicb_function(cmd, str + i);
-          }
+               exec_uicb_function(cmd, str + strlen(cmd));
      }
 
      return;
