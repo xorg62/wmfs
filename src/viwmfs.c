@@ -39,6 +39,8 @@ vicmd_to_uicb vicmd[] =
      {"t",                "tag"},
      {"tn",               "tag_next"},
      {"tp",               "tag_prev"},
+     {"l",                "set_layout"},
+     {"layout",           "set_layout"},
      {"ln",               "layout_next"},
      {"lp",               "layout_prev"},
      {"s",                "screen_select"},
@@ -52,6 +54,9 @@ vicmd_to_uicb vicmd[] =
      {"cp",               "client_prev"},
      {"csn",              "client_swap_next"},
      {"csp",              "client_swap_prev"},
+     {"mwf",              "set_mwfact"},
+     {"mwfact",           "set_mwfact"},
+     {"nmaster",          "set_nmaster"},
      {"tm",               "toggle_max"},
      {"tf",               "toggle_free"},
 };
@@ -99,7 +104,7 @@ viwmfs(int argc, char **argv)
           for(i = 0; i < LEN(vicmd); ++i)
                if(!strncmp(cmd, vicmd[i].cmd, strlen(cmd)))
                {
-                    exec_uicb_function(vicmd[i].uicb, str + strlen(cmd));
+                    exec_uicb_function(vicmd[i].uicb, clean_value(str + strlen(cmd)));
                     e = True;
                     break;
                }
