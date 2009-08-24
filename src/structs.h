@@ -388,4 +388,10 @@ typedef struct
      uint button;
 } name_to_uint_t;
 
+typedef struct
+{
+     char *cmd;
+     char *uicb;
+} vicmd_to_uicb;
+
 #endif /* STRUCTS_H */

@@ -352,11 +352,11 @@ main(int argc, char **argv)
      argv_global  = _strdup(argv[0]);
      sprintf(conf.confpath, "%s/"DEF_CONF, getenv("HOME"));
 
-     while((i = getopt(argc, argv, "hvic:s:g:C:")) != -1)
+     while((i = getopt(argc, argv, "hvic:s:g:C:V:")) != -1)
      {
 
           /* For options who need WMFS running */
-          if((i == 'c' || i == 's' || i == 'g')
+          if((i == 'c' || i == 's' || i == 'g' || i == 'V')
              && !(dpy = XOpenDisplay(NULL)))
           {
                fprintf(stderr, "WMFS: cannot open X server.\n");
@@ -367,11 +367,12 @@ main(int argc, char **argv)
           {
           case 'h':
           default:
-               printf("usage: %s [-ihv] [-C <file>] [-c <uicb function> <cmd> ] [-g <argument>] [-s <string>]\n"
+               printf("usage: %s [-ihv] [-C <file>] [-c <uicb function> <cmd> ] [-g <argument>] [-s <string>] [-V <viwmfs cmd]\n"
                       "   -C <file>                 Load a configuration file\n"
                       "   -c <uicb_function> <cmd>  Execute an uicb function to control WMFS\n"
                       "   -g <argument>             Show information about wmfs status\n"
                       "   -s <string>               Set the bar(s) statustext\n"
+                      "   -V <viwmfs cmd>           Manage WMFS with vi-like command\n"
                       "   -h                        Show this page\n"
                       "   -i                        Show informations\n"
                       "   -v                        Show WMFS version\n", argv[0]);
@@ -410,6 +411,11 @@ main(int argc, char **argv)
 
           case 'g':
                getinfo(optarg);
+               XCloseDisplay(dpy);
+               exit(EXIT_SUCCESS);
+               break;
+          case 'V':
+               viwmfs(optarg);
                XCloseDisplay(dpy);
                exit(EXIT_SUCCESS);
                break;

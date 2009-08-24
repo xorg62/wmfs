@@ -317,6 +317,9 @@ void getinfo_mwfact(void);
 void getinfo_nmaster(void);
 void getinfo(char *info);
 
+/* viwmfs.c */
+void viwmfs(char *str);
+
 /* wmfs.c */
 int errorhandler(Display *d, XErrorEvent *event);
 int errorhandlerdummy(Display *d, XErrorEvent *event);

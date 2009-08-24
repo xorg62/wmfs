@@ -44,6 +44,7 @@ set(wmfs_src
   src/screen.c
   src/tag.c
   src/util.c
+  src/viwmfs.c
   src/wmfs.c)
 
 # Set the executable from the wmfs_src
