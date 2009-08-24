@@ -49,7 +49,6 @@ vicmd_to_uicb vicmd[] =
      {"sp",               "screen_prev"},
      {"cc",               "client_kill"},
      {"ct",               "tag_transfert"},
-     {"client_transfert", "tag_transfert"},
      {"cn",               "client_next"},
      {"cp",               "client_prev"},
      {"csn",              "client_swap_next"},
@@ -64,7 +63,19 @@ vicmd_to_uicb vicmd[] =
 void
 viwmfs_help(void)
 {
+     int i;
+     char s[20];
+
      printf("ViWMFS commands list:\n");
+
+     for(i = 0; i < LEN(vicmd); ++i)
+     {
+          memset(s, ' ', sizeof(s));
+
+          s[15 - strlen(vicmd[i].cmd)] = '\0';
+
+          printf("   :%s%s %s\n", vicmd[i].cmd, s, vicmd[i].uicb);
+     }
 
      return;
 }
@@ -92,6 +103,13 @@ viwmfs(int argc, char **argv)
      else
           strcpy(str, argv[2]);
 
+     if(!strcmp(str, "help"))
+     {
+          viwmfs_help();
+
+          return;
+     }
+
      if(*str == ':')
      {
           for(i = 0; i < strlen(str); str[i] = str[i + 1], ++i);
@@ -111,7 +129,12 @@ viwmfs(int argc, char **argv)
 
           /* For uicb function with normal name specified */
           if(!e)
-               exec_uicb_function(cmd, str + strlen(cmd));
+          {
+               if(!strcmp(str, "h") || !strcmp(str, "help"))
+                    viwmfs_help();
+               else
+                    exec_uicb_function(cmd, str + strlen(cmd));
+          }
      }
 
      return;
