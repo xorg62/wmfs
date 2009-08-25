@@ -174,11 +174,11 @@ secname(char *name)
 
      ret = emalloc(SecLast, sizeof(char*));
 
-     /* Len of name + '[' + ']' */
-     ret[SecStart] = emalloc(strlen(name) + 2, sizeof(char));
+     /* Len of name + '[' + ']' + '\0' */
+     ret[SecStart] = emalloc(strlen(name) + 3, sizeof(char));
 
-     /* Len of name + '[' + '/' + ']' */
-     ret[SecEnd] = emalloc(strlen(name) + 3, sizeof(char));
+     /* Len of name + '[' + '/' + ']' + '\0' */
+     ret[SecEnd] = emalloc(strlen(name) + 4, sizeof(char));
 
      sprintf(ret[SecStart], "%c%s%c", SEC_DEL_S, name, SEC_DEL_E);
      sprintf(ret[SecEnd], "%c/%s%c", SEC_DEL_S, name, SEC_DEL_E);
