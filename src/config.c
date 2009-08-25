@@ -276,8 +276,9 @@ conf_layout_section(char *src)
      if(strcmp(get_opt(src, "menu", "system").str, "menu") == 0)
           conf.layout_system = True;
 
-     if((conf.nlayout = get_size_sec(src, "layout")) > NUM_OF_LAYOUT
-          || !(conf.nlayout = get_size_sec(src, "layout")))
+	 conf.nlayout = get_size_sec(src, "layout");
+
+     if(conf.nlayout > NUM_OF_LAYOUT || !(conf.nlayout))
      {
           fprintf(stderr, "WMFS Configuration: Too many or no layouts (%d)\n", conf.nlayout);
           conf.nlayout          = 1;
