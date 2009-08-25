@@ -276,7 +276,7 @@ conf_layout_section(char *src)
      if(strcmp(get_opt(src, "menu", "system").str, "menu") == 0)
           conf.layout_system = True;
 
-	 conf.nlayout = get_size_sec(src, "layout");
+     conf.nlayout = get_size_sec(src, "layout");
 
      if(conf.nlayout > NUM_OF_LAYOUT || !(conf.nlayout))
      {
@@ -323,7 +323,7 @@ conf_layout_section(char *src)
 void
 conf_tag_section(char *src)
 {
-     int i, j, k, l = 0, m, n;
+     int i, j, k, l = 0, m, n, sc;
      char *cfgtmp, *tmp;
      opt_type *buf;
 
@@ -340,15 +340,17 @@ conf_tag_section(char *src)
      conf.colors.tag_occupied_bg  = getcolor(get_opt(src, "#222222", "occupied_bg").str);
      conf.border.tag              = get_opt(src, "false", "border").bool;
 
-     /* Alloc all */
-     conf.ntag = emalloc(screen_count(), sizeof(int));
-     tags      = emalloc(screen_count(), sizeof(Tag*));
-     seltag    = emalloc(screen_count(), sizeof(int));
+     sc = screen_count();
 
-     for(i = 0; i < screen_count(); ++i)
+     /* Alloc all */
+     conf.ntag = emalloc(sc, sizeof(int));
+     tags      = emalloc(sc, sizeof(Tag*));
+     seltag    = emalloc(sc, sizeof(int));
+
+     for(i = 0; i < sc; ++i)
           seltag[i] = 1;
 
-     for(i = 0; i < screen_count(); ++i)
+     for(i = 0; i < sc; ++i)
           tags[i] = emalloc(get_size_sec(src, "tag") + 2, sizeof(Tag));
 
      for(i = 0; i < get_size_sec(src, "tag"); ++i)
@@ -357,11 +359,11 @@ conf_tag_section(char *src)
           cfgtmp = get_nsec(src, "tag", i);
           j = get_opt(cfgtmp, "-1", "screen").num;
 
-          if(j < 0 || j > screen_count() - 1)
+          if(j < 0 || j > sc - 1)
                j = -1;
 
           for(k = ((j == -1) ? 0 : j);
-              ((j == -1) ? (k < screen_count()) : !l);
+              ((j == -1) ? (k < sc) : !l);
               ((j == -1) ? ++k : --l))
           {
                ++conf.ntag[k];
@@ -398,7 +400,7 @@ conf_tag_section(char *src)
           l = 0;
      }
 
-     for(i = 0; i < screen_count(); ++i)
+     for(i = 0; i < sc; ++i)
           if(!conf.ntag[i] || conf.ntag[i] > MAXTAG)
           {
                fprintf(stderr, "WMFS Configuration: Too many or no tag"
