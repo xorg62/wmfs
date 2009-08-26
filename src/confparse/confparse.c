@@ -47,7 +47,7 @@ file_to_str(char *path)
      stat(path, &st);
 
      /* Bufferize file */
-     if((buf = (char*)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, SEEK_SET)) == (char*) -1)
+     if((buf = (char*)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, SEEK_SET)) == (char*) MAP_FAILED)
           return NULL;
 
      /* Copy buffer without comments in return value */
@@ -56,7 +56,7 @@ file_to_str(char *path)
      for(p = buf, i = 0; *p != '\0'; p++)
      {
           if(strchr("\"'", *p))
-               is_char = (is_char == False) ? True : False;
+               is_char = !is_char;
 
           if(*p == COMMENT_CHAR && is_char == False)
           {
