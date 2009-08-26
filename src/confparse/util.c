@@ -42,11 +42,12 @@ erase_delim_content(char *buf)
           return NULL;
 
      for(i = 0; i < strlen(str); ++i)
-          if((c = str[i]) == '"' || (c = str[i]) == '\'')
+          if(strchr("\"'", (c = str[i])))
           {
                for(*(str + (j = i)) = ' '; str[j] && str[j] != c; str[j++] = ' ');
                str[j] = ' ';
           }
+
 
      return str;
 }

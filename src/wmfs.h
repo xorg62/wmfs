@@ -55,14 +55,14 @@
 #include "config.h"
 #include "structs.h"
 
-/* Optional dependences */
+/* Optional dependencies */
 #ifdef HAVE_XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif /* HAVE_XINERAMA */
 
 #ifdef HAVE_XRANDR
 #include <X11/extensions/Xrandr.h>
-#endif /* HAVE_XINERAMA */
+#endif /* HAVE_XRANDR */
 
 /* MACRO */
 #define ButtonMask   (ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)

@@ -38,6 +38,7 @@ file_to_str(char *path)
      char *buf, *ret, *p;
      int fd, i;
      struct stat st;
+     Bool is_char = False;
 
      if(!path || !(fd = open(path, O_RDONLY)))
           return NULL;
@@ -49,16 +50,28 @@ file_to_str(char *path)
      if((buf = (char*)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, SEEK_SET)) == (char*) -1)
           return NULL;
 
-     /* Copy buffer in return value */
-     ret = _strdup(buf);
+     /* Copy buffer without comments in return value */
+     ret = emalloc(strlen(buf) + 1, sizeof(char));
+
+     for(p = buf, i = 0; *p != '\0'; p++)
+     {
+          if(strchr("\"'", *p))
+               is_char = (is_char == False) ? True : False;
+
+          if(*p == COMMENT_CHAR && is_char == False)
+          {
+               if(!(p = strchr(p, '\n')))
+                    break;
+               ret[i++] = '\n';
+          }
+          else
+               ret[i++] = *p;
+     }
+     ret[i++] = '\0';
 
      /* Unmap buffer, thanks linkdd. */
      munmap(buf, st.st_size);
      close(fd);
-
-     /* Erase comment line from return value */
-     for(i = 0; (p = strchr(erase_delim_content(ret + i), COMMENT_CHAR));)
-          for(i = st.st_size - strlen(p); ret[i] && ret[i] != '\n'; ret[i++] = ' ');
 
      fprintf(stderr, "WMFS Configuration info: '%s' read.\n", path);
 
