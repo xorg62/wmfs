@@ -32,6 +32,9 @@
 
 #include "wmfs.h"
 
+/* local function definition */
+static void conf_section(void (*)(char*), char *, char *);
+
 func_name_list_t tmp_func_list[] =
 {
      {"spawn",                   uicb_spawn },
@@ -531,15 +534,15 @@ init_conf(void)
      func_list = emalloc(LEN(tmp_func_list), sizeof(func_name_list_t));
      memcpy(func_list, tmp_func_list, LEN(tmp_func_list) * sizeof(func_name_list_t));
 
-     conf_misc_section(get_sec(file, "misc"));
-     conf_bar_section(get_sec(file, "bar"));
-     conf_root_section(get_sec(file, "root"));
-     conf_client_section(get_sec(file, "client"));
-     conf_layout_section(get_sec(file, "layouts"));
-     conf_tag_section(get_sec(file, "tags"));
-     conf_menu_section(get_sec(file, "menu"));
-     conf_launcher_section(get_sec(file, "launcher"));
-     conf_keybind_section(get_sec(file, "keys"));
+     conf_section(conf_misc_section, file, "misc");
+     conf_section(conf_bar_section, file, "bar");
+     conf_section(conf_root_section, file, "root");
+     conf_section(conf_client_section, file, "client");
+     conf_section(conf_layout_section, file, "layouts");
+     conf_section(conf_tag_section, file, "tags");
+     conf_section(conf_menu_section, file, "menu");
+     conf_section(conf_launcher_section, file, "launcher");
+     conf_section(conf_keybind_section, file, "keys");
 
      free(file);
 
@@ -547,5 +550,18 @@ init_conf(void)
 }
 
 
+/** Simple wrapper for calling functions and free pointer
+ */
+static void
+conf_section(void (*func)(char*), char *src, char *name)
+{
+     char *sec;
+
+     sec = get_sec(src, name);
+     func(sec);
+     free(sec);
+
+     return;
+}
 
 
