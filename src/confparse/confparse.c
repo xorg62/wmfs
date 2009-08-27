@@ -81,8 +81,10 @@ file_to_str(char *path)
 char*
 get_sec(char *src, char *name)
 {
-     char *ret, *p;
+     char *ret = NULL, *start, *end;
      char **sec;
+     size_t len;
+     Bool is_char = False;
 
      if(!src)
           return NULL;
@@ -91,20 +93,39 @@ get_sec(char *src, char *name)
           return src;
 
      sec = secname(name);
+     len = strlen(sec[SecStart]);
 
-     ret = _strdup(src);
-
-     if((p = strstr(erase_delim_content(src), sec[SecStart])))
+     /* Find start section pointer */
+     for(start = src; *start != '\0'; start++)
      {
-          ret += strlen(ret) - strlen(p) + strlen(sec[SecStart]) + 1;
-
-          if((p = strstr(erase_delim_content(ret), sec[SecEnd])))
-               *(ret + (strlen(ret) - strlen(p))) = '\0';
-          else
-               ret = NULL;
+          if(strchr("\"'", *start))
+               is_char = !is_char;
+          if(is_char == False && !strncmp(start, sec[SecStart], len))
+               break;
      }
-     else
-          ret = NULL;
+
+     if(*start != '\0')
+     {
+          /* Here is_char == False */
+          start += len;
+          /* Find end section pointer */
+          for(end = start; *end != '\0'; end++)
+          {
+               if(strchr("\"'", *end))
+                    is_char = !is_char;
+               if(is_char == False && !strncmp(end, sec[SecEnd], len+1))
+                    break;
+          }
+
+          /* Allocate and set ret */
+          if(end != '\0')
+          {
+               len = end - start;
+               ret = emalloc(len + 1, sizeof(char));
+               memcpy(ret, start, len);
+               ret[len] = '\0';
+          }
+     }
 
      free_secname(sec);
 
