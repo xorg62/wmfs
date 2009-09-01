@@ -559,7 +559,7 @@ conf_section(void (*func)(char*), char *src, char *name)
 
      sec = get_sec(src, name);
      func(sec);
-     free(sec);
+     IFREE(sec);
 
      return;
 }
