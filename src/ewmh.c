@@ -167,8 +167,8 @@ ewmh_update_current_tag_prop(void)
 
      /* Current layout */
      XChangeProperty(dpy, ROOT, net_atom[wmfs_current_layout], net_atom[utf8_string], 8,
-                     PropModeReplace, (uchar*)tags[selscreen][seltag[selscreen]].layout.symbol,
-                     strlen(tags[selscreen][seltag[selscreen]].layout.symbol));
+               PropModeReplace, (uchar*)tags[selscreen][seltag[selscreen]].layout.symbol,
+               strlen(tags[selscreen][seltag[selscreen]].layout.symbol));
 
      free(s);
 

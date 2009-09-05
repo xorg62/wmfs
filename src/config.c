@@ -297,25 +297,25 @@ conf_layout_section(char *src)
                     conf.colors.layout_fg,
                     conf.colors.bar,
                     conf.colors.text);
+     }
 
-          if(!conf.layout[0].symbol
-             && !conf.layout[0].func)
+     if(!conf.layout[0].symbol
+               && !conf.layout[0].func)
+     {
+          for(i = 0; i < conf.nlayout; ++i)
           {
-               for(i = 0; i < conf.nlayout; ++i)
+               tmp = get_nsec(src, "layout", i);
+
+               if(!name_to_func((p = get_opt(tmp, "tile", "type").str), layout_list))
+                    fprintf(stderr, "WMFS Configuration: Unknow Layout type: \"%s\"\n", p);
+               else
                {
-                    tmp = get_nsec(src, "layout", i);
+                    if(conf.layout_system && conf.nlayout > 1)
+                         menu_new_item(&menulayout.item[i], get_opt(tmp, "", "symbol").str,
+                                   uicb_set_layout, p);
 
-                    if(!name_to_func((p = get_opt(tmp, "tile", "type").str), layout_list))
-                         fprintf(stderr, "WMFS Configuration: Unknow Layout type: \"%s\"\n", p);
-                    else
-                    {
-                         if(conf.layout_system && conf.nlayout > 1)
-                              menu_new_item(&menulayout.item[i], get_opt(tmp, "", "symbol").str,
-                                            uicb_set_layout, p);
-
-                         conf.layout[i].symbol = get_opt(tmp, "TILE (default)", "symbol").str;
-                         conf.layout[i].func = name_to_func(p, layout_list);
-                    }
+                    conf.layout[i].symbol = get_opt(tmp, "TILE (default)", "symbol").str;
+                    conf.layout[i].func = name_to_func(p, layout_list);
                }
           }
      }
