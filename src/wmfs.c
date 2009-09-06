@@ -180,7 +180,7 @@ scan(void)
      Client *c;
 
      if(XQueryTree(dpy, ROOT, &usl, &usl2, &w, &n))
-          for(i = 0; i < n; ++i)
+          for(i = n - 1; i != 0; --i)
                if(XGetWindowAttributes(dpy, w[i], &wa)
                   && !(wa.override_redirect || XGetTransientForHint(dpy, w[i], &usl))
                   && wa.map_state == IsViewable)
