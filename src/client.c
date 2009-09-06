@@ -615,8 +615,12 @@ client_geo_hints(XRectangle *geo, Client *c)
 void
 client_moveresize(Client *c, XRectangle geo, Bool r)
 {
+     int os;
+
      if(!c)
           return;
+
+     os = c->screen;
 
      if(r)
           client_geo_hints(&geo, c);
@@ -624,13 +628,12 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
      c->flags &= ~MaxFlag;
      c->geo = c->ogeo = geo;
 
-     c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
-     c->tag = seltag[c->screen];
+     if((c->screen = screen_get_with_geo(c->geo.x, c->geo.y)) != os)
+          c->tag = seltag[c->screen];
 
      frame_moveresize(c, c->geo);
 
-     XMoveResizeWindow(dpy, c->win, BORDH, TBARH,
-                       c->geo.width, c->geo.height);
+     XMoveResizeWindow(dpy, c->win, BORDH, TBARH, c->geo.width, c->geo.height);
 
      client_configure(c);
      client_update_attributes(c);
