@@ -35,7 +35,7 @@
 char*
 file_to_str(char *path)
 {
-     char *buf, *ret, *p;
+     char *buf, *ret, *p, *c;
      int fd, i;
      struct stat st;
      Bool is_char = False;
@@ -55,10 +55,12 @@ file_to_str(char *path)
 
      for(p = buf, i = 0; *p != '\0'; p++)
      {
-          if(strchr("\"'", *p))
+          if(!is_char && (c = strchr("\"'", *p)))
+               is_char = !is_char;
+          else if (is_char && *p == *c)
                is_char = !is_char;
 
-          if(*p == COMMENT_CHAR && is_char == False)
+          if(*p == COMMENT_CHAR && !is_char)
           {
                if(!(p = strchr(p, '\n')))
                     break;
@@ -81,10 +83,9 @@ file_to_str(char *path)
 char*
 get_sec(char *src, char *name)
 {
-     char *ret = NULL, *start, *end;
+     char *ret = NULL, *start, *end, *p;
      char **sec;
      size_t len;
-     Bool is_char = False;
 
      if(!src)
           return NULL;
@@ -98,9 +99,10 @@ get_sec(char *src, char *name)
      /* Find start section pointer */
      for(start = src; *start != '\0'; start++)
      {
-          if(strchr("\"'", *start))
-               is_char = !is_char;
-          if(is_char == False && !strncmp(start, sec[SecStart], len))
+          if( (p = strchr("\"'", *start)) )
+               while (*(++start) && *start != *p);
+
+          if(!strncmp(start, sec[SecStart], len))
                break;
      }
 
@@ -111,9 +113,10 @@ get_sec(char *src, char *name)
           /* Find end section pointer */
           for(end = start; *end != '\0'; end++)
           {
-               if(strchr("\"'", *end))
-                    is_char = !is_char;
-               if(is_char == False && !strncmp(end, sec[SecEnd], len+1))
+               if( (p = strchr("\"'", *start)) )
+                    while (*(++start) && *start != *p);
+
+               if(!strncmp(end, sec[SecEnd], len+1))
                     break;
           }
 
