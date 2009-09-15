@@ -193,7 +193,7 @@ get_opt(char *src, char *def, char *name)
      opt_type ret = null_opt_type;
 
      if(!src || !name)
-          return (def) ? str_to_opt(def) : null_opt_type;
+          return (def) ? str_to_opt(def) : ret;
 
      if((p = opt_srch(erase_sec_content(src), name)))
      {
@@ -220,7 +220,8 @@ get_opt(char *src, char *def, char *name)
                ret = str_to_opt(clean_value(++p));
           }
      }
-     else
+
+     if(!ret.str)
           ret = str_to_opt(def);
 
      return ret;
