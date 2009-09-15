@@ -276,7 +276,8 @@ conf_layout_section(char *src)
      conf.colors.layout_fg  = get_opt(src, "#ffffff", "fg").str;
      conf.colors.layout_bg  = getcolor((get_opt(src, "#000000", "bg").str));
 
-     if(strcmp(get_opt(src, "menu", "system").str, "menu") == 0)
+
+     if((tmp = get_opt(src, "menu", "system").str) && !strcmp(tmp, "menu"))
           conf.layout_system = True;
 
      conf.nlayout = get_size_sec(src, "layout");

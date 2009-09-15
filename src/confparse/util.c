@@ -48,7 +48,6 @@ erase_delim_content(char *buf)
                str[j] = ' ';
           }
 
-
      return str;
 }
 
