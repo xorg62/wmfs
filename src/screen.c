@@ -48,8 +48,9 @@ screen_count(void)
 #endif /* HAVE_XINERAMA */
 
      /* Set _WMFS_SCREEN_COUNT */
-     XChangeProperty(dpy, ROOT, net_atom[wmfs_screen_count], XA_CARDINAL, 32,
-                     PropModeReplace, (uchar*)&n, 1);
+     if(net_atom)
+          XChangeProperty(dpy, ROOT, net_atom[wmfs_screen_count], XA_CARDINAL, 32,
+                    PropModeReplace, (uchar*)&n, 1);
 
      return n;
 }

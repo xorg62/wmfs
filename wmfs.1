@@ -13,7 +13,7 @@
 .SH "NAME"
 wmfs \- Window Manager From Scratch
 .SH "SYNOPSIS"
-\fBwmfs\fR [\fB\-ihv\fR] [\fB\-C <file>\fR] [\fB\-c <uicb_function> <cmd>\fR] [\fB\-g <argument>\fR] [\fB\-s <string>\fR]  [\fB\-V <viwmfs cmd>\fR]
+\fBwmfs\fR [\fB\-ihv\fR] [\fB\-C <file>\fR] [\fB\-c <uicb_function> <cmd>\fR] [\fB\-g <argument>\fR] [\fB\-s <screen_num> <string>\fR]  [\fB\-V <viwmfs cmd>\fR]
 .sp
 .SH "DESCRIPTION"
 \fBWMFS\fR is a basic, lightweight and dynamic tiling windows manager for X\&.
@@ -35,9 +35,9 @@ Execute an uicb function to control WMFS\&.
 Show information about wmfs status\&.
 .RE
 .PP
-\fB\-s <string>\fR
+\fB\-s <screen_num> <string>\fR
 .RS 4
-Set the bar(s) statustext\&.
+Set the bar(s) statustext. If the screen number is not specified, the string will be show on all screens bars\&.
 .RE
 .PP
 \fB\-V <viwmfs cmd>\fR

@@ -327,7 +327,7 @@ void mainloop(void);
 void scan(void);
 Bool check_wmfs_running(void);
 void exec_uicb_function(char *func, char *cmd);
-void set_statustext(char *str);
+void set_statustext(int s, char *str);
 void handle_signal(int signum);
 void uicb_quit(uicb_t);
 void uicb_reload(uicb_t);
@@ -341,7 +341,6 @@ int selscreen;
 Conf conf;
 Key *keys;
 Bool exiting;
-char *statustext;
 XRectangle *sgeo;
 XRectangle *spgeo;
 Cursor cursor[CurLast];
@@ -352,7 +351,7 @@ int xrandr_event;
 XftFont *font;
 
 /* Atoms list */
-Atom net_atom[net_last];
+Atom *net_atom;
 
 /* InfoBar/Tags */
 InfoBar *infobar;

@@ -97,7 +97,8 @@ infobar_init(void)
           barwin_refresh(infobar[sc].bar);
 
           /* Default statustext is set here */
-          statustext = _strdup(WMFS_VERSION);
+          for(i = 0; i < screen_count(); ++i)
+               infobar[i].statustext = _strdup(WMFS_VERSION);
           infobar_draw(sc);
      }
 
@@ -113,7 +114,7 @@ infobar_draw(int sc)
      infobar_draw_taglist(sc);
      infobar_draw_layout(sc);
      barwin_refresh_color(infobar[sc].bar);
-     infobar_draw_statustext(sc, statustext);
+     infobar_draw_statustext(sc, infobar[sc].statustext);
 
      return;
 }
@@ -180,7 +181,7 @@ infobar_draw_statustext(int sc, char *str)
           return;
 
      barwin_refresh_color(infobar[sc].bar);
-     statustext = _strdup(str);
+     infobar[sc].statustext = _strdup(str);
      strwc = _strdup(str);
 
      /* Count how many color block there is and make a string without color block (\#....\)*/

@@ -42,10 +42,12 @@
 void
 ewmh_init_hints(void)
 {
-     int i = 1, showing_desk = 0;
+     int i = 1, j, showing_desk = 0;
      char root_name[] = "WMFS "WMFS_VERSION;
-     char class[] = "wmfs";
+     char class[] = "wmfs", st[64];
      long pid = (long)getpid();
+
+     net_atom = emalloc(net_last + screen_count() + 1, sizeof(Atom));
 
      /* EWMH hints */
      net_atom[net_supported]                  = ATOM("_NET_SUPPORTED");
@@ -78,7 +80,6 @@ ewmh_init_hints(void)
      /* WMFS hints */
      net_atom[wmfs_running]                   = ATOM("_WMFS_RUNNING");
      net_atom[wmfs_update_hints]              = ATOM("_WMFS_UPDATE_HINTS");
-     net_atom[wmfs_statustext]                = ATOM("_WMFS_STATUSTEXT");
      net_atom[wmfs_set_screen]                = ATOM("_WMFS_SET_SCREEN");
      net_atom[wmfs_screen_count]              = ATOM("_WMFS_SCREEN_COUNT");
      net_atom[wmfs_current_tag]               = ATOM("_WMFS_CURRENT_TAG");
@@ -89,6 +90,14 @@ ewmh_init_hints(void)
      net_atom[wmfs_nmaster]                   = ATOM("_WMFS_NMASTER");
      net_atom[wmfs_function]                  = ATOM("_WMFS_FUNCTION");
      net_atom[wmfs_cmd]                       = ATOM("_WMFS_CMD");
+
+     /* Multi atom _WMFS_STATUSTEXT_<screennum> */
+     for(j = 0; j < screen_count(); ++j)
+     {
+          sprintf(st, "_WMFS_STATUSTEXT_%d", j);
+          net_atom[wmfs_statustext + j] = ATOM(st);
+     }
+
 
      XChangeProperty(dpy, ROOT, net_atom[net_supported], XA_ATOM, 32,
                      PropModeReplace, (uchar*)net_atom, net_last);

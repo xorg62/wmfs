@@ -190,14 +190,13 @@ clientmessageevent(XClientMessageEvent *ev)
           if((c = client_gb_win(ev->window)))
                tag_transfert(c, ev->data.l[0]);
 
-     /* Manage _WMFS_STATUSTEXT */
-     if(mess_t == wmfs_statustext && ev->data.l[4] == True)
+     /* Manage _WMFS_STATUSTEXT_x */
+     if(mess_t >= wmfs_statustext && ev->data.l[4] == True)
      {
-          if(XGetWindowProperty(dpy, ROOT, net_atom[wmfs_statustext], 0, 4096,
+          if(XGetWindowProperty(dpy, ROOT, net_atom[mess_t], 0, 4096,
                                 False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret) == Success)
           {
-               for(i = 0; i < screen_count(); ++i)
-                    infobar_draw_statustext(i, (char*)ret);
+               infobar_draw_statustext(mess_t - wmfs_statustext, (char*)ret);
                XFree(ret);
           }
      }

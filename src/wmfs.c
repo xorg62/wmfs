@@ -107,6 +107,7 @@ quit(void)
      IFREE(keys);
      IFREE(func_list);
      IFREE(layout_list);
+     IFREE(net_atom);
 
      /* Clean conf alloced thing */
      IFREE(menulayout.item);
@@ -313,16 +314,38 @@ exec_uicb_function(char *func, char *cmd)
  *\param str Statustext string
 */
 void
-set_statustext(char *str)
+set_statustext(int s, char *str)
 {
+     int i;
      long data[5];
+     char atom_name[64];
 
      data[4] = True;
 
-     XChangeProperty(dpy, ROOT, ATOM("_WMFS_STATUSTEXT"), ATOM("UTF8_STRING"),
-                     8, PropModeReplace, (uchar*)str, strlen(str));
+     if(!str)
+          return;
 
-     send_client_event(data, "_WMFS_STATUSTEXT");
+     if(s == -1)
+     {
+          for(i = 0; i < screen_count(); ++i)
+          {
+               sprintf(atom_name, "_WMFS_STATUSTEXT_%d", i);
+
+               XChangeProperty(dpy, ROOT, ATOM(atom_name), ATOM("UTF8_STRING"),
+                         8, PropModeReplace, (uchar*)str, strlen(str));
+
+               send_client_event(data, atom_name);
+          }
+     }
+     else
+     {
+          sprintf(atom_name, "_WMFS_STATUSTEXT_%d", s);
+
+          XChangeProperty(dpy, ROOT, ATOM(atom_name), ATOM("UTF8_STRING"),
+                         8, PropModeReplace, (uchar*)str, strlen(str));
+
+          send_client_event(data, atom_name);
+     }
 
      return;
 }
@@ -348,6 +371,7 @@ int
 main(int argc, char **argv)
 {
      int i;
+     char *ol = "csgV";
 
      argv_global  = _strdup(argv[0]);
      sprintf(conf.confpath, "%s/"DEF_CONF, getenv("HOME"));
@@ -356,8 +380,7 @@ main(int argc, char **argv)
      {
 
           /* For options who need WMFS running */
-          if((i == 'c' || i == 's' || i == 'g' || i == 'V')
-             && !(dpy = XOpenDisplay(NULL)))
+          if(strchr(ol, i) && !(dpy = XOpenDisplay(NULL)))
           {
                fprintf(stderr, "WMFS: cannot open X server.\n");
                exit(EXIT_FAILURE);
@@ -367,11 +390,11 @@ main(int argc, char **argv)
           {
           case 'h':
           default:
-               printf("usage: %s [-ihv] [-C <file>] [-c <uicb function> <cmd> ] [-g <argument>] [-s <string>] [-V <viwmfs cmd]\n"
+               printf("usage: %s [-ihv] [-C <file>] [-c <uicb function> <cmd> ] [-g <argument>] [-s <screen_num> <string>] [-V <viwmfs cmd]\n"
                       "   -C <file>                 Load a configuration file\n"
                       "   -c <uicb_function> <cmd>  Execute an uicb function to control WMFS\n"
                       "   -g <argument>             Show information about wmfs status\n"
-                      "   -s <string>               Set the bar(s) statustext\n"
+                      "   -s <screen_num> <string>  Set the bar(s) statustext\n"
                       "   -V <viwmfs cmd>           Manage WMFS with vi-like command\n"
                       "   -h                        Show this page\n"
                       "   -i                        Show informations\n"
@@ -404,7 +427,10 @@ main(int argc, char **argv)
                break;
 
           case 's':
-               set_statustext(optarg);
+               if(argc > 3)
+                    set_statustext(atoi(optarg), argv[3]);
+               else
+                    set_statustext(-1, optarg);
                XCloseDisplay(dpy);
                exit(EXIT_SUCCESS);
                break;
