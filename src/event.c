@@ -529,7 +529,6 @@ send_client_event(long data[5], char *atom_name)
 void
 getevent(XEvent ev)
 {
-     int st;
 
      switch(ev.type)
      {
@@ -563,7 +562,7 @@ getevent(XEvent ev)
           break;
      }
 
-     wait(&st);
+     wait((int[]){0});
 
      return;
 }
