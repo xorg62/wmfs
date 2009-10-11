@@ -629,7 +629,7 @@ mirror(int screen, Bool horizontal)
 void
 layer(int screen)
 {
-    Client *c;
+     Client *c;
      XRectangle geo = { 0 };
      XRectangle sg = sgeo[screen];
      int n, i, l = tags[screen][seltag[screen]].layers;
@@ -649,15 +649,16 @@ layer(int screen)
      }
 
      for(c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next))
+     {
+          for(; c->layer > l; --(c->layer));
           ++nl[c->layer];
+     }
 
      for(i = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
      {
           /* Set client property */
           c->flags &= ~(MaxFlag | LMaxFlag);
           c->flags |= TileFlag;
-
-          for(; c->layer > l; --(c->layer));
 
           geo.x = x[c->layer];
           geo.height = (sg.height / l) - BORDH;
