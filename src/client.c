@@ -480,7 +480,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      Window trans, dw;
      Status rettrans;
      XSetWindowAttributes at;
-     int mx, my, dint;
+     int  mx, my, dint;
      uint duint;
 
      screen_get_sel();
@@ -490,10 +490,11 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      c->screen = selscreen;
      c->flags = 0;
 
+
+     XQueryPointer(dpy, ROOT, &dw, &dw, &mx, &my, &dint, &dint, &duint);
+
      if(conf.client.place_at_mouse)
      {
-          XQueryPointer(dpy, ROOT, &dw, &dw, &mx, &my, &dint, &dint, &duint);
-
           mx += BORDH;
           my += TBARH;
 
@@ -521,6 +522,9 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      c->ogeo.width = c->geo.width = wa->width;
      c->ogeo.height = c->geo.height = wa->height;
      c->tag = seltag[c->screen];
+
+     c->layer = (sel && sel->layer > 0) ? sel->layer : 1;
+
 
      at.event_mask = PropertyChangeMask;
 

@@ -69,7 +69,11 @@ func_name_list_t tmp_func_list[] =
      {"reload",                  uicb_reload },
      {"launcher",                uicb_launcher },
      {"set_layout",              uicb_set_layout },
-     {"menu",                    uicb_menu }
+     {"menu",                    uicb_menu },
+     {"set_client_layer",        uicb_set_client_layer },
+     {"set_layer",               uicb_set_layer }
+
+
 };
 
 key_name_list_t key_list[] =
@@ -334,7 +338,7 @@ conf_tag_section(char *src)
      /* If there is no tag in the conf or more than
       * MAXTAG (32) print an error and create only one.
       */
-     Tag default_tag = { "WMFS", NULL, 0,
+     Tag default_tag = { "WMFS", NULL, 0, 1,
                          0.50, 1, False, False, IB_Top,
                          layout_name_to_struct(conf.layout, "tile_right", conf.nlayout, layout_list) };
 
@@ -375,6 +379,7 @@ conf_tag_section(char *src)
                tags[k][conf.ntag[k]].mwfact     = get_opt(cfgtmp, "0.65", "mwfact").fnum;
                tags[k][conf.ntag[k]].nmaster    = get_opt(cfgtmp, "1", "nmaster").num;
                tags[k][conf.ntag[k]].resizehint = get_opt(cfgtmp, "false", "resizehint").bool;
+               tags[k][conf.ntag[k]].layers = 1;
 
                tmp = _strdup(get_opt(cfgtmp, "top", "infobar_position").str);
 

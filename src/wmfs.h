@@ -288,7 +288,8 @@ Client *tiled_client(int screen, Client *c);
  void tile_bottom(int screen);
  void mirror_vertical(int screen);
  void mirror_horizontal(int screen);
-/* }}} */
+ void layer(int screen);
+ /* }}} */
 void uicb_togglemax(uicb_t);
 void uicb_togglefree(uicb_t);
 void uicb_layout_prev(uicb_t);
@@ -297,6 +298,9 @@ void uicb_set_mwfact(uicb_t);
 void uicb_set_nmaster(uicb_t);
 void uicb_set_layout(uicb_t);
 void uicb_toggle_resizehint(uicb_t);
+void uicb_set_layer(uicb_t cmd);
+void uicb_set_client_layer(uicb_t cmd);
+
 
 /* init.c */
 void init(void);

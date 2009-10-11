@@ -173,6 +173,7 @@ init_layout(void)
                {"tile_mirror_vertical",    mirror_vertical },
                {"mirror_horizontal",       mirror_horizontal },
                {"tile_mirror_horizontal",  mirror_horizontal },
+               {"layer",                   layer },
                {"max",                     maxlayout },
                {"maxlayout",               maxlayout },
                {"freelayout",              freelayout },

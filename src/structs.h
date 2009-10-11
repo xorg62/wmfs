@@ -37,7 +37,7 @@
 
 #define NBUTTON        8
 #define MAXTAG         36
-#define NUM_OF_LAYOUT  9
+#define NUM_OF_LAYOUT  10
 
 /* Clients flags definition */
 #define FreeFlag  (1 << 1)
@@ -166,6 +166,8 @@ struct Client
      uint tag;
      /* Screen */
      int screen;
+     /* Layer */
+     int layer;
      /* Window attribute */
      XRectangle geo;
      XRectangle tmp_geo;
@@ -241,6 +243,7 @@ typedef struct
      char *name;
      char **clients;
      int nclients;
+     int layers;
      float mwfact;
      int nmaster;
      Bool resizehint;
