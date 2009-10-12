@@ -661,7 +661,7 @@ layer(int screen)
           c->flags |= TileFlag;
 
           geo.x = x[c->layer];
-          geo.height = (sg.height / l) - BORDH;
+          geo.height = (sg.height / l) - (BORDH + TBARH);
           geo.width = (sg.width / ((nl[c->layer]) ? nl[c->layer] : 1)) - BORDH * 2;
           geo.y = sg.y + ((geo.height + TBARH + BORDH) * c->layer) - (geo.height + TBARH + BORDH);
 

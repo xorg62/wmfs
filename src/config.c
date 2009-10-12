@@ -501,7 +501,7 @@ conf_keybind_section(char *src)
      for(i = 0; i < conf.nkeybind; ++i)
      {
           tmp = get_nsec(src, "key", i);
-          buf = get_list_opt(tmp, "{Control}", "mod", &n);
+          buf = get_list_opt(tmp, "", "mod", &n);
 
           for(j = 0; j < n; ++j)
                keys[i].mod |= char_to_modkey(buf[j].str, key_list);
