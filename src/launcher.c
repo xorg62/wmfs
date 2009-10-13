@@ -30,13 +30,18 @@
 *      OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "wmfs.h"
-#include <dirent.h>
-
 /* conforming to glib use _GNU_SOURCE for asprintf declaration */
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
+/* DT_DIR in dirent.h from glibc must have _BSD_SOURCE */
+#ifndef _BSD_SOURCE
+#define _BSD_SOURCE
+#endif
+
+#include "wmfs.h"
+#include <dirent.h>
+
 
 static char *complete_on_command(char*, size_t);
 static char *complete_on_files(char*, size_t);
