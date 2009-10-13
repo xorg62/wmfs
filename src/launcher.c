@@ -34,6 +34,7 @@
 #include <dirent.h>
 
 static char *complete_on_command(char*, size_t);
+static char *complete_on_files(char*, size_t);
 
 void
 launcher_execute(Launcher launcher)
@@ -102,6 +103,13 @@ launcher_execute(Launcher launcher)
                     my_guitar_gently_wheeps = 0;
                     break;
                case XK_Tab:
+                    /*
+                     * completion
+                     * if there is not space in buffer we
+                     * complete the command using complete_on_command.
+                     * Else we try to complete on filename using
+                     * complete_on_files.
+                     */
                     buf[pos] = '\0';
                     if (lastwastab)
                          tabhits++;
@@ -114,7 +122,11 @@ launcher_execute(Launcher launcher)
 
                     if (pos)
                     {
-                         complete = complete_on_command(tmpbuf, tabhits);
+                         if (strchr(tmpbuf, ' '))
+                              complete = complete_on_files(tmpbuf, tabhits);
+                         else
+                              complete = complete_on_command(tmpbuf, tabhits);
+
                          if (complete)
                          {
                               strcpy(buf, tmpbuf);
@@ -185,6 +197,10 @@ uicb_launcher(uicb_t cmd)
      return;
 }
 
+/*
+ * Just search command in PATH.
+ * Return the characters to complete the command.
+ */
 static char *
 complete_on_command(char *start, size_t hits)
 {
@@ -201,6 +217,7 @@ complete_on_command(char *start, size_t hits)
      path = _strdup(getenv("PATH"));
      dirname = strtok(path, ":");
 
+     /* recursively open PATH */
      while (dirname)
      {
           if ((dir = opendir(dirname)))
@@ -225,3 +242,67 @@ complete_on_command(char *start, size_t hits)
      return ret;
 }
 
+/*
+ * Complete a filename or directory name.
+ * works like complete_on_command.
+ */
+static char *
+complete_on_files(char *start, size_t hits)
+{
+     char *ret = NULL;
+     char *p;
+     char *dirname = NULL;
+     DIR *dir;
+     struct dirent *content;
+     size_t count = 0;
+
+     if (!start || hits <= 0 || !(p = strrchr(start, ' ')))
+          return NULL;
+
+     /*
+      * Search the directory to open and set
+      * the beginning of file to complete on pointer 'p'.
+      */
+     if (*(++p) == '\0' || !strrchr(p, '/'))
+          dir = opendir(".");
+     else
+     {
+          dirname = _strdup(p);
+          p = strrchr(dirname, '/');
+          if (p != dirname)
+          {
+               *(p++) = '\0';
+               dir = opendir(dirname);
+          }
+          else
+          {
+               dir = opendir("/");
+               p++;
+          }
+     }
+
+     if (dir)
+     {
+          while ((content = readdir(dir)))
+          {
+               if (!strcmp(content->d_name, ".") || !strcmp(content->d_name, ".."))
+                    continue;
+               if (!strncmp(content->d_name, p, strlen(p)) && ++count == hits)
+               {
+                    /* If it's a directory append '/' to the completion
+                     * TODO : content type can be a link to a directory check that
+                     */
+                    if (content->d_type == DT_DIR)
+                         asprintf(&ret, "%s/", content->d_name + strlen(p));
+                    else
+                         ret = _strdup(content->d_name + strlen(p));
+                    break;
+               }
+          }
+          closedir(dir);
+     }
+
+     IFREE(dirname);
+
+     return ret;
+}
