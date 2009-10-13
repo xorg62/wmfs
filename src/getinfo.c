@@ -200,7 +200,7 @@ getinfo(char *info)
                  "    mwfact         Show mwfact of current tag.\n"
                  "    nmaster        Show nmaster of current tag.\n");
      else
-          fprintf(stderr, "Unknow info argument '%s'\nTry 'wmfs -g help'\n", info);
+          warnx("Unknow info argument '%s'\nTry 'wmfs -g help'", info);
 
      return;
 }

@@ -41,10 +41,7 @@ errorhandler(Display *d, XErrorEvent *event)
      /* Check if there is another WM running */
      if(BadAccess == event->error_code
         && ROOT == event->resourceid)
-     {
-          fprintf(stderr, "WMFS Error: Another Window Manager is already running.\n");
-          exit(EXIT_FAILURE);
-     }
+          errx(EXIT_FAILURE, "Another Window Manager is already running.");
 
      /* Ignore focus change error for unmapped client */
      /* Too lazy to add Xproto.h so:
@@ -59,7 +56,7 @@ errorhandler(Display *d, XErrorEvent *event)
 
 
      XGetErrorText(d, event->error_code, mess, 128);
-     fprintf(stderr, "WMFS error: %s(%d) opcodes %d/%d\n  resource #%lx\n", mess,
+     warnx("%s(%d) opcodes %d/%d\n  resource #%lx\n", mess,
              event->error_code,
              event->request_code,
              event->minor_code,
@@ -269,7 +266,7 @@ check_wmfs_running(void)
       {
            XFree(ret);
 
-           fprintf(stderr, "Wmfs is not running. (_WMFS_RUNNING not present)\n");
+           warnx("Wmfs is not running. (_WMFS_RUNNING not present)");
 
            return False;
       }
@@ -381,10 +378,7 @@ main(int argc, char **argv)
 
           /* For options who need WMFS running */
           if(strchr(ol, i) && !(dpy = XOpenDisplay(NULL)))
-          {
-               fprintf(stderr, "WMFS: cannot open X server.\n");
-               exit(EXIT_FAILURE);
-          }
+               errx(EXIT_FAILURE, "cannot open X server.");
 
           switch(i)
           {
@@ -450,10 +444,7 @@ main(int argc, char **argv)
 
      /* Check if WMFS can open X server */
      if(!(dpy = XOpenDisplay(NULL)))
-     {
-          fprintf(stderr, "WMFS: cannot open X server.\n");
-          exit(EXIT_FAILURE);
-     }
+          errx(EXIT_FAILURE, "cannot open X server.");
 
      /* Set signal handler */
      (void)signal(SIGTERM, &signal_handle);

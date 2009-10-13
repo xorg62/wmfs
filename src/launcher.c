@@ -308,7 +308,7 @@ complete_on_files(char *start, size_t hits)
                               ret = _strdup(content->d_name + strlen(p));
                     }
                     else
-                         warnx("%s", filepath);
+                         warn("%s", filepath);
 
                     IFREE(filepath);
 

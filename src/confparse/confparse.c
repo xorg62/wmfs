@@ -40,8 +40,14 @@ file_to_str(char *path)
      struct stat st;
      Bool is_char = False;
 
-     if(!path || !(fd = open(path, O_RDONLY)))
+     if (!path)
           return NULL;
+
+     if (!(fd = open(path, O_RDONLY)))
+     {
+          warn("%s", path);
+          return NULL;
+     }
 
      /* Get the file size */
      stat(path, &st);
@@ -75,7 +81,7 @@ file_to_str(char *path)
      munmap(buf, st.st_size);
      close(fd);
 
-     fprintf(stderr, "WMFS Configuration info: '%s' read.\n", path);
+     warnx("%s read.", path);
 
      return ret;
 }
@@ -212,7 +218,7 @@ get_opt(char *src, char *def, char *name)
                for(i = 0; i < strlen(p2); ++i)
                     if(p2[i] != ' ')
                     {
-                         fprintf(stderr, "WMFS Configuration warning: Missing '=' after option: '%s'"
+                         warnx("Configuration warning: Missing '=' after option: '%s'"
                                    " and before expression: '%s'\n", name, p2);
                          return str_to_opt(def);
                     }

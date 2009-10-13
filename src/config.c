@@ -136,7 +136,7 @@ conf_misc_section(char *src)
 
      if(pad > 24 || pad < 1)
      {
-          fprintf(stderr, "WMFS Configuration: pad value (%d) incorrect.\n", pad);
+          warnx("configuration : pad value (%d) incorrect.", pad);
 
           pad = 12;
      }
@@ -288,7 +288,7 @@ conf_layout_section(char *src)
 
      if(conf.nlayout > NUM_OF_LAYOUT || !(conf.nlayout))
      {
-          fprintf(stderr, "WMFS Configuration: Too many or no layouts (%d)\n", conf.nlayout);
+          warnx("configuration : Too many or no layouts (%d).", conf.nlayout);
           conf.nlayout          = 1;
           conf.layout[0].symbol = _strdup("TILE");
           conf.layout[0].func   = tile;
@@ -312,7 +312,7 @@ conf_layout_section(char *src)
                tmp = get_nsec(src, "layout", i);
 
                if(!name_to_func((p = get_opt(tmp, "tile", "type").str), layout_list))
-                    fprintf(stderr, "WMFS Configuration: Unknow Layout type: \"%s\"\n", p);
+                    warnx("configuration : Unknown Layout type : \"%s\".", p);
                else
                {
                     if(conf.layout_system && conf.nlayout > 1)
@@ -412,9 +412,7 @@ conf_tag_section(char *src)
      for(i = 0; i < sc; ++i)
           if(!conf.ntag[i] || conf.ntag[i] > MAXTAG)
           {
-               fprintf(stderr, "WMFS Configuration: Too many or no tag"
-                       " (%d) in the screen %d\n", conf.ntag[i], i);
-
+               warnx("configuration : Too many or no tag (%d) in the screen %d.", conf.ntag[i], i);
                conf.ntag[i] = 1;
                tags[i][1] = default_tag;
           }
@@ -511,7 +509,7 @@ conf_keybind_section(char *src)
 
           if(keys[i].func == NULL)
           {
-               fprintf(stderr, "WMFS Configuration warning: Unknow Function \"%s\"\n", get_opt(tmp, "", "func").str);
+               warnx("configuration : Unknown Function \"%s\".", get_opt(tmp, "", "func").str);
                keys[i].func = uicb_spawn;
           }
 
@@ -530,9 +528,9 @@ init_conf(void)
 
      if(!(file = file_to_str(conf.confpath)))
      {
-          fprintf(stderr, "WMFS: parsing configuration file (%s) failed\n", conf.confpath);
+          warnx("parsing configuration file (%s) failed.", conf.confpath);
           sprintf(conf.confpath, "%s/wmfs/wmfsrc", XDG_CONFIG_DIR);
-          fprintf(stderr, "Use the default configuration (%s).\n", conf.confpath);
+          warnx("Use the default configuration (%s).", conf.confpath);
           file = file_to_str(conf.confpath);
      }
 

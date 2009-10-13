@@ -43,7 +43,7 @@ emalloc(uint element, uint size)
      void *ret = calloc(element, size);
 
      if(!ret)
-          fprintf(stderr,"WMFS Error: could not malloc() %u bytes\n", size);
+          warn("calloc()");
 
      return ret;
 }
@@ -58,7 +58,7 @@ getcolor(char *color)
      XColor xcolor;
 
      if(!XAllocNamedColor(dpy, DefaultColormap(dpy, SCREEN), color, &xcolor, &xcolor))
-          fprintf(stderr,"WMFS Error: cannot allocate color \"%s\"\n", color);
+          warnx("Error: cannot allocate color \"%s\".", color);
 
      return xcolor.pixel;
 }
@@ -210,7 +210,7 @@ spawn(const char *format, ...)
 
      if(strlen(format) > 511)
      {
-          fprintf(stderr, "WMFS spawn(): Error, command too long.\n");
+          warnx("spawn(): Error, command too long.");
           return;
      }
 

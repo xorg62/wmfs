@@ -63,7 +63,7 @@ init_font(void)
 
      if(!font)
      {
-          fprintf(stderr, "WMFS Error: Cannot initialize font\n");
+          warnx("WMFS Error: Cannot initialize font");
           font = XftFontOpenName(dpy, SCREEN, "sans-10");
      }
 
