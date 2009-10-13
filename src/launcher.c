@@ -33,26 +33,21 @@
 #include "wmfs.h"
 #include <dirent.h>
 
-#define PATHMAX 4095
+static char *complete_on_command(char*, size_t);
 
 void
 launcher_execute(Launcher launcher)
 {
      BarWindow *bw;
-     Bool stop, found;
+     Bool found;
      Bool lastwastab = False;
      Bool my_guitar_gently_wheeps = True;
      char tmp[32] = { 0 };
      char buf[512] = { 0 };
-     char tabbuf[512] = { 0 };
-     char *searchpath;
-     char *start, *end;
-     char currentpath[PATHMAX];
-     DIR *dir;
-     struct dirent *dirent;
+     char tmpbuf[512] = { 0 };
+     char *complete;
      int pos = 0, x;
      int tabhits = 0;
-     int searchhits = 0;
      KeySym ks;
      XEvent ev;
 
@@ -107,60 +102,27 @@ launcher_execute(Launcher launcher)
                     my_guitar_gently_wheeps = 0;
                     break;
                case XK_Tab:
-                    stop = found = False;
-
-                    searchpath = getenv("PATH");
-                    start = searchpath;
-
+                    buf[pos] = '\0';
                     if (lastwastab)
-                    {
-                         strcpy(buf, tabbuf);
                          tabhits++;
-                    }
                     else
-                         tabhits = 1;
-
-                    searchhits = 0;
-
-                    do
                     {
-                         end = strchr(start, ':');
-                         if (end == NULL)
-                         {
-                              stop = True;
-                              strncpy(currentpath, start, PATHMAX);
-                         }
-                         else
-                         {
-                              strncpy(currentpath, start, end - start);
-                              currentpath[end - start] = '\0';
-                         }
-                         if (!stop)
-                              start = end + 1;
+                         tabhits = 1;
+                         strcpy(tmpbuf, buf);
+                    }
 
-                         dir = opendir(currentpath);
-                         if (dir)
-                         {
-                              while ((dirent = readdir(dir)) != NULL)
-                              {
-                                   if (!strncmp(dirent->d_name, buf, strlen(buf)))
-                                   {
-                                        searchhits++;
-                                        if (searchhits == tabhits)
-                                        {
-                                             strcpy(tabbuf, buf);
-                                             strcpy(buf, dirent->d_name);
-                                             pos = strlen(dirent->d_name);
-                                             buf[pos] = '\0';
-                                             found = stop = True;
-                                        }
-                                   }
-                              }
 
-                              closedir(dir);
+                    if (pos)
+                    {
+                         complete = complete_on_command(tmpbuf, tabhits);
+                         if (complete)
+                         {
+                              strcpy(buf, tmpbuf);
+                              strncat(buf, complete, sizeof(buf));
+                              found = True;
+                              free(complete);
                          }
                     }
-                    while (!stop);
 
                     lastwastab = True;
 
@@ -222,3 +184,44 @@ uicb_launcher(uicb_t cmd)
 
      return;
 }
+
+static char *
+complete_on_command(char *start, size_t hits)
+{
+     char *path;
+     char *dirname;
+     char *ret = NULL;
+     DIR *dir;
+     struct dirent *content;
+     size_t count = 0;
+
+     if (!getenv("PATH") || !start || hits <= 0)
+         return NULL;
+
+     path = _strdup(getenv("PATH"));
+     dirname = strtok(path, ":");
+
+     while (dirname)
+     {
+          if ((dir = opendir(dirname)))
+          {
+               while ((content = readdir(dir)))
+                    if (!strncmp(content->d_name, start, strlen(start)) && ++count == hits)
+                    {
+                         ret = _strdup(content->d_name + strlen(start));
+                         break;
+                    }
+               closedir(dir);
+          }
+
+          if (ret)
+              break;
+
+          dirname = strtok(NULL, ":");
+     }
+
+     free(path);
+
+     return ret;
+}
+
