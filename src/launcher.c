@@ -34,13 +34,8 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
-/* DT_DIR in dirent.h from glibc must have _BSD_SOURCE */
-#ifndef _BSD_SOURCE
-#define _BSD_SOURCE
-#endif
 
 #include "wmfs.h"
-#include <dirent.h>
 
 
 static char *complete_on_command(char*, size_t);
@@ -260,10 +255,13 @@ static char *
 complete_on_files(char *start, size_t hits)
 {
      char *ret = NULL;
-     char *p;
+     char *p = NULL;
      char *dirname = NULL;
-     DIR *dir;
-     struct dirent *content;
+     char *path = NULL;
+     char *filepath = NULL;
+     DIR *dir = NULL;
+     struct dirent *content = NULL;
+     struct stat st;
      size_t count = 0;
 
      if (!start || hits <= 0 || !(p = strrchr(start, ' ')))
@@ -274,7 +272,7 @@ complete_on_files(char *start, size_t hits)
       * the beginning of file to complete on pointer 'p'.
       */
      if (*(++p) == '\0' || !strrchr(p, '/'))
-          dir = opendir(".");
+          path = _strdup(".");
      else
      {
           dirname = _strdup(p);
@@ -282,16 +280,16 @@ complete_on_files(char *start, size_t hits)
           if (p != dirname)
           {
                *(p++) = '\0';
-               dir = opendir(dirname);
+               path = _strdup(dirname);
           }
           else
           {
-               dir = opendir("/");
+               path = _strdup("/");
                p++;
           }
      }
 
-     if (dir)
+     if ((dir = opendir(path)))
      {
           while ((content = readdir(dir)))
           {
@@ -299,13 +297,21 @@ complete_on_files(char *start, size_t hits)
                     continue;
                if (!strncmp(content->d_name, p, strlen(p)) && ++count == hits)
                {
-                    /* If it's a directory append '/' to the completion
-                     * TODO : content type can be a link to a directory check that
-                     */
-                    if (content->d_type == DT_DIR)
-                         asprintf(&ret, "%s/", content->d_name + strlen(p));
+                    /* If it's a directory append '/' to the completion */
+                    asprintf(&filepath, "%s/%s", path, content->d_name);
+
+                    if (filepath && stat(filepath, &st) != -1)
+                    {
+                         if (S_ISDIR(st.st_mode))
+                              asprintf(&ret, "%s/", content->d_name + strlen(p));
+                         else
+                              ret = _strdup(content->d_name + strlen(p));
+                    }
                     else
-                         ret = _strdup(content->d_name + strlen(p));
+                         warnx("%s", filepath);
+
+                    IFREE(filepath);
+
                     break;
                }
           }
@@ -313,6 +319,7 @@ complete_on_files(char *start, size_t hits)
      }
 
      IFREE(dirname);
+     IFREE(path);
 
      return ret;
 }
