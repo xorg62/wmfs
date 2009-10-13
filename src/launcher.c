@@ -33,6 +33,11 @@
 #include "wmfs.h"
 #include <dirent.h>
 
+/* conforming to glib use _GNU_SOURCE for asprintf declaration */
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 static char *complete_on_command(char*, size_t);
 static char *complete_on_files(char*, size_t);
 
