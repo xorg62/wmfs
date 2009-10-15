@@ -275,7 +275,17 @@ complete_on_files(char *start, size_t hits)
           path = _strdup(".");
      else
      {
-          dirname = _strdup(p);
+          /* remplace ~ by $HOME in dirname */
+          if (!strncmp(p, "~/", 2) && getenv("HOME"))
+               asprintf(&dirname, "%s%s", getenv("HOME"), p+1);
+          else
+               dirname = _strdup(p);
+
+          /* Set p to filename to be complete
+           * and path the directory containing the file
+           * /foooooo/baaaaaar/somethinglikethis<tab>
+           * <---- path - ---><------- p ------>
+           */
           p = strrchr(dirname, '/');
           if (p != dirname)
           {
