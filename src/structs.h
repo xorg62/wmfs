@@ -348,6 +348,7 @@ typedef struct
      } root;
      struct
      {
+          Bool set_new_win_master;
           Bool place_at_mouse;
           Bool border_shadow;
           int borderheight;
@@ -356,7 +357,7 @@ typedef struct
           uint resizecorner_normal;
           uint resizecorner_focus;
           uint mod;
-          MouseBinding *mouse;
+                    MouseBinding *mouse;
           int nmouse;
      } client;
      struct

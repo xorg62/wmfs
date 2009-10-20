@@ -303,7 +303,7 @@ void uicb_set_layout(uicb_t);
 void uicb_toggle_resizehint(uicb_t);
 void uicb_set_layer(uicb_t cmd);
 void uicb_set_client_layer(uicb_t cmd);
-
+void layout_set_client_master(Client *c);
 
 /* init.c */
 void init(void);
