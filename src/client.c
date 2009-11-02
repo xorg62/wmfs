@@ -897,7 +897,13 @@ client_unmanage(Client *c)
      ewmh_get_client_list();
 
      /* Arrange */
-     tags[c->screen][c->tag].layout.func(c->screen);
+     if(c->tag == seltag[selscreen] && c->screen == selscreen)
+          tags[c->screen][c->tag].layout.func(c->screen);
+     else
+     {
+          tags[c->screen][c->tag].request_update = True;
+          infobar_draw(c->screen);
+     }
 
      XFree(c->title);
 
