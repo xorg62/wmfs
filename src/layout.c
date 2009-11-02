@@ -756,23 +756,7 @@ mirror_horizontal(int screen)
 void
 uicb_tile_switch(uicb_t cmd)
 {
-     Client *c;
-
-     screen_get_sel();
-
-     if(!sel
-        || (sel->flags & HintFlag)
-        || !(sel->flags & TileFlag)
-        || (sel->flags & FSSFlag))
-          return;
-
-     if((c = sel) == tiled_client(selscreen, clients))
-          CHECK((c = tiled_client(selscreen, c->next)));
-     client_detach(c);
-     client_attach(c);
-     client_focus(c);
-     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
-
+     layout_set_client_master (sel);
      return;
 }
 
@@ -866,6 +850,30 @@ uicb_set_layout(uicb_t cmd)
                          tags[selscreen][seltag[selscreen]].layout = conf.layout[j];
 
      arrange(selscreen, True);
+
+     return;
+}
+
+/** Set the client as master
+ * \param c Client
+ */
+void
+layout_set_client_master(Client *c)
+{
+     screen_get_sel();
+
+     if(!c
+        || (c->flags & HintFlag)
+        || !(c->flags & TileFlag)
+        || (c->flags & FSSFlag))
+          return;
+
+     if(c == tiled_client(selscreen, clients))
+          CHECK((c = tiled_client(selscreen, c->next)));
+     client_detach(c);
+     client_attach(c);
+     client_focus(c);
+     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
 
      return;
 }

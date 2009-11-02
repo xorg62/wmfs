@@ -558,6 +558,9 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      if(ar)
           arrange(c->screen, True);
 
+     if(conf.client.set_new_win_master)
+          layout_set_client_master(c);
+
      return c;
 }
 
