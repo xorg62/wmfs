@@ -148,7 +148,7 @@ get_nsec(char *src, char *name, int n)
      char *ret, *buf, **sec;
      char *buf2;
 
-     if(!src)
+     if(!src || !strlen(src))
           return NULL;
 
      if(!name)
@@ -159,8 +159,8 @@ get_nsec(char *src, char *name, int n)
 
      sec = secname(name);
 
-     buf = erase_delim_content(src);
-     buf2 = erase_sec_content(buf);
+     buf = _strdup(sauv_delimc);
+     buf2 = _strdup(sauv_secc);
 
      for(i = 0; i < n && (buf = strstr(buf, sec[SecStart])); ++i, buf += strlen(sec[SecStart]));
 
@@ -182,7 +182,7 @@ get_size_sec(char *src, char *name)
 
      sec = secname(name);
 
-     buf = erase_sec_content(src);
+     buf = _strdup(sauv_secc);
 
      for(ret = 0; (buf = strstr(buf, sec[SecStart])); ++ret, buf += strlen(sec[SecStart]));
 
@@ -201,7 +201,7 @@ get_opt(char *src, char *def, char *name)
      if(!src || !name)
           return (def) ? str_to_opt(def) : ret;
 
-     if((p = opt_srch(erase_sec_content(src), name)))
+     if((p = opt_srch(sauv_secc, name)))
      {
           for(i = 0; p[i] && p[i] != '\n'; ++i);
           p[i] = '\0';

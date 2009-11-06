@@ -862,17 +862,17 @@ layout_set_client_master(Client *c)
 {
      screen_get_sel();
 
-     if(!c
-        || (c->flags & HintFlag)
-        || !(c->flags & TileFlag)
-        || (c->flags & FSSFlag))
+     if(!c || (c->flags & HintFlag) || !(c->flags & TileFlag)
+               || (c->flags & FSSFlag))
           return;
 
      if(c == tiled_client(selscreen, clients))
           CHECK((c = tiled_client(selscreen, c->next)));
+
      client_detach(c);
      client_attach(c);
      client_focus(c);
+
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);
 
      return;

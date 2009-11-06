@@ -67,6 +67,7 @@ char *erase_sec_content(char *buf);
 char *opt_srch(char *buf, char *opt);
 opt_type str_to_opt(char *str);
 char *clean_value(char *str);
+void set_current_sauv(char *str);
 char **secname(char *name);
 void free_secname(char **secname);
 
@@ -79,5 +80,8 @@ opt_type get_opt(char *src, char *def, char *name);
 opt_type *get_list_opt(char *src, char *def, char *name, int *n);
 
 static const opt_type null_opt_type = {0, 0, 0, NULL};
+
+char *sauv_delimc;
+char *sauv_secc;
 
 #endif /* CONFPARSE_H */

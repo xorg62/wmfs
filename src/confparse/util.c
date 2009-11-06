@@ -69,7 +69,7 @@ erase_sec_content(char *buf)
      char *p, *str, *name, *ret;
      char **sec;
 
-     if(!buf || !(str = erase_delim_content(buf)))
+     if(!buf || !(str = _strdup(sauv_delimc)))
           return NULL;
 
      ret = _strdup(buf);
@@ -108,7 +108,7 @@ opt_srch(char *buf, char *opt)
      if(!buf || !opt)
           return NULL;
 
-     if((p = strstr(erase_delim_content(buf), opt)))
+     if((p = strstr(sauv_delimc /*erase_delim_content(buf)*/, opt)))
           if((*(p + strlen(opt)) == ' ' || *(p + strlen(opt)) == '=')
              && (*(p - 1) == ' ' || *(p - 1) == '\n' || *(p - 1) == '\t' || !(*(p - 1))))
              return _strdup(buf + (strlen(buf) - strlen(p)));
@@ -162,6 +162,23 @@ clean_value(char *str)
      }
 
      return p;
+}
+
+void
+set_current_sauv(char *str)
+{
+     if(!str)
+     {
+          sauv_delimc = NULL;
+          sauv_secc = NULL;
+
+          return;
+     }
+
+     sauv_delimc = erase_delim_content(_strdup(str));
+     sauv_secc = erase_sec_content(_strdup(str));
+
+     return;
 }
 
 char**

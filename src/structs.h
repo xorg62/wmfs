@@ -357,7 +357,7 @@ typedef struct
           uint resizecorner_normal;
           uint resizecorner_focus;
           uint mod;
-                    MouseBinding *mouse;
+          MouseBinding *mouse;
           int nmouse;
      } client;
      struct
