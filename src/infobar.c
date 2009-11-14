@@ -175,12 +175,17 @@ infobar_draw_statustext(int sc, char *str)
      char *strwc = NULL;
      char col[8] = { 0 };
      int i, j, c, k = 0;
+     char *lastst;
 
      /* If the str == the current statustext, return (not needed) */
      if(!str)
           return;
 
      barwin_refresh_color(infobar[sc].bar);
+
+     /* save last status text address (for free at the end) */
+     lastst = infobar[sc].statustext;
+
      infobar[sc].statustext = _strdup(str);
      strwc = _strdup(str);
 
@@ -230,6 +235,9 @@ infobar_draw_statustext(int sc, char *str)
      }
 
      barwin_refresh(infobar[sc].bar);
+
+     free(lastst);
+     free(strwc);
 
      return;
 }
