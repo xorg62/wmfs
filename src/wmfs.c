@@ -302,9 +302,7 @@ exec_uicb_function(char *func, char *cmd)
      XChangeProperty(dpy, ROOT, ATOM("_WMFS_CMD"), ATOM("UTF8_STRING"),
                      8, PropModeReplace, (uchar*)cmd, strlen(cmd));
 
-     /* send_client_event(data, "_WMFS_FUNCTION"); */
-     send_client_event(data, "_WMFS_CMD");
-
+     send_client_event(data, "_WMFS_FUNCTION");
 
      return;
 }
