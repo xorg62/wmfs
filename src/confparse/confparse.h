@@ -67,7 +67,7 @@ char *erase_sec_content(char *buf);
 char *opt_srch(char *buf, char *opt);
 opt_type str_to_opt(char *str);
 char *clean_value(char *str);
-void set_current_sauv(char *str);
+void cfg_set_sauv(char *str);
 char **secname(char *name);
 void free_secname(char **secname);
 

@@ -165,7 +165,7 @@ clean_value(char *str)
 }
 
 void
-set_current_sauv(char *str)
+cfg_set_sauv(char *str)
 {
      if(!str)
      {

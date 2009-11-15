@@ -112,9 +112,9 @@ mouse_section(MouseBinding mb[], char *src, int ns)
 
      for(i = 0; i < ns; ++i)
      {
-          tmp          = get_nsec(src, "mouse", i);
+          tmp = get_nsec(src, "mouse", i);
 
-          set_current_sauv(tmp);
+          cfg_set_sauv(tmp);
 
           mb[i].tag    = get_opt(tmp, "-1", "tag").num;
           mb[i].screen = get_opt(tmp, "-1", "screen").num;
@@ -122,8 +122,7 @@ mouse_section(MouseBinding mb[], char *src, int ns)
           mb[i].func   = name_to_func(get_opt(tmp, "", "func").str, func_list);
           mb[i].cmd    = get_opt(tmp, "", "cmd").str;
 
-          set_current_sauv(src);
-
+          cfg_set_sauv(src);
      }
 
      return;
@@ -134,13 +133,13 @@ conf_misc_section(char *src)
 {
      int pad = 12;
 
-     set_current_sauv(src);
+     cfg_set_sauv(src);
 
-     conf.font          = get_opt(src, "sans-9", "font").str;
-     conf.raisefocus    = get_opt(src, "false", "raisefocus").bool;
-     conf.raiseswitch   = get_opt(src, "false", "raiseswitch").bool;
-     conf.focus_fmouse  = get_opt(src, "true", "focus_follow_mouse").bool;
-     pad = get_opt(src, "12", "pad").num;
+     conf.font         = get_opt(src, "sans-9", "font").str;
+     conf.raisefocus   = get_opt(src, "false", "raisefocus").bool;
+     conf.raiseswitch  = get_opt(src, "false", "raiseswitch").bool;
+     conf.focus_fmouse = get_opt(src, "true", "focus_follow_mouse").bool;
+     pad               = get_opt(src, "12", "pad").num;
 
      if(pad > 24 || pad < 1)
      {
@@ -157,7 +156,7 @@ conf_misc_section(char *src)
 void
 conf_bar_section(char *src)
 {
-     set_current_sauv(src);
+     cfg_set_sauv(src);
 
      conf.border.bar  = get_opt(src, "false", "border").bool;
      conf.bars.height = get_opt(src, "-1", "height").num;
@@ -176,7 +175,7 @@ conf_bar_section(char *src)
 void
 conf_root_section(char *src)
 {
-     set_current_sauv(src);
+     cfg_set_sauv(src);
 
      conf.root.background_command = get_opt(src, "", "background_command").str;
 
@@ -197,7 +196,7 @@ conf_client_section(char *src)
      opt_type *buf;
 
      /* Client misc */
-     set_current_sauv(src);
+     cfg_set_sauv(src);
 
      conf.client.borderheight        = (get_opt(src, "1", "border_height").num) ? get_opt(src, "1", "border_height").num : 1;
      conf.client.border_shadow       = get_opt(src, "false", "border_shadow").bool;
@@ -216,8 +215,8 @@ conf_client_section(char *src)
      }
 
      /* Titlebar part {{ */
-     tmp                     = get_sec(src, "titlebar");
-     set_current_sauv(tmp);
+     tmp = get_sec(src, "titlebar");
+     cfg_set_sauv(tmp);
 
      conf.titlebar.height    = get_opt(tmp, "0", "height").num;
      conf.titlebar.fg_normal = get_opt(tmp, "#ffffff", "fg_normal").str;
@@ -250,7 +249,7 @@ conf_client_section(char *src)
           {
                tmp2 = get_nsec(tmp, "button", i);
 
-               set_current_sauv(tmp2);
+               cfg_set_sauv(tmp2);
 
                /* Multi mouse section */
                if((conf.titlebar.button[i].nmouse = get_size_sec(tmp2, "mouse")))
@@ -267,16 +266,20 @@ conf_client_section(char *src)
                     for(j = 0; j < conf.titlebar.button[i].nlines; ++j)
                     {
                          tmp3 = get_nsec(tmp2, "line", j);
+                         cfg_set_sauv(tmp3);
+
                          buf = get_list_opt(tmp3, "{0, 0, 0, 0}", "coord", &d);
 
                          conf.titlebar.button[i].linecoord[j].x1 = buf[0].num;
                          conf.titlebar.button[i].linecoord[j].y1 = buf[1].num;
                          conf.titlebar.button[i].linecoord[j].x2 = buf[2].num;
                          conf.titlebar.button[i].linecoord[j].y2 = buf[3].num;
+
+                         cfg_set_sauv(tmp2);
                     }
                }
 
-               set_current_sauv(tmp);
+               cfg_set_sauv(tmp);
           }
      }
      /* }} */
@@ -297,7 +300,7 @@ conf_layout_section(char *src)
           conf.layout[i].func = NULL;
      }
 
-     set_current_sauv(src);
+     cfg_set_sauv(src);
 
      conf.border.layout     = get_opt(src, "false", "border").bool;
      conf.colors.layout_fg  = get_opt(src, "#ffffff", "fg").str;
@@ -334,7 +337,7 @@ conf_layout_section(char *src)
           {
                tmp = get_nsec(src, "layout", i);
 
-               set_current_sauv(tmp);
+               cfg_set_sauv(tmp);
 
                if(!name_to_func((p = get_opt(tmp, "tile", "type").str), layout_list))
                     warnx("configuration : Unknown Layout type : \"%s\".", p);
@@ -348,7 +351,7 @@ conf_layout_section(char *src)
                     conf.layout[i].func = name_to_func(p, layout_list);
                }
 
-               set_current_sauv(src);
+               cfg_set_sauv(src);
           }
      }
 
@@ -369,7 +372,7 @@ conf_tag_section(char *src)
                          0.50, 1, False, False, IB_Top,
                          layout_name_to_struct(conf.layout, "tile_right", conf.nlayout, layout_list) };
 
-     set_current_sauv(src);
+     cfg_set_sauv(src);
 
      conf.tag_round               = get_opt(src, "false", "tag_round").bool;
      conf.colors.tagselfg         = get_opt(src, "#ffffff", "sel_fg").str;
@@ -394,7 +397,7 @@ conf_tag_section(char *src)
      {
           /* printf("%d -> %s\n", i, (cfgtmp = get_nsec(src, "tag", i)));*/
           cfgtmp = get_nsec(src, "tag", i);
-          set_current_sauv(cfgtmp);
+          cfg_set_sauv(cfgtmp);
 
           j = get_opt(cfgtmp, "-1", "screen").num;
 
@@ -438,7 +441,7 @@ conf_tag_section(char *src)
 
           }
           l = 0;
-          set_current_sauv(src);
+          cfg_set_sauv(src);
      }
 
      for(i = 0; i < sc; ++i)
@@ -458,7 +461,7 @@ conf_menu_section(char *src)
      char *tmp, *tmp2;
      int i, j;
 
-     set_current_sauv(src);
+     cfg_set_sauv(src);
 
      CHECK((conf.nmenu = get_size_sec(src, "set_menu")));
 
@@ -467,7 +470,7 @@ conf_menu_section(char *src)
      for(i = 0; i < conf.nmenu; ++i)
      {
           tmp = get_nsec(src, "set_menu", i);
-          set_current_sauv(tmp);
+          cfg_set_sauv(tmp);
 
           conf.menu[i].name = get_opt(tmp, "menu_wname", "name").str;
 
@@ -488,17 +491,17 @@ conf_menu_section(char *src)
                for(j = 0; j < get_size_sec(tmp, "item"); ++j)
                {
                     tmp2 = get_nsec(tmp, "item", j);
-                    set_current_sauv(tmp2);
+                    cfg_set_sauv(tmp2);
 
                     conf.menu[i].item[j].name = get_opt(tmp2, "item_wname", "name").str;
                     conf.menu[i].item[j].func = name_to_func(get_opt(tmp2, "", "func").str, func_list);
                     conf.menu[i].item[j].cmd  = (!get_opt(tmp2, "", "cmd").str) ? NULL : get_opt(tmp2, "", "cmd").str;
 
-                    set_current_sauv(tmp);
+                    cfg_set_sauv(tmp);
                }
           }
 
-          set_current_sauv(src);
+          cfg_set_sauv(src);
      }
 
      return;
@@ -510,7 +513,7 @@ conf_launcher_section(char *src)
      int i;
      char *tmp;
 
-     set_current_sauv(src);
+     cfg_set_sauv(src);
 
      CHECK((conf.nlauncher = get_size_sec(src, "set_launcher")));
 
@@ -519,13 +522,13 @@ conf_launcher_section(char *src)
      for(i = 0; i < conf.nlauncher; ++i)
      {
           tmp = get_nsec(src, "set_launcher", i);
-          set_current_sauv(tmp);
+          cfg_set_sauv(tmp);
 
           conf.launcher[i].name    = get_opt(tmp, "launcher", "name").str;
           conf.launcher[i].prompt  = get_opt(tmp, "Exec:", "prompt").str;
           conf.launcher[i].command = get_opt(tmp, "exec", "command").str;
 
-          set_current_sauv(src);
+          cfg_set_sauv(src);
      }
 
      return;
@@ -538,7 +541,7 @@ conf_keybind_section(char *src)
      char *tmp;
      opt_type *buf;
 
-     set_current_sauv(src);
+     cfg_set_sauv(src);
 
      conf.nkeybind = get_size_sec(src, "key");
      keys = emalloc(conf.nkeybind, sizeof(Key));
@@ -547,7 +550,7 @@ conf_keybind_section(char *src)
      {
           tmp = get_nsec(src, "key", i);
 
-          set_current_sauv(tmp);
+          cfg_set_sauv(tmp);
 
           buf = get_list_opt(tmp, "", "mod", &n);
 
@@ -566,7 +569,7 @@ conf_keybind_section(char *src)
 
           keys[i].cmd = (!get_opt(tmp, "", "cmd").str) ? NULL : get_opt(tmp, "", "cmd").str;
 
-          set_current_sauv(src);
+          cfg_set_sauv(src);
      }
 
      return;

@@ -146,7 +146,6 @@ get_nsec(char *src, char *name, int n)
 {
      int i;
      char *ret, *buf, **sec;
-     char *buf2;
 
      if(!src || !strlen(src))
           return NULL;
@@ -160,7 +159,6 @@ get_nsec(char *src, char *name, int n)
      sec = secname(name);
 
      buf = _strdup(sauv_delimc);
-     buf2 = _strdup(sauv_secc);
 
      for(i = 0; i < n && (buf = strstr(buf, sec[SecStart])); ++i, buf += strlen(sec[SecStart]));
 
