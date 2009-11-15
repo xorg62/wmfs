@@ -206,10 +206,10 @@ clientmessageevent(XClientMessageEvent *ev)
         || (mess_t == wmfs_cmd && ev->data.l[4] == True))
      {
           XGetWindowProperty(dpy, ROOT, net_atom[wmfs_function], 0, 4096,
-                             False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret);
+                    False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret);
 
           XGetWindowProperty(dpy, ROOT, net_atom[wmfs_cmd], 0, 4096,
-                             False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret_cmd);
+                    False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret_cmd);
 
           if((func = name_to_func((char*)ret, func_list)))
                func((uicb_t)ret_cmd);

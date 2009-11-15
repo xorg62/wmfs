@@ -127,9 +127,9 @@ enum
      wmfs_nmaster,
      wmfs_set_screen,
      wmfs_screen_count,
-     wmfs_statustext,
      wmfs_function,
      wmfs_cmd,
+     wmfs_statustext,
      net_last
 };
 

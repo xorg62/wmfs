@@ -43,7 +43,7 @@ void
 ewmh_init_hints(void)
 {
      int i = 1, j, showing_desk = 0;
-     char root_name[] = "WMFS "WMFS_VERSION;
+     char root_name[] = WMFS_VERSION;
      char class[] = "wmfs", st[64];
      long pid = (long)getpid();
 
