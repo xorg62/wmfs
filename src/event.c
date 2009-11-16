@@ -151,7 +151,7 @@ clientmessageevent(XClientMessageEvent *ev)
      if(ev->format != 32)
           return;
 
-     for(i = 0; i < net_last; ++i)
+     for(i = 0; i < net_last + screen_count(); ++i)
           if(net_atom[i] == ev->message_type)
                mess_t = i;
 

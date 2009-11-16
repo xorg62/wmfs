@@ -47,7 +47,7 @@ ewmh_init_hints(void)
      char class[] = "wmfs", st[64];
      long pid = (long)getpid();
 
-     net_atom = emalloc(net_last + screen_count() + 1, sizeof(Atom));
+     net_atom = emalloc(net_last + screen_count(), sizeof(Atom));
 
      /* EWMH hints */
      net_atom[net_supported]                  = ATOM("_NET_SUPPORTED");
@@ -98,9 +98,8 @@ ewmh_init_hints(void)
           net_atom[wmfs_statustext + j] = ATOM(st);
      }
 
-
      XChangeProperty(dpy, ROOT, net_atom[net_supported], XA_ATOM, 32,
-                     PropModeReplace, (uchar*)net_atom, net_last);
+                     PropModeReplace, (uchar*)net_atom, net_last + screen_count());
 
      XChangeProperty(dpy, ROOT, net_atom[wmfs_running], XA_CARDINAL, 32,
                      PropModeReplace, (uchar*)&i, 1);
