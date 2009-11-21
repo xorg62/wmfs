@@ -206,7 +206,7 @@ conf_client_section(char *src)
      conf.client.resizecorner_normal = getcolor(get_opt(src, "#222222", "resize_corner_normal").str);
      conf.client.resizecorner_focus  = getcolor(get_opt(src, "#DDDDDD", "resize_corner_focus").str);
      conf.client.mod                 |= char_to_modkey(get_opt(src, "Alt", "modifier").str, key_list);
-     conf.client.set_new_win_master  = get_opt(src, "false", "set_new_win_master").bool;
+     conf.client.set_new_win_master  = get_opt(src, "true", "set_new_win_master").bool;
 
      if((conf.client.nmouse = get_size_sec(src, "mouse")))
      {
