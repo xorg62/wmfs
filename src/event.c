@@ -253,7 +253,7 @@ configureevent(XConfigureRequestEvent *ev)
           CHECK(!(c->flags & FSSFlag));
      }
 
-     if((c= client_gb_win(ev->window)))
+     if((c = client_gb_win(ev->window)))
      {
           if(ev->value_mask & CWX)
                c->geo.x = ev->x + BORDH;
@@ -264,7 +264,8 @@ configureevent(XConfigureRequestEvent *ev)
           if(ev->value_mask & CWHeight)
                c->geo.height = ev->height;
 
-          client_moveresize(c, c->geo, False);
+          if(c->flags & FreeFlag)
+               client_moveresize(c, c->geo, False);
      }
      else
      {

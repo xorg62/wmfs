@@ -402,7 +402,7 @@ main(int argc, char **argv)
                break;
 
           case 'v':
-               printf("WMFS version : "WMFS_VERSION".\n"
+               printf("WMFS version : "WMFS_VERSION"\n"
                       "  Compilation settings :\n"
                       "    - Flags : "WMFS_COMPILE_FLAGS"\n"
                       "    - Linked Libs : "WMFS_LINKED_LIBS"\n"

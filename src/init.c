@@ -48,6 +48,7 @@ init(void)
      init_root();
      screen_init_geo();
      infobar_init();
+     init_status();
      ewmh_update_current_tag_prop();
      grabkeys();
 
@@ -189,4 +190,37 @@ init_layout(void)
      return;
 }
 
+/** Init statustext shell script
+  */
+void
+init_status(void)
+{
+     char *path;
+     int fd;
+     struct stat st;
+
+     path = emalloc(strlen(getenv("HOME")) + strlen(DEF_STATUS) + 2, sizeof(char));
+
+     sprintf(path, "%s/"DEF_STATUS, getenv("HOME"));
+
+     if(!(fd = open(path, O_RDONLY)))
+     {
+          free(path);
+
+          return;
+     }
+
+     stat(path, &st);
+
+     if(st.st_mode & S_IXUSR)
+          spawn(path);
+     else
+          warnx("status.sh file present in wmfs directory can't be executed, try 'chmod +x %s'.", path);
+
+     close(fd);
+
+     free(path);
+
+     return;
+}
 

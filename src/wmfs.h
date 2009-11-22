@@ -84,6 +84,7 @@
 #define RESHW        (6 * BORDH)
 #define BUTTONWH     (TBARH / 2)
 #define DEF_CONF     ".config/wmfs/wmfsrc"
+#define DEF_STATUS   ".config/wmfs/status.sh"
 #define PAD          conf.pad
 
 #define CWIN(win, parent, x, y, w, h, b, mask, col, at)                             \
@@ -314,6 +315,7 @@ void init_gc(void);
 void init_cursor(void);
 void init_key(void);
 void init_geometry(void);
+void init_status(void);
 
 /* getinfo.c */
 void getinfo_tag(void);
