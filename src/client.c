@@ -206,13 +206,13 @@ client_above(Client *c)
 
      c->flags |= AboveFlag;
 
-     geo.height = sgeo[c->screen].height * 0.75;
-     geo.width = sgeo[c->screen].width * 0.75;
+     geo.height = spgeo[c->screen].height * 0.75;
+     geo.width = spgeo[c->screen].width * 0.75;
 
-     geo.x = (sgeo[c->screen].height - geo.height) / 2;
-     geo.y = (sgeo[c->screen].width - geo.width) / 2;
+     geo.x = ((spgeo[c->screen].y + spgeo[c->screen].height) / 2) - (geo.height / 2);
+     geo.y = ((spgeo[c->screen].x + spgeo[c->screen].width) / 2)- (geo.width / 2);
 
-     client_moveresize(c, geo, True);
+     client_moveresize(c, geo, tags[c->screen][c->tag].resizehint);
      client_raise(c);
 
      tags[c->screen][c->tag].layout.func(c->screen);
