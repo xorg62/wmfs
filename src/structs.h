@@ -48,6 +48,7 @@
 #define UnmapFlag (1 << 6)
 #define HintFlag  (1 << 7)
 #define FSSFlag   (1 << 8)
+#define AboveFlag (1 << 9)
 
 /* XEMBED messages */
 #define XEMBED_MAPPED                 (1 << 0)
@@ -248,6 +249,7 @@ typedef struct
      int nmaster;
      Bool resizehint;
      Bool request_update;
+     Bool abovefc;
      int barpos;
      Layout layout;
 } Tag;

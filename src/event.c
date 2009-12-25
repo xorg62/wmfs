@@ -317,13 +317,14 @@ enternotify(XCrossingEvent *ev)
      if(conf.focus_fmouse)
      {
           if((c = client_gb_win(ev->window))
-             || (c = client_gb_frame(ev->window))
-             || (c = client_gb_titlebar(ev->window))
-             || (c = client_gb_button(ev->window, &n)))
+                    || (c = client_gb_frame(ev->window))
+                    || (c = client_gb_titlebar(ev->window))
+                    || (c = client_gb_button(ev->window, &n)))
                client_focus(c);
           else
                client_focus(NULL);
      }
+
 
      return;
 }

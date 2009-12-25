@@ -168,6 +168,7 @@ tiled_client(int screen, Client *c)
      for(;c && ((c->flags & MaxFlag)
                 || (c->flags & FreeFlag)
                 || (c->flags & FSSFlag)
+                || (c->flags & AboveFlag)
                 || c->screen != screen
                 || ishide(c, screen)); c = c->next);
 
@@ -826,6 +827,21 @@ uicb_toggle_resizehint(uicb_t cmd)
      tags[selscreen][seltag[selscreen]].resizehint = !tags[selscreen][seltag[selscreen]].resizehint;
 
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);
+
+     return;
+}
+
+/** Toggle abovefc option
+  *\param cmd uicb_t type
+  */
+void
+uicb_toggle_abovefc(uicb_t cmd)
+{
+     screen_get_sel();
+
+     tags[selscreen][seltag[selscreen]].abovefc = !tags[selscreen][seltag[selscreen]].abovefc;
+
+     client_focus(sel);
 
      return;
 }
