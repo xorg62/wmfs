@@ -837,9 +837,21 @@ uicb_toggle_resizehint(uicb_t cmd)
 void
 uicb_toggle_abovefc(uicb_t cmd)
 {
+     Client *c;
+
      screen_get_sel();
 
-     tags[selscreen][seltag[selscreen]].abovefc = !tags[selscreen][seltag[selscreen]].abovefc;
+     if(!(tags[selscreen][seltag[selscreen]].abovefc = !tags[selscreen][seltag[selscreen]].abovefc))
+     {
+          for(c = clients; c; c = c->next)
+               if(c->flags & AboveFlag)
+               {
+                    c->flags &= ~AboveFlag;
+                    break;
+               }
+
+          tags[selscreen][seltag[selscreen]].layout.func(selscreen);
+     }
 
      client_focus(sel);
 
