@@ -844,7 +844,9 @@ uicb_toggle_abovefc(uicb_t cmd)
      if(!(tags[selscreen][seltag[selscreen]].abovefc = !tags[selscreen][seltag[selscreen]].abovefc))
      {
           for(c = clients; c; c = c->next)
-               if(c->flags & AboveFlag)
+               if(c->flags & AboveFlag
+                         && c->screen == selscreen
+                         && c->tag == seltag[selscreen])
                {
                     c->flags &= ~AboveFlag;
                     break;
