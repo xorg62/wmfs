@@ -209,8 +209,8 @@ client_above(Client *c)
      geo.height = spgeo[c->screen].height * 0.75;
      geo.width = spgeo[c->screen].width * 0.75;
 
-     geo.x = ((spgeo[c->screen].y + spgeo[c->screen].height) / 2) - (geo.height / 2);
-     geo.y = ((spgeo[c->screen].x + spgeo[c->screen].width) / 2)- (geo.width / 2);
+     geo.y = spgeo[c->screen].y + (spgeo[c->screen].height / 2) - (geo.height / 2);
+     geo.x = spgeo[c->screen].x + (spgeo[c->screen].width / 2)- (geo.width / 2);
 
      client_moveresize(c, geo, tags[c->screen][c->tag].resizehint);
      client_raise(c);
