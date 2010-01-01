@@ -136,11 +136,12 @@ conf_misc_section(char *src)
 
      cfg_set_sauv(src);
 
-     conf.font         = get_opt(src, "sans-9", "font").str;
-     conf.raisefocus   = get_opt(src, "false", "raisefocus").bool;
-     conf.raiseswitch  = get_opt(src, "false", "raiseswitch").bool;
-     conf.focus_fmouse = get_opt(src, "true", "focus_follow_mouse").bool;
-     pad               = get_opt(src, "12", "pad").num;
+     conf.font          = get_opt(src, "sans-9", "font").str;
+     conf.raisefocus    = get_opt(src, "false", "raisefocus").bool;
+     conf.raiseswitch   = get_opt(src, "false", "raiseswitch").bool;
+     conf.focus_fmouse  = get_opt(src, "true", "focus_follow_mouse").bool;
+     conf.status_timing = get_opt(src, "1", "status_timing").num;
+     pad                = get_opt(src, "12", "pad").num;
 
      if(pad > 24 || pad < 1)
      {
@@ -150,6 +151,12 @@ conf_misc_section(char *src)
      }
 
      conf.pad = pad;
+
+     if(conf.status_timing <= 0)
+     {
+          warnx("configuration : status_timing value (%d) incorrect.", conf.status_timing);
+          conf.status_timing = 1;
+     }
 
      return;
 }

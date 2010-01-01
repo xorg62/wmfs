@@ -231,6 +231,10 @@ clientmessageevent(XClientMessageEvent *ev)
           screen_get_sel();
      }
 
+     if(mess_t == wmfs_update_status
+               && estatus)
+          spawn(status_path);
+
      return;
 }
 

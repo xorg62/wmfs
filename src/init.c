@@ -195,31 +195,32 @@ init_layout(void)
 void
 init_status(void)
 {
-     char *path;
      int fd;
      struct stat st;
 
-     path = emalloc(strlen(getenv("HOME")) + strlen(DEF_STATUS) + 2, sizeof(char));
+     status_path = emalloc(strlen(getenv("HOME")) + strlen(DEF_STATUS) + 2, sizeof(char));
 
-     sprintf(path, "%s/"DEF_STATUS, getenv("HOME"));
+     sprintf(status_path, "%s/"DEF_STATUS, getenv("HOME"));
 
-     if(!(fd = open(path, O_RDONLY)))
+     if(!(fd = open(status_path, O_RDONLY)))
      {
-          free(path);
+          free(status_path);
 
           return;
      }
 
-     stat(path, &st);
+     stat(status_path, &st);
 
      if(st.st_mode & S_IXUSR)
-          spawn(path);
+     {
+          estatus = True;
+          system(status_path);
+     }
      else
-          warnx("status.sh file present in wmfs directory can't be executed, try 'chmod +x %s'.", path);
+          warnx("status.sh file present in wmfs directory can't be executed, try 'chmod +x %s'.",
+                    status_path);
 
      close(fd);
-
-     free(path);
 
      return;
 }

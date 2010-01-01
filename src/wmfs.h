@@ -44,6 +44,7 @@
 #include <getopt.h>
 #include <dirent.h>
 #include <err.h>
+#include <pthread.h>
 #include <sys/select.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -334,11 +335,13 @@ void viwmfs(int argc, char **argv);
 int errorhandler(Display *d, XErrorEvent *event);
 int errorhandlerdummy(Display *d, XErrorEvent *event);
 void quit(void);
+void *thread_process(void *arg);
 void mainloop(void);
 void scan(void);
 Bool check_wmfs_running(void);
 void exec_uicb_function(char *func, char *cmd);
 void set_statustext(int s, char *str);
+void update_status(void);
 void handle_signal(int signum);
 void uicb_quit(uicb_t);
 void uicb_reload(uicb_t);
@@ -351,12 +354,13 @@ GC gc, gc_stipple;
 int selscreen;
 Conf conf;
 Key *keys;
-Bool exiting;
+Bool exiting, estatus;
 XRectangle *sgeo;
 XRectangle *spgeo;
 Cursor cursor[CurLast];
-char *argv_global;
+char *argv_global, *status_path;
 int xrandr_event;
+uint timing;
 
 /* Fonts */
 XftFont *font;

@@ -80,6 +80,7 @@ ewmh_init_hints(void)
      /* WMFS hints */
      net_atom[wmfs_running]                   = ATOM("_WMFS_RUNNING");
      net_atom[wmfs_update_hints]              = ATOM("_WMFS_UPDATE_HINTS");
+     net_atom[wmfs_update_status]             = ATOM("_WMFS_UPDATE_STATUS");
      net_atom[wmfs_set_screen]                = ATOM("_WMFS_SET_SCREEN");
      net_atom[wmfs_screen_count]              = ATOM("_WMFS_SCREEN_COUNT");
      net_atom[wmfs_current_tag]               = ATOM("_WMFS_CURRENT_TAG");
