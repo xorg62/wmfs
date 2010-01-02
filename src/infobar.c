@@ -171,8 +171,8 @@ infobar_draw_taglist(int sc)
 void
 infobar_draw_statustext(int sc, char *str)
 {
-     char *buf = NULL;
-     char *strwc = NULL;
+     char buf[512] = { 0 };
+     char strwc[512] = { 0 };
      char col[8] = { 0 };
      int i, j, c, k = 0;
      char *lastst;
@@ -187,10 +187,12 @@ infobar_draw_statustext(int sc, char *str)
      lastst = infobar[sc].statustext;
 
      infobar[sc].statustext = _strdup(str);
-     strwc = _strdup(str);
+     strcpy(strwc, &str[sizeof(strwc)]);
 
      /* Count how many color block there is and make a string without color block (\#....\)*/
-     for(i = j = c = 0; i < strlen(str); ++i, ++j)
+     for(i = j = c = 0;
+               i < ((strlen(str) > sizeof(strwc)) ? sizeof(strwc) : strlen(str));
+               ++i, ++j)
      {
           if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
           {
@@ -211,14 +213,14 @@ infobar_draw_statustext(int sc, char *str)
      /* Draw text with its color */
      if(c)
      {
-          buf = _strdup(strwc);
+          strcpy(buf, strwc);
 
           for(i = k; i < strlen(str); ++i, ++k)
                if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
                {
                     /* Store current color in col[] */
                     for(j = 0, ++i; str[i] != '\\'; col[j++] = str[i++]);
-                    buf += k;
+                    strcpy(buf, &buf[k]);
 
                     /* Draw a rectangle with the bar color to draw the text properly */
                     draw_rectangle(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(buf),
@@ -229,17 +231,14 @@ infobar_draw_statustext(int sc, char *str)
                     draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(buf),
                               FHINFOBAR,  col, 0, buf);
 
-                    buf = _strdup(strwc);
+                    strcpy(buf, strwc);
                     ++i;
                }
-
-          free(buf);
      }
 
      barwin_refresh(infobar[sc].bar);
 
      free(lastst);
-     free(strwc);
 
      return;
 }
