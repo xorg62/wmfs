@@ -140,7 +140,7 @@ void
 clientmessageevent(XClientMessageEvent *ev)
 {
      Client *c;
-     int i, mess_t = 0;
+     int s, i, mess_t = 0;
      Atom rt;
      int rf;
      ulong ir, il;
@@ -151,7 +151,9 @@ clientmessageevent(XClientMessageEvent *ev)
      if(ev->format != 32)
           return;
 
-     for(i = 0; i < net_last + screen_count(); ++i)
+     s = screen_count();
+
+     for(i = 0; i < net_last + s; ++i)
           if(net_atom[i] == ev->message_type)
                mess_t = i;
 
@@ -166,7 +168,7 @@ clientmessageevent(XClientMessageEvent *ev)
           /* Manage _WMFS_SET_SCREEN */
           if(mess_t == wmfs_set_screen
              && ev->data.l[0] >= 0
-             && ev->data.l[0] <= screen_count())
+             && ev->data.l[0] <= s)
                screen_set_sel((int)(ev->data.l[0]));
 
           /* Manage _NET_ACTIVE_WINDOW */

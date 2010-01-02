@@ -37,12 +37,14 @@
 void
 infobar_init(void)
 {
-     int sc, i, j;
+     int s, sc, i, j;
+
+     s = screen_count();
 
      if(!infobar)
-          infobar = emalloc(screen_count(), sizeof(InfoBar));
+          infobar = emalloc(s, sizeof(InfoBar));
 
-     for(sc = 0; sc < screen_count(); ++sc)
+     for(sc = 0; sc < s; ++sc)
      {
           j = 0;
           infobar[sc].geo.height = INFOBARH;
@@ -97,7 +99,7 @@ infobar_init(void)
           barwin_refresh(infobar[sc].bar);
 
           /* Default statustext is set here */
-          for(i = 0; i < screen_count(); ++i)
+          for(i = 0; i < s; ++i)
                infobar[i].statustext = _strdup(WMFS_VERSION);
           infobar_draw(sc);
      }
@@ -187,7 +189,7 @@ infobar_draw_statustext(int sc, char *str)
      lastst = infobar[sc].statustext;
 
      infobar[sc].statustext = _strdup(str);
-     strcpy(strwc, &str[sizeof(strwc)]);
+     strcpy(strwc, str);
 
      /* Count how many color block there is and make a string without color block (\#....\)*/
      for(i = j = c = 0;
@@ -220,16 +222,15 @@ infobar_draw_statustext(int sc, char *str)
                {
                     /* Store current color in col[] */
                     for(j = 0, ++i; str[i] != '\\'; col[j++] = str[i++]);
-                    strcpy(buf, &buf[k]);
 
                     /* Draw a rectangle with the bar color to draw the text properly */
-                    draw_rectangle(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(buf),
-                                   0, INFOBARH - (sgeo[sc].width - SHADH) - textw(buf),
+                    draw_rectangle(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(&buf[k]),
+                                   0, INFOBARH - (sgeo[sc].width - SHADH) - textw(&buf[k]),
                                    INFOBARH, conf.colors.bar);
 
                     /* Draw text with its color */
-                    draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(buf),
-                              FHINFOBAR,  col, 0, buf);
+                    draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(&buf[k]),
+                              FHINFOBAR,  col, 0, &buf[k]);
 
                     strcpy(buf, strwc);
                     ++i;

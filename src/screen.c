@@ -166,11 +166,12 @@ void
 screen_init_geo(void)
 {
      int i;
+     int s = screen_count();
 
-     sgeo = emalloc(screen_count(), sizeof(XRectangle));
-     spgeo = emalloc(screen_count(), sizeof(XRectangle));
+     sgeo = emalloc(s, sizeof(XRectangle));
+     spgeo = emalloc(s, sizeof(XRectangle));
 
-     for(i = 0; i < screen_count(); ++i)
+     for(i = 0; i < s; ++i)
           sgeo[i] = screen_get_geo(i);
 
      spgeo[0].x = 0;

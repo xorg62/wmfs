@@ -210,10 +210,12 @@ scan(void)
      XWindowAttributes wa;
      Window usl, usl2, *w = NULL;
      Atom rt;
-     int rf, tag = -1, screen = -1, free = -1;
+     int s, rf, tag = -1, screen = -1, free = -1;
      ulong ir, il;
      uchar *ret;
      Client *c;
+
+     s = screen_count();
 
      if(XQueryTree(dpy, ROOT, &usl, &usl2, &w, &n))
           for(i = n - 1; i != -1; --i)
@@ -246,7 +248,7 @@ scan(void)
 
                     if(tag != -1)
                          c->tag = tag;
-                    if(screen != -1 && screen <= screen_count() - 1)
+                    if(screen != -1 && screen <= s - 1)
                          c->screen = screen;
                     if(free != -1)
                          c->flags |= (free) ? FreeFlag : 0;
@@ -262,7 +264,7 @@ scan(void)
           tags[c->screen][c->tag].request_update = True;
      }
 
-     for(i = 0; i < screen_count(); ++i)
+     for(i = 0; i < s; ++i)
           arrange(i, True);
 
      XFree(w);

@@ -42,12 +42,13 @@
 void
 ewmh_init_hints(void)
 {
-     int i = 1, j, showing_desk = 0;
+     int i = 1, s, j, showing_desk = 0;
      char root_name[] = WMFS_VERSION;
      char class[] = "wmfs", st[64];
      long pid = (long)getpid();
 
-     net_atom = emalloc(net_last + screen_count(), sizeof(Atom));
+     s = screen_count();
+     net_atom = emalloc(net_last + s, sizeof(Atom));
 
      /* EWMH hints */
      net_atom[net_supported]                  = ATOM("_NET_SUPPORTED");
@@ -93,14 +94,14 @@ ewmh_init_hints(void)
      net_atom[wmfs_cmd]                       = ATOM("_WMFS_CMD");
 
      /* Multi atom _WMFS_STATUSTEXT_<screennum> */
-     for(j = 0; j < screen_count(); ++j)
+     for(j = 0; j < s; ++j)
      {
           sprintf(st, "_WMFS_STATUSTEXT_%d", j);
           net_atom[wmfs_statustext + j] = ATOM(st);
      }
 
      XChangeProperty(dpy, ROOT, net_atom[net_supported], XA_ATOM, 32,
-                     PropModeReplace, (uchar*)net_atom, net_last + screen_count());
+                     PropModeReplace, (uchar*)net_atom, net_last + s);
 
      XChangeProperty(dpy, ROOT, net_atom[wmfs_running], XA_CARDINAL, 32,
                      PropModeReplace, (uchar*)&i, 1);
@@ -213,15 +214,17 @@ void
 ewmh_get_desktop_names(void)
 {
      char *str = NULL;
-     int s, i, len = 0, pos = 0;
+     int S, s, i, len = 0, pos = 0;
 
-     for(s = 0 ; s < screen_count(); ++s)
+     S = screen_count();
+
+     for(s = 0 ; s < S; ++s)
           for(i = 1; i < conf.ntag[s] + 1; ++i)
                len += strlen(tags[s][i].name);
 
      str = emalloc(len + i + 1, sizeof(char*));
 
-     for(s = 0; s < screen_count(); ++s)
+     for(s = 0; s < S; ++s)
           for(i = 1; i < conf.ntag[s] + 1; ++i, ++pos)
           {
                strncpy(str + pos, tags[s][i].name, strlen(tags[s][i].name));
@@ -264,14 +267,16 @@ void
 ewmh_set_workarea(void)
 {
      long *data;
-     int i, j, tag_c = 0, pos = 0;
+     int i, s, j, tag_c = 0, pos = 0;
 
-     for(i = 0; i < screen_count(); ++i)
+     s = screen_count();
+
+     for(i = 0; i < s; ++i)
           tag_c += conf.ntag[i];
 
      data = emalloc(tag_c * 4, sizeof(long));
 
-     for(i = 0; i < screen_count(); ++i)
+     for(i = 0; i < s; ++i)
           for(j = 0; j < conf.ntag[i]; ++j)
           {
                data[pos++] = spgeo[i].x;
