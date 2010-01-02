@@ -202,16 +202,18 @@ init_status(void)
 
      sprintf(status_path, "%s/"DEF_STATUS, getenv("HOME"));
 
-     if(!(fd = open(status_path, O_RDONLY)))
+     if(!(fd = open(status_path, O_RDONLY))
+               || !fopen(status_path, "r"))
      {
           free(status_path);
+          estatus = False;
 
           return;
      }
 
      stat(status_path, &st);
 
-     if(st.st_mode & S_IXUSR)
+     if(st.st_size && st.st_mode & S_IXUSR)
      {
           estatus = True;
           system(status_path);

@@ -229,7 +229,6 @@ infobar_draw_statustext(int sc, char *str)
                     draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(buf),
                               FHINFOBAR,  col, 0, buf);
 
-                    free(buf);
                     buf = _strdup(strwc);
                     ++i;
                }
