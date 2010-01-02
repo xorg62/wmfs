@@ -54,12 +54,12 @@ add_executable(wmfs ${wmfs_src})
 set(VERSION "WMFS-201001")
 
 # FLAGS
-set(CFLAGS "-g -Wall -lpthread -ansi")
+set(CFLAGS "-g -Wall -ansi")
 set(CMAKE_C_FLAGS ${CFLAGS})
 
 # Linker FLAGS
 
-set(DEFAULT_LDFLAGS "-L /usr/local/lib")
+set(DEFAULT_LDFLAGS "-L /usr/local/lib -lpthread")
 
 if(CMAKE_SYSTEM_NAME MATCHES NetBSD)
     message("-- NetBSD system found - Using /usr/pkg/lib for linker")
