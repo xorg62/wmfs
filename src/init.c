@@ -216,7 +216,7 @@ init_status(void)
      if(st.st_size && st.st_mode & S_IXUSR)
      {
           estatus = True;
-          system(status_path);
+          spawn(status_path);
      }
      else
           warnx("status.sh file present in wmfs directory can't be executed, try 'chmod +x %s'.",
