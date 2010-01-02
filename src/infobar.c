@@ -177,6 +177,7 @@ infobar_draw_statustext(int sc, char *str)
      char strwc[512] = { 0 };
      char col[8] = { 0 };
      int i, j, c, k = 0;
+     int len;
      char *lastst;
 
      /* If the str == the current statustext, return (not needed) */
@@ -189,12 +190,12 @@ infobar_draw_statustext(int sc, char *str)
      lastst = infobar[sc].statustext;
 
      infobar[sc].statustext = _strdup(str);
-     strcpy(strwc, str);
+     strncpy(strwc, str, sizeof(strwc));
+
+     len = ((strlen(str) > sizeof(strwc)) ? sizeof(strwc) : strlen(str));
 
      /* Count how many color block there is and make a string without color block (\#....\)*/
-     for(i = j = c = 0;
-               i < ((strlen(str) > sizeof(strwc)) ? sizeof(strwc) : strlen(str));
-               ++i, ++j)
+     for(i = j = c = 0; i < len; ++i, ++j)
      {
           if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
           {
@@ -217,7 +218,7 @@ infobar_draw_statustext(int sc, char *str)
      {
           strcpy(buf, strwc);
 
-          for(i = k; i < strlen(str); ++i, ++k)
+          for(i = k; i < len; ++i, ++k)
                if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
                {
                     /* Store current color in col[] */

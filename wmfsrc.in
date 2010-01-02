@@ -7,6 +7,7 @@
         font               = "dejavu-10"
         raisefocus         = false
         focus_follow_mouse = true
+        status_timing      = 1     #seconds
 [/misc]
 
 [bar]
