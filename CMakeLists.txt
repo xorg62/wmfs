@@ -51,10 +51,10 @@ set(wmfs_src
 add_executable(wmfs ${wmfs_src})
 
 # Set the version
-set(VERSION "WMFS-200910")
+set(VERSION "WMFS-201001")
 
 # FLAGS
-set(CFLAGS "-g -Wall -ansi")
+set(CFLAGS "-g -Wall -lpthread -ansi")
 set(CMAKE_C_FLAGS ${CFLAGS})
 
 # Linker FLAGS

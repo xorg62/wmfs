@@ -136,15 +136,53 @@ quit(void)
      return;
 }
 
+void *
+thread_process(void *arg)
+{
+     XEvent ev;
+
+     /* X event loop */
+     if(!(int*)arg)
+     {
+          while(!exiting && !XNextEvent(dpy, &ev))
+               getevent(ev);
+
+          pthread_exit(0);
+     }
+
+     /* Status checking loop with timing */
+     else
+     {
+          while(!exiting)
+          {
+               spawn(status_path);
+               sleep(conf.status_timing);
+          }
+
+          pthread_exit(0);
+     }
+}
+
 /** WMFS main loop.
  */
 void
 mainloop(void)
 {
      XEvent ev;
+     pthread_t evloop, evstatus;
+     void *ret;
 
-     while(!exiting && !XNextEvent(dpy, &ev))
-          getevent(ev);
+     if(!estatus)
+          while(!exiting && !XNextEvent(dpy, &ev))
+               getevent(ev);
+     else
+     {
+          pthread_create(&evloop, NULL, thread_process, "1");
+          pthread_create(&evstatus, NULL, thread_process, NULL);
+
+          (void)pthread_join(evloop, &ret);
+          (void)pthread_join(evstatus, &ret);
+     }
 
      return;
 }
@@ -347,6 +385,23 @@ set_statustext(int s, char *str)
      return;
 }
 
+/** Update status script by ewmh hint
+  */
+void
+update_status(void)
+{
+     long data[5];
+
+     if(!check_wmfs_running())
+          return;
+
+     data[4] = True;
+
+     send_client_event(data, "_WMFS_UPDATE_STATUS");
+
+     return;
+}
+
 /** Signal handle function
 */
 void
@@ -368,12 +423,12 @@ int
 main(int argc, char **argv)
 {
      int i;
-     char *ol = "csgV";
+     char *ol = "csgVS";
 
      argv_global  = _strdup(argv[0]);
      sprintf(conf.confpath, "%s/"DEF_CONF, getenv("HOME"));
 
-     while((i = getopt(argc, argv, "hvic:s:g:C:V:")) != -1)
+     while((i = getopt(argc, argv, "hviSc:s:g:C:V:")) != -1)
      {
 
           /* For options who need WMFS running */
@@ -384,12 +439,13 @@ main(int argc, char **argv)
           {
           case 'h':
           default:
-               printf("usage: %s [-ihv] [-C <file>] [-c <uicb function> <cmd> ] [-g <argument>] [-s <screen_num> <string>] [-V <viwmfs cmd]\n"
+               printf("usage: %s [-ihvS] [-C <file>] [-c <uicb function> <cmd> ] [-g <argument>] [-s <screen_num> <string>] [-V <viwmfs cmd]\n"
                       "   -C <file>                 Load a configuration file\n"
                       "   -c <uicb_function> <cmd>  Execute an uicb function to control WMFS\n"
                       "   -g <argument>             Show information about wmfs status\n"
                       "   -s <screen_num> <string>  Set the bar(s) statustext\n"
                       "   -V <viwmfs cmd>           Manage WMFS with vi-like command\n"
+                      "   -S                        Update status script\n"
                       "   -h                        Show this page\n"
                       "   -i                        Show informations\n"
                       "   -v                        Show WMFS version\n", argv[0]);
@@ -402,11 +458,17 @@ main(int argc, char **argv)
                break;
 
           case 'v':
-               printf("WMFS version : "WMFS_VERSION".\n"
+               printf("WMFS version : "WMFS_VERSION"\n"
                       "  Compilation settings :\n"
                       "    - Flags : "WMFS_COMPILE_FLAGS"\n"
                       "    - Linked Libs : "WMFS_LINKED_LIBS"\n"
                       "    - On "WMFS_COMPILE_MACHINE" by "WMFS_COMPILE_BY".\n");
+               exit(EXIT_SUCCESS);
+               break;
+
+          case 'S':
+               update_status();
+               XCloseDisplay(dpy);
                exit(EXIT_SUCCESS);
                break;
 

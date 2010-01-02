@@ -48,6 +48,7 @@
 #define UnmapFlag (1 << 6)
 #define HintFlag  (1 << 7)
 #define FSSFlag   (1 << 8)
+#define AboveFlag (1 << 9)
 
 /* XEMBED messages */
 #define XEMBED_MAPPED                 (1 << 0)
@@ -119,6 +120,7 @@ enum
      /* WMFS HINTS */
      wmfs_running,
      wmfs_update_hints,
+     wmfs_update_status,
      wmfs_current_tag,
      wmfs_current_screen,
      wmfs_current_layout,
@@ -248,6 +250,7 @@ typedef struct
      int nmaster;
      Bool resizehint;
      Bool request_update;
+     Bool abovefc;
      int barpos;
      Layout layout;
 } Tag;
@@ -319,6 +322,7 @@ typedef struct
      Bool raiseswitch;
      Bool focus_fmouse;
      uint pad;
+     int status_timing;
      struct
      {
           /*

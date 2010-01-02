@@ -151,7 +151,7 @@ clientmessageevent(XClientMessageEvent *ev)
      if(ev->format != 32)
           return;
 
-     for(i = 0; i < net_last; ++i)
+     for(i = 0; i < net_last + screen_count(); ++i)
           if(net_atom[i] == ev->message_type)
                mess_t = i;
 
@@ -231,6 +231,10 @@ clientmessageevent(XClientMessageEvent *ev)
           screen_get_sel();
      }
 
+     if(mess_t == wmfs_update_status
+               && estatus)
+          spawn(status_path);
+
      return;
 }
 
@@ -253,7 +257,7 @@ configureevent(XConfigureRequestEvent *ev)
           CHECK(!(c->flags & FSSFlag));
      }
 
-     if((c= client_gb_win(ev->window)))
+     if((c = client_gb_win(ev->window)))
      {
           if(ev->value_mask & CWX)
                c->geo.x = ev->x + BORDH;
@@ -264,7 +268,8 @@ configureevent(XConfigureRequestEvent *ev)
           if(ev->value_mask & CWHeight)
                c->geo.height = ev->height;
 
-          client_moveresize(c, c->geo, False);
+          if(c->flags & FreeFlag)
+               client_moveresize(c, c->geo, False);
      }
      else
      {
@@ -316,13 +321,14 @@ enternotify(XCrossingEvent *ev)
      if(conf.focus_fmouse)
      {
           if((c = client_gb_win(ev->window))
-             || (c = client_gb_frame(ev->window))
-             || (c = client_gb_titlebar(ev->window))
-             || (c = client_gb_button(ev->window, &n)))
+                    || (c = client_gb_frame(ev->window))
+                    || (c = client_gb_titlebar(ev->window))
+                    || (c = client_gb_button(ev->window, &n)))
                client_focus(c);
           else
                client_focus(NULL);
      }
+
 
      return;
 }

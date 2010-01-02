@@ -44,6 +44,7 @@
 #include <getopt.h>
 #include <dirent.h>
 #include <err.h>
+#include <pthread.h>
 #include <sys/select.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -84,6 +85,7 @@
 #define RESHW        (6 * BORDH)
 #define BUTTONWH     (TBARH / 2)
 #define DEF_CONF     ".config/wmfs/wmfsrc"
+#define DEF_STATUS   ".config/wmfs/status.sh"
 #define PAD          conf.pad
 
 #define CWIN(win, parent, x, y, w, h, b, mask, col, at)                             \
@@ -140,6 +142,7 @@ void uicb_infobar_togglepos(uicb_t);
 void client_attach(Client *c);
 void client_configure(Client *c);
 void client_detach(Client *c);
+void client_above(Client *c);
 void client_focus(Client *c);
 Client* client_get_next(void);
 Client* client_get_prev(void);
@@ -301,6 +304,7 @@ void uicb_set_mwfact(uicb_t);
 void uicb_set_nmaster(uicb_t);
 void uicb_set_layout(uicb_t);
 void uicb_toggle_resizehint(uicb_t);
+void uicb_toggle_abovefc(uicb_t cmd);
 void uicb_set_layer(uicb_t cmd);
 void uicb_set_client_layer(uicb_t cmd);
 void layout_set_client_master(Client *c);
@@ -314,6 +318,7 @@ void init_gc(void);
 void init_cursor(void);
 void init_key(void);
 void init_geometry(void);
+void init_status(void);
 
 /* getinfo.c */
 void getinfo_tag(void);
@@ -330,11 +335,13 @@ void viwmfs(int argc, char **argv);
 int errorhandler(Display *d, XErrorEvent *event);
 int errorhandlerdummy(Display *d, XErrorEvent *event);
 void quit(void);
+void *thread_process(void *arg);
 void mainloop(void);
 void scan(void);
 Bool check_wmfs_running(void);
 void exec_uicb_function(char *func, char *cmd);
 void set_statustext(int s, char *str);
+void update_status(void);
 void handle_signal(int signum);
 void uicb_quit(uicb_t);
 void uicb_reload(uicb_t);
@@ -347,12 +354,13 @@ GC gc, gc_stipple;
 int selscreen;
 Conf conf;
 Key *keys;
-Bool exiting;
+Bool exiting, estatus;
 XRectangle *sgeo;
 XRectangle *spgeo;
 Cursor cursor[CurLast];
-char *argv_global;
+char *argv_global, *status_path;
 int xrandr_event;
+uint timing;
 
 /* Fonts */
 XftFont *font;

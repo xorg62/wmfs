@@ -63,6 +63,7 @@ func_name_list_t tmp_func_list[] =
      {"mouse_resize",            uicb_mouse_resize },
      {"client_raise",            uicb_client_raise },
      {"toggle_free",             uicb_togglefree },
+     {"toggle_abovefc",          uicb_toggle_abovefc },
      {"screen_select",           uicb_screen_select },
      {"screen_next",             uicb_screen_next },
      {"screen_prev",             uicb_screen_prev },
@@ -135,11 +136,12 @@ conf_misc_section(char *src)
 
      cfg_set_sauv(src);
 
-     conf.font         = get_opt(src, "sans-9", "font").str;
-     conf.raisefocus   = get_opt(src, "false", "raisefocus").bool;
-     conf.raiseswitch  = get_opt(src, "false", "raiseswitch").bool;
-     conf.focus_fmouse = get_opt(src, "true", "focus_follow_mouse").bool;
-     pad               = get_opt(src, "12", "pad").num;
+     conf.font          = get_opt(src, "sans-9", "font").str;
+     conf.raisefocus    = get_opt(src, "false", "raisefocus").bool;
+     conf.raiseswitch   = get_opt(src, "false", "raiseswitch").bool;
+     conf.focus_fmouse  = get_opt(src, "true", "focus_follow_mouse").bool;
+     conf.status_timing = get_opt(src, "1", "status_timing").num;
+     pad                = get_opt(src, "12", "pad").num;
 
      if(pad > 24 || pad < 1)
      {
@@ -149,6 +151,12 @@ conf_misc_section(char *src)
      }
 
      conf.pad = pad;
+
+     if(conf.status_timing <= 0)
+     {
+          warnx("configuration : status_timing value (%d) incorrect.", conf.status_timing);
+          conf.status_timing = 1;
+     }
 
      return;
 }
@@ -206,7 +214,7 @@ conf_client_section(char *src)
      conf.client.resizecorner_normal = getcolor(get_opt(src, "#222222", "resize_corner_normal").str);
      conf.client.resizecorner_focus  = getcolor(get_opt(src, "#DDDDDD", "resize_corner_focus").str);
      conf.client.mod                 |= char_to_modkey(get_opt(src, "Alt", "modifier").str, key_list);
-     conf.client.set_new_win_master  = get_opt(src, "false", "set_new_win_master").bool;
+     conf.client.set_new_win_master  = get_opt(src, "true", "set_new_win_master").bool;
 
      if((conf.client.nmouse = get_size_sec(src, "mouse")))
      {
@@ -369,7 +377,7 @@ conf_tag_section(char *src)
       * MAXTAG (32) print an error and create only one.
       */
      Tag default_tag = { "WMFS", NULL, 0, 1,
-                         0.50, 1, False, False, IB_Top,
+                         0.50, 1, False, False, False, IB_Top,
                          layout_name_to_struct(conf.layout, "tile_right", conf.nlayout, layout_list) };
 
      cfg_set_sauv(src);
@@ -413,6 +421,7 @@ conf_tag_section(char *src)
                tags[k][conf.ntag[k]].mwfact     = get_opt(cfgtmp, "0.65", "mwfact").fnum;
                tags[k][conf.ntag[k]].nmaster    = get_opt(cfgtmp, "1", "nmaster").num;
                tags[k][conf.ntag[k]].resizehint = get_opt(cfgtmp, "false", "resizehint").bool;
+               tags[k][conf.ntag[k]].abovefc    = get_opt(cfgtmp, "false", "abovefc").bool;
                tags[k][conf.ntag[k]].layers = 1;
 
                tmp = _strdup(get_opt(cfgtmp, "top", "infobar_position").str);

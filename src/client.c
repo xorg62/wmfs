@@ -193,6 +193,33 @@ uicb_client_swap_prev(uicb_t cmd)
      return;
 }
 
+/** Set the client c above
+  *\param c Client pointer
+*/
+void
+client_above(Client *c)
+{
+     XRectangle geo = { 0 };
+
+     if(c->flags & AboveFlag)
+          return;
+
+     c->flags |= AboveFlag;
+
+     geo.height = spgeo[c->screen].height * 0.75;
+     geo.width = spgeo[c->screen].width * 0.75;
+
+     geo.y = spgeo[c->screen].y + (spgeo[c->screen].height / 2) - (geo.height / 2);
+     geo.x = spgeo[c->screen].x + (spgeo[c->screen].width / 2)- (geo.width / 2);
+
+     client_moveresize(c, geo, tags[c->screen][c->tag].resizehint);
+     client_raise(c);
+
+     tags[c->screen][c->tag].layout.func(c->screen);
+
+     return;
+}
+
 /** Set the focus to a client
  * \param c Client pointer
 */
@@ -207,15 +234,18 @@ client_focus(Client *c)
           sel->colors.frame = conf.client.bordernormal;
           sel->colors.fg = conf.titlebar.fg_normal;
           sel->colors.resizecorner = conf.client.resizecorner_normal;
+
           if(TBARH - BORDH && sel->titlebar->stipple)
                sel->titlebar->stipple_color = conf.titlebar.stipple.colors.normal;
+
+          if(sel->flags & AboveFlag)
+               sel->flags &= ~AboveFlag;
+
           frame_update(sel);
           mouse_grabbuttons(sel, False);
      }
 
-     sel = c;
-
-     if(c)
+     if((sel = c))
      {
           c->colors.frame = conf.client.borderfocus;
           c->colors.fg = conf.titlebar.fg_focus;
@@ -234,6 +264,10 @@ client_focus(Client *c)
                   || c == client_gb_titlebar(w))
                     client_raise(c);
           }
+
+          if(tags[sel->screen][sel->tag].abovefc
+                    && !conf.focus_fmouse)
+               client_above(sel);
 
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
      }
@@ -558,7 +592,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      if(ar)
           arrange(c->screen, True);
 
-     if(conf.client.set_new_win_master)
+     if(!conf.client.set_new_win_master)
           layout_set_client_master(c);
 
      return c;
@@ -842,7 +876,7 @@ client_update_attributes(Client *c)
 void
 client_raise(Client *c)
 {
-     if(!c || (c->flags & TileFlag))
+     if(!c || ((c->flags & TileFlag) && !(c->flags & AboveFlag)))
           return;
 
      XRaiseWindow(dpy, c->frame);
@@ -883,6 +917,8 @@ void
 client_unmanage(Client *c)
 {
      Client *c_next = NULL;
+     Bool b = False;
+     int i;
 
      XGrabServer(dpy);
      XSetErrorHandler(errorhandlerdummy);
@@ -900,7 +936,11 @@ client_unmanage(Client *c)
      ewmh_get_client_list();
 
      /* Arrange */
-     if(c->tag == seltag[selscreen] && c->screen == selscreen)
+     for(i = 0; i < screen_count() && !b; ++i)
+          if(c->tag == seltag[i])
+               b = True;
+
+     if(b)
           tags[c->screen][c->tag].layout.func(c->screen);
      else
      {
