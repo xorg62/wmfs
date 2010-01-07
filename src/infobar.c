@@ -209,8 +209,9 @@ infobar_draw_statustext(int sc, char *str)
           /* Bars */
           else if(str[i] == '\\' && str[i + 1] == 'b' && str[i + 2] == '[')
           {
-               for(--j, z = 1; str[z + i] != '\\' && str[z + i]; ++z);
+               for(z = 1, --j; str[z + i] != '\\' && str[z + i]; ++z);
 
+               /* Syntax to draw rectangle : \b[x;y;width;height;#color]\ */
                if(sscanf(&str[i + 1], "b[%d;%d;%d;%d;#%x]%c",
                               &bcord[0], &bcord[1], &bcord[2], &bcord[3], &bcol, &as) == 6 && as == '\\')
                     draw_rectangle(infobar[sc].bar->dr, bcord[0], bcord[1], bcord[2], bcord[3], bcol);
