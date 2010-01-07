@@ -176,7 +176,7 @@ infobar_draw_statustext(int sc, char *str)
      char buf[512] = { 0 };
      char strwc[512] = { 0 };
      char as, col[8] = { 0 };
-     int i, j, c, b, x, k = 0, z;
+     int i, j, c, z, k = 0;
      int bcord[4] = { 0 };
      uint bcol = 0;
      int len;
@@ -197,7 +197,7 @@ infobar_draw_statustext(int sc, char *str)
      len = ((strlen(str) > sizeof(strwc)) ? sizeof(strwc) : strlen(str));
 
      /* Count how many blocks there is and make a string without block (\#....\, \b[;;;;]\) */
-     for(i = j = c = b = 0; i < len; ++i, ++j)
+     for(i = j = c = 0; i < len; ++i, ++j)
      {
           /* Colors */
           if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
@@ -209,8 +209,7 @@ infobar_draw_statustext(int sc, char *str)
           /* Bars */
           else if(str[i] == '\\' && str[i + 1] == 'b' && str[i + 2] == '[')
           {
-               for(z = 1; str[z + i] != '\\' && str[z + i]; ++z);
-               --j;
+               for(--j, z = 1; str[z + i] != '\\' && str[z + i]; ++z);
 
                if(sscanf(&str[i + 1], "b[%d;%d;%d;%d;#%x]%c",
                               &bcord[0], &bcord[1], &bcord[2], &bcord[3], &bcol, &as) == 6 && as == '\\')
@@ -225,7 +224,7 @@ infobar_draw_statustext(int sc, char *str)
      strwc[j] = '\0';
 
      /* Draw a first time the statustext for non colorized text */
-     draw_text(infobar[sc].bar->dr, (x = (sgeo[sc].width - SHADH) - textw(strwc)),
+     draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(strwc),
                FHINFOBAR, infobar[sc].bar->fg, 0, strwc);
 
      /* Draw text with its color */
@@ -245,7 +244,7 @@ infobar_draw_statustext(int sc, char *str)
                                    INFOBARH, conf.colors.bar);
 
                     /* Draw text with its color */
-                    draw_text(infobar[sc].bar->dr, (x = ((sgeo[sc].width - SHADH) - textw(&buf[k]))),
+                    draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(&buf[k]),
                               FHINFOBAR,  col, 0, &buf[k]);
 
                     strcpy(buf, strwc);
