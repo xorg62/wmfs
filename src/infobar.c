@@ -218,8 +218,6 @@ infobar_draw_statustext(int sc, char *str)
           else
                strwc[j] = strwb[i];
 
-     printf("--> '%s'\n", strwc);
-
      /* Draw a first time the statustext for non colorized text */
      draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(strwc),
                FHINFOBAR, infobar[sc].bar->fg, 0, strwc);
