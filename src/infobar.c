@@ -173,12 +173,14 @@ infobar_draw_taglist(int sc)
 void
 infobar_draw_statustext(int sc, char *str)
 {
-     char buf[512] = { 0 };
+     /* str without \b[;;;;]\ blocks and str without colorsblocks * */
+     char strwb[512] = { 0 };
      char strwc[512] = { 0 };
+
+     char buf[512] = { 0 };
      char as, col[8] = { 0 };
-     int i, j, c, z, k = 0;
-     int bcord[4] = { 0 };
-     uint bcol = 0;
+     int i, j, c, k = 0, b = 0;
+     uint bp[64][5] = { {0} };
      int len;
      char *lastst;
 
@@ -196,33 +198,24 @@ infobar_draw_statustext(int sc, char *str)
 
      len = ((strlen(str) > sizeof(strwc)) ? sizeof(strwc) : strlen(str));
 
-     /* Count how many blocks there is and make a string without block (\#....\, \b[;;;;]\) */
+     /* Search \b[;;;;#]\ blocks and store properties. */
+     for(i = j = 0; i < len; ++i, ++j)
+          if(sscanf(&str[i], "\\b[%d;%d;%d;%d;#%x]%c", &bp[b][0], &bp[b][1], &bp[b][2], &bp[b][3], &bp[b][4], &as) == 6
+                    && as == '\\')
+               for(++b, ++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
+          else
+               strwb[j] = str[i];
+
+     /* Count how many color blocks there is and make a string without these (\#xxxxxx\) */
      for(i = j = c = 0; i < len; ++i, ++j)
-     {
-          /* Colors */
-          if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
+          if(strwb[i] == '\\' && strwb[i + 1] == '#' && strwb[i + 8] == '\\')
           {
                ++c;
                i += 8;
                --j;
           }
-          /* Bars */
-          else if(str[i] == '\\' && str[i + 1] == 'b' && str[i + 2] == '[')
-          {
-               for(z = 1, --j; str[z + i] != '\\' && str[z + i]; ++z);
-
-               /* Syntax to draw rectangle : \b[x;y;width;height;#color]\ */
-               if(sscanf(&str[i + 1], "b[%d;%d;%d;%d;#%x]%c",
-                              &bcord[0], &bcord[1], &bcord[2], &bcord[3], &bcol, &as) == 6 && as == '\\')
-                    draw_rectangle(infobar[sc].bar->dr, bcord[0], bcord[1], bcord[2], bcord[3], bcol);
-
-               i += z;
-          }
           else
-               strwc[j] = str[i];
-     }
-
-     strwc[j] = '\0';
+               strwc[j] = strwb[i];
 
      /* Draw a first time the statustext for non colorized text */
      draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(strwc),
@@ -233,11 +226,11 @@ infobar_draw_statustext(int sc, char *str)
      {
           strcpy(buf, strwc);
 
-          for(i = k; i < len; ++i, ++k)
-               if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
+          for(i = k = 0; i < len; ++i, ++k)
+               if(strwb[i] == '\\' && strwb[i + 1] == '#' && strwb[i + 8] == '\\')
                {
                     /* Store current color in col[] */
-                    for(j = 0, ++i; str[i] != '\\'; col[j++] = str[i++]);
+                    for(j = 0, ++i; strwb[i] != '\\'; col[j++] = strwb[i++]);
 
                     /* Draw a rectangle with the bar color to draw the text properly */
                     draw_rectangle(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(&buf[k]),
@@ -252,6 +245,10 @@ infobar_draw_statustext(int sc, char *str)
                     ++i;
                }
      }
+
+     /* Finally drawing rectangles with stored properties. */
+     for(i = 0; i < b; ++i)
+          draw_rectangle(infobar[sc].bar->dr, bp[i][0], bp[i][1], bp[i][2], bp[i][3], bp[i][4]);
 
      barwin_refresh(infobar[sc].bar);
 
