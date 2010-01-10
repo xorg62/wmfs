@@ -194,9 +194,6 @@ infobar_draw_statustext(int sc, char *str)
      lastst = infobar[sc].statustext;
 
      infobar[sc].statustext = _strdup(str);
-
-     strncpy(strwb, str, sizeof(strwb));
-
      len = ((strlen(str) > sizeof(strwc)) ? sizeof(strwc) : strlen(str));
 
      /* Search \b[;;;;#]\ blocks and store properties. */
@@ -217,6 +214,9 @@ infobar_draw_statustext(int sc, char *str)
           }
           else
                strwc[j] = strwb[i];
+
+
+     printf("%s\n", strwc);
 
      /* Draw a first time the statustext for non colorized text */
      draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(strwc),
