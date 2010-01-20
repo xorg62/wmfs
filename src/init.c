@@ -198,10 +198,18 @@ init_status(void)
 {
      int fd;
      struct stat st;
+     char *home;
 
-     status_path = emalloc(strlen(getenv("HOME")) + strlen(DEF_STATUS) + 2, sizeof(char));
+     if(!(home = getenv("HOME")))
+     {
+          warnx("HOME not set, can't launch status.sh");
+          estatus = False;
+          return;
+     }
 
-     sprintf(status_path, "%s/"DEF_STATUS, getenv("HOME"));
+     status_path = emalloc(strlen(home) + strlen(DEF_STATUS) + 2, sizeof(char));
+
+     sprintf(status_path, "%s/"DEF_STATUS, home);
 
      if(!(fd = open(status_path, O_RDONLY))
                || !fopen(status_path, "r"))
