@@ -178,7 +178,8 @@ init_layout(void)
                {"max",                     maxlayout },
                {"maxlayout",               maxlayout },
                {"freelayout",              freelayout },
-               {"free",                    freelayout }
+               {"free",                    freelayout },
+               { NULL, NULL }
           };
 
      layout_list = emalloc(LEN(layout_list_tmp), sizeof(func_name_list_t));
