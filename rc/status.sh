@@ -5,9 +5,7 @@
 
 statustext()
 {
-     local DATE=`date`
-
-     wmfs -s "$DATE"
+     wmfs -s "`date`"
 }
 
 statustext
