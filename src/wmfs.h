@@ -249,10 +249,10 @@ long getcolor(char *color);
 void setwinstate(Window win, long state);
 char* _strdup(char const *str);
 /* Conf usage {{{ */
-void* name_to_func(char *name, func_name_list_t *l);
+void* name_to_func(char *name, const func_name_list_t *l);
 ulong char_to_modkey(char *name, key_name_list_t key_l[]);
 uint char_to_button(char *name, name_to_uint_t blist[]);
-Layout layout_name_to_struct(Layout lt[], char *name, int n, func_name_list_t llist[]);
+Layout layout_name_to_struct(Layout lt[], char *name, int n, const func_name_list_t llist[]);
 char* alias_to_str(char *conf_choice);
 /* }}} */
 XRectangle get_mouse_pos(void);
@@ -312,7 +312,6 @@ void layout_set_client_master(Client *c);
 /* init.c */
 void init(void);
 void init_root(void);
-void init_layout(void);
 void init_font(void);
 void init_gc(void);
 void init_cursor(void);
@@ -380,7 +379,7 @@ Client *sel;
 
 /* Other */
 func_name_list_t *func_list;
-func_name_list_t *layout_list;
+extern const func_name_list_t layout_list[];
 uint numlockmask;
 
 #endif /* WMFS_H */

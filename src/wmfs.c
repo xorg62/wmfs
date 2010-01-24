@@ -103,7 +103,6 @@ quit(void)
      IFREE(infobar);
      IFREE(keys);
      IFREE(func_list);
-     IFREE(layout_list);
      IFREE(net_atom);
 
      /* Clean conf alloced thing */

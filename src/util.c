@@ -111,7 +111,7 @@ _strdup(const char *str)
    usage. {{{
 */
 void*
-name_to_func(char *name, func_name_list_t *l)
+name_to_func(char *name, const func_name_list_t *l)
 {
      int i;
 
@@ -150,7 +150,7 @@ char_to_button(char *name, name_to_uint_t blist[])
 }
 
 Layout
-layout_name_to_struct(Layout lt[], char *name, int n, func_name_list_t llist[])
+layout_name_to_struct(Layout lt[], char *name, int n, const func_name_list_t llist[])
 {
      int i;
 
