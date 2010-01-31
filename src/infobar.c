@@ -174,10 +174,10 @@ void
 infobar_draw_statustext(int sc, char *str)
 {
      /* str without \b[;;;;]\ blocks and str without colorsblocks * */
-     char strwb[512] = { 0 };
-     char strwc[512] = { 0 };
+     char strwb[MAXSS] = { 0 };
+     char strwc[MAXSS] = { 0 };
 
-     char buf[512] = { 0 };
+     char buf[MAXSS] = { 0 };
      char as, col[8] = { 0 };
      int i, j, c, k = 0, b = 0;
      uint bp[64][5] = { {0} };
