@@ -552,10 +552,10 @@ conf_keybind_section(char *src)
 
      cfg_set_sauv(src);
 
-     conf.nkeybind = get_size_sec(src, "key");
-     keys = emalloc(conf.nkeybind, sizeof(Key));
+     conf.nkeybind = get_size_sec(src, "key") + 1;
+     keys = emalloc(conf.nkeybind + 1, sizeof(Key));
 
-     for(i = 0; i < conf.nkeybind; ++i)
+     for(i = 0; i < conf.nkeybind + 1; ++i)
      {
           tmp = get_nsec(src, "key", i);
 
