@@ -399,6 +399,19 @@ typedef struct
      int nlauncher;
 } Conf;
 
+typedef struct
+{
+     uint x, y, w, h;
+     uint color;
+} StatusRec;
+
+typedef struct
+{
+     uint x, y;
+     char color[8];
+     char text[512];
+} StatusText;
+
 /* Config.c struct */
 typedef struct
 {

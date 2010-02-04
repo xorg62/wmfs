@@ -198,7 +198,7 @@ clientmessageevent(XClientMessageEvent *ev)
           if(XGetWindowProperty(dpy, ROOT, net_atom[mess_t], 0, 4096,
                                 False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret) == Success)
           {
-               infobar_draw_statustext(mess_t - wmfs_statustext, (char*)ret);
+               statustext_handle(mess_t - wmfs_statustext, (char*)ret);
                XFree(ret);
           }
      }

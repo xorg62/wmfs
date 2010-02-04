@@ -116,7 +116,7 @@ infobar_draw(int sc)
      infobar_draw_taglist(sc);
      infobar_draw_layout(sc);
      barwin_refresh_color(infobar[sc].bar);
-     infobar_draw_statustext(sc, infobar[sc].statustext);
+     statustext_handle(sc, infobar[sc].statustext);
 
      return;
 }
@@ -162,95 +162,6 @@ infobar_draw_taglist(int sc)
           if(tags[sc][i].name)
                barwin_draw_text(infobar[sc].tags[i], PAD / 2, FHINFOBAR, tags[sc][i].name);
      }
-
-     return;
-}
-
-/** Draw text in the statustext and parse color format
- *\param sc Screen
- *\param str String
-*/
-void
-infobar_draw_statustext(int sc, char *str)
-{
-     /* str without \b[;;;;]\ blocks and str without colorsblocks * */
-     char strwb[MAXSS] = { 0 };
-     char strwc[MAXSS] = { 0 };
-
-     char buf[MAXSS] = { 0 };
-     char as, col[8] = { 0 };
-     int i, j, c, k = 0, b = 0;
-     uint bp[64][5] = { {0} };
-     int len;
-     char *lastst;
-
-     /* If the str == the current statustext, return (not needed) */
-     if(!str)
-          return;
-
-     barwin_refresh_color(infobar[sc].bar);
-
-     /* save last status text address (for free at the end) */
-     lastst = infobar[sc].statustext;
-
-     infobar[sc].statustext = _strdup(str);
-     len = ((strlen(str) > sizeof(strwc)) ? sizeof(strwc) : strlen(str));
-
-     /* Search \b[;;;;#]\ blocks and store properties. */
-     for(i = j = 0; i < len; ++i, ++j)
-          if(sscanf(&str[i], "\\b[%d;%d;%d;%d;#%x]%c", &bp[b][0], &bp[b][1], &bp[b][2], &bp[b][3], &bp[b][4], &as) == 6
-                    && as == '\\')
-               for(++b, ++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
-          else
-               strwb[j] = str[i];
-
-     /* Count how many color blocks there is and make a string without these (\#xxxxxx\) */
-     for(i = j = c = 0; i < len; ++i, ++j)
-          if(strwb[i] == '\\' && strwb[i + 1] == '#' && strwb[i + 8] == '\\')
-          {
-               ++c;
-               i += 8;
-               --j;
-          }
-          else
-               strwc[j] = strwb[i];
-
-     /* Draw a first time the statustext for non colorized text */
-     draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(strwc),
-               FHINFOBAR, infobar[sc].bar->fg, 0, strwc);
-
-     /* Draw text with its color */
-     if(c)
-     {
-          strcpy(buf, strwc);
-
-          for(i = k = 0; i < len; ++i, ++k)
-               if(strwb[i] == '\\' && strwb[i + 1] == '#' && strwb[i + 8] == '\\')
-               {
-                    /* Store current color in col[] */
-                    for(j = 0, ++i; strwb[i] != '\\'; col[j++] = strwb[i++]);
-
-                    /* Draw a rectangle with the bar color to draw the text properly */
-                    draw_rectangle(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(&buf[k]),
-                                   0, INFOBARH - (sgeo[sc].width - SHADH) - textw(&buf[k]),
-                                   INFOBARH, conf.colors.bar);
-
-                    /* Draw text with its color */
-                    draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(&buf[k]),
-                              FHINFOBAR,  col, 0, &buf[k]);
-
-                    strcpy(buf, strwc);
-                    ++i;
-               }
-     }
-
-     /* Finally drawing rectangles with stored properties. */
-     for(i = 0; i < b; ++i)
-          draw_rectangle(infobar[sc].bar->dr, bp[i][0], bp[i][1], bp[i][2], bp[i][3], bp[i][4]);
-
-     barwin_refresh(infobar[sc].bar);
-
-     free(lastst);
 
      return;
 }

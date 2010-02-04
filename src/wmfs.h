@@ -87,7 +87,7 @@
 #define DEF_CONF     ".config/wmfs/wmfsrc"
 #define DEF_STATUS   ".config/wmfs/status.sh"
 #define PAD          conf.pad
-#define MAXSS        4096
+#define MAXSTATUS    4096
 
 #define CWIN(win, parent, x, y, w, h, b, mask, col, at)                             \
     do {                                                                            \
@@ -134,7 +134,6 @@ void infobar_init(void);
 void infobar_draw(int sc);
 void infobar_draw_layout(int sc);
 void infobar_draw_taglist(int sc);
-void infobar_draw_statustext(int sc, char *str);
 void infobar_destroy(void);
 void infobar_set_position(int pos);
 void uicb_infobar_togglepos(uicb_t);
@@ -280,6 +279,12 @@ void screen_init_geo(void);
 void uicb_screen_select(uicb_t);
 void uicb_screen_next(uicb_t);
 void uicb_screen_prev(uicb_t);
+
+/* status.c */
+int statustext_rectangle(StatusRec *r, char *str);
+int statustext_text(StatusText *s, char *str);
+void statustext_normal(int sc, char *str);
+void statustext_handle(int sc, char *str);
 
 /* layout.c */
 void arrange(int screen, Bool update_layout);
