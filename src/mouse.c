@@ -88,7 +88,7 @@ mouse_move_tag_client(Client *c)
 
      s = c->screen;
 
-     XQueryPointer(dpy, infobar[selscreen].bar->win, &w, &w, &d, &d, &d, &d, (uint*)&d);
+     XQueryPointer(dpy, infobar[selscreen].tags_board->win, &w, &w, &d, &d, &d, &d, (uint*)&d);
 
      for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
           if(infobar[selscreen].tags[i]->win == w
