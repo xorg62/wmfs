@@ -26,6 +26,9 @@
         # Value menu or switch.
         system = "menu"
 
+        # Value left or right.
+        placement = "right"
+
         # Tiling layouts.
         [layout] type = "tile_right"        symbol = "RIGHT"    [/layout]
         [layout] type = "tile_left"         symbol = "LEFT"     [/layout]

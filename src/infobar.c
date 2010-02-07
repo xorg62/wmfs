@@ -37,7 +37,7 @@
 void
 infobar_init(void)
 {
-     int s, sc, i, j;
+     int s, sc, i, j = 0;
 
      s = screen_count();
 
@@ -72,29 +72,44 @@ infobar_init(void)
                                           sgeo[sc].width, infobar[sc].geo.height,
                                           conf.colors.bar, conf.colors.text, False, False, conf.border.bar);
 
+          infobar[sc].tags_board = barwin_create(infobar[sc].bar->win,
+                    ((conf.layout_placement) ? textw(tags[sc][seltag[sc]].layout.symbol) + PAD * 1.5: 0), 0,
+                    textw(tags[sc][0].name) + PAD, /* Base size, will change */
+                    infobar[sc].geo.height,
+                    conf.colors.bar, conf.colors.text, False, False, False);
+
           /* Create tags window */
           for(i = 1; i < conf.ntag[sc] + 1; ++i)
           {
-               infobar[sc].tags[i] = barwin_create(infobar[sc].bar->win, j, 0,
+               infobar[sc].tags[i] = barwin_create(infobar[sc].tags_board->win, j, 0,
                                                    textw(tags[sc][i].name) + PAD,
                                                    infobar[sc].geo.height,
                                                    conf.colors.bar, conf.colors.text, False, False, conf.border.tag);
+
                j += textw(tags[sc][i].name) + PAD;
+
+               barwin_resize(infobar[sc].tags_board, j, infobar[sc].geo.height);
                barwin_map_subwin(infobar[sc].tags[i]);
           }
 
           /* Create layout switch barwindow */
-          infobar[sc].layout_button = barwin_create(infobar[sc].bar->win, j + PAD / 2, 0,
-                                                    textw(tags[sc][seltag[sc]].layout.symbol) + PAD,
-                                                    infobar[sc].geo.height,
-                                                    conf.colors.layout_bg, conf.colors.layout_fg,
-                                                    False, False, conf.border.layout);
+          infobar[sc].layout_button = barwin_create(infobar[sc].bar->win,
+                    ((conf.layout_placement) ? 0 : (j + PAD / 2)), 0,
+                    textw(tags[sc][seltag[sc]].layout.symbol) + PAD,
+                    infobar[sc].geo.height,
+                    conf.colors.layout_bg, conf.colors.layout_fg,
+                    False, False, conf.border.layout);
 
           /* Map/Refresh all */
           barwin_map(infobar[sc].bar);
           barwin_map_subwin(infobar[sc].bar);
+
+          barwin_map(infobar[sc].tags_board);
+          barwin_map_subwin(infobar[sc].tags_board);
+
           if(conf.border.layout)
                barwin_map_subwin(infobar[sc].layout_button);
+
           barwin_refresh_color(infobar[sc].bar);
           barwin_refresh(infobar[sc].bar);
 
@@ -129,6 +144,7 @@ infobar_draw_layout(int sc)
 {
      barwin_resize(infobar[sc].layout_button, textw(tags[sc][seltag[sc]].layout.symbol) + PAD, infobar[sc].geo.height);
      barwin_refresh_color(infobar[sc].layout_button);
+
      if(tags[sc][seltag[sc]].layout.symbol)
           barwin_draw_text(infobar[sc].layout_button, PAD / 2, FHINFOBAR, tags[sc][seltag[sc]].layout.symbol);
 
@@ -143,6 +159,9 @@ infobar_draw_taglist(int sc)
 {
      int i;
      Client *c;
+
+     if(conf.layout_placement)
+          barwin_move(infobar[sc].tags_board, textw(tags[sc][seltag[sc]].layout.symbol) + PAD * 1.5, 0);
 
      for(i = 1; i < conf.ntag[sc] + 1; ++i)
      {
@@ -177,11 +196,15 @@ infobar_destroy(void)
      {
           barwin_delete(infobar[sc].layout_button);
           barwin_delete_subwin(infobar[sc].layout_button);
+
           for(i = 1; i < conf.ntag[sc] + 1; ++i)
           {
                barwin_delete_subwin(infobar[sc].tags[i]);
                barwin_delete(infobar[sc].tags[i]);
           }
+
+          barwin_delete_subwin(infobar[sc].tags_board);
+          barwin_delete(infobar[sc].tags_board);
           barwin_delete_subwin(infobar[sc].bar);
           barwin_delete(infobar[sc].bar);
      }

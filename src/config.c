@@ -318,6 +318,9 @@ conf_layout_section(char *src)
      if((tmp = get_opt(src, "menu", "system").str) && !strcmp(tmp, "menu"))
           conf.layout_system = True;
 
+     if((tmp = get_opt(src, "right", "placement").str) && !strcmp(tmp, "left"))
+          conf.layout_placement = True;
+
      conf.nlayout = get_size_sec(src, "layout");
 
      if(conf.nlayout > NUM_OF_LAYOUT || !(conf.nlayout))

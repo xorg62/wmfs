@@ -226,7 +226,7 @@ typedef struct
 {
      BarWindow *bar;
      BarWindow *layout_button;
-     BarWindow *tags[MAXTAG];
+     BarWindow *tags_board, *tags[MAXTAG];
      XRectangle geo;
      int position;
      char *statustext;
@@ -392,6 +392,7 @@ typedef struct
      int *ntag;
      Bool tag_round;
      Bool layout_system; /* Switch: False, Menu: True. */
+     Bool layout_placement; /* Right (normal): False, Left: True. */
      /* Number of... */
      int nkeybind;
      int nlayout;
