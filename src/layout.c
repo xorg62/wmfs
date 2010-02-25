@@ -71,7 +71,7 @@ freelayout(int screen)
              && c->screen == screen_get_sel()
              && !(c->flags & MaxFlag))
           {
-               client_moveresize(c, c->ogeo, True);
+               client_moveresize(c, c->free_geo, True);
                c->flags &= ~(TileFlag | LMaxFlag);
           }
 
@@ -93,7 +93,10 @@ layoutswitch(Bool b)
 
      if(tags[selscreen][seltag[selscreen]].layout.func == freelayout)
           for(c = clients; c && (c->tag != seltag[selscreen] && c->screen != selscreen); c = c->next)
+          {
                c->ogeo = c->geo;
+               c->free_geo = c->geo;
+          }
 
      for(i = 0; i < conf.nlayout; ++i)
      {
@@ -775,11 +778,14 @@ uicb_togglefree(uicb_t cmd)
      if((sel->flags & FreeFlag))
      {
           sel->flags &= ~(TileFlag | MaxFlag | LMaxFlag);
-          client_moveresize(sel, sel->ogeo, True);
+          client_moveresize(sel, sel->free_geo, True);
           client_raise(sel);
      }
      else
+     {
+          sel->free_geo = sel->geo;
           sel->ogeo = sel->geo;
+     }
 
      client_update_attributes(sel);
 
@@ -802,6 +808,7 @@ uicb_togglemax(uicb_t cmd)
      if(!(sel->flags & MaxFlag))
      {
           sel->ogeo = sel->geo;
+          sel->free_geo = sel->geo;
           sel->flags &= ~(TileFlag | FreeFlag);
           client_maximize(sel);
           client_raise(sel);
@@ -809,6 +816,8 @@ uicb_togglemax(uicb_t cmd)
      }
      else
      {
+          sel->geo = sel->free_geo;
+          client_moveresize(sel, sel->geo, True);
           sel->flags &= ~MaxFlag;
           tags[selscreen][seltag[selscreen]].layout.func(selscreen);
      }

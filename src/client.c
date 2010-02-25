@@ -555,6 +555,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      c->ogeo.y = c->geo.y = my;
      c->ogeo.width = c->geo.width = wa->width;
      c->ogeo.height = c->geo.height = wa->height;
+     c->free_geo = c->geo;
      c->tag = seltag[c->screen];
 
      c->layer = (sel && sel->layer > 0) ? sel->layer : 1;

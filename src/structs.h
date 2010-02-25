@@ -176,6 +176,8 @@ struct Client
      XRectangle frame_geo;
      /* Old window attribute */
      XRectangle ogeo;
+     /* Free window attribute */
+     XRectangle free_geo;
      /* For resizehint usage */
      int basew, baseh, incw, inch;
      int maxw, maxh, minw, minh;
