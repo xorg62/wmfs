@@ -49,6 +49,8 @@ vicmd_to_uicb vicmd[] =
      {"sp",      "screen_prev"},
      {"cc",      "client_kill"},
      {"ct",      "tag_transfert"},
+     {"ctn",     "tag_transfert_next"},
+     {"ctp",     "tag_transfert_prev"},
      {"cn",      "client_next"},
      {"cp",      "client_prev"},
      {"csn",     "client_swap_next"},

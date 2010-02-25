@@ -184,3 +184,42 @@ uicb_tag_prev_sel(uicb_t cmd)
      return;
 }
 
+/** Transfert the selected client to the next tag
+ * \param cmd uicb_t type unused
+*/
+void
+uicb_tagtransfert_next(uicb_t cmd)
+{
+     CHECK(sel);
+     int tag = seltag[selscreen] + 1;
+
+     if(tag > conf.ntag[selscreen])
+     {
+         if(!conf.tag_round)
+             return;
+         tag = 1;
+     }
+     tag_transfert(sel, tag);
+
+     return;
+}
+
+/** Transfert the selected client to the prev tag
+ * \param cmd uicb_t type unused
+*/
+void
+uicb_tagtransfert_prev(uicb_t cmd)
+{
+     CHECK(sel);
+     int tag = seltag[selscreen] - 1;
+
+     if(tag <= 0)
+     {
+         if(!conf.tag_round)
+              return;
+         tag = conf.ntag[selscreen];
+     }
+     tag_transfert(sel, tag);
+
+     return;
+}

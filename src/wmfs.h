@@ -268,7 +268,9 @@ void uicb_tag(uicb_t);
 void uicb_tag_next(uicb_t);
 void uicb_tag_prev(uicb_t);
 void uicb_tagtransfert(uicb_t);
-void uicb_tag_prev_sel(uicb_t cmd);
+void uicb_tag_prev_sel(uicb_t);
+void uicb_tagtransfert_next(uicb_t);
+void uicb_tagtransfert_prev(uicb_t);
 
 /* screen.c */
 int screen_count(void);
