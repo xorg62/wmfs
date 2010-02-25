@@ -268,6 +268,7 @@ void uicb_tag(uicb_t);
 void uicb_tag_next(uicb_t);
 void uicb_tag_prev(uicb_t);
 void uicb_tagtransfert(uicb_t);
+void uicb_tag_prev_sel(uicb_t cmd);
 
 /* screen.c */
 int screen_count(void);
@@ -377,6 +378,7 @@ Atom *net_atom;
 InfoBar *infobar;
 Tag **tags;
 int *seltag;
+int *prevseltag;
 Menu menulayout;
 
 /* Important Client */

@@ -53,6 +53,7 @@ func_name_list_t tmp_func_list[] =
      {"tag",                     uicb_tag },
      {"tag_next",                uicb_tag_next },
      {"tag_prev",                uicb_tag_prev },
+     {"tag_prev_sel",            uicb_tag_prev_sel },
      {"tag_transfert",           uicb_tagtransfert },
      {"set_mwfact",              uicb_set_mwfact },
      {"set_nmaster",             uicb_set_nmaster },
@@ -394,9 +395,10 @@ conf_tag_section(char *src)
      sc = screen_count();
 
      /* Alloc all */
-     conf.ntag = emalloc(sc, sizeof(int));
-     tags      = emalloc(sc, sizeof(Tag*));
-     seltag    = emalloc(sc, sizeof(int));
+     conf.ntag  = emalloc(sc, sizeof(int));
+     tags       = emalloc(sc, sizeof(Tag*));
+     seltag     = emalloc(sc, sizeof(int));
+     prevseltag = emalloc(sc, sizeof(int));
 
      for(i = 0; i < sc; ++i)
           seltag[i] = 1;

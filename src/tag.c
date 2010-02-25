@@ -38,12 +38,11 @@
 void
 tag_set(int tag)
 {
-     int otag;
      Client *c;
 
      screen_get_sel();
 
-     otag = seltag[selscreen];
+     prevseltag[selscreen] = seltag[selscreen];
 
      if(conf.tag_round)
      {
@@ -59,13 +58,14 @@ tag_set(int tag)
           if(!tag || tag == seltag[selscreen]
              || tag > conf.ntag[selscreen])
                return;
+
           seltag[selscreen] = tag;
      }
 
      ewmh_update_current_tag_prop();
 
      /* Arrange infobar position */
-     if(tags[selscreen][otag].barpos != tags[selscreen][seltag[selscreen]].barpos)
+     if(tags[selscreen][prevseltag[selscreen]].barpos != tags[selscreen][seltag[selscreen]].barpos)
           infobar_set_position(tags[selscreen][seltag[selscreen]].barpos);
 
      arrange(selscreen, False);
@@ -170,3 +170,17 @@ uicb_tagtransfert(uicb_t cmd)
 
      return;
 }
+
+/** Set the previous selected tag
+  * \param cmd uicb_t type unused
+  */
+void
+uicb_tag_prev_sel(uicb_t cmd)
+{
+     screen_get_sel();
+
+     tag_set(prevseltag[selscreen]);
+
+     return;
+}
+

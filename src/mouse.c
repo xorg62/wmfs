@@ -53,7 +53,6 @@ void
 mouse_move_tile_client(Client **c)
 {
      Client *sc;
-
      Window w;
      int d;
 
