@@ -123,10 +123,13 @@ screen_set_sel(int screen)
      if(screen < 0 || screen > screen_count() - 1)
           screen = 0;
 
+     prevselscreen = selscreen;
+
      client_focus(NULL);
      XWarpPointer(dpy, None, ROOT, 0, 0, 0, 0,
                   sgeo[screen].x + sgeo[screen].width / 2,
                   sgeo[screen].y + sgeo[screen].height / 2);
+
      selscreen = screen;
 
      return;
@@ -138,6 +141,8 @@ screen_set_sel(int screen)
 int
 screen_get_sel(void)
 {
+     int os = selscreen;
+
      selscreen = 0;
 
 #ifdef HAVE_XINERAMA
@@ -156,6 +161,9 @@ screen_get_sel(void)
      /* Set _WMFS_CURRENT_SCREEN */
      XChangeProperty(dpy, ROOT, net_atom[wmfs_current_screen], XA_CARDINAL, 32,
                      PropModeReplace, (uchar*)&selscreen, 1);
+
+     if(os != selscreen)
+          prevselscreen = os;
 
      return selscreen;
 }
@@ -251,3 +259,18 @@ uicb_screen_prev(uicb_t cmd)
 
      return;
 }
+
+/** Uicb: screen prev sel
+  * \param cmd uicb_t type unused
+  */
+void
+uicb_screen_prev_sel(uicb_t cmd)
+{
+     screen_get_sel();
+
+     screen_set_sel(prevselscreen);
+
+     return;
+}
+
+

@@ -282,6 +282,7 @@ void screen_init_geo(void);
 void uicb_screen_select(uicb_t);
 void uicb_screen_next(uicb_t);
 void uicb_screen_prev(uicb_t);
+void uicb_screen_prev_sel(uicb_t);
 
 /* status.c */
 int statustext_rectangle(StatusRec *r, char *str);
@@ -360,6 +361,7 @@ void uicb_reload(uicb_t);
 Display *dpy;
 GC gc, gc_stipple;
 int selscreen;
+int prevselscreen;
 Conf conf;
 Key *keys;
 Bool exiting, estatus;

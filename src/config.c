@@ -70,6 +70,7 @@ func_name_list_t tmp_func_list[] =
      {"screen_select",           uicb_screen_select },
      {"screen_next",             uicb_screen_next },
      {"screen_prev",             uicb_screen_prev },
+     {"screen_prev_sel",         uicb_screen_prev_sel},
      {"reload",                  uicb_reload },
      {"launcher",                uicb_launcher },
      {"set_layout",              uicb_set_layout },
