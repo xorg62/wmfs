@@ -105,7 +105,7 @@ tag_transfert(Client *c, int tag)
 
      arrange(c->screen, True);
 
-     if(c == sel)
+     if(c == sel && c->tag != tag)
           client_focus(NULL);
 
      client_update_attributes(c);
