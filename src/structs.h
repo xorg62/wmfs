@@ -226,7 +226,7 @@ typedef struct
 /* InfoBar Struct */
 typedef struct
 {
-     BarWindow *bar;
+     BarWindow *bar, *selbar;
      BarWindow *layout_button;
      BarWindow *tags_board, *tags[MAXTAG];
      XRectangle geo;
@@ -345,6 +345,7 @@ typedef struct
           int height;
           MouseBinding *mouse;
           int nmouse;
+          Bool selbar;
      } bars;
      struct
      {

@@ -57,8 +57,8 @@ client_configure(Client *c)
      ev.type              = ConfigureNotify;
      ev.event             = c->win;
      ev.window            = c->win;
-     ev.x                 = c->geo.x;
-     ev.y                 = c->geo.y;
+     ev.x                 = spgeo[c->screen].x + c->geo.x;
+     ev.y                 = spgeo[c->screen].y + c->geo.y;
      ev.width             = c->geo.width;
      ev.height            = c->geo.height;
      ev.above             = None;
@@ -270,9 +270,16 @@ client_focus(Client *c)
                client_above(sel);
 
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
+
+          if(conf.bars.selbar)
+               infobar_draw_selbar(sel->screen);
      }
      else
+     {
           XSetInputFocus(dpy, ROOT, RevertToPointerRoot, CurrentTime);
+          if(conf.bars.selbar)
+               infobar_draw_selbar(selscreen);
+     }
 
      return;
 }

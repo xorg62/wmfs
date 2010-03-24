@@ -107,6 +107,9 @@ barwin_create(Window parent,
 void
 barwin_draw_text(BarWindow *bw, int x, int y, char *text)
 {
+     if(!text)
+          return;
+
      /* Background color of the text if there is stipple */
      if(bw->stipple)
           draw_rectangle(bw->dr, x - 4, 0, textw(text) + 8, bw->geo.height, bw->bg);

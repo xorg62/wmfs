@@ -14,6 +14,7 @@
         bg     = "#191919"
         fg     = "#D4D4D4"
         border = true
+        selbar = false
 [/bar]
 
 [layouts]

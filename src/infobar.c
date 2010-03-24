@@ -100,6 +100,16 @@ infobar_init(void)
                     conf.colors.layout_bg, conf.colors.layout_fg,
                     False, False, conf.border.layout);
 
+          /* Selbar */
+          if(conf.bars.selbar)
+               infobar[sc].selbar = barwin_create(infobar[sc].bar->win,
+                         ((conf.layout_placement)
+                          ? (j + PAD / 2)
+                          : infobar[sc].layout_button->geo.x + infobar[sc].layout_button->geo.width + PAD / 2), 1,
+                         (sel) ? textw(sel->title) + PAD : 1,
+                         infobar[sc].geo.height - 2,
+                         conf.colors.bar, conf.colors.text, False, False, False);
+
           /* Map/Refresh all */
           barwin_map(infobar[sc].bar);
           barwin_map_subwin(infobar[sc].bar);
@@ -110,12 +120,16 @@ infobar_init(void)
           if(conf.border.layout)
                barwin_map_subwin(infobar[sc].layout_button);
 
+          if(conf.bars.selbar)
+               barwin_map(infobar[sc].selbar);
+
           barwin_refresh_color(infobar[sc].bar);
           barwin_refresh(infobar[sc].bar);
 
           /* Default statustext is set here */
           for(i = 0; i < s; ++i)
                infobar[i].statustext = _strdup(WMFS_VERSION);
+
           infobar_draw(sc);
      }
 
@@ -130,6 +144,7 @@ infobar_draw(int sc)
 {
      infobar_draw_taglist(sc);
      infobar_draw_layout(sc);
+     infobar_draw_selbar(sc);
      barwin_refresh_color(infobar[sc].bar);
      statustext_handle(sc, infobar[sc].statustext);
 
@@ -147,6 +162,29 @@ infobar_draw_layout(int sc)
 
      if(tags[sc][seltag[sc]].layout.symbol)
           barwin_draw_text(infobar[sc].layout_button, PAD / 2, FHINFOBAR, tags[sc][seltag[sc]].layout.symbol);
+
+     return;
+}
+
+/** Draw Selbar (selected client title bar in infobar
+ *\param sc Screen Number
+ */
+void
+infobar_draw_selbar(int sc)
+{
+     if(!conf.bars.selbar)
+          return;
+
+     barwin_move(infobar[sc].selbar,
+               ((conf.layout_placement)
+                ? (infobar[sc].tags_board->geo.x + infobar[sc].tags_board->geo.width + PAD / 2)
+                : (infobar[sc].layout_button->geo.x + infobar[sc].layout_button->geo.width + PAD / 2)), 1);
+
+     barwin_resize(infobar[sc].selbar, textw(sel ? sel->title : NULL) + PAD, infobar[sc].geo.height - 2);
+     barwin_refresh_color(infobar[sc].selbar);
+     barwin_draw_text(infobar[sc].selbar, PAD / 2, FHINFOBAR - 1, (sel) ? sel->title : NULL);
+
+     barwin_refresh(infobar[sc].selbar);
 
      return;
 }

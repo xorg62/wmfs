@@ -46,6 +46,9 @@ draw_text(Drawable d, int x, int y, char* fg, int pad, char *str)
      XftColor xftcolor;
      XftDraw *xftd;
 
+     if(!str)
+          return;
+
      /* Transform X Drawable -> Xft Drawable */
      xftd = XftDrawCreate(dpy, d, DefaultVisual(dpy, SCREEN), DefaultColormap(dpy, SCREEN));
 

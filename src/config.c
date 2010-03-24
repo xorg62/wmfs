@@ -174,6 +174,7 @@ conf_bar_section(char *src)
      conf.bars.height = get_opt(src, "-1", "height").num;
      conf.colors.bar  = getcolor(get_opt(src, "#000000", "bg").str);
      conf.colors.text = get_opt(src, "#ffffff", "fg").str;
+     conf.bars.selbar = get_opt(src, "false", "selbar").bool;
 
      if((conf.bars.nmouse = get_size_sec(src, "mouse")))
      {
