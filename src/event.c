@@ -351,6 +351,8 @@ expose(XExposeEvent *ev)
                barwin_refresh(infobar[sc].bar);
           if(ev->window == infobar[sc].layout_button->win)
                barwin_refresh(infobar[sc].layout_button);
+          if(conf.bars.selbar && ev->window == infobar[sc].selbar->win)
+               barwin_refresh(infobar[sc].selbar);
           for(i = 1; i < conf.ntag[sc] + 1; ++i)
                if(ev->window == infobar[sc].tags[i]->win)
                     barwin_refresh(infobar[sc].tags[i]);
