@@ -57,8 +57,8 @@ client_configure(Client *c)
      ev.type              = ConfigureNotify;
      ev.event             = c->win;
      ev.window            = c->win;
-     ev.x                 = spgeo[c->screen].x + c->geo.x;
-     ev.y                 = spgeo[c->screen].y + c->geo.y;
+     ev.x                 = c->geo.x;
+     ev.y                 = c->geo.y;
      ev.width             = c->geo.width;
      ev.height            = c->geo.height;
      ev.above             = None;
