@@ -396,6 +396,9 @@ client_get_name(Client *c)
 
      frame_update(c);
 
+     if(conf.bars.selbar && c == sel)
+          infobar_draw_selbar(c->screen);
+
      return;
 }
 
