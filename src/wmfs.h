@@ -369,7 +369,7 @@ Bool exiting, estatus;
 XRectangle *sgeo;
 XRectangle *spgeo;
 Cursor cursor[CurLast];
-char *argv_global, *status_path;
+char *argv_global;
 int xrandr_event;
 uint timing;
 

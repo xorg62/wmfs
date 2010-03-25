@@ -145,6 +145,7 @@ conf_misc_section(char *src)
      conf.raiseswitch   = get_opt(src, "false", "raiseswitch").bool;
      conf.focus_fmouse  = get_opt(src, "true", "focus_follow_mouse").bool;
      conf.status_timing = get_opt(src, "1", "status_timing").num;
+     conf.status_path   = get_opt(src, "", "status_path").str;
      pad                = get_opt(src, "12", "pad").num;
 
      if(pad > 24 || pad < 1)

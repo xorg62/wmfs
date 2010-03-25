@@ -325,6 +325,7 @@ typedef struct
      Bool focus_fmouse;
      uint pad;
      int status_timing;
+     char *status_path;
      struct
      {
           /*

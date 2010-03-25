@@ -154,7 +154,7 @@ thread_process(void *arg)
      {
           while(!exiting)
           {
-               spawn(status_path);
+               spawn(conf.status_path);
                sleep(conf.status_timing);
           }
 

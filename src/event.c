@@ -235,7 +235,7 @@ clientmessageevent(XClientMessageEvent *ev)
 
      if(mess_t == wmfs_update_status
                && estatus)
-          spawn(status_path);
+          spawn(conf.status_path);
 
      return;
 }
