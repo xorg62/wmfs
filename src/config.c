@@ -264,6 +264,15 @@ conf_client_section(char *src)
 
                cfg_set_sauv(tmp2);
 
+               tmp3 = get_opt(tmp2, "none", "flags").str;
+               conf.titlebar.button[i].flags = 0;
+               if(strstr(tmp3, "free"))
+                    conf.titlebar.button[i].flags |= FreeFlag;
+               if(strstr(tmp3, "max"))
+                    conf.titlebar.button[i].flags |= MaxFlag;
+               if(strstr(tmp3, "tile"))
+                    conf.titlebar.button[i].flags |= TileFlag;
+
                /* Multi mouse section */
                if((conf.titlebar.button[i].nmouse = get_size_sec(tmp2, "mouse")))
                {

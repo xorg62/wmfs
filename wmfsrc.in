@@ -111,6 +111,8 @@
                 [mouse] button = "3" func = "mouse_resize" [/mouse]
 
                 [button]
+                        # Available "free", "max", "tile" flags of button.
+                        flags = "free,max,tile"
                         [mouse] button = "1" func = "client_kill"             [/mouse]
                         [mouse] button = "3" func = "menu" cmd = "clientmenu" [/mouse]
 

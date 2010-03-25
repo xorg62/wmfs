@@ -303,6 +303,7 @@ typedef struct
      XSegment *linecoord;
      int nlines;
      int nmouse;
+     uint flags;
 } Button;
 
 /* Alias struct */

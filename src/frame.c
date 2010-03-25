@@ -220,16 +220,26 @@ frame_update(Client *c)
                {
                     XSetWindowBackground(dpy, c->button[i], c->colors.frame);
                     XClearWindow(dpy, c->button[i]);
-                    XSetWindowBorder(dpy, c->button[i], getcolor(c->colors.fg));
 
-                    /* Button's lines */
-                    if(conf.titlebar.button[i].nlines)
+                    if((!conf.titlebar.button[i].flags)
+                              || ((conf.titlebar.button[i].flags & FreeFlag) && (c->flags & FreeFlag))
+                              || ((conf.titlebar.button[i].flags &  MaxFlag) && (c->flags &  MaxFlag))
+                              || ((conf.titlebar.button[i].flags & TileFlag) && (c->flags & TileFlag)))
                     {
-                         XSetForeground(dpy, gc, getcolor(c->colors.fg));
-                         XDrawSegments(dpy, c->button[i], gc,
-                                       conf.titlebar.button[i].linecoord,
-                                       conf.titlebar.button[i].nlines);
+
+                         XSetWindowBorder(dpy, c->button[i], getcolor(c->colors.fg));
+
+                         /* Button's lines */
+                         if(conf.titlebar.button[i].nlines)
+                         {
+                              XSetForeground(dpy, gc, getcolor(c->colors.fg));
+                              XDrawSegments(dpy, c->button[i], gc,
+                                        conf.titlebar.button[i].linecoord,
+                                        conf.titlebar.button[i].nlines);
+                         }
                     }
+                    else
+                         XSetWindowBorder(dpy, c->button[i], c->colors.frame);
                }
           }
 
