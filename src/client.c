@@ -837,6 +837,12 @@ client_set_wanted_tag(Client *c)
      XClassHint xch = { 0 };
      int i, j, k;
 
+     if(conf.ignore_next_client_rules)
+     {
+          conf.ignore_next_client_rules = False;
+          return;
+     }
+
      XGetClassHint(dpy, c->win, &xch);
 
      for(i = 0; i < screen_count(); ++i)
@@ -1130,3 +1136,16 @@ uicb_client_resize(uicb_t cmd)
 
      return;
 }
+
+/** Ignore next client rules
+  *\param cmd uicb_t type
+  */
+void
+uicb_ignore_next_client_rules(uicb_t cmd)
+{
+     conf.ignore_next_client_rules = !conf.ignore_next_client_rules;
+
+     return;
+}
+
+

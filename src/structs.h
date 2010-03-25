@@ -323,6 +323,7 @@ typedef struct
      Bool raisefocus;
      Bool raiseswitch;
      Bool focus_fmouse;
+     Bool ignore_next_client_rules;
      uint pad;
      int status_timing;
      char *status_path;
