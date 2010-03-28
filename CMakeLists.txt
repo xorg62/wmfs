@@ -106,6 +106,8 @@ pkg_check_modules(WMFS_REQUIRED REQUIRED
   freetype2
   xft)
 
+# Optional dependencies check
+
 # Check for xinerama
 pkg_check_modules(HAVE_XINERAMA xinerama)
 if(HAVE_XINERAMA_FOUND)
@@ -123,6 +125,17 @@ if(HAVE_XRANDR_FOUND)
 else()
     set(WMFS_HAVE_XRANDR "")
 endif()
+
+# Check for Imlib
+pkg_check_modules(HAVE_IMLIB imlib2)
+if(HAVE_IMLIB_FOUND)
+     set(WMFS_HAVE_IMLIB "#define HAVE_IMLIB")
+     set(LIBRARIES_TO_LINK ${LIBRARIES_TO_LINK} Imlib2)
+else()
+     set(WMFS_HAVE_IMLIB "")
+endif()
+
+
 
 target_link_libraries(wmfs ${LIBRARIES_TO_LINK})
 

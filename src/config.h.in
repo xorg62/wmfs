@@ -41,7 +41,10 @@
 #define WMFS_COMPILE_FLAGS   "@WMFS_COMPILE_FLAGS@"
 #define WMFS_LINKED_LIBS     "@WMFS_LINKED_LIBS@"
 #define XDG_CONFIG_DIR       "@XDG_CONFIG_DIR@"
+
+/* Optional dependencies */
 @WMFS_HAVE_XINERAMA@
 @WMFS_HAVE_XRANDR@
+@WMFS_HAVE_IMLIB@
 
 #endif /* CONFIG_H */

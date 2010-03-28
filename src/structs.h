@@ -419,6 +419,12 @@ typedef struct
      char text[512];
 } StatusText;
 
+typedef struct
+{
+     uint x, y, w, h;
+     char name[512];
+} StatusImage;
+
 /* Config.c struct */
 typedef struct
 {

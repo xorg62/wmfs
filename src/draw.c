@@ -85,6 +85,48 @@ draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color)
      return;
 }
 
+#ifdef HAVE_IMLIB
+/** Draw an image in a drawable
+  * \param dr Drawable
+  * \param x X position
+  * \param y Y position
+  * \param name Path of the XPM
+*/
+void
+draw_image(Drawable dr, int x, int y, int w, int h, char *name)
+{
+     Imlib_Image image;
+
+     if(!name)
+          return;
+
+     imlib_set_cache_size(2048 * 1024);
+     imlib_context_set_display(dpy);
+     imlib_context_set_visual(DefaultVisual(dpy, DefaultScreen(dpy)));
+     imlib_context_set_colormap(DefaultColormap(dpy, DefaultScreen(dpy)));
+     imlib_context_set_drawable(dr);
+
+     image = imlib_load_image(name);
+     imlib_context_set_image(image);
+
+     if(w <= 0)
+          w = imlib_image_get_width();
+
+     if(h <= 0)
+          h = imlib_image_get_height();
+
+     if(image)
+     {
+          imlib_render_image_on_drawable_at_size(x, y, w, h);
+          imlib_free_image();
+     }
+     else
+          warnx("Can't draw image: '%s'", name);
+
+     return;
+}
+#endif /* HAVE_IMLIB */
+
 /** Calculates the text's size relatively to the font
  * \param text Text string
  * \return final text width
