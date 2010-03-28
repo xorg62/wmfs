@@ -423,7 +423,7 @@ typedef struct
 {
      uint x, y, w, h;
      char name[512];
-} StatusImage;
+} ImageAttr;
 
 /* Config.c struct */
 typedef struct

@@ -273,6 +273,11 @@ void spawn(const char *str, ...);
 void swap_ptr(void **x, void **y);
 void uicb_spawn(uicb_t);
 
+#ifdef HAVE_IMLIB
+int parse_image_block(ImageAttr *im, char *str);
+#endif /* HAVE_IMLIB */
+
+
 /* tag.c */
 void tag_set(int tag);
 void tag_transfert(Client *c, int tag);
@@ -299,11 +304,6 @@ void uicb_screen_prev_sel(uicb_t);
 /* status.c */
 int statustext_rectangle(StatusRec *r, char *str);
 int statustext_text(StatusText *s, char *str);
-
-#ifdef HAVE_IMLIB
-int statustext_image(StatusImage *im, char *str);
-#endif /* HAVE_IMLIB */
-
 void statustext_normal(int sc, char *str);
 void statustext_handle(int sc, char *str);
 

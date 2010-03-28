@@ -83,12 +83,12 @@ statustext_text(StatusText *s, char *str)
 #ifdef HAVE_IMLIB
 /** Check images blocks in str and return properties
   * --> \i[x;y;w;h;name]\
-  *\param im StatusImage pointer, image properties
+  *\param im ImageAttr pointer, image properties
   *\param str String
   *\return n Lenght of i
   */
 int
-statustext_image(StatusImage *im, char *str)
+statustext_image(ImageAttr *im, char *str)
 {
      char as;
      int n, i, j, k;
@@ -188,13 +188,6 @@ statustext_handle(int sc, char *str)
      nr = statustext_rectangle(r, str);
      ns = statustext_text(s, str);
 
-#ifdef HAVE_IMLIB
-     int ni;
-     StatusImage im[128];
-
-     ni = statustext_image(im, str);
-#endif /* HAVE_IMLIB */
-
      /* Draw normal text (and possibly colored with \#color\ blocks) */
      statustext_normal(sc, str);
 
@@ -205,12 +198,6 @@ statustext_handle(int sc, char *str)
      /* Draw located text with stored properties. */
      for(i = 0; i < ns; ++i)
           draw_text(infobar[sc].bar->dr, s[i].x, s[i].y, s[i].color, 0, s[i].text);
-
-#ifdef HAVE_IMLIB
-     /* Draw images with stored properties. */
-     for(i = 0; i < ni; ++i)
-          draw_image(infobar[sc].bar->dr, im[i].x, im[i].y, im[i].w, im[i].h, im[i].name);
-#endif /* HAVE_IMLIB */
 
      barwin_refresh(infobar[sc].bar);
 

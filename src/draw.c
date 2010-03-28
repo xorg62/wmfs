@@ -53,11 +53,11 @@ draw_text(Drawable d, int x, int y, char* fg, int pad, char *str)
 #ifdef HAVE_IMLIB
      char *ostr = NULL;
      int i, ni;
-     StatusImage im[56];
+     ImageAttr im[128];
 
      ostr = _strdup(str);
 
-     ni = statustext_image(im, str);
+     ni = parse_image_block(im, str);
 
      for(i = 0; i < ni; ++i)
           draw_image(d, im[i].x, im[i].y, im[i].w, im[i].h, im[i].name);
@@ -161,11 +161,11 @@ textw(char *text)
 #ifdef HAVE_IMLIB
      char *ostr = NULL;
 
-     StatusImage im[56];
+     ImageAttr im[128];
 
      ostr = _strdup(text);
 
-     statustext_image(im, text);
+     parse_image_block(im, text);
 #endif /* HAVE_IMLIB */
 
      XftTextExtentsUtf8(dpy, font, (FcChar8 *)text, strlen(text), &gl);
