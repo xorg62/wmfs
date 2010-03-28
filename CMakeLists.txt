@@ -55,7 +55,7 @@ add_executable(wmfs ${wmfs_src})
 set(VERSION "WMFS-201003")
 
 # FLAGS
-set(CFLAGS "-g -Wall -ansi")
+set(CFLAGS "-Wall -ansi")
 set(CMAKE_C_FLAGS ${CFLAGS})
 
 # Linker FLAGS

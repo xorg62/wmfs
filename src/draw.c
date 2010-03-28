@@ -57,10 +57,13 @@ draw_text(Drawable d, int x, int y, char* fg, int pad, char *str)
 
      ostr = _strdup(str);
 
-     ni = parse_image_block(im, str);
+     if(strstr(str, "i["))
+     {
+          ni = parse_image_block(im, str);
 
-     for(i = 0; i < ni; ++i)
-          draw_image(d, im[i].x, im[i].y, im[i].w, im[i].h, im[i].name);
+          for(i = 0; i < ni; ++i)
+               draw_image(d, im[i].x, im[i].y, im[i].w, im[i].h, im[i].name);
+     }
 #endif /* HAVE_IMLIB */
 
      /* Transform X Drawable -> Xft Drawable */
@@ -78,7 +81,9 @@ draw_text(Drawable d, int x, int y, char* fg, int pad, char *str)
      XftDrawDestroy(xftd);
 
 #ifdef HAVE_IMLIB
-     strcpy(str, ostr);
+     if(strstr(ostr, "i["))
+          strcpy(str, ostr);
+
      IFREE(ostr);
 #endif /* HAVE_IMLIB */
 
@@ -165,13 +170,16 @@ textw(char *text)
 
      ostr = _strdup(text);
 
-     parse_image_block(im, text);
+     if(strstr(text, "i["))
+          parse_image_block(im, text);
 #endif /* HAVE_IMLIB */
 
      XftTextExtentsUtf8(dpy, font, (FcChar8 *)text, strlen(text), &gl);
 
 #ifdef HAVE_IMLIB
-     strcpy(text, ostr);
+     if(strstr(ostr, "i["))
+          strcpy(text, ostr);
+
      IFREE(ostr);
 #endif /* HAVE_IMLIB */
 
