@@ -94,7 +94,6 @@ statustext_image(StatusImage *im, char *str)
      int n, i, j, k;
 
      for(i = j = n = 0; i < strlen(str); ++i, ++j)
-          /* %512[^]] */
           if(sscanf(&str[i], "\\i[%d;%d;%d;%d;%512[^]]]%c", &im[n].x, &im[n].y, &im[n].w, &im[n].h, im[n].name, &as) == 6
                     && as == '\\')
                for(++n, ++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
@@ -193,9 +192,8 @@ statustext_handle(int sc, char *str)
      int ni;
      StatusImage im[128];
 
-     ni = statustext_image(im,  str);
+     ni = statustext_image(im, str);
 #endif /* HAVE_IMLIB */
-
 
      /* Draw normal text (and possibly colored with \#color\ blocks) */
      statustext_normal(sc, str);

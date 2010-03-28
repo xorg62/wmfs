@@ -49,6 +49,20 @@ draw_text(Drawable d, int x, int y, char* fg, int pad, char *str)
      if(!str)
           return;
 
+     /* To draw image everywhere we can draw text */
+#ifdef HAVE_IMLIB
+     char *ostr = NULL;
+     int i, ni;
+     StatusImage im[56];
+
+     ostr = _strdup(str);
+
+     ni = statustext_image(im, str);
+
+     for(i = 0; i < ni; ++i)
+          draw_image(d, im[i].x, im[i].y, im[i].w, im[i].h, im[i].name);
+#endif /* HAVE_IMLIB */
+
      /* Transform X Drawable -> Xft Drawable */
      xftd = XftDrawCreate(dpy, d, DefaultVisual(dpy, SCREEN), DefaultColormap(dpy, SCREEN));
 
@@ -62,6 +76,11 @@ draw_text(Drawable d, int x, int y, char* fg, int pad, char *str)
      XftColorFree(dpy, DefaultVisual(dpy, SCREEN), DefaultColormap(dpy, SCREEN), &xftcolor);
 
      XftDrawDestroy(xftd);
+
+#ifdef HAVE_IMLIB
+     strcpy(str, ostr);
+     IFREE(ostr);
+#endif /* HAVE_IMLIB */
 
      return;
 }
@@ -90,7 +109,7 @@ draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color)
   * \param dr Drawable
   * \param x X position
   * \param y Y position
-  * \param name Path of the XPM
+  * \param name Path of the image
 */
 void
 draw_image(Drawable dr, int x, int y, int w, int h, char *name)
@@ -132,14 +151,29 @@ draw_image(Drawable dr, int x, int y, int w, int h, char *name)
  * \return final text width
 */
 ushort
-textw(const char *text)
+textw(char *text)
 {
      XGlyphInfo gl;
 
      if(!text)
           return 0;
 
+#ifdef HAVE_IMLIB
+     char *ostr = NULL;
+
+     StatusImage im[56];
+
+     ostr = _strdup(text);
+
+     statustext_image(im, text);
+#endif /* HAVE_IMLIB */
+
      XftTextExtentsUtf8(dpy, font, (FcChar8 *)text, strlen(text), &gl);
+
+#ifdef HAVE_IMLIB
+     strcpy(text, ostr);
+     IFREE(ostr);
+#endif /* HAVE_IMLIB */
 
      return gl.width + font->descent;
 }

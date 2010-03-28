@@ -136,7 +136,7 @@ void draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color);
 void draw_image(Drawable dr, int x, int y, int w, int h, char *name);
 #endif /* HAVE_IMLIB */
 
-ushort textw(const char *text);
+ushort textw(char *text);
 
 /* infobar.c */
 void infobar_init(void);

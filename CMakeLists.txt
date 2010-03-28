@@ -135,8 +135,6 @@ else()
      set(WMFS_HAVE_IMLIB "")
 endif()
 
-
-
 target_link_libraries(wmfs ${LIBRARIES_TO_LINK})
 
 # Messages
