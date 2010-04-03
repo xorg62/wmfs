@@ -328,6 +328,8 @@ typedef struct
      uint pad;
      int status_timing;
      char *status_path;
+     char *autostart_path;
+     char *autostart_command;
      struct
      {
           /*

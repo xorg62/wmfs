@@ -139,13 +139,15 @@ conf_misc_section(char *src)
 
      cfg_set_sauv(src);
 
-     conf.font          = get_opt(src, "sans-9", "font").str;
-     conf.raisefocus    = get_opt(src, "false", "raisefocus").bool;
-     conf.raiseswitch   = get_opt(src, "false", "raiseswitch").bool;
-     conf.focus_fmouse  = get_opt(src, "true", "focus_follow_mouse").bool;
-     conf.status_timing = get_opt(src, "1", "status_timing").num;
-     conf.status_path   = get_opt(src, "", "status_path").str;
-     pad                = get_opt(src, "12", "pad").num;
+     conf.font              = get_opt(src, "sans-9", "font").str;
+     conf.raisefocus        = get_opt(src, "false", "raisefocus").bool;
+     conf.raiseswitch       = get_opt(src, "false", "raiseswitch").bool;
+     conf.focus_fmouse      = get_opt(src, "true", "focus_follow_mouse").bool;
+     conf.status_timing     = get_opt(src, "1", "status_timing").num;
+     conf.status_path       = get_opt(src, "", "status_path").str;
+     conf.autostart_path    = get_opt(src, "", "autostart_path").str;
+     conf.autostart_command = get_opt(src, "", "autostart_command").str;
+     pad                    = get_opt(src, "12", "pad").num;
 
      if(pad > 24 || pad < 1)
      {
@@ -211,7 +213,7 @@ conf_client_section(char *src)
      /* Client misc */
      cfg_set_sauv(src);
 
-     conf.client.borderheight        = (get_opt(src, "1", "border_height").num) ? get_opt(src, "1", "border_height").num : 1;
+     conf.client.borderheight        = (get_opt(src, "1", "border_height").num);
      conf.client.border_shadow       = get_opt(src, "false", "border_shadow").bool;
      conf.client.place_at_mouse      = get_opt(src, "false", "place_at_mouse").bool;
      conf.client.bordernormal        = getcolor(get_opt(src, "#000000", "border_normal").str);

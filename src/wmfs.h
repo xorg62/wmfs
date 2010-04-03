@@ -86,7 +86,7 @@
 #define SHADC        (0x000000) /* 'Cause i don't know how darken a color yet */
 #define BORDH        conf.client.borderheight
 #define TBARH        ((conf.titlebar.height < BORDH) ? BORDH : conf.titlebar.height)
-#define RESHW        (6 * BORDH)
+#define RESHW        (6 * (BORDH + 1))
 #define BUTTONWH     (TBARH / 2)
 #define DEF_CONF     ".config/wmfs/wmfsrc"
 #define DEF_STATUS   ".config/wmfs/status.sh"
