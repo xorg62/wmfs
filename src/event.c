@@ -457,6 +457,7 @@ propertynotify(XPropertyEvent *ev)
 {
      Client *c;
      Window trans;
+     XWMHints *h;
 
      if(ev->state == PropertyDelete)
           return;
@@ -465,8 +466,7 @@ propertynotify(XPropertyEvent *ev)
      {
           switch(ev->atom)
           {
-          default: break;
-          case XA_WM_TRANSIENT_FOR:
+               case XA_WM_TRANSIENT_FOR:
                XGetTransientForHint(dpy, c->win, &trans);
                if((c->flags & TileFlag || c->flags & MaxFlag))
                     if(((c->flags & HintFlag && (client_gb_win(trans) != NULL)))
@@ -476,8 +476,21 @@ propertynotify(XPropertyEvent *ev)
           case XA_WM_NORMAL_HINTS:
                client_size_hints(c);
                break;
+          case XA_WM_HINTS:
+               if((h = XGetWMHints(dpy, c->win)) && (h->flags & XUrgencyHint))
+               {
+                    c->flags |= UrgentFlag;
+
+                    if(ishide(c, selscreen))
+                         infobar_draw_taglist(c->screen);
+
+                    XFree(h);
+               }
+               break;
           case XA_WM_NAME:
                client_get_name(c);
+               break;
+          default:
                break;
           }
           if(ev->atom == net_atom[net_wm_name])

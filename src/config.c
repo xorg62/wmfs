@@ -404,6 +404,8 @@ conf_tag_section(char *src)
      conf.tag_round               = get_opt(src, "false", "tag_round").bool;
      conf.colors.tagselfg         = get_opt(src, "#ffffff", "sel_fg").str;
      conf.colors.tagselbg         = getcolor(get_opt(src, "#000000", "sel_bg").str);
+     conf.colors.tagurfg          = get_opt(src, "#000000", "urgent_fg").str;
+     conf.colors.tagurbg          = getcolor(get_opt(src, "#DD1111", "urgent_bg").str);
      conf.colors.tag_occupied_bg  = getcolor(get_opt(src, "#222222", "occupied_bg").str);
      conf.border.tag              = get_opt(src, "false", "border").bool;
 

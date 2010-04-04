@@ -50,6 +50,8 @@
         occupied_bg = "#003366"
         sel_fg      = "#191919"
         sel_bg      = "#7E89A2"
+        urgent_bg   = "#DD1111"
+        urgent_fg   = "#000000"
 
         # Border around the tag buttons.
         border      = true

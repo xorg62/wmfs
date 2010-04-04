@@ -265,9 +265,14 @@ client_focus(Client *c)
                     client_raise(c);
           }
 
-          if(tags[sel->screen][sel->tag].abovefc
-                    && !conf.focus_fmouse)
+          if(tags[sel->screen][sel->tag].abovefc && !conf.focus_fmouse)
                client_above(sel);
+
+          if(c->flags & UrgentFlag)
+          {
+               c->flags &= ~UrgentFlag;
+               infobar_draw_taglist(c->screen);
+          }
 
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 

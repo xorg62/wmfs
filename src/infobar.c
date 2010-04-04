@@ -205,17 +205,26 @@ infobar_draw_taglist(int sc)
      {
           infobar[sc].tags[i]->bg = ((i == seltag[sc]) ? conf.colors.tagselbg : conf.colors.bar);
           infobar[sc].tags[i]->fg = ((i == seltag[sc]) ? conf.colors.tagselfg : conf.colors.text);
+
           barwin_refresh_color(infobar[sc].tags[i]);
 
-          /* Colorize a tag if there are clients in this */
+          /* Colorize a tag if there are clients in this or in urgent case */
           for(c = clients; c; c = c->next)
           {
                if(c->screen == sc)
                {
-                    infobar[sc].tags[c->tag]->bg = ((c->tag == seltag[sc]) ? conf.colors.tagselbg : conf.colors.tag_occupied_bg);
+                    if(c->tag == i && (c->flags & UrgentFlag) && c->tag != seltag[sc])
+                    {
+                         infobar[sc].tags[i]->bg = conf.colors.tagurbg;
+                         infobar[sc].tags[i]->fg = conf.colors.tagurfg;
+                    }
+                    else
+                         infobar[sc].tags[c->tag]->bg = ((c->tag == seltag[sc]) ? conf.colors.tagselbg : conf.colors.tag_occupied_bg);
+
                     barwin_refresh_color(infobar[sc].tags[i]);
                }
           }
+
           if(tags[sc][i].name)
                barwin_draw_text(infobar[sc].tags[i], PAD / 2, FHINFOBAR, tags[sc][i].name);
      }

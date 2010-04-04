@@ -40,15 +40,16 @@
 #define NUM_OF_LAYOUT  10
 
 /* Clients flags definition */
-#define FreeFlag  (1 << 1)
-#define MaxFlag   (1 << 2)
-#define TileFlag  (1 << 3)
-#define HideFlag  (1 << 4)
-#define LMaxFlag  (1 << 5)
-#define UnmapFlag (1 << 6)
-#define HintFlag  (1 << 7)
-#define FSSFlag   (1 << 8)
-#define AboveFlag (1 << 9)
+#define FreeFlag   (1 << 1)
+#define MaxFlag    (1 << 2)
+#define TileFlag   (1 << 3)
+#define HideFlag   (1 << 4)
+#define LMaxFlag   (1 << 5)
+#define UnmapFlag  (1 << 6)
+#define HintFlag   (1 << 7)
+#define FSSFlag    (1 << 8)
+#define AboveFlag  (1 << 9)
+#define UrgentFlag (1 << 10)
 
 /* XEMBED messages */
 #define XEMBED_MAPPED                 (1 << 0)
@@ -339,6 +340,8 @@ typedef struct
           uint bar;
           char *text;
           char *tagselfg;
+          char *tagurfg;
+          uint tagurbg;
           uint tagselbg;
           uint tag_occupied_bg;
           uint tagbord;
