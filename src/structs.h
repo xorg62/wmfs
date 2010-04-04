@@ -251,6 +251,7 @@ typedef struct
      int layers;
      float mwfact;
      int nmaster;
+     Bool urgent;
      Bool resizehint;
      Bool request_update;
      Bool abovefc;

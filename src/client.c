@@ -271,6 +271,7 @@ client_focus(Client *c)
           if(c->flags & UrgentFlag)
           {
                c->flags &= ~UrgentFlag;
+               tags[c->screen][c->tag].urgent = False;
                infobar_draw_taglist(c->screen);
           }
 

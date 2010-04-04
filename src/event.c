@@ -477,12 +477,12 @@ propertynotify(XPropertyEvent *ev)
                client_size_hints(c);
                break;
           case XA_WM_HINTS:
-               if((h = XGetWMHints(dpy, c->win)) && (h->flags & XUrgencyHint))
+               if((h = XGetWMHints(dpy, c->win)) && (h->flags & XUrgencyHint) && c != sel)
                {
                     c->flags |= UrgentFlag;
 
-                    if(ishide(c, selscreen))
-                         infobar_draw_taglist(c->screen);
+                    tags[c->screen][c->tag].urgent = True;
+                    infobar_draw_taglist(c->screen);
 
                     XFree(h);
                }

@@ -208,21 +208,22 @@ infobar_draw_taglist(int sc)
 
           barwin_refresh_color(infobar[sc].tags[i]);
 
-          /* Colorize a tag if there are clients in this or in urgent case */
+          /* Colorize a tag if there are clients in this */
           for(c = clients; c; c = c->next)
           {
                if(c->screen == sc)
                {
-                    if(c->tag == i && (c->flags & UrgentFlag) && c->tag != seltag[sc])
-                    {
-                         infobar[sc].tags[i]->bg = conf.colors.tagurbg;
-                         infobar[sc].tags[i]->fg = conf.colors.tagurfg;
-                    }
-                    else
-                         infobar[sc].tags[c->tag]->bg = ((c->tag == seltag[sc]) ? conf.colors.tagselbg : conf.colors.tag_occupied_bg);
-
+                    infobar[sc].tags[c->tag]->bg = ((c->tag == seltag[sc]) ? conf.colors.tagselbg : conf.colors.tag_occupied_bg);
                     barwin_refresh_color(infobar[sc].tags[i]);
                }
+          }
+
+          if(tags[sc][i].urgent)
+          {
+               infobar[sc].tags[i]->bg = conf.colors.tagurbg;
+               infobar[sc].tags[i]->fg = conf.colors.tagurfg;
+
+               barwin_refresh_color(infobar[sc].tags[i]);
           }
 
           if(tags[sc][i].name)
