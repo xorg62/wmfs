@@ -80,32 +80,6 @@ statustext_text(StatusText *s, char *str)
      return n;
 }
 
-#ifdef HAVE_IMLIB
-/** Check images blocks in str and return properties
-  * --> \i[x;y;w;h;name]\
-  *\param im ImageAttr pointer, image properties
-  *\param str String
-  *\return n Lenght of i
-  */
-int
-statustext_image(ImageAttr *im, char *str)
-{
-     char as;
-     int n, i, j, k;
-
-     for(i = j = n = 0; i < strlen(str); ++i, ++j)
-          if(sscanf(&str[i], "\\i[%d;%d;%d;%d;%512[^]]]%c", &im[n].x, &im[n].y, &im[n].w, &im[n].h, im[n].name, &as) == 6
-                    && as == '\\')
-               for(++n, ++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
-          else if(j != i)
-               str[j] = str[i];
-
-     for(k = j; k < i; str[k++] = 0);
-
-     return n;
-}
-#endif /* HAVE_IMLIB */
-
 /** Draw normal text and colored normal text
   * --> \#color\ text in color
   *\param sc Screen

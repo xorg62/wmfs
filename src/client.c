@@ -686,6 +686,9 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
      c->flags &= ~MaxFlag;
      c->geo = c->ogeo = geo;
 
+     if(c->flags & FreeFlag || tags[c->screen][c->tag].layout.func == freelayout)
+          c->free_geo = geo;
+
      if((c->screen = screen_get_with_geo(c->geo.x, c->geo.y)) != os)
           c->tag = seltag[c->screen];
 
