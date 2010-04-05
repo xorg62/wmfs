@@ -223,3 +223,30 @@ uicb_tagtransfert_prev(uicb_t cmd)
 
      return;
 }
+
+/** Go to the current urgent tag
+  *\param cmd uicb_t type unused
+  */
+void
+uicb_tag_urgent(uicb_t cmd)
+{
+     Client *c;
+     Bool b = False;
+
+     /* Check if there is a urgent client */
+     for(c = clients; c; c = c->next)
+          if(c->flags & UrgentFlag)
+          {
+               b = True;
+               break;
+          }
+
+     if(!b)
+          return;
+
+    screen_set_sel(c->screen);
+    tag_set(c->tag);
+    client_focus(c);
+
+    return;
+}

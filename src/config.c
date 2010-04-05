@@ -57,6 +57,7 @@ func_name_list_t tmp_func_list[] =
      {"tag_transfert",            uicb_tagtransfert },
      {"tag_transfert_next",       uicb_tagtransfert_next },
      {"tag_transfert_prev",       uicb_tagtransfert_prev },
+     {"tag_urgent",               uicb_tag_urgent },
      {"set_mwfact",               uicb_set_mwfact },
      {"set_nmaster",              uicb_set_nmaster },
      {"quit",                     uicb_quit },

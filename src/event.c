@@ -466,7 +466,7 @@ propertynotify(XPropertyEvent *ev)
      {
           switch(ev->atom)
           {
-               case XA_WM_TRANSIENT_FOR:
+          case XA_WM_TRANSIENT_FOR:
                XGetTransientForHint(dpy, c->win, &trans);
                if((c->flags & TileFlag || c->flags & MaxFlag))
                     if(((c->flags & HintFlag && (client_gb_win(trans) != NULL)))
@@ -491,10 +491,10 @@ propertynotify(XPropertyEvent *ev)
                client_get_name(c);
                break;
           default:
+               if(ev->atom == net_atom[net_wm_name])
+                    client_get_name(c);
                break;
           }
-          if(ev->atom == net_atom[net_wm_name])
-               client_get_name(c);
      }
 
      return;
