@@ -865,7 +865,10 @@ client_set_wanted_tag(Client *c)
                               c->tag = j;
 
                               if(c->tag != seltag[selscreen])
+                              {
                                    tags[c->screen][c->tag].request_update = True;
+                                   client_focus(NULL);
+                              }
 
                               tags[c->screen][c->tag].layout.func(c->screen);
                          }
