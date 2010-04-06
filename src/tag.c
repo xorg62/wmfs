@@ -70,7 +70,6 @@ tag_set(int tag)
      if(tags[selscreen][prevseltag[selscreen]].barpos != tags[selscreen][seltag[selscreen]].barpos)
           infobar_set_position(tags[selscreen][seltag[selscreen]].barpos);
 
-
      /* Check if a layout update is needed with additional tags */
      if(tags[selscreen][seltag[selscreen]].tagad)
           al = True;

@@ -56,6 +56,13 @@
         # Border around the tag buttons.
         border      = true
 
+        # Mouse buttons action on tag.
+        mouse_button_tag_sel       = "1"
+        mouse_button_tag_transfert = "2"
+        mouse_button_tag_add       = "3"
+        mouse_button_tag_next      = "4"
+        mouse_button_tag_prev      = "5"
+
         [tag]
                 name             = "one"
                 screen           = 0
@@ -64,6 +71,8 @@
                 layout           = "tile_right"
                 resizehint       = false
                 infobar_position = "top"
+
+                #[mouse] [/mouse] Possible multi mouse section
         [/tag]
 
         [tag] name = "two"  clients = {"Browser"} [/tag]
@@ -260,6 +269,18 @@
         [key] mod = {"Alt", "Shift"} key = "F7" func = "tag_transfert" cmd ="7" [/key]
         [key] mod = {"Alt", "Shift"} key = "F8" func = "tag_transfert" cmd ="8" [/key]
         [key] mod = {"Alt", "Shift"} key = "F9" func = "tag_transfert" cmd ="9" [/key]
+
+        # Toggle additional tags (x) on the current tag
+        [key] mod = {"Alt", "Super"} key = "F1" func = "tag_toggle_additional" cmd ="1" [/key]
+        [key] mod = {"Alt", "Super"} key = "F2" func = "tag_toggle_additional" cmd ="2" [/key]
+        [key] mod = {"Alt", "Super"} key = "F3" func = "tag_toggle_additional" cmd ="3" [/key]
+        [key] mod = {"Alt", "Super"} key = "F4" func = "tag_toggle_additional" cmd ="4" [/key]
+        [key] mod = {"Alt", "Super"} key = "F5" func = "tag_toggle_additional" cmd ="5" [/key]
+        [key] mod = {"Alt", "Super"} key = "F6" func = "tag_toggle_additional" cmd ="6" [/key]
+        [key] mod = {"Alt", "Super"} key = "F7" func = "tag_toggle_additional" cmd ="7" [/key]
+        [key] mod = {"Alt", "Super"} key = "F8" func = "tag_toggle_additional" cmd ="8" [/key]
+        [key] mod = {"Alt", "Super"} key = "F9" func = "tag_toggle_additional" cmd ="9" [/key]
+
 [/keys]
 
 
