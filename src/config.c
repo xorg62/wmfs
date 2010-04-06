@@ -559,6 +559,7 @@ conf_launcher_section(char *src)
           conf.launcher[i].name    = get_opt(tmp, "launcher", "name").str;
           conf.launcher[i].prompt  = get_opt(tmp, "Exec:", "prompt").str;
           conf.launcher[i].command = get_opt(tmp, "exec", "command").str;
+          conf.launcher[i].nhisto  = 1;
 
           cfg_set_sauv(src);
      }

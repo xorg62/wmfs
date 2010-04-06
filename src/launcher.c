@@ -42,7 +42,7 @@ static char *complete_on_command(char*, size_t);
 static char *complete_on_files(char*, size_t);
 
 void
-launcher_execute(Launcher launcher)
+launcher_execute(Launcher *launcher)
 {
      BarWindow *bw;
      Bool found;
@@ -52,7 +52,7 @@ launcher_execute(Launcher launcher)
      char buf[512] = { 0 };
      char tmpbuf[512] = { 0 };
      char *complete;
-     int pos = 0, x;
+     int i, pos = 0, histpos = 0, x;
      int tabhits = 0;
      KeySym ks;
      XEvent ev;
@@ -76,12 +76,12 @@ launcher_execute(Launcher launcher)
 
      /* First draw of the cursor */
      XSetForeground(dpy, gc, getcolor(infobar[selscreen].bar->fg));
-     XDrawLine(dpy, bw->dr, gc, textw(launcher.prompt) + textw(" "),
-               2, textw(launcher.prompt) + textw(" "), INFOBARH - 4);
+     XDrawLine(dpy, bw->dr, gc, textw(launcher->prompt) + textw(" "),
+               2, textw(launcher->prompt) + textw(" "), INFOBARH - 4);
 
      barwin_refresh(bw);
 
-     barwin_draw_text(bw, 1, FHINFOBAR - 1, launcher.prompt);
+     barwin_draw_text(bw, 1, FHINFOBAR - 1, launcher->prompt);
 
      while(my_guitar_gently_wheeps)
      {
@@ -100,13 +100,43 @@ launcher_execute(Launcher launcher)
 
                switch(ks)
                {
+               case XK_Up:
+                    if(launcher->nhisto)
+                    {
+                         if(histpos >= launcher->nhisto)
+                              histpos = 0;
+                         strcpy(buf, launcher->histo[launcher->nhisto - ++histpos]);
+                         pos = strlen(buf);
+                    }
+                    break;
+               case XK_Down:
+                    if(launcher->nhisto && histpos > 0 && histpos < launcher->nhisto)
+                    {
+                         strcpy(buf, launcher->histo[launcher->nhisto - --histpos]);
+                         pos = strlen(buf);
+                    }
+                    break;
+
                case XK_Return:
-                    spawn("%s %s", launcher.command, buf);
+                    spawn("%s %s", launcher->command, buf);
+                    /* Histo */
+                    if(launcher->nhisto + 1 > 128)
+                    {
+                         for(i = launcher->nhisto - 1; i > 1; --i)
+                              strcpy(launcher->histo[i], launcher->histo[i - 1]);
+
+                         launcher->nhisto = 0;
+                    }
+                    /* Store in histo array */
+                    strcpy(launcher->histo[launcher->nhisto++], buf);
+
                     my_guitar_gently_wheeps = 0;
                     break;
+
                case XK_Escape:
                     my_guitar_gently_wheeps = 0;
                     break;
+
                case XK_Tab:
                     /*
                      * completion
@@ -156,6 +186,7 @@ launcher_execute(Launcher launcher)
                     if(pos)
                          buf[--pos] = 0;
                     break;
+
                default:
                     lastwastab = False;
                     strncat(buf, tmp, sizeof(buf));
@@ -168,11 +199,11 @@ launcher_execute(Launcher launcher)
                /* Update cursor position */
                XSetForeground(dpy, gc, getcolor(infobar[selscreen].bar->fg));
                XDrawLine(dpy, bw->dr, gc,
-                         1 + textw(launcher.prompt) + textw(" ") + textw(buf), 2,
-                         1 + textw(launcher.prompt) + textw(" ") + textw(buf), INFOBARH - 4);
+                         1 + textw(launcher->prompt) + textw(" ") + textw(buf), 2,
+                         1 + textw(launcher->prompt) + textw(" ") + textw(buf), INFOBARH - 4);
 
-               barwin_draw_text(bw, 1, FHINFOBAR - 1, launcher.prompt);
-               barwin_draw_text(bw, 1 + textw(launcher.prompt) + textw(" "), FHINFOBAR - 1, buf);
+               barwin_draw_text(bw, 1, FHINFOBAR - 1, launcher->prompt);
+               barwin_draw_text(bw, 1 + textw(launcher->prompt) + textw(" "), FHINFOBAR - 1, buf);
                barwin_refresh(bw);
           }
           else
@@ -197,7 +228,7 @@ uicb_launcher(uicb_t cmd)
 
      for(i = 0; i < conf.nlauncher; ++i)
           if(!strcmp(cmd, conf.launcher[i].name))
-               launcher_execute(conf.launcher[i]);
+               launcher_execute(&conf.launcher[i]);
 
      return;
 }

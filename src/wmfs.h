@@ -241,7 +241,7 @@ int menu_get_longer_string(MenuItem *mt, int nitem);
 void uicb_menu(uicb_t cmd);
 
 /* launcher.c */
-void launcher_execute(Launcher launcher);
+void launcher_execute(Launcher *launcher);
 void uicb_launcher(uicb_t);
 
 /* mouse.c */

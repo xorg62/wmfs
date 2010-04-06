@@ -296,6 +296,8 @@ typedef struct
      char *name;
      char *prompt;
      char *command;
+     char histo[128][512];
+     uint nhisto;
 } Launcher;
 
 /* Button struct */
