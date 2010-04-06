@@ -250,3 +250,38 @@ uicb_tag_urgent(uicb_t cmd)
 
     return;
 }
+
+/** Add a additional tag to the current tag
+  *\param sc Screen
+  *\param tag Tag where apply additional tag
+  *\param adtag Additional tag to apply in tag
+ */
+void
+tag_additional(int sc, int tag, int adtag)
+{
+     if(tag < 0 || tag > conf.ntag[sc]
+       || adtag < 1 || adtag > conf.ntag[sc] || adtag == seltag[sc])
+          return;
+
+     tags[sc][tag].tagad ^= TagFlag(adtag);
+     tags[sc][adtag].request_update = True;
+     arrange(sc, True);
+
+     return;
+}
+
+/** Add a additional tag to the current tag
+  *\param cmd uicb_t
+ */
+void
+uicb_tag_toggle_additional(uicb_t cmd)
+{
+     screen_get_sel();
+
+     tag_additional(selscreen, seltag[selscreen], atoi(cmd));
+
+     return;
+}
+
+
+

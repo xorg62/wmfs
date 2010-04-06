@@ -51,6 +51,8 @@
 #define AboveFlag  (1 << 9)
 #define UrgentFlag (1 << 10)
 
+#define TagFlag(t) (1 << (t))
+
 /* XEMBED messages */
 #define XEMBED_MAPPED                 (1 << 0)
 #define XEMBED_EMBEDDED_NOTIFY        0
@@ -82,12 +84,12 @@ typedef unsigned char  uchar;
 
 /* Enum */
 enum { CurNormal, CurResize, CurRightResize, CurLeftResize, CurMove, CurLast };
+enum { TagSel, TagTransfert, TagAdd, TagNext, TagPrev, TagActionLast };
 
 /* Infobar position */
 enum { IB_Hide = 0, IB_Bottom = 1, IB_Top = 2 };
 
 typedef enum { Right, Left, Top, Bottom, Center, PositionLast } Position;
-
 
 /* Ewmh hints list */
 enum
@@ -257,6 +259,9 @@ typedef struct
      Bool abovefc;
      int barpos;
      Layout layout;
+     uint tagad;
+     MouseBinding *mouse;
+     int nmouse;
 } Tag;
 
 /* Menu Item Struct */
@@ -400,6 +405,7 @@ typedef struct
           Bool layout;
      } border;
      Alias alias[256];
+     uint mouse_tag_action[TagActionLast];
      Layout layout[NUM_OF_LAYOUT];
      Menu *menu;
      Launcher *launcher;

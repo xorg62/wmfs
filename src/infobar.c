@@ -203,8 +203,15 @@ infobar_draw_taglist(int sc)
 
      for(i = 1; i < conf.ntag[sc] + 1; ++i)
      {
-          infobar[sc].tags[i]->bg = ((i == seltag[sc]) ? conf.colors.tagselbg : conf.colors.bar);
-          infobar[sc].tags[i]->fg = ((i == seltag[sc]) ? conf.colors.tagselfg : conf.colors.text);
+          infobar[sc].tags[i]->bg =
+               ((i == seltag[sc] || tags[sc][seltag[sc]].tagad & TagFlag(i))
+                ? conf.colors.tagselbg
+                : conf.colors.bar);
+
+          infobar[sc].tags[i]->fg =
+               ((i == seltag[sc] || tags[sc][seltag[sc]].tagad & TagFlag(i))
+                ? conf.colors.tagselfg
+                : conf.colors.text);
 
           barwin_refresh_color(infobar[sc].tags[i]);
 
@@ -213,7 +220,11 @@ infobar_draw_taglist(int sc)
           {
                if(c->screen == sc)
                {
-                    infobar[sc].tags[c->tag]->bg = ((c->tag == seltag[sc]) ? conf.colors.tagselbg : conf.colors.tag_occupied_bg);
+                    infobar[sc].tags[c->tag]->bg =
+                         ((c->tag == seltag[sc] || tags[sc][seltag[sc]].tagad & TagFlag(c->tag)))
+                         ? conf.colors.tagselbg
+                         : conf.colors.tag_occupied_bg;
+
                     barwin_refresh_color(infobar[sc].tags[i]);
                }
           }

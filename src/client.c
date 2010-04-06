@@ -430,7 +430,8 @@ client_hide(Client *c)
 Bool
 ishide(Client *c, int screen)
 {
-     if(c->tag == seltag[screen] && c->screen == screen)
+     if((c->tag == seltag[screen] && c->screen == screen)
+               || tags[screen][seltag[screen]].tagad & TagFlag(c->tag))
           return False;
 
      return True;

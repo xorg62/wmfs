@@ -99,13 +99,24 @@ buttonpress(XButtonEvent *ev)
      /* Tags */
      for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
           if(ev->window == infobar[selscreen].tags[i]->win)
-               switch(ev->button)
-               {
-               case Button1: tag_set(i);                     break;
-               case Button3: tag_transfert(sel, i);          break;
-               case Button4: tag_set(seltag[selscreen] + 1); break;
-               case Button5: tag_set(seltag[selscreen] - 1); break;
-               }
+          {
+               for(j = 0; j < tags[selscreen][i].nmouse; ++j)
+                    if(ev->button == tags[selscreen][i].mouse[j].button)
+                         if(tags[selscreen][i].mouse[j].func)
+                              tags[selscreen][i].mouse[j].func(tags[selscreen][i].mouse[j].cmd);
+
+               /* Mouse button action on tag */
+               if(ev->button == conf.mouse_tag_action[TagSel])
+                    tag_set(i);
+               else if(ev->button == conf.mouse_tag_action[TagTransfert])
+                    tag_transfert(sel, i);
+               else if(ev->button == conf.mouse_tag_action[TagAdd])
+                    tag_additional(selscreen, seltag[selscreen], i);
+               else if(ev->button == conf.mouse_tag_action[TagNext])
+                    tag_set(seltag[selscreen] + 1);
+               else if(ev->button == conf.mouse_tag_action[TagPrev])
+                    tag_set(seltag[selscreen] - 1);
+          }
 
      /* Layout button */
      if(ev->window == infobar[selscreen].layout_button->win && conf.nlayout > 1)

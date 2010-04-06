@@ -58,6 +58,7 @@ func_name_list_t tmp_func_list[] =
      {"tag_transfert_next",       uicb_tagtransfert_next },
      {"tag_transfert_prev",       uicb_tagtransfert_prev },
      {"tag_urgent",               uicb_tag_urgent },
+     {"tag_toggle_additional",    uicb_tag_toggle_additional },
      {"set_mwfact",               uicb_set_mwfact },
      {"set_nmaster",              uicb_set_nmaster },
      {"quit",                     uicb_quit },
@@ -398,7 +399,8 @@ conf_tag_section(char *src)
       */
      Tag default_tag = { "WMFS", NULL, 0, 1,
                          0.50, 1, False, False, False, False, IB_Top,
-                         layout_name_to_struct(conf.layout, "tile_right", conf.nlayout, layout_list) };
+                         layout_name_to_struct(conf.layout, "tile_right", conf.nlayout, layout_list),
+                         0, NULL, 0 };
 
      cfg_set_sauv(src);
 
@@ -409,6 +411,18 @@ conf_tag_section(char *src)
      conf.colors.tagurbg          = getcolor(get_opt(src, "#DD1111", "urgent_bg").str);
      conf.colors.tag_occupied_bg  = getcolor(get_opt(src, "#222222", "occupied_bg").str);
      conf.border.tag              = get_opt(src, "false", "border").bool;
+
+     /* Mouse button action on tag */
+     conf.mouse_tag_action[TagSel] =
+          char_to_button(get_opt(src, "1", "mouse_button_tag_sel").str, mouse_button_list);
+     conf.mouse_tag_action[TagTransfert] =
+          char_to_button(get_opt(src, "2", "mouse_button_tag_transfert").str, mouse_button_list);
+     conf.mouse_tag_action[TagAdd] =
+          char_to_button(get_opt(src, "3", "mouse_button_tag_add").str, mouse_button_list);
+     conf.mouse_tag_action[TagNext]  =
+          char_to_button(get_opt(src, "4", "mouse_button_tag_next").str, mouse_button_list);
+     conf.mouse_tag_action[TagPrev]  =
+          char_to_button(get_opt(src, "5", "mouse_button_tag_prev").str, mouse_button_list);
 
      sc = screen_count();
 
@@ -469,6 +483,13 @@ conf_tag_section(char *src)
                     tags[k][conf.ntag[k]].clients = emalloc(n, sizeof(char *));
                     for(m = 0; m < n; ++m)
                          tags[k][conf.ntag[k]].clients[m] = (buf[m].str) ? buf[m].str : NULL;
+               }
+
+               /* Multi mouse sections */
+               if((tags[k][conf.ntag[k]].nmouse = get_size_sec(cfgtmp, "mouse")))
+               {
+                    tags[k][conf.ntag[k]].mouse = emalloc(tags[k][conf.ntag[k]].nmouse, sizeof(MouseBinding));
+                    mouse_section(tags[k][conf.ntag[k]].mouse, cfgtmp, tags[k][conf.ntag[k]].nmouse);
                }
 
           }
