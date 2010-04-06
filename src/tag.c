@@ -39,6 +39,8 @@ void
 tag_set(int tag)
 {
      Client *c;
+     Bool al = False;
+     int i;
 
      screen_get_sel();
 
@@ -68,7 +70,16 @@ tag_set(int tag)
      if(tags[selscreen][prevseltag[selscreen]].barpos != tags[selscreen][seltag[selscreen]].barpos)
           infobar_set_position(tags[selscreen][seltag[selscreen]].barpos);
 
-     arrange(selscreen, False);
+
+     /* Check if a layout update is needed with additional tags */
+     if(tags[selscreen][seltag[selscreen]].tagad)
+          al = True;
+
+     for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
+          if(tags[selscreen][i].tagad & TagFlag(seltag[selscreen]))
+               al = True;
+
+     arrange(selscreen, al);
 
      if(tags[selscreen][tag].request_update)
      {
@@ -251,7 +262,7 @@ uicb_tag_urgent(uicb_t cmd)
     return;
 }
 
-/** Add a additional tag to the current tag
+/** Add an additional tag to the current tag
   *\param sc Screen
   *\param tag Tag where apply additional tag
   *\param adtag Additional tag to apply in tag
@@ -270,7 +281,7 @@ tag_additional(int sc, int tag, int adtag)
      return;
 }
 
-/** Add a additional tag to the current tag
+/** Add an additional tag to the current tag
   *\param cmd uicb_t
  */
 void
