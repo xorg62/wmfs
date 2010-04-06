@@ -91,8 +91,14 @@ launcher_execute(Launcher *launcher)
 
                /* Check Ctrl-c / Ctrl-d */
                if(ev.xkey.state & ControlMask)
+               {
                     if(ks == XK_c || ks == XK_d)
                          ks = XK_Escape;
+                    else if(ks == XK_p)
+                         ks = XK_Up;
+                    else if(ks == XK_n)
+                         ks = XK_Down;
+               }
 
                /* Check if there is a keypad */
                if(IsKeypadKey(ks) && ks == XK_KP_Enter)
