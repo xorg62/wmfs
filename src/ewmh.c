@@ -301,10 +301,9 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
      /* Manage _NET_WM_STATE_FULLSCREEN */
      if(data_l[1] == net_atom[net_wm_state_fullscreen])
      {
-          if(data_l[0] == _NET_WM_STATE_ADD)
+          if(data_l[0] == _NET_WM_STATE_ADD && !(c->flags & FSSFlag))
           {
                c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
-               client_unmap(c);
                c->flags &= ~UnmapFlag;
                XMapWindow(dpy, c->win);
                XReparentWindow(dpy, c->win, ROOT, spgeo[c->screen].x, spgeo[c->screen].y);
@@ -318,16 +317,18 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
                     c->ogeo = c->geo;
 
                c->flags |= (FSSFlag | MaxFlag);
+
+               client_raise(c);
+               client_focus(c);
+               XUnmapWindow(dpy, c->frame);
           }
-          else if(data_l[0] == _NET_WM_STATE_REMOVE)
+          else if(data_l[0] == _NET_WM_STATE_REMOVE && (c->flags & FSSFlag))
           {
                c->flags &= ~(FSSFlag | MaxFlag);
                client_map(c);
                XReparentWindow(dpy, c->win, c->frame, BORDH, TBARH);
                client_moveresize(c, c->tmp_geo, False);
           }
-          XRaiseWindow(dpy, c->win);
-          client_focus(c);
      }
      /* Manage _NET_WM_STATE_DEMANDS_ATTENTION */
      else if(data_l[1] == net_atom[net_wm_state_demands_attention])
