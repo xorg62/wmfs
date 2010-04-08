@@ -76,8 +76,12 @@ launcher_execute(Launcher *launcher)
 
      /* First draw of the cursor */
      XSetForeground(dpy, gc, getcolor(infobar[selscreen].bar->fg));
-     XDrawLine(dpy, bw->dr, gc, textw(launcher->prompt) + textw(" "),
-               2, textw(launcher->prompt) + textw(" "), INFOBARH - 4);
+     /*XDrawLine(dpy, bw->dr, gc, 1 + textw(launcher->prompt) + textw(" "),
+               , 1 + textw(launcher->prompt) + textw(" "), INFOBARH - 4);
+      */
+     XDrawLine(dpy, bw->dr, gc,
+               1 + textw(launcher->prompt) + textw(" ") + textw(buf), 2,
+               1 + textw(launcher->prompt) + textw(" ") + textw(buf), INFOBARH - 4);
 
      barwin_refresh(bw);
 
@@ -111,14 +115,14 @@ launcher_execute(Launcher *launcher)
                     {
                          if(histpos >= launcher->nhisto)
                               histpos = 0;
-                         strcpy(buf, launcher->histo[launcher->nhisto - ++histpos]);
+                         strncpy(buf, launcher->histo[launcher->nhisto - ++histpos], sizeof(buf));
                          pos = strlen(buf);
                     }
                     break;
                case XK_Down:
                     if(launcher->nhisto && histpos > 0 && histpos < launcher->nhisto)
                     {
-                         strcpy(buf, launcher->histo[launcher->nhisto - --histpos]);
+                         strncpy(buf, launcher->histo[launcher->nhisto - --histpos], sizeof(buf));
                          pos = strlen(buf);
                     }
                     break;
@@ -126,15 +130,15 @@ launcher_execute(Launcher *launcher)
                case XK_Return:
                     spawn("%s %s", launcher->command, buf);
                     /* Histo */
-                    if(launcher->nhisto + 1 > 128)
+                    if(launcher->nhisto + 1 > HISTOLEN)
                     {
                          for(i = launcher->nhisto - 1; i > 1; --i)
-                              strcpy(launcher->histo[i], launcher->histo[i - 1]);
+                              strncpy(launcher->histo[i], launcher->histo[i - 1], sizeof(launcher->histo[i]));
 
                          launcher->nhisto = 0;
                     }
                     /* Store in histo array */
-                    strcpy(launcher->histo[launcher->nhisto++], buf);
+                    strncpy(launcher->histo[launcher->nhisto++], buf, sizeof(buf));
 
                     my_guitar_gently_wheeps = 0;
                     break;
@@ -195,7 +199,7 @@ launcher_execute(Launcher *launcher)
 
                default:
                     lastwastab = False;
-                    strncat(buf, tmp, sizeof(buf));
+                    strncat(buf, tmp, sizeof(tmp));
                     ++pos;
                     break;
                }

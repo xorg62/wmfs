@@ -38,6 +38,7 @@
 #define NBUTTON        8
 #define MAXTAG         36
 #define NUM_OF_LAYOUT  10
+#define HISTOLEN       128
 
 /* Clients flags definition */
 #define FreeFlag   (1 << 1)
@@ -301,7 +302,7 @@ typedef struct
      char *name;
      char *prompt;
      char *command;
-     char histo[128][512];
+     char histo[HISTOLEN][512];
      uint nhisto;
 } Launcher;
 
