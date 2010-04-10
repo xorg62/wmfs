@@ -194,28 +194,28 @@ menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
 Bool
 menu_activate_item(Menu *menu, int i)
 {
-     int j, d, u, x, y;
-     Window w;
+     int j, x, y;
 
      if(menu->item[i].submenu)
      {
           for(j = 0; j < conf.nmenu; ++j)
                if(!strcmp(menu->item[i].submenu, conf.menu[j].name))
                {
-                    XQueryPointer(dpy, ROOT, &w, &w, &x, &y, &d, &d, (uint *)&u);
-
-                    x = menu->x;
-                    x += menu_get_longer_string(menu->item, menu->nitem) + PAD * 3;
+                    y = menu->y + ((i - 1) * INFOBARH + PAD) - SHADH * 2;
+                    x = menu->x + menu_get_longer_string(menu->item, menu->nitem) + PAD * 3;
 
                     menu_draw(conf.menu[j], x, y);
+
                     return True;
                }
      }
      else if(menu->item[i].func)
      {
           menu->item[i].func(menu->item[i].cmd);
+
           return True;
      }
+
      return False;
 }
 

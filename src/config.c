@@ -376,13 +376,16 @@ conf_layout_section(char *src)
                else
                {
                     if(conf.layout_system && conf.nlayout > 1)
+                    {
                          menu_new_item(&menulayout.item[i], get_opt(tmp, "", "symbol").str,
                                    uicb_set_layout, p);
+
+                         menulayout.item[i].check = name_to_func("check_layout", func_list);
+                    }
 
                     conf.layout[i].symbol = get_opt(tmp, "TILE (default)", "symbol").str;
                     conf.layout[i].func = name_to_func(p, layout_list);
                     conf.layout[i].type = p;
-                    menulayout.item[i].check = name_to_func("check_layout", func_list);
                }
 
                cfg_set_sauv(src);
