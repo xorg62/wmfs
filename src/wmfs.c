@@ -478,7 +478,7 @@ main(int argc, char **argv)
                break;
 
           case 'c':
-               exec_uicb_function(argv[2], ((argv[3]) ? argv[3] : NULL));
+               exec_uicb_function(optarg, argv[optind]);
                XCloseDisplay(dpy);
                exit(EXIT_SUCCESS);
                break;
