@@ -237,7 +237,7 @@ void menu_draw(Menu menu, int x, int y);
 Bool menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[]);
 void menu_focus_item(Menu *menu, int item, BarWindow *winitem[]);
 void menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[]);
-int menu_get_longer_string(MenuItem *mt, int nitem);
+int menu_get_longer_string(MenuItem *mi, int nitem);
 void uicb_menu(uicb_t cmd);
 
 /* launcher.c */

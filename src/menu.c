@@ -68,7 +68,7 @@ menu_draw(Menu menu, int x, int y)
      BarWindow *item[menu.nitem];
      BarWindow *frame;
 
-     width = menu_get_longer_string(menu.item, menu.nitem);
+     width = menu_get_longer_string(menu.item, menu.nitem) + PAD;
 
      /* Frame barwin */
      frame = barwin_create(ROOT, x, y, width + SHADH, menu.nitem * (INFOBARH - SHADH) + SHADH * 2,
@@ -219,7 +219,7 @@ menu_focus_item(Menu *menu, int item, BarWindow *winitem[])
 void
 menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[])
 {
-     int width = menu_get_longer_string(menu->item, menu->nitem);
+     int width = menu_get_longer_string(menu->item, menu->nitem) + PAD;
 
      barwin_draw_text(winitem[item],
                       ((width / 2) - (textw(menu->item[item].name) / 2)),
@@ -230,15 +230,15 @@ menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[])
 }
 
 int
-menu_get_longer_string(MenuItem *mt, int nitem)
+menu_get_longer_string(MenuItem *mi, int nitem)
 {
-     int i, l = 0;
+     int i, w, l = 0;
 
      for(i = 0; i < nitem; ++i)
-          if(textw(mt[i].name) > l)
-               l = textw(mt[i].name);
+          if((w = textw(mi[i].name)) > l)
+               l = w;
 
-     return l + PAD;
+     return l;
 }
 
 void
