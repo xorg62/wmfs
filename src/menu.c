@@ -207,7 +207,7 @@ menu_activate_item(Menu *menu, int i)
                     x = menu->x;
                     x += menu_get_longer_string(menu->item, menu->nitem) + PAD * 3;
 
-                    menu_draw(conf.menu[i], x, y);
+                    menu_draw(conf.menu[j], x, y);
                     return True;
                }
      }
