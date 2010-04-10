@@ -135,12 +135,7 @@ menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
           {
                if(ev->xbutton.window == winitem[i]->win
                   && (ev->xbutton.button == Button1 || ev->xbutton.button == Button2))
-               {
-                    if(menu->item[i].func)
-                         menu->item[i].func(menu->item[i].cmd);
-
-                    quit = True;
-               }
+                    quit = menu_activate_item(menu, i);
                else if(ev->xbutton.window != winitem[i]->win)
                     ++c;
                else if(ev->xbutton.button == Button4)
@@ -169,9 +164,7 @@ menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
                break;
 
           case XK_Return:
-               if(menu->item[menu->focus_item].func)
-                    menu->item[menu->focus_item].func(menu->item[menu->focus_item].cmd);
-               quit = True;
+               quit = menu_activate_item(menu, menu->focus_item);
                break;
 
           case XK_Escape:
@@ -198,6 +191,33 @@ menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
      return quit;
 }
 
+Bool
+menu_activate_item(Menu *menu, int i)
+{
+     int j, d, u, x, y;
+     Window w;
+
+     if(menu->item[i].submenu)
+     {
+          for(j = 0; j < conf.nmenu; ++j)
+               if(!strcmp(menu->item[i].submenu, conf.menu[j].name))
+               {
+                    XQueryPointer(dpy, ROOT, &w, &w, &x, &y, &d, &d, (uint *)&u);
+
+                    x = menu->x;
+                    x += menu_get_longer_string(menu->item, menu->nitem) + PAD * 3;
+
+                    menu_draw(conf.menu[i], x, y);
+                    return True;
+               }
+     }
+     else if(menu->item[i].func)
+     {
+          menu->item[i].func(menu->item[i].cmd);
+          return True;
+     }
+     return False;
+}
 
 void
 menu_focus_item(Menu *menu, int item, BarWindow *winitem[])
@@ -228,7 +248,7 @@ void
 menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[])
 {
      int x;
-     int width = menu_get_longer_string(menu->item, menu->nitem) + PAD;
+     int width = menu_get_longer_string(menu->item, menu->nitem);
 
      switch(menu->align)
      {
@@ -248,6 +268,9 @@ menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[])
      if(menu->item[item].check)
           if(menu->item[item].check(menu->item[item].cmd))
                barwin_draw_text(winitem[item], PAD / 3, FHINFOBAR, "*");
+
+     if(menu->item[item].submenu)
+          barwin_draw_text(winitem[item], width + PAD * 2, FHINFOBAR, ">");
 
      return;
 }
@@ -277,7 +300,11 @@ uicb_menu(uicb_t cmd)
           if(!strcmp(cmd, conf.menu[i].name))
           {
                if(conf.menu[i].place_at_mouse)
+               {
                     XQueryPointer(dpy, ROOT, &w, &w, &x, &y, &d, &d, (uint *)&u);
+                    conf.menu[i].x = x;
+                    conf.menu[i].y = y;
+               }
                else
                {
                     screen_get_sel();

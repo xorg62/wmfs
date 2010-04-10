@@ -235,6 +235,7 @@ void menu_init(Menu *menu, char *name, int nitem, uint bg_f, char *fg_f, uint bg
 void menu_new_item(MenuItem *mi, char *name, void *func, char *cmd);
 void menu_draw(Menu menu, int x, int y);
 Bool menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[]);
+Bool menu_activate_item(Menu *menu, int i);
 void menu_focus_item(Menu *menu, int item, BarWindow *winitem[]);
 void menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[]);
 int menu_get_longer_string(MenuItem *mi, int nitem);

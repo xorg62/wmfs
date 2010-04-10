@@ -564,6 +564,7 @@ conf_menu_section(char *src)
                     conf.menu[i].item[j].func = name_to_func(get_opt(tmp2, "", "func").str, func_list);
                     conf.menu[i].item[j].cmd  = (!get_opt(tmp2, "", "cmd").str) ? NULL : get_opt(tmp2, "", "cmd").str;
                     conf.menu[i].item[j].check = name_to_func(get_opt(tmp2, "", "check").str, func_list);
+                    conf.menu[i].item[j].submenu = get_opt(tmp2, "", "submenu").str;
 
                     cfg_set_sauv(tmp);
                }

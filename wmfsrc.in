@@ -149,12 +149,24 @@
                 fg_normal = "#9F9AB3" bg_normal = "#191919"
 
                 [item] name = "Terminal"        func = "spawn" cmd = "@WMFS_TERM@" [/item]
+                [item] name = "Applications" submenu = "appmenu"                   [/item]
                 [item] name = "Next tag"        func = "tag_next"                  [/item]
                 [item] name = "Previous tag"    func = "tag_prev"                  [/item]
                 [item] name = "Next layout"     func = "layout_next"               [/item]
                 [item] name = "Previous layout" func = "layout_prev"               [/item]
                 [item] name = "Toggle infobar"  func = "toggle_infobar_position"   [/item]
                 [item] name = "Quit WMFS"       func = "quit"                      [/item]
+        [/set_menu]
+
+        [set_menu]
+                name = "appmenu"
+                align = "left"
+
+                fg_focus  = "#191919" bg_focus  = "#7E89A2"
+                fg_normal = "#9F9AB3" bg_normal = "#191919"
+
+                [item] name = "Browser"         func = "spawn" cmd = "firefox"     [/item]
+                [item] name = "Calculator"      func = "spawn" cmd = "xcalc"       [/item]
         [/set_menu]
 
         [set_menu]

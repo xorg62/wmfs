@@ -276,6 +276,7 @@ typedef struct
      void (*func)(uicb_t);
      uicb_t cmd;
      Bool (*check)(uicb_t);
+     char *submenu;
 } MenuItem;
 
 /* Menu Struct */
