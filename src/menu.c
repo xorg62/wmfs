@@ -63,15 +63,21 @@ menu_new_item(MenuItem *mi, char *name, void *func, char *cmd)
 void
 menu_draw(Menu menu, int x, int y)
 {
-     int i, width;
+     int i, width, height, out;
      XEvent ev;
      BarWindow *item[menu.nitem];
      BarWindow *frame;
 
      width = menu_get_longer_string(menu.item, menu.nitem) + PAD;
+     height = menu.nitem * (INFOBARH - SHADH);
 
      /* Frame barwin */
-     frame = barwin_create(ROOT, x, y, width + SHADH, menu.nitem * (INFOBARH - SHADH) + SHADH * 2,
+     screen_get_sel();
+
+     if((out = x + width  - spgeo[selscreen].width)  > 0) x -= out;
+     if((out = y + height - spgeo[selscreen].height) > 0) y -= out;
+
+     frame = barwin_create(ROOT, x, y, width + SHADH, height + SHADH * 2,
                            menu.colors.normal.bg, menu.colors.normal.fg, False, False, True);
 
      barwin_map(frame);
@@ -219,12 +225,23 @@ menu_focus_item(Menu *menu, int item, BarWindow *winitem[])
 void
 menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[])
 {
+     int x;
      int width = menu_get_longer_string(menu->item, menu->nitem) + PAD;
 
-     barwin_draw_text(winitem[item],
-                      ((width / 2) - (textw(menu->item[item].name) / 2)),
-                      FHINFOBAR,
-                      menu->item[item].name);
+     switch(menu->align)
+     {
+     case MA_Left:
+          x = PAD / 2;
+          break;
+     case MA_Right:
+          x = width - textw(menu->item[item].name) + PAD / 2;
+          break;
+     default:
+     case MA_Center:
+          x = width / 2 - textw(menu->item[item].name) / 2 + PAD / 2;
+          break;
+     }
+     barwin_draw_text(winitem[item], x, FHINFOBAR, menu->item[item].name);
 
      return;
 }

@@ -142,6 +142,9 @@
                 # place_at_mouse = false
                 # x = 40 y = 50
 
+                # Available "center", "left", "right" menu align. Default: "center".
+                align = "left"
+
                 fg_focus  = "#191919" bg_focus  = "#7E89A2"
                 fg_normal = "#9F9AB3" bg_normal = "#191919"
 

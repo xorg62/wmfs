@@ -533,6 +533,15 @@ conf_menu_section(char *src)
                conf.menu[i].y = get_opt(tmp, "0", "y").num;
           }
 
+          tmp2 = _strdup(get_opt(tmp, "center", "align").str);
+
+          if(!strcmp(tmp2 ,"left"))
+               conf.menu[i].align = MA_Left;
+          else if(!strcmp(tmp2, "right"))
+               conf.menu[i].align = MA_Right;
+          else
+               conf.menu[i].align = MA_Center;
+
           conf.menu[i].colors.focus.bg  = getcolor(get_opt(tmp, "#000000", "bg_focus").str);
           conf.menu[i].colors.focus.fg  = get_opt(tmp, "#ffffff", "fg_focus").str;
           conf.menu[i].colors.normal.bg = getcolor(get_opt(tmp, "#000000", "bg_normal").str);

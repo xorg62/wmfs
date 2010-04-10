@@ -87,6 +87,9 @@ typedef unsigned char  uchar;
 enum { CurNormal, CurResize, CurRightResize, CurLeftResize, CurMove, CurLast };
 enum { TagSel, TagTransfert, TagAdd, TagNext, TagPrev, TagActionLast };
 
+/* Menu align */
+enum { MA_Center = 0, MA_Left = 1, MA_Right = 2 };
+
 /* Infobar position */
 enum { IB_Hide = 0, IB_Bottom = 1, IB_Top = 2 };
 
@@ -283,6 +286,7 @@ typedef struct
      char *name;
      /* Placement */
      Bool place_at_mouse;
+     int align;
      int x, y;
      /* Color */
      struct
