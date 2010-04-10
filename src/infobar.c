@@ -127,8 +127,7 @@ infobar_init(void)
           barwin_refresh(infobar[sc].bar);
 
           /* Default statustext is set here */
-          for(i = 0; i < s; ++i)
-               infobar[i].statustext = _strdup(WMFS_VERSION);
+          infobar[sc].statustext = _strdup(WMFS_VERSION);
 
           infobar_draw(sc);
      }
@@ -264,6 +263,7 @@ infobar_destroy(void)
 
           barwin_delete_subwin(infobar[sc].tags_board);
           barwin_delete(infobar[sc].tags_board);
+          barwin_delete(infobar[sc].selbar);
           barwin_delete_subwin(infobar[sc].bar);
           barwin_delete(infobar[sc].bar);
      }

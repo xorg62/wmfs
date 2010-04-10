@@ -74,8 +74,10 @@ menu_draw(Menu menu, int x, int y)
      /* Frame barwin */
      screen_get_sel();
 
-     if((out = x + width  - spgeo[selscreen].width)  > 0) x -= out;
-     if((out = y + height - spgeo[selscreen].height) > 0) y -= out;
+     if((out = x + width  - MAXW)  > 0)
+          x -= out;
+     if((out = y + height - MAXH) > 0)
+          y -= out;
 
      frame = barwin_create(ROOT, x, y, width + SHADH, height + SHADH * 2,
                            menu.colors.normal.bg, menu.colors.normal.fg, False, False, True);
