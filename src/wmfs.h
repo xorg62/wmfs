@@ -339,6 +339,9 @@ void uicb_toggle_abovefc(uicb_t cmd);
 void uicb_set_layer(uicb_t cmd);
 void uicb_set_client_layer(uicb_t cmd);
 void layout_set_client_master(Client *c);
+Bool uicb_checkmax(uicb_t);
+Bool uicb_checkfree(uicb_t);
+Bool uicb_checklayout(uicb_t);
 
 /* init.c */
 void init(void);

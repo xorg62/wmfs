@@ -79,7 +79,10 @@ func_name_list_t tmp_func_list[] =
      {"menu",                     uicb_menu },
      {"set_client_layer",         uicb_set_client_layer },
      {"set_layer",                uicb_set_layer },
-     {"ignore_next_client_rules", uicb_ignore_next_client_rules }
+     {"ignore_next_client_rules", uicb_ignore_next_client_rules },
+     {"check_max",                uicb_checkmax },
+     {"check_free",               uicb_checkfree },
+     {"check_layout",             uicb_checklayout }
 };
 
 key_name_list_t key_list[] =
@@ -378,6 +381,8 @@ conf_layout_section(char *src)
 
                     conf.layout[i].symbol = get_opt(tmp, "TILE (default)", "symbol").str;
                     conf.layout[i].func = name_to_func(p, layout_list);
+                    conf.layout[i].type = p;
+                    menulayout.item[i].check = name_to_func("check_layout", func_list);
                }
 
                cfg_set_sauv(src);
@@ -558,6 +563,7 @@ conf_menu_section(char *src)
                     conf.menu[i].item[j].name = get_opt(tmp2, "item_wname", "name").str;
                     conf.menu[i].item[j].func = name_to_func(get_opt(tmp2, "", "func").str, func_list);
                     conf.menu[i].item[j].cmd  = (!get_opt(tmp2, "", "cmd").str) ? NULL : get_opt(tmp2, "", "cmd").str;
+                    conf.menu[i].item[j].check = name_to_func(get_opt(tmp2, "", "check").str, func_list);
 
                     cfg_set_sauv(tmp);
                }

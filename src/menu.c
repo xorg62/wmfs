@@ -68,7 +68,7 @@ menu_draw(Menu menu, int x, int y)
      BarWindow *item[menu.nitem];
      BarWindow *frame;
 
-     width = menu_get_longer_string(menu.item, menu.nitem) + PAD;
+     width = menu_get_longer_string(menu.item, menu.nitem) + PAD * 3;
      height = menu.nitem * (INFOBARH - SHADH);
 
      /* Frame barwin */
@@ -231,17 +231,21 @@ menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[])
      switch(menu->align)
      {
      case MA_Left:
-          x = PAD / 2;
+          x = PAD * 3 / 2;
           break;
      case MA_Right:
-          x = width - textw(menu->item[item].name) + PAD / 2;
+          x = width - textw(menu->item[item].name) + PAD * 3 / 2;
           break;
      default:
      case MA_Center:
-          x = width / 2 - textw(menu->item[item].name) / 2 + PAD / 2;
+          x = width / 2 - textw(menu->item[item].name) / 2 + PAD * 3 / 2;
           break;
      }
      barwin_draw_text(winitem[item], x, FHINFOBAR, menu->item[item].name);
+
+     if(menu->item[item].check)
+          if(menu->item[item].check(menu->item[item].cmd))
+               barwin_draw_text(winitem[item], PAD / 3, FHINFOBAR, "*");
 
      return;
 }

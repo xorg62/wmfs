@@ -916,3 +916,48 @@ layout_set_client_master(Client *c)
 
      return;
 }
+
+/** Check the selected client is max
+ * \param cmd uicb_t type unused
+*/
+Bool
+uicb_checkmax(uicb_t cmd)
+{
+     if(!sel)
+          return False;
+
+     if(sel->flags & MaxFlag)
+          return True;
+
+     return False;
+}
+
+/** Check the selected client is free
+ * \param cmd uicb_t type unused
+*/
+Bool
+uicb_checkfree(uicb_t cmd)
+{
+     if(!sel)
+          return False;
+
+     if(sel->flags & FreeFlag)
+          return True;
+
+     return False;
+}
+
+/** Check layout type
+ * \param cmd uicb_t type layout type
+*/
+Bool
+uicb_checklayout(uicb_t cmd)
+{
+     screen_get_sel();
+
+     if(!strcmp(cmd, tags[selscreen][seltag[selscreen]].layout.type))
+          return True;
+
+     return False;
+}
+

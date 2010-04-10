@@ -245,6 +245,7 @@ typedef struct
 typedef struct
 {
      char *symbol;
+     char *type;
      void (*func)(int screen);
 } Layout;
 
@@ -274,6 +275,7 @@ typedef struct
      char *name;
      void (*func)(uicb_t);
      uicb_t cmd;
+     Bool (*check)(uicb_t);
 } MenuItem;
 
 /* Menu Struct */

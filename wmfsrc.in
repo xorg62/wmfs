@@ -163,9 +163,10 @@
                 fg_focus  = "#D4D4D4" bg_focus  = "#003366"
                 fg_normal = "#D4D4D4" bg_normal = "#191919"
 
-                [item] name = "Close"    func = "client_kill" [/item]
-                [item] name = "Maximize" func = "toggle_max"  [/item]
-                [item] name = "Free"     func = "toggle_free" [/item]
+                # Check items: possible 'check_max' or 'check_free'.
+                [item] name = "Close"    func = "client_kill"                      [/item]
+                [item] name = "Maximize" func = "toggle_max"  check = "check_max"  [/item]
+                [item] name = "Free"     func = "toggle_free" check = "check_free" [/item]
         [/set_menu]
 [/menu]
 
