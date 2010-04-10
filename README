@@ -13,6 +13,7 @@ REQUIREMENT :
   - freetype2
   - libxinerama (optional)
   - libxrandr   (optional)
+  - imlib2      (optional)
   - libxft
   - libx11
   - CMake >= 2.6
@@ -33,4 +34,4 @@ If you have doxygen installed you can generate doxygen documentation via custom 
 
 DISTROS :
   - wmfs port for FreeBSD at x11-wm/wmfs
-  - wmfs is available with AUR in ArchLinux
+  - wmfs is available with AUR in ArchLinux (wmfs or wmfs-git)
