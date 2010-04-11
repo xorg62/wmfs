@@ -7,6 +7,10 @@
         font               = "dejavu-10"
         raisefocus         = false
         focus_follow_mouse = true
+        # focus_pointer_click: click on unfocused client area:
+        # true  -- default, set focus
+        # false -- click go to client; including dockapps
+        focus_pointer_click = true
         status_timing      = 1     #seconds
 [/misc]
 

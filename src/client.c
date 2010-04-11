@@ -242,7 +242,7 @@ client_focus(Client *c)
                sel->flags &= ~AboveFlag;
 
           frame_update(sel);
-          mouse_grabbuttons(sel, False);
+          mouse_grabbuttons(sel, !conf.focus_pclick);
      }
 
      if((sel = c))

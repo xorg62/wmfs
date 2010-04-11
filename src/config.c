@@ -148,6 +148,7 @@ conf_misc_section(char *src)
      conf.raisefocus        = get_opt(src, "false", "raisefocus").bool;
      conf.raiseswitch       = get_opt(src, "false", "raiseswitch").bool;
      conf.focus_fmouse      = get_opt(src, "true", "focus_follow_mouse").bool;
+     conf.focus_pclick      = get_opt(src, "true", "focus_pointer_click").bool;
      conf.status_timing     = get_opt(src, "1", "status_timing").num;
      conf.status_path       = get_opt(src, "", "status_path").str;
      conf.autostart_path    = get_opt(src, "", "autostart_path").str;
