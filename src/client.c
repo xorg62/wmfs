@@ -96,7 +96,7 @@ client_get_next(void)
           return NULL;
 
      for(c = sel->next; c && ishide(c, selscreen); c = c->next);
-     if(!c)
+     if(!c && conf.client_round)
           for(c = clients; c && ishide(c, selscreen); c = c->next);
 
      return c;
@@ -117,7 +117,7 @@ client_get_prev(void)
           if(!ishide(d, selscreen))
                c = d;
 
-     if(!c)
+     if(!c && conf.client_round)
           for(; d; d = d->next)
                if(!ishide(d, selscreen))
                     c = d;
@@ -242,7 +242,7 @@ client_focus(Client *c)
                sel->flags &= ~AboveFlag;
 
           frame_update(sel);
-          mouse_grabbuttons(sel, False);
+          mouse_grabbuttons(sel, !conf.focus_pclick);
      }
 
      if((sel = c))

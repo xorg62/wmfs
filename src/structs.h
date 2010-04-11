@@ -341,6 +341,7 @@ typedef struct
      Bool raisefocus;
      Bool raiseswitch;
      Bool focus_fmouse;
+     Bool focus_pclick;
      Bool ignore_next_client_rules;
      uint pad;
      int status_timing;
@@ -419,6 +420,7 @@ typedef struct
      Launcher *launcher;
      int *ntag;
      Bool tag_round;
+     Bool client_round;
      Bool layout_system; /* Switch: False, Menu: True. */
      Bool layout_placement; /* Right (normal): False, Left: True. */
      /* Number of... */
