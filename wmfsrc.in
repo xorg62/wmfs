@@ -99,6 +99,7 @@
 [/root]
 
 [client]
+        client_round         = true
         border_height        = 3
         border_shadow        = true
         border_normal        = "#191919"

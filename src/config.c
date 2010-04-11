@@ -219,6 +219,7 @@ conf_client_section(char *src)
      /* Client misc */
      cfg_set_sauv(src);
 
+     conf.client_round               = get_opt(src, "true", "client_round").bool;
      conf.client.borderheight        = (get_opt(src, "1", "border_height").num < 1 ? 1 : get_opt(src, "1", "border_height").num);
      conf.client.border_shadow       = get_opt(src, "false", "border_shadow").bool;
      conf.client.place_at_mouse      = get_opt(src, "false", "place_at_mouse").bool;
