@@ -196,45 +196,35 @@ infobar_draw_taglist(int sc)
 {
      int i;
      Client *c;
+     Bool is_occupied[MAXTAG];
 
      if(conf.layout_placement)
           barwin_move(infobar[sc].tags_board, textw(tags[sc][seltag[sc]].layout.symbol) + PAD * 1.5, 0);
 
+     for(i = 0; i < MAXTAG; i++)
+          is_occupied[i] = False;
+
+     for(c = clients; c; c = c->next)
+          if(c->screen == sc)
+               is_occupied[c->tag] = True;
+
      for(i = 1; i < conf.ntag[sc] + 1; ++i)
      {
-          infobar[sc].tags[i]->bg =
-               ((i == seltag[sc] || tags[sc][seltag[sc]].tagad & TagFlag(i))
-                ? conf.colors.tagselbg
-                : conf.colors.bar);
+          infobar[sc].tags[i]->bg = tags[sc][i].urgent
+               ? conf.colors.tagurbg
+               : ((i == seltag[sc] || tags[sc][seltag[sc]].tagad & TagFlag(i))
+                    ? conf.colors.tagselbg
+                    : (is_occupied[i]
+                         ? conf.colors.tag_occupied_bg
+                         : conf.colors.bar));
 
-          infobar[sc].tags[i]->fg =
-               ((i == seltag[sc] || tags[sc][seltag[sc]].tagad & TagFlag(i))
-                ? conf.colors.tagselfg
-                : conf.colors.text);
+          infobar[sc].tags[i]->fg = tags[sc][i].urgent
+               ? conf.colors.tagurfg
+               : ((i == seltag[sc] || tags[sc][seltag[sc]].tagad & TagFlag(i))
+                    ? conf.colors.tagselfg
+                    : conf.colors.text);
 
           barwin_refresh_color(infobar[sc].tags[i]);
-
-          /* Colorize a tag if there are clients in this */
-          for(c = clients; c; c = c->next)
-          {
-               if(c->screen == sc)
-               {
-                    infobar[sc].tags[c->tag]->bg =
-                         ((c->tag == seltag[sc] || tags[sc][seltag[sc]].tagad & TagFlag(c->tag)))
-                         ? conf.colors.tagselbg
-                         : conf.colors.tag_occupied_bg;
-
-                    barwin_refresh_color(infobar[sc].tags[i]);
-               }
-          }
-
-          if(tags[sc][i].urgent)
-          {
-               infobar[sc].tags[i]->bg = conf.colors.tagurbg;
-               infobar[sc].tags[i]->fg = conf.colors.tagurfg;
-
-               barwin_refresh_color(infobar[sc].tags[i]);
-          }
 
           if(tags[sc][i].name)
                barwin_draw_text(infobar[sc].tags[i], PAD / 2, FHINFOBAR, tags[sc][i].name);
