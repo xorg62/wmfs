@@ -67,6 +67,7 @@ barwin_create(Window parent,
           |ButtonMask|MouseMask
           |ExposureMask|VisibilityChangeMask
           |StructureNotifyMask|SubstructureRedirectMask;
+
      if(entermask)
           at.event_mask |= EnterWindowMask|LeaveWindowMask|FocusChangeMask;
 
@@ -219,10 +220,7 @@ barwin_move(BarWindow *bw, int x, int y)
 {
      CHECK(bw);
 
-     bw->geo.x = x;
-     bw->geo.y = y;
-
-     XMoveWindow(dpy, bw->win, x, y);
+     XMoveWindow(dpy, bw->win, (bw->geo.x = x), (bw->geo.y = y));
 
      return;
 }

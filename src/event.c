@@ -49,6 +49,8 @@ buttonpress(XButtonEvent *ev)
      {
           client_focus(c);
           client_raise(c);
+
+          return;
      }
 
      /* Titlebar */
@@ -436,6 +438,8 @@ keypress(XKeyPressedEvent *ev)
 void
 mappingnotify(XMappingEvent *ev)
 {
+     XRefreshKeyboardMapping(ev);
+
      if(ev->request == MappingKeyboard)
           grabkeys();
 

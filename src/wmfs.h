@@ -91,7 +91,7 @@
 #define DEF_CONF     ".config/wmfs/wmfsrc"
 #define DEF_STATUS   ".config/wmfs/status.sh"
 #define PAD          conf.pad
-#define MAXSTATUS    4096
+#define MAXSTATUS    (4096)
 
 #define CWIN(win, parent, x, y, w, h, b, mask, col, at)                             \
     do {                                                                            \
