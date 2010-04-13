@@ -108,7 +108,7 @@ infobar_init(void)
                           : infobar[sc].layout_button->geo.x + infobar[sc].layout_button->geo.width + PAD / 2), 1,
                          (sel) ? textw(sel->title) + PAD : 1,
                          infobar[sc].geo.height - 2,
-                         conf.colors.bar, conf.colors.text, False, False, False);
+                         conf.selbar.bg, conf.selbar.fg, False, False, False);
 
           /* Map/Refresh all */
           barwin_map(infobar[sc].bar);

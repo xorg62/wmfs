@@ -177,19 +177,37 @@ conf_misc_section(char *src)
 void
 conf_bar_section(char *src)
 {
+     char *tmp;
+
      cfg_set_sauv(src);
 
      conf.border.bar  = get_opt(src, "false", "border").bool;
      conf.bars.height = get_opt(src, "-1", "height").num;
      conf.colors.bar  = getcolor(get_opt(src, "#000000", "bg").str);
      conf.colors.text = get_opt(src, "#ffffff", "fg").str;
-     conf.bars.selbar = get_opt(src, "false", "selbar").bool;
 
      if((conf.bars.nmouse = get_size_sec(src, "mouse")))
      {
           conf.bars.mouse = emalloc(conf.bars.nmouse, sizeof(MouseBinding));
           mouse_section(conf.bars.mouse, src, conf.bars.nmouse);
      }
+
+     /* Selbar part {{ */
+     tmp = get_sec(src, "selbar");
+     cfg_set_sauv(tmp);
+
+     conf.bars.selbar = tmp ? True : False;
+
+     conf.selbar.bg = getcolor(get_opt(tmp, "#000000", "bg").str);
+     conf.selbar.fg = get_opt(tmp, "#ffffff", "fg").str;
+
+     /* Multi mouse section */
+     if((conf.selbar.nmouse = get_size_sec(tmp, "mouse")))
+     {
+          conf.selbar.mouse = emalloc(conf.selbar.nmouse, sizeof(MouseBinding));
+          mouse_section(conf.selbar.mouse, tmp, conf.selbar.nmouse);
+     }
+     /* }} */
 
      return;
 }
