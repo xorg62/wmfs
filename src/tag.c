@@ -110,6 +110,9 @@ tag_transfert(Client *c, int tag)
      if(!tag)
           tag = 1;
 
+     if(tag > conf.ntag[selscreen])
+          return;
+
      c->tag = tag;
      c->screen = selscreen;
 
