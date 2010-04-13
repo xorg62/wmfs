@@ -312,7 +312,7 @@ conf_client_section(void)
                     conf.titlebar.button[i].flags |= TileFlag;
 
                /* Multi mouse section */
-               mouse = fetch_section(button[n], "mouse");
+               mouse = fetch_section(button[i], "mouse");
 
                for(n = 0; mouse[n]; n++);
 
@@ -324,9 +324,9 @@ conf_client_section(void)
                free(mouse);
 
                /* Multi line section */
-               line = fetch_section(button[n], "line");
+               line = fetch_section(button[i], "line");
 
-               for (n = 0; line[n]; n++);
+               for(n = 0; line[n]; n++);
 
                if((conf.titlebar.button[i].nlines = n) > 0)
                {
