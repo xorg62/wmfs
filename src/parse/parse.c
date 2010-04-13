@@ -47,7 +47,7 @@ static const struct opt_type opt_type_null = { 0, 0, False, NULL };
 
 static struct {
      const char *name;
-     size_t line;
+     int line;
 } file = { NULL, 1 };
 
 static void
@@ -225,7 +225,7 @@ get_conf(const char *name)
                     SLIST_INSERT_HEAD(&config, s, entry);
                     break;
                default:
-                    errx(1, "%s:%lu: near '%s', config out of any section",
+                    errx(1, "%s:%d: near '%s', config out of any section",
                               file.name, curk->line, curw->name);
                     break;
           }
@@ -246,7 +246,7 @@ get_section(void)
      pop_keyword();
 
      if (curk->type != WORD)
-          errx(1, "%s:%lu: near '%s', missing section name",
+          errx(1, "%s:%d: near '%s', missing section name",
                     file.name, curk->line, curw->name);
      pop_keyword();
 
@@ -264,7 +264,7 @@ get_section(void)
                case SEC_END:
                     break;
                default:
-                    errx(1, "%s:%lu: near '%s', syntax error",
+                    errx(1, "%s:%d: near '%s', syntax error",
                               file.name, curk->line, curw->name);
                     break;
           }
@@ -272,11 +272,11 @@ get_section(void)
      pop_keyword();
 
      if (curk->type != WORD)
-          errx(1, "%s:%lu: near '%s', missing end-section name",
+          errx(1, "%s:%d: near '%s', missing end-section name",
                     file.name, curk->line, curw->name);
 
      if (strcmp(curw->name, s->name))
-          errx(1, "%s:%lu: near '%s', non-closed section '%s'",
+          errx(1, "%s:%d: near '%s', non-closed section '%s'",
                     file.name, curk->line, curw->name, s->name);
 
      pop_stack();
@@ -297,7 +297,7 @@ get_option(void)
      pop_keyword();
 
      if (curk->type != EQUAL)
-          errx(1, "%s:%lu: near '%s', missing '=' here",
+          errx(1, "%s:%d: near '%s', missing '=' here",
                     file.name, curk->line, curw->name);
 
      pop_keyword();
@@ -312,7 +312,7 @@ get_option(void)
                pop_keyword();
                while (curk->type != LIST_END) {
                     if (curk->type != WORD)
-                         errx(1, "%s:%lu: near '%s', declaration into a list",
+                         errx(1, "%s:%d: near '%s', declaration into a list",
                                    file.name, curk->line, curw->name);
                     o->val[j++] = strdup(curw->name);
                     pop_stack();
@@ -321,7 +321,7 @@ get_option(void)
                o->val[j] = NULL;
                break;
           default:
-               errx(1, "%s:%lu: near '%s', syntax error",
+               errx(1, "%s:%d: near '%s', syntax error",
                          file.name, curk->line, curw->name);
                break;
      }
@@ -385,6 +385,34 @@ fetch_section(struct conf_sec *s, char *name)
      return ret;
 }
 
+struct conf_sec *
+fetch_section_first(struct conf_sec *s, char *name)
+{
+     struct conf_sec *sec;
+
+     if (!name)
+          return NULL;
+
+     if (!s)
+          SLIST_FOREACH(sec, &config, entry)
+               if (!strcmp(sec->name, name))
+                    return sec;
+
+     SLIST_FOREACH(sec, &s->sub, entry)
+          if (!strcmp(sec->name, name))
+               return sec;
+
+     return NULL;
+}
+
+size_t
+fetch_section_count(struct conf_sec **s)
+{
+     size_t ret;
+     for (ret = 0; s[ret]; ret++);
+     return ret;
+}
+
 struct opt_type *
 fetch_opt(struct conf_sec *s, char *dfl, char *name)
 {
@@ -412,6 +440,28 @@ fetch_opt(struct conf_sec *s, char *dfl, char *name)
      ret[0] = string_to_opt(dfl);
      ret[1] = opt_type_null;
 
+     return ret;
+}
+
+struct opt_type
+fetch_opt_first(struct conf_sec *s, char *dfl, char *name)
+{
+     struct conf_opt *o;
+
+     if (!name || !s)
+          return opt_type_null;
+
+     SLIST_FOREACH(o, &s->optlist, entry)
+          if (!strcmp(o->name, name))
+               return string_to_opt(o->val[0]);
+     return string_to_opt(dfl);
+}
+
+size_t
+fetch_opt_count(struct opt_type *o)
+{
+     size_t ret;
+     for(ret = 0; o[ret].str; ret++);
      return ret;
 }
 

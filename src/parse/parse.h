@@ -46,7 +46,7 @@ enum conf_type { SEC_START, SEC_END, WORD, EQUAL, LIST_START, LIST_END, NONE };
 
 struct conf_keyword {
      enum conf_type type;
-     size_t line;
+     int line;
      TAILQ_ENTRY(conf_keyword) entry;
 };
 
@@ -86,6 +86,11 @@ struct opt_type {
 
 int get_conf(const char *);
 struct conf_sec **fetch_section(struct conf_sec *, char *);
+struct conf_sec *fetch_section_first(struct conf_sec *, char *);
+size_t fetch_section_count(struct conf_sec **);
+
+struct opt_type fetch_opt_first(struct conf_sec *, char *, char *);
 struct opt_type *fetch_opt(struct conf_sec *, char *, char *);
+size_t fetch_opt_count(struct opt_type *);
 
 #endif /* PARSE_H */

@@ -118,11 +118,11 @@ mouse_section(MouseBinding mb[], int ns, struct conf_sec **sec)
 
      for (n = 0; sec[n]; n++)
      {
-          mb[n].tag    = fetch_opt(sec[n], "-1", "tag")[0].num;
-          mb[n].screen = fetch_opt(sec[n], "-1", "screen")[0].num;
-          mb[n].button = char_to_button(fetch_opt(sec[n], "1", "button")[0].str, mouse_button_list);
-          mb[n].func   = name_to_func(fetch_opt(sec[n], "", "func")[0].str, func_list);
-          mb[n].cmd    = fetch_opt(sec[n], "", "cmd")[0].str;
+          mb[n].tag    = fetch_opt_first(sec[n], "-1", "tag").num;
+          mb[n].screen = fetch_opt_first(sec[n], "-1", "screen").num;
+          mb[n].button = char_to_button(fetch_opt_first(sec[n], "1", "button").str, mouse_button_list);
+          mb[n].func   = name_to_func(fetch_opt_first(sec[n], "", "func").str, func_list);
+          mb[n].cmd    = fetch_opt_first(sec[n], "", "cmd").str;
      }
 }
 
@@ -130,20 +130,20 @@ void
 conf_misc_section(void)
 {
      int pad = 12;
-     struct conf_sec **sec;
+     struct conf_sec *sec;
 
-     sec = fetch_section(NULL, "misc");
+     sec = fetch_section_first(NULL, "misc");
 
-     conf.font              = fetch_opt(sec[0], "sans-9", "font")[0].str;
-     conf.raisefocus        = fetch_opt(sec[0], "false", "raisefocus")[0].bool;
-     conf.raiseswitch       = fetch_opt(sec[0], "false", "raiseswitch")[0].bool;
-     conf.focus_fmouse      = fetch_opt(sec[0], "true", "focus_follow_mouse")[0].bool;
-     conf.focus_pclick      = fetch_opt(sec[0], "true", "focus_pointer_click")[0].bool;
-     conf.status_timing     = fetch_opt(sec[0], "1", "status_timing")[0].num;
-     conf.status_path       = fetch_opt(sec[0], "", "status_path")[0].str;
-     conf.autostart_path    = fetch_opt(sec[0], "", "autostart_path")[0].str;
-     conf.autostart_command = fetch_opt(sec[0], "", "autostart_command")[0].str;
-     pad                    = fetch_opt(sec[0], "12", "pad")[0].num;
+     conf.font              = fetch_opt_first(sec, "sans-9", "font").str;
+     conf.raisefocus        = fetch_opt_first(sec, "false", "raisefocus").bool;
+     conf.raiseswitch       = fetch_opt_first(sec, "false", "raiseswitch").bool;
+     conf.focus_fmouse      = fetch_opt_first(sec, "true", "focus_follow_mouse").bool;
+     conf.focus_pclick      = fetch_opt_first(sec, "true", "focus_pointer_click").bool;
+     conf.status_timing     = fetch_opt_first(sec, "1", "status_timing").num;
+     conf.status_path       = fetch_opt_first(sec, "", "status_path").str;
+     conf.autostart_path    = fetch_opt_first(sec, "", "autostart_path").str;
+     conf.autostart_command = fetch_opt_first(sec, "", "autostart_command").str;
+     pad                    = fetch_opt_first(sec, "12", "pad").num;
 
      if(pad > 24 || pad < 1)
      {
@@ -160,41 +160,30 @@ conf_misc_section(void)
           conf.status_timing = 1;
      }
 
-     free(sec);
-
      return;
 }
 
 void
 conf_bar_section(void)
 {
-     struct conf_sec **sec, **mouse;
-     int n;
+     struct conf_sec *bar, **mouse;
 
-     sec = fetch_section(NULL, "bar");
+     bar = fetch_section_first(NULL, "bar");
 
-     conf.border.bar  = fetch_opt(sec[0], "false", "border")[0].bool;
-     conf.bars.height = fetch_opt(sec[0], "-1", "height")[0].num;
-     conf.colors.bar  = getcolor(fetch_opt(sec[0], "#000000", "bg")[0].str);
-     conf.colors.text = fetch_opt(sec[0], "#ffffff", "fg")[0].str;
-     conf.bars.selbar = fetch_opt(sec[0], "false", "selbar")[0].bool;
+     conf.border.bar  = fetch_opt_first(bar, "false", "border").bool;
+     conf.bars.height = fetch_opt_first(bar, "-1", "height").num;
+     conf.colors.bar  = getcolor(fetch_opt_first(bar, "#000000", "bg").str);
+     conf.colors.text = fetch_opt_first(bar, "#ffffff", "fg").str;
+     conf.bars.selbar = fetch_opt_first(bar, "false", "selbar").bool;
 
-     mouse = fetch_section(sec[0], "mouse");
+     mouse = fetch_section(bar, "mouse");
 
-     if (!mouse)
-          return;
-
-     for (n = 0; mouse[n] ; n++);
-
-     conf.bars.nmouse = n;
-
-     if (n > 0)
+     if ((conf.bars.nmouse = fetch_section_count(mouse)) > 0)
      {
-          conf.bars.mouse = emalloc(n, sizeof(MouseBinding));
-          mouse_section(conf.bars.mouse, n, mouse);
+          conf.bars.mouse = emalloc(conf.bars.nmouse, sizeof(MouseBinding));
+          mouse_section(conf.bars.mouse, conf.bars.nmouse, mouse);
      }
 
-     free(sec);
      free(mouse);
 
      return;
@@ -203,25 +192,21 @@ conf_bar_section(void)
 void
 conf_root_section(void)
 {
-     struct conf_sec **sec, **mouse;
-     int n;
+     struct conf_sec *root, **mouse;
 
-     sec = fetch_section(NULL, "root");
+     root = fetch_section_first(NULL, "root");
 
-     conf.root.background_command = fetch_opt(sec[0], "", "background_command")[0].str;
+     conf.root.background_command = fetch_opt_first(root, "", "background_command").str;
 
-     mouse = fetch_section(sec[0], "mouse");
+     mouse = fetch_section(root, "mouse");
 
-     if (mouse)
+     if ((conf.root.nmouse = fetch_section_count(mouse)) > 0)
      {
-        for(n = 0; mouse[n]; n++);
-        if ((conf.root.nmouse = n) > 0) {
-             conf.root.mouse = emalloc(n, sizeof(MouseBinding));
-             mouse_section(conf.root.mouse, n, mouse);
-        }
-        free(mouse);
+          conf.root.mouse = emalloc(conf.root.nmouse, sizeof(MouseBinding));
+          mouse_section(conf.root.mouse, conf.root.nmouse, mouse);
      }
-     free(sec);
+
+     free(mouse);
 
      return;
 }
@@ -229,79 +214,74 @@ conf_root_section(void)
 void
 conf_client_section(void)
 {
-     int i, j, n;
+     int i, j;
      char *flags, *p;
-     struct conf_sec **sec, **mouse, **titlebar, **button, **line;
+     struct conf_sec *sec, **mouse, *titlebar, **button, **line;
      struct opt_type *opt;
 
-     sec = fetch_section(NULL, "client");
+     sec = fetch_section_first(NULL, "client");
 
-     conf.client_round               = fetch_opt(sec[0], "true", "client_round")[0].bool;
+     conf.client_round               = fetch_opt_first(sec, "true", "client_round").bool;
 
-     if ((conf.client.borderheight = fetch_opt(sec[0], "1", "border_height")[0].num) < 1)
+     if ((conf.client.borderheight = fetch_opt_first(sec, "1", "border_height").num) < 1)
           conf.client.borderheight = 1;
 
-     conf.client.border_shadow       = fetch_opt(sec[0], "false", "border_shadow")[0].bool;
-     conf.client.place_at_mouse      = fetch_opt(sec[0], "false", "place_at_mouse")[0].bool;
-     conf.client.bordernormal        = getcolor(fetch_opt(sec[0], "#000000", "border_normal")[0].str);
-     conf.client.borderfocus         = getcolor(fetch_opt(sec[0], "#ffffff", "border_focus")[0].str);
-     conf.client.resizecorner_normal = getcolor(fetch_opt(sec[0], "#222222", "resize_corner_normal")[0].str);
-     conf.client.resizecorner_focus  = getcolor(fetch_opt(sec[0], "#DDDDDD", "resize_corner_focus")[0].str);
-     conf.client.mod                 |= char_to_modkey(fetch_opt(sec[0], "Alt", "modifier")[0].str, key_list);
-     conf.client.set_new_win_master  = fetch_opt(sec[0], "true", "set_new_win_master")[0].bool;
+     conf.client.border_shadow       = fetch_opt_first(sec, "false", "border_shadow").bool;
+     conf.client.place_at_mouse      = fetch_opt_first(sec, "false", "place_at_mouse").bool;
+     conf.client.bordernormal        = getcolor(fetch_opt_first(sec, "#000000", "border_normal").str);
+     conf.client.borderfocus         = getcolor(fetch_opt_first(sec, "#ffffff", "border_focus").str);
+     conf.client.resizecorner_normal = getcolor(fetch_opt_first(sec, "#222222", "resize_corner_normal").str);
+     conf.client.resizecorner_focus  = getcolor(fetch_opt_first(sec, "#DDDDDD", "resize_corner_focus").str);
+     conf.client.mod                 |= char_to_modkey(fetch_opt_first(sec, "Alt", "modifier").str, key_list);
+     conf.client.set_new_win_master  = fetch_opt_first(sec, "true", "set_new_win_master").bool;
 
-     mouse = fetch_section(sec[0], "mouse");
+     mouse = fetch_section(sec, "mouse");
 
-     for(n = 0; mouse[n]; n++);
-
-     if((conf.client.nmouse = n) > 0)
+     if((conf.client.nmouse = fetch_section_count(mouse)) > 0)
      {
           conf.client.mouse = emalloc(conf.client.nmouse, sizeof(MouseBinding));
-          mouse_section(conf.client.mouse, n, mouse);
+          mouse_section(conf.client.mouse, conf.client.nmouse, mouse);
      }
+
      free(mouse);
 
-     titlebar = fetch_section(sec[0], "titlebar");
+     titlebar = fetch_section_first(sec, "titlebar");
 
-     conf.titlebar.height    = fetch_opt(titlebar[0], "0", "height")[0].num;
-     conf.titlebar.fg_normal = fetch_opt(titlebar[0], "#ffffff", "fg_normal")[0].str;
-     conf.titlebar.fg_focus  = fetch_opt(titlebar[0], "#000000", "fg_focus")[0].str;
+     conf.titlebar.height    = fetch_opt_first(titlebar, "0", "height").num;
+     conf.titlebar.fg_normal = fetch_opt_first(titlebar, "#ffffff", "fg_normal").str;
+     conf.titlebar.fg_focus  = fetch_opt_first(titlebar, "#000000", "fg_focus").str;
 
-     conf.titlebar.stipple.active = fetch_opt(titlebar[0], "false", "stipple")[0].bool;
+     conf.titlebar.stipple.active = fetch_opt_first(titlebar, "false", "stipple").bool;
 
-     if(!strcmp((p = fetch_opt(titlebar[0], "-1", "stipple_normal")[0].str), "-1"))
+     if(!strcmp((p = fetch_opt_first(titlebar, "-1", "stipple_normal").str), "-1"))
           conf.titlebar.stipple.colors.normal = getcolor(conf.titlebar.fg_normal);
      else
           conf.titlebar.stipple.colors.normal = getcolor(p);
 
-     if(!strcmp((p = fetch_opt(titlebar[0], "-1", "stipple_focus")[0].str), "-1"))
+     if(!strcmp((p = fetch_opt_first(titlebar, "-1", "stipple_focus").str), "-1"))
           conf.titlebar.stipple.colors.focus = getcolor(conf.titlebar.fg_focus);
      else
           conf.titlebar.stipple.colors.focus = getcolor(p);
 
-     mouse = fetch_section(titlebar[0], "mouse");
+     mouse = fetch_section(titlebar, "mouse");
 
-     for(n = 0; mouse[n]; n++);
-
-     if((conf.titlebar.nmouse = n) > 0)
+     if((conf.titlebar.nmouse = fetch_section_count(mouse)) > 0)
      {
           conf.titlebar.mouse = emalloc(conf.titlebar.nmouse, sizeof(MouseBinding));
-          mouse_section(conf.titlebar.mouse, n, mouse);
+          mouse_section(conf.titlebar.mouse, conf.titlebar.nmouse, mouse);
      }
 
      free(mouse);
 
      /* Multi button part */
-     button = fetch_section(titlebar[0], "button");
+     button = fetch_section(titlebar, "button");
 
-     for(n = 0; button[n]; n++);
-
-     if((conf.titlebar.nbutton = n) > 0)
+     if((conf.titlebar.nbutton = fetch_section_count(button)) > 0)
      {
           conf.titlebar.button = emalloc(conf.titlebar.nbutton, sizeof(Button));
           for(i = 0; i < conf.titlebar.nbutton; ++i)
           {
-               flags = fetch_opt(button[n], "none", "flags")[0].str;
+               flags = fetch_opt_first(button[i], "none", "flags").str;
 
                conf.titlebar.button[i].flags = 0;
                if(strstr(flags, "free"))
@@ -314,39 +294,36 @@ conf_client_section(void)
                /* Multi mouse section */
                mouse = fetch_section(button[i], "mouse");
 
-               for(n = 0; mouse[n]; n++);
-
-               if((conf.titlebar.button[i].nmouse = n) > 0)
+               if((conf.titlebar.button[i].nmouse = fetch_section_count(mouse)) > 0)
                {
                     conf.titlebar.button[i].mouse = emalloc(conf.titlebar.button[i].nmouse, sizeof(MouseBinding));
-                    mouse_section(conf.titlebar.button[i].mouse, n, mouse);
+                    mouse_section(conf.titlebar.button[i].mouse, conf.titlebar.button[i].nmouse, mouse);
                }
+
                free(mouse);
 
                /* Multi line section */
                line = fetch_section(button[i], "line");
 
-               for(n = 0; line[n]; n++);
-
-               if((conf.titlebar.button[i].nlines = n) > 0)
+               if((conf.titlebar.button[i].nlines = fetch_section_count(line)) > 0)
                {
                     conf.titlebar.button[i].linecoord = emalloc(conf.titlebar.button[i].nlines, sizeof(XSegment));
 
-                    for(j = 0; j < n; ++j)
+                    for(j = 0; j < conf.titlebar.button[i].nlines; ++j)
                     {
                          opt = fetch_opt(line[j], "0", "coord");
                          conf.titlebar.button[i].linecoord[j].x1 = opt[0].num;
                          conf.titlebar.button[i].linecoord[j].y1 = opt[1].num;
                          conf.titlebar.button[i].linecoord[j].x2 = opt[2].num;
                          conf.titlebar.button[i].linecoord[j].y2 = opt[3].num;
+                         free(opt);
                     }
                }
+
                free(line);
           }
      }
      free(button);
-     free(titlebar);
-     free(sec);
 
      return;
 }
@@ -356,8 +333,7 @@ conf_layout_section(void)
 {
      int i;
      char *tmp = NULL, *p;
-     struct conf_sec **layouts, **layout;
-     int n;
+     struct conf_sec *layouts, **layout;
 
      /* Set conf.layout NULL for conf reload */
      for(i = 0; i < NUM_OF_LAYOUT; ++i)
@@ -366,24 +342,21 @@ conf_layout_section(void)
           conf.layout[i].func = NULL;
      }
 
-     layouts = fetch_section(NULL, "layouts");
+     layouts = fetch_section_first(NULL, "layouts");
 
-     conf.border.layout     = fetch_opt(layouts[0], "false", "border")[0].bool;
-     conf.colors.layout_fg  = fetch_opt(layouts[0], "#ffffff", "fg")[0].str;
-     conf.colors.layout_bg  = getcolor((fetch_opt(layouts[0], "#000000", "bg")[0].str));
+     conf.border.layout     = fetch_opt_first(layouts, "false", "border").bool;
+     conf.colors.layout_fg  = fetch_opt_first(layouts, "#ffffff", "fg").str;
+     conf.colors.layout_bg  = getcolor((fetch_opt_first(layouts, "#000000", "bg").str));
 
 
-     if((tmp = fetch_opt(layouts[0], "menu", "system")[0].str) && !strcmp(tmp, "menu"))
+     if((tmp = fetch_opt_first(layouts, "menu", "system").str) && !strcmp(tmp, "menu"))
           conf.layout_system = True;
 
-     if((tmp = fetch_opt(layouts[0], "right", "placement")[0].str) && !strcmp(tmp, "left"))
+     if((tmp = fetch_opt_first(layouts, "right", "placement").str) && !strcmp(tmp, "left"))
           conf.layout_placement = True;
 
-     layout = fetch_section(layouts[0], "layout");
-
-     for (n = 0; layout[n]; n++);
-
-     conf.nlayout = n;
+     layout = fetch_section(layouts, "layout");
+     conf.nlayout = fetch_section_count(layout);
 
      if(conf.nlayout > NUM_OF_LAYOUT || !(conf.nlayout))
      {
@@ -408,26 +381,25 @@ conf_layout_section(void)
      {
           for(i = 0; i < conf.nlayout; ++i)
           {
-               if(!name_to_func((p = fetch_opt(layout[i], "tile", "type")[0].str), layout_list))
+               if(!name_to_func((p = fetch_opt_first(layout[i], "tile", "type").str), layout_list))
                     warnx("configuration : Unknown Layout type : \"%s\".", p);
                else
                {
                     if(conf.layout_system && conf.nlayout > 1)
                     {
-                         menu_new_item(&menulayout.item[i], fetch_opt(layout[i], "", "symbol")[0].str,
+                         menu_new_item(&menulayout.item[i], fetch_opt_first(layout[i], "", "symbol").str,
                                    uicb_set_layout, p);
 
                          menulayout.item[i].check = name_to_func("check_layout", func_list);
                     }
 
-                    conf.layout[i].symbol = fetch_opt(layout[i], "TILE (default)", "symbol")[0].str;
+                    conf.layout[i].symbol = fetch_opt_first(layout[i], "TILE (default)", "symbol").str;
                     conf.layout[i].func = name_to_func(p, layout_list);
                     conf.layout[i].type = p;
                }
           }
      }
      free(layout);
-     free(layouts);
 
      return;
 }
@@ -437,7 +409,7 @@ conf_tag_section(void)
 {
      int i, j, k, l = 0, m, n, sc, count;
      char *tmp;
-     struct conf_sec **sec, **tag, **mouse;
+     struct conf_sec *sec, **tag, **mouse;
      struct opt_type *opt;
 
      /* If there is no tag in the conf or more than
@@ -448,27 +420,27 @@ conf_tag_section(void)
                          layout_name_to_struct(conf.layout, "tile_right", conf.nlayout, layout_list),
                          0, NULL, 0 };
 
-     sec = fetch_section(NULL, "tags");
+     sec = fetch_section_first(NULL, "tags");
 
-     conf.tag_round               = fetch_opt(sec[0], "false", "tag_round")[0].bool;
-     conf.colors.tagselfg         = fetch_opt(sec[0], "#ffffff", "sel_fg")[0].str;
-     conf.colors.tagselbg         = getcolor(fetch_opt(sec[0], "#000000", "sel_bg")[0].str);
-     conf.colors.tagurfg          = fetch_opt(sec[0], "#000000", "urgent_fg")[0].str;
-     conf.colors.tagurbg          = getcolor(fetch_opt(sec[0], "#DD1111", "urgent_bg")[0].str);
-     conf.colors.tag_occupied_bg  = getcolor(fetch_opt(sec[0], "#222222", "occupied_bg")[0].str);
-     conf.border.tag              = fetch_opt(sec[0], "false", "border")[0].bool;
+     conf.tag_round               = fetch_opt_first(sec, "false", "tag_round").bool;
+     conf.colors.tagselfg         = fetch_opt_first(sec, "#ffffff", "sel_fg").str;
+     conf.colors.tagselbg         = getcolor(fetch_opt_first(sec, "#000000", "sel_bg").str);
+     conf.colors.tagurfg          = fetch_opt_first(sec, "#000000", "urgent_fg").str;
+     conf.colors.tagurbg          = getcolor(fetch_opt_first(sec, "#DD1111", "urgent_bg").str);
+     conf.colors.tag_occupied_bg  = getcolor(fetch_opt_first(sec, "#222222", "occupied_bg").str);
+     conf.border.tag              = fetch_opt_first(sec, "false", "border").bool;
 
      /* Mouse button action on tag */
      conf.mouse_tag_action[TagSel] =
-          char_to_button(fetch_opt(sec[0], "1", "mouse_button_tag_sel")[0].str, mouse_button_list);
+          char_to_button(fetch_opt_first(sec, "1", "mouse_button_tag_sel").str, mouse_button_list);
      conf.mouse_tag_action[TagTransfert] =
-          char_to_button(fetch_opt(sec[0], "2", "mouse_button_tag_transfert")[0].str, mouse_button_list);
+          char_to_button(fetch_opt_first(sec, "2", "mouse_button_tag_transfert").str, mouse_button_list);
      conf.mouse_tag_action[TagAdd] =
-          char_to_button(fetch_opt(sec[0], "3", "mouse_button_tag_add")[0].str, mouse_button_list);
+          char_to_button(fetch_opt_first(sec, "3", "mouse_button_tag_add").str, mouse_button_list);
      conf.mouse_tag_action[TagNext]  =
-          char_to_button(fetch_opt(sec[0], "4", "mouse_button_tag_next")[0].str, mouse_button_list);
+          char_to_button(fetch_opt_first(sec, "4", "mouse_button_tag_next").str, mouse_button_list);
      conf.mouse_tag_action[TagPrev]  =
-          char_to_button(fetch_opt(sec[0], "5", "mouse_button_tag_prev")[0].str, mouse_button_list);
+          char_to_button(fetch_opt_first(sec, "5", "mouse_button_tag_prev").str, mouse_button_list);
 
      sc = screen_count();
 
@@ -481,16 +453,16 @@ conf_tag_section(void)
      for(i = 0; i < sc; ++i)
           seltag[i] = 1;
 
-     tag = fetch_section(sec[0], "tag");
+     tag = fetch_section(sec, "tag");
 
-     for(n = 0; tag[n]; n++);
+     n = fetch_section_count(tag);
 
      for(i = 0; i < sc; ++i)
           tags[i] = emalloc(n + 2, sizeof(Tag));
 
      for(i = (n - 1); i >= 0; i--)
      {
-          j = fetch_opt(tag[i], "-1", "screen")[0].num;
+          j = fetch_opt_first(tag[i], "-1", "screen").num;
 
           if(j < 0 || j > sc - 1)
                j = -1;
@@ -500,14 +472,14 @@ conf_tag_section(void)
               ((j == -1) ? ++k : --l))
           {
                ++conf.ntag[k];
-               tags[k][conf.ntag[k]].name       = fetch_opt(tag[i], "", "name")[0].str;
-               tags[k][conf.ntag[k]].mwfact     = fetch_opt(tag[i], "0.65", "mwfact")[0].fnum;
-               tags[k][conf.ntag[k]].nmaster    = fetch_opt(tag[i], "1", "nmaster")[0].num;
-               tags[k][conf.ntag[k]].resizehint = fetch_opt(tag[i], "false", "resizehint")[0].bool;
-               tags[k][conf.ntag[k]].abovefc    = fetch_opt(tag[i], "false", "abovefc")[0].bool;
+               tags[k][conf.ntag[k]].name       = fetch_opt_first(tag[i], "", "name").str;
+               tags[k][conf.ntag[k]].mwfact     = fetch_opt_first(tag[i], "0.65", "mwfact").fnum;
+               tags[k][conf.ntag[k]].nmaster    = fetch_opt_first(tag[i], "1", "nmaster").num;
+               tags[k][conf.ntag[k]].resizehint = fetch_opt_first(tag[i], "false", "resizehint").bool;
+               tags[k][conf.ntag[k]].abovefc    = fetch_opt_first(tag[i], "false", "abovefc").bool;
                tags[k][conf.ntag[k]].layers = 1;
 
-               tmp = fetch_opt(tag[i], "top", "infobar_position")[0].str;
+               tmp = fetch_opt_first(tag[i], "top", "infobar_position").str;
 
                if(!strcmp(tmp ,"none") || !strcmp(tmp, "hide") || !strcmp(tmp, "hidden"))
                     tags[k][conf.ntag[k]].barpos = IB_Hide;
@@ -517,16 +489,14 @@ conf_tag_section(void)
                     tags[k][conf.ntag[k]].barpos = IB_Top;
 
                tags[k][conf.ntag[k]].layout = layout_name_to_struct(conf.layout,
-                                                                    fetch_opt(tag[i], "tile_right", "layout")[0].str,
+                                                                    fetch_opt_first(tag[i], "tile_right", "layout").str,
                                                                     conf.nlayout,
                                                                     layout_list);
 
                /* Clients list */
                opt = fetch_opt(tag[i], "", "clients");
 
-               for (count = 0; opt[count].str; count++);
-
-               if(count)
+               if ((count = fetch_opt_count(opt)))
                {
                     tags[k][conf.ntag[k]].nclients = count;
                     tags[k][conf.ntag[k]].clients = emalloc(count, sizeof(char *));
@@ -534,16 +504,17 @@ conf_tag_section(void)
                          tags[k][conf.ntag[k]].clients[m] = opt[m].str;
                }
 
+               free(opt);
+
                /* Multi mouse sections */
                mouse = fetch_section(tag[i], "mouse");
 
-               for (count = 0; mouse[count]; count++);
-
-               if((tags[k][conf.ntag[k]].nmouse = count))
+               if((tags[k][conf.ntag[k]].nmouse = fetch_section_count(mouse)))
                {
                     tags[k][conf.ntag[k]].mouse = emalloc(tags[k][conf.ntag[k]].nmouse, sizeof(MouseBinding));
-                    mouse_section(tags[k][conf.ntag[k]].mouse, count, mouse);
+                    mouse_section(tags[k][conf.ntag[k]].mouse, tags[k][conf.ntag[k]].nmouse, mouse);
                }
+
                free(mouse);
           }
           l = 0;
@@ -558,7 +529,6 @@ conf_tag_section(void)
           }
 
      free(tag);
-     free(sec);
 
      return;
 }
@@ -567,31 +537,28 @@ void
 conf_menu_section(void)
 {
      char *tmp2;
-     int i, j, aj,  n;
-     struct conf_sec **menu, **set_menu, **item;
+     int i, j, aj;
+     struct conf_sec *menu, **set_menu, **item;
 
-     menu = fetch_section(NULL, "menu");
-     set_menu = fetch_section(menu[0], "set_menu");
+     menu = fetch_section_first(NULL, "menu");
+     set_menu = fetch_section(menu, "set_menu");
 
-     for (n = 0; set_menu[n]; n++);
-
-
-     CHECK((conf.nmenu = n));
+     CHECK((conf.nmenu = fetch_section_count(set_menu)));
 
      conf.menu = calloc(conf.nmenu, sizeof(Menu));
 
      for(i = 0; i < conf.nmenu; ++i)
      {
 
-          conf.menu[i].name = fetch_opt(set_menu[i], "menu_wname", "name")[0].str;
+          conf.menu[i].name = fetch_opt_first(set_menu[i], "menu_wname", "name").str;
 
-          if(!(conf.menu[i].place_at_mouse = fetch_opt(set_menu[i], "true", "place_at_mouse")[0].bool))
+          if(!(conf.menu[i].place_at_mouse = fetch_opt_first(set_menu[i], "true", "place_at_mouse").bool))
           {
-               conf.menu[i].x = fetch_opt(set_menu[i], "0", "x")[0].num;
-               conf.menu[i].y = fetch_opt(set_menu[i], "0", "y")[0].num;
+               conf.menu[i].x = fetch_opt_first(set_menu[i], "0", "x").num;
+               conf.menu[i].y = fetch_opt_first(set_menu[i], "0", "y").num;
           }
 
-          tmp2 = fetch_opt(set_menu[i], "center", "align")[0].str;
+          tmp2 = fetch_opt_first(set_menu[i], "center", "align").str;
 
           if(!strcmp(tmp2 ,"left"))
                conf.menu[i].align = MA_Left;
@@ -600,32 +567,29 @@ conf_menu_section(void)
           else
                conf.menu[i].align = MA_Center;
 
-          conf.menu[i].colors.focus.bg  = getcolor(fetch_opt(set_menu[i], "#000000", "bg_focus")[0].str);
-          conf.menu[i].colors.focus.fg  = fetch_opt(set_menu[i], "#ffffff", "fg_focus")[0].str;
-          conf.menu[i].colors.normal.bg = getcolor(fetch_opt(set_menu[i], "#000000", "bg_normal")[0].str);
-          conf.menu[i].colors.normal.fg = fetch_opt(set_menu[i], "#ffffff", "fg_normal")[0].str;
+          conf.menu[i].colors.focus.bg  = getcolor(fetch_opt_first(set_menu[i], "#000000", "bg_focus").str);
+          conf.menu[i].colors.focus.fg  = fetch_opt_first(set_menu[i], "#ffffff", "fg_focus").str;
+          conf.menu[i].colors.normal.bg = getcolor(fetch_opt_first(set_menu[i], "#000000", "bg_normal").str);
+          conf.menu[i].colors.normal.fg = fetch_opt_first(set_menu[i], "#ffffff", "fg_normal").str;
 
           item = fetch_section(set_menu[i], "item");
 
-          for (n = 0; item[n]; n++);
-
-          if((conf.menu[i].nitem = n))
+          if((conf.menu[i].nitem = fetch_section_count(item)))
           {
                conf.menu[i].item = emalloc(conf.menu[i].nitem, sizeof(MenuItem));
-               for(j = 0; j < n; ++j)
+               for(j = 0; j < conf.menu[i].nitem; ++j)
                {
-                    aj = (n - 1) - j;
-                    conf.menu[i].item[aj].name = fetch_opt(item[j], "item_wname", "name")[0].str;
-                    conf.menu[i].item[aj].func = name_to_func(fetch_opt(item[j], "", "func")[0].str, func_list);
-                    conf.menu[i].item[aj].cmd  = fetch_opt(item[j], "", "cmd")[0].str;
-                    conf.menu[i].item[aj].check = name_to_func(fetch_opt(item[j], "", "check")[0].str, func_list);
-                    conf.menu[i].item[aj].submenu = fetch_opt(item[j], "", "submenu")[0].str;
+                    aj = (conf.menu[i].nitem - 1) - j;
+                    conf.menu[i].item[aj].name = fetch_opt_first(item[j], "item_wname", "name").str;
+                    conf.menu[i].item[aj].func = name_to_func(fetch_opt_first(item[j], "", "func").str, func_list);
+                    conf.menu[i].item[aj].cmd  = fetch_opt_first(item[j], "", "cmd").str;
+                    conf.menu[i].item[aj].check = name_to_func(fetch_opt_first(item[j], "", "check").str, func_list);
+                    conf.menu[i].item[aj].submenu = fetch_opt_first(item[j], "", "submenu").str;
                }
           }
           free(item);
      }
      free(set_menu);
-     free(menu);
 
      return;
 }
@@ -633,27 +597,24 @@ conf_menu_section(void)
 void
 conf_launcher_section(void)
 {
-     int i, n;
-     struct conf_sec **launcher, **set_launcher;
+     int i;
+     struct conf_sec *launcher, **set_launcher;
 
-     launcher = fetch_section(NULL, "launcher");
-     set_launcher = fetch_section(launcher[0], "set_launcher");
+     launcher = fetch_section_first(NULL, "launcher");
+     set_launcher = fetch_section(launcher, "set_launcher");
 
-     for (n = 0; set_launcher[n]; n++);
-
-     CHECK((conf.nlauncher = n));
+     CHECK((conf.nlauncher = fetch_section_count(set_launcher)));
 
      conf.launcher = emalloc(conf.nlauncher, sizeof(Launcher));
 
      for(i = 0; i < conf.nlauncher; ++i)
      {
-          conf.launcher[i].name    = fetch_opt(set_launcher[i], "launcher", "name")[0].str;
-          conf.launcher[i].prompt  = fetch_opt(set_launcher[i], "Exec:", "prompt")[0].str;
-          conf.launcher[i].command = fetch_opt(set_launcher[i], "exec", "command")[0].str;
+          conf.launcher[i].name    = fetch_opt_first(set_launcher[i], "launcher", "name").str;
+          conf.launcher[i].prompt  = fetch_opt_first(set_launcher[i], "Exec:", "prompt").str;
+          conf.launcher[i].command = fetch_opt_first(set_launcher[i], "exec", "command").str;
           conf.launcher[i].nhisto  = 1;
      }
      free(set_launcher);
-     free(launcher);
 
      return;
 }
@@ -661,39 +622,39 @@ conf_launcher_section(void)
 void
 conf_keybind_section(void)
 {
-     int i, j, n = 0;
-     struct conf_sec **sec, **ks;
+     int i, j;
+     struct conf_sec *sec, **ks;
      struct opt_type *opt;
 
-     sec = fetch_section(NULL, "keys");
-     ks = fetch_section(sec[0], "key");
+     sec = fetch_section_first(NULL, "keys");
+     ks = fetch_section(sec, "key");
 
-     for (n = 0; ks[n]; n++);
-
-     conf.nkeybind = n;
+     conf.nkeybind = fetch_section_count(ks);
      keys = emalloc(conf.nkeybind, sizeof(Key));
 
      for(i = 0; i < conf.nkeybind; ++i)
      {
           opt = fetch_opt(ks[i], "", "mod");
 
-          for (n = 0; opt[n].str; n++);
-
-          for(j = 0; j < n; ++j)
+          for(j = 0; j < fetch_opt_count(opt); ++j)
                keys[i].mod |= char_to_modkey(opt[j].str, key_list);
 
-          keys[i].keysym = XStringToKeysym(fetch_opt(ks[i], "None", "key")[0].str);
+          free(opt);
 
-          keys[i].func = name_to_func(fetch_opt(ks[i], "", "func")[0].str, func_list);
+          keys[i].keysym = XStringToKeysym(fetch_opt_first(ks[i], "None", "key").str);
+
+          keys[i].func = name_to_func(fetch_opt_first(ks[i], "", "func").str, func_list);
 
           if(keys[i].func == NULL)
           {
-               warnx("configuration : Unknown Function \"%s\".", fetch_opt(ks[i], "", "func")[0].str);
+               warnx("configuration : Unknown Function \"%s\".", fetch_opt_first(ks[i], "", "func").str);
                keys[i].func = uicb_spawn;
           }
 
-          keys[i].cmd = fetch_opt(ks[i], "", "cmd")[0].str;
+          keys[i].cmd = fetch_opt_first(ks[i], "", "cmd").str;
      }
+
+     free(ks);
 
      return;
 }
