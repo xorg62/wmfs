@@ -225,7 +225,7 @@ get_conf(const char *name)
                     SLIST_INSERT_HEAD(&config, s, entry);
                     break;
                default:
-                    errx(1, "%s:%d: near '%s', config out of any section",
+                    errx(1, "%s:%lu: near '%s', config out of any section",
                               file.name, curk->line, curw->name);
                     break;
           }
@@ -246,7 +246,7 @@ get_section(void)
      pop_keyword();
 
      if (curk->type != WORD)
-          errx(1, "%s:%d: near '%s', missing section name",
+          errx(1, "%s:%lu: near '%s', missing section name",
                     file.name, curk->line, curw->name);
      pop_keyword();
 
@@ -264,7 +264,7 @@ get_section(void)
                case SEC_END:
                     break;
                default:
-                    errx(1, "%s:%d: near '%s', syntax error",
+                    errx(1, "%s:%lu: near '%s', syntax error",
                               file.name, curk->line, curw->name);
                     break;
           }
@@ -272,11 +272,11 @@ get_section(void)
      pop_keyword();
 
      if (curk->type != WORD)
-          errx(1, "%s:%d: near '%s', missing end-section name",
+          errx(1, "%s:%lu: near '%s', missing end-section name",
                     file.name, curk->line, curw->name);
 
      if (strcmp(curw->name, s->name))
-          errx(1, "%s:%d: near '%s', non-closed section '%s'",
+          errx(1, "%s:%lu: near '%s', non-closed section '%s'",
                     file.name, curk->line, curw->name, s->name);
 
      pop_stack();
@@ -297,7 +297,7 @@ get_option(void)
      pop_keyword();
 
      if (curk->type != EQUAL)
-          errx(1, "%s:%d: near '%s', missing '=' here",
+          errx(1, "%s:%lu: near '%s', missing '=' here",
                     file.name, curk->line, curw->name);
 
      pop_keyword();
@@ -312,7 +312,7 @@ get_option(void)
                pop_keyword();
                while (curk->type != LIST_END) {
                     if (curk->type != WORD)
-                         errx(1, "%s:%d: near '%s', declaration into a list",
+                         errx(1, "%s:%lu: near '%s', declaration into a list",
                                    file.name, curk->line, curw->name);
                     o->val[j++] = strdup(curw->name);
                     pop_stack();
@@ -321,7 +321,7 @@ get_option(void)
                o->val[j] = NULL;
                break;
           default:
-               errx(1, "%s:%d: near '%s', syntax error",
+               errx(1, "%s:%lu: near '%s', syntax error",
                          file.name, curk->line, curw->name);
                break;
      }

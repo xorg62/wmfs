@@ -281,17 +281,18 @@ conf_client_section(void)
 
      mouse = fetch_section(titlebar[0], "mouse");
 
-     for(n = 0; sec[n]; n++);
+     for(n = 0; mouse[n]; n++);
 
      if((conf.titlebar.nmouse = n) > 0)
      {
           conf.titlebar.mouse = emalloc(conf.titlebar.nmouse, sizeof(MouseBinding));
           mouse_section(conf.titlebar.mouse, n, mouse);
      }
+
      free(mouse);
 
      /* Multi button part */
-     button = fetch_section(sec[0], "button");
+     button = fetch_section(titlebar[0], "button");
 
      for(n = 0; button[n]; n++);
 
@@ -487,7 +488,7 @@ conf_tag_section(void)
      for(i = 0; i < sc; ++i)
           tags[i] = emalloc(n + 2, sizeof(Tag));
 
-     for(i = (n-1); i >= 0; i--)
+     for(i = (n - 1); i >= 0; i--)
      {
           j = fetch_opt(tag[i], "-1", "screen")[0].num;
 
@@ -566,7 +567,7 @@ void
 conf_menu_section(void)
 {
      char *tmp2;
-     int i, j, n;
+     int i, j, aj,  n;
      struct conf_sec **menu, **set_menu, **item;
 
      menu = fetch_section(NULL, "menu");
@@ -611,13 +612,14 @@ conf_menu_section(void)
           if((conf.menu[i].nitem = n))
           {
                conf.menu[i].item = emalloc(conf.menu[i].nitem, sizeof(MenuItem));
-               for(j = 0; j < conf.menu[i].nitem; ++j)
+               for(j = 0; j < n; ++j)
                {
-                    conf.menu[i].item[j].name = fetch_opt(item[j], "item_wname", "name")[0].str;
-                    conf.menu[i].item[j].func = name_to_func(fetch_opt(item[j], "", "func")[0].str, func_list);
-                    conf.menu[i].item[j].cmd  = fetch_opt(item[j], "", "cmd")[0].str;
-                    conf.menu[i].item[j].check = name_to_func(fetch_opt(item[j], "", "check")[0].str, func_list);
-                    conf.menu[i].item[j].submenu = fetch_opt(item[j], "", "submenu")[0].str;
+                    aj = (n - 1) - j;
+                    conf.menu[i].item[aj].name = fetch_opt(item[j], "item_wname", "name")[0].str;
+                    conf.menu[i].item[aj].func = name_to_func(fetch_opt(item[j], "", "func")[0].str, func_list);
+                    conf.menu[i].item[aj].cmd  = fetch_opt(item[j], "", "cmd")[0].str;
+                    conf.menu[i].item[aj].check = name_to_func(fetch_opt(item[j], "", "check")[0].str, func_list);
+                    conf.menu[i].item[aj].submenu = fetch_opt(item[j], "", "submenu")[0].str;
                }
           }
           free(item);
