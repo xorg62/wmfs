@@ -387,10 +387,10 @@ conf_layout_section(void)
                {
                     if(conf.layout_system && conf.nlayout > 1)
                     {
-                         menu_new_item(&menulayout.item[i], fetch_opt_first(layout[i], "", "symbol").str,
+                         menu_new_item(&menulayout.item[conf.nlayout-i-1], fetch_opt_first(layout[i], "", "symbol").str,
                                    uicb_set_layout, p);
 
-                         menulayout.item[i].check = name_to_func("check_layout", func_list);
+                         menulayout.item[conf.nlayout-i-1].check = name_to_func("check_layout", func_list);
                     }
 
                     conf.layout[i].symbol = fetch_opt_first(layout[i], "TILE (default)", "symbol").str;
