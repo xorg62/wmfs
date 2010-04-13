@@ -21,11 +21,13 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
 #include <err.h>
 
 #include "../wmfs.h"
 
 
+static void get_keyword(const char *buf, size_t n);
 static void pop_keyword(void);
 static void pop_stack(void);
 static struct conf_sec *get_section(void);
@@ -44,11 +46,11 @@ static struct conf_stack *curw; /* current word */
 static const struct opt_type opt_type_null = { 0, 0, False, NULL };
 
 static struct {
-     char *name;
+     const char *name;
      size_t line;
 } file = { NULL, 1 };
 
-void
+static void
 get_keyword(const char *buf, size_t n)
 {
      struct conf_keyword *kw;
@@ -58,8 +60,8 @@ get_keyword(const char *buf, size_t n)
 
      TAILQ_INIT(&stack);
      TAILQ_INIT(&keywords);
-     kw = malloc(sizeof(*kw));
-     e = malloc(sizeof(*e));
+     kw = emalloc(1, sizeof(*kw));
+     e = emalloc(1, sizeof(*e));
 
      for(i = 0, j = 0; i < n; i++)
      {
@@ -180,10 +182,36 @@ get_kw_name(enum conf_type type)
 }
 #endif
 
-void
-get_conf(void)
+int
+get_conf(const char *name)
 {
+     int fd;
+     struct stat st;
+     char *buf;
      struct conf_sec *s;
+
+     if (!name)
+          return (-1);
+
+     if ((fd = open(name, O_RDONLY)) == -1 ||
+               stat(name, &st) == -1)
+     {
+          warn("%s", name);
+          return (-1);
+     }
+
+     buf = (char*)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, SEEK_SET);
+
+     if (buf == (char*) MAP_FAILED)
+          return -1;
+
+     get_keyword(buf, st.st_size);
+
+     munmap(buf, st.st_size);
+     close(fd);
+     warnx("%s read", name);
+
+     file.name = name;
 
      curk = TAILQ_FIRST(&keywords);
      curw = TAILQ_FIRST(&stack);
@@ -202,6 +230,7 @@ get_conf(void)
                     break;
           }
      }
+     return 0;
 }
 
 static struct conf_sec *
@@ -211,7 +240,7 @@ get_section(void)
      struct conf_opt *o;
      struct conf_sec *sub;
 
-     s = calloc(1, sizeof(*s));
+     s = emalloc(1, sizeof(*s));
      s->name = strdup(curw->name);
      pop_stack();
      pop_keyword();
@@ -262,7 +291,7 @@ get_option(void)
      struct conf_opt *o;
      size_t j = 0;
 
-     o = calloc(1, sizeof(*o));
+     o = emalloc(1, sizeof(*o));
      o->name = strdup(curw->name);
      pop_stack();
      pop_keyword();
@@ -337,15 +366,16 @@ fetch_section(struct conf_sec *s, char *name)
           return NULL;
 
      if (!s) {
-          ret = malloc(2 * sizeof(struct conf_sec *));
+          ret = emalloc(2, sizeof(struct conf_sec *));
           SLIST_FOREACH(sec, &config, entry)
                if (!strcmp(sec->name, name)) {
                     ret[0] = sec;
                     ret[1] = NULL;
+                    break;
                }
      }
      else {
-          ret = calloc(s->nsub, sizeof(struct conf_sec *));
+          ret = emalloc(s->nsub+1, sizeof(struct conf_sec *));
           SLIST_FOREACH(sec, &s->sub, entry) {
                if (!strcmp(sec->name, name) && i < s->nsub)
                     ret[i++] = sec;
@@ -365,7 +395,7 @@ fetch_opt(struct conf_sec *s, char *dfl, char *name)
      if (!name)
           return NULL;
 
-     ret = calloc(10, sizeof(struct opt_type));
+     ret = emalloc(10, sizeof(struct opt_type));
 
      if (s) {
           SLIST_FOREACH(o, &s->optlist, entry)
@@ -402,7 +432,7 @@ string_to_opt(char *s)
      else
           ret.bool = False;
 
-     ret.str = strdup(s);
+     ret.str = s;
 
      return ret;
 }

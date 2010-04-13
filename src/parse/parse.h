@@ -84,8 +84,7 @@ struct opt_type {
      char *str;
 };
 
-void get_keyword(const char *, size_t);
-void get_conf(void);
+int get_conf(const char *);
 struct conf_sec **fetch_section(struct conf_sec *, char *);
 struct opt_type *fetch_opt(struct conf_sec *, char *, char *);
 

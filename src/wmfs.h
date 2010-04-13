@@ -40,6 +40,7 @@
 #include <string.h>
 #include <signal.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <time.h>
 #include <getopt.h>
 #include <dirent.h>
@@ -55,7 +56,7 @@
 #include <X11/Xft/Xft.h>
 
 /* Local headers */
-#include "confparse/confparse.h"
+#include "parse/parse.h"
 #include "config.h"
 #include "structs.h"
 
@@ -273,6 +274,7 @@ char *char_to_str(const char c);
 void spawn(const char *str, ...);
 void swap_ptr(void **x, void **y);
 void uicb_spawn(uicb_t);
+char *clean_value(char *str);
 
 #ifdef HAVE_IMLIB
 int parse_image_block(ImageAttr *im, char *str);
