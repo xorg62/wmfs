@@ -448,12 +448,12 @@ fetch_opt_first(struct conf_sec *s, char *dfl, char *name)
 {
      struct conf_opt *o;
 
-     if (!name || !s)
+     if (!name)
           return opt_type_null;
-
-     SLIST_FOREACH(o, &s->optlist, entry)
-          if (!strcmp(o->name, name))
-               return string_to_opt(o->val[0]);
+     else if (s)
+          SLIST_FOREACH(o, &s->optlist, entry)
+               if (!strcmp(o->name, name))
+                    return string_to_opt(o->val[0]);
      return string_to_opt(dfl);
 }
 
