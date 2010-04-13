@@ -358,26 +358,65 @@ pop_stack(void)
 }
 
 void
-print_unused(struct conf_sec *s)
+print_unused(struct conf_sec *sec)
 {
-     struct conf_sec *sec;
+     struct conf_sec *s;
      struct conf_opt *o;
 
-     if (!s)
+     if (!sec)
      {
-          SLIST_FOREACH(sec, &config, entry)
-               print_unused(sec);
+          SLIST_FOREACH(s, &config, entry)
+               print_unused(s);
           return;
      }
 
-     SLIST_FOREACH(o, &s->optlist, entry)
+     SLIST_FOREACH(o, &sec->optlist, entry)
           if (o->used == False)
                warnx("%s:%d, unused param %s",
                          file.name, o->line, o->name);
 
-     SLIST_FOREACH(sec, &s->sub, entry)
-          if (!SLIST_EMPTY(&sec->sub))
-               print_unused(sec);
+     SLIST_FOREACH(s, &sec->sub, entry)
+          if (!SLIST_EMPTY(&s->sub))
+               print_unused(s);
+}
+
+void
+free_conf(struct conf_sec *sec)
+{
+     struct conf_sec *s;
+     struct conf_opt *o;
+     size_t n;
+
+     if (!sec)
+     {
+          SLIST_FOREACH(s, &config, entry)
+          {
+               free(s->name);
+               free_conf(s);
+               free(s);
+          }
+          return;
+     }
+
+     while (!SLIST_EMPTY(&sec->optlist))
+     {
+          o = SLIST_FIRST(&sec->optlist);
+          SLIST_REMOVE_HEAD(&sec->optlist, entry);
+          free(o->name);
+
+          for (n = 0; o->val[n]; n++)
+               free(o->val[n]);
+
+          free(o);
+     }
+
+     while (!SLIST_EMPTY(&sec->sub))
+     {
+          s = SLIST_FIRST(&sec->sub);
+          SLIST_REMOVE_HEAD(&sec->sub, entry);
+          free_conf(s);
+     }
+
 }
 
 struct conf_sec **

@@ -64,19 +64,19 @@ struct conf_state {
 struct conf_opt {
      char *name;
      char *val[10];
-     SLIST_ENTRY(conf_opt) entry;
      size_t nval;
      Bool used;
      int line;
+     SLIST_ENTRY(conf_opt) entry;
 };
 
 struct conf_sec {
      char *name;
      SLIST_HEAD(, conf_opt) optlist;
      SLIST_HEAD(, conf_sec) sub;
-     SLIST_ENTRY(conf_sec) entry;
      size_t nopt;
      size_t nsub;
+     SLIST_ENTRY(conf_sec) entry;
 };
 
 struct opt_type {
@@ -88,6 +88,7 @@ struct opt_type {
 
 int get_conf(const char *);
 void print_unused(struct conf_sec *s);
+void free_conf(struct conf_sec *s);
 
 struct conf_sec **fetch_section(struct conf_sec *, char *);
 struct conf_sec *fetch_section_first(struct conf_sec *, char *);
