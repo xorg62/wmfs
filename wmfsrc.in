@@ -18,7 +18,17 @@
         bg     = "#191919"
         fg     = "#D4D4D4"
         border = true
-        selbar = false
+        # selbar = false   #not worked now, see section [selbar]
+
+        # Remove this section to disable the selbar.
+        [selbar]
+                bg = "#191919"
+                fg = "#D4D4ff"
+
+                [mouse] button = "4" func = "client_next" [/mouse]
+                [mouse] button = "5" func = "client_prev" [/mouse]
+        [/selbar]
+
 [/bar]
 
 [layouts]

@@ -96,6 +96,15 @@ buttonpress(XButtonEvent *ev)
                                    if(conf.bars.mouse[j].func)
                                         conf.bars.mouse[j].func(conf.bars.mouse[j].cmd);
 
+     /* Selbar */
+     if(ev->window == infobar[selscreen].selbar->win)
+          for(i = 0; i < conf.selbar.nmouse; ++i)
+               if(conf.selbar.mouse[i].tag == seltag[conf.selbar.mouse[i].screen]
+                  || conf.selbar.mouse[i].tag < 0)
+                    if(ev->button == conf.selbar.mouse[i].button)
+                         if(conf.selbar.mouse[i].func)
+                              conf.selbar.mouse[i].func(conf.selbar.mouse[i].cmd);
+
      /* Tags */
      for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
           if(ev->window == infobar[selscreen].tags[i]->win)

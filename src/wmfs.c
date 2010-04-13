@@ -125,6 +125,7 @@ quit(void)
      }
 
      IFREE(conf.bars.mouse);
+     IFREE(conf.selbar.mouse);
      IFREE(conf.titlebar.button);
      IFREE(conf.client.mouse);
      IFREE(conf.root.mouse);
