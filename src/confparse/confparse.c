@@ -158,9 +158,7 @@ get_nsec(char *src, char *name, int n)
 
      sec = secname(name);
 
-     buf = _strdup(sauv_delimc);
-
-     for(i = 0; i < n && (buf = strstr(buf, sec[SecStart])); ++i, buf += strlen(sec[SecStart]));
+     for(i = 0, buf = sauv_delimc; i < n && (buf = strstr(buf, sec[SecStart])); ++i, buf += strlen(sec[SecStart]));
 
      ret = get_sec(src + strlen(src) - strlen(buf), name);
 
@@ -180,9 +178,7 @@ get_size_sec(char *src, char *name)
 
      sec = secname(name);
 
-     buf = _strdup(sauv_secc);
-
-     for(ret = 0; (buf = strstr(buf, sec[SecStart])); ++ret, buf += strlen(sec[SecStart]));
+     for(ret = 0, buf = sauv_secc; (buf = strstr(buf, sec[SecStart])); ++ret, buf += strlen(sec[SecStart]));
 
      free_secname(sec);
 
@@ -223,6 +219,7 @@ get_opt(char *src, char *def, char *name)
 
                ret = str_to_opt(clean_value(++p));
           }
+          free(p2);
      }
 
      if(!ret.str)
@@ -236,7 +233,7 @@ opt_type*
 get_list_opt(char *src, char *def, char *name, int *n)
 {
      int i, j;
-     char *p, *p2;
+     char *p, *p2, *p2_orig;
      opt_type *ret;
 
      if(!src || !name)
@@ -268,7 +265,7 @@ get_list_opt(char *src, char *def, char *name, int *n)
 
           ret = emalloc(*n, sizeof(opt_type));
 
-          p2 = _strdup(p);
+          p2_orig = p2 = _strdup(p);
 
           /* Set all value in return array */
           for(i = j = 0; i < *n; ++i, p2 += ++j)
@@ -278,6 +275,7 @@ get_list_opt(char *src, char *def, char *name, int *n)
 
                ret[i] = str_to_opt(clean_value(p2));
           }
+          free(p2_orig);
      }
      else
      {

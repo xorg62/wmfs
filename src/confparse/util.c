@@ -175,8 +175,8 @@ cfg_set_sauv(char *str)
           return;
      }
 
-     sauv_delimc = erase_delim_content(_strdup(str));
-     sauv_secc = erase_sec_content(_strdup(str));
+     sauv_delimc = erase_delim_content(str);
+     sauv_secc = erase_sec_content(str);
 
      return;
 }
