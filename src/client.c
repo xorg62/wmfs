@@ -40,6 +40,7 @@ client_attach(Client *c)
 {
      if(clients)
           clients->prev = c;
+
      c->next = clients;
      clients = c;
 
@@ -96,6 +97,7 @@ client_get_next(void)
           return NULL;
 
      for(c = sel->next; c && ishide(c, selscreen); c = c->next);
+
      if(!c && conf.client_round)
           for(c = clients; c && ishide(c, selscreen); c = c->next);
 
@@ -290,7 +292,7 @@ client_focus(Client *c)
      return;
 }
 
-/* The following function have the same point :
+/* The following functions have the same point :
  * find a client member with a Window {{{
  */
 
@@ -386,6 +388,8 @@ client_get_name(Client *c)
      int rf;
      ulong ir, il;
 
+     IFREE(c->title);
+
      /* This one instead XFetchName for utf8 name support */
      if(XGetWindowProperty(dpy, c->win, net_atom[net_wm_name], 0, 4096,
                            False, net_atom[utf8_string], &rt, &rf, &ir, &il, (uchar**)&c->title) != Success)
@@ -396,6 +400,7 @@ client_get_name(Client *c)
      if(!c->title)
      {
           XFetchName(dpy, c->win, &(c->title));
+
           if(!c->title)
                c->title = _strdup("WMFS");
      }
@@ -583,13 +588,21 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      frame_create(c);
      client_size_hints(c);
      XChangeWindowAttributes(dpy, c->win, CWEventMask, &at);
-     XSetWindowBorderWidth(dpy, c->win, 0); /* client win sould _not_ have borders */
+
+     /* client win should _not_ have borders */
+     XSetWindowBorderWidth(dpy, c->win, 0);
      mouse_grabbuttons(c, False);
 
+     /* Transient */
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
           for(t = clients; t && t->win != trans; t = t->next);
+
      if(t)
+     {
           c->tag = t->tag;
+          c->screen = t->screen;
+     }
+
      if(!(c->flags & FreeFlag)
           && (rettrans == Success || (c->flags & HintFlag)))
                c->flags |= FreeFlag;
@@ -892,7 +905,7 @@ client_update_attributes(Client *c)
      XChangeProperty(dpy, c->win, ATOM("_WMFS_SCREEN"), XA_CARDINAL, 32,
                      PropModeReplace, (uchar*)&(c->screen), 1);
 
-     f = (c->flags & FreeFlag) ? True : False;
+     f = (c->flags & FreeFlag);
 
      XChangeProperty(dpy, c->win, ATOM("_WMFS_ISFREE"), XA_CARDINAL, 32,
                      PropModeReplace, (uchar*)&f, 1);
@@ -920,6 +933,8 @@ client_raise(Client *c)
 void
 uicb_client_raise(uicb_t cmd)
 {
+     CHECK(sel);
+
      client_raise(sel);
 
      return;

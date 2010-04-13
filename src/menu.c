@@ -35,7 +35,6 @@
 void
 menu_init(Menu *menu, char *name, int nitem, uint bg_f, char *fg_f, uint bg_n, char *fg_n)
 {
-
      /* Item */
      menu->nitem = nitem;
      menu->item = emalloc(sizeof(MenuItem), nitem);

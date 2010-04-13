@@ -92,6 +92,7 @@ key_name_list_t key_list[] =
      {"Mod3",    Mod3Mask },
      {"Mod4",    Mod4Mask },
      {"Super",   Mod4Mask },
+     {"Home",    Mod4Mask },
      {"Mod5",    Mod5Mask },
      {NULL,      NoSymbol }
 };

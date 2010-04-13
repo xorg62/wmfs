@@ -262,6 +262,8 @@ void
 uicb_spawn(uicb_t cmd)
 {
      spawn("%s", cmd);
+
+     return;
 }
 
 #ifdef HAVE_IMLIB
