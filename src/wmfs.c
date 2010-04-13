@@ -116,13 +116,6 @@ quit(void)
      }
 
      IFREE(conf.launcher);
-     IFREE(conf.ntag);
-     IFREE(conf.titlebar.mouse);
-     for(i = 0; i < conf.titlebar.nbutton; ++i)
-     {
-          IFREE(conf.titlebar.button[i].mouse);
-          IFREE(conf.titlebar.button[i].linecoord);
-     }
 
      IFREE(conf.bars.mouse);
      IFREE(conf.titlebar.button);

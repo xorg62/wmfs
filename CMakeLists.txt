@@ -24,8 +24,7 @@ project(${PROJECT_NAME} C)
 
 # Definition of the wmfs source
 set(wmfs_src
-  src/confparse/util.c
-  src/confparse/confparse.c
+  src/parse/parse.c 
   src/barwin.c
   src/client.c
   src/config.c
