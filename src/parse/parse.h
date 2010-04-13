@@ -25,33 +25,33 @@ typedef enum { False, True } Bool;
 
 enum conf_type { SEC_START, SEC_END, WORD, EQUAL, LIST_START, LIST_END, NONE };
 
-#define TOKEN(t)          \
-     do {                         \
-          kw->type = (t);     \
-          kw->line = file.line; \
+#define TOKEN(t)                                   \
+     do {                                          \
+          kw->type = (t);                          \
           TAILQ_INSERT_TAIL(&keywords, kw, entry); \
-          kw = malloc(sizeof(*kw)); \
+          kw = malloc(sizeof(*kw));                \
      } while (0)
 
-#define NEW_WORD()                                             \
-     do {                                                       \
-          if (j > 0) {                                        \
-               e->name[j] = '\0';                              \
-               TAILQ_INSERT_TAIL(&stack, e, entry);     \
-               e = malloc(sizeof(*e));                         \
-               j = 0;                                             \
-               TOKEN(WORD);                                   \
-          }                                                       \
+#define NEW_WORD()                                  \
+     do {                                           \
+          if (j > 0) {                              \
+               e->name[j] = '\0';                   \
+               e->line = file.line;                 \
+               TAILQ_INSERT_TAIL(&stack, e, entry); \
+               e = malloc(sizeof(*e));              \
+               j = 0;                               \
+               TOKEN(WORD);                         \
+          }                                         \
      } while (0)
 
 struct conf_keyword {
      enum conf_type type;
-     int line;
      TAILQ_ENTRY(conf_keyword) entry;
 };
 
 struct conf_stack {
      char name[BUFSIZ];
+     int line;
      TAILQ_ENTRY(conf_stack) entry;
 };
 
@@ -66,6 +66,8 @@ struct conf_opt {
      char *val[10];
      SLIST_ENTRY(conf_opt) entry;
      size_t nval;
+     Bool used;
+     int line;
 };
 
 struct conf_sec {
@@ -85,6 +87,8 @@ struct opt_type {
 };
 
 int get_conf(const char *);
+void print_unused(struct conf_sec *s);
+
 struct conf_sec **fetch_section(struct conf_sec *, char *);
 struct conf_sec *fetch_section_first(struct conf_sec *, char *);
 size_t fetch_section_count(struct conf_sec **);

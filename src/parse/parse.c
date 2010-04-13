@@ -66,6 +66,7 @@ get_keyword(const char *buf, size_t n)
      for(i = 0, j = 0; i < n; i++)
      {
           if (buf[i] == '\n' && s.comment == True) {
+               file.line++;
                s.comment = False;
                continue;
           }
@@ -129,9 +130,9 @@ get_keyword(const char *buf, size_t n)
           }
 
           if (strchr("\t\n ", buf[i]) && s.quote == False) {
+               NEW_WORD();
                if (buf[i] == '\n')
                     file.line++;
-               NEW_WORD();
                continue;
           }
 
@@ -226,7 +227,7 @@ get_conf(const char *name)
                     break;
                default:
                     errx(1, "%s:%d: near '%s', config out of any section",
-                              file.name, curk->line, curw->name);
+                              file.name, curw->line, curw->name);
                     break;
           }
      }
@@ -247,7 +248,7 @@ get_section(void)
 
      if (curk->type != WORD)
           errx(1, "%s:%d: near '%s', missing section name",
-                    file.name, curk->line, curw->name);
+                    file.name, curw->line, curw->name);
      pop_keyword();
 
      while (curk->type != SEC_END) {
@@ -265,7 +266,7 @@ get_section(void)
                     break;
                default:
                     errx(1, "%s:%d: near '%s', syntax error",
-                              file.name, curk->line, curw->name);
+                              file.name, curw->line, curw->name);
                     break;
           }
      }
@@ -273,11 +274,11 @@ get_section(void)
 
      if (curk->type != WORD)
           errx(1, "%s:%d: near '%s', missing end-section name",
-                    file.name, curk->line, curw->name);
+                    file.name, curw->line, curw->name);
 
      if (strcmp(curw->name, s->name))
           errx(1, "%s:%d: near '%s', non-closed section '%s'",
-                    file.name, curk->line, curw->name, s->name);
+                    file.name, curw->line, curw->name, s->name);
 
      pop_stack();
      pop_keyword();
@@ -293,12 +294,14 @@ get_option(void)
 
      o = emalloc(1, sizeof(*o));
      o->name = strdup(curw->name);
+     o->used = False;
+     o->line = curw->line;
      pop_stack();
      pop_keyword();
 
      if (curk->type != EQUAL)
           errx(1, "%s:%d: near '%s', missing '=' here",
-                    file.name, curk->line, curw->name);
+                    file.name, curw->line, curw->name);
 
      pop_keyword();
 
@@ -313,7 +316,7 @@ get_option(void)
                while (curk->type != LIST_END) {
                     if (curk->type != WORD)
                          errx(1, "%s:%d: near '%s', declaration into a list",
-                                   file.name, curk->line, curw->name);
+                                   file.name, curw->line, curw->name);
                     o->val[j++] = strdup(curw->name);
                     pop_stack();
                     pop_keyword();
@@ -322,7 +325,7 @@ get_option(void)
                break;
           default:
                errx(1, "%s:%d: near '%s', syntax error",
-                         file.name, curk->line, curw->name);
+                         file.name, curw->line, curw->name);
                break;
      }
      pop_keyword();
@@ -354,6 +357,28 @@ pop_stack(void)
      curw = TAILQ_FIRST(&stack);
 }
 
+void
+print_unused(struct conf_sec *s)
+{
+     struct conf_sec *sec;
+     struct conf_opt *o;
+
+     if (!s)
+     {
+          SLIST_FOREACH(sec, &config, entry)
+               print_unused(sec);
+          return;
+     }
+
+     SLIST_FOREACH(o, &s->optlist, entry)
+          if (o->used == False)
+               warnx("%s:%d, unused param %s",
+                         file.name, o->line, o->name);
+
+     SLIST_FOREACH(sec, &s->sub, entry)
+          if (!SLIST_EMPTY(&sec->sub))
+               print_unused(sec);
+}
 
 struct conf_sec **
 fetch_section(struct conf_sec *s, char *name)
@@ -429,6 +454,7 @@ fetch_opt(struct conf_sec *s, char *dfl, char *name)
           SLIST_FOREACH(o, &s->optlist, entry)
                if (!strcmp(o->name, name)) {
                     while (o->val[i]) {
+                         o->used = True;
                          ret[i] = string_to_opt(o->val[i]);
                          i++;
                     }
@@ -452,8 +478,10 @@ fetch_opt_first(struct conf_sec *s, char *dfl, char *name)
           return opt_type_null;
      else if (s)
           SLIST_FOREACH(o, &s->optlist, entry)
-               if (!strcmp(o->name, name))
+               if (!strcmp(o->name, name)) {
+                    o->used = True;
                     return string_to_opt(o->val[0]);
+               }
      return string_to_opt(dfl);
 }
 

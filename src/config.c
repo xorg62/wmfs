@@ -688,6 +688,8 @@ init_conf(void)
      conf_launcher_section();
      conf_keybind_section();
 
+     print_unused(NULL);
+
      return;
 }
 
