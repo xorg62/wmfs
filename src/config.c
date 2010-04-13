@@ -281,13 +281,14 @@ conf_client_section(void)
 
      mouse = fetch_section(titlebar[0], "mouse");
 
-     for(n = 0; sec[n]; n++);
+     for(n = 0; mouse[n]; n++);
 
      if((conf.titlebar.nmouse = n) > 0)
      {
           conf.titlebar.mouse = emalloc(conf.titlebar.nmouse, sizeof(MouseBinding));
           mouse_section(conf.titlebar.mouse, n, mouse);
      }
+
      free(mouse);
 
      /* Multi button part */
