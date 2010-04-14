@@ -1176,4 +1176,82 @@ uicb_ignore_next_client_rules(uicb_t cmd)
      return;
 }
 
+/** Show clientlist menu
+ *\param cmd uicb_t type
+ */
+void
+uicb_clientlist(uicb_t cmd)
+{
+     int i, d, u, x, y;
+     int n = 0;
+     Window w;
+     Client *c = NULL;
+     Bool is_sel;
+
+     for(c = clients; c; c = c->next)
+          if(c->tag == seltag[selscreen] && c->screen == selscreen)
+               ++n;
+
+     if(n > 0)
+     {
+          if(clientlist.nitem)
+               menu_clear(&clientlist);
+
+          menu_init(&clientlist, "clientlist", n,
+                    /* Colors */
+                    conf.menu[0].colors.focus.bg,
+                    conf.menu[0].colors.focus.fg,
+                    conf.menu[0].colors.normal.bg,
+                    conf.menu[0].colors.normal.fg);
+
+          for(i = 0, c = clients; c; c = c->next)
+               if(c->tag == seltag[selscreen] && c->screen == selscreen)
+               {
+                    sprintf(clist_index[i].key, "%d", i);
+                    clist_index[i].client = c;
+
+                    menu_new_item(&clientlist.item[i], c->title,
+                                  uicb_client_select, clist_index[i].key);
+
+                    if(c == sel)
+                         clientlist.item[i].check = name_to_func("check_clist", func_list);
+
+                    i++;
+               }
+
+          clist_index[i].client = NULL;
+
+          XQueryPointer(dpy, ROOT, &w, &w, &x, &y, &d, &d, (uint *)&u);
+          menu_draw(clientlist, x, y);
+     }
+
+     return;
+}
+
+/** Select client
+ *\param cmd uicb_t type clientlist index
+ */
+void
+uicb_client_select(uicb_t cmd)
+{
+     int i;
+
+     for(i = 0; i < MAXCLIST && clist_index[i].client; ++i)
+          if(!strcmp(cmd, clist_index[i].key))
+          {
+               client_focus(clist_index[i].client);
+               client_raise(clist_index[i].client);
+          }
+
+     return;
+}
+
+/** Check clientlist menu fake function
+ * \param cmd uicb_t type unused
+*/
+Bool
+uicb_checkclist(uicb_t cmd)
+{
+     return True;
+}
 

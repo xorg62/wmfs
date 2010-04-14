@@ -79,7 +79,9 @@ func_name_list_t tmp_func_list[] =
      {"ignore_next_client_rules", uicb_ignore_next_client_rules },
      {"check_max",                uicb_checkmax },
      {"check_free",               uicb_checkfree },
-     {"check_layout",             uicb_checklayout }
+     {"check_layout",             uicb_checklayout },
+     {"clientlist",               uicb_clientlist },
+     {"check_clist",              uicb_checkclist }
 };
 
 key_name_list_t key_list[] =
@@ -166,7 +168,7 @@ conf_misc_section(void)
 void
 conf_bar_section(void)
 {
-     struct conf_sec *bar, **mouse;
+     struct conf_sec *bar, **mouse, *selbar;
 
      bar = fetch_section_first(NULL, "bar");
 
@@ -182,6 +184,22 @@ conf_bar_section(void)
      {
           conf.bars.mouse = emalloc(conf.bars.nmouse, sizeof(MouseBinding));
           mouse_section(conf.bars.mouse, conf.bars.nmouse, mouse);
+     }
+
+     free(mouse);
+
+     selbar = fetch_section_first(bar, "selbar");
+     conf.bars.selbar = selbar ? True : False;
+
+     conf.selbar.bg = getcolor(fetch_opt_first(selbar, "#000000", "bg").str);
+     conf.selbar.fg = fetch_opt_first(selbar, "#ffffff", "fg").str;
+
+     mouse = fetch_section(selbar, "mouse");
+
+     if ((conf.selbar.nmouse = fetch_section_count(mouse)))
+     {
+          conf.selbar.mouse = emalloc(conf.selbar.nmouse, sizeof(MouseBinding));
+          mouse_section(conf.selbar.mouse, mouse);
      }
 
      free(mouse);

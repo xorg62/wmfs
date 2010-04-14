@@ -374,6 +374,13 @@ typedef struct
      } bars;
      struct
      {
+          char *fg;
+          uint bg;
+          MouseBinding *mouse;
+          int nmouse;
+     } selbar;
+     struct
+     {
           char *background_command;
           MouseBinding *mouse;
           int nmouse;
