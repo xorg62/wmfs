@@ -19,48 +19,6 @@
 
 #include <sys/queue.h>
 
-#if !defined(WMFS_H)
-typedef enum { False, True } Bool;
-#endif
-
-enum conf_type { SEC_START, SEC_END, WORD, EQUAL, LIST_START, LIST_END, NONE };
-
-#define TOKEN(t)                                   \
-     do {                                          \
-          kw->type = (t);                          \
-          TAILQ_INSERT_TAIL(&keywords, kw, entry); \
-          kw = malloc(sizeof(*kw));                \
-     } while (0)
-
-#define NEW_WORD()                                  \
-     do {                                           \
-          if (j > 0) {                              \
-               e->name[j] = '\0';                   \
-               e->line = file.line;                 \
-               TAILQ_INSERT_TAIL(&stack, e, entry); \
-               e = malloc(sizeof(*e));              \
-               j = 0;                               \
-               TOKEN(WORD);                         \
-          }                                         \
-     } while (0)
-
-struct conf_keyword {
-     enum conf_type type;
-     TAILQ_ENTRY(conf_keyword) entry;
-};
-
-struct conf_stack {
-     char name[BUFSIZ];
-     int line;
-     TAILQ_ENTRY(conf_stack) entry;
-};
-
-struct conf_state {
-     Bool quote;
-     Bool comment;
-     char quote_char;
-};
-
 struct conf_opt {
      char *name;
      char *val[10];
@@ -86,16 +44,64 @@ struct opt_type {
      char *str;
 };
 
+/*
+ * Create config from file
+ * return -1 on failure
+ */
 int get_conf(const char *);
+
+/*
+ * Print unused option name from section s (and subsections).
+ * If s == NULL print unused option name for all config struct.
+ */
 void print_unused(struct conf_sec *s);
+
+/*
+ * Free the config struct.
+ * WARNING: This make all string
+ * returned by fetch_(opt|section)(_first) unusable.
+ */
 void free_conf(struct conf_sec *s);
 
+/*
+ * Get all subsection matching the given name on the given
+ * section.
+ * If section == NULL, return subsections from root section.
+ * Return a NULL terminated array.
+ * WARNING : This MUST be free() after use.
+ */
 struct conf_sec **fetch_section(struct conf_sec *, char *);
+
+/*
+ * Get first (last in config file) subsection  matching the given name
+ * on the given section.
+ */
 struct conf_sec *fetch_section_first(struct conf_sec *, char *);
+
+/*
+ * Count member of a conf_sec **
+ */
 size_t fetch_section_count(struct conf_sec **);
 
+/*
+ * Return all options matching the given name on the given subsection.
+ * If none match or section == NULL return opt_type build with the
+ * given default param.
+ * WARNING: This MUST be free() after use.
+ * WARNING: The string member is directly taken from the config struct.
+ */
 struct opt_type fetch_opt_first(struct conf_sec *, char *, char *);
+
+/*
+ * Get first (last in config file) option matching the given name
+ * on the given section.
+ * WARNING: The string member is directly taken from the config struct.
+ */
 struct opt_type *fetch_opt(struct conf_sec *, char *, char *);
+
+/*
+ * Count member of a opt_type *
+ */
 size_t fetch_opt_count(struct opt_type *);
 
 #endif /* PARSE_H */

@@ -27,6 +27,44 @@
 #include "../wmfs.h"
 
 
+#define TOKEN(t)                                   \
+     do {                                          \
+          kw->type = (t);                          \
+          TAILQ_INSERT_TAIL(&keywords, kw, entry); \
+          kw = malloc(sizeof(*kw));                \
+     } while (0)
+
+#define NEW_WORD()                                  \
+     do {                                           \
+          if (j > 0) {                              \
+               e->name[j] = '\0';                   \
+               e->line = file.line;                 \
+               TAILQ_INSERT_TAIL(&stack, e, entry); \
+               e = malloc(sizeof(*e));              \
+               j = 0;                               \
+               TOKEN(WORD);                         \
+          }                                         \
+     } while (0)
+
+enum conf_type { SEC_START, SEC_END, WORD, EQUAL, LIST_START, LIST_END, NONE };
+
+struct conf_keyword {
+     enum conf_type type;
+     TAILQ_ENTRY(conf_keyword) entry;
+};
+
+struct conf_stack {
+     char name[BUFSIZ];
+     int line;
+     TAILQ_ENTRY(conf_stack) entry;
+};
+
+struct conf_state {
+     Bool quote;
+     Bool comment;
+     char quote_char;
+};
+
 static void get_keyword(const char *buf, size_t n);
 static void pop_keyword(void);
 static void pop_stack(void);
