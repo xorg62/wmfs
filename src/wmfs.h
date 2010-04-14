@@ -107,6 +107,7 @@
 #define CHECK(x)     if(!(x)) return
 #define IFREE(x)     if(x) free(x)
 #define LEN(x)       (sizeof(x) / sizeof((x)[0]))
+#define MAXCLIST     (64)
 
 /* barwin.c */
 BarWindow *barwin_create(Window parent,
@@ -191,7 +192,9 @@ void uicb_client_screen_prev(uicb_t);
 void uicb_client_move(uicb_t cmd);
 void uicb_client_resize(uicb_t cmd);
 void uicb_ignore_next_client_rules(uicb_t cmd);
-
+void uicb_clientlist(uicb_t cmd);
+void uicb_client_select(uicb_t cmd);
+Bool uicb_checkclist(uicb_t);
 
 /* ewmh.c */
 void ewmh_init_hints(void);
@@ -240,6 +243,7 @@ void menu_focus_item(Menu *menu, int item, BarWindow *winitem[]);
 void menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[]);
 int menu_get_longer_string(MenuItem *mi, int nitem);
 void uicb_menu(uicb_t cmd);
+void menu_clear(Menu *menu);
 
 /* launcher.c */
 void launcher_execute(Launcher *launcher);
@@ -409,6 +413,13 @@ Tag **tags;
 int *seltag;
 int *prevseltag;
 Menu menulayout;
+
+/* ClientList */
+Menu clientlist;
+struct clndx {
+     char key[4];
+     Client *client;
+} clist_index[MAXCLIST];
 
 /* Important Client */
 Client *clients;

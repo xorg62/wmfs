@@ -25,6 +25,7 @@
                 bg = "#191919"
                 fg = "#D4D4ff"
 
+                [mouse] button = "3" func = "clientlist"  [/mouse]
                 [mouse] button = "4" func = "client_next" [/mouse]
                 [mouse] button = "5" func = "client_prev" [/mouse]
         [/selbar]

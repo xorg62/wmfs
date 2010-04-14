@@ -82,7 +82,9 @@ func_name_list_t tmp_func_list[] =
      {"ignore_next_client_rules", uicb_ignore_next_client_rules },
      {"check_max",                uicb_checkmax },
      {"check_free",               uicb_checkfree },
-     {"check_layout",             uicb_checklayout }
+     {"check_layout",             uicb_checklayout },
+     {"clientlist",               uicb_clientlist },
+     {"check_clist",              uicb_checkclist }
 };
 
 key_name_list_t key_list[] =
