@@ -622,7 +622,7 @@ conf_launcher_section(void)
 void
 conf_keybind_section(void)
 {
-     int i, j;
+     int i, j, aj;
      struct conf_sec *sec, **ks;
      struct opt_type *opt;
 
@@ -634,24 +634,25 @@ conf_keybind_section(void)
 
      for(i = 0; i < conf.nkeybind; ++i)
      {
+          aj = conf.nkeybind - i - 1;
           opt = fetch_opt(ks[i], "", "mod");
 
           for(j = 0; j < fetch_opt_count(opt); ++j)
-               keys[i].mod |= char_to_modkey(opt[j].str, key_list);
+               keys[aj].mod |= char_to_modkey(opt[j].str, key_list);
 
           free(opt);
 
-          keys[i].keysym = XStringToKeysym(fetch_opt_first(ks[i], "None", "key").str);
+          keys[aj].keysym = XStringToKeysym(fetch_opt_first(ks[i], "None", "key").str);
 
-          keys[i].func = name_to_func(fetch_opt_first(ks[i], "", "func").str, func_list);
+          keys[aj].func = name_to_func(fetch_opt_first(ks[i], "", "func").str, func_list);
 
-          if(keys[i].func == NULL)
+          if(keys[aj].func == NULL)
           {
                warnx("configuration : Unknown Function \"%s\".", fetch_opt_first(ks[i], "", "func").str);
-               keys[i].func = uicb_spawn;
+               keys[aj].func = uicb_spawn;
           }
 
-          keys[i].cmd = fetch_opt_first(ks[i], "", "cmd").str;
+          keys[aj].cmd = fetch_opt_first(ks[i], "", "cmd").str;
      }
 
      free(ks);
