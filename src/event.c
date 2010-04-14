@@ -99,7 +99,7 @@ buttonpress(XButtonEvent *ev)
                                         conf.bars.mouse[j].func(conf.bars.mouse[j].cmd);
 
      /* Selbar */
-     if(ev->window == infobar[selscreen].selbar->win)
+     if(conf.bars.selbar && ev->window == infobar[selscreen].selbar->win)
           for(i = 0; i < conf.selbar.nmouse; ++i)
                if(conf.selbar.mouse[i].tag == seltag[conf.selbar.mouse[i].screen]
                   || conf.selbar.mouse[i].tag < 0)

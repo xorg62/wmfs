@@ -176,7 +176,6 @@ conf_bar_section(void)
      conf.bars.height = fetch_opt_first(bar, "-1", "height").num;
      conf.colors.bar  = getcolor(fetch_opt_first(bar, "#000000", "bg").str);
      conf.colors.text = fetch_opt_first(bar, "#ffffff", "fg").str;
-     conf.bars.selbar = fetch_opt_first(bar, "false", "selbar").bool;
 
      mouse = fetch_section(bar, "mouse");
 

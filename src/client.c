@@ -1186,7 +1186,6 @@ uicb_clientlist(uicb_t cmd)
      int n = 0;
      Window w;
      Client *c = NULL;
-     Bool is_sel;
 
      for(c = clients; c; c = c->next)
           if(c->tag == seltag[selscreen] && c->screen == selscreen)
