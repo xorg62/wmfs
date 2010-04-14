@@ -114,7 +114,7 @@ name_to_uint_t mouse_button_list[] =
 };
 
 void
-mouse_section(MouseBinding mb[], int ns, struct conf_sec **sec)
+mouse_section(MouseBinding mb[], struct conf_sec **sec)
 {
      int n;
 
@@ -182,7 +182,7 @@ conf_bar_section(void)
      if ((conf.bars.nmouse = fetch_section_count(mouse)) > 0)
      {
           conf.bars.mouse = emalloc(conf.bars.nmouse, sizeof(MouseBinding));
-          mouse_section(conf.bars.mouse, conf.bars.nmouse, mouse);
+          mouse_section(conf.bars.mouse, mouse);
      }
 
      free(mouse);
@@ -198,7 +198,7 @@ conf_bar_section(void)
      if ((conf.selbar.nmouse = fetch_section_count(mouse)))
      {
           conf.selbar.mouse = emalloc(conf.selbar.nmouse, sizeof(MouseBinding));
-          mouse_section(conf.selbar.mouse, conf.selbar.nmouse, mouse);
+          mouse_section(conf.selbar.mouse, mouse);
      }
 
      free(mouse);
@@ -220,7 +220,7 @@ conf_root_section(void)
      if ((conf.root.nmouse = fetch_section_count(mouse)) > 0)
      {
           conf.root.mouse = emalloc(conf.root.nmouse, sizeof(MouseBinding));
-          mouse_section(conf.root.mouse, conf.root.nmouse, mouse);
+          mouse_section(conf.root.mouse, mouse);
      }
 
      free(mouse);
@@ -257,7 +257,7 @@ conf_client_section(void)
      if((conf.client.nmouse = fetch_section_count(mouse)) > 0)
      {
           conf.client.mouse = emalloc(conf.client.nmouse, sizeof(MouseBinding));
-          mouse_section(conf.client.mouse, conf.client.nmouse, mouse);
+          mouse_section(conf.client.mouse, mouse);
      }
 
      free(mouse);
@@ -285,7 +285,7 @@ conf_client_section(void)
      if((conf.titlebar.nmouse = fetch_section_count(mouse)) > 0)
      {
           conf.titlebar.mouse = emalloc(conf.titlebar.nmouse, sizeof(MouseBinding));
-          mouse_section(conf.titlebar.mouse, conf.titlebar.nmouse, mouse);
+          mouse_section(conf.titlebar.mouse, mouse);
      }
 
      free(mouse);
@@ -314,7 +314,7 @@ conf_client_section(void)
                if((conf.titlebar.button[i].nmouse = fetch_section_count(mouse)) > 0)
                {
                     conf.titlebar.button[i].mouse = emalloc(conf.titlebar.button[i].nmouse, sizeof(MouseBinding));
-                    mouse_section(conf.titlebar.button[i].mouse, conf.titlebar.button[i].nmouse, mouse);
+                    mouse_section(conf.titlebar.button[i].mouse, mouse);
                }
 
                free(mouse);
@@ -529,7 +529,7 @@ conf_tag_section(void)
                if((tags[k][conf.ntag[k]].nmouse = fetch_section_count(mouse)))
                {
                     tags[k][conf.ntag[k]].mouse = emalloc(tags[k][conf.ntag[k]].nmouse, sizeof(MouseBinding));
-                    mouse_section(tags[k][conf.ntag[k]].mouse, tags[k][conf.ntag[k]].nmouse, mouse);
+                    mouse_section(tags[k][conf.ntag[k]].mouse, mouse);
                }
 
                free(mouse);
