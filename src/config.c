@@ -199,7 +199,7 @@ conf_bar_section(void)
      if ((conf.selbar.nmouse = fetch_section_count(mouse)))
      {
           conf.selbar.mouse = emalloc(conf.selbar.nmouse, sizeof(MouseBinding));
-          mouse_section(conf.selbar.mouse, mouse);
+          mouse_section(conf.selbar.mouse, conf.selbar.nmouse, mouse);
      }
 
      free(mouse);
