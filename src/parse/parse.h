@@ -31,10 +31,10 @@ struct conf_opt {
 struct conf_sec {
      char *name;
      SLIST_HEAD(, conf_opt) optlist;
-     SLIST_HEAD(, conf_sec) sub;
+     TAILQ_HEAD(, conf_sec) sub;
      size_t nopt;
      size_t nsub;
-     SLIST_ENTRY(conf_sec) entry;
+     TAILQ_ENTRY(conf_sec) entry;
 };
 
 struct opt_type {
@@ -68,13 +68,14 @@ void free_conf(struct conf_sec *s);
  * section.
  * If section == NULL, return subsections from root section.
  * Return a NULL terminated array.
+ * Subsections are returned in order as they are in config file
  * WARNING : This MUST be free() after use.
  */
 struct conf_sec **fetch_section(struct conf_sec *, char *);
 
 /*
- * Get first (last in config file) subsection  matching the given name
- * on the given section.
+ * Get first subsection  matching the given name
+ * on the given section. (first found on the file)
  */
 struct conf_sec *fetch_section_first(struct conf_sec *, char *);
 
@@ -89,6 +90,8 @@ size_t fetch_section_count(struct conf_sec **);
  * given default param.
  * WARNING: This MUST be free() after use.
  * WARNING: The string member is directly taken from the config struct.
+ * WARNING: Returned in reverse order as they are in config file.
+ * (I think the last option MUST overwrite all others)
  */
 struct opt_type fetch_opt_first(struct conf_sec *, char *, char *);
 

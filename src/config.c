@@ -404,10 +404,10 @@ conf_layout_section(void)
                {
                     if(conf.layout_system && conf.nlayout > 1)
                     {
-                         menu_new_item(&menulayout.item[conf.nlayout-i-1], fetch_opt_first(layout[i], "", "symbol").str,
+                         menu_new_item(&menulayout.item[i], fetch_opt_first(layout[i], "", "symbol").str,
                                    uicb_set_layout, p);
 
-                         menulayout.item[conf.nlayout-i-1].check = name_to_func("check_layout", func_list);
+                         menulayout.item[i].check = name_to_func("check_layout", func_list);
                     }
 
                     conf.layout[i].symbol = fetch_opt_first(layout[i], "TILE (default)", "symbol").str;
@@ -477,7 +477,7 @@ conf_tag_section(void)
      for(i = 0; i < sc; ++i)
           tags[i] = emalloc(n + 2, sizeof(Tag));
 
-     for(i = (n - 1); i >= 0; i--)
+     for(i = 0; i < n; i++)
      {
           j = fetch_opt_first(tag[i], "-1", "screen").num;
 
@@ -554,7 +554,7 @@ void
 conf_menu_section(void)
 {
      char *tmp2;
-     int i, j, aj;
+     int i, j;
      struct conf_sec *menu, **set_menu, **item;
 
      menu = fetch_section_first(NULL, "menu");
@@ -596,12 +596,11 @@ conf_menu_section(void)
                conf.menu[i].item = emalloc(conf.menu[i].nitem, sizeof(MenuItem));
                for(j = 0; j < conf.menu[i].nitem; ++j)
                {
-                    aj = (conf.menu[i].nitem - 1) - j;
-                    conf.menu[i].item[aj].name = fetch_opt_first(item[j], "item_wname", "name").str;
-                    conf.menu[i].item[aj].func = name_to_func(fetch_opt_first(item[j], "", "func").str, func_list);
-                    conf.menu[i].item[aj].cmd  = fetch_opt_first(item[j], "", "cmd").str;
-                    conf.menu[i].item[aj].check = name_to_func(fetch_opt_first(item[j], "", "check").str, func_list);
-                    conf.menu[i].item[aj].submenu = fetch_opt_first(item[j], "", "submenu").str;
+                    conf.menu[i].item[j].name = fetch_opt_first(item[j], "item_wname", "name").str;
+                    conf.menu[i].item[j].func = name_to_func(fetch_opt_first(item[j], "", "func").str, func_list);
+                    conf.menu[i].item[j].cmd  = fetch_opt_first(item[j], "", "cmd").str;
+                    conf.menu[i].item[j].check = name_to_func(fetch_opt_first(item[j], "", "check").str, func_list);
+                    conf.menu[i].item[j].submenu = fetch_opt_first(item[j], "", "submenu").str;
                }
           }
           free(item);
@@ -639,7 +638,7 @@ conf_launcher_section(void)
 void
 conf_keybind_section(void)
 {
-     int i, j, aj;
+     int i, j;
      struct conf_sec *sec, **ks;
      struct opt_type *opt;
 
@@ -651,25 +650,24 @@ conf_keybind_section(void)
 
      for(i = 0; i < conf.nkeybind; ++i)
      {
-          aj = conf.nkeybind - i - 1;
           opt = fetch_opt(ks[i], "", "mod");
 
           for(j = 0; j < fetch_opt_count(opt); ++j)
-               keys[aj].mod |= char_to_modkey(opt[j].str, key_list);
+               keys[i].mod |= char_to_modkey(opt[j].str, key_list);
 
           free(opt);
 
-          keys[aj].keysym = XStringToKeysym(fetch_opt_first(ks[i], "None", "key").str);
+          keys[i].keysym = XStringToKeysym(fetch_opt_first(ks[i], "None", "key").str);
 
-          keys[aj].func = name_to_func(fetch_opt_first(ks[i], "", "func").str, func_list);
+          keys[i].func = name_to_func(fetch_opt_first(ks[i], "", "func").str, func_list);
 
-          if(keys[aj].func == NULL)
+          if(keys[i].func == NULL)
           {
                warnx("configuration : Unknown Function \"%s\".", fetch_opt_first(ks[i], "", "func").str);
-               keys[aj].func = uicb_spawn;
+               keys[i].func = uicb_spawn;
           }
 
-          keys[aj].cmd = fetch_opt_first(ks[i], "", "cmd").str;
+          keys[i].cmd = fetch_opt_first(ks[i], "", "cmd").str;
      }
 
      free(ks);

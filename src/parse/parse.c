@@ -78,7 +78,7 @@ static char * get_kw_name(enum conf_type);
 
 static TAILQ_HEAD(, conf_keyword) keywords;
 static TAILQ_HEAD(, conf_stack) stack;
-static SLIST_HEAD(, conf_sec) config;
+static TAILQ_HEAD(, conf_sec) config;
 static struct conf_keyword *curk; /* current keyword */
 static struct conf_stack *curw; /* current word */
 static const struct opt_type opt_type_null = { 0, 0, False, NULL };
@@ -255,13 +255,13 @@ get_conf(const char *name)
      curk = TAILQ_FIRST(&keywords);
      curw = TAILQ_FIRST(&stack);
 
-     SLIST_INIT(&config);
+     TAILQ_INIT(&config);
 
      while (!TAILQ_EMPTY(&keywords)) {
           switch (curk->type) {
                case SEC_START:
                     s = get_section();
-                    SLIST_INSERT_HEAD(&config, s, entry);
+                    TAILQ_INSERT_TAIL(&config, s, entry);
                     break;
                default:
                     errx(1, "%s:%d: near '%s', config out of any section",
@@ -281,6 +281,9 @@ get_section(void)
 
      s = emalloc(1, sizeof(*s));
      s->name = strdup(curw->name);
+     TAILQ_INIT(&s->sub);
+     SLIST_INIT(&s->optlist);
+
      pop_stack();
      pop_keyword();
 
@@ -298,7 +301,7 @@ get_section(void)
                     break;
                case SEC_START:
                     sub = get_section();
-                    SLIST_INSERT_HEAD(&s->sub, sub, entry);
+                    TAILQ_INSERT_TAIL(&s->sub, sub, entry);
                     s->nsub++;
                case SEC_END:
                     break;
@@ -403,7 +406,7 @@ print_unused(struct conf_sec *sec)
 
      if (!sec)
      {
-          SLIST_FOREACH(s, &config, entry)
+          TAILQ_FOREACH(s, &config, entry)
                print_unused(s);
           return;
      }
@@ -413,8 +416,8 @@ print_unused(struct conf_sec *sec)
                warnx("%s:%d, unused param %s",
                          file.name, o->line, o->name);
 
-     SLIST_FOREACH(s, &sec->sub, entry)
-          if (!SLIST_EMPTY(&s->sub))
+     TAILQ_FOREACH(s, &sec->sub, entry)
+          if (!TAILQ_EMPTY(&s->sub))
                print_unused(s);
 }
 
@@ -427,7 +430,7 @@ free_conf(struct conf_sec *sec)
 
      if (!sec)
      {
-          SLIST_FOREACH(s, &config, entry)
+          TAILQ_FOREACH(s, &config, entry)
           {
                free(s->name);
                free_conf(s);
@@ -448,10 +451,10 @@ free_conf(struct conf_sec *sec)
           free(o);
      }
 
-     while (!SLIST_EMPTY(&sec->sub))
+     while (!TAILQ_EMPTY(&sec->sub))
      {
-          s = SLIST_FIRST(&sec->sub);
-          SLIST_REMOVE_HEAD(&sec->sub, entry);
+          s = TAILQ_FIRST(&sec->sub);
+          TAILQ_REMOVE(&sec->sub, s, entry);
           free_conf(s);
      }
 
@@ -469,7 +472,7 @@ fetch_section(struct conf_sec *s, char *name)
 
      if (!s) {
           ret = emalloc(2, sizeof(struct conf_sec *));
-          SLIST_FOREACH(sec, &config, entry)
+          TAILQ_FOREACH(sec, &config, entry)
                if (!strcmp(sec->name, name)) {
                     ret[0] = sec;
                     ret[1] = NULL;
@@ -478,7 +481,7 @@ fetch_section(struct conf_sec *s, char *name)
      }
      else {
           ret = emalloc(s->nsub+1, sizeof(struct conf_sec *));
-          SLIST_FOREACH(sec, &s->sub, entry) {
+          TAILQ_FOREACH(sec, &s->sub, entry) {
                if (!strcmp(sec->name, name) && i < s->nsub)
                     ret[i++] = sec;
           }
@@ -496,11 +499,11 @@ fetch_section_first(struct conf_sec *s, char *name)
           return NULL;
 
      if (!s)
-          SLIST_FOREACH(sec, &config, entry)
+          TAILQ_FOREACH(sec, &config, entry)
                if (!strcmp(sec->name, name))
                     return sec;
 
-     SLIST_FOREACH(sec, &s->sub, entry)
+     TAILQ_FOREACH(sec, &s->sub, entry)
           if (!strcmp(sec->name, name))
                return sec;
 
