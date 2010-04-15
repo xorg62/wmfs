@@ -137,25 +137,22 @@ thread_process(void *arg)
      XEvent ev;
 
      /* X event loop */
-     if(!(int*)arg)
+     if(arg)
      {
           while(!exiting && !XNextEvent(dpy, &ev))
                getevent(ev);
-
-          pthread_exit(0);
      }
-
      /* Status checking loop with timing */
      else
      {
+          pthread_detach(pthread_self());
           do
           {
                spawn(conf.status_path);
                sleep(conf.status_timing);
           } while (!exiting && conf.status_timing != 0);
-
-          pthread_exit(0);
      }
+     pthread_exit(NULL);
 }
 
 /** WMFS main loop.
@@ -176,7 +173,6 @@ mainloop(void)
           pthread_create(&evstatus, NULL, thread_process, NULL);
 
           (void)pthread_join(evloop, &ret);
-          (void)pthread_join(evstatus, &ret);
      }
 
      return;
