@@ -174,6 +174,14 @@ infobar_draw_selbar(int sc)
      if(!conf.bars.selbar)
           return;
 
+     if(!sel && infobar[sc].selbar->mapped)
+     {
+          barwin_unmap(infobar[sc].selbar);
+          return;
+     }
+     else if(sel && !infobar[sc].selbar->mapped)
+          barwin_map(infobar[sc].selbar);
+
      barwin_move(infobar[sc].selbar,
                ((conf.layout_placement)
                 ? (infobar[sc].tags_board->geo.x + infobar[sc].tags_board->geo.width + PAD / 2)
