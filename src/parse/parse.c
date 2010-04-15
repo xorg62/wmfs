@@ -581,8 +581,8 @@ string_to_opt(char *s)
      if (!s || !strlen(s))
           return ret;
 
-     ret.num = atoi(s);
-     sscanf(s, "%f", &ret.fnum);
+     ret.num = strtol(s, (char**)NULL, 10);
+     ret.fnum = strtod(s, NULL);
 
      if (!strcmp(s, "true") || !strcmp(s, "True") ||
                !strcmp(s, "TRUE") || !strcmp(s, "1"))
