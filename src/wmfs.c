@@ -148,11 +148,11 @@ thread_process(void *arg)
      /* Status checking loop with timing */
      else
      {
-          while(!exiting)
+          do
           {
                spawn(conf.status_path);
                sleep(conf.status_timing);
-          }
+          } while (!exiting && conf.status_timing != 0);
 
           pthread_exit(0);
      }

@@ -156,7 +156,7 @@ conf_misc_section(void)
 
      conf.pad = pad;
 
-     if(conf.status_timing <= 0)
+     if(conf.status_timing < 0)
      {
           warnx("configuration : status_timing value (%d) incorrect.", conf.status_timing);
           conf.status_timing = 1;
