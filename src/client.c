@@ -1187,8 +1187,10 @@ uicb_clientlist(uicb_t cmd)
      Window w;
      Client *c = NULL;
 
+     screen_get_sel();
+
      for(c = clients; c; c = c->next)
-          if(c->tag == seltag[selscreen] && c->screen == selscreen)
+          if(!ishide(c, selscreen))
                ++n;
 
      if(n > 0)
@@ -1198,13 +1200,13 @@ uicb_clientlist(uicb_t cmd)
 
           menu_init(&clientlist, "clientlist", n,
                     /* Colors */
-                    conf.menu[0].colors.focus.bg,
-                    conf.menu[0].colors.focus.fg,
-                    conf.menu[0].colors.normal.bg,
-                    conf.menu[0].colors.normal.fg);
+                    conf.colors.tagselbg,
+                    conf.colors.tagselfg,
+                    conf.colors.bar,
+                    conf.colors.text);
 
           for(i = 0, c = clients; c; c = c->next)
-               if(c->tag == seltag[selscreen] && c->screen == selscreen)
+               if(!ishide(c, selscreen))
                {
                     sprintf(clist_index[i].key, "%d", i);
                     clist_index[i].client = c;
