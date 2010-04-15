@@ -169,12 +169,13 @@ void
 conf_bar_section(void)
 {
      struct conf_sec *bar, **mouse, *selbar;
+     char *barbg;
 
      bar = fetch_section_first(NULL, "bar");
 
      conf.border.bar  = fetch_opt_first(bar, "false", "border").bool;
      conf.bars.height = fetch_opt_first(bar, "-1", "height").num;
-     conf.colors.bar  = getcolor(fetch_opt_first(bar, "#000000", "bg").str);
+     conf.colors.bar  = getcolor((barbg = fetch_opt_first(bar, "#000000", "bg").str));
      conf.colors.text = fetch_opt_first(bar, "#ffffff", "fg").str;
 
      mouse = fetch_section(bar, "mouse");
@@ -190,8 +191,8 @@ conf_bar_section(void)
      selbar = fetch_section_first(bar, "selbar");
      conf.bars.selbar = selbar ? True : False;
 
-     conf.selbar.bg = getcolor(fetch_opt_first(selbar, "#000000", "bg").str);
-     conf.selbar.fg = fetch_opt_first(selbar, "#ffffff", "fg").str;
+     conf.selbar.bg = getcolor(fetch_opt_first(selbar, barbg, "bg").str);
+     conf.selbar.fg = fetch_opt_first(selbar, conf.colors.text, "fg").str;
 
      mouse = fetch_section(selbar, "mouse");
 
@@ -202,6 +203,7 @@ conf_bar_section(void)
      }
 
      free(mouse);
+     free(barbg);
 
      return;
 }
