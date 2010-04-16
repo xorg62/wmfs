@@ -188,7 +188,9 @@ infobar_draw_selbar(int sc)
      {
           str = emalloc(conf.selbar.maxlenght + 4, sizeof(char));
           strncpy(str, sel->title, conf.selbar.maxlenght);
-          strcat(str, "...");
+
+          if(strlen(sel->title) > conf.selbar.maxlenght)
+               strcat(str, "...");
      }
 
      barwin_resize(infobar[sc].selbar, textw(str ? str : sel->title) + PAD, infobar[sc].geo.height - 2);
