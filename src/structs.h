@@ -376,6 +376,7 @@ typedef struct
      {
           char *fg;
           uint bg;
+          int maxlenght;
           MouseBinding *mouse;
           int nmouse;
      } selbar;

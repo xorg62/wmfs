@@ -171,10 +171,12 @@ infobar_draw_layout(int sc)
 void
 infobar_draw_selbar(int sc)
 {
+     char *str = NULL;
+
      if(!conf.bars.selbar)
           return;
 
-     if(!sel && infobar[sc].selbar->mapped)
+     if(!sel)
      {
           barwin_unmap(infobar[sc].selbar);
           return;
@@ -182,16 +184,26 @@ infobar_draw_selbar(int sc)
      else if(sel && !infobar[sc].selbar->mapped)
           barwin_map(infobar[sc].selbar);
 
+     if(conf.selbar.maxlenght >= 0 && sel)
+     {
+          str = emalloc(conf.selbar.maxlenght + 4, sizeof(char));
+          strncpy(str, sel->title, conf.selbar.maxlenght);
+          strcat(str, "...");
+     }
+
+     barwin_resize(infobar[sc].selbar, textw(str ? str : sel->title) + PAD, infobar[sc].geo.height - 2);
+
      barwin_move(infobar[sc].selbar,
                ((conf.layout_placement)
                 ? (infobar[sc].tags_board->geo.x + infobar[sc].tags_board->geo.width + PAD / 2)
                 : (infobar[sc].layout_button->geo.x + infobar[sc].layout_button->geo.width + PAD / 2)), 1);
 
-     barwin_resize(infobar[sc].selbar, textw(sel ? sel->title : NULL) + PAD, infobar[sc].geo.height - 2);
      barwin_refresh_color(infobar[sc].selbar);
-     barwin_draw_text(infobar[sc].selbar, PAD / 2, FHINFOBAR - 1, (sel) ? sel->title : NULL);
+     barwin_draw_text(infobar[sc].selbar, PAD / 2, FHINFOBAR - 1, ((str) ? str : sel->title));
 
      barwin_refresh(infobar[sc].selbar);
+
+     IFREE(str);
 
      return;
 }

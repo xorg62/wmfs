@@ -193,6 +193,7 @@ conf_bar_section(void)
 
      conf.selbar.bg = getcolor(fetch_opt_first(selbar, barbg, "bg").str);
      conf.selbar.fg = fetch_opt_first(selbar, conf.colors.text, "fg").str;
+     conf.selbar.maxlenght = fetch_opt_first(selbar, "-1", "max_lenght").num;
 
      mouse = fetch_section(selbar, "mouse");
 
