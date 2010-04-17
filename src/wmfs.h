@@ -133,6 +133,7 @@ void barwin_refresh(BarWindow *bw);
 /* draw.c */
 void draw_text(Drawable d, int x, int y, char* fg, int pad, char *str);
 void draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color);
+void draw_graph(Drawable dr, int x, int y, uint w, uint h, uint color, char *data);
 
 #ifdef HAVE_IMLIB
 void draw_image(Drawable dr, int x, int y, int w, int h, char *name);
@@ -314,6 +315,7 @@ void uicb_screen_prev_sel(uicb_t);
 
 /* status.c */
 int statustext_rectangle(StatusRec *r, char *str);
+int statustext_graph(StatusGraph *g, char *str);
 int statustext_text(StatusText *s, char *str);
 void statustext_normal(int sc, char *str);
 void statustext_handle(int sc, char *str);

@@ -109,6 +109,32 @@ draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color)
      return;
 }
 
+/** Draw a Graph in a drawable
+ * \param dr Drawable
+ * \param x X position
+ * \param y Y position
+ * \param w Width
+ * \param h Height
+ * \param color Color of the graph
+ * \param data Array of bytes that will be draw
+*/
+void
+draw_graph(Drawable dr, int x, int y, uint w, uint h, uint color, char *data)
+{
+     int i;
+
+     XSetForeground(dpy, gc, color);
+
+     for(i = 0; i < w; ++i)
+     {
+          XRectangle r = { (x + i), (y + h - data[i]), 1, data[i] };
+
+          XFillRectangles(dpy, dr, gc, &r, 1);
+     }
+
+     return;
+}
+
 #ifdef HAVE_IMLIB
 /** Draw an image in a drawable
   * \param dr Drawable

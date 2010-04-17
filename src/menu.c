@@ -319,7 +319,6 @@ uicb_menu(uicb_t cmd)
 void
 menu_clear(Menu *menu)
 {
-	 /*menu->item = emalloc(sizeof(MenuItem), nitem);*/
      IFREE(menu->item);
      menu->nitem = 0;
 
