@@ -561,6 +561,7 @@ conf_menu_section(void)
      struct conf_sec *menu, **set_menu, **item;
 
      menu = fetch_section_first(NULL, "menu");
+
      set_menu = fetch_section(menu, "set_menu");
 
      CHECK((conf.nmenu = fetch_section_count(set_menu)));

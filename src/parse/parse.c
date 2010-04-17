@@ -503,6 +503,9 @@ fetch_section_first(struct conf_sec *s, char *name)
                if (!strcmp(sec->name, name))
                     return sec;
 
+     if(!sec)
+          return NULL;
+
      TAILQ_FOREACH(sec, &s->sub, entry)
           if (!strcmp(sec->name, name))
                return sec;
