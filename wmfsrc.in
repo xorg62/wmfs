@@ -74,6 +74,9 @@
         # Border around the tag buttons.
         border      = true
 
+        # Hide empty tags in tag list
+        autohide    = false
+
         # Mouse buttons action on tag.
         mouse_button_tag_sel       = "1"
         mouse_button_tag_transfert = "2"

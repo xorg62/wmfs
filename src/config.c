@@ -449,6 +449,7 @@ conf_tag_section(void)
      conf.colors.tagurbg          = getcolor(fetch_opt_first(sec, "#DD1111", "urgent_bg").str);
      conf.colors.tag_occupied_bg  = getcolor(fetch_opt_first(sec, "#222222", "occupied_bg").str);
      conf.border.tag              = fetch_opt_first(sec, "false", "border").bool;
+     conf.tagautohide             = fetch_opt_first(sec, "false", "autohide").bool;
 
      /* Mouse button action on tag */
      conf.mouse_tag_action[TagSel] =

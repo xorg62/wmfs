@@ -156,6 +156,9 @@ infobar_draw(int sc)
 void
 infobar_draw_layout(int sc)
 {
+     if(!conf.layout_placement)
+          barwin_move(infobar[sc].layout_button, infobar[sc].tags_board->geo.width + PAD / 2, 0);
+
      barwin_resize(infobar[sc].layout_button, textw(tags[sc][seltag[sc]].layout.symbol) + PAD, infobar[sc].geo.height);
      barwin_refresh_color(infobar[sc].layout_button);
 
@@ -216,7 +219,7 @@ infobar_draw_selbar(int sc)
 void
 infobar_draw_taglist(int sc)
 {
-     int i;
+     int i, x;
      Client *c;
      Bool is_occupied[MAXTAG];
 
@@ -230,8 +233,29 @@ infobar_draw_taglist(int sc)
           if(c->screen == sc)
                is_occupied[c->tag] = True;
 
-     for(i = 1; i < conf.ntag[sc] + 1; ++i)
+     for(i = 1, x = 0; i < conf.ntag[sc] + 1; ++i)
      {
+
+          /* Autohide tag feature */
+          if(conf.tagautohide)
+          {
+               if(!is_occupied[i] && i != seltag[sc])
+               {
+                    barwin_unmap(infobar[sc].tags[i]);
+
+                    continue;
+               }
+
+               if(!infobar[sc].tags[i]->mapped)
+                    barwin_map(infobar[sc].tags[i]);
+
+               barwin_move(infobar[sc].tags[i], x, 0);
+
+               x += infobar[sc].tags[i]->geo.width;
+
+               barwin_resize(infobar[sc].tags_board, x, infobar[sc].geo.height);
+          }
+
           infobar[sc].tags[i]->bg = tags[sc][i].urgent
                ? conf.colors.tagurbg
                : ((i == seltag[sc] || tags[sc][seltag[sc]].tagad & TagFlag(i))
