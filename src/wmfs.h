@@ -146,6 +146,7 @@ void infobar_draw(int sc);
 void infobar_draw_layout(int sc);
 void infobar_draw_selbar(int sc);
 void infobar_draw_taglist(int sc);
+void infobar_update_taglist(int sc);
 void infobar_destroy(void);
 void infobar_set_position(int pos);
 void uicb_infobar_togglepos(uicb_t);
@@ -301,6 +302,10 @@ void tag_swap(int s, int t1, int t2);
 void uicb_tag_swap(uicb_t);
 void uicb_tag_swap_next(uicb_t);
 void uicb_tag_swap_previous(uicb_t);
+void tag_new(int s, char *name);
+void uicb_tag_new(uicb_t);
+void tag_delete(int s, int tag);
+void uicb_tag_del(uicb_t);
 
 /* screen.c */
 int screen_count(void);

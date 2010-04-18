@@ -278,6 +278,47 @@ infobar_draw_taglist(int sc)
      return;
 }
 
+/** Update taglist geo
+  *\param sc Screen number
+*/
+void
+infobar_update_taglist(int sc)
+{
+     int i, j;
+
+     for(i = 1, j = 0; i < conf.ntag[sc] + 1; ++i)
+     {
+          /* If the tag i does not exist yet (graphically) or need full update */
+          if(!infobar[sc].tags[i] || infobar[sc].need_update)
+          {
+               infobar[sc].tags[i] = barwin_create(infobar[sc].tags_board->win, j, 0,
+                         textw(tags[sc][i].name) + PAD,
+                         infobar[sc].geo.height,
+                         conf.colors.bar, conf.colors.text, False, False, conf.border.tag);
+
+               barwin_map(infobar[sc].tags[i]);
+               barwin_map_subwin(infobar[sc].tags[i]);
+
+               j += textw(tags[sc][i].name) + PAD;
+
+               barwin_resize(infobar[sc].tags_board, j, infobar[sc].geo.height);
+
+               continue;
+          }
+
+          barwin_move(infobar[sc].tags[i], j, 0);
+          j += textw(tags[sc][i].name) + PAD;
+          barwin_resize(infobar[sc].tags[i], textw(tags[sc][i].name) + PAD, infobar[sc].geo.height);
+          barwin_resize(infobar[sc].tags_board, j, infobar[sc].geo.height);
+     }
+
+     infobar[sc].need_update = False;
+
+
+     return;
+}
+
+
 /** Destroy the InfoBar
 */
 void
