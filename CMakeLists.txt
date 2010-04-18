@@ -54,8 +54,7 @@ add_executable(wmfs ${wmfs_src})
 set(VERSION "WMFS-201004")
 
 # FLAGS
-set(CFLAGS "-Wall -ansi")
-set(CMAKE_C_FLAGS ${CFLAGS})
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -ansi")
 
 # Linker FLAGS
 
@@ -138,7 +137,7 @@ target_link_libraries(wmfs ${LIBRARIES_TO_LINK})
 
 # Messages
 message("Project version: ${VERSION}")
-message("Using these CFLAGS: ${CFLAGS}")
+message("Using these CFLAGS: ${CMAKE_C_FLAGS}")
 message("Using these LDFLAGS: ${LDFLAGS}")
 message("Linking with theses libraries : ${LIBRARIES_TO_LINK}")
 
@@ -227,7 +226,7 @@ endif()
 set(WMFS_VERSION ${VERSION})
 set(WMFS_COMPILE_MACHINE ${CMAKE_SYSTEM_PROCESSOR})
 set(WMFS_COMPILE_BY $ENV{USER})
-set(WMFS_COMPILE_FLAGS ${CFLAGS})
+set(WMFS_COMPILE_FLAGS ${CMAKE_C_FLAGS})
 set(WMFS_LINKED_LIBS ${LIBRARIES_TO_LINK})
 set(WMFS_SYSCONFDIR ${XDG_CONFIG_DIR}/${PROJECT_NAME})
 set(WMFS_SOURCE_DIR ${SOURCE_DIR})
