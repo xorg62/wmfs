@@ -239,6 +239,7 @@ typedef struct
      XRectangle geo;
      int position;
      char *statustext;
+     Bool need_update;
 } InfoBar;
 
 /* Layout Structure */

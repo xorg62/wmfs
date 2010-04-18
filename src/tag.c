@@ -306,7 +306,6 @@ tag_swap(int s, int t1, int t2)
 {
      Client *c;
      Tag t;
-     int i, j;
 
      if(t1 > conf.ntag[s] || t1 < 1
                || t2 > conf.ntag[s] || t2 < 1 || t1 == t2)
@@ -324,15 +323,7 @@ tag_swap(int s, int t1, int t2)
                c->tag = t1;
      }
 
-     /* Adapt tags buttons */
-     for(i = 1, j = 0; i < conf.ntag[s] + 1; ++i)
-     {
-          barwin_move(infobar[s].tags[i], j, 0);
-          j += textw(tags[s][i].name) + PAD;
-          barwin_resize(infobar[s].tags[i], textw(tags[s][i].name) + PAD, infobar[s].geo.height);
-          barwin_resize(infobar[s].tags_board, j, infobar[s].geo.height);
-     }
-
+     infobar_update_taglist(s);
      tag_set(t2);
 
      return;
@@ -376,3 +367,98 @@ uicb_tag_swap_previous(uicb_t cmd)
 
      return;
 }
+
+/** Adding a tag
+  *\param s Screen number
+  *\param name New tag name
+*/
+void
+tag_new(int s, char *name)
+{
+     Tag t = { NULL, NULL, 0, 0, 0.65, 1, False, False, False, False, IB_Top,
+          layout_name_to_struct(conf.layout, "tile_right", conf.nlayout, layout_list), 0, NULL, 0 };
+
+     if(conf.ntag[s] + 1 > MAXTAG)
+     {
+          warnx("Too many tag: Can't create new tag");
+
+          return;
+     }
+
+     ++conf.ntag[s];
+
+     tags[s][conf.ntag[s]] = t;
+
+     tags[s][conf.ntag[s]].name = _strdup(((strlen(name)) ? name : "new tag"));
+
+     infobar_update_taglist(s);
+     infobar_draw(s);
+
+     return;
+}
+
+/** Adding a tag
+  *\param cmd uicb_t type
+*/
+void
+uicb_tag_new(uicb_t cmd)
+{
+     screen_get_sel();
+
+     tag_new(selscreen, (char*)cmd);
+
+     return;
+}
+
+/** Delete a tag
+  *\param s Screen number
+  *\param tag Tag number
+*/
+void
+tag_delete(int s, int tag)
+{
+     Tag t = { 0 };
+     Client *c;
+     int i;
+
+     if(tag < 0 || tag > conf.ntag[s] || conf.ntag[s] == 1)
+          return;
+
+     for(c = clients; c; c = c->next)
+          if(c->screen == s && c->tag == tag)
+          {
+               warnx("Client(s) present in this tag, can't delete it");
+
+               return;
+          }
+
+     --conf.ntag[s];
+
+     tags[s][tag] = t;
+     infobar[s].tags[tag] = NULL;
+
+     for(i = tag; i < conf.ntag[s] + 1; ++i)
+          tags[s][i] = tags[s][i + 1];
+
+     infobar[s].need_update = True;
+     infobar_update_taglist(s);
+     infobar_draw(s);
+
+     tag_set(tag);
+
+     return;
+}
+
+/** Delete a tag
+  *\param cmd uicb_t type
+*/
+void
+uicb_tag_del(uicb_t cmd)
+{
+     screen_get_sel();
+
+     tag_delete(selscreen, ((strlen((char*)cmd)) ? atoi(cmd) : seltag[selscreen]));
+
+     return;
+}
+
