@@ -304,6 +304,7 @@ uicb_tag_toggle_additional(uicb_t cmd)
 void
 tag_swap(int s, int t1, int t2)
 {
+     Client *c;
      Tag t;
      int i, j;
 
@@ -314,6 +315,10 @@ tag_swap(int s, int t1, int t2)
      t = tags[s][t1];
      tags[s][t1] = tags[s][t2];
      tags[s][t2] = t;
+
+     for(c = clients; c; c = c->next)
+          if(c->screen == s && c->tag == t1)
+               c->tag = t2;
 
      /* Adapt tags buttons */
      for(i = 1, j = 0; i < conf.ntag[s] + 1; ++i)
