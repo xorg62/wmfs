@@ -389,7 +389,7 @@ tag_new(int s, char *name)
 
      tags[s][conf.ntag[s]] = t;
 
-     tags[s][conf.ntag[s]].name = _strdup(((strlen(name)) ? name : "new tag"));
+     tags[s][conf.ntag[s]].name = _strdup((name ? name : "new tag"));
 
      infobar_update_taglist(s);
      infobar_draw(s);
@@ -404,6 +404,7 @@ void
 uicb_tag_new(uicb_t cmd)
 {
      screen_get_sel();
+
 
      tag_new(selscreen, (char*)cmd);
 
