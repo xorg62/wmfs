@@ -455,9 +455,13 @@ tag_delete(int s, int tag)
 void
 uicb_tag_del(uicb_t cmd)
 {
+     int n;
+
      screen_get_sel();
 
-     tag_delete(selscreen, ((strlen((char*)cmd)) ? atoi(cmd) : seltag[selscreen]));
+     n = (cmd ? atoi(cmd) : seltag[selscreen]);
+
+     tag_delete(selscreen, n);
 
      return;
 }
