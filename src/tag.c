@@ -307,8 +307,8 @@ tag_swap(int s, int t1, int t2)
      Tag t;
      int i, j;
 
-     if(t1 > conf.ntag[s] || t1 < 0
-               || t2 > conf.ntag[s] || t2 < 0 || t1 == t2)
+     if(t1 > conf.ntag[s] || t1 < 1
+               || t2 > conf.ntag[s] || t2 < 1 || t1 == t2)
           return;
 
      t = tags[s][t1];
