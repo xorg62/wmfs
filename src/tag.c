@@ -317,8 +317,12 @@ tag_swap(int s, int t1, int t2)
      tags[s][t2] = t;
 
      for(c = clients; c; c = c->next)
+     {
           if(c->screen == s && c->tag == t1)
                c->tag = t2;
+          else if(c->screen == s && c->tag == t2)
+               c->tag = t1;
+     }
 
      /* Adapt tags buttons */
      for(i = 1, j = 0; i < conf.ntag[s] + 1; ++i)
