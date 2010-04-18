@@ -284,7 +284,6 @@ char *clean_value(char *str);
 int parse_image_block(ImageAttr *im, char *str);
 #endif /* HAVE_IMLIB */
 
-
 /* tag.c */
 void tag_set(int tag);
 void tag_transfert(Client *c, int tag);
@@ -297,8 +296,11 @@ void uicb_tagtransfert_next(uicb_t);
 void uicb_tagtransfert_prev(uicb_t);
 void uicb_tag_urgent(uicb_t cmd);
 void tag_additional(int sc, int tag, int adtag);
-void uicb_tag_toggle_additional(uicb_t cmd);
-
+void uicb_tag_toggle_additional(uicb_t);
+void tag_swap(int s, int t1, int t2);
+void uicb_tag_swap(uicb_t);
+void uicb_tag_swap_next(uicb_t);
+void uicb_tag_swap_previous(uicb_t);
 
 /* screen.c */
 int screen_count(void);
