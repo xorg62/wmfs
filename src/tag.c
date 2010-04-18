@@ -296,5 +296,74 @@ uicb_tag_toggle_additional(uicb_t cmd)
      return;
 }
 
+/** Swap 2 tags
+  *\param s  Screen
+  *\param t1 Tag 1
+  *\param t2 Tag 2
+*/
+void
+tag_swap(int s, int t1, int t2)
+{
+     Tag t;
+     int i, j;
 
+     if(t1 > conf.ntag[s] || t1 < 0
+               || t2 > conf.ntag[s] || t2 < 0 || t1 == t2)
+          return;
 
+     t = tags[s][t1];
+     tags[s][t1] = tags[s][t2];
+     tags[s][t2] = t;
+
+     /* Adapt tags buttons */
+     for(i = 1, j = 0; i < conf.ntag[s] + 1; ++i)
+     {
+          barwin_move(infobar[s].tags[i], j, 0);
+          j += textw(tags[s][i].name) + PAD;
+          barwin_resize(infobar[s].tags[i], textw(tags[s][i].name) + PAD, infobar[s].geo.height);
+          barwin_resize(infobar[s].tags_board, j, infobar[s].geo.height);
+     }
+
+     tag_set(t2);
+
+     return;
+}
+
+/** Swap current tag with a specified tag
+  *\param cmd uicb_t type
+*/
+void
+uicb_tag_swap(uicb_t cmd)
+{
+     screen_get_sel();
+
+     tag_swap(selscreen, seltag[selscreen], atoi(cmd));
+
+     return;
+}
+
+/** Swap current tag with next tag
+  *\param cmd uicb_t type
+*/
+void
+uicb_tag_swap_next(uicb_t cmd)
+{
+     screen_get_sel();
+
+     tag_swap(selscreen, seltag[selscreen], seltag[selscreen] + 1);
+
+     return;
+}
+
+/** Swap current tag with previous tag
+  *\param cmd uicb_t type
+*/
+void
+uicb_tag_swap_previous(uicb_t cmd)
+{
+     screen_get_sel();
+
+     tag_swap(selscreen, seltag[selscreen], seltag[selscreen] - 1);
+
+     return;
+}

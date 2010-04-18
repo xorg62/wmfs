@@ -218,7 +218,8 @@ barwin_unmap_subwin(BarWindow *bw)
 void
 barwin_move(BarWindow *bw, int x, int y)
 {
-     CHECK(bw);
+     if(!bw || (bw->geo.x == x && bw->geo.y == y))
+          return;
 
      XMoveWindow(dpy, bw->win, (bw->geo.x = x), (bw->geo.y = y));
 
@@ -233,7 +234,8 @@ barwin_move(BarWindow *bw, int x, int y)
 void
 barwin_resize(BarWindow *bw, uint w, uint h)
 {
-     CHECK(bw);
+     if(!bw || (bw->geo.width == w && bw->geo.height == h))
+          return;
 
      bw->geo.width = w;
      bw->geo.height = h;
