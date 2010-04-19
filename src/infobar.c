@@ -314,7 +314,6 @@ infobar_update_taglist(int sc)
 
      infobar[sc].need_update = False;
 
-
      return;
 }
 
