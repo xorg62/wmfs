@@ -448,6 +448,13 @@ typedef struct
 
 typedef struct
 {
+     uint x, y, w, h;
+     uint color;
+     char data[512];
+} StatusGraph;
+
+typedef struct
+{
      uint x, y;
      char color[8];
      char text[512];
