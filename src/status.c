@@ -56,6 +56,56 @@ statustext_rectangle(StatusRec *r, char *str)
      return n;
 }
 
+/** Check graphs blocks in str and return properties
+  * --> \g[x;y;width;height;#color;data]\
+  *\param g StatusGraph pointer, graphs properties
+  *\param str String
+  *\return n Length of g
+  */
+int
+statustext_graph(StatusGraph *g, char *str)
+{
+     char as, c, *p;
+     int n, i, j, k, m, w;
+
+     for(i = j = n = 0; i < strlen(str); ++i, ++j)
+          if(sscanf(&str[i], "\\g[%d;%d;%d;%d;#%x;%512[^]]]%c",
+                    &g[n].x, &g[n].y, &g[n].w, &g[n].h, &g[n].color, g[n].data, &as) == 7
+                    && as == '\\')
+          {
+               /* data is a list of numbers separated by ';' */
+               w = g[n].w;
+               p = strtok(g[n].data, ";");
+               m = 0;
+
+               while(p && m < w)
+               {
+                    c = atoi(p);
+                    /* height limits */
+                    if(c < 0)
+                         c = 0;
+                    if(c > g[n].h)
+                         c = g[n].h;
+                    g[n].data[m] = c;
+                    p = strtok(NULL, ";");
+                    ++m;
+               }
+
+               /* width limits */
+               for(; m < w; ++m)
+                    g[n].data[m] = 0;
+               /* data is a array[w] of bytes now */
+
+               for(++n, ++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
+          }
+          else if(j != i)
+               str[j] = str[i];
+
+     for(k = j; k < i; str[k++] = 0);
+
+     return n;
+}
+
 /** Check text blocks in str and return properties
   * --> \s[x;y;#color;text]\
   *\param s StatusText pointer, text properties
@@ -142,8 +192,9 @@ void
 statustext_handle(int sc, char *str)
 {
      char *lastst;
-     int i, nr, ns, len;
+     int i, nr, ng, ns, len;
      StatusRec r[128];
+     StatusGraph g[128];
      StatusText s[128];
 
      /* If the str == the current statustext, return (not needed) */
@@ -160,6 +211,7 @@ statustext_handle(int sc, char *str)
 
      /* Store rectangles, located text & images properties. */
      nr = statustext_rectangle(r, str);
+     ng = statustext_graph(g, str);
      ns = statustext_text(s, str);
 
      /* Draw normal text (and possibly colored with \#color\ blocks) */
@@ -168,6 +220,10 @@ statustext_handle(int sc, char *str)
      /* Draw rectangles with stored properties. */
      for(i = 0; i < nr; ++i)
           draw_rectangle(infobar[sc].bar->dr, r[i].x, r[i].y, r[i].w, r[i].h, r[i].color);
+
+     /* Draw graphs with stored properties. */
+     for(i = 0; i < ng; ++i)
+          draw_graph(infobar[sc].bar->dr, g[i].x, g[i].y, g[i].w, g[i].h, g[i].color, g[i].data);
 
      /* Draw located text with stored properties. */
      for(i = 0; i < ns; ++i)
