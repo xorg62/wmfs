@@ -405,7 +405,6 @@ uicb_tag_new(uicb_t cmd)
 {
      screen_get_sel();
 
-
      tag_new(selscreen, (char*)cmd);
 
      return;
@@ -439,13 +438,22 @@ tag_delete(int s, int tag)
      infobar[s].tags[tag] = NULL;
 
      for(i = tag; i < conf.ntag[s] + 1; ++i)
+     {
+          /* Set clients tag because of shift */
+          for(c = clients; c; c = c->next)
+               if(c->screen == s && c->tag == i + 1)
+                    c->tag = i;
+
+          /* shift */
           tags[s][i] = tags[s][i + 1];
+     }
 
      infobar[s].need_update = True;
      infobar_update_taglist(s);
      infobar_draw(s);
 
-     tag_set(tag);
+     if(tag == seltag[s])
+          tag_set(tag);
 
      return;
 }
@@ -460,7 +468,8 @@ uicb_tag_del(uicb_t cmd)
 
      screen_get_sel();
 
-     n = (cmd ? atoi(cmd) : seltag[selscreen]);
+     if(cmd == NULL || !(n = atoi(cmd)))
+          n = seltag[selscreen];
 
      tag_delete(selscreen, n);
 
