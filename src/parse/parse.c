@@ -493,24 +493,29 @@ fetch_section(struct conf_sec *s, char *name)
 struct conf_sec *
 fetch_section_first(struct conf_sec *s, char *name)
 {
-     struct conf_sec *sec;
+     struct conf_sec *sec, *ret = NULL;
 
      if (!name)
           return NULL;
 
      if (!s)
+     {
           TAILQ_FOREACH(sec, &config, entry)
-               if (!strcmp(sec->name, name))
-                    return sec;
+               if (!strcmp(sec->name, name)) {
+                   ret = sec;
+                   break;
+               }
+     }
+     else
+     {
+         TAILQ_FOREACH(sec, &s->sub, entry)
+              if (!strcmp(sec->name, name)) {
+                  ret = sec;
+                  break;
+              }
+     }
 
-     if(!sec)
-          return NULL;
-
-     TAILQ_FOREACH(sec, &s->sub, entry)
-          if (!strcmp(sec->name, name))
-               return sec;
-
-     return NULL;
+     return ret;
 }
 
 size_t
