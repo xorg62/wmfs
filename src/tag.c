@@ -389,7 +389,7 @@ tag_new(int s, char *name)
 
      tags[s][conf.ntag[s]] = t;
 
-     tags[s][conf.ntag[s]].name = _strdup(((strlen(name)) ? name : "new tag"));
+     tags[s][conf.ntag[s]].name = _strdup((name ? name : "new tag"));
 
      infobar_update_taglist(s);
      infobar_draw(s);
@@ -404,6 +404,7 @@ void
 uicb_tag_new(uicb_t cmd)
 {
      screen_get_sel();
+
 
      tag_new(selscreen, (char*)cmd);
 
@@ -455,9 +456,13 @@ tag_delete(int s, int tag)
 void
 uicb_tag_del(uicb_t cmd)
 {
+     int n;
+
      screen_get_sel();
 
-     tag_delete(selscreen, ((strlen((char*)cmd)) ? atoi(cmd) : seltag[selscreen]));
+     n = (cmd ? atoi(cmd) : seltag[selscreen]);
+
+     tag_delete(selscreen, n);
 
      return;
 }

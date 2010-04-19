@@ -40,6 +40,7 @@
 #include <string.h>
 #include <signal.h>
 #include <unistd.h>
+#include <ctype.h>
 #include <fcntl.h>
 #include <time.h>
 #include <getopt.h>
