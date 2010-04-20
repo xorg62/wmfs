@@ -250,6 +250,9 @@
         # Toggle the resizehint of the current tag/screen
         [key] mod = {"Shift", "Control"} key = "r" func = "toggle_resizehint" [/key]
 
+        # Toggle the tag_autohide mode
+        [key] mod = {"Shift", "Control"} key = "t" func = "toggle_tagautohide" [/key]
+
         # Select the next client.
         [key] mod = {"Alt"} key = "Tab" func = "client_next" [/key]
 

@@ -399,3 +399,33 @@ uicb_infobar_togglepos(uicb_t cmd)
 
      return;
 }
+
+/** Toggle the tag_autohide mode
+ * \param cmd uicb_t type unused
+*/
+void
+uicb_toggle_tagautohide(uicb_t cmd)
+{
+     int i, x;
+
+     screen_get_sel();
+     conf.tagautohide = !conf.tagautohide;
+
+     if(!conf.tagautohide)
+     {
+          for(i = 1, x = 0; i < conf.ntag[selscreen] + 1; ++i)
+          {
+               if(!infobar[selscreen].tags[i]->mapped)
+                    barwin_map(infobar[selscreen].tags[i]);
+
+               barwin_move(infobar[selscreen].tags[i], x, 0);
+               x += infobar[selscreen].tags[i]->geo.width;
+          }
+
+          barwin_resize(infobar[selscreen].tags_board, x, infobar[selscreen].geo.height);
+     }
+
+     infobar_draw_taglist(selscreen);
+
+     return;
+}
