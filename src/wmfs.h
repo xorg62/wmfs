@@ -154,6 +154,7 @@ void infobar_update_taglist(int sc);
 void infobar_destroy(void);
 void infobar_set_position(int pos);
 void uicb_infobar_togglepos(uicb_t);
+void uicb_toggle_tagautohide(uicb_t);
 
 /* client.c */
 void client_attach(Client *c);

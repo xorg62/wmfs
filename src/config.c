@@ -87,7 +87,8 @@ func_name_list_t tmp_func_list[] =
      {"check_free",               uicb_checkfree },
      {"check_layout",             uicb_checklayout },
      {"clientlist",               uicb_clientlist },
-     {"check_clist",              uicb_checkclist }
+     {"check_clist",              uicb_checkclist },
+     {"toggle_tagautohide",       uicb_toggle_tagautohide }
 };
 
 key_name_list_t key_list[] =
