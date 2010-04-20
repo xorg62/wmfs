@@ -210,7 +210,7 @@ void
 ewmh_get_desktop_names(void)
 {
      char *str = NULL;
-     int S, s, i, len = 0, pos = 0;
+     int S, s, i = 0, len = 0, pos = 0;
 
      S = screen_count();
 

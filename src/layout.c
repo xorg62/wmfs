@@ -331,7 +331,7 @@ multi_tile(int screen, Position type)
      XRectangle sg = sgeo[screen];
      XRectangle mastergeo = {sg.x, sg.y, 0, 0};
      XRectangle cgeo = {sg.x, sg.y, 0, 0};
-     uint i, n, tilesize, mwfact, nmaster = tags[screen][seltag[screen]].nmaster;
+     uint i, n, tilesize = 0, mwfact, nmaster = tags[screen][seltag[screen]].nmaster;
 
      for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
      CHECK(n);
@@ -462,7 +462,7 @@ mirror(int screen, Bool horizontal)
      XRectangle mastergeo = {sg.x, sg.y, sg.width, sg.height};
      XRectangle cgeo = {sg.x, sg.y , sg.width, sg.height};
      XRectangle nextg[2] = { {0} };
-     uint i, n, tilesize, mwfact;
+     uint i, n, tilesize = 0, mwfact;
      uint nmaster = tags[screen][seltag[screen]].nmaster;
      int pa, imp;
      Bool isp = 0;
