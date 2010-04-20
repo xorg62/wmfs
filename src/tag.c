@@ -76,7 +76,18 @@ tag_set(int tag)
 
      for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
           if(tags[selscreen][i].tagad & TagFlag(seltag[selscreen]))
+          {
                al = True;
+               break;
+          }
+
+     /* Check for ignore_tag clients */
+     for(c = clients; c; c = c->next)
+          if(c->tag == MAXTAG + 1 && c->screen == selscreen)
+          {
+               al = True;
+               break;
+          }
 
      arrange(selscreen, al);
 

@@ -435,7 +435,7 @@ client_hide(Client *c)
 Bool
 ishide(Client *c, int screen)
 {
-     if((c->tag == seltag[screen] && c->screen == screen)
+     if(((c->tag == seltag[screen] || c->tag == MAXTAG + 1) && c->screen == screen)
                || tags[screen][seltag[screen]].tagad & TagFlag(c->tag))
           return False;
 
@@ -703,7 +703,8 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
      if(c->flags & FreeFlag || tags[c->screen][c->tag].layout.func == freelayout)
           c->free_geo = geo;
 
-     if((c->screen = screen_get_with_geo(c->geo.x, c->geo.y)) != os)
+     if((c->screen = screen_get_with_geo(c->geo.x, c->geo.y)) != os
+               && c->tag != MAXTAG + 1)
           c->tag = seltag[c->screen];
 
      frame_moveresize(c, c->geo);
@@ -1254,5 +1255,22 @@ Bool
 uicb_checkclist(uicb_t cmd)
 {
      return True;
+}
+
+/** Set selected client on all tag (ignore tags
+  *\para cmd uicb_t type unused
+*/
+void
+uicb_client_ignore_tag(uicb_t cmd)
+{
+     CHECK(sel);
+
+     screen_get_sel();
+
+     sel->tag = ((sel->tag == MAXTAG + 1) ? seltag[selscreen] : MAXTAG + 1);
+
+     arrange(sel->screen, True);
+
+     return;
 }
 

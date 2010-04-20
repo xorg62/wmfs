@@ -241,7 +241,7 @@ scan(void)
 
                     c = client_manage(w[i], &wa, False);
 
-                    if(tag != -1)
+                    if(tag != -1 && tag != MAXTAG + 1)
                          c->tag = tag;
                     if(screen != -1 && screen <= s - 1)
                          c->screen = screen;

@@ -201,6 +201,7 @@ void uicb_ignore_next_client_rules(uicb_t cmd);
 void uicb_clientlist(uicb_t cmd);
 void uicb_client_select(uicb_t cmd);
 Bool uicb_checkclist(uicb_t);
+void uicb_client_ignore_tag(uicb_t);
 
 /* ewmh.c */
 void ewmh_init_hints(void);
