@@ -200,44 +200,69 @@ get_mouse_pos(void)
 
 /** Execute a sh command
  * \param cmd Command
+ * \return child pid
 */
-void
+int
 spawn(const char *format, ...)
 {
      char *sh = NULL;
      char cmd[512];
      va_list ap;
-
-     if(strlen(format) > 511)
-     {
-          warnx("spawn(): Error, command too long.");
-          return;
-     }
+     pid_t pid, ret;
+     int p[2], len;
 
      va_start(ap, format);
-     vsprintf(cmd, format, ap);
+     len = vsnprintf(cmd, sizeof(cmd), format, ap);
      va_end(ap);
 
-     if(!strlen(cmd))
-          return;
+     if (len >= sizeof(cmd))
+     {
+          warnx("command too long (> 512 bytes)");
+          return -1;
+     }
 
      if(!(sh = getenv("SHELL")))
           sh = "/bin/sh";
 
-     if(fork() == 0)
+     if (pipe(p) == -1)
      {
-          if(fork() == 0)
+          warn("pipe");
+          return -1;
+     }
+
+     if((pid = fork()) == 0)
+     {
+          close(p[0]);
+          if((pid = fork()) == 0)
           {
                if(dpy)
                     close(ConnectionNumber(dpy));
                setsid();
                execl(sh, sh, "-c", cmd, (char*)NULL);
-               exit(EXIT_SUCCESS);
+               exit(EXIT_FAILURE);
           }
+          write(p[1], &pid, sizeof(pid_t));
+          close(p[1]);
           exit(EXIT_SUCCESS);
      }
+     else if (pid != -1)
+     {
+          close(p[1]);
+          if (sizeof(pid_t) != read(p[0], &ret, sizeof(pid_t)))
+          {
+               warn("read");
+               ret = -1;
+          }
+          close(p[0]);
+          waitpid(pid, NULL, 0);
+     }
+     else
+     {
+          warn("fork");
+          ret = -1;
+     }
 
-     return;
+     return ret;
 }
 
 /** Swap two pointer.

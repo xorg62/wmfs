@@ -180,44 +180,34 @@ init_root(void)
 void
 init_status(void)
 {
-     int fd;
      struct stat st;
      char *home;
+
+     conf.status_pid = -1;
+     estatus = False;
 
      if(!conf.status_path)
      {
           if(!(home = getenv("HOME")))
           {
                warnx("HOME not set, can't launch status.sh");
-               estatus = False;
                return;
           }
 
           conf.status_path = emalloc(strlen(home) + strlen(DEF_STATUS) + 2, sizeof(char));
-
           sprintf(conf.status_path, "%s/"DEF_STATUS, home);
      }
 
-     if(!(fd = open(conf.status_path, O_RDONLY))
-               || !fopen(conf.status_path, "r"))
+     if (stat(conf.status_path, &st) == -1)
      {
-          free(conf.status_path);
-          estatus = False;
-
+          warn("%s", conf.status_path);
           return;
      }
 
-     stat(conf.status_path, &st);
-
      if(st.st_size && st.st_mode & S_IXUSR)
-     {
           estatus = True;
-          spawn(conf.status_path);
-     }
      else
           warnx("status file specified in configuratin (status_path) or present in wmfs directory can't be executed, try 'chmod +x %s'.", conf.status_path);
-
-     close(fd);
 
      return;
 }

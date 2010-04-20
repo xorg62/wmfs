@@ -33,6 +33,8 @@
 #ifndef WMFS_H
 #define WMFS_H
 
+#define _BSD_SOURCE /* vsnprintf */
+#define _POSIX_SOURCE /* kill */
 /* Lib headers */
 #include <stdio.h>
 #include <stdlib.h>
@@ -278,7 +280,7 @@ char* alias_to_str(char *conf_choice);
 /* }}} */
 XRectangle get_mouse_pos(void);
 char *char_to_str(const char c);
-void spawn(const char *str, ...);
+int spawn(const char *str, ...);
 void swap_ptr(void **x, void **y);
 void uicb_spawn(uicb_t);
 char *clean_value(char *str);

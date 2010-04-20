@@ -148,7 +148,7 @@ thread_process(void *arg)
           pthread_detach(pthread_self());
           do
           {
-               spawn(conf.status_path);
+               conf.status_pid = spawn(conf.status_path);
                sleep(conf.status_timing);
           } while (!exiting && conf.status_timing != 0);
      }
@@ -270,6 +270,9 @@ void
 uicb_reload(uicb_t cmd)
 {
      quit();
+
+     if (conf.status_pid != (pid_t)-1)
+          kill(conf.status_pid, SIGQUIT);
 
      for(; argv_global[0] && argv_global[0] == ' '; ++argv_global);
 
