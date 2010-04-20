@@ -128,6 +128,10 @@ quit(void)
      XSync(dpy, False);
      XCloseDisplay(dpy);
 
+     /* kill status script */
+     if (conf.status_pid != (pid_t)-1)
+         kill(conf.status_pid, SIGQUIT);
+
      return;
 }
 
@@ -270,9 +274,6 @@ void
 uicb_reload(uicb_t cmd)
 {
      quit();
-
-     if (conf.status_pid != (pid_t)-1)
-          kill(conf.status_pid, SIGQUIT);
 
      for(; argv_global[0] && argv_global[0] == ' '; ++argv_global);
 
