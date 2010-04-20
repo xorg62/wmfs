@@ -425,7 +425,7 @@ uicb_toggle_tagautohide(uicb_t cmd)
           barwin_resize(infobar[selscreen].tags_board, x, infobar[selscreen].geo.height);
      }
 
-     infobar_draw_taglist(selscreen);
+     infobar_draw(selscreen);
 
      return;
 }
