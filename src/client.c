@@ -1237,12 +1237,21 @@ void
 uicb_client_select(uicb_t cmd)
 {
      int i;
+     Window w;
+     int d, x, y;
+
 
      for(i = 0; i < MAXCLIST && clist_index[i].client; ++i)
           if(!strcmp(cmd, clist_index[i].key))
           {
                client_focus(clist_index[i].client);
                client_raise(clist_index[i].client);
+
+               /* Move pointer on client */
+               XQueryPointer(dpy, ROOT, &w, &w, &x, &y, &d, &d, (uint *)&d);
+               XWarpPointer(dpy, ROOT, ROOT, x, y, d, d,
+                         clist_index[i].client->geo.x +  clist_index[i].client->geo.width / 2,
+                         clist_index[i].client->geo.y +  clist_index[i].client->geo.height / 2);
           }
 
      return;
