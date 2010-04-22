@@ -91,7 +91,7 @@ menu_draw(Menu menu, int x, int y)
                                   SHADH,
                                   (i * (INFOBARH - SHADH) + SHADH),
                                   width - SHADH,
-                                  INFOBARH,
+                                  INFOBARH - SHADH,
                                   menu.colors.normal.bg,
                                   menu.colors.normal.fg,
                                   True, False, False);

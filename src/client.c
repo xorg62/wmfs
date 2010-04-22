@@ -1250,8 +1250,8 @@ uicb_client_select(uicb_t cmd)
                /* Move pointer on client */
                XQueryPointer(dpy, ROOT, &w, &w, &x, &y, &d, &d, (uint *)&d);
                XWarpPointer(dpy, ROOT, ROOT, x, y, d, d,
-                         clist_index[i].client->geo.x +  clist_index[i].client->geo.width / 2,
-                         clist_index[i].client->geo.y +  clist_index[i].client->geo.height / 2);
+                         clist_index[i].client->geo.x + clist_index[i].client->geo.width / 2,
+                         clist_index[i].client->geo.y + clist_index[i].client->geo.height / 2);
           }
 
      return;
