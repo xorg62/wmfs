@@ -404,6 +404,7 @@ tag_new(int s, char *name)
 
      infobar_update_taglist(s);
      infobar_draw(s);
+     tag_set(conf.ntag[s]);
 
      return;
 }
