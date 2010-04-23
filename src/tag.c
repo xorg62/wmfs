@@ -181,6 +181,92 @@ uicb_tag_prev(uicb_t cmd)
      return;
 }
 
+/** Set the next visible tag
+ * \param cmd uicb_t type unused
+*/
+void
+uicb_tag_next_visible(uicb_t cmd)
+{
+     int i, tag;
+     Client *c;
+     Bool is_occupied[MAXTAG];
+
+     screen_get_sel();
+
+     if(!conf.tagautohide)
+     {
+          tag_set(seltag[selscreen] + 1);
+          return;
+     }
+
+     for(i = 0; i < MAXTAG; i++)
+          is_occupied[i] = False;
+
+     for(c = clients; c; c = c->next)
+          if(c->screen == selscreen)
+               is_occupied[c->tag] = True;
+
+     for(tag = seltag[selscreen] + 1; tag < conf.ntag[selscreen] + 1; ++tag)
+          if(is_occupied[tag])
+          {
+               tag_set(tag);
+               return;
+          }
+
+     if(conf.tag_round)
+          for(tag = 0; tag < seltag[selscreen]; ++tag)
+               if(is_occupied[tag])
+               {
+                    tag_set(tag);
+                    return;
+               }
+
+     return;
+}
+
+/** Set the prev visible tag
+ * \param cmd uicb_t type unused
+*/
+void
+uicb_tag_prev_visible(uicb_t cmd)
+{
+     int i, tag;
+     Client *c;
+     Bool is_occupied[MAXTAG];
+
+     screen_get_sel();
+
+     if(!conf.tagautohide)
+     {
+          tag_set(seltag[selscreen] - 1);
+          return;
+     }
+
+     for(i = 0; i < MAXTAG; i++)
+          is_occupied[i] = False;
+
+     for(c = clients; c; c = c->next)
+          if(c->screen == selscreen)
+               is_occupied[c->tag] = True;
+
+     for(tag = seltag[selscreen] - 1; tag >= 0; --tag)
+          if(is_occupied[tag])
+          {
+               tag_set(tag);
+               return;
+          }
+
+     if(conf.tag_round)
+          for(tag = conf.ntag[selscreen]; tag > seltag[selscreen]; --tag)
+               if(is_occupied[tag])
+               {
+                    tag_set(tag);
+                    return;
+               }
+
+     return;
+}
+
 /** Transfert the selected client to
  *  the wanted tag
  * \param cmd Wanted tag, uicb_t type

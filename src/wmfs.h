@@ -297,6 +297,8 @@ void tag_transfert(Client *c, int tag);
 void uicb_tag(uicb_t);
 void uicb_tag_next(uicb_t);
 void uicb_tag_prev(uicb_t);
+void uicb_tag_next_visible(uicb_t);
+void uicb_tag_prev_visible(uicb_t);
 void uicb_tagtransfert(uicb_t);
 void uicb_tag_prev_sel(uicb_t);
 void uicb_tagtransfert_next(uicb_t);

@@ -51,6 +51,8 @@ func_name_list_t tmp_func_list[] =
      {"tag",                      uicb_tag },
      {"tag_next",                 uicb_tag_next },
      {"tag_prev",                 uicb_tag_prev },
+     {"tag_next_visible",         uicb_tag_next_visible },
+     {"tag_prev_visible",         uicb_tag_prev_visible },
      {"tag_prev_sel",             uicb_tag_prev_sel },
      {"tag_transfert",            uicb_tagtransfert },
      {"tag_transfert_next",       uicb_tagtransfert_next },

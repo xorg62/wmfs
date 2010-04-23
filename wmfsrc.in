@@ -265,6 +265,12 @@
         # Select the previous tag.
         [key] mod = {"Control"} key = "Left" func = "tag_prev" [/key]
 
+        # Select the next visible tag.
+        [key] mod = {"Control","Alt"} key = "Right" func = "tag_next_visible" [/key]
+
+        # Select the previous visible tag.
+        [key] mod = {"Control","Alt"} key = "Left" func = "tag_prev_visible" [/key]
+
         # Set the next layout.
         [key] mod = {"Alt"} key = "space" func = "layout_next" [/key]
 
