@@ -464,7 +464,7 @@ tag_delete(int s, int tag)
      infobar_draw(s);
 
      if(tag == seltag[s])
-          tag_set(tag);
+          tag_set(tag <= conf.ntag[s] ? tag : conf.ntag[s]);
 
      return;
 }
