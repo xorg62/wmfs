@@ -78,7 +78,7 @@ menu_draw(Menu menu, int x, int y)
      if((out = y + height - MAXH) > 0)
           y -= out;
 
-     frame = barwin_create(ROOT, x, y, width + SHADH, height + SHADH * 2,
+     frame = barwin_create(ROOT, x, y, width + SHADH, height + SHADH * 3,
                            menu.colors.normal.bg, menu.colors.normal.fg, False, False, True);
 
      barwin_map(frame);
@@ -91,7 +91,7 @@ menu_draw(Menu menu, int x, int y)
                                   SHADH,
                                   (i * (INFOBARH - SHADH) + SHADH),
                                   width - SHADH,
-                                  INFOBARH - SHADH,
+                                  INFOBARH,
                                   menu.colors.normal.bg,
                                   menu.colors.normal.fg,
                                   True, False, False);
