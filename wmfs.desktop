@@ -1,6 +1,5 @@
-[Desktop Entry] 
+[Desktop Entry]
 Encoding="UTF-8"
 Name="wmfs"
 Comment="Window Manager From Scratch"
-TryExec="wmfs"
 Exec="ck-launch-session wmfs"
