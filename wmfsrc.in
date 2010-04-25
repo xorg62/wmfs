@@ -124,6 +124,9 @@
         resize_corner_normal = "#191919"
         resize_corner_focus  = "#003366"
 
+        # Space between tiled clients
+        padding = 0
+
         modifier = "Alt"
 
         [mouse] button = "1" func = "client_raise" [/mouse]

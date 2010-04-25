@@ -175,6 +175,9 @@ tiled_client(int screen, Client *c)
                 || c->screen != screen
                 || ishide(c, screen)); c = c->next);
 
+     if(c)
+          c->flags |= FLayFlag;
+
      return c;
 }
 

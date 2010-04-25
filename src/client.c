@@ -698,6 +698,17 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
           client_geo_hints(&geo, c);
 
      c->flags &= ~MaxFlag;
+
+     if(conf.client.padding && c->flags & TileFlag && c->flags & FLayFlag)
+     {
+          geo.x += conf.client.padding;
+          geo.y += conf.client.padding;
+          geo.width -= conf.client.padding;
+          geo.height -= conf.client.padding;
+
+          c->flags &= ~FLayFlag;
+     }
+
      c->geo = c->ogeo = geo;
 
      if(c->flags & FreeFlag || tags[c->screen][c->tag].layout.func == freelayout)

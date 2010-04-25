@@ -263,6 +263,7 @@ conf_client_section(void)
      conf.client.resizecorner_focus  = getcolor(fetch_opt_first(sec, "#DDDDDD", "resize_corner_focus").str);
      conf.client.mod                 |= char_to_modkey(fetch_opt_first(sec, "Alt", "modifier").str, key_list);
      conf.client.set_new_win_master  = fetch_opt_first(sec, "true", "set_new_win_master").bool;
+     conf.client.padding             = fetch_opt_first(sec, "0", "padding").num;
 
      mouse = fetch_section(sec, "mouse");
 

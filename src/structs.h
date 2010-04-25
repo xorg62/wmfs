@@ -51,6 +51,7 @@
 #define FSSFlag    (1 << 8)
 #define AboveFlag  (1 << 9)
 #define UrgentFlag (1 << 10)
+#define FLayFlag   (1 << 11)
 
 #define TagFlag(t) (1 << (t))
 
@@ -400,6 +401,7 @@ typedef struct
           uint resizecorner_normal;
           uint resizecorner_focus;
           uint mod;
+          uint padding;
           MouseBinding *mouse;
           int nmouse;
      } client;
