@@ -698,7 +698,7 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
 
      c->flags &= ~MaxFlag;
 
-    /* if(conf.client.padding && c->flags & TileFlag && c->flags & FLayFlag)
+     if(conf.client.padding && c->flags & TileFlag && c->flags & FLayFlag)
      {
           geo.x += conf.client.padding;
           geo.y += conf.client.padding;
@@ -706,7 +706,7 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
           geo.height -= conf.client.padding * 2;
 
           c->flags &= ~FLayFlag;
-     }*/
+     }
 
      c->geo = c->ogeo = geo;
 
