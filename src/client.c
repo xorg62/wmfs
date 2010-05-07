@@ -546,7 +546,6 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      c->screen = selscreen;
      c->flags = 0;
 
-
      XQueryPointer(dpy, ROOT, &dw, &dw, &mx, &my, &dint, &dint, &duint);
 
      if(conf.client.place_at_mouse)
@@ -610,15 +609,15 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      free(t);
 
      client_attach(c);
+     client_set_wanted_tag(c);
      client_get_name(c);
-     client_map(c);
      client_raise(c);
      client_focus(c);
      setwinstate(c->win, NormalState);
      ewmh_get_client_list();
      ewmh_manage_window_type(c);
-     client_set_wanted_tag(c);
      client_update_attributes(c);
+     client_map(c);
 
      if(ar)
           arrange(c->screen, True);
@@ -699,15 +698,15 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
 
      c->flags &= ~MaxFlag;
 
-     if(conf.client.padding && c->flags & TileFlag && c->flags & FLayFlag)
+    /* if(conf.client.padding && c->flags & TileFlag && c->flags & FLayFlag)
      {
           geo.x += conf.client.padding;
           geo.y += conf.client.padding;
-          geo.width -= conf.client.padding;
-          geo.height -= conf.client.padding;
+          geo.width -= conf.client.padding * 2;
+          geo.height -= conf.client.padding * 2;
 
           c->flags &= ~FLayFlag;
-     }
+     }*/
 
      c->geo = c->ogeo = geo;
 
