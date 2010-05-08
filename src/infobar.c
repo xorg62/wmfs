@@ -179,9 +179,10 @@ infobar_draw_selbar(int sc)
      if(!conf.bars.selbar)
           return;
 
-     if(!sel)
+     if(!sel || (sel && sel->screen != sc))
      {
           barwin_unmap(infobar[sc].selbar);
+
           return;
      }
      else if(sel && !infobar[sc].selbar->mapped)
