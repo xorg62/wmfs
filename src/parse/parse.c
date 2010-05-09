@@ -26,6 +26,7 @@
 
 #include "../wmfs.h"
 
+extern char *__progname;
 
 #define TOKEN(t)                                   \
      do {                                          \
@@ -68,6 +69,7 @@ struct conf_state {
 static void get_keyword(const char *buf, size_t n);
 static void pop_keyword(void);
 static void pop_stack(void);
+static void syntax(const char *, ...);
 static struct conf_sec *get_section(void);
 static struct conf_opt *get_option(void);
 static struct opt_type string_to_opt(char *);
@@ -264,8 +266,7 @@ get_conf(const char *name)
                     TAILQ_INSERT_TAIL(&config, s, entry);
                     break;
                default:
-                    errx(1, "%s:%d: near '%s', config out of any section",
-                              file.name, curw->line, curw->name);
+                    syntax("out of any section");
                     break;
           }
      }
@@ -287,12 +288,11 @@ get_section(void)
      pop_stack();
      pop_keyword();
 
-     if (curk->type != WORD)
-          errx(1, "%s:%d: near '%s', missing section name",
-                    file.name, curw->line, curw->name);
+     if (!curk || curk->type != WORD)
+          syntax("missing section name");
      pop_keyword();
 
-     while (curk->type != SEC_END) {
+     while (!TAILQ_EMPTY(&keywords) && curk->type != SEC_END) {
           switch (curk->type) {
                case WORD:
                     o = get_option();
@@ -306,20 +306,17 @@ get_section(void)
                case SEC_END:
                     break;
                default:
-                    errx(1, "%s:%d: near '%s', syntax error",
-                              file.name, curw->line, curw->name);
+                    syntax("syntax error");
                     break;
           }
      }
      pop_keyword();
 
-     if (curk->type != WORD)
-          errx(1, "%s:%d: near '%s', missing end-section name",
-                    file.name, curw->line, curw->name);
+     if (curk && curk->type != WORD)
+          syntax("missing end-section name");
 
-     if (strcmp(curw->name, s->name))
-          errx(1, "%s:%d: near '%s', non-closed section '%s'",
-                    file.name, curw->line, curw->name, s->name);
+     if (!curk || strcmp(curw->name, s->name))
+          syntax("non-closed section '%s'", s->name);
 
      pop_stack();
      pop_keyword();
@@ -340,11 +337,13 @@ get_option(void)
      pop_stack();
      pop_keyword();
 
-     if (curk->type != EQUAL)
-          errx(1, "%s:%d: near '%s', missing '=' here",
-                    file.name, curw->line, curw->name);
+     if (!curk || curk->type != EQUAL)
+          syntax("missing '=' here");
 
      pop_keyword();
+
+     if (!curk)
+          syntax("syntax error");
 
      switch (curk->type) {
           case WORD:
@@ -354,10 +353,9 @@ get_option(void)
                break;
           case LIST_START:
                pop_keyword();
-               while (curk->type != LIST_END) {
+               while (curk && curk->type != LIST_END) {
                     if (curk->type != WORD)
-                         errx(1, "%s:%d: near '%s', declaration into a list",
-                                   file.name, curw->line, curw->name);
+                         syntax("declaration into a list");
                     o->val[j++] = strdup(curw->name);
                     pop_stack();
                     pop_keyword();
@@ -365,8 +363,7 @@ get_option(void)
                o->val[j] = NULL;
                break;
           default:
-               errx(1, "%s:%d: near '%s', syntax error",
-                         file.name, curw->line, curw->name);
+               syntax("syntax error");
                break;
      }
      pop_keyword();
@@ -377,25 +374,47 @@ get_option(void)
 static void
 pop_keyword(void)
 {
-     TAILQ_REMOVE(&keywords, curk, entry);
+     if (curk)
+     {
+          TAILQ_REMOVE(&keywords, curk, entry);
 #ifdef DEBUG
-     warnx("%s", get_kw_name(curk->type));
+          warnx("%s", get_kw_name(curk->type));
 #endif
-     free(curk);
+          free(curk);
 
-     curk = TAILQ_FIRST(&keywords);
+          curk = TAILQ_FIRST(&keywords);
+     }
 }
 
 static void
 pop_stack(void)
 {
-     TAILQ_REMOVE(&stack, curw, entry);
+     if (curw)
+     {
+          TAILQ_REMOVE(&stack, curw, entry);
 #ifdef DEBUG
-     warnx("%s", curw->name);
+          warnx("%s", curw->name);
 #endif
-     free(curw);
+          free(curw);
 
-     curw = TAILQ_FIRST(&stack);
+          curw = TAILQ_FIRST(&stack);
+     }
+}
+
+static void
+syntax(const char *fmt, ...)
+{
+     va_list args;
+
+     if (curw)
+          fprintf(stderr, "%s: %s:%d, near '%s', ",
+                    __progname, file.name, curw->line, curw->name);
+     else
+          fprintf(stderr, "%s: %s: ", __progname, file.name);
+     va_start(args, fmt);
+     vfprintf(stderr, fmt, args);
+     va_end(args);
+     exit(EXIT_FAILURE);
 }
 
 void
