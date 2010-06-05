@@ -981,6 +981,9 @@ client_unmanage(Client *c)
      if(sel == c)
           client_focus(NULL);
 
+     if(c->flags & UrgentFlag)
+          tags[c->screen][c->tag].urgent = False;
+
      client_detach(c);
      XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
      setwinstate(c->win, WithdrawnState);
