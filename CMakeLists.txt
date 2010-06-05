@@ -24,7 +24,7 @@ project(${PROJECT_NAME} C)
 
 # Definition of the wmfs source
 set(wmfs_src
-  src/parse/parse.c 
+  src/parse/parse.c
   src/barwin.c
   src/client.c
   src/config.c
@@ -51,7 +51,7 @@ set(wmfs_src
 add_executable(wmfs ${wmfs_src})
 
 # Set the version
-set(VERSION "WMFS-201004")
+set(VERSION "WMFS-201006")
 
 # FLAGS
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -ansi")
