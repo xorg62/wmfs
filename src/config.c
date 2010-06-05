@@ -64,6 +64,7 @@ func_name_list_t tmp_func_list[] =
      {"tag_swap_prev",            uicb_tag_swap_previous },
      {"tag_new",                  uicb_tag_new },
      {"tag_del",                  uicb_tag_del },
+     {"tag_rename",               uicb_tag_rename },
      {"set_mwfact",               uicb_set_mwfact },
      {"set_nmaster",              uicb_set_nmaster },
      {"quit",                     uicb_quit },

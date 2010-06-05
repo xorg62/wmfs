@@ -574,3 +574,21 @@ uicb_tag_del(uicb_t cmd)
      return;
 }
 
+/** Rename the selected tag
+  *\param cmd uicb_t type
+*/
+void
+uicb_tag_rename(uicb_t cmd)
+{
+     screen_get_sel();
+
+     if(!cmd || !strlen(cmd))
+          return;
+
+     strcpy(tags[selscreen][seltag[selscreen]].name, cmd);
+     infobar_update_taglist(selscreen);
+     infobar_draw(selscreen);
+
+     return;
+}
+

@@ -314,6 +314,7 @@ void tag_new(int s, char *name);
 void uicb_tag_new(uicb_t);
 void tag_delete(int s, int tag);
 void uicb_tag_del(uicb_t);
+void uicb_tag_rename(uicb_t cmd);
 
 /* screen.c */
 int screen_count(void);
