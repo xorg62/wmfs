@@ -371,10 +371,6 @@ ewmh_manage_window_type(Client *c)
                     /* Reparent it to ROOT win */
                     XReparentWindow(dpy, c->win, ROOT, c->geo.x, c->geo.y);
                     XRaiseWindow(dpy, c->win);
-
-                    /* This window will not be managed anymore,
-                     * so let's detach it. */
-                    client_detach(c);
                }
                /* MANAGE _NET_WM_WINDOW_TYPE_DIALOG */
                else if(atom[i] == net_atom[net_wm_window_type_dialog])
