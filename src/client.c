@@ -990,8 +990,8 @@ client_set_rules(Client *c)
      XGetClassHint(dpy, c->win, &xch);
 
      /* Auto free */
-     if((xch.res_name && strstr(conf.client.autofree, xch.res_name))
-               || (xch.res_class && strstr(conf.client.autofree, xch.res_class)))
+     if(conf.client.autofree && ((xch.res_name && strstr(conf.client.autofree, xch.res_name))
+               || (xch.res_class && strstr(conf.client.autofree, xch.res_class))))
           c->flags |= FreeFlag;
 
      /* Wanted tag */
