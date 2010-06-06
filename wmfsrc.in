@@ -127,7 +127,11 @@
         # Space between tiled clients
         padding = 0
 
+        # Modifier for mouse use
         modifier = "Alt"
+
+        # Set automatic free client
+        # autofree = "xterm|MPlayer"
 
         [mouse] button = "1" func = "client_raise" [/mouse]
         [mouse] button = "1" func = "mouse_move"   [/mouse]

@@ -719,7 +719,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      free(t);
 
      client_attach(c);
-     client_set_wanted_tag(c);
+     client_set_rules(c);
      client_get_name(c);
      client_raise(c);
      client_focus(c);
@@ -972,11 +972,11 @@ client_swap(Client *c1, Client *c2)
      return;
 }
 
-/** Set the wanted tag of a client
+/** Set the wanted tag or autofree of a client
  *\param c Client pointer
 */
 void
-client_set_wanted_tag(Client *c)
+client_set_rules(Client *c)
 {
      XClassHint xch = { 0 };
      int i, j, k;
@@ -989,6 +989,12 @@ client_set_wanted_tag(Client *c)
 
      XGetClassHint(dpy, c->win, &xch);
 
+     /* Auto free */
+     if((xch.res_name && strstr(conf.client.autofree, xch.res_name))
+               || (xch.res_class && strstr(conf.client.autofree, xch.res_class)))
+          c->flags |= FreeFlag;
+
+     /* Wanted tag */
      for(i = 0; i < screen_count(); ++i)
           for(j = 1; j < conf.ntag[i] + 1; ++j)
                if(tags[i][j].clients)
