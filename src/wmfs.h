@@ -164,6 +164,7 @@ void client_above(Client *c);
 void client_focus(Client *c);
 Client* client_get_next(void);
 Client* client_get_prev(void);
+Client* client_get_next_with_direction(Position pos);
 /* client_gb_*() {{{ */
 Client* client_gb_win(Window w);
 Client* client_gb_frame(Window w);
@@ -193,6 +194,10 @@ void uicb_client_next(uicb_t);
 void uicb_client_prev(uicb_t);
 void uicb_client_swap_next(uicb_t);
 void uicb_client_swap_prev(uicb_t);
+void uicb_client_focus_right(uicb_t cmd);
+void uicb_client_focus_left(uicb_t cmd);
+void uicb_client_focus_top(uicb_t cmd);
+void uicb_client_focus_bottom(uicb_t cmd);
 void uicb_client_kill(uicb_t);
 void uicb_client_screen_next(uicb_t);
 void uicb_client_screen_prev(uicb_t);

@@ -127,6 +127,49 @@ client_get_prev(void)
      return c;
 }
 
+/** Get client left/right/top/bottom of selected client
+  *\param pos Position (Left/Right/Top/Bottom
+  *\return Client found
+*/
+Client*
+client_get_next_with_direction(Position pos)
+{
+     Client *c = NULL;
+     Client *ret = NULL;
+
+     if(!sel || ishide(sel, selscreen))
+          return NULL;
+
+     for(c = clients; c; c = c->next)
+          if(c != sel && !ishide(c, sel->screen))
+               switch(pos)
+               {
+                    default:
+                    case Right:
+                         if(c->geo.x > sel->geo.x
+                                   && (!ret || (ret && ret->geo.x > sel->geo.x && c->geo.x < ret->geo.x)))
+                              ret = c;
+                         break;
+                    case Left:
+                         if(c->geo.x < sel->geo.x
+                                   && (!ret || (ret && ret->geo.x < sel->geo.x && c->geo.x > ret->geo.x)))
+                              ret = c;
+                         break;
+                    case Top:
+                         if(c->geo.y < sel->geo.y
+                                   && (!ret || (ret && ret->geo.y < sel->geo.y && c->geo.y > ret->geo.y)))
+                              ret = c;
+                         break;
+                    case Bottom:
+                         if(c->geo.y > sel->geo.y
+                                   && (!ret || (ret && ret->geo.y > sel->geo.y && c->geo.y < ret->geo.y)))
+                              ret = c;
+                         break;
+               }
+
+     return ret;
+}
+
 /** Switch to the previous client
  * \param cmd uicb_t type unused
 */
@@ -190,6 +233,75 @@ uicb_client_swap_prev(uicb_t cmd)
      {
           client_swap(sel, c);
           client_focus(c);
+     }
+
+     return;
+}
+
+/** Select next client positioned to the right
+  *\param cmd uicb_t type unused
+*/
+void
+uicb_client_focus_right(uicb_t cmd)
+{
+     Client *c;
+
+     if((c = client_get_next_with_direction(Right)))
+     {
+          client_focus(c);
+          client_raise(c);
+
+     }
+
+     return;
+}
+
+/** Select next client positioned to the left
+  *\param cmd uicb_t type unused
+*/
+void
+uicb_client_focus_left(uicb_t cmd)
+{
+     Client *c;
+
+     if((c = client_get_next_with_direction(Left)))
+     {
+          client_focus(c);
+          client_raise(c);
+     }
+
+     return;
+}
+
+/** Select next client positioned to the top
+  *\param cmd uicb_t type unused
+*/
+void
+uicb_client_focus_top(uicb_t cmd)
+{
+     Client *c;
+
+     if((c = client_get_next_with_direction(Top)))
+     {
+          client_focus(c);
+          client_raise(c);
+     }
+
+     return;
+}
+
+/** Select next client positioned to the bottom
+  *\param cmd uicb_t type unused
+*/
+void
+uicb_client_focus_bottom(uicb_t cmd)
+{
+     Client *c;
+
+     if((c = client_get_next_with_direction(Bottom)))
+     {
+          client_focus(c);
+          client_raise(c);
      }
 
      return;
