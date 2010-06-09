@@ -130,8 +130,9 @@
         # Modifier for mouse use
         modifier = "Alt"
 
-        # Set automatic free client
+        # Set automatic free or max client
         # autofree = "xterm|MPlayer"
+        # automax  = "Navigator"
 
         [mouse] button = "1" func = "client_raise" [/mouse]
         [mouse] button = "1" func = "mouse_move"   [/mouse]

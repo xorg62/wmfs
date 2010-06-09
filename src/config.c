@@ -270,6 +270,7 @@ conf_client_section(void)
      conf.client.set_new_win_master  = fetch_opt_first(sec, "true", "set_new_win_master").bool;
      conf.client.padding             = fetch_opt_first(sec, "0", "padding").num;
      conf.client.autofree            = fetch_opt_first(sec, "", "autofree").str;
+     conf.client.automax             = fetch_opt_first(sec, "", "automax").str;
 
      mouse = fetch_section(sec, "mouse");
 

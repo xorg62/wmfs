@@ -396,7 +396,7 @@ typedef struct
           Bool place_at_mouse;
           Bool border_shadow;
           int borderheight;
-          char *autofree;
+          char *autofree, *automax;
           uint bordernormal;
           uint borderfocus;
           uint resizecorner_normal;

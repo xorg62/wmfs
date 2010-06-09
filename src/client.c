@@ -718,6 +718,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
 
      free(t);
 
+     XUnmapWindow(dpy, c->win);
      client_attach(c);
      client_set_rules(c);
      client_get_name(c);
@@ -972,7 +973,7 @@ client_swap(Client *c1, Client *c2)
      return;
 }
 
-/** Set the wanted tag or autofree of a client
+/** Set the wanted tag or autofree/max of a client
  *\param c Client pointer
 */
 void
@@ -993,6 +994,14 @@ client_set_rules(Client *c)
      if(conf.client.autofree && ((xch.res_name && strstr(conf.client.autofree, xch.res_name))
                || (xch.res_class && strstr(conf.client.autofree, xch.res_class))))
           c->flags |= FreeFlag;
+
+     /* Auto free */
+     if(conf.client.automax && ((xch.res_name && strstr(conf.client.automax, xch.res_name))
+                    || (xch.res_class && strstr(conf.client.automax, xch.res_class))))
+     {
+          client_maximize(c);
+          c->flags |= MaxFlag;
+     }
 
      /* Wanted tag */
      for(i = 0; i < screen_count(); ++i)
