@@ -718,7 +718,6 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
 
      free(t);
 
-     XUnmapWindow(dpy, c->win);
      client_attach(c);
      client_set_rules(c);
      client_get_name(c);
@@ -995,7 +994,7 @@ client_set_rules(Client *c)
                || (xch.res_class && strstr(conf.client.autofree, xch.res_class))))
           c->flags |= FreeFlag;
 
-     /* Auto free */
+     /* Auto maximize */
      if(conf.client.automax && ((xch.res_name && strstr(conf.client.automax, xch.res_name))
                     || (xch.res_class && strstr(conf.client.automax, xch.res_class))))
      {
