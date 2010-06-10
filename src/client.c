@@ -820,7 +820,8 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
 
      c->geo = c->ogeo = geo;
 
-     if(c->flags & FreeFlag || tags[c->screen][c->tag].layout.func == freelayout)
+     if(c->flags & FreeFlag || tags[c->screen][c->tag].layout.func == freelayout
+               || conf.keep_layout_geo)
           c->free_geo = geo;
 
      if((c->screen = screen_get_with_geo(c->geo.x, c->geo.y)) != os

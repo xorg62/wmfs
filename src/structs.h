@@ -437,6 +437,7 @@ typedef struct
      Bool client_round;
      Bool layout_system; /* Switch: False, Menu: True. */
      Bool layout_placement; /* Right (normal): False, Left: True. */
+     Bool keep_layout_geo;
      /* Number of... */
      int nkeybind;
      int nlayout;
