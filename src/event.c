@@ -410,13 +410,13 @@ grabkeys(void)
 
      XUngrabKey(dpy, AnyKey, AnyModifier, ROOT);
      for(i = 0; i < conf.nkeybind; ++i)
-     {
-          code = XKeysymToKeycode(dpy, keys[i].keysym);
-          XGrabKey(dpy, code, keys[i].mod, ROOT, True, GrabModeAsync, GrabModeAsync);
-          XGrabKey(dpy, code, keys[i].mod | LockMask, ROOT, True, GrabModeAsync, GrabModeAsync);
-          XGrabKey(dpy, code, keys[i].mod | numlockmask, ROOT, True, GrabModeAsync, GrabModeAsync);
-          XGrabKey(dpy, code, keys[i].mod | LockMask | numlockmask, ROOT, True, GrabModeAsync, GrabModeAsync);
-     }
+          if((code = XKeysymToKeycode(dpy, keys[i].keysym)))
+          {
+               XGrabKey(dpy, code, keys[i].mod, ROOT, True, GrabModeAsync, GrabModeAsync);
+               XGrabKey(dpy, code, keys[i].mod | LockMask, ROOT, True, GrabModeAsync, GrabModeAsync);
+               XGrabKey(dpy, code, keys[i].mod | numlockmask, ROOT, True, GrabModeAsync, GrabModeAsync);
+               XGrabKey(dpy, code, keys[i].mod | LockMask | numlockmask, ROOT, True, GrabModeAsync, GrabModeAsync);
+          }
 
      return;
 }
