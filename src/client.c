@@ -722,12 +722,12 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      client_set_rules(c);
      client_get_name(c);
      client_raise(c);
-     client_focus(c);
      setwinstate(c->win, NormalState);
      ewmh_get_client_list();
      ewmh_manage_window_type(c);
      client_update_attributes(c);
      client_map(c);
+     client_focus(c);
 
      if(ar)
           arrange(c->screen, True);
