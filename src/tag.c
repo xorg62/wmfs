@@ -486,14 +486,16 @@ tag_new(int s, char *name)
 
      ++conf.ntag[s];
 
-     if(!name && conf.tagnamecount){
-         displayedName = (char*) malloc( sizeof(char)*2 );
-         sprintf(displayedName, "[%d]", conf.ntag[s]);
+     if((!name || strlen(name) == 0)){
+         if(conf.tagnamecount){
+             displayedName = (char*) malloc( sizeof(char)*2 );
+             sprintf(displayedName, "[%d]", conf.ntag[s]);
+         }
+         else
+             displayedName = conf.tagdefaultname;
      }
-     else if(strlen(name) > 0)
-         displayedName = name;
      else
-         displayedName = conf.tagdefaultname;
+         displayedName = name;
 
      tags[s][conf.ntag[s]] = t;
 
