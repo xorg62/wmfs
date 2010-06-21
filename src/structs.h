@@ -346,6 +346,8 @@ typedef struct
      Bool focus_pclick;
      Bool ignore_next_client_rules;
      Bool tagautohide;
+     Bool tagnamecount;
+     char * tagdefaultname;
      uint pad;
      int status_timing;
      char *status_path;

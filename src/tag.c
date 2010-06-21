@@ -472,6 +472,8 @@ uicb_tag_swap_previous(uicb_t cmd)
 void
 tag_new(int s, char *name)
 {
+     char count[2];
+
      Tag t = { NULL, NULL, 0, 0, 0.65, 1, False, False, False, False, IB_Top,
           layout_name_to_struct(conf.layout, "tile_right", conf.nlayout, layout_list), 0, NULL, 0 };
 
@@ -484,9 +486,14 @@ tag_new(int s, char *name)
 
      ++conf.ntag[s];
 
+     if(!name && conf.tagnamecount){
+         sprintf(count, "[%d]", conf.ntag[s]);
+     }
+
      tags[s][conf.ntag[s]] = t;
 
-     tags[s][conf.ntag[s]].name = _strdup((name ? name : "new tag"));
+     tags[s][conf.ntag[s]].name = _strdup((name ? name : 
+                 (conf.tagnamecount? count : conf.tagdefaultname)));
 
      infobar_update_taglist(s);
      infobar_draw(s);

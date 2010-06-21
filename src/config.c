@@ -451,7 +451,7 @@ conf_tag_section(void)
      struct opt_type *opt;
 
      /* If there is no tag in the conf or more than
-      * MAXTAG (32) print an error and create only one.
+      * MAXTAG (36) print an error and create only one.
       */
      Tag default_tag = { "WMFS", NULL, 0, 1,
                          0.50, 1, False, False, False, False, IB_Top,
@@ -468,6 +468,8 @@ conf_tag_section(void)
      conf.colors.tag_occupied_bg  = getcolor(fetch_opt_first(sec, "#222222", "occupied_bg").str);
      conf.border.tag              = fetch_opt_first(sec, "false", "border").bool;
      conf.tagautohide             = fetch_opt_first(sec, "false", "autohide").bool;
+     conf.tagnamecount            = fetch_opt_first(sec, "false", "name_count").bool;
+     conf.tagdefaultname          = fetch_opt_first(sec, "new tag", "default_name").str;
 
      /* Mouse button action on tag */
      conf.mouse_tag_action[TagSel] =
