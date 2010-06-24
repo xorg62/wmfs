@@ -347,7 +347,7 @@ void layoutswitch(Bool b);
 void maxlayout(int screen);
 Client *tiled_client(int screen, Client *c);
 /* tile {{{ */
- void grid(int screen);
+ void grid(int screen, Bool horizontal);
  void tile(int screen);
  void tile_left(int screen);
  void tile_top(int screen);
@@ -355,6 +355,8 @@ Client *tiled_client(int screen, Client *c);
  void mirror_vertical(int screen);
  void mirror_horizontal(int screen);
  void layer(int screen);
+ void grid_vertical(int screen);
+ void grid_horizontal(int screen);
  /* }}} */
 void uicb_togglemax(uicb_t);
 void uicb_togglefree(uicb_t);

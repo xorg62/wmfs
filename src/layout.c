@@ -270,7 +270,7 @@ uicb_set_layer(uicb_t cmd)
 /** Grid layout function
 */
 void
-grid(int screen)
+grid(int screen, Bool horizontal)
 {
      Client *c;
      XRectangle sg = sgeo[screen];
@@ -287,6 +287,14 @@ grid(int screen)
      cols = (rows && ((rows - 1) * rows) >= n)
           ? rows - 1
           : rows;
+
+     if(!horizontal)
+     {
+         unsigned int tmp;
+         tmp = cols;
+         cols = rows;
+         rows = tmp;
+     }
 
      for(i = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
      {
@@ -755,6 +763,26 @@ mirror_horizontal(int screen)
      mirror(screen, True);
 
      return;
+}
+
+/** Horizontal grid function
+ */
+void
+grid_horizontal(int screen)
+{
+    grid(screen, True);
+
+    return;
+}
+
+/** Vertical grid function
+ */
+void
+grid_vertical(int screen)
+{
+    grid(screen, False);
+
+    return;
 }
 
 /** Put the selected client to the master postion

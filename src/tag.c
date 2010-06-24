@@ -486,8 +486,10 @@ tag_new(int s, char *name)
 
      ++conf.ntag[s];
 
-     if((!name || strlen(name) == 0)){
-         if(conf.tagnamecount){
+     if((!name || strlen(name) == 0))
+     {
+         if(conf.tagnamecount)
+         {
              displayedName = (char*) malloc( sizeof(char)*2 );
              sprintf(displayedName, "[%d]", conf.ntag[s]);
          }
