@@ -275,7 +275,7 @@ grid(int screen, Bool horizontal)
      Client *c;
      XRectangle sg = sgeo[screen];
      XRectangle cgeo = {sg.x, sg.y, 0, 0};
-     unsigned int i, n, cols, rows, cpcols = 0;
+     unsigned int i, n, temp, cols, rows, cpcols = 0;
 
      for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
      CHECK(n);
@@ -290,10 +290,9 @@ grid(int screen, Bool horizontal)
 
      if(!horizontal)
      {
-         unsigned int tmp;
-         tmp = cols;
+         temp = cols;
          cols = rows;
-         rows = tmp;
+         rows = temp;
      }
 
      for(i = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
