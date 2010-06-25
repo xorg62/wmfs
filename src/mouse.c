@@ -247,7 +247,6 @@ mouse_resize(Client *c)
           {
                /* To resize MWFACT in tile mode */
                if((c->flags & TileFlag)
-                  && tags[selscreen][seltag[selscreen]].layout.func != grid // for backward compatibility
                   && tags[selscreen][seltag[selscreen]].layout.func != grid_vertical
                   && tags[selscreen][seltag[selscreen]].layout.func != grid_horizontal)
                {
