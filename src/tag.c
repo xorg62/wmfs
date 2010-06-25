@@ -475,7 +475,7 @@ tag_new(int s, char *name)
      char * displayedName;
 
      Tag t = { NULL, NULL, 0, 0, 0.65, 1, False, False, False, False, IB_Top,
-          layout_name_to_struct(conf.layout, "tile_right", conf.nlayout, layout_list), 0, NULL, 0 };
+          layout_name_to_struct(conf.layout, conf.tagdefaultlayout, conf.nlayout, layout_list), 0, NULL, 0 };
 
      if(conf.ntag[s] + 1 > MAXTAG)
      {

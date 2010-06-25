@@ -449,14 +449,6 @@ conf_tag_section(void)
      struct conf_sec *sec, **tag, **mouse;
      struct opt_type *opt;
 
-     /* If there is no tag in the conf or more than
-      * MAXTAG (36) print an error and create only one.
-      */
-     Tag default_tag = { "WMFS", NULL, 0, 1,
-                         0.50, 1, False, False, False, False, IB_Top,
-                         layout_name_to_struct(conf.layout, "tile_right", conf.nlayout, layout_list),
-                         0, NULL, 0 };
-
      sec = fetch_section_first(NULL, "tags");
 
      conf.tag_round               = fetch_opt_first(sec, "false", "tag_round").bool;
@@ -469,6 +461,15 @@ conf_tag_section(void)
      conf.tagautohide             = fetch_opt_first(sec, "false", "autohide").bool;
      conf.tagnamecount            = fetch_opt_first(sec, "false", "name_count").bool;
      conf.tagdefaultname          = fetch_opt_first(sec, "new tag", "default_name").str;
+     conf.tagdefaultlayout        = fetch_opt_first(sec, "tile_right", "default_layout").str;
+
+     /* If there is no tag in the conf or more than
+      * MAXTAG (36) print an error and create only one.
+      */
+     Tag default_tag = { "WMFS", NULL, 0, 1,
+                         0.50, 1, False, False, False, False, IB_Top,
+                         layout_name_to_struct(conf.layout, conf.tagdefaultlayout, conf.nlayout, layout_list),
+                         0, NULL, 0 };
 
      /* Mouse button action on tag */
      conf.mouse_tag_action[TagSel] =

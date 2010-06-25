@@ -348,6 +348,7 @@ typedef struct
      Bool tagautohide;
      Bool tagnamecount;
      char * tagdefaultname;
+     char * tagdefaultlayout;
      uint pad;
      int status_timing;
      char *status_path;

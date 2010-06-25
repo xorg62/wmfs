@@ -68,15 +68,16 @@
 [/layouts]
 
 [tags]
-        tag_round   = false
-        occupied_bg = "#003366"
-        sel_fg      = "#191919"
-        sel_bg      = "#7E89A2"
-        urgent_bg   = "#DD1111"
-        urgent_fg   = "#000000"
+        tag_round      = false
+        occupied_bg    = "#003366"
+        sel_fg         = "#191919"
+        sel_bg         = "#7E89A2"
+        urgent_bg      = "#DD1111"
+        urgent_fg      = "#000000"
         # If true, number of the tag will be used for name
-        name_count  = false
-        default_name= "new tag" # default name for a new tag
+        name_count     = false
+        default_name   = "new tag" # default name for a new tag
+        default_layout = "tile_right"
 
         # Border around the tag buttons.
         border      = true
