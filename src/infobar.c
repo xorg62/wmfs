@@ -221,8 +221,8 @@ void
 infobar_draw_taglist(int sc)
 {
      int i, x, j;
-     Client *c;
-     Bool is_occupied[MAXTAG];
+     Client *c = NULL;
+     Bool is_occupied[MAXTAG + 1];
 
      if(conf.layout_placement)
           barwin_move(infobar[sc].tags_board, textw(tags[sc][seltag[sc]].layout.symbol) + PAD * 1.5, 0);
