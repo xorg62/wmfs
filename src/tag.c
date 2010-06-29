@@ -72,7 +72,12 @@ tag_set(int tag)
 
      /* Check if a layout update is needed with additional tags */
      if(tags[selscreen][seltag[selscreen]].tagad)
-          al = True;
+         al = True;
+     else if(tags[selscreen][seltag[selscreen]].request_update)
+     {
+         al = True;
+         tags[selscreen][seltag[selscreen]].request_update = False;
+     }
 
      for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
           if(tags[selscreen][i].tagad & TagFlag(seltag[selscreen]))
