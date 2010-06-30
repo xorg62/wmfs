@@ -377,7 +377,7 @@ ewmh_manage_window_type(Client *c)
                {
                     c->flags |= FreeFlag;
                     c->flags &= ~(TileFlag | MaxFlag | LMaxFlag);
-                    client_moveresize(sel, sel->ogeo, True);
+                    client_moveresize(c, c->ogeo, True);
                     client_focus(c);
                     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
                }
