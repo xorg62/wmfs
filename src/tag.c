@@ -479,31 +479,6 @@ tag_new(int s, char *name)
 {
      char * displayedName;
 
-     Tag t = { NULL, NULL, 0, 1,
-               conf.default_tag.mwfact, conf.default_tag.nmaster, 
-               False, conf.default_tag.resizehint, False, False, IB_Top,
-               layout_name_to_struct(conf.layout, conf.default_tag.layout, conf.nlayout, layout_list),
-               0, NULL, 0 };
-     
-     if(!strcmp(conf.default_tag.infobar_position ,"none") 
-            || !strcmp(conf.default_tag.infobar_position, "hide") 
-            || !strcmp(conf.default_tag.infobar_position, "hidden"))
-          t.barpos = IB_Hide;
-     else if(!strcmp(conf.default_tag.infobar_position, "bottom") 
-            || !strcmp(conf.default_tag.infobar_position, "down"))
-          t.barpos = IB_Bottom;
-     else
-          t.barpos = IB_Top;
-
-     if(conf.ntag[s] + 1 > MAXTAG)
-     {
-          warnx("Too many tag: Can't create new tag");
-
-          return;
-     }
-
-     ++conf.ntag[s];
-
      if((!name || strlen(name) == 0))
      {
          if(conf.tagnamecount)
@@ -517,9 +492,23 @@ tag_new(int s, char *name)
      else
          displayedName = name;
 
-     tags[s][conf.ntag[s]] = t;
+     Tag t = { displayedName, NULL, 0, 0,
+               conf.default_tag.mwfact, conf.default_tag.nmaster, 
+               False, conf.default_tag.resizehint, False, False,
+               conf.default_tag.barpos, conf.default_tag.layout, 
+               0, NULL, 0 };
 
-     tags[s][conf.ntag[s]].name = _strdup(displayedName);
+     if(conf.ntag[s] + 1 > MAXTAG)
+     {
+          warnx("Too many tag: Can't create new tag");
+
+          return;
+     }
+
+     ++conf.ntag[s];
+
+     tags[s][conf.ntag[s]] = t;
+/*     tags[s][conf.ntag[s]].name = _strdup(displayedName);*/
 
      infobar_update_taglist(s);
      infobar_draw(s);
