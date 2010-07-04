@@ -51,6 +51,9 @@
         # Keep layout geo for free layout
         keep_layout_geo = false
 
+        # Symbol displayed for the selected layout in the list
+        selected_layout_symbol = "*"
+
         # Tiling layouts.
         [layout] type = "tile_right"         symbol = "RIGHT"    [/layout]
         [layout] type = "tile_left"          symbol = "LEFT"     [/layout]

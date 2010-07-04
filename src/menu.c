@@ -266,7 +266,7 @@ menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[])
 
      if(menu->item[item].check)
           if(menu->item[item].check(menu->item[item].cmd))
-               barwin_draw_text(winitem[item], PAD / 3, FHINFOBAR, "*");
+               barwin_draw_text(winitem[item], PAD / 3, FHINFOBAR, conf.selected_layout_symbol);
 
      if(menu->item[item].submenu)
           barwin_draw_text(winitem[item], width + PAD * 2, FHINFOBAR, ">");

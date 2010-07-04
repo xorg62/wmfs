@@ -381,10 +381,11 @@ conf_layout_section(void)
 
      layouts = fetch_section_first(NULL, "layouts");
 
-     conf.border.layout     = fetch_opt_first(layouts, "false", "border").bool;
-     conf.colors.layout_fg  = fetch_opt_first(layouts, "#ffffff", "fg").str;
-     conf.colors.layout_bg  = getcolor((fetch_opt_first(layouts, "#000000", "bg").str));
-     conf.keep_layout_geo   = fetch_opt_first(layouts, "false", "keep_layout_geo").bool;
+     conf.border.layout          = fetch_opt_first(layouts, "false", "border").bool;
+     conf.colors.layout_fg       = fetch_opt_first(layouts, "#ffffff", "fg").str;
+     conf.colors.layout_bg       = getcolor((fetch_opt_first(layouts, "#000000", "bg").str));
+     conf.keep_layout_geo        = fetch_opt_first(layouts, "false", "keep_layout_geo").bool;
+     conf.selected_layout_symbol = fetch_opt_first(layouts, "*", "selected_layout_symbol").str;
 
      if((tmp = fetch_opt_first(layouts, "menu", "system").str) && !strcmp(tmp, "menu"))
           conf.layout_system = True;

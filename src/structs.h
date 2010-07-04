@@ -448,6 +448,7 @@ typedef struct
      Bool layout_system; /* Switch: False, Menu: True. */
      Bool layout_placement; /* Right (normal): False, Left: True. */
      Bool keep_layout_geo;
+     char *selected_layout_symbol;
      /* Number of... */
      int nkeybind;
      int nlayout;
