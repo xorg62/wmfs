@@ -347,8 +347,15 @@ typedef struct
      Bool ignore_next_client_rules;
      Bool tagautohide;
      Bool tagnamecount;
-     char * tagdefaultname;
-     char * tagdefaultlayout;
+     struct
+     {
+          char *name;
+          float mwfact;
+          uint nmaster;
+          char *layout;
+          Bool resizehint;
+          char *infobar_position;
+     }default_tag;
      uint pad;
      int status_timing;
      char *status_path;

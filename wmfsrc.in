@@ -68,6 +68,15 @@
 [/layouts]
 
 [tags]
+        [default_tag]
+             name             = "new tag"
+             mwfact           = 0.5
+             nmaster          = 1
+             layout           = "tile_right"
+             resizehint       = false
+             infobar_position = "top"
+        [/default_tag]
+
         tag_round      = false
         occupied_bg    = "#003366"
         sel_fg         = "#191919"
@@ -76,8 +85,8 @@
         urgent_fg      = "#000000"
         # If true, number of the tag will be used for name
         name_count     = false
-        default_name   = "new tag" # default name for a new tag
-        default_layout = "tile_right"
+        #default_name   = "new tag" # deprecated, use [default_tag] instead
+        #default_layout = "tile_right" # deprecated, use [default_tag] instead
 
         # Border around the tag buttons.
         border      = true

@@ -479,8 +479,21 @@ tag_new(int s, char *name)
 {
      char * displayedName;
 
-     Tag t = { NULL, NULL, 0, 0, 0.65, 1, False, False, False, False, IB_Top,
-          layout_name_to_struct(conf.layout, conf.tagdefaultlayout, conf.nlayout, layout_list), 0, NULL, 0 };
+     Tag t = { NULL, NULL, 0, 1,
+               conf.default_tag.mwfact, conf.default_tag.nmaster, 
+               False, conf.default_tag.resizehint, False, False, IB_Top,
+               layout_name_to_struct(conf.layout, conf.default_tag.layout, conf.nlayout, layout_list),
+               0, NULL, 0 };
+     
+     if(!strcmp(conf.default_tag.infobar_position ,"none") 
+            || !strcmp(conf.default_tag.infobar_position, "hide") 
+            || !strcmp(conf.default_tag.infobar_position, "hidden"))
+          t.barpos = IB_Hide;
+     else if(!strcmp(conf.default_tag.infobar_position, "bottom") 
+            || !strcmp(conf.default_tag.infobar_position, "down"))
+          t.barpos = IB_Bottom;
+     else
+          t.barpos = IB_Top;
 
      if(conf.ntag[s] + 1 > MAXTAG)
      {
@@ -499,7 +512,7 @@ tag_new(int s, char *name)
              sprintf(displayedName, "[%d]", conf.ntag[s]);
          }
          else
-             displayedName = conf.tagdefaultname;
+             displayedName = conf.default_tag.name;
      }
      else
          displayedName = name;

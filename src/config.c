@@ -446,7 +446,7 @@ conf_tag_section(void)
 {
      int i, j, k, l = 0, m, n, sc, count;
      char *tmp;
-     struct conf_sec *sec, **tag, **mouse;
+     struct conf_sec *sec, *def_tag, **tag, **mouse;
      struct opt_type *opt;
 
      sec = fetch_section_first(NULL, "tags");
@@ -460,16 +460,36 @@ conf_tag_section(void)
      conf.border.tag              = fetch_opt_first(sec, "false", "border").bool;
      conf.tagautohide             = fetch_opt_first(sec, "false", "autohide").bool;
      conf.tagnamecount            = fetch_opt_first(sec, "false", "name_count").bool;
-     conf.tagdefaultname          = fetch_opt_first(sec, "new tag", "default_name").str;
-     conf.tagdefaultlayout        = fetch_opt_first(sec, "tile_right", "default_layout").str;
+     
+
+     def_tag = fetch_section_first(sec, "default_tag");
+
+     conf.default_tag.name             = fetch_opt_first(def_tag, "new tag", "name").str;
+     conf.default_tag.mwfact           = fetch_opt_first(def_tag, "0.5", "mwfact").fnum;
+     conf.default_tag.nmaster          = fetch_opt_first(def_tag, "1", "nmaster").num;
+     conf.default_tag.layout           = fetch_opt_first(def_tag, "title_right", "layout").str;
+     conf.default_tag.resizehint       = fetch_opt_first(def_tag, "false", "resizehint").bool;
+     conf.default_tag.infobar_position = fetch_opt_first(def_tag, "top", "infobar_position").str;
 
      /* If there is no tag in the conf or more than
       * MAXTAG (36) print an error and create only one.
       */
-     Tag default_tag = { "WMFS", NULL, 0, 1,
-                         0.50, 1, False, False, False, False, IB_Top,
-                         layout_name_to_struct(conf.layout, conf.tagdefaultlayout, conf.nlayout, layout_list),
+     Tag default_tag = { conf.default_tag.name, NULL, 0, 1,
+                         conf.default_tag.mwfact, conf.default_tag.nmaster, 
+                         False, conf.default_tag.resizehint, False, False, 
+                         IB_Top,
+                         layout_name_to_struct(conf.layout, conf.default_tag.layout, conf.nlayout, layout_list),
                          0, NULL, 0 };
+
+     if(!strcmp(conf.default_tag.infobar_position ,"none") 
+            || !strcmp(conf.default_tag.infobar_position, "hide") 
+            || !strcmp(conf.default_tag.infobar_position, "hidden"))
+          default_tag.barpos = IB_Hide;
+     else if(!strcmp(conf.default_tag.infobar_position, "bottom") 
+            || !strcmp(conf.default_tag.infobar_position, "down"))
+          default_tag.barpos = IB_Bottom;
+     else
+          default_tag.barpos = IB_Top;
 
      /* Mouse button action on tag */
      conf.mouse_tag_action[TagSel] =
