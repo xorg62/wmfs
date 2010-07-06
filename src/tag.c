@@ -479,7 +479,16 @@ tag_new(int s, char *name)
 {
      char * displayedName;
 
-     if((!name || strlen(name) == 0))
+     if(conf.ntag[s] + 1 > MAXTAG)
+     {
+          warnx("Too many tag: Can't create new tag");
+
+          return;
+     }
+
+     ++conf.ntag[s];
+
+     if(!name || strlen(name) == 0)
      {
          if(conf.tagnamecount)
          {
@@ -498,17 +507,8 @@ tag_new(int s, char *name)
                conf.default_tag.barpos, conf.default_tag.layout, 
                0, NULL, 0 };
 
-     if(conf.ntag[s] + 1 > MAXTAG)
-     {
-          warnx("Too many tag: Can't create new tag");
-
-          return;
-     }
-
-     ++conf.ntag[s];
 
      tags[s][conf.ntag[s]] = t;
-/*     tags[s][conf.ntag[s]].name = _strdup(displayedName);*/
 
      infobar_update_taglist(s);
      infobar_draw(s);
