@@ -350,6 +350,7 @@ ewmh_manage_window_type(Client *c)
      int i, f;
      ulong n, il;
      uchar *data = NULL;
+     long ldata[5] = { 0 };
 
      if(XGetWindowProperty(dpy, c->win, net_atom[net_wm_window_type], 0L, 0x7FFFFFFFL,
                            False, XA_ATOM, &rf, &f, &n, &il, &data) == Success && n)
@@ -382,6 +383,24 @@ ewmh_manage_window_type(Client *c)
                     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
                }
           }
+          XFree(data);
+     }
+
+     /* Get NET_WM_STATE set without sending client message event */
+     if(XGetWindowProperty(dpy, c->win, net_atom[net_wm_state], 0L, 0x7FFFFFFFL,
+                           False, XA_ATOM, &rf, &f, &n, &il, &data) == Success && n)
+     {
+          atom = (Atom*)data;
+
+          for(i = 0; i < n; ++i)
+               /* _NET_WM_STATE_FULLSCREEN in case of flash fullscreen or anything like this */
+               if(atom[i] == net_atom[net_wm_state_fullscreen])
+               {
+                    ldata[1] = net_atom[net_wm_state_fullscreen];
+                    ldata[0] = _NET_WM_STATE_ADD;
+                    ewmh_manage_net_wm_state(ldata, c);
+               }
+
           XFree(data);
      }
 
