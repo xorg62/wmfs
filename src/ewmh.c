@@ -393,13 +393,11 @@ ewmh_manage_window_type(Client *c)
           atom = (Atom*)data;
 
           for(i = 0; i < n; ++i)
-               /* _NET_WM_STATE_FULLSCREEN in case of flash fullscreen or anything like this */
-               if(atom[i] == net_atom[net_wm_state_fullscreen])
-               {
-                    ldata[1] = net_atom[net_wm_state_fullscreen];
-                    ldata[0] = _NET_WM_STATE_ADD;
-                    ewmh_manage_net_wm_state(ldata, c);
-               }
+          {
+               ldata[0] = _NET_WM_STATE_ADD;
+               ldata[1] = atom[i];
+               ewmh_manage_net_wm_state(ldata, c);
+          }
 
           XFree(data);
      }
