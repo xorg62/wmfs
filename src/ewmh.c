@@ -75,6 +75,7 @@ ewmh_init_hints(void)
      net_atom[net_wm_icon]                    = ATOM("_NET_WM_ICON");
      net_atom[net_wm_state]                   = ATOM("_NET_WM_STATE");
      net_atom[net_wm_state_fullscreen]        = ATOM("_NET_WM_STATE_FULLSCREEN");
+     net_atom[net_wm_state_sticky]            = ATOM("_NET_WM_STATE_STICKY");
      net_atom[net_wm_state_demands_attention] = ATOM("_NET_WM_STATE_DEMANDS_ATTENTION");
      net_atom[utf8_string]                    = ATOM("UTF8_STRING");
 
@@ -325,6 +326,13 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
                XReparentWindow(dpy, c->win, c->frame, BORDH, TBARH);
                client_moveresize(c, c->tmp_geo, False);
           }
+     }
+     /* Manage _NET_WM_STATE_STICKY */
+     else if(data_l[1] == net_atom[net_wm_state_sticky])
+     {
+          /* == client_ignore_tag */
+          c->tag = MAXTAG + 1;
+          arrange(c->screen, True);
      }
      /* Manage _NET_WM_STATE_DEMANDS_ATTENTION */
      else if(data_l[1] == net_atom[net_wm_state_demands_attention])
