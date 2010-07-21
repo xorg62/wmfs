@@ -75,6 +75,7 @@ ewmh_init_hints(void)
      net_atom[net_wm_icon]                    = ATOM("_NET_WM_ICON");
      net_atom[net_wm_state]                   = ATOM("_NET_WM_STATE");
      net_atom[net_wm_state_fullscreen]        = ATOM("_NET_WM_STATE_FULLSCREEN");
+     net_atom[net_wm_state_sticky]            = ATOM("_NET_WM_STATE_STICKY");
      net_atom[net_wm_state_demands_attention] = ATOM("_NET_WM_STATE_DEMANDS_ATTENTION");
      net_atom[utf8_string]                    = ATOM("UTF8_STRING");
 
@@ -326,6 +327,13 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
                client_moveresize(c, c->tmp_geo, False);
           }
      }
+     /* Manage _NET_WM_STATE_STICKY */
+     else if(data_l[1] == net_atom[net_wm_state_sticky])
+     {
+          /* == client_ignore_tag */
+          c->tag = MAXTAG + 1;
+          arrange(c->screen, True);
+     }
      /* Manage _NET_WM_STATE_DEMANDS_ATTENTION */
      else if(data_l[1] == net_atom[net_wm_state_demands_attention])
      {
@@ -350,6 +358,7 @@ ewmh_manage_window_type(Client *c)
      int i, f;
      ulong n, il;
      uchar *data = NULL;
+     long ldata[5] = { 0 };
 
      if(XGetWindowProperty(dpy, c->win, net_atom[net_wm_window_type], 0L, 0x7FFFFFFFL,
                            False, XA_ATOM, &rf, &f, &n, &il, &data) == Success && n)
@@ -382,6 +391,22 @@ ewmh_manage_window_type(Client *c)
                     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
                }
           }
+          XFree(data);
+     }
+
+     /* Get NET_WM_STATE set without sending client message event */
+     if(XGetWindowProperty(dpy, c->win, net_atom[net_wm_state], 0L, 0x7FFFFFFFL,
+                           False, XA_ATOM, &rf, &f, &n, &il, &data) == Success && n)
+     {
+          atom = (Atom*)data;
+
+          for(i = 0; i < n; ++i)
+          {
+               ldata[0] = _NET_WM_STATE_ADD;
+               ldata[1] = atom[i];
+               ewmh_manage_net_wm_state(ldata, c);
+          }
+
           XFree(data);
      }
 

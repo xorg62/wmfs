@@ -340,6 +340,9 @@ int statustext_text(StatusText *s, char *str);
 void statustext_normal(int sc, char *str);
 void statustext_handle(int sc, char *str);
 
+/* systray.c */
+
+
 /* layout.c */
 void arrange(int screen, Bool update_layout);
 void freelayout(int screen);
