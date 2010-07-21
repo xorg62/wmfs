@@ -39,7 +39,7 @@ arrange(int screen, Bool update_layout)
 {
      Client *c;
 
-     if(screen < 0 || screen > screen_count())
+     if(screen < 0 || screen > screen_count() - 1)
           screen = screen_get_sel();
 
      for(c = clients; c; c = c->next)
