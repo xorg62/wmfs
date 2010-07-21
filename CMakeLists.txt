@@ -42,6 +42,7 @@ set(wmfs_src
   src/mouse.c
   src/screen.c
   src/status.c
+  src/systray.c
   src/tag.c
   src/util.c
   src/viwmfs.c
