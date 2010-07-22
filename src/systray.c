@@ -97,7 +97,7 @@ systray_add(Window win)
 
      setwinstate(s->win, WithdrawnState);
      XSelectInput(dpy, s->win, StructureNotifyMask | PropertyChangeMask| EnterWindowMask | FocusChangeMask);
-	XReparentWindow(dpy, s->win, traywin, 0, 0);
+     XReparentWindow(dpy, s->win, traywin, 0, 0);
 
      ewmh_send_message(s->win, s->win, "_XEMBED", CurrentTime, XEMBED_EMBEDDED_NOTIFY, 0, traywin, 0);
 
@@ -112,15 +112,14 @@ systray_add(Window win)
 }
 
 void
-systray_del(Window win)
+systray_del(Systray *s)
 {
-     Systray  *t, **ss;
+     Systray **ss;
 
-     if(!(t = systray_find(win)))
-          return;
+     for(ss = &trayicons; *ss && *ss != s; ss = &(*ss)->next);
+     *ss = s->next;
 
-     for(ss = &trayicons; *ss && *ss != t; ss = &(*ss)->next);
-     *ss = t->next;
+     IFREE(s);
 
      return;
 }

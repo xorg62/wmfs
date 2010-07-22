@@ -350,7 +350,7 @@ destroynotify(XDestroyWindowEvent *ev)
      else if((s = systray_find(ev->window)))
      {
           setwinstate(s->win, WithdrawnState);
-          systray_del(s->win);
+          systray_del(s);
           systray_update();
      }
 
@@ -480,19 +480,10 @@ keypress(XKeyPressedEvent *ev)
 void
 mappingnotify(XMappingEvent *ev)
 {
-     Systray *s;
-
      XRefreshKeyboardMapping(ev);
 
      if(ev->request == MappingKeyboard)
           grabkeys();
-
-     if(!(s = systray_find(ev->window)))
-     {
-          setwinstate(s->win, NormalState);
-          ewmh_send_message(s->win, s->win, "_XEMBED", CurrentTime, XEMBED_WINDOW_ACTIVATE, 0, 0, 0);
-     }
-
 
      return;
 }
@@ -650,8 +641,7 @@ unmapnotify(XUnmapEvent *ev)
 
      if((s = systray_find(ev->window)))
      {
-          setwinstate(s->win, WithdrawnState);
-          systray_del(s->win);
+          systray_del(s);
           systray_update();
      }
 

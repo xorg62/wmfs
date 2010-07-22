@@ -210,7 +210,6 @@ scan(void)
      Atom rt;
      int s, rf, tag = -1, screen = -1, free = -1;
      ulong ir, il;
-     long flags;
      uchar *ret;
      Client *c;
 
@@ -218,12 +217,14 @@ scan(void)
 
      if(XQueryTree(dpy, ROOT, &usl, &usl2, &w, &n))
           for(i = n - 1; i != -1; --i)
-               if(XGetWindowAttributes(dpy, w[i], &wa)
-                  && !(wa.override_redirect || XGetTransientForHint(dpy, w[i], &usl))
+          {
+               XGetWindowAttributes(dpy, w[i], &wa);
+
+               if(!wa.override_redirect/* || XGetTransientForHint(dpy, w[i], &usl))*/
                   && wa.map_state == IsViewable)
                {
-                    if((flags = ewmh_get_xembed_state(w[i])))
-                         systray_add(w[i]);
+                    if(ewmh_get_xembed_state(w[i]))
+                        systray_add(w[i]);
 
                     if(XGetWindowProperty(dpy, w[i], ATOM("_WMFS_TAG"), 0, 32,
                                           False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
@@ -257,6 +258,7 @@ scan(void)
 
                     client_update_attributes(c);
                }
+          }
 
      /* Set update layout request */
      for(c = clients; c; c = c->next)

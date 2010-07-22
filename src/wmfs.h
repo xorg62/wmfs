@@ -352,7 +352,7 @@ Bool systray_acquire(void);
 void systray_init(void);
 void systray_kill(void);
 void systray_add(Window win);
-void systray_del(Window win);
+void systray_del(Systray *s);
 void systray_configure(Systray *s);
 void systray_state(Systray *s);
 void systray_freeicons(void);
