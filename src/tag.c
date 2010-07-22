@@ -42,6 +42,9 @@ tag_set(int tag)
      Bool al = False;
      int i;
 
+     if(tag < 0 || tag > MAXTAG)
+          return;
+
      screen_get_sel();
 
      prevseltag[selscreen] = seltag[selscreen];
@@ -123,7 +126,7 @@ tag_transfert(Client *c, int tag)
 
      CHECK(c);
 
-     if(!tag)
+     if(tag <= 0)
           tag = 1;
 
      if(tag > conf.ntag[selscreen])
@@ -493,9 +496,9 @@ tag_new(int s, char *name)
          displayedName = name;
 
      Tag t = { displayedName, NULL, 0, 0,
-               conf.default_tag.mwfact, conf.default_tag.nmaster, 
+               conf.default_tag.mwfact, conf.default_tag.nmaster,
                False, conf.default_tag.resizehint, False, False,
-               conf.default_tag.barpos, conf.default_tag.layout, 
+               conf.default_tag.barpos, conf.default_tag.layout,
                0, NULL, 0 };
 
      if(conf.ntag[s] + 1 > MAXTAG)

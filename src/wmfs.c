@@ -220,8 +220,8 @@ scan(void)
           {
                XGetWindowAttributes(dpy, w[i], &wa);
 
-               if(!wa.override_redirect/* || XGetTransientForHint(dpy, w[i], &usl))*/
-                  && wa.map_state == IsViewable)
+               if(!wa.override_redirect
+                         && wa.map_state == IsViewable)
                {
                     if(ewmh_get_xembed_state(w[i]))
                         systray_add(w[i]);

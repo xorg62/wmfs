@@ -232,9 +232,8 @@ clientmessageevent(XClientMessageEvent *ev)
 
      /* Manage _NET_WM_DESKTOP */
      if(mess_t == net_wm_desktop)
-          if((c = client_gb_win(ev->window)))
+          if((c = client_gb_win(ev->window)) && ev->data.l[0] != 0xFFFFFFFF)
                tag_transfert(c, ev->data.l[0]);
-
 
      /* Manage _WMFS_STATUSTEXT_x */
      if(mess_t >= wmfs_statustext && ev->data.l[4] == True)
