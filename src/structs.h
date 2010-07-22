@@ -125,6 +125,11 @@ enum
      net_wm_state_fullscreen,
      net_wm_state_sticky,
      net_wm_state_demands_attention,
+     net_wm_system_tray_opcode,
+     net_system_tray_message_data,
+     net_system_tray_s,
+     xembed,
+     xembedinfo,
      utf8_string,
      /* WMFS HINTS */
      wmfs_running,
@@ -251,6 +256,15 @@ typedef struct
      char *type;
      void (*func)(int screen);
 } Layout;
+
+/* Systray Structure */
+typedef struct Systray Systray;
+struct Systray
+{
+     Window win;
+     XRectangle geo;
+     Systray *next, *prev;
+};
 
 /* Tag Structure */
 typedef struct
@@ -499,5 +513,10 @@ typedef struct
      char *cmd;
      char *uicb;
 } vicmd_to_uicb;
+
+typedef struct
+{
+     int flags;
+} xembed_info;
 
 #endif /* STRUCTS_H */

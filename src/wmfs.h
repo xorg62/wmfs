@@ -54,6 +54,8 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <X11/Xlib.h>
+#include <X11/Xmd.h>
+#include <X11/Xutil.h>
 #include <X11/Xatom.h>
 #include <X11/cursorfont.h>
 #include <X11/Xft/Xft.h>
@@ -211,6 +213,8 @@ void uicb_client_ignore_tag(uicb_t);
 
 /* ewmh.c */
 void ewmh_init_hints(void);
+void ewmh_send_message(Window d, Window w, char *atom, long d0, long d1, long d2, long d3, long d4);
+long ewmh_get_xembed_state(Window win);
 void ewmh_get_number_of_desktop(void);
 void ewmh_update_current_tag_prop(void);
 void ewmh_get_client_list(void);
@@ -240,7 +244,10 @@ void focusin(XFocusChangeEvent *ev);
 void grabkeys(void);
 void keypress(XKeyPressedEvent *ev);
 void mappingnotify(XMappingEvent *ev);
+void mapnotify(XMapEvent *ev);
 void maprequest(XMapRequestEvent *ev);
+void reparentnotify(XReparentEvent *ev);
+void selectionclearevent(XSelectionClearEvent *ev);
 void propertynotify(XPropertyEvent *ev);
 void unmapnotify(XUnmapEvent *ev);
 void send_client_event(long data[5], char *atom_name);
@@ -341,7 +348,17 @@ void statustext_normal(int sc, char *str);
 void statustext_handle(int sc, char *str);
 
 /* systray.c */
-
+Bool systray_acquire(void);
+void systray_init(void);
+void systray_kill(void);
+void systray_add(Window win);
+void systray_del(Window win);
+void systray_configure(Systray *s);
+void systray_state(Systray *s);
+void systray_freeicons(void);
+Systray* systray_find(Window win);
+int systray_get_width(void);
+void systray_update(void);
 
 /* layout.c */
 void arrange(int screen, Bool update_layout);
@@ -435,6 +452,7 @@ XftFont *font;
 
 /* Atoms list */
 Atom *net_atom;
+Atom trayatom;
 
 /* InfoBar/Tags */
 InfoBar *infobar;
@@ -458,6 +476,9 @@ Client *sel;
 func_name_list_t *func_list;
 extern const func_name_list_t layout_list[];
 uint numlockmask;
+Systray *trayicons;
+Window traywin;
+int tray_width;
 
 #endif /* WMFS_H */
 

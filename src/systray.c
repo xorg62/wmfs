@@ -32,3 +32,220 @@
 
 #include "wmfs.h"
 
+#define TRAY_DWIDTH 18
+
+Bool
+systray_acquire(void)
+{
+     char systray_atom[32];
+
+     snprintf(systray_atom, sizeof(systray_atom), "_NET_SYSTEM_TRAY_S%u", SCREEN);
+     trayatom = XInternAtom(dpy, systray_atom, False);
+
+     XSetSelectionOwner(dpy, ATOM(systray_atom), traywin, CurrentTime);
+
+     if(XGetSelectionOwner(dpy, trayatom) != traywin)
+          return False;
+
+     ewmh_send_message(ROOT, ROOT, "MANAGER", CurrentTime, trayatom, traywin, 0, 0);
+
+     return True;
+}
+
+void
+systray_init(void)
+{
+     XSetWindowAttributes wattr;
+
+     /* Init traywin window */
+     wattr.event_mask        = ButtonPressMask|ExposureMask;
+     wattr.override_redirect = True;
+     wattr.background_pixel  = conf.colors.bar;
+
+     traywin = XCreateSimpleWindow(dpy, infobar[0].bar->win, 0, 0, 1, 1, 0, 0, conf.colors.bar);
+
+     XChangeWindowAttributes(dpy, traywin, CWEventMask | CWOverrideRedirect | CWBackPixel, &wattr);
+     XSelectInput(dpy, traywin, KeyPressMask | ButtonPressMask);
+
+     XMapRaised(dpy, traywin);
+
+     /* Select tray */
+     if(!systray_acquire())
+          warnx("Can't initialize system tray: owned by another process");
+
+     return;
+}
+
+void
+systray_kill(void)
+{
+     XSetSelectionOwner(dpy, trayatom, None, CurrentTime);
+     XUnmapWindow(dpy, traywin);
+
+     return;
+}
+
+void
+systray_add(Window win)
+{
+     Systray *s = emalloc(1, sizeof(Systray));
+
+     s->win = win;
+
+     s->geo.height = infobar[0].bar->geo.height;
+     s->geo.width  = TRAY_DWIDTH;
+
+     setwinstate(s->win, WithdrawnState);
+     XSelectInput(dpy, s->win, StructureNotifyMask | PropertyChangeMask| EnterWindowMask | FocusChangeMask);
+	XReparentWindow(dpy, s->win, traywin, 0, 0);
+
+     ewmh_send_message(s->win, s->win, "_XEMBED", CurrentTime, XEMBED_EMBEDDED_NOTIFY, 0, traywin, 0);
+
+     /* Attach */
+	if(trayicons)
+		trayicons->prev = s;
+
+     s->next = trayicons;
+     trayicons = s;
+
+     return;
+}
+
+void
+systray_del(Window win)
+{
+     Systray  *t, **ss;
+
+     if(!(t = systray_find(win)))
+          return;
+
+     for(ss = &trayicons; *ss && *ss != t; ss = &(*ss)->next);
+     *ss = t->next;
+
+     return;
+}
+
+void
+systray_configure(Systray *s)
+{
+     long d = 0;
+     XSizeHints *sh = NULL;
+
+     if(!(sh = XAllocSizeHints()))
+          return;
+
+     XGetWMNormalHints(dpy, s->win, sh, &d);
+
+     /* TODO: Improve this.. */
+     if(d > 0)
+          if(sh->flags & (USSize|PSize))
+               s->geo.width = sh->width;
+
+     XFree(sh);
+
+     return;
+}
+
+void
+systray_state(Systray *s)
+{
+     long flags;
+     int code = 0;
+
+     if(!(flags = ewmh_get_xembed_state(s->win)))
+          return;
+
+     if(flags & XEMBED_MAPPED)
+     {
+          code = XEMBED_WINDOW_ACTIVATE;
+          XMapRaised(dpy, s->win);
+          setwinstate(s->win, NormalState);
+     }
+     else
+     {
+          code = XEMBED_WINDOW_DEACTIVATE;
+          XUnmapWindow(dpy, s->win);
+          setwinstate(s->win, WithdrawnState);
+     }
+
+     ewmh_send_message(s->win, s->win, "_XEMBED", CurrentTime, code, 0, 0, 0);
+
+     return;
+}
+
+void
+systray_freeicons(void)
+{
+	Systray *i, *next;
+
+     for(i = trayicons; i; i = next)
+     {
+		next = i->next;
+		XReparentWindow(dpy, i->win, ROOT, 0, 0);
+          IFREE(i);
+     }
+
+	XSync(dpy, 0);
+
+     return;
+}
+
+Systray*
+systray_find(Window win)
+{
+	Systray *i;
+
+     for(i = trayicons; i; i = i->next)
+          if(i->win == win)
+               return i;
+
+     return NULL;
+}
+
+int
+systray_get_width(void)
+{
+     int w = 0;
+     Systray *i;
+
+     for(i = trayicons; i; i = i->next)
+          w += i->geo.width + 2;
+
+     return w;
+}
+
+void
+systray_update(void)
+{
+     Systray *i;
+     XWindowAttributes xa;
+     int x = 0;
+
+     if(!trayicons)
+     {
+          XMoveResizeWindow(dpy, traywin, infobar[0].bar->geo.width - 1, 0, 1, 1);
+          return;
+     }
+
+     for(i = trayicons; i; i = i->next)
+     {
+          memset(&xa, 0, sizeof(xa));
+		XGetWindowAttributes(dpy, i->win, &xa);
+
+          XMapWindow(dpy, i->win);
+
+          if(xa.width < (i->geo.width = TRAY_DWIDTH))
+               i->geo.width = xa.width;
+
+          if(xa.height < (i->geo.height = infobar[0].bar->geo.height))
+               i->geo.height = xa.height;
+
+          XMoveResizeWindow(dpy, i->win, (i->geo.x = x), 0, i->geo.width, i->geo.height);
+
+          x += i->geo.width + 2;
+     }
+
+     XMoveResizeWindow(dpy, traywin, infobar[0].bar->geo.width - x, 0, x, infobar[0].bar->geo.height);
+
+     return;
+}

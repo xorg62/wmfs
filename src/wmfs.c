@@ -98,6 +98,9 @@ quit(void)
      XFreeGC(dpy, gc_stipple);
      infobar_destroy();
 
+     systray_freeicons();
+     systray_kill();
+
      IFREE(sgeo);
      IFREE(spgeo);
      IFREE(infobar);
@@ -207,6 +210,7 @@ scan(void)
      Atom rt;
      int s, rf, tag = -1, screen = -1, free = -1;
      ulong ir, il;
+     long flags;
      uchar *ret;
      Client *c;
 
@@ -218,6 +222,9 @@ scan(void)
                   && !(wa.override_redirect || XGetTransientForHint(dpy, w[i], &usl))
                   && wa.map_state == IsViewable)
                {
+                    if((flags = ewmh_get_xembed_state(w[i])))
+                         systray_add(w[i]);
+
                     if(XGetWindowProperty(dpy, w[i], ATOM("_WMFS_TAG"), 0, 32,
                                           False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
                     {

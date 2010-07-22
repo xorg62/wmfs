@@ -74,6 +74,7 @@ init(void)
      init_status();
      ewmh_update_current_tag_prop();
      grabkeys();
+     systray_init();
 
      return;
 }

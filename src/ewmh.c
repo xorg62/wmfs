@@ -77,6 +77,11 @@ ewmh_init_hints(void)
      net_atom[net_wm_state_fullscreen]        = ATOM("_NET_WM_STATE_FULLSCREEN");
      net_atom[net_wm_state_sticky]            = ATOM("_NET_WM_STATE_STICKY");
      net_atom[net_wm_state_demands_attention] = ATOM("_NET_WM_STATE_DEMANDS_ATTENTION");
+     net_atom[net_wm_system_tray_opcode]      = ATOM("_NET_SYSTEM_TRAY_OPCODE");
+     net_atom[net_system_tray_message_data]   = ATOM("_NET_SYSTEM_TRAY_MESSAGE_DATA");
+     net_atom[net_system_tray_s]              = ATOM("_NET_SYSTEM_TRAY_S");
+     net_atom[xembed]                         = ATOM("_XEMBED");
+     net_atom[xembedinfo]                     = ATOM("_XEMBED_INFO");
      net_atom[utf8_string]                    = ATOM("UTF8_STRING");
 
      /* WMFS hints */
@@ -126,6 +131,57 @@ ewmh_init_hints(void)
                      PropModeReplace, (uchar*)&showing_desk, 1);
 
      return;
+}
+
+/** Send ewmh message
+  */
+void
+ewmh_send_message(Window d, Window w, char *atom, long d0, long d1, long d2, long d3, long d4)
+{
+
+     XClientMessageEvent e;
+
+     e.type          = ClientMessage;
+     e.message_type  = ATOM(atom);
+     e.window        = w;
+     e.format        = 32;
+     e.data.l[0]     = d0;
+     e.data.l[1]     = d1;
+     e.data.l[2]     = d2;
+     e.data.l[3]     = d3;
+     e.data.l[4]     = d4;
+
+     XSendEvent(dpy, d, False, NoEventMask, (XEvent*)&e);
+
+     return;
+}
+
+/** Get xembed state
+ */
+long
+ewmh_get_xembed_state(Window win)
+{
+     xembed_info *xi = NULL;
+     Atom rf;
+     int f;
+     ulong n, il;
+     long flags;
+     uchar *data = NULL;
+
+     if(XGetWindowProperty(dpy, win, net_atom[xembedinfo], 0L, 0x7FFFFFFFL,
+                    False, net_atom[xembedinfo], &rf, &f, &n, &il, &data) == Success && n)
+          xi = (xembed_info*)data;
+     else
+     {
+          XFree(data);
+          return 0;
+     }
+
+     flags = xi->flags;
+
+     XFree(xi);
+
+     return flags;
 }
 
 /** Get the number of desktop (tag)
