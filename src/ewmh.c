@@ -436,6 +436,8 @@ ewmh_manage_window_type(Client *c)
                     /* Reparent it to ROOT win */
                     XReparentWindow(dpy, c->win, ROOT, c->geo.x, c->geo.y);
                     XRaiseWindow(dpy, c->win);
+
+                    c->flags |= DockFlag;
                }
                /* MANAGE _NET_WM_WINDOW_TYPE_DIALOG */
                else if(atom[i] == net_atom[net_wm_window_type_dialog])

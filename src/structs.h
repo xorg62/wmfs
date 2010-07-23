@@ -52,6 +52,7 @@
 #define AboveFlag  (1 << 9)
 #define UrgentFlag (1 << 10)
 #define FLayFlag   (1 << 11)
+#define DockFlag   (1 << 12)
 
 #define TagFlag(t) (1 << (t))
 

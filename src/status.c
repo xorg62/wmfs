@@ -141,7 +141,11 @@ statustext_normal(int sc, char *str)
      char strwc[MAXSTATUS] = { 0 };
      char buf[MAXSTATUS] = { 0 };
      char col[8] = { 0 };
-     int n, i, j, k;
+     int n, i, j, k, sw = 0;
+
+     /* if(sc == SYSTRAY_SCREEN) */
+     if(!sc)
+          sw = systray_get_width();
 
      for(i = j = n = 0; i < strlen(str); ++i, ++j)
           if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
@@ -154,7 +158,7 @@ statustext_normal(int sc, char *str)
                strwc[j] = str[i];
 
      /* Draw normal text without any blocks */
-     draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(strwc),
+     draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - (textw(strwc) + sw++),
                FHINFOBAR, infobar[sc].bar->fg, 0, strwc);
 
      if(n)
@@ -169,11 +173,11 @@ statustext_normal(int sc, char *str)
 
                     /* Draw a rectangle with the bar color to draw the text properly */
                     draw_rectangle(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(&buf[k]),
-                                   0, INFOBARH - (sgeo[sc].width - SHADH) - textw(&buf[k]),
+                                   0, INFOBARH - (sgeo[sc].width - SHADH) - (textw(&buf[k]) + sw),
                                    INFOBARH, conf.colors.bar);
 
                     /* Draw text with its color */
-                    draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(&buf[k]),
+                    draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - (textw(&buf[k]) + sw),
                               FHINFOBAR,  col, 0, &buf[k]);
 
                     strcpy(buf, strwc);
@@ -192,7 +196,7 @@ void
 statustext_handle(int sc, char *str)
 {
      char *lastst;
-     int i, nr, ng, ns, len;
+     int i, nr, ng, ns, len, sw = 0;
      StatusRec r[128];
      StatusGraph g[128];
      StatusText s[128];
@@ -200,6 +204,11 @@ statustext_handle(int sc, char *str)
      /* If the str == the current statustext, return (not needed) */
      if(!str)
           return;
+
+     /* if(sc == SYSTRAY_SCREEN) */
+     if(!sc)
+          sw = systray_get_width();
+
 
      barwin_refresh_color(infobar[sc].bar);
 
@@ -219,15 +228,15 @@ statustext_handle(int sc, char *str)
 
      /* Draw rectangles with stored properties. */
      for(i = 0; i < nr; ++i)
-          draw_rectangle(infobar[sc].bar->dr, r[i].x, r[i].y, r[i].w, r[i].h, r[i].color);
+          draw_rectangle(infobar[sc].bar->dr, r[i].x - sw, r[i].y, r[i].w, r[i].h, r[i].color);
 
      /* Draw graphs with stored properties. */
      for(i = 0; i < ng; ++i)
-          draw_graph(infobar[sc].bar->dr, g[i].x, g[i].y, g[i].w, g[i].h, g[i].color, g[i].data);
+          draw_graph(infobar[sc].bar->dr, g[i].x - sw, g[i].y, g[i].w, g[i].h, g[i].color, g[i].data);
 
      /* Draw located text with stored properties. */
      for(i = 0; i < ns; ++i)
-          draw_text(infobar[sc].bar->dr, s[i].x, s[i].y, s[i].color, 0, s[i].text);
+          draw_text(infobar[sc].bar->dr, s[i].x - sw, s[i].y, s[i].color, 0, s[i].text);
 
      barwin_refresh(infobar[sc].bar);
 

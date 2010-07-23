@@ -52,7 +52,7 @@ draw_text(Drawable d, int x, int y, char* fg, int pad, char *str)
      /* To draw image everywhere we can draw text */
 #ifdef HAVE_IMLIB
      char *ostr = NULL;
-     int i, ni;
+     int i, ni, sw = 0;
      ImageAttr im[128];
 
      ostr = _strdup(str);
@@ -61,8 +61,11 @@ draw_text(Drawable d, int x, int y, char* fg, int pad, char *str)
      {
           ni = parse_image_block(im, str);
 
+          if(d == infobar[0 /* SYSTRAY_SCREEN */].bar->dr)
+               sw = systray_get_width();
+
           for(i = 0; i < ni; ++i)
-               draw_image(d, im[i].x, im[i].y, im[i].w, im[i].h, im[i].name);
+               draw_image(d, im[i].x - sw, im[i].y, im[i].w, im[i].h, im[i].name);
      }
 #endif /* HAVE_IMLIB */
 

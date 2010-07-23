@@ -32,7 +32,8 @@
 
 #include "wmfs.h"
 
-#define TRAY_DWIDTH 18
+#define TRAY_SPACING  (3)
+#define TRAY_DWIDTH   (infobar[0].bar->geo.height + TRAY_SPACING)
 
 Bool
 systray_acquire(void)
@@ -208,7 +209,7 @@ systray_get_width(void)
      Systray *i;
 
      for(i = trayicons; i; i = i->next)
-          w += i->geo.width + 2;
+          w += i->geo.width + TRAY_SPACING + 1;
 
      return w;
 }
@@ -218,7 +219,7 @@ systray_update(void)
 {
      Systray *i;
      XWindowAttributes xa;
-     int x = 0;
+     int x = 1;
 
      if(!trayicons)
      {
@@ -241,7 +242,7 @@ systray_update(void)
 
           XMoveResizeWindow(dpy, i->win, (i->geo.x = x), 0, i->geo.width, i->geo.height);
 
-          x += i->geo.width + 2;
+          x += i->geo.width + TRAY_SPACING;
      }
 
      XMoveResizeWindow(dpy, traywin, infobar[0].bar->geo.width - x, 0, x, infobar[0].bar->geo.height);

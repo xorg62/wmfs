@@ -616,7 +616,7 @@ client_map(Client *c)
 {
      CHECK(c);
 
-     if(c->flags & FSSFlag)
+     if(c->flags & FSSFlag || c->flags & DockFlag)
           XMapWindow(dpy, c->win);
      else
      {
