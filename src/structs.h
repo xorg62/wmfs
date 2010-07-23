@@ -445,6 +445,12 @@ typedef struct
           Bool tag;
           Bool layout;
      } border;
+     struct
+     {
+          Bool active;
+          int screen;
+          int spacing;
+     } systray;
      Alias alias[256];
      uint mouse_tag_action[TagActionLast];
      Layout layout[NUM_OF_LAYOUT];

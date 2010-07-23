@@ -61,7 +61,7 @@ draw_text(Drawable d, int x, int y, char* fg, int pad, char *str)
      {
           ni = parse_image_block(im, str);
 
-          if(d == infobar[0 /* SYSTRAY_SCREEN */].bar->dr)
+          if(infobar[conf.systray.screen].bar && d == infobar[conf.systray.screen].bar->dr)
                sw = systray_get_width();
 
           for(i = 0; i < ni; ++i)

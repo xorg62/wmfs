@@ -143,8 +143,7 @@ statustext_normal(int sc, char *str)
      char col[8] = { 0 };
      int n, i, j, k, sw = 0;
 
-     /* if(sc == SYSTRAY_SCREEN) */
-     if(!sc)
+     if(sc == conf.systray.screen)
           sw = systray_get_width();
 
      for(i = j = n = 0; i < strlen(str); ++i, ++j)
@@ -205,10 +204,8 @@ statustext_handle(int sc, char *str)
      if(!str)
           return;
 
-     /* if(sc == SYSTRAY_SCREEN) */
-     if(!sc)
+     if(sc == conf.systray.screen)
           sw = systray_get_width();
-
 
      barwin_refresh_color(infobar[sc].bar);
 

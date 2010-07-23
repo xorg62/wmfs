@@ -462,28 +462,28 @@ conf_tag_section(void)
      conf.border.tag              = fetch_opt_first(sec, "false", "border").bool;
      conf.tagautohide             = fetch_opt_first(sec, "false", "autohide").bool;
      conf.tagnamecount            = fetch_opt_first(sec, "false", "name_count").bool;
-     
+
 
      def_tag = fetch_section_first(sec, "default_tag");
 
      position = fetch_opt_first(def_tag, "top", "infobar_position").str;
-     if(!strcmp(position, "none") 
-            || !strcmp(position, "hide") 
+     if(!strcmp(position, "none")
+            || !strcmp(position, "hide")
             || !strcmp(position, "hidden"))
           bar_pos = IB_Hide;
-     else if(!strcmp(position, "bottom") 
+     else if(!strcmp(position, "bottom")
             || !strcmp(position, "down"))
           bar_pos = IB_Bottom;
      else
           bar_pos = IB_Top;
-     
+
      /* If there is no tag in the conf or more than
       * MAXTAG (36) print an error and create only one.
       */
      Tag default_tag = { fetch_opt_first(def_tag, "new tag", "name").str, NULL, 0, 1,
-                         fetch_opt_first(def_tag, "0.5", "mwfact").fnum, 
-                         fetch_opt_first(def_tag, "1", "nmaster").num, 
-                         False, fetch_opt_first(def_tag, "false", "resizehint").bool, 
+                         fetch_opt_first(def_tag, "0.5", "mwfact").fnum,
+                         fetch_opt_first(def_tag, "1", "nmaster").num,
+                         False, fetch_opt_first(def_tag, "false", "resizehint").bool,
                          False, False, bar_pos,
                          layout_name_to_struct(conf.layout, fetch_opt_first(def_tag, "title_right", "layout").str, conf.nlayout, layout_list),
                          0, NULL, 0 };
@@ -719,6 +719,26 @@ conf_keybind_section(void)
      return;
 }
 
+void
+conf_systray_section(void)
+{
+     struct conf_sec *systray;
+     int sc = screen_count();
+
+     systray = fetch_section_first(NULL, "systray");
+
+     conf.systray.active = fetch_opt_first(systray, "true", "active").bool;
+
+     if((conf.systray.screen = fetch_opt_first(systray, "0", "screen").num) < 0
+               || conf.systray.screen >= sc)
+          conf.systray.screen = 0;
+
+     if((conf.systray.spacing = fetch_opt_first(systray, "3", "spacing").num) < 0)
+          conf.systray.spacing = 0;
+
+     return;
+}
+
 /** Configuration initialization
 */
 void
@@ -747,6 +767,7 @@ init_conf(void)
      conf_menu_section();
      conf_launcher_section();
      conf_keybind_section();
+     conf_systray_section();
 
      print_unused(NULL);
 

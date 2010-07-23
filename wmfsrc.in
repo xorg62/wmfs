@@ -35,6 +35,17 @@
 
 [/bar]
 
+[systray]
+        # Enable/disable systray
+        active = true
+
+        # Screen of systray
+        screen = 0
+
+        # Spacing between tray icons
+        spacing = 3
+[/systray]
+
 [layouts]
         fg = "#191919"
         bg = "#7E89A2"

@@ -32,13 +32,15 @@
 
 #include "wmfs.h"
 
-#define TRAY_SPACING  (3)
-#define TRAY_DWIDTH   (infobar[0].bar->geo.height + TRAY_SPACING)
+#define TRAY_DWIDTH   (infobar[conf.systray.screen].bar->geo.height + conf.systray.spacing)
 
 Bool
 systray_acquire(void)
 {
      char systray_atom[32];
+
+     if(!conf.systray.active)
+          return False;
 
      snprintf(systray_atom, sizeof(systray_atom), "_NET_SYSTEM_TRAY_S%u", SCREEN);
      trayatom = XInternAtom(dpy, systray_atom, False);
@@ -58,12 +60,15 @@ systray_init(void)
 {
      XSetWindowAttributes wattr;
 
+     if(!conf.systray.active)
+          return;
+
      /* Init traywin window */
      wattr.event_mask        = ButtonPressMask|ExposureMask;
      wattr.override_redirect = True;
      wattr.background_pixel  = conf.colors.bar;
 
-     traywin = XCreateSimpleWindow(dpy, infobar[0].bar->win, 0, 0, 1, 1, 0, 0, conf.colors.bar);
+     traywin = XCreateSimpleWindow(dpy, infobar[conf.systray.screen].bar->win, 0, 0, 1, 1, 0, 0, conf.colors.bar);
 
      XChangeWindowAttributes(dpy, traywin, CWEventMask | CWOverrideRedirect | CWBackPixel, &wattr);
      XSelectInput(dpy, traywin, KeyPressMask | ButtonPressMask);
@@ -80,6 +85,9 @@ systray_init(void)
 void
 systray_kill(void)
 {
+     if(!conf.systray.active)
+          return;
+
      XSetSelectionOwner(dpy, trayatom, None, CurrentTime);
      XUnmapWindow(dpy, traywin);
 
@@ -89,11 +97,15 @@ systray_kill(void)
 void
 systray_add(Window win)
 {
-     Systray *s = emalloc(1, sizeof(Systray));
+     Systray *s;
 
+     if(!conf.systray.active)
+          return;
+
+     s = emalloc(1, sizeof(Systray));
      s->win = win;
 
-     s->geo.height = infobar[0].bar->geo.height;
+     s->geo.height = infobar[conf.systray.screen].bar->geo.height;
      s->geo.width  = TRAY_DWIDTH;
 
      setwinstate(s->win, WithdrawnState);
@@ -117,6 +129,9 @@ systray_del(Systray *s)
 {
      Systray **ss;
 
+     if(!conf.systray.active)
+          return;
+
      for(ss = &trayicons; *ss && *ss != s; ss = &(*ss)->next);
      *ss = s->next;
 
@@ -131,7 +146,7 @@ systray_configure(Systray *s)
      long d = 0;
      XSizeHints *sh = NULL;
 
-     if(!(sh = XAllocSizeHints()))
+     if(!(sh = XAllocSizeHints()) || !conf.systray.active)
           return;
 
      XGetWMNormalHints(dpy, s->win, sh, &d);
@@ -152,7 +167,7 @@ systray_state(Systray *s)
      long flags;
      int code = 0;
 
-     if(!(flags = ewmh_get_xembed_state(s->win)))
+     if(!(flags = ewmh_get_xembed_state(s->win)) || !conf.systray.active)
           return;
 
      if(flags & XEMBED_MAPPED)
@@ -178,6 +193,9 @@ systray_freeicons(void)
 {
 	Systray *i, *next;
 
+     if(!conf.systray.active)
+          return;
+
      for(i = trayicons; i; i = next)
      {
 		next = i->next;
@@ -195,6 +213,10 @@ systray_find(Window win)
 {
 	Systray *i;
 
+     if(!conf.systray.active)
+          return NULL;
+
+
      for(i = trayicons; i; i = i->next)
           if(i->win == win)
                return i;
@@ -208,8 +230,11 @@ systray_get_width(void)
      int w = 0;
      Systray *i;
 
+     if(!conf.systray.active)
+          return 0;
+
      for(i = trayicons; i; i = i->next)
-          w += i->geo.width + TRAY_SPACING + 1;
+          w += i->geo.width + conf.systray.spacing + 1;
 
      return w;
 }
@@ -221,9 +246,12 @@ systray_update(void)
      XWindowAttributes xa;
      int x = 1;
 
+     if(!conf.systray.active)
+          return;
+
      if(!trayicons)
      {
-          XMoveResizeWindow(dpy, traywin, infobar[0].bar->geo.width - 1, 0, 1, 1);
+          XMoveResizeWindow(dpy, traywin, infobar[conf.systray.screen].bar->geo.width - 1, 0, 1, 1);
           return;
      }
 
@@ -237,15 +265,16 @@ systray_update(void)
           if(xa.width < (i->geo.width = TRAY_DWIDTH))
                i->geo.width = xa.width;
 
-          if(xa.height < (i->geo.height = infobar[0].bar->geo.height))
+          if(xa.height < (i->geo.height = infobar[conf.systray.screen].bar->geo.height))
                i->geo.height = xa.height;
 
           XMoveResizeWindow(dpy, i->win, (i->geo.x = x), 0, i->geo.width, i->geo.height);
 
-          x += i->geo.width + TRAY_SPACING;
+          x += i->geo.width + conf.systray.spacing;
      }
 
-     XMoveResizeWindow(dpy, traywin, infobar[0].bar->geo.width - x, 0, x, infobar[0].bar->geo.height);
+     XMoveResizeWindow(dpy, traywin, infobar[conf.systray.screen].bar->geo.width - x,
+               0, x, infobar[conf.systray.screen].bar->geo.height);
 
      return;
 }
