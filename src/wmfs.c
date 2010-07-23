@@ -99,7 +99,6 @@ quit(void)
      infobar_destroy();
 
      systray_freeicons();
-     systray_kill();
 
      IFREE(sgeo);
      IFREE(spgeo);

@@ -158,7 +158,7 @@ statustext_normal(int sc, char *str)
                strwc[j] = str[i];
 
      /* Draw normal text without any blocks */
-     draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - (textw(strwc) + sw++),
+     draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - (textw(strwc) + sw),
                FHINFOBAR, infobar[sc].bar->fg, 0, strwc);
 
      if(n)
@@ -172,8 +172,8 @@ statustext_normal(int sc, char *str)
                     for(j = 0, ++i; str[i] != '\\'; col[j++] = str[i++]);
 
                     /* Draw a rectangle with the bar color to draw the text properly */
-                    draw_rectangle(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - textw(&buf[k]),
-                                   0, INFOBARH - (sgeo[sc].width - SHADH) - (textw(&buf[k]) + sw),
+                    draw_rectangle(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - (textw(&buf[k]) + sw),
+                                   0, INFOBARH - (sgeo[sc].width - SHADH) - textw(&buf[k]),
                                    INFOBARH, conf.colors.bar);
 
                     /* Draw text with its color */
