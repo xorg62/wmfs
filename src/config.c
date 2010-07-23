@@ -182,8 +182,8 @@ conf_misc_section(void)
 void
 conf_bar_section(void)
 {
-     struct conf_sec *bar, **mouse, *selbar;
-     char *barbg;
+     struct conf_sec *bar, **mouse, *selbar, *systray;
+     char *barbg, sc = screen_count();
 
      bar = fetch_section_first(NULL, "bar");
 
@@ -201,6 +201,20 @@ conf_bar_section(void)
      }
 
      free(mouse);
+
+     if((systray = fetch_section_first(bar, "systray")))
+     {
+          conf.systray.active = fetch_opt_first(systray, "true", "active").bool;
+
+          if((conf.systray.screen = fetch_opt_first(systray, "0", "screen").num) < 0
+                    || conf.systray.screen >= sc)
+               conf.systray.screen = 0;
+
+          if((conf.systray.spacing = fetch_opt_first(systray, "3", "spacing").num) < 0)
+               conf.systray.spacing = 0;
+     }
+     else
+          conf.systray.active = False;
 
      selbar = fetch_section_first(bar, "selbar");
      conf.bars.selbar = selbar ? True : False;
@@ -719,26 +733,6 @@ conf_keybind_section(void)
      return;
 }
 
-void
-conf_systray_section(void)
-{
-     struct conf_sec *systray;
-     int sc = screen_count();
-
-     systray = fetch_section_first(NULL, "systray");
-
-     conf.systray.active = fetch_opt_first(systray, "true", "active").bool;
-
-     if((conf.systray.screen = fetch_opt_first(systray, "0", "screen").num) < 0
-               || conf.systray.screen >= sc)
-          conf.systray.screen = 0;
-
-     if((conf.systray.spacing = fetch_opt_first(systray, "3", "spacing").num) < 0)
-          conf.systray.spacing = 0;
-
-     return;
-}
-
 /** Configuration initialization
 */
 void
@@ -767,7 +761,6 @@ init_conf(void)
      conf_menu_section();
      conf_launcher_section();
      conf_keybind_section();
-     conf_systray_section();
 
      print_unused(NULL);
 

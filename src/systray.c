@@ -216,7 +216,6 @@ systray_find(Window win)
      if(!conf.systray.active)
           return NULL;
 
-
      for(i = trayicons; i; i = i->next)
           if(i->win == win)
                return i;
