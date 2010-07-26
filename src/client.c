@@ -1121,7 +1121,7 @@ client_unmanage(Client *c)
 
      /* Arrange */
      for(i = 0; i < screen_count() && !b; ++i)
-          if(c->tag == seltag[i])
+          if(c->tag == seltag[i] || tags[i][seltag[i]].tagad & TagFlag(c->tag))
                b = True;
 
      if(b)
