@@ -830,7 +830,7 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
 
      frame_moveresize(c, c->geo);
 
-     XMoveResizeWindow(dpy, c->win, BORDH, TBARH, geo.width, geo.height);
+     XMoveResizeWindow(dpy, c->win, BORDH, TBARH, c->geo.width, c->geo.height);
 
      client_update_attributes(c);
      client_configure(c);

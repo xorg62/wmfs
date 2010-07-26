@@ -248,7 +248,6 @@ void reparentnotify(XReparentEvent *ev);
 void selectionclearevent(XSelectionClearEvent *ev);
 void propertynotify(XPropertyEvent *ev);
 void unmapnotify(XUnmapEvent *ev);
-void send_client_event(long data[5], char *atom_name);
 void getevent(XEvent ev);
 
 /* menu.c */

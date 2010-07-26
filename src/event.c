@@ -647,32 +647,6 @@ unmapnotify(XUnmapEvent *ev)
      return;
 }
 
-/** Send a client event
- *\param data Event data
- *\param atom_name Event atom name
- */
-void
-send_client_event(long data[5], char *atom_name)
-{
-     XEvent ev;
-     int i;
-
-     ev.xclient.type = ClientMessage;
-     ev.xclient.serial = 0;
-     ev.xclient.send_event = True;
-     ev.xclient.message_type = ATOM(atom_name);
-     ev.xclient.window = ROOT;
-     ev.xclient.format = 32;
-
-     for(i = 0; i < 5; ++i, ev.xclient.data.l[i] = data[i]);
-
-     XSendEvent(dpy, ROOT, False, SubstructureRedirectMask | SubstructureNotifyMask, &ev);
-     XSync(dpy, False);
-
-
-     return;
-}
-
 /** Event handle function: execute every function
  * handle by event
  * \param ev Event
