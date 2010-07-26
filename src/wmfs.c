@@ -92,13 +92,13 @@ quit(void)
      IFREE(tags);
      IFREE(seltag);
 
+     systray_freeicons();
+
      XftFontClose(dpy, font);
      for(i = 0; i < CurLast; ++i)
           XFreeCursor(dpy, cursor[i]);
      XFreeGC(dpy, gc_stipple);
      infobar_destroy();
-
-     systray_freeicons();
 
      IFREE(sgeo);
      IFREE(spgeo);
@@ -219,28 +219,31 @@ scan(void)
           {
                XGetWindowAttributes(dpy, w[i], &wa);
 
-               if(!wa.override_redirect
-                         && wa.map_state == IsViewable)
+               if(!wa.override_redirect && wa.map_state == IsViewable)
                {
+
                     if(ewmh_get_xembed_state(w[i]))
-                        systray_add(w[i]);
+                    {
+                         systray_add(w[i]);
+                         systray_update();
+                    }
 
                     if(XGetWindowProperty(dpy, w[i], ATOM("_WMFS_TAG"), 0, 32,
-                                          False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
+                                   False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
                     {
                          tag = *ret;
                          XFree(ret);
                     }
 
                     if(XGetWindowProperty(dpy, w[i], ATOM("_WMFS_SCREEN"), 0, 32,
-                                          False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
+                                   False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
                     {
                          screen = *ret;
                          XFree(ret);
                     }
 
                     if(XGetWindowProperty(dpy, w[i], ATOM("_WMFS_ISFREE"), 0, 32,
-                                          False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
+                                   False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
                     {
                          free = *ret;
                          XFree(ret);

@@ -64,8 +64,9 @@ systray_init(void)
           return;
 
      /* Init traywin window */
-     wattr.event_mask        = ButtonPressMask|ExposureMask;
+     wattr.event_mask        = ButtonPressMask | ExposureMask;
      wattr.override_redirect = True;
+     wattr.background_pixmap = ParentRelative;
      wattr.background_pixel  = conf.colors.bar;
 
      traywin = XCreateSimpleWindow(dpy, infobar[conf.systray.screen].bar->win, 0, 0, 1, 1, 0, 0, conf.colors.bar);
@@ -78,18 +79,6 @@ systray_init(void)
      /* Select tray */
      if(!systray_acquire())
           warnx("Can't initialize system tray: owned by another process");
-
-     return;
-}
-
-void
-systray_kill(void)
-{
-     if(!conf.systray.active)
-          return;
-
-     XSetSelectionOwner(dpy, trayatom, None, CurrentTime);
-     XUnmapWindow(dpy, traywin);
 
      return;
 }
@@ -141,27 +130,6 @@ systray_del(Systray *s)
 }
 
 void
-systray_configure(Systray *s)
-{
-     long d = 0;
-     XSizeHints *sh = NULL;
-
-     if(!(sh = XAllocSizeHints()) || !conf.systray.active)
-          return;
-
-     XGetWMNormalHints(dpy, s->win, sh, &d);
-
-     /* TODO: Improve this.. */
-     if(d > 0)
-          if(sh->flags & (USSize|PSize))
-               s->geo.width = sh->width;
-
-     XFree(sh);
-
-     return;
-}
-
-void
 systray_state(Systray *s)
 {
      long flags;
@@ -191,19 +159,22 @@ systray_state(Systray *s)
 void
 systray_freeicons(void)
 {
-	Systray *i, *next;
+	Systray *i;
 
      if(!conf.systray.active)
           return;
 
-     for(i = trayicons; i; i = next)
+     for(i = trayicons; i; i = i->next)
      {
-		next = i->next;
+          XUnmapWindow(dpy, i->win);
 		XReparentWindow(dpy, i->win, ROOT, 0, 0);
           IFREE(i);
      }
 
-	XSync(dpy, 0);
+     XSetSelectionOwner(dpy, trayatom, None, CurrentTime);
+     XDestroyWindow(dpy, traywin);
+
+     XSync(dpy, 0);
 
      return;
 }
@@ -242,7 +213,6 @@ void
 systray_update(void)
 {
      Systray *i;
-     XWindowAttributes xa;
      int x = 1;
 
      if(!conf.systray.active)
@@ -256,16 +226,7 @@ systray_update(void)
 
      for(i = trayicons; i; i = i->next)
      {
-          memset(&xa, 0, sizeof(xa));
-		XGetWindowAttributes(dpy, i->win, &xa);
-
           XMapWindow(dpy, i->win);
-
-          if(xa.width < (i->geo.width = TRAY_DWIDTH))
-               i->geo.width = xa.width;
-
-          if(xa.height < (i->geo.height = infobar[conf.systray.screen].bar->geo.height))
-               i->geo.height = xa.height;
 
           XMoveResizeWindow(dpy, i->win, (i->geo.x = x), 0, i->geo.width, i->geo.height);
 

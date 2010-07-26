@@ -131,6 +131,7 @@ enum
      net_system_tray_s,
      xembed,
      xembedinfo,
+     manager,
      utf8_string,
      /* WMFS HINTS */
      wmfs_running,
@@ -523,6 +524,7 @@ typedef struct
 
 typedef struct
 {
+     int version;
      int flags;
 } xembed_info;
 

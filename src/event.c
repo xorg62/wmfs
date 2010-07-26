@@ -77,6 +77,7 @@ buttonpress(XButtonEvent *ev)
                if(ev->button == conf.client.mouse[i].button)
                     if(conf.client.mouse[i].func)
                          conf.client.mouse[i].func(conf.client.mouse[i].cmd);
+
      /* Root */
      if(ev->window == ROOT)
           for(i = 0; i < conf.root.nmouse; ++i)
@@ -371,8 +372,9 @@ enternotify(XCrossingEvent *ev)
         && ev->window != ROOT)
           return;
 
-     if((s = systray_find(ev->window)))
-          XSetInputFocus(dpy, s->win, RevertToNone, CurrentTime);
+     /* Don't handle EnterNotify event if it's about systray */
+     if((s = systray_find(ev->window)) || ev->window == traywin)
+          return;
 
      if(conf.focus_fmouse)
      {
@@ -518,11 +520,17 @@ maprequest(XMapRequestEvent *ev)
 {
      XWindowAttributes at;
      Client *c;
+     Systray *s;
 
      CHECK(XGetWindowAttributes(dpy, ev->window, &at));
      CHECK(!at.override_redirect);
 
-     if(!(c = client_gb_win(ev->window)))
+     if((s = systray_find(ev->window)))
+     {
+          ewmh_send_message(s->win, s->win, "_XEMBED", CurrentTime, XEMBED_WINDOW_ACTIVATE, 0, 0, 0);
+          systray_update();
+     }
+     else if(!(c = client_gb_win(ev->window)))
           client_manage(ev->window, &at, True);
 
      return;
@@ -544,16 +552,8 @@ propertynotify(XPropertyEvent *ev)
 
      if((s = systray_find(ev->window)))
      {
-          if(ev->atom == XA_WM_NORMAL_HINTS)
-          {
-               systray_configure(s);
-               systray_update();
-          }
-          else if(ev->atom == net_atom[xembedinfo])
-          {
-               systray_state(s);
-               systray_update();
-          }
+          systray_state(s);
+          systray_update();
      }
 
      if((c = client_gb_win(ev->window)))

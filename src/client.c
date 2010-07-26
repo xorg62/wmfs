@@ -692,7 +692,6 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
 
      c->layer = (sel && sel->layer > 0) ? sel->layer : 1;
 
-
      at.event_mask = PropertyChangeMask;
 
      frame_create(c);
@@ -831,10 +830,10 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
 
      frame_moveresize(c, c->geo);
 
-     XMoveResizeWindow(dpy, c->win, BORDH, TBARH, c->geo.width, c->geo.height);
+     XMoveResizeWindow(dpy, c->win, BORDH, TBARH, geo.width, geo.height);
 
-     client_configure(c);
      client_update_attributes(c);
+     client_configure(c);
 
      return;
 }

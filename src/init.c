@@ -71,10 +71,10 @@ init(void)
      init_root();
      screen_init_geo();
      infobar_init();
+     systray_init();
      init_status();
      ewmh_update_current_tag_prop();
      grabkeys();
-     systray_init();
 
      return;
 }

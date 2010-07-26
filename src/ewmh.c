@@ -82,6 +82,7 @@ ewmh_init_hints(void)
      net_atom[net_system_tray_s]              = ATOM("_NET_SYSTEM_TRAY_S");
      net_atom[xembed]                         = ATOM("_XEMBED");
      net_atom[xembedinfo]                     = ATOM("_XEMBED_INFO");
+     net_atom[manager]                        = ATOM("MANAGER");
      net_atom[utf8_string]                    = ATOM("UTF8_STRING");
 
      /* WMFS hints */
@@ -161,27 +162,23 @@ ewmh_send_message(Window d, Window w, char *atom, long d0, long d1, long d2, lon
 long
 ewmh_get_xembed_state(Window win)
 {
-     xembed_info *xi = NULL;
      Atom rf;
      int f;
      ulong n, il;
-     long flags;
+     long ret = 0;
      uchar *data = NULL;
 
-     if(XGetWindowProperty(dpy, win, net_atom[xembedinfo], 0L, 0x7FFFFFFFL,
-                    False, net_atom[xembedinfo], &rf, &f, &n, &il, &data) == Success && n)
-          xi = (xembed_info*)data;
-     else
-     {
-          XFree(data);
+     if(XGetWindowProperty(dpy, win, net_atom[xembedinfo], 0L, 2, False,
+                    net_atom[xembedinfo], &rf, &f, &n, &il, &data) != Success)
           return 0;
-     }
 
-     flags = xi->flags;
+     if(rf == net_atom[xembedinfo] && n == 2)
+          ret = (long)data[1];
 
-     XFree(xi);
+     if(n && data)
+          XFree(data);
 
-     return flags;
+     return ret;
 }
 
 /** Get the number of desktop (tag)
