@@ -152,7 +152,8 @@ ewmh_send_message(Window d, Window w, char *atom, long d0, long d1, long d2, lon
      e.data.l[3]     = d3;
      e.data.l[4]     = d4;
 
-     XSendEvent(dpy, d, False, NoEventMask, (XEvent*)&e);
+     XSendEvent(dpy, d, False, (d4) ? (SubstructureRedirectMask | SubstructureNotifyMask) : NoEventMask, (XEvent*)&e);
+     XSync(dpy, False);
 
      return;
 }
