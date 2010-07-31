@@ -71,7 +71,7 @@ init(void)
      init_root();
      screen_init_geo();
      infobar_init();
-     systray_init();
+     systray_acquire();
      init_status();
      ewmh_update_current_tag_prop();
      grabkeys();

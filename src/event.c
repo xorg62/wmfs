@@ -562,9 +562,10 @@ propertynotify(XPropertyEvent *ev)
           {
           case XA_WM_TRANSIENT_FOR:
                XGetTransientForHint(dpy, c->win, &trans);
-               if((c->flags & TileFlag || c->flags & MaxFlag))
-                    if(((c->flags & HintFlag && (client_gb_win(trans) != NULL)))
-                       || (!(c->flags & HintFlag && (client_gb_win(trans) != NULL))))
+               if(!(c->flags & FreeFlag) && client_gb_win(trans) != NULL)
+
+                      /*   f(((c->flags & HintFlag && (client_gb_win(trans) != NULL)))
+                       || (!(c->flags & HintFlag && (client_gb_win(trans) != NULL))))*/
                          arrange(c->screen, True);
                break;
           case XA_WM_NORMAL_HINTS:

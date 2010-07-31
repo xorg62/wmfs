@@ -37,31 +37,16 @@
 Bool
 systray_acquire(void)
 {
-     char systray_atom[32];
-
-     if(!conf.systray.active)
-          return False;
-
-     snprintf(systray_atom, sizeof(systray_atom), "_NET_SYSTEM_TRAY_S%u", SCREEN);
-     trayatom = XInternAtom(dpy, systray_atom, False);
-
-     XSetSelectionOwner(dpy, ATOM(systray_atom), traywin, CurrentTime);
-
-     if(XGetSelectionOwner(dpy, trayatom) != traywin)
-          return False;
-
-     ewmh_send_message(ROOT, ROOT, "MANAGER", CurrentTime, trayatom, traywin, 0, 0);
-
-     return True;
-}
-
-void
-systray_init(void)
-{
      XSetWindowAttributes wattr;
 
-     if(!conf.systray.active)
-          return;
+     if(!conf.systray.active || traywin)
+          return False;
+
+     if(XGetSelectionOwner(dpy, net_atom[net_system_tray_s]) != None)
+     {
+          warnx("Can't initialize system tray: owned by another process");
+          return False;
+     }
 
      /* Init traywin window */
      wattr.event_mask        = ButtonPressMask | ExposureMask;
@@ -69,18 +54,27 @@ systray_init(void)
      wattr.background_pixmap = ParentRelative;
      wattr.background_pixel  = conf.colors.bar;
 
-     traywin = XCreateSimpleWindow(dpy, infobar[conf.systray.screen].bar->win, 0, 0, 1, 1, 0, 0, conf.colors.bar);
+     traywin = XCreateSimpleWindow(dpy, ROOT, -1, -1, 1, 1, 0, 0, conf.colors.bar);
 
      XChangeWindowAttributes(dpy, traywin, CWEventMask | CWOverrideRedirect | CWBackPixel, &wattr);
      XSelectInput(dpy, traywin, KeyPressMask | ButtonPressMask);
 
      XMapRaised(dpy, traywin);
 
-     /* Select tray */
-     if(!systray_acquire())
-          warnx("Can't initialize system tray: owned by another process");
+     XSetSelectionOwner(dpy, net_atom[net_system_tray_s], traywin, CurrentTime);
 
-     return;
+     if(XGetSelectionOwner(dpy, net_atom[net_system_tray_s]) != traywin)
+     {
+          systray_freeicons();
+          warnx("System tray: can't get systray manager");
+          return False;
+     }
+
+     ewmh_send_message(ROOT, ROOT, "MANAGER", CurrentTime, net_atom[net_system_tray_s], traywin, 0, 0);
+
+     XSync(dpy, False);
+
+     return True;
 }
 
 void
@@ -171,7 +165,7 @@ systray_freeicons(void)
           IFREE(i);
      }
 
-     XSetSelectionOwner(dpy, trayatom, None, CurrentTime);
+     XSetSelectionOwner(dpy, net_atom[net_system_tray_s], None, CurrentTime);
      XDestroyWindow(dpy, traywin);
 
      XSync(dpy, 0);

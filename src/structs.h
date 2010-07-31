@@ -129,6 +129,8 @@ enum
      net_wm_system_tray_opcode,
      net_system_tray_message_data,
      net_system_tray_s,
+     net_system_tray_visual,
+     net_system_tray_orientation,
      xembed,
      xembedinfo,
      manager,

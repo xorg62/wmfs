@@ -46,6 +46,8 @@ ewmh_init_hints(void)
      char root_name[] = WMFS_VERSION;
      char class[] = "wmfs", st[64];
      long pid = (long)getpid();
+     char systray_atom[48];
+
 
      s = screen_count();
      net_atom = emalloc(net_last + s, sizeof(Atom));
@@ -79,7 +81,12 @@ ewmh_init_hints(void)
      net_atom[net_wm_state_demands_attention] = ATOM("_NET_WM_STATE_DEMANDS_ATTENTION");
      net_atom[net_wm_system_tray_opcode]      = ATOM("_NET_SYSTEM_TRAY_OPCODE");
      net_atom[net_system_tray_message_data]   = ATOM("_NET_SYSTEM_TRAY_MESSAGE_DATA");
-     net_atom[net_system_tray_s]              = ATOM("_NET_SYSTEM_TRAY_S");
+     net_atom[net_system_tray_visual]         = ATOM("_NET_SYSTEM_TRAY_VISUAL");
+
+     snprintf(systray_atom, sizeof(systray_atom), "_NET_SYSTEM_TRAY_S%d", 0/*SCREEN*/);
+     net_atom[net_system_tray_s]              = ATOM(systray_atom);
+
+     net_atom[net_system_tray_orientation]    = ATOM("_NET_SYSTEM_TRAY_ORIENTATION");
      net_atom[xembed]                         = ATOM("_XEMBED");
      net_atom[xembedinfo]                     = ATOM("_XEMBED_INFO");
      net_atom[manager]                        = ATOM("MANAGER");
@@ -152,7 +159,7 @@ ewmh_send_message(Window d, Window w, char *atom, long d0, long d1, long d2, lon
      e.data.l[3]     = d3;
      e.data.l[4]     = d4;
 
-     XSendEvent(dpy, d, False, (d4) ? (SubstructureRedirectMask | SubstructureNotifyMask) : NoEventMask, (XEvent*)&e);
+     XSendEvent(dpy, d, False, StructureNotifyMask, (XEvent*)&e);
      XSync(dpy, False);
 
      return;

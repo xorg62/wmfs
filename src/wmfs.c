@@ -221,13 +221,6 @@ scan(void)
 
                if(!wa.override_redirect && wa.map_state == IsViewable)
                {
-
-                    if(ewmh_get_xembed_state(w[i]))
-                    {
-                         systray_add(w[i]);
-                         systray_update();
-                    }
-
                     if(XGetWindowProperty(dpy, w[i], ATOM("_WMFS_TAG"), 0, 32,
                                    False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
                     {
