@@ -354,7 +354,5 @@ patht(char *path)
      if(strstr(path, "~/"))
           sprintf(ret, "%s/%s", getenv("HOME"), path + 2);
 
-     printf("--> (%s) - %s\n", path, ret);
-
      return ret;
 }
