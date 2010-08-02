@@ -296,6 +296,8 @@ int spawn(const char *str, ...);
 void swap_ptr(void **x, void **y);
 void uicb_spawn(uicb_t);
 char *clean_value(char *str);
+char* patht(char *path);
+
 
 #ifdef HAVE_IMLIB
 int parse_image_block(ImageAttr *im, char *str);

@@ -201,16 +201,16 @@ init_status(void)
           sprintf(conf.status_path, "%s/"DEF_STATUS, home);
      }
 
-     if (stat(conf.status_path, &st) == -1)
+     if (stat(patht(conf.status_path), &st) == -1)
      {
-          warn("%s", conf.status_path);
+          warn("%s", patht(conf.status_path));
           return;
      }
 
      if(st.st_size && st.st_mode & S_IXUSR)
           estatus = True;
      else
-          warnx("status file specified in configuratin (status_path) or present in wmfs directory can't be executed, try 'chmod +x %s'.", conf.status_path);
+          warnx("status file specified in configuratin (status_path) or present in wmfs directory can't be executed, try 'chmod +x %s'.", patht(conf.status_path));
 
      return;
 }

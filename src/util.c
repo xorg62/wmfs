@@ -340,3 +340,21 @@ clean_value(char *str)
      return p;
 }
 
+/* To use ~/ shortcut.. */
+char*
+patht(char *path)
+{
+     static char ret[512];
+
+     if(!path)
+          return NULL;
+
+     strcpy(ret, path);
+
+     if(strstr(path, "~/"))
+          sprintf(ret, "%s/%s", getenv("HOME"), path + 2);
+
+     printf("--> (%s) - %s\n", path, ret);
+
+     return ret;
+}

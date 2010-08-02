@@ -159,7 +159,7 @@ draw_image(Drawable dr, int x, int y, int w, int h, char *name)
      imlib_context_set_colormap(DefaultColormap(dpy, DefaultScreen(dpy)));
      imlib_context_set_drawable(dr);
 
-     image = imlib_load_image(name);
+     image = imlib_load_image(patht(name));
      imlib_context_set_image(image);
 
      if(w <= 0)
