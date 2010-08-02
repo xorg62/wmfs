@@ -1091,13 +1091,34 @@ client_unhide(Client *c)
      return;
 }
 
+/** Select next or previous client to don't lose focus
+  * \param c Client pointer
+  */
+void
+client_focus_next(Client *c)
+{
+     Client *c_next = NULL;
+
+     for(c_next = clients;
+         c_next && c_next != c->prev
+              && c_next->tag != c->tag
+              && c_next->screen != c->screen;
+         c_next = c_next->next);
+
+     if(c_next && c_next->tag == seltag[selscreen]
+        && c_next->screen == selscreen)
+          client_focus(c_next);
+
+     return;
+}
+
+
 /** Unmanage a client
  * \param c Client pointer
 */
 void
 client_unmanage(Client *c)
 {
-     Client *c_next = NULL;
      Bool b = False;
      int i;
 
@@ -1134,16 +1155,7 @@ client_unmanage(Client *c)
 
      XFree(c->title);
 
-     /* To focus the previous client */
-     for(c_next = clients;
-         c_next && c_next != c->prev
-              && c_next->tag != c->tag
-              && c_next->screen != c->screen;
-         c_next = c_next->next);
-
-     if(c_next && c_next->tag == seltag[selscreen]
-        && c_next->screen == selscreen)
-          client_focus(c_next);
+     client_focus_next(c);
 
      free(c);
 

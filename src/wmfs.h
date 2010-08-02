@@ -185,6 +185,7 @@ void client_size_hints(Client *c);
 void client_swap(Client *c1, Client *c2);
 void client_raise(Client *c);
 void client_unhide(Client *c);
+void client_focus_next(Client *c);
 void client_unmanage(Client *c);
 void client_unmap(Client *c);
 void client_set_rules(Client *c);
