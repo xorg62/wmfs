@@ -52,6 +52,7 @@
 #define AboveFlag  (1 << 9)
 #define UrgentFlag (1 << 10)
 #define FLayFlag   (1 << 11)
+#define DockFlag   (1 << 12)
 
 #define TagFlag(t) (1 << (t))
 
@@ -125,6 +126,14 @@ enum
      net_wm_state_fullscreen,
      net_wm_state_sticky,
      net_wm_state_demands_attention,
+     net_wm_system_tray_opcode,
+     net_system_tray_message_data,
+     net_system_tray_s,
+     net_system_tray_visual,
+     net_system_tray_orientation,
+     xembed,
+     xembedinfo,
+     manager,
      utf8_string,
      /* WMFS HINTS */
      wmfs_running,
@@ -175,6 +184,7 @@ struct Client
      char *title;
      /* Tag num */
      uint tag;
+     int focusontag;
      /* Screen */
      int screen;
      /* Layer */
@@ -251,6 +261,15 @@ typedef struct
      char *type;
      void (*func)(int screen);
 } Layout;
+
+/* Systray Structure */
+typedef struct Systray Systray;
+struct Systray
+{
+     Window win;
+     XRectangle geo;
+     Systray *next, *prev;
+};
 
 /* Tag Structure */
 typedef struct
@@ -430,6 +449,12 @@ typedef struct
           Bool tag;
           Bool layout;
      } border;
+     struct
+     {
+          Bool active;
+          int screen;
+          int spacing;
+     } systray;
      Alias alias[256];
      uint mouse_tag_action[TagActionLast];
      Layout layout[NUM_OF_LAYOUT];
@@ -499,5 +524,11 @@ typedef struct
      char *cmd;
      char *uicb;
 } vicmd_to_uicb;
+
+typedef struct
+{
+     int version;
+     int flags;
+} xembed_info;
 
 #endif /* STRUCTS_H */

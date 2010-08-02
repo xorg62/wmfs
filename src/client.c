@@ -340,6 +340,7 @@ client_above(Client *c)
 void
 client_focus(Client *c)
 {
+     Client *cc;
      Window w;
      int d;
 
@@ -365,6 +366,14 @@ client_focus(Client *c)
           c->colors.frame = conf.client.borderfocus;
           c->colors.fg = conf.titlebar.fg_focus;
           c->colors.resizecorner = conf.client.resizecorner_focus;
+
+          /* Set focusontag option */
+          for(cc = clients; cc; cc = cc->next)
+               if(cc->focusontag == c->tag)
+                    cc->focusontag = -1;
+
+          c->focusontag = seltag[selscreen];
+
           if(TBARH - BORDH && c->titlebar->stipple)
                c->titlebar->stipple_color = conf.titlebar.stipple.colors.focus;
           frame_update(c);
@@ -616,7 +625,7 @@ client_map(Client *c)
 {
      CHECK(c);
 
-     if(c->flags & FSSFlag)
+     if(c->flags & FSSFlag || c->flags & DockFlag)
           XMapWindow(dpy, c->win);
      else
      {
@@ -689,9 +698,9 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      c->ogeo.height = c->geo.height = wa->height;
      c->free_geo = c->geo;
      c->tag = seltag[c->screen];
+     c->focusontag = -1;
 
      c->layer = (sel && sel->layer > 0) ? sel->layer : 1;
-
 
      at.event_mask = PropertyChangeMask;
 
@@ -725,9 +734,9 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      client_raise(c);
      setwinstate(c->win, NormalState);
      ewmh_get_client_list();
-     ewmh_manage_window_type(c);
      client_update_attributes(c);
      client_map(c);
+     ewmh_manage_window_type(c);
      client_focus(c);
 
      if(ar)
@@ -833,8 +842,8 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
 
      XMoveResizeWindow(dpy, c->win, BORDH, TBARH, c->geo.width, c->geo.height);
 
-     client_configure(c);
      client_update_attributes(c);
+     client_configure(c);
 
      return;
 }
@@ -949,7 +958,7 @@ client_swap(Client *c1, Client *c2)
      CHECK(!(c1->flags & FreeFlag));
      CHECK(!(c2->flags & FreeFlag));
 
-     if(c1 == c2 || (c1->screen == c2->screen && c1->tag != c2->tag))
+     if(c1 == c2)
           return;
 
      /* Swap only the windows */
@@ -1092,13 +1101,34 @@ client_unhide(Client *c)
      return;
 }
 
+/** Select next or previous client to don't lose focus
+  * \param c Client pointer
+  */
+void
+client_focus_next(Client *c)
+{
+     Client *c_next = NULL;
+
+     for(c_next = clients;
+         c_next && c_next != c->prev
+              && c_next->tag != c->tag
+              && c_next->screen != c->screen;
+         c_next = c_next->next);
+
+     if(c_next && c_next->tag == seltag[selscreen]
+        && c_next->screen == selscreen)
+          client_focus(c_next);
+
+     return;
+}
+
+
 /** Unmanage a client
  * \param c Client pointer
 */
 void
 client_unmanage(Client *c)
 {
-     Client *c_next = NULL;
      Bool b = False;
      int i;
 
@@ -1122,7 +1152,7 @@ client_unmanage(Client *c)
 
      /* Arrange */
      for(i = 0; i < screen_count() && !b; ++i)
-          if(c->tag == seltag[i])
+          if(c->tag == seltag[i] || tags[i][seltag[i]].tagad & TagFlag(c->tag))
                b = True;
 
      if(b)
@@ -1135,16 +1165,7 @@ client_unmanage(Client *c)
 
      XFree(c->title);
 
-     /* To focus the previous client */
-     for(c_next = clients;
-         c_next && c_next != c->prev
-              && c_next->tag != c->tag
-              && c_next->screen != c->screen;
-         c_next = c_next->next);
-
-     if(c_next && c_next->tag == seltag[selscreen]
-        && c_next->screen == selscreen)
-          client_focus(c_next);
+     client_focus_next(c);
 
      free(c);
 

@@ -92,6 +92,8 @@ quit(void)
      IFREE(tags);
      IFREE(seltag);
 
+     systray_freeicons();
+
      XftFontClose(dpy, font);
      for(i = 0; i < CurLast; ++i)
           XFreeCursor(dpy, cursor[i]);
@@ -214,26 +216,27 @@ scan(void)
 
      if(XQueryTree(dpy, ROOT, &usl, &usl2, &w, &n))
           for(i = n - 1; i != -1; --i)
-               if(XGetWindowAttributes(dpy, w[i], &wa)
-                  && !(wa.override_redirect || XGetTransientForHint(dpy, w[i], &usl))
-                  && wa.map_state == IsViewable)
+          {
+               XGetWindowAttributes(dpy, w[i], &wa);
+
+               if(!wa.override_redirect && wa.map_state == IsViewable)
                {
                     if(XGetWindowProperty(dpy, w[i], ATOM("_WMFS_TAG"), 0, 32,
-                                          False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
+                                   False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
                     {
                          tag = *ret;
                          XFree(ret);
                     }
 
                     if(XGetWindowProperty(dpy, w[i], ATOM("_WMFS_SCREEN"), 0, 32,
-                                          False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
+                                   False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
                     {
                          screen = *ret;
                          XFree(ret);
                     }
 
                     if(XGetWindowProperty(dpy, w[i], ATOM("_WMFS_ISFREE"), 0, 32,
-                                          False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
+                                   False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
                     {
                          free = *ret;
                          XFree(ret);
@@ -250,6 +253,7 @@ scan(void)
 
                     client_update_attributes(c);
                }
+          }
 
      /* Set update layout request */
      for(c = clients; c; c = c->next)
@@ -319,14 +323,10 @@ check_wmfs_running(void)
 void
 exec_uicb_function(char *func, char *cmd)
 {
-     long data[5];
-
      /* Check if wmfs is running (this function is executed when wmfs
       is already running normally...) */
      if(!check_wmfs_running())
           return;
-
-     data[4] = True;
 
      XChangeProperty(dpy, ROOT, ATOM("_WMFS_FUNCTION"), ATOM("UTF8_STRING"),
                      8, PropModeReplace, (uchar*)func, strlen(func));
@@ -337,7 +337,7 @@ exec_uicb_function(char *func, char *cmd)
      XChangeProperty(dpy, ROOT, ATOM("_WMFS_CMD"), ATOM("UTF8_STRING"),
                      8, PropModeReplace, (uchar*)cmd, strlen(cmd));
 
-     send_client_event(data, "_WMFS_FUNCTION");
+     ewmh_send_message(ROOT, ROOT, "_WMFS_FUNCTION", 0, 0, 0, 0, True);
 
      return;
 }
@@ -349,10 +349,7 @@ void
 set_statustext(int s, char *str)
 {
      int i;
-     long data[5];
      char atom_name[64];
-
-     data[4] = True;
 
      if(!str)
           return;
@@ -366,7 +363,7 @@ set_statustext(int s, char *str)
                XChangeProperty(dpy, ROOT, ATOM(atom_name), ATOM("UTF8_STRING"),
                          8, PropModeReplace, (uchar*)str, strlen(str));
 
-               send_client_event(data, atom_name);
+               ewmh_send_message(ROOT, ROOT, atom_name, 0, 0, 0, 0, True);
           }
      }
      else
@@ -376,7 +373,7 @@ set_statustext(int s, char *str)
           XChangeProperty(dpy, ROOT, ATOM(atom_name), ATOM("UTF8_STRING"),
                          8, PropModeReplace, (uchar*)str, strlen(str));
 
-          send_client_event(data, atom_name);
+               ewmh_send_message(ROOT, ROOT, atom_name, 0, 0, 0, 0, True);
      }
 
      return;
@@ -387,14 +384,10 @@ set_statustext(int s, char *str)
 void
 update_status(void)
 {
-     long data[5];
-
      if(!check_wmfs_running())
           return;
 
-     data[4] = True;
-
-     send_client_event(data, "_WMFS_UPDATE_STATUS");
+     ewmh_send_message(ROOT, ROOT, "_WMFS_UPDATE_STATUS", 0, 0, 0, 0, True);
 
      return;
 }

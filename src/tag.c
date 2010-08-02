@@ -42,6 +42,9 @@ tag_set(int tag)
      Bool al = False;
      int i;
 
+     if(tag < 0 || tag > MAXTAG)
+          return;
+
      screen_get_sel();
 
      prevseltag[selscreen] = seltag[selscreen];
@@ -102,10 +105,16 @@ tag_set(int tag)
           tags[selscreen][tag].request_update = False;
      }
 
-     /* To focus the first client in the new tag */
+     /* To focus selected client of the via focusontag option */
      for(c = clients; c; c = c->next)
-          if(c->tag == seltag[selscreen] && c->screen == selscreen)
+          if(c->focusontag == tag && c->screen == selscreen)
                break;
+
+     /* No focusontag option found on any client, try to find the first of the tag */
+     if(!c)
+          for(c = clients; c; c = c->next)
+               if(c->tag == seltag[selscreen] && c->screen == selscreen)
+                    break;
 
      client_focus((c) ? c : NULL);
 
@@ -123,7 +132,7 @@ tag_transfert(Client *c, int tag)
 
      CHECK(c);
 
-     if(!tag)
+     if(tag <= 0)
           tag = 1;
 
      if(tag > conf.ntag[selscreen])
@@ -134,8 +143,7 @@ tag_transfert(Client *c, int tag)
 
      arrange(c->screen, True);
 
-     if(c == sel && c->tag != tag)
-          client_focus(NULL);
+     client_focus_next(c);
 
      client_update_attributes(c);
 
@@ -502,9 +510,9 @@ tag_new(int s, char *name)
          displayedName = name;
 
      Tag t = { displayedName, NULL, 0, 0,
-               conf.default_tag.mwfact, conf.default_tag.nmaster, 
+               conf.default_tag.mwfact, conf.default_tag.nmaster,
                False, conf.default_tag.resizehint, False, False,
-               conf.default_tag.barpos, conf.default_tag.layout, 
+               conf.default_tag.barpos, conf.default_tag.layout,
                0, NULL, 0 };
 
 

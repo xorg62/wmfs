@@ -77,6 +77,7 @@ buttonpress(XButtonEvent *ev)
                if(ev->button == conf.client.mouse[i].button)
                     if(conf.client.mouse[i].func)
                          conf.client.mouse[i].func(conf.client.mouse[i].cmd);
+
      /* Root */
      if(ev->window == ROOT)
           for(i = 0; i < conf.root.nmouse; ++i)
@@ -162,6 +163,7 @@ void
 clientmessageevent(XClientMessageEvent *ev)
 {
      Client *c;
+     Systray *sy;
      int s, i, mess_t = 0;
      Atom rt;
      int rf;
@@ -195,8 +197,28 @@ clientmessageevent(XClientMessageEvent *ev)
 
           /* Manage _NET_ACTIVE_WINDOW */
           else if(mess_t == net_active_window)
+          {
                if((c = client_gb_win(ev->window)))
                     client_focus(c);
+               else if((sy = systray_find(ev->data.l[0])))
+                    XSetInputFocus(dpy, sy->win, RevertToNone, CurrentTime);
+          }
+     }
+     else if(ev->window == traywin)
+     {
+          /* Manage _NET_WM_SYSTEM_TRAY_OPCODE */
+          if(mess_t == net_wm_system_tray_opcode)
+          {
+               if(ev->data.l[1] == XEMBED_EMBEDDED_NOTIFY)
+               {
+                    systray_add(ev->data.l[2]);
+                    systray_update();
+               }
+               else if(ev->data.l[1] == XEMBED_REQUEST_FOCUS)
+                    if((sy = systray_find(ev->data.l[2])))
+                         ewmh_send_message(sy->win, sy->win, "_XEMBED",
+                                   XEMBED_FOCUS_IN, XEMBED_FOCUS_CURRENT, 0, 0, 0);
+          }
      }
 
      /* Manage _NET_WM_STATE */
@@ -211,7 +233,7 @@ clientmessageevent(XClientMessageEvent *ev)
 
      /* Manage _NET_WM_DESKTOP */
      if(mess_t == net_wm_desktop)
-          if((c = client_gb_win(ev->window)))
+          if((c = client_gb_win(ev->window)) && ev->data.l[0] != 0xFFFFFFFF)
                tag_transfert(c, ev->data.l[0]);
 
      /* Manage _WMFS_STATUSTEXT_x */
@@ -262,8 +284,8 @@ clientmessageevent(XClientMessageEvent *ev)
      return;
 }
 
-/** ConfigureRequest & ConfigureNotify handle events
- * \param ev XEvent pointer
+/** ConfigureRequesthandle events
+ * \param ev XConfigureRequestEvent pointer
 */
 void
 configureevent(XConfigureRequestEvent *ev)
@@ -275,7 +297,6 @@ configureevent(XConfigureRequestEvent *ev)
      if((c = client_gb_win(ev->window))
         || (c = client_gb_win(ev->window)))
      {
-          CHECK(!(c->flags & TileFlag));
           CHECK(!(c->flags & LMaxFlag));
           CHECK(!(c->flags & MaxFlag));
           CHECK(!(c->flags & FSSFlag));
@@ -292,8 +313,13 @@ configureevent(XConfigureRequestEvent *ev)
           if(ev->value_mask & CWHeight)
                c->geo.height = ev->height;
 
-          if(c->flags & FreeFlag)
+          if(c->flags & FreeFlag || !(c->flags & (TileFlag | LMaxFlag)))
                client_moveresize(c, c->geo, False);
+          else
+          {
+               client_configure(c);
+               arrange(c->screen, True);
+          }
      }
      else
      {
@@ -318,11 +344,18 @@ void
 destroynotify(XDestroyWindowEvent *ev)
 {
      Client *c;
+     Systray *s;
 
      if((c = client_gb_win(ev->window)))
      {
           client_unmanage(c);
           XSetErrorHandler(errorhandler);
+     }
+     else if((s = systray_find(ev->window)))
+     {
+          setwinstate(s->win, WithdrawnState);
+          systray_del(s);
+          systray_update();
      }
 
      return;
@@ -335,11 +368,16 @@ void
 enternotify(XCrossingEvent *ev)
 {
      Client *c;
+     Systray *s;
      int n;
 
      if((ev->mode != NotifyNormal
          || ev->detail == NotifyInferior)
         && ev->window != ROOT)
+          return;
+
+     /* Don't handle EnterNotify event if it's about systray */
+     if((s = systray_find(ev->window)) || ev->window == traywin)
           return;
 
      if(conf.focus_fmouse)
@@ -441,7 +479,7 @@ keypress(XKeyPressedEvent *ev)
      return;
 }
 
-/** MapNotify handle event
+/** MappingNotify handle event
  * \param ev XMappingEvent pointer
 */
 void
@@ -455,6 +493,29 @@ mappingnotify(XMappingEvent *ev)
      return;
 }
 
+/** MapNotify handle event
+  * \param ev XMapEvent pointer
+  */
+void
+mapnotify(XMapEvent *ev)
+{
+     Client *c;
+     Systray *s;
+
+     if(ev->window != ev->event && !ev->send_event)
+          return;
+
+     if((c = client_gb_win(ev->window)))
+          setwinstate(c->win, NormalState);
+     else if((s = systray_find(ev->window)))
+     {
+          setwinstate(s->win, NormalState);
+          ewmh_send_message(s->win, s->win, "_XEMBED", CurrentTime, XEMBED_WINDOW_ACTIVATE, 0, 0, 0);
+     }
+
+     return;
+}
+
 /** MapRequest handle event
  * \param ev XMapRequestEvent pointer
 */
@@ -463,11 +524,17 @@ maprequest(XMapRequestEvent *ev)
 {
      XWindowAttributes at;
      Client *c;
+     Systray *s;
 
      CHECK(XGetWindowAttributes(dpy, ev->window, &at));
      CHECK(!at.override_redirect);
 
-     if(!(c = client_gb_win(ev->window)))
+     if((s = systray_find(ev->window)))
+     {
+          ewmh_send_message(s->win, s->win, "_XEMBED", CurrentTime, XEMBED_WINDOW_ACTIVATE, 0, 0, 0);
+          systray_update();
+     }
+     else if(!(c = client_gb_win(ev->window)))
           client_manage(ev->window, &at, True);
 
      return;
@@ -480,11 +547,18 @@ void
 propertynotify(XPropertyEvent *ev)
 {
      Client *c;
+     Systray *s;
      Window trans;
      XWMHints *h;
 
      if(ev->state == PropertyDelete)
           return;
+
+     if((s = systray_find(ev->window)))
+     {
+          systray_state(s);
+          systray_update();
+     }
 
      if((c = client_gb_win(ev->window)))
      {
@@ -494,7 +568,7 @@ propertynotify(XPropertyEvent *ev)
                XGetTransientForHint(dpy, c->win, &trans);
                if((c->flags & TileFlag || c->flags & MaxFlag))
                     if(((c->flags & HintFlag && (client_gb_win(trans) != NULL)))
-                       || (!(c->flags & HintFlag && (client_gb_win(trans) != NULL))))
+                              || (!(c->flags & HintFlag && (client_gb_win(trans) != NULL))))
                          arrange(c->screen, True);
                break;
           case XA_WM_NORMAL_HINTS:
@@ -524,6 +598,33 @@ propertynotify(XPropertyEvent *ev)
      return;
 }
 
+/** XReparentEvent handle event
+ * \param ev XReparentEvent pointer
+ */
+void
+reparentnotify(XReparentEvent *ev)
+{
+
+     return;
+}
+
+
+/** SelectionClearEvent handle event
+ * \param ev XSelectionClearEvent pointer
+ */
+void
+selectionclearevent(XSelectionClearEvent *ev)
+{
+     /* Getting selection if lost it */
+     if(ev->window == traywin)
+          systray_acquire();
+
+     systray_update();
+
+     return;
+}
+
+
 /** UnmapNotify handle event
  * \param ev XUnmapEvent pointer
  */
@@ -531,6 +632,7 @@ void
 unmapnotify(XUnmapEvent *ev)
 {
      Client *c;
+     Systray *s;
 
      if((c = client_gb_win(ev->window))
         && ev->send_event
@@ -540,31 +642,11 @@ unmapnotify(XUnmapEvent *ev)
           XSetErrorHandler(errorhandler);
      }
 
-     return;
-}
-
-/** Send a client event
- *\param data Event data
- *\param atom_name Event atom name
- */
-void
-send_client_event(long data[5], char *atom_name)
-{
-     XEvent ev;
-     int i;
-
-     ev.xclient.type = ClientMessage;
-     ev.xclient.serial = 0;
-     ev.xclient.send_event = True;
-     ev.xclient.message_type = ATOM(atom_name);
-     ev.xclient.window = ROOT;
-     ev.xclient.format = 32;
-
-     for(i = 0; i < 5; ++i, ev.xclient.data.l[i] = data[i]);
-
-     XSendEvent(dpy, ROOT, False, SubstructureRedirectMask | SubstructureNotifyMask, &ev);
-     XSync(dpy, False);
-
+     if((s = systray_find(ev->window)))
+     {
+          systray_del(s);
+          systray_update();
+     }
 
      return;
 }
@@ -579,18 +661,21 @@ getevent(XEvent ev)
 
      switch(ev.type)
      {
-     case ButtonPress:      buttonpress(&ev.xbutton);              break;
-     case ClientMessage:    clientmessageevent(&ev.xclient);       break;
-     case ConfigureRequest: configureevent(&ev.xconfigurerequest); break;
-     case DestroyNotify:    destroynotify(&ev.xdestroywindow);     break;
-     case EnterNotify:      enternotify(&ev.xcrossing);            break;
-     case Expose:           expose(&ev.xexpose);                   break;
-     case FocusIn:          focusin(&ev.xfocus);                   break;
-     case KeyPress:         keypress(&ev.xkey);                    break;
-     case MapRequest:       maprequest(&ev.xmaprequest);           break;
-     case MappingNotify:    mappingnotify(&ev.xmapping);           break;
-     case PropertyNotify:   propertynotify(&ev.xproperty);         break;
-     case UnmapNotify:      unmapnotify(&ev.xunmap);               break;
+     case ButtonPress:      buttonpress(&ev.xbutton);                 break;
+     case ClientMessage:    clientmessageevent(&ev.xclient);          break;
+     case ConfigureRequest: configureevent(&ev.xconfigurerequest);    break;
+     case DestroyNotify:    destroynotify(&ev.xdestroywindow);        break;
+     case EnterNotify:      enternotify(&ev.xcrossing);               break;
+     case Expose:           expose(&ev.xexpose);                      break;
+     case FocusIn:          focusin(&ev.xfocus);                      break;
+     case KeyPress:         keypress(&ev.xkey);                       break;
+     case MapNotify:        mapnotify(&ev.xmap);                      break;
+     case MapRequest:       maprequest(&ev.xmaprequest);              break;
+     case MappingNotify:    mappingnotify(&ev.xmapping);              break;
+     case PropertyNotify:   propertynotify(&ev.xproperty);            break;
+     case ReparentNotify:   reparentnotify(&ev.xreparent);            break;
+     case SelectionClear:   selectionclearevent(&ev.xselectionclear); break;
+     case UnmapNotify:      unmapnotify(&ev.xunmap);                  break;
      default:
 
 #ifdef HAVE_XRANDR

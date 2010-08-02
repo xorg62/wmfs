@@ -20,6 +20,17 @@
         border = true
         # selbar = false   #not worked now, see section [selbar]
 
+        [systray]
+                # Enable/disable systray
+                active = true
+
+                # Screen of systray
+                screen = 0
+
+                # Spacing between tray icons
+                spacing = 3
+        [/systray]
+
         # Remove this section to disable the selbar.
         [selbar]
                 bg = "#191919"

@@ -46,6 +46,8 @@ ewmh_init_hints(void)
      char root_name[] = WMFS_VERSION;
      char class[] = "wmfs", st[64];
      long pid = (long)getpid();
+     char systray_atom[48];
+
 
      s = screen_count();
      net_atom = emalloc(net_last + s, sizeof(Atom));
@@ -77,6 +79,17 @@ ewmh_init_hints(void)
      net_atom[net_wm_state_fullscreen]        = ATOM("_NET_WM_STATE_FULLSCREEN");
      net_atom[net_wm_state_sticky]            = ATOM("_NET_WM_STATE_STICKY");
      net_atom[net_wm_state_demands_attention] = ATOM("_NET_WM_STATE_DEMANDS_ATTENTION");
+     net_atom[net_wm_system_tray_opcode]      = ATOM("_NET_SYSTEM_TRAY_OPCODE");
+     net_atom[net_system_tray_message_data]   = ATOM("_NET_SYSTEM_TRAY_MESSAGE_DATA");
+     net_atom[net_system_tray_visual]         = ATOM("_NET_SYSTEM_TRAY_VISUAL");
+
+     snprintf(systray_atom, sizeof(systray_atom), "_NET_SYSTEM_TRAY_S%d", 0/*SCREEN*/);
+     net_atom[net_system_tray_s]              = ATOM(systray_atom);
+
+     net_atom[net_system_tray_orientation]    = ATOM("_NET_SYSTEM_TRAY_ORIENTATION");
+     net_atom[xembed]                         = ATOM("_XEMBED");
+     net_atom[xembedinfo]                     = ATOM("_XEMBED_INFO");
+     net_atom[manager]                        = ATOM("MANAGER");
      net_atom[utf8_string]                    = ATOM("UTF8_STRING");
 
      /* WMFS hints */
@@ -126,6 +139,54 @@ ewmh_init_hints(void)
                      PropModeReplace, (uchar*)&showing_desk, 1);
 
      return;
+}
+
+/** Send ewmh message
+  */
+void
+ewmh_send_message(Window d, Window w, char *atom, long d0, long d1, long d2, long d3, long d4)
+{
+
+     XClientMessageEvent e;
+
+     e.type          = ClientMessage;
+     e.message_type  = ATOM(atom);
+     e.window        = w;
+     e.format        = 32;
+     e.data.l[0]     = d0;
+     e.data.l[1]     = d1;
+     e.data.l[2]     = d2;
+     e.data.l[3]     = d3;
+     e.data.l[4]     = d4;
+
+     XSendEvent(dpy, d, False, StructureNotifyMask, (XEvent*)&e);
+     XSync(dpy, False);
+
+     return;
+}
+
+/** Get xembed state
+ */
+long
+ewmh_get_xembed_state(Window win)
+{
+     Atom rf;
+     int f;
+     ulong n, il;
+     long ret = 0;
+     uchar *data = NULL;
+
+     if(XGetWindowProperty(dpy, win, net_atom[xembedinfo], 0L, 2, False,
+                    net_atom[xembedinfo], &rf, &f, &n, &il, &data) != Success)
+          return 0;
+
+     if(rf == net_atom[xembedinfo] && n == 2)
+          ret = (long)data[1];
+
+     if(n && data)
+          XFree(data);
+
+     return ret;
 }
 
 /** Get the number of desktop (tag)
@@ -380,6 +441,8 @@ ewmh_manage_window_type(Client *c)
                     /* Reparent it to ROOT win */
                     XReparentWindow(dpy, c->win, ROOT, c->geo.x, c->geo.y);
                     XRaiseWindow(dpy, c->win);
+
+                    c->flags |= DockFlag;
                }
                /* MANAGE _NET_WM_WINDOW_TYPE_DIALOG */
                else if(atom[i] == net_atom[net_wm_window_type_dialog])
@@ -406,7 +469,6 @@ ewmh_manage_window_type(Client *c)
                ldata[1] = atom[i];
                ewmh_manage_net_wm_state(ldata, c);
           }
-
           XFree(data);
      }
 

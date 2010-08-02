@@ -173,14 +173,10 @@ getinfo_nmaster(void)
 void
 getinfo(char *info)
 {
-     long data[5];
-
      if(!check_wmfs_running())
           return;
 
-     data[4] = True;
-
-     send_client_event(data, "_WMFS_UPDATE_HINTS");
+     ewmh_send_message(ROOT, ROOT, "_WMFS_UPDATE_HINTS", 0, 0, 0, 0, True);
 
      if(!strcmp(info, "tag"))
           getinfo_tag();

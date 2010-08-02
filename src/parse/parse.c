@@ -520,7 +520,7 @@ fetch_section_first(struct conf_sec *s, char *name)
      if (!s)
      {
           TAILQ_FOREACH(sec, &config, entry)
-               if (!strcmp(sec->name, name)) {
+               if(sec->name && !strcmp(sec->name, name)) {
                    ret = sec;
                    break;
                }
@@ -528,7 +528,7 @@ fetch_section_first(struct conf_sec *s, char *name)
      else
      {
          TAILQ_FOREACH(sec, &s->sub, entry)
-              if (!strcmp(sec->name, name)) {
+              if (sec->name && !strcmp(sec->name, name)) {
                   ret = sec;
                   break;
               }

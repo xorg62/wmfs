@@ -222,7 +222,8 @@ frame_update(Client *c)
                     XClearWindow(dpy, c->button[i]);
 
                     if((!conf.titlebar.button[i].flags)
-                              || ((conf.titlebar.button[i].flags & FreeFlag) && (c->flags & FreeFlag))
+                              || ((conf.titlebar.button[i].flags & FreeFlag)
+                                   && ((c->flags & FreeFlag) || !(c->flags & (TileFlag | LMaxFlag))))
                               || ((conf.titlebar.button[i].flags &  MaxFlag) && (c->flags &  MaxFlag))
                               || ((conf.titlebar.button[i].flags & TileFlag) && (c->flags & TileFlag)))
                     {
