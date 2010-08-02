@@ -54,7 +54,7 @@ systray_acquire(void)
      wattr.background_pixmap = ParentRelative;
      wattr.background_pixel  = conf.colors.bar;
 
-     traywin = XCreateSimpleWindow(dpy, ROOT, -1, -1, 1, 1, 0, 0, conf.colors.bar);
+     traywin = XCreateSimpleWindow(dpy, infobar[conf.systray.screen].bar->win, -1, -1, 1, 1, 0, 0, conf.colors.bar);
 
      XChangeWindowAttributes(dpy, traywin, CWEventMask | CWOverrideRedirect | CWBackPixel, &wattr);
      XSelectInput(dpy, traywin, KeyPressMask | ButtonPressMask);
