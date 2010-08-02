@@ -297,7 +297,6 @@ configureevent(XConfigureRequestEvent *ev)
      if((c = client_gb_win(ev->window))
         || (c = client_gb_win(ev->window)))
      {
-          CHECK(!(c->flags & TileFlag));
           CHECK(!(c->flags & LMaxFlag));
           CHECK(!(c->flags & MaxFlag));
           CHECK(!(c->flags & FSSFlag));
@@ -314,8 +313,13 @@ configureevent(XConfigureRequestEvent *ev)
           if(ev->value_mask & CWHeight)
                c->geo.height = ev->height;
 
-          if(c->flags & FreeFlag)
+          if(c->flags & FreeFlag || !(c->flags & (TileFlag | LMaxFlag)))
                client_moveresize(c, c->geo, False);
+          else
+          {
+               client_configure(c);
+               arrange(c->screen, True);
+          }
      }
      else
      {
