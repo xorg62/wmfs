@@ -102,6 +102,8 @@ mouse_move_tag_client(Client *c)
                     arrange(c->screen, True);
           }
 
+     client_focus_next(c);
+
      return;
 }
 

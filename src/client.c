@@ -340,6 +340,7 @@ client_above(Client *c)
 void
 client_focus(Client *c)
 {
+     Client *cc;
      Window w;
      int d;
 
@@ -365,6 +366,14 @@ client_focus(Client *c)
           c->colors.frame = conf.client.borderfocus;
           c->colors.fg = conf.titlebar.fg_focus;
           c->colors.resizecorner = conf.client.resizecorner_focus;
+
+          /* Set focusontag option */
+          for(cc = clients; cc; cc = cc->next)
+               if(cc->focusontag == c->tag)
+                    cc->focusontag = -1;
+
+          c->focusontag = seltag[selscreen];
+
           if(TBARH - BORDH && c->titlebar->stipple)
                c->titlebar->stipple_color = conf.titlebar.stipple.colors.focus;
           frame_update(c);
@@ -689,6 +698,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      c->ogeo.height = c->geo.height = wa->height;
      c->free_geo = c->geo;
      c->tag = seltag[c->screen];
+     c->focusontag = -1;
 
      c->layer = (sel && sel->layer > 0) ? sel->layer : 1;
 

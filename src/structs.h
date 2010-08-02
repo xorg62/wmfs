@@ -184,6 +184,7 @@ struct Client
      char *title;
      /* Tag num */
      uint tag;
+     int focusontag;
      /* Screen */
      int screen;
      /* Layer */
