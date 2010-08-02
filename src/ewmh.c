@@ -469,7 +469,6 @@ ewmh_manage_window_type(Client *c)
                ldata[1] = atom[i];
                ewmh_manage_net_wm_state(ldata, c);
           }
-
           XFree(data);
      }
 

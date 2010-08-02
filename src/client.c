@@ -726,8 +726,8 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      ewmh_get_client_list();
      client_update_attributes(c);
      client_map(c);
-     client_focus(c);
      ewmh_manage_window_type(c);
+     client_focus(c);
 
      if(ar)
           arrange(c->screen, True);
