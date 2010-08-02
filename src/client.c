@@ -948,7 +948,7 @@ client_swap(Client *c1, Client *c2)
      CHECK(!(c1->flags & FreeFlag));
      CHECK(!(c2->flags & FreeFlag));
 
-     if(c1 == c2 || (c1->screen == c2->screen && c1->tag != c2->tag))
+     if(c1 == c2)
           return;
 
      /* Swap only the windows */
