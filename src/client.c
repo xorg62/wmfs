@@ -828,11 +828,10 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
           c->flags &= ~FLayFlag;
      }
 
-     c->geo = c->ogeo = geo;
+     c->geo = geo;
 
-     if(c->flags & FreeFlag || tags[c->screen][c->tag].layout.func == freelayout
-               || conf.keep_layout_geo)
-          c->free_geo = geo;
+     if(c->flags & FreeFlag || !(c->flags & (TileFlag | LMaxFlag)) || conf.keep_layout_geo)
+          c->free_geo = c->geo;
 
      if((c->screen = screen_get_with_geo(c->geo.x, c->geo.y)) != os
                && c->tag != MAXTAG + 1)
@@ -854,19 +853,17 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
 void
 client_maximize(Client *c)
 {
-     XRectangle geo;
-
      if(!c || c->flags & FSSFlag)
           return;
 
      c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
 
-     geo.x = sgeo[c->screen].x;
-     geo.y = sgeo[c->screen].y;
-     geo.width  = sgeo[c->screen].width  - BORDH * 2;
-     geo.height = sgeo[c->screen].height - BORDH;
+     c->geo.x = sgeo[c->screen].x;
+     c->geo.y = sgeo[c->screen].y;
+     c->geo.width  = sgeo[c->screen].width  - BORDH * 2;
+     c->geo.height = sgeo[c->screen].height - BORDH;
 
-     client_moveresize(c, geo, False);
+     client_moveresize(c, c->geo, False);
 
      return;
 }
