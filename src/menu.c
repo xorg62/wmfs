@@ -49,6 +49,7 @@ menu_init(Menu *menu, char *name, int nitem, uint bg_f, char *fg_f, uint bg_n, c
      return;
 }
 
+
 void
 menu_new_item(MenuItem *mi, char *name, void *func, char *cmd)
 {
@@ -124,6 +125,7 @@ menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
      int i, c = 0;
      KeySym ks;
      Bool quit = False;
+     char acc = 0;
 
      switch(ev->type)
      {
@@ -178,7 +180,20 @@ menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
           /* For focus an item with the mouse */
           for(i = 0; i < menu->nitem; ++i)
                if(ev->xcrossing.window == winitem[i]->win)
+               {
+                    acc = 1;
                     menu_focus_item(menu, i, winitem);
+                    if(menu->item[i].submenu)
+                       menu_activate_item(menu, menu->focus_item);
+               }
+
+          if(!acc)
+          {
+               if(ev->xcrossing.window)
+                    XSendEvent(dpy, ev->xcrossing.window, False, StructureNotifyMask, ev);
+
+               return True;
+          }
           break;
 
      default:
