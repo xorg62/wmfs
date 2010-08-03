@@ -846,7 +846,7 @@ uicb_togglemax(uicb_t cmd)
      }
      else
      {
-          sel->geo = sel->free_geo;
+          sel->geo = sel->ogeo;
           client_moveresize(sel, sel->geo, True);
           sel->flags &= ~MaxFlag;
           tags[selscreen][seltag[selscreen]].layout.func(selscreen);
