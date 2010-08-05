@@ -230,43 +230,6 @@ uicb_set_nmaster(uicb_t cmd)
      return;
 }
 
-void
-uicb_set_client_layer(uicb_t cmd)
-{
-     int n = atoi(cmd);
-
-     screen_get_sel();
-
-     CHECK(sel);
-
-     if(sel->layer + n < 1
-               || sel->layer + n > tags[selscreen][seltag[selscreen]].layers)
-          return;
-
-     sel->layer += n;
-
-     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
-
-     return;
-}
-
-void
-uicb_set_layer(uicb_t cmd)
-{
-     int n = atoi(cmd);
-
-     screen_get_sel();
-
-     if(tags[selscreen][seltag[selscreen]].layers + n < 1)
-          return;
-
-     tags[selscreen][seltag[selscreen]].layers += n;
-     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
-
-     return;
-}
-
-
 /** Grid layout function
 */
 void
@@ -632,72 +595,6 @@ mirror(int screen, Bool horizontal)
           }
 
      }
-
-     ewmh_update_current_tag_prop();
-
-     return;
-}
-
-/** Layer layout function
-*/
-void
-layer(int screen)
-{
-     Client *c;
-     XRectangle geo = { 0 };
-     XRectangle sg = sgeo[screen];
-     int n, i, l = tags[screen][seltag[screen]].layers;
-     int *x = NULL;
-     int *nl = NULL;
-     int *ncl = NULL;
-
-     for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
-     CHECK(n);
-
-     x = emalloc(l + 1, sizeof(int));
-     nl = emalloc(l + 1, sizeof(int));
-     ncl = emalloc(l + 1, sizeof(int));
-
-     for(i = 0; i < l + 1; ++i)
-     {
-          x[i] = sg.x;
-          nl[i] = 0;
-          ncl[i] = 0;
-     }
-
-     for(c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next))
-     {
-          for(; c->layer > l; --(c->layer));
-          ++nl[c->layer];
-     }
-
-     for(i = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
-     {
-          /* Set client property */
-          c->flags &= ~(MaxFlag | LMaxFlag);
-          c->flags |= TileFlag;
-
-          ++ncl[c->layer];
-
-          geo.x = x[c->layer];
-          geo.height = (sg.height / l) - (BORDH + TBARH);
-          geo.width = (sg.width / ((nl[c->layer]) ? nl[c->layer] : 1)) - BORDH * 2;
-          geo.y = sg.y + ((geo.height + TBARH + BORDH) * c->layer) - (geo.height + TBARH + BORDH);
-
-          if(c->layer == l)
-               geo.height = (sg.y + sg.height) - geo.y - BORDH;
-
-          if(ncl[c->layer] == nl[c->layer])
-               geo.width = sg.width - (geo.x - (sg.x - (BORDH * 2)));
-
-          client_moveresize(c, geo, False);
-
-          x[c->layer] = geo.x + geo.width + BORDH * 2;
-     }
-
-     free(x);
-     free(nl);
-     free(ncl);
 
      ewmh_update_current_tag_prop();
 
