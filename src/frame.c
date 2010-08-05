@@ -224,7 +224,8 @@ frame_update(Client *c)
                     if((!conf.titlebar.button[i].flags)
                               || ((conf.titlebar.button[i].flags & FreeFlag)
                                    && ((c->flags & FreeFlag) || !(c->flags & (TileFlag | LMaxFlag))))
-                              || ((conf.titlebar.button[i].flags &  MaxFlag) && (c->flags &  MaxFlag))
+                              || ((conf.titlebar.button[i].flags &  MaxFlag)
+                                   && ((c->flags &  MaxFlag) || (c->flags & LMaxFlag)))
                               || ((conf.titlebar.button[i].flags & TileFlag) && (c->flags & TileFlag)))
                     {
 
