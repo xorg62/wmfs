@@ -87,8 +87,6 @@ func_name_list_t tmp_func_list[] =
      {"launcher",                 uicb_launcher },
      {"set_layout",               uicb_set_layout },
      {"menu",                     uicb_menu },
-     {"set_client_layer",         uicb_set_client_layer },
-     {"set_layer",                uicb_set_layer },
      {"ignore_next_client_rules", uicb_ignore_next_client_rules },
      {"check_max",                uicb_checkmax },
      {"check_free",               uicb_checkfree },
