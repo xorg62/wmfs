@@ -1367,6 +1367,8 @@ uicb_clientlist(uicb_t cmd)
                     conf.colors.bar,
                     conf.colors.text);
 
+          clientlist.align = MA_Left;
+
           for(i = 0, c = clients; c; c = c->next)
                if(!ishide(c, selscreen) || all)
                {
