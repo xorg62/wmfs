@@ -1342,13 +1342,17 @@ uicb_clientlist(uicb_t cmd)
 {
      int i, d, u, x, y;
      int n = 0;
+     Bool all = False;
      Window w;
      Client *c = NULL;
 
      screen_get_sel();
 
+     if(cmd && !strcmp(cmd, "all"))
+          all = True;
+
      for(c = clients; c; c = c->next)
-          if(!ishide(c, selscreen))
+          if(!ishide(c, selscreen) || all)
                ++n;
 
      if(n > 0)
@@ -1364,7 +1368,7 @@ uicb_clientlist(uicb_t cmd)
                     conf.colors.text);
 
           for(i = 0, c = clients; c; c = c->next)
-               if(!ishide(c, selscreen))
+               if(!ishide(c, selscreen) || all)
                {
                     sprintf(clist_index[i].key, "%d", i);
                     clist_index[i].client = c;
@@ -1401,6 +1405,12 @@ uicb_client_select(uicb_t cmd)
      for(i = 0; i < MAXCLIST && clist_index[i].client; ++i)
           if(!strcmp(cmd, clist_index[i].key))
           {
+               if(clist_index[i].client->screen != selscreen)
+                    screen_set_sel(clist_index[i].client->screen);
+
+               if(clist_index[i].client->tag != seltag[clist_index[i].client->screen])
+                    tag_set(clist_index[i].client->tag);
+
                client_focus(clist_index[i].client);
                client_raise(clist_index[i].client);
 
