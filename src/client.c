@@ -1051,31 +1051,33 @@ client_set_rules(Client *c)
      for(i = 0; i < conf.nrule; ++i)
      {
           if((xch.res_class && conf.rule[i].class && !strcmp(xch.res_class, conf.rule[i].class))
-                    || (xch.res_name && conf.rule[i].instance && !strcmp(xch.res_name, conf.rule[i].instance))
-                    || (strlen(wwrole) && conf.rule[i].role && !strcmp(wwrole, conf.rule[i].role)))
+                    || (xch.res_name && conf.rule[i].instance && !strcmp(xch.res_name, conf.rule[i].instance)))
           {
-               if(conf.rule[i].screen != -1)
-                    c->screen = conf.rule[i].screen;
-
-               if(conf.rule[i].tag != -1)
-                    c->tag = conf.rule[i].tag;
-
-               if(conf.rule[i].free)
-                    c->flags |= FreeFlag;
-
-               if(conf.rule[i].max)
+               if((strlen(wwrole) && conf.rule[i].role && !strcmp(wwrole, conf.rule[i].role)) || !strlen(wwrole))
                {
-                    client_maximize(c);
-                    c->flags |= MaxFlag;
-               }
+                    if(conf.rule[i].screen != -1)
+                         c->screen = conf.rule[i].screen;
 
-               if(c->tag != seltag[selscreen])
-               {
-                    tags[c->screen][c->tag].request_update = True;
-                    client_focus(NULL);
-               }
+                    if(conf.rule[i].tag != -1)
+                         c->tag = conf.rule[i].tag;
 
-               tags[c->screen][c->tag].layout.func(c->screen);
+                    if(conf.rule[i].free)
+                         c->flags |= FreeFlag;
+
+                    if(conf.rule[i].max)
+                    {
+                         client_maximize(c);
+                         c->flags |= MaxFlag;
+                    }
+
+                    if(c->tag != seltag[selscreen])
+                    {
+                         tags[c->screen][c->tag].request_update = True;
+                         client_focus(NULL);
+                    }
+
+                    tags[c->screen][c->tag].layout.func(c->screen);
+               }
           }
      }
 
