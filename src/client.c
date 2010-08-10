@@ -1053,7 +1053,7 @@ client_set_rules(Client *c)
           if((xch.res_class && conf.rule[i].class && !strcmp(xch.res_class, conf.rule[i].class))
                     || (xch.res_name && conf.rule[i].instance && !strcmp(xch.res_name, conf.rule[i].instance)))
           {
-               if((strlen(wwrole) && conf.rule[i].role && !strcmp(wwrole, conf.rule[i].role)) || !strlen(wwrole))
+               if((strlen(wwrole) && conf.rule[i].role && !strcmp(wwrole, conf.rule[i].role)) || (!strlen(wwrole) || !conf.rule[i].role))
                {
                     if(conf.rule[i].screen != -1)
                          c->screen = conf.rule[i].screen;
@@ -1070,7 +1070,7 @@ client_set_rules(Client *c)
                          c->flags |= MaxFlag;
                     }
 
-                    if(c->tag != seltag[selscreen])
+                    if(c->tag != seltag[c->screen])
                     {
                          tags[c->screen][c->tag].request_update = True;
                          client_focus(NULL);
