@@ -987,7 +987,11 @@ void
 client_set_rules(Client *c)
 {
      XClassHint xch = { 0 };
-     int i, j, k;
+     int i, j, k, f;
+     Atom rf;
+     ulong n, il;
+     uchar *data = NULL;
+     char wwrole[256] = { 0 };
 
      if(conf.ignore_next_client_rules)
      {
@@ -995,9 +999,18 @@ client_set_rules(Client *c)
           return;
      }
 
+     /* Get WM_CLASS */
      XGetClassHint(dpy, c->win, &xch);
 
-     /* Following features is DEPRECATED, will be removed in some revision.  {{{ */
+     /* Get WM_WINDOW_ROLE */
+     if(XGetWindowProperty(dpy, c->win, ATOM("WM_WINDOW_ROLE"), 0L, 0x7FFFFFFFL, False,
+                    XA_STRING, &rf, &f, &n, &il, &data) == Success && data)
+     {
+          strcpy(wwrole, (char*)data);
+          XFree(data);
+     }
+
+     /* Following features is *DEPRECATED*, will be removed in some revision.  {{{ */
 
      /* Auto free */
      if(conf.client.autofree && ((xch.res_name && strstr(conf.client.autofree, xch.res_name))
@@ -1038,7 +1051,8 @@ client_set_rules(Client *c)
      for(i = 0; i < conf.nrule; ++i)
      {
           if((xch.res_class && conf.rule[i].class && !strcmp(xch.res_class, conf.rule[i].class))
-                    || (xch.res_name && conf.rule[i].instance && !strcmp(xch.res_name, conf.rule[i].instance)))
+                    || (xch.res_name && conf.rule[i].instance && !strcmp(xch.res_name, conf.rule[i].instance))
+                    || (strlen(wwrole) && conf.rule[i].role && !strcmp(wwrole, conf.rule[i].role)))
           {
                if(conf.rule[i].screen != -1)
                     c->screen = conf.rule[i].screen;
@@ -1056,7 +1070,6 @@ client_set_rules(Client *c)
                }
           }
      }
-
 
      return;
 }

@@ -203,7 +203,7 @@
 
                class    = "MPlayer"  # First part of WM_CLASS
                instance = "xv"       # Seconf part of WM_CLASS, not needed if first part is correct
-               # role = ""           # WM_WINDOW_ROLE (will be implemented)
+               # role = ""           # WM_WINDOW_ROLE
                screen   = 0          # Screen to use
                tag      = 2          # Tag number of apps
                free     = true       # Set automatic free client
