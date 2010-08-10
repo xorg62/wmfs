@@ -350,11 +350,6 @@ typedef struct
 {
      char *name;
      char *content;
-     char *role;
-     int screen;
-     int tag;
-     Bool free;
-     Bool max;
 } Alias;
 
 /* Rule struct */
