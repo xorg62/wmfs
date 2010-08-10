@@ -127,6 +127,7 @@
                 #[mouse] [/mouse] Possible multi mouse section
         [/tag]
 
+        # clients option is *DEPRECATED* but works, see [rules] section
         [tag] name = "two"  clients = {"Browser"} [/tag]
         [tag] name = "three" [/tag]
         [tag] name = "four"  [/tag]
@@ -161,6 +162,7 @@
         # Modifier for mouse use
         modifier = "Alt"
 
+        # *DEPRECATED* but works, see [rules] section
         # Set automatic free or max client
         # autofree = "xterm|MPlayer"
         # automax  = "Navigator"
@@ -194,6 +196,20 @@
                 [/button]
         [/titlebar]
 [/client]
+
+[rules]
+       # Example of rule for Mplayer
+       [rule]
+
+               class    = "MPlayer"  # First part of WM_CLASS
+               instance = "xv"       # Seconf part of WM_CLASS, not needed if first part is correct
+               # role = ""           # WM_WINDOW_ROLE (will be implemented)
+               screen   = 0          # Screen to use
+               tag      = 2          # Tag number of apps
+               free     = true       # Set automatic free client
+               max      = false      # Set automatic maximized client
+       [/rule]
+[/rules]
 
 [menu]
         # Default menu, binded on the root window, button 3.

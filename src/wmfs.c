@@ -118,6 +118,7 @@ quit(void)
      }
 
      IFREE(conf.launcher);
+     IFREE(conf.rule);
 
      IFREE(conf.bars.mouse);
      IFREE(conf.selbar.mouse);

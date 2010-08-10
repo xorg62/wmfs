@@ -997,6 +997,8 @@ client_set_rules(Client *c)
 
      XGetClassHint(dpy, c->win, &xch);
 
+     /* Following features is DEPRECATED, will be removed in some revision.  {{{ */
+
      /* Auto free */
      if(conf.client.autofree && ((xch.res_name && strstr(conf.client.autofree, xch.res_name))
                || (xch.res_class && strstr(conf.client.autofree, xch.res_class))))
@@ -1029,6 +1031,32 @@ client_set_rules(Client *c)
 
                               tags[c->screen][c->tag].layout.func(c->screen);
                          }
+
+     /* }}} */
+
+     /* Apply Rule if class || instance || role match */
+     for(i = 0; i < conf.nrule; ++i)
+     {
+          if((xch.res_class && conf.rule[i].class && !strcmp(xch.res_class, conf.rule[i].class))
+                    || (xch.res_name && conf.rule[i].instance && !strcmp(xch.res_name, conf.rule[i].instance)))
+          {
+               if(conf.rule[i].screen != -1)
+                    c->screen = conf.rule[i].screen;
+
+               if(conf.rule[i].tag != -1)
+                    c->tag = conf.rule[i].tag;
+
+               if(conf.rule[i].free)
+                    c->flags |= FreeFlag;
+
+               if(conf.rule[i].max)
+               {
+                    client_maximize(c);
+                    c->flags |= MaxFlag;
+               }
+          }
+     }
+
 
      return;
 }
