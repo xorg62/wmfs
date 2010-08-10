@@ -200,9 +200,8 @@
 [rules]
        # Example of rule for Mplayer
        [rule]
-
-               class    = "MPlayer"  # First part of WM_CLASS
-               instance = "xv"       # Seconf part of WM_CLASS, not needed if first part is correct
+               instance = "xv"       # First part of WM_CLASS
+               class    = "MPlayer"  # Seconf part of WM_CLASS, not needed if first part is correct
                # role = ""           # WM_WINDOW_ROLE
                screen   = 0          # Screen to use
                tag      = 2          # Tag number of apps

@@ -1068,6 +1068,14 @@ client_set_rules(Client *c)
                     client_maximize(c);
                     c->flags |= MaxFlag;
                }
+
+               if(c->tag != seltag[selscreen])
+               {
+                    tags[c->screen][c->tag].request_update = True;
+                    client_focus(NULL);
+               }
+
+               tags[c->screen][c->tag].layout.func(c->screen);
           }
      }
 
