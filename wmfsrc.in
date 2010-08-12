@@ -37,7 +37,7 @@
                 fg = "#D4D4ff"
 
                 # Cut title lenght
-                # max_lenght = 25
+                # max_length = 25
 
                 [mouse] button = "3" func = "clientlist"  [/mouse]
                 [mouse] button = "4" func = "client_next" [/mouse]
