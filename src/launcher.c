@@ -61,7 +61,7 @@ launcher_execute(Launcher *launcher)
 
      x = (conf.layout_placement)
           ? (infobar[selscreen].tags_board->geo.x + infobar[selscreen].tags_board->geo.width)
-          : (infobar[selscreen].layout_button->geo.x + textw(tags[selscreen][seltag[selscreen]].layout.symbol) + PAD);
+          : (infobar[selscreen].layout_button->geo.x + infobar[selscreen].layout_button->geo.width);
 
      XGrabKeyboard(dpy, ROOT, True, GrabModeAsync, GrabModeAsync, CurrentTime);
 

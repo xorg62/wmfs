@@ -393,6 +393,7 @@ conf_layout_section(void)
 
      layouts = fetch_section_first(NULL, "layouts");
 
+     conf.layout_button_width    = fetch_opt_first(layouts, "O", "layout_button_width").num;
      conf.border.layout          = fetch_opt_first(layouts, "false", "border").bool;
      conf.colors.layout_fg       = fetch_opt_first(layouts, "#ffffff", "fg").str;
      conf.colors.layout_bg       = getcolor((fetch_opt_first(layouts, "#000000", "bg").str));

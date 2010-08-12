@@ -36,7 +36,7 @@
                 bg = "#191919"
                 fg = "#D4D4ff"
 
-                # Cut title lenght
+                # Cut title length
                 # max_length = 25
 
                 [mouse] button = "3" func = "clientlist"  [/mouse]
@@ -64,6 +64,9 @@
 
         # Symbol displayed for the selected layout in the list
         selected_layout_symbol = "*"
+
+        # Width of layout button
+        # layout_button_width = x
 
         # Tiling layouts.
         [layout] type = "tile_right"         symbol = "RIGHT"    [/layout]

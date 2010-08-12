@@ -469,6 +469,7 @@ typedef struct
      } systray;
      Alias alias[256];
      uint mouse_tag_action[TagActionLast];
+     int layout_button_width;
      Layout layout[NUM_OF_LAYOUT];
      Menu *menu;
      Launcher *launcher;
