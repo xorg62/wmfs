@@ -414,7 +414,7 @@ typedef struct
      {
           char *fg;
           uint bg;
-          int maxlenght;
+          int maxlength;
           MouseBinding *mouse;
           int nmouse;
      } selbar;
