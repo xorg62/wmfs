@@ -122,6 +122,7 @@ BarWindow *barwin_create(Window parent,
                          Bool stipple,
                          Bool border);
 void barwin_draw_text(BarWindow *bw, int x, int y, char *text);
+void barwin_draw_image_ofset_text(BarWindow *bw, int x, int y, char *text, int x_image_ofset, int y_image_ofset);
 void barwin_delete(BarWindow *bw);
 void barwin_delete_subwin(BarWindow *bw);
 void barwin_map(BarWindow *bw);
@@ -135,6 +136,7 @@ void barwin_refresh(BarWindow *bw);
 
 /* draw.c */
 void draw_text(Drawable d, int x, int y, char* fg, int pad, char *str);
+void draw_image_ofset_text(Drawable d, int x, int y, char* fg, int pad, char *str, int x_image_ofset, int y_image_ofset);
 void draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color);
 void draw_graph(Drawable dr, int x, int y, uint w, uint h, uint color, char *data);
 
@@ -258,10 +260,11 @@ void menu_draw(Menu menu, int x, int y);
 Bool menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[]);
 Bool menu_activate_item(Menu *menu, int i);
 void menu_focus_item(Menu *menu, int item, BarWindow *winitem[]);
-void menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[]);
+void menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[], int chcklen);
 int menu_get_longer_string(MenuItem *mi, int nitem);
 void uicb_menu(uicb_t cmd);
 void menu_clear(Menu *menu);
+Bool menu_get_checkstring_needed(MenuItem *mi, int nitem);
 
 /* launcher.c */
 void launcher_execute(Launcher *launcher);

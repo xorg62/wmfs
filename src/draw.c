@@ -32,6 +32,12 @@
 
 #include "wmfs.h"
 
+void
+draw_text(Drawable d, int x, int y, char* fg, int pad, char *str)
+{
+	 draw_image_ofset_text(d, x, y, fg, pad, str, 0, 0);
+}
+
 /** Draw a string in a Drawable
  * \param d Drawable
  * \param x X position
@@ -41,7 +47,7 @@
  * \param str String that will be draw
 */
 void
-draw_text(Drawable d, int x, int y, char* fg, int pad, char *str)
+draw_image_ofset_text(Drawable d, int x, int y, char* fg, int pad, char *str, int x_image_ofset, int y_image_ofset)
 {
      XftColor xftcolor;
      XftDraw *xftd;
@@ -65,7 +71,7 @@ draw_text(Drawable d, int x, int y, char* fg, int pad, char *str)
                sw = systray_get_width();
 
           for(i = 0; i < ni; ++i)
-               draw_image(d, im[i].x - sw, im[i].y, im[i].w, im[i].h, im[i].name);
+               draw_image(d, x_image_ofset + im[i].x - sw, y_image_ofset + im[i].y, im[i].w, im[i].h, im[i].name);
      }
 #endif /* HAVE_IMLIB */
 
