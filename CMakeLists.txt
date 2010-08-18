@@ -52,7 +52,7 @@ set(wmfs_src
 add_executable(wmfs ${wmfs_src})
 
 # Set the version
-set(VERSION "WMFS-201006")
+set(VERSION "WMFS-201008")
 
 # FLAGS
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -ansi")
