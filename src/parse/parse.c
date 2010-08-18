@@ -275,6 +275,8 @@ get_conf(const char *name)
      char *tmp_inc_list = NULL;
      char *incname = NULL;
      char *tmp_inc = NULL;
+     char *rem_inc_tmp = NULL;
+     Bool rem = False;
 
      if (!name)
           return (-1);
@@ -296,6 +298,20 @@ get_conf(const char *name)
 
      while(pos && (strlen(buf) > 0))
      {
+         rem_inc_tmp = pos;
+         rem = False;
+         while(buf > rem_inc_tmp)
+         {
+             if((rem_inc_tmp[0] == '\n') || (rem_inc_tmp[0] == '\r'))
+                 break;
+             if(rem_inc_tmp[0] == '#')
+             {
+                 rem = True;
+                 break;
+             }
+             rem_inc_tmp = rem_inc_tmp - sizeof(char);
+         }
+
          xpos = strstr(buf, inc);
          xpos = xpos + strlen(inc);
          xend = strstr(xpos, inc_end);
@@ -313,7 +329,7 @@ get_conf(const char *name)
          strcat(tmp_inc, "]");
          tmpbuf = NULL;
 
-         if(!strstr(inc_list, tmp_inc))
+         if(!strstr(inc_list, tmp_inc) && !rem)
          {
              tmp_inc_list = (char *) malloc(sizeof(char) * (strlen(tmp_inc) + strlen(inc_list) + 5));
              strcpy(tmp_inc_list, "\r\n");
@@ -334,6 +350,7 @@ get_conf(const char *name)
 
          buffer = (char *)malloc(sizeof(char) * (strlen(buf) + strlen(tmpbuf) + 1));
          strncpy(buffer, buf, (pos - buf));
+         memset(buffer + (pos - buf), 0, sizeof(char));
          strcat(buffer, tmpbuf);
          strcat(buffer, pos_end);
          free(buf);
