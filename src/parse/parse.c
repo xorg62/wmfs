@@ -223,34 +223,129 @@ get_kw_name(enum conf_type type)
 }
 #endif
 
-int
-get_conf(const char *name)
+char *
+load_file(const char *name)
 {
      int fd;
      struct stat st;
      char *buf;
-     struct conf_sec *s;
+     char *buffer;
 
      if (!name)
-          return (-1);
+          return NULL;
 
-     if ((fd = open(name, O_RDONLY)) == -1 ||
-               stat(name, &st) == -1)
+     if ((fd = open(name, O_RDONLY)) == -1 || stat(name, &st) == -1)
      {
-          warn("%s", name);
-          return (-1);
+          warn("%s not read", name);
+          return NULL;
      }
 
      buf = (char*)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, SEEK_SET);
 
      if (buf == (char*) MAP_FAILED)
-          return -1;
+          return NULL;
 
-     get_keyword(buf, st.st_size);
+     buffer = strdup(buf);
 
      munmap(buf, st.st_size);
      close(fd);
      warnx("%s read", name);
+
+     return buffer;
+}
+
+int
+get_conf(const char *name)
+{
+     char *buf;
+     struct conf_sec *s;
+     char inc[] = "@include \"";
+     char inc_end[] = "\"";
+     char *pos = NULL;
+     char *pos_end = NULL;
+     char *tmpname = NULL;
+     char *tmpbuf = NULL;
+     char *buffer = NULL;
+
+     char *xpos = NULL;
+     char *xend = NULL;
+     int xl;
+
+     char *inc_list = NULL;
+     char *tmp_inc_list = NULL;
+     char *incname = NULL;
+     char *tmp_inc = NULL;
+
+     if (!name)
+          return (-1);
+
+     /* remember name for duplicity include */
+     tmp_inc = strdup(name);
+     incname = patht(tmp_inc);
+     free(tmp_inc);
+     inc_list = (char *) malloc(sizeof(char) * (strlen(incname) + 3));
+     strcpy(inc_list, "[");
+     strcat(inc_list, incname);
+     strcat(inc_list, "]");
+     buf = load_file(incname);
+
+     if(!buf)
+         return (-1);
+
+     pos = strstr(buf, inc);
+
+     while(pos && (strlen(buf) > 0))
+     {
+         xpos = strstr(buf, inc);
+         xpos = xpos + strlen(inc);
+         xend = strstr(xpos, inc_end);
+         xl = xend - xpos;
+         tmpname = (char *)malloc(sizeof(char) * (xl + 1));
+         strncpy(tmpname, xpos, xl);
+         memset(tmpname + xl, 0, sizeof(char));
+         pos_end = xend + strlen(inc_end);
+
+         /* test and remember tmpname for duplicity include */
+         incname = patht(tmpname);
+         tmp_inc = (char *) malloc(sizeof(char) * (strlen(incname) + 3));
+         strcpy(tmp_inc, "[");
+         strcat(tmp_inc, incname);
+         strcat(tmp_inc, "]");
+         tmpbuf = NULL;
+
+         if(!strstr(inc_list, tmp_inc))
+         {
+             tmp_inc_list = (char *) malloc(sizeof(char) * (strlen(tmp_inc) + strlen(inc_list) + 5));
+             strcpy(tmp_inc_list, "\r\n");
+             strcat(tmp_inc_list, inc_list);
+             strcat(tmp_inc_list, tmp_inc);
+             strcat(tmp_inc_list, "\r\n");
+             free(inc_list);
+
+             inc_list = tmp_inc_list;
+
+             tmpbuf = load_file(incname);
+         }
+
+         free(tmpname);
+
+         if(!tmpbuf)
+             tmpbuf = strdup("");
+
+         buffer = (char *)malloc(sizeof(char) * (strlen(buf) + strlen(tmpbuf) + 1));
+         strncpy(buffer, buf, (pos - buf));
+         strcat(buffer, tmpbuf);
+         strcat(buffer, pos_end);
+         free(buf);
+
+         if(tmpbuf)
+             free(tmpbuf);
+
+         buf = buffer;
+         pos = strstr(buf, inc);
+     }
+
+     get_keyword(buf, strlen(buf));
 
      file.name = name;
 
@@ -270,6 +365,9 @@ get_conf(const char *name)
                     break;
           }
      }
+
+     free(buf);
+
      return 0;
 }
 

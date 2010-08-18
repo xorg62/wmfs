@@ -45,6 +45,13 @@ struct opt_type {
 };
 
 /*
+ * Load all text from file
+ * return new char* on succes - needs to use free() to delete
+ * return NULL on failure
+ */
+char * load_file(const char *name);
+
+/*
  * Create config from file
  * return -1 on failure
  */
