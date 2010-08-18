@@ -3,6 +3,9 @@
 # ~/.config/wmfs/wmfsrc and edit it.
 #
 
+# Include file to split configuration
+# @include "~/.config/wmfs/menu-wmfsrc"
+
 [misc]
         font               = "dejavu-10"
         raisefocus         = false
