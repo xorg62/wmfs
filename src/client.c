@@ -93,6 +93,8 @@ client_get_next(void)
 {
      Client *c = NULL;
 
+     screen_get_sel();
+
      if(!sel || ishide(sel, selscreen))
           return NULL;
 
@@ -111,6 +113,8 @@ Client*
 client_get_prev(void)
 {
      Client *c = NULL, *d;
+
+     screen_get_sel();
 
      if(!sel || ishide(sel, selscreen))
           return NULL;
@@ -745,6 +749,9 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      if(!conf.client.set_new_win_master)
           layout_set_client_master(c);
 
+
+     cient_moveresize(c, c->geo, False);
+
      return c;
 }
 
@@ -1103,6 +1110,8 @@ client_update_attributes(Client *c)
 
      XChangeProperty(dpy, c->win, ATOM("_WMFS_ISFREE"), XA_CARDINAL, 32,
                      PropModeReplace, (uchar*)&f, 1);
+
+     c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
 
      return;
 }
