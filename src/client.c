@@ -1108,8 +1108,6 @@ client_update_attributes(Client *c)
      XChangeProperty(dpy, c->win, ATOM("_WMFS_ISFREE"), XA_CARDINAL, 32,
                      PropModeReplace, (uchar*)&f, 1);
 
-     c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
-
      return;
 }
 
