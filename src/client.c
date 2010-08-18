@@ -749,9 +749,6 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      if(!conf.client.set_new_win_master)
           layout_set_client_master(c);
 
-
-     cient_moveresize(c, c->geo, False);
-
      return c;
 }
 
