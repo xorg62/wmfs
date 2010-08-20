@@ -65,7 +65,10 @@ buttonpress(XButtonEvent *ev)
           for(i = 0; i < conf.titlebar.button[n].nmouse; ++i)
                if(ev->button == conf.titlebar.button[n].mouse[i].button)
                     if(conf.titlebar.button[n].mouse[i].func)
+                    {
+                         client_focus(c);
                          conf.titlebar.button[n].mouse[i].func(conf.titlebar.button[n].mouse[i].cmd);
+                    }
 
      /* Frame Resize Area */
      if((c = client_gb_resize(ev->window)))
