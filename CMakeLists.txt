@@ -59,7 +59,7 @@ option(WITH_IMLIB2 "Build with Imlib2 support" ON)
 
 # optional finders
 if(WITH_XINERAMA)
-	add_definitions(-DHAVE_XINIERAMA)
+	add_definitions(-DHAVE_XINERAMA)
 	pkg_check_modules(XINERAMA REQUIRED xinerama)
 	include_directories(${XINERAMA_INCLUDE_DIRS})
 	set(CMAKE_LINK_LIBRARIES ${XINERAMA_LIBRARIES} ${CMAKE_LINK_LIBRARIES})
