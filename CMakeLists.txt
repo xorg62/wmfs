@@ -95,7 +95,6 @@ set(WMFS_TERM xterm)
 # get the user compiling this thing
 SET(USERNAME $ENV{USER})
 
-
 # configure files
 set(CONFIGURE_FILES
   src/config.h.in
@@ -154,7 +153,7 @@ set(WMFS_DOCS
 install(FILES ${WMFS_DOCS} DESTINATION ${CMAKE_DOCDIR})
 
 # config file
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/wmfsrc DESTINATION ${CMAKE_SYSCONFDIR}/${PROJECT_NAME})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/wmfsrc DESTINATION ${CMAKE_SYSCONFDIR}/${PROJECT_NAME})
 
 # xsession
 install(FILES "wmfs.desktop" DESTINATION ${CMAKE_DATADIR}/xsessions)
