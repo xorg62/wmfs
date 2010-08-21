@@ -92,6 +92,9 @@ set(CMAKE_DOCDIR ${CMAKE_INSTALL_PREFIX}/share/doc/${PROJECT_NAME}-${VERSION} CA
 
 # set default terminal for user
 set(WMFS_TERM xterm)
+# get the user compiling this thing
+SET(USERNAME $ENV{USER})
+
 
 # configure files
 set(CONFIGURE_FILES
