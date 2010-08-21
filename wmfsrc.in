@@ -8,7 +8,8 @@
 
 [misc]
         font               = "dejavu-10"
-        raisefocus         = false
+        raisefocus         = true
+
         focus_follow_mouse = true
         # focus_pointer_click: click on unfocused client area:
         # true  -- default, set focus
