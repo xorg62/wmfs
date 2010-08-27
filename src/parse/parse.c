@@ -28,13 +28,6 @@
 
 extern char *__progname;
 
-#define TOKEN(t)                                   \
-     do {                                          \
-          kw->type = (t);                          \
-          TAILQ_INSERT_TAIL(&keywords, kw, entry); \
-          kw = malloc(sizeof(*kw));                \
-     } while (0)
-
 #define NEW_WORD()                                  \
      do {                                           \
           if (j > 0) {                              \
@@ -43,7 +36,7 @@ extern char *__progname;
                TAILQ_INSERT_TAIL(&stack, e, entry); \
                e = malloc(sizeof(*e));              \
                j = 0;                               \
-               TOKEN(WORD);                         \
+               push_keyword(WORD);                  \
           }                                         \
      } while (0)
 
@@ -67,6 +60,7 @@ struct conf_state {
 };
 
 static void get_keyword(const char *buf, size_t n);
+static void push_keyword(enum conf_type);
 static void pop_keyword(void);
 static void pop_stack(void);
 static void syntax(const char *, ...);
@@ -135,7 +129,7 @@ get_keyword(const char *buf, size_t n)
 
           if (buf[i] == '[' && s.quote == False) {
                NEW_WORD();
-               TOKEN((buf[i+1] == '/') ? SEC_END : SEC_START);
+               push_keyword((buf[i+1] == '/') ? SEC_END : SEC_START);
                if (buf[i+1] == '/')
                     i++;
                continue;
@@ -148,13 +142,13 @@ get_keyword(const char *buf, size_t n)
 
           if (buf[i] == '{' && s.quote == False) {
                NEW_WORD();
-               TOKEN(LIST_START);
+               push_keyword(LIST_START);
                continue;
           }
 
           if (buf[i] == '}' && s.quote == False) {
                NEW_WORD();
-               TOKEN(LIST_END);
+               push_keyword(LIST_END);
                continue;
           }
 
@@ -165,7 +159,7 @@ get_keyword(const char *buf, size_t n)
 
           if (buf[i] == '=' && s.quote == False) {
                NEW_WORD();
-               TOKEN(EQUAL);
+               push_keyword(EQUAL);
                continue;
           }
 
@@ -178,6 +172,15 @@ get_keyword(const char *buf, size_t n)
 
           e->name[j++] = buf[i];
      }
+}
+
+static void
+push_keyword(enum conf_type type)
+{
+     struct conf_keyword *kw;
+     kw = emalloc(1, sizeof(*kw));
+     kw->type = type;
+     TAILQ_INSERT_TAIL(&keywords, kw, entry);
 }
 
 #ifdef DEBUG
