@@ -241,7 +241,10 @@ spawn(const char *format, ...)
                execl(sh, sh, "-c", cmd, (char*)NULL);
                exit(EXIT_FAILURE);
           }
-          write(p[1], &pid, sizeof(pid_t));
+
+          if (sizeof(pid_t) != write(p[1], &pid, sizeof(pid_t)))
+               warn("write");
+
           close(p[1]);
           exit(EXIT_SUCCESS);
      }
