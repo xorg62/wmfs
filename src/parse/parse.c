@@ -14,6 +14,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#define _GNU_SOURCE
 #define _BSD_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,6 +23,8 @@
 #include <limits.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <libgen.h>
+#include <pwd.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <sys/param.h>
@@ -277,13 +280,34 @@ include(struct keyword *head)
      struct keyword *kw;
      struct keyword *tail;
      struct files *file;
+     struct passwd *user;
+     char *filename = NULL;
+     char *base = NULL;
 
      head = head->next;
 
      if (!head || head->type != WORD)
           syntax(head, "missing filename to include");
 
-     if (!(kw = parse_keywords(head->name))) {
+     /* replace ~ by user directory */
+     if (head->name && head->name[0] == '~') {
+          if ( (user = getpwuid(getuid())) && user->pw_dir)
+               asprintf(&filename, "%s%s", user->pw_dir, head->name+1);
+          else if (getenv("HOME"))
+               asprintf(&filename, "%s%s", getenv("HOME"), head->name+1);
+          else /* to warning ? */
+               filename = head->name;
+     }
+     /* relative path from parent file */
+     else if (head->name && head->name[0] != '/') {
+          base = strdup(kw->file->parent->name);
+          asprintf(&filename, "%s/%s", dirname(base), head->name);
+          free(base);
+     }
+     else
+          filename = head->name;
+
+     if (!(kw = parse_keywords(filename))) {
           warnx("no config fond in include file %s", head->name);
           return head->next;
      }
