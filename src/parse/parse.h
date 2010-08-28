@@ -19,12 +19,20 @@
 
 #include <sys/queue.h>
 
+#define INCLUDE_CMD "@include"
+
+#define False 0
+#define True 1
+
+#define bool_t int
+
 struct conf_opt {
      char *name;
      char *val[10];
      size_t nval;
-     Bool used;
+     bool_t used;
      int line;
+     char *filename;
      SLIST_ENTRY(conf_opt) entry;
 };
 
@@ -40,16 +48,9 @@ struct conf_sec {
 struct opt_type {
      long int num;
      float fnum;
-     Bool bool;
+     bool_t bool;
      char *str;
 };
-
-/*
- * Load all text from file
- * return new char* on succes - needs to use free() to delete
- * return NULL on failure
- */
-char * load_file(const char *name);
 
 /*
  * Create config from file
@@ -113,5 +114,9 @@ struct opt_type *fetch_opt(struct conf_sec *, char *, char *);
  * Count member of a opt_type *
  */
 size_t fetch_opt_count(struct opt_type *);
+
+
+/* wrapper for calloc */
+void *xcalloc(size_t, size_t);
 
 #endif /* PARSE_H */

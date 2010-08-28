@@ -18,89 +18,150 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
+#include <limits.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
+#include <sys/param.h>
 #include <err.h>
 
-#include "../wmfs.h"
+#include "parse.h"
 
 extern char *__progname;
 
-#define NEW_WORD()                                  \
-     do {                                           \
-          if (j > 0) {                              \
-               e->name[j] = '\0';                   \
-               e->line = file.line;                 \
-               TAILQ_INSERT_TAIL(&stack, e, entry); \
-               e = malloc(sizeof(*e));              \
-               j = 0;                               \
-               push_keyword(WORD);                  \
-          }                                         \
-     } while (0)
-
-enum conf_type { SEC_START, SEC_END, WORD, EQUAL, LIST_START, LIST_END, NONE };
-
-struct conf_keyword {
-     enum conf_type type;
-     TAILQ_ENTRY(conf_keyword) entry;
-};
-
-struct conf_stack {
-     char name[BUFSIZ];
-     int line;
-     TAILQ_ENTRY(conf_stack) entry;
-};
-
-struct conf_state {
-     Bool quote;
-     Bool comment;
-     char quote_char;
-};
-
-static void get_keyword(const char *buf, size_t n);
-static void push_keyword(enum conf_type);
-static void pop_keyword(void);
-static void pop_stack(void);
-static void syntax(const char *, ...);
-static struct conf_sec *get_section(void);
-static struct conf_opt *get_option(void);
-static struct opt_type string_to_opt(char *);
-#ifdef DEBUG
-static void print_kw_tree(void);
-static char * get_kw_name(enum conf_type);
-#endif
-
-static TAILQ_HEAD(, conf_keyword) keywords;
-static TAILQ_HEAD(, conf_stack) stack;
-static TAILQ_HEAD(, conf_sec) config;
-static struct conf_keyword *curk; /* current keyword */
-static struct conf_stack *curw; /* current word */
-static const struct opt_type opt_type_null = { 0, 0, False, NULL };
+enum keyword_t { SEC_START, SEC_END, INCLUDE, WORD, EQUAL, LIST_START, LIST_END, NONE };
 
 static struct {
      const char *name;
+     enum keyword_t type;
+} kw_t_name[] = {
+     {"SEC_START", SEC_START},
+     {"SEC_END", SEC_END},
+     {"INCLUDE", INCLUDE},
+     {"WORD", WORD},
+     {"EQUAL", EQUAL},
+     {"LIST_START", LIST_START},
+     {"LIST_END", LIST_END},
+     {"NONE", NONE},
+};
+
+struct files {
+     char *name;
+     struct files *parent;
+};
+
+struct keyword {
+     enum keyword_t type;
+     /* if WORD */
      int line;
-} file = { NULL, 1 };
+     struct files *file;
+     char *name;
+     struct keyword *next;
+};
 
-static void
-get_keyword(const char *buf, size_t n)
+struct state {
+     bool_t quote;
+     bool_t comment;
+     char quote_char;
+};
+
+/* TO REMOVE (use a identifier for config and fallback XDG in api functions) */
+TAILQ_HEAD(, conf_sec) config;
+
+static struct keyword *
+push_keyword(struct keyword *tail, enum keyword_t type, char *buf, size_t *offset, struct files *file, int line)
 {
-     struct conf_keyword *kw;
-     size_t j, i;
-     struct conf_state s = { False, False, '\0' };
-     struct conf_stack *e;
+     struct keyword *kw;
+     int i = 0;
 
-     TAILQ_INIT(&stack);
-     TAILQ_INIT(&keywords);
-     kw = emalloc(1, sizeof(*kw));
-     e = emalloc(1, sizeof(*e));
+     if (type == WORD && *offset == 0)
+          return tail;
 
-     for(i = 0, j = 0; i < n; i++)
-     {
+     kw = xcalloc(1, sizeof(*kw));
+     kw->type = type;
+     kw->line = line;
+     kw->file = file;
+     kw->next = NULL;
+
+     if (*offset != 0) {
+          buf[*offset] = '\0';
+          if (!strcmp(buf, INCLUDE_CMD))
+               type = kw->type = INCLUDE;
+          else
+               kw->name = strdup(buf);
+          *offset = 0;
+     }
+     else
+          kw->name = NULL;
+
+     if (tail)
+          tail->next = kw;
+
+#ifdef DEBUG
+     for (i = 0; kw_t_name[i].type != NONE; i++) {
+          if (kw_t_name[i].type == kw->type) {
+               warnx("%s %s %s:%d\n", kw_t_name[i].name,
+                         (kw->name) ? kw->name : "",
+                         kw->file->name, kw->line);
+          }
+     }
+#endif
+
+     return kw;
+}
+
+#define PUSH_KEYWORD(type) tail = push_keyword(tail, type, bufname, &j, file, line)
+static struct keyword *
+parse_keywords(const char *filename)
+{
+     int fd;
+     struct stat st;
+     char *buf;
+
+     struct keyword *head = NULL;
+     struct keyword *tail = NULL;
+     struct files *file;
+     enum keyword_t type; /* keyword type to push */
+     struct state s = { False, False, '\0'};
+     char *bufname;
+     char path[PATH_MAX];
+     size_t i, j;
+     int line;
+
+
+     if ((fd = open(filename, O_RDONLY)) == -1 || stat(filename, &st) == -1) {
+          warn("%s", filename);
+          return NULL;
+     }
+
+     buf = (char *)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, SEEK_SET);
+
+     if (buf == (char*)MAP_FAILED) {
+          warn("%s", filename);
+          return NULL;
+     }
+
+     if (!realpath(filename, path)) {
+          warn("%s", filename);
+          return NULL;
+     }
+
+     file = xcalloc(1, sizeof(*file));
+     file->name = strdup(path);
+     file->parent = NULL;
+
+     bufname = xcalloc(1, sizeof(*bufname) * BUFSIZ);
+
+
+     for(i = 0, j = 0, line = 1; i < (size_t)st.st_size; i++) {
+
+          if (tail && !head)
+               head = tail;
+
           if (buf[i] == '\n' && s.comment == True) {
-               file.line++;
+               line++;
                s.comment = False;
                continue;
           }
@@ -114,7 +175,8 @@ get_keyword(const char *buf, size_t n)
                continue;
 
           if (buf[i] == s.quote_char && s.quote == True) {
-               NEW_WORD();
+               /* end of quotted string */
+               PUSH_KEYWORD(WORD);
                s.quote = False;
                continue;
           }
@@ -122,621 +184,276 @@ get_keyword(const char *buf, size_t n)
           if ((buf[i] == '"' || buf[i] == '\'') &&
                     s.quote == False)
           {
+               PUSH_KEYWORD(WORD);
+               /* begin quotted string */
                s.quote_char = buf[i];
                s.quote = True;
                continue;
           }
 
           if (buf[i] == '[' && s.quote == False) {
-               NEW_WORD();
-               push_keyword((buf[i+1] == '/') ? SEC_END : SEC_START);
-               if (buf[i+1] == '/')
+               PUSH_KEYWORD(WORD);
+               if (buf[i+1] == '/') {
+                    i +=2;
+                    type = SEC_END;
+               }
+               else {
                     i++;
-               continue;
-          }
+                    type = SEC_START;
+               }
 
-          if (buf[i] == ']' && s.quote == False) {
-               NEW_WORD();
+               while (buf[i] != ']') {
+                    if (i >= (size_t)st.st_size)
+                    {
+                         /* TODO ERREUR */
+                    }
+                    bufname[j++] = buf[i++];
+               }
+               PUSH_KEYWORD(type);
                continue;
           }
 
           if (buf[i] == '{' && s.quote == False) {
-               NEW_WORD();
-               push_keyword(LIST_START);
+               PUSH_KEYWORD(WORD);
+               PUSH_KEYWORD(LIST_START);
                continue;
           }
 
           if (buf[i] == '}' && s.quote == False) {
-               NEW_WORD();
-               push_keyword(LIST_END);
+               PUSH_KEYWORD(WORD);
+               PUSH_KEYWORD(LIST_END);
                continue;
           }
 
           if (buf[i] == ',' && s.quote == False) {
-               NEW_WORD();
+               PUSH_KEYWORD(WORD);
                continue;
           }
 
           if (buf[i] == '=' && s.quote == False) {
-               NEW_WORD();
-               push_keyword(EQUAL);
+               PUSH_KEYWORD(WORD);
+               PUSH_KEYWORD(EQUAL);
                continue;
           }
 
           if (strchr("\t\n ", buf[i]) && s.quote == False) {
-               NEW_WORD();
+               PUSH_KEYWORD(WORD);
+
                if (buf[i] == '\n')
-                    file.line++;
+                    line++;
+
                continue;
           }
 
-          e->name[j++] = buf[i];
+          bufname[j++] = buf[i];
      }
+     munmap(buf, st.st_size);
+     warnx("%s read", file->name);
+     return head;
 }
 
 static void
-push_keyword(enum conf_type type)
+syntax(struct keyword *kw, const char *fmt, ...)
 {
-     struct conf_keyword *kw;
-     kw = emalloc(1, sizeof(*kw));
-     kw->type = type;
-     TAILQ_INSERT_TAIL(&keywords, kw, entry);
+     va_list args;
+
+     fprintf(stderr, "%s: %s:%d", __progname, kw->file->name, kw->line);
+     if (kw->name)
+          fprintf(stderr, ", near '%s'", kw->name);
+     fprintf(stderr, ": ");
+
+     va_start(args, fmt);
+     vfprintf(stderr, fmt, args);
+     va_end(args);
+
+     fprintf(stderr, "\n");
+
+     exit(EXIT_FAILURE);
 }
 
-#ifdef DEBUG
-static void
-print_kw_tree(void)
+static struct keyword *
+include(struct keyword *head)
 {
-     struct conf_keyword *k;
-     struct conf_stack *s;
+     struct keyword *kw;
+     struct keyword *tail;
+     struct files *file;
 
-     s = TAILQ_FIRST(&stack);
+     head = head->next;
 
-     TAILQ_FOREACH(k, &keywords, entry)
-          printf("%s ", get_kw_name(k->type));
-     printf("\n");
+     if (!head || head->type != WORD)
+          syntax(head, "missing filename to include");
+
+     if (!(kw = parse_keywords(head->name))) {
+          warnx("no config fond in include file %s", head->name);
+          return head->next;
+     }
+
+     kw->file->parent = head->file;
+     head = head->next;
+
+     /* detect circular include */
+     for (file = kw->file->parent; file != NULL; file = file->parent)
+     {
+          if (!strcmp(file->name, kw->file->name))
+               syntax(kw, "circular include of %s", kw->file->name);
+     }
+
+     if (kw) {
+          for (tail = kw; tail->next; tail = tail->next);
+          tail->next = head;
+     }
+
+     return kw;
 }
 
-static char *
-get_kw_name(enum conf_type type)
+static struct conf_opt *
+get_option(struct keyword **head)
 {
-     switch (type) {
-          case SEC_START:
-               return ("SEC_START");
-               break;
-          case SEC_END:
-               return ("SEC_END");
+     struct conf_opt *o;
+     size_t j = 0;
+     struct keyword *kw = *head;
+
+     o = xcalloc(1, sizeof(*o));
+     o->name = kw->name;
+     o->used = False;
+     o->line = kw->line;
+     o->filename = kw->file->name;
+
+     kw = kw->next;
+
+     if (kw->type != EQUAL)
+          syntax(kw, "missing '=' here");
+
+     kw = kw->next;
+
+     if (!kw)
+          syntax(kw, "missing value");
+
+
+     switch (kw->type) {
+          case INCLUDE:
+               kw = include(kw);
                break;
           case WORD:
-               return ("WORD");
+               o->val[0] = kw->name;
+               o->val[1] = NULL;
+               kw = kw->next;
                break;
           case LIST_START:
-               return ("LIST_START ");
-               break;
-          case LIST_END:
-               return ("LIST_END ");
-               break;
-          case EQUAL:
-               return ("EQUAL ");
+               kw = kw->next;
+               while (kw && kw->type != LIST_END) {
+                    switch (kw->type) {
+                         case WORD:
+                              if (j > 9)
+                                   syntax(kw, "too much values in list");
+                              o->val[j++] = kw->name;
+                              kw = kw->next;
+                              break;
+                         case INCLUDE:
+                              kw = include(kw);
+                              break;
+                         default:
+                              syntax(kw, "declaration into a list");
+                              break;
+                    }
+               }
+
+               if (!kw)
+                    syntax(kw, "list unclosed");
+
+               kw = kw->next;
                break;
           default:
-               return ("NONE ");
+               syntax(kw, "missing value");
                break;
      }
-}
-#endif
 
-char *
-load_file(const char *name)
-{
-     int fd;
-     struct stat st;
-     char *buf;
-     char *buffer;
-
-     if (!name)
-          return NULL;
-
-     if ((fd = open(name, O_RDONLY)) == -1 || stat(name, &st) == -1)
-     {
-          warn("%s not read", name);
-          return NULL;
-     }
-
-     buf = (char*)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, SEEK_SET);
-
-     if (buf == (char*) MAP_FAILED)
-          return NULL;
-
-     buffer = strdup(buf);
-
-     munmap(buf, st.st_size);
-     close(fd);
-     warnx("%s read", name);
-
-     return buffer;
-}
-
-int
-get_conf(const char *name)
-{
-     char *buf;
-     struct conf_sec *s;
-     char inc[] = "@include \"";
-     char inc_end[] = "\"";
-     char *pos = NULL;
-     char *pos_end = NULL;
-     char *tmpname = NULL;
-     char *tmpbuf = NULL;
-     char *buffer = NULL;
-
-     char *xpos = NULL;
-     char *xend = NULL;
-     int xl;
-
-     char *inc_list = NULL;
-     char *tmp_inc_list = NULL;
-     char *incname = NULL;
-     char *tmp_inc = NULL;
-     char *rem_inc_tmp = NULL;
-     Bool rem = False;
-
-     if (!name)
-          return (-1);
-
-     /* remember name for duplicity include */
-     tmp_inc = strdup(name);
-     incname = patht(tmp_inc);
-     free(tmp_inc);
-     inc_list = (char *) malloc(sizeof(char) * (strlen(incname) + 3));
-     strcpy(inc_list, "[");
-     strcat(inc_list, incname);
-     strcat(inc_list, "]");
-     buf = load_file(incname);
-
-     if(!buf)
-         return (-1);
-
-     pos = strstr(buf, inc);
-
-     while(pos && (strlen(buf) > 0))
-     {
-         rem_inc_tmp = pos;
-         rem = False;
-         while(buf > rem_inc_tmp)
-         {
-             if((rem_inc_tmp[0] == '\n') || (rem_inc_tmp[0] == '\r'))
-                 break;
-             if(rem_inc_tmp[0] == '#')
-             {
-                 rem = True;
-                 break;
-             }
-             rem_inc_tmp = rem_inc_tmp - sizeof(char);
-         }
-
-         xpos = strstr(buf, inc);
-         xpos = xpos + strlen(inc);
-         xend = strstr(xpos, inc_end);
-         xl = xend - xpos;
-         tmpname = (char *)malloc(sizeof(char) * (xl + 1));
-         strncpy(tmpname, xpos, xl);
-         memset(tmpname + xl, 0, sizeof(char));
-         pos_end = xend + strlen(inc_end);
-
-         /* test and remember tmpname for duplicity include */
-         incname = patht(tmpname);
-         tmp_inc = (char *) malloc(sizeof(char) * (strlen(incname) + 3));
-         strcpy(tmp_inc, "[");
-         strcat(tmp_inc, incname);
-         strcat(tmp_inc, "]");
-         tmpbuf = NULL;
-
-         if(!strstr(inc_list, tmp_inc) && !rem)
-         {
-             tmp_inc_list = (char *) malloc(sizeof(char) * (strlen(tmp_inc) + strlen(inc_list) + 5));
-             strcpy(tmp_inc_list, "\r\n");
-             strcat(tmp_inc_list, inc_list);
-             strcat(tmp_inc_list, tmp_inc);
-             strcat(tmp_inc_list, "\r\n");
-             free(inc_list);
-
-             inc_list = tmp_inc_list;
-
-             tmpbuf = load_file(incname);
-         }
-
-         free(tmpname);
-
-         if(!tmpbuf)
-             tmpbuf = strdup("");
-
-         buffer = (char *)malloc(sizeof(char) * (strlen(buf) + strlen(tmpbuf) + 1));
-         strncpy(buffer, buf, (pos - buf));
-         memset(buffer + (pos - buf), 0, sizeof(char));
-         strcat(buffer, tmpbuf);
-         strcat(buffer, pos_end);
-         free(buf);
-
-         if(tmpbuf)
-             free(tmpbuf);
-
-         buf = buffer;
-         pos = strstr(buf, inc);
-     }
-
-     get_keyword(buf, strlen(buf));
-
-     file.name = name;
-
-     curk = TAILQ_FIRST(&keywords);
-     curw = TAILQ_FIRST(&stack);
-
-     TAILQ_INIT(&config);
-
-     while (!TAILQ_EMPTY(&keywords)) {
-          switch (curk->type) {
-               case SEC_START:
-                    s = get_section();
-                    TAILQ_INSERT_TAIL(&config, s, entry);
-                    break;
-               default:
-                    syntax("out of any section");
-                    break;
-          }
-     }
-
-     free(buf);
-
-     return 0;
+     *head = kw;
+     return o;
 }
 
 static struct conf_sec *
-get_section(void)
+get_section(struct keyword **head)
 {
      struct conf_sec *s;
      struct conf_opt *o;
      struct conf_sec *sub;
+     struct keyword *kw = *head;
 
-     s = emalloc(1, sizeof(*s));
-     s->name = strdup(curw->name);
+     s = xcalloc(1, sizeof(*s));
+     s->name = kw->name;
      TAILQ_INIT(&s->sub);
      SLIST_INIT(&s->optlist);
 
-     pop_stack();
-     pop_keyword();
+     kw = kw->next;
 
-     if (!curk || curk->type != WORD)
-          syntax("missing section name");
-     pop_keyword();
-
-     while (!TAILQ_EMPTY(&keywords) && curk->type != SEC_END) {
-          switch (curk->type) {
+     while (kw && kw->type != SEC_END) {
+          switch (kw->type) {
+               case INCLUDE:
+                    kw = include(kw);
+                    break;
+               case SEC_START:
+                    sub = get_section(&kw);
+                    TAILQ_INSERT_TAIL(&s->sub, sub, entry);
+                    s->nsub++;
+                    break;
                case WORD:
-                    o = get_option();
+                    o = get_option(&kw);
                     SLIST_INSERT_HEAD(&s->optlist, o, entry);
                     s->nopt++;
                     break;
-               case SEC_START:
-                    sub = get_section();
-                    TAILQ_INSERT_TAIL(&s->sub, sub, entry);
-                    s->nsub++;
-               case SEC_END:
-                    break;
                default:
-                    syntax("syntax error");
+                    syntax(kw, "syntax error");
                     break;
           }
      }
-     pop_keyword();
 
-     if (curk && curk->type != WORD)
-          syntax("missing end-section name");
+     if (!kw || strcmp(kw->name, s->name))
+          syntax(kw, "missing end section %s", s->name);
 
-     if (!curk || strcmp(curw->name, s->name))
-          syntax("non-closed section '%s'", s->name);
+     kw = kw->next;
+     *head = kw;
 
-     pop_stack();
-     pop_keyword();
      return s;
 }
 
-
-static struct conf_opt *
-get_option(void)
-{
-     struct conf_opt *o;
-     size_t j = 0;
-
-     o = emalloc(1, sizeof(*o));
-     o->name = strdup(curw->name);
-     o->used = False;
-     o->line = curw->line;
-     pop_stack();
-     pop_keyword();
-
-     if (!curk || curk->type != EQUAL)
-          syntax("missing '=' here");
-
-     pop_keyword();
-
-     if (!curk)
-          syntax("syntax error");
-
-     switch (curk->type) {
-          case WORD:
-               o->val[0] = strdup(curw->name);
-               o->val[1] = NULL;
-               pop_stack();
-               break;
-          case LIST_START:
-               pop_keyword();
-               while (curk && curk->type != LIST_END) {
-                    if (curk->type != WORD)
-                         syntax("declaration into a list");
-                    o->val[j++] = strdup(curw->name);
-                    pop_stack();
-                    pop_keyword();
-               }
-               o->val[j] = NULL;
-               break;
-          default:
-               syntax("syntax error");
-               break;
-     }
-     pop_keyword();
-     return o;
-}
-
-
-static void
-pop_keyword(void)
-{
-     if (curk)
-     {
-          TAILQ_REMOVE(&keywords, curk, entry);
-#ifdef DEBUG
-          warnx("%s", get_kw_name(curk->type));
-#endif
-          free(curk);
-
-          curk = TAILQ_FIRST(&keywords);
-     }
-}
-
-static void
-pop_stack(void)
-{
-     if (curw)
-     {
-          TAILQ_REMOVE(&stack, curw, entry);
-#ifdef DEBUG
-          warnx("%s", curw->name);
-#endif
-          free(curw);
-
-          curw = TAILQ_FIRST(&stack);
-     }
-}
-
-static void
-syntax(const char *fmt, ...)
-{
-     va_list args;
-
-     if (curw)
-          fprintf(stderr, "%s: %s:%d, near '%s', ",
-                    __progname, file.name, curw->line, curw->name);
-     else
-          fprintf(stderr, "%s: %s: ", __progname, file.name);
-     va_start(args, fmt);
-     vfprintf(stderr, fmt, args);
-     va_end(args);
-     exit(EXIT_FAILURE);
-}
-
-void
-print_unused(struct conf_sec *sec)
+int
+get_conf(const char *filename)
 {
      struct conf_sec *s;
-     struct conf_opt *o;
+     struct keyword *head, *kw;
 
-     if (!sec)
-     {
-          TAILQ_FOREACH(s, &config, entry)
-               print_unused(s);
-          return;
-     }
+     kw = head = parse_keywords(filename);
+     if (!head)
+          return -1; /* TODO ERREUR */
 
-     SLIST_FOREACH(o, &sec->optlist, entry)
-          if (o->used == False)
-               warnx("%s:%d, unused param %s",
-                         file.name, o->line, o->name);
+     TAILQ_INIT(&config);
 
-     TAILQ_FOREACH(s, &sec->sub, entry)
-          if (!TAILQ_EMPTY(&s->sub))
-               print_unused(s);
-}
-
-void
-free_conf(struct conf_sec *sec)
-{
-     struct conf_sec *s;
-     struct conf_opt *o;
-     size_t n;
-
-     if (!sec)
-     {
-          TAILQ_FOREACH(s, &config, entry)
-          {
-               free(s->name);
-               free_conf(s);
-               free(s);
-          }
-          return;
-     }
-
-     while (!SLIST_EMPTY(&sec->optlist))
-     {
-          o = SLIST_FIRST(&sec->optlist);
-          SLIST_REMOVE_HEAD(&sec->optlist, entry);
-          free(o->name);
-
-          for (n = 0; o->val[n]; n++)
-               free(o->val[n]);
-
-          free(o);
-     }
-
-     while (!TAILQ_EMPTY(&sec->sub))
-     {
-          s = TAILQ_FIRST(&sec->sub);
-          TAILQ_REMOVE(&sec->sub, s, entry);
-          free_conf(s);
-     }
-
-}
-
-struct conf_sec **
-fetch_section(struct conf_sec *s, char *name)
-{
-     struct conf_sec **ret;
-     struct conf_sec *sec;
-     size_t i = 0;
-
-     if (!name)
-          return NULL;
-
-     if (!s) {
-          ret = emalloc(2, sizeof(struct conf_sec *));
-          TAILQ_FOREACH(sec, &config, entry)
-               if (!strcmp(sec->name, name)) {
-                    ret[0] = sec;
-                    ret[1] = NULL;
+     while (kw) {
+          switch (kw->type) {
+               case INCLUDE:
+                    kw = include(kw);
                     break;
-               }
-     }
-     else {
-          ret = emalloc(s->nsub+1, sizeof(struct conf_sec *));
-          TAILQ_FOREACH(sec, &s->sub, entry) {
-               if (!strcmp(sec->name, name) && i < s->nsub)
-                    ret[i++] = sec;
+               case SEC_START:
+                    s = get_section(&kw);
+                    TAILQ_INSERT_TAIL(&config, s, entry);
+                    break;
+               default:
+                    syntax(kw, "out of any section");
+                    break;
           }
-          ret[i] = NULL;
      }
-     return ret;
+     return 0;
 }
 
-struct conf_sec *
-fetch_section_first(struct conf_sec *s, char *name)
+
+void *
+xcalloc(size_t nmemb, size_t size)
 {
-     struct conf_sec *sec, *ret = NULL;
+     void *ret;
 
-     if (!name)
-          return NULL;
-
-     if (!s)
-     {
-          TAILQ_FOREACH(sec, &config, entry)
-               if(sec->name && !strcmp(sec->name, name)) {
-                   ret = sec;
-                   break;
-               }
-     }
-     else
-     {
-         TAILQ_FOREACH(sec, &s->sub, entry)
-              if (sec->name && !strcmp(sec->name, name)) {
-                  ret = sec;
-                  break;
-              }
-     }
+     if (!(ret = calloc(nmemb, size)))
+          warn("calloc");
 
      return ret;
 }
-
-size_t
-fetch_section_count(struct conf_sec **s)
-{
-     size_t ret;
-     for (ret = 0; s[ret]; ret++);
-     return ret;
-}
-
-struct opt_type *
-fetch_opt(struct conf_sec *s, char *dfl, char *name)
-{
-     struct conf_opt *o;
-     struct opt_type *ret;
-     size_t i = 0;
-
-     if (!name)
-          return NULL;
-
-     ret = emalloc(10, sizeof(struct opt_type));
-
-     if (s) {
-          SLIST_FOREACH(o, &s->optlist, entry)
-               if (!strcmp(o->name, name)) {
-                    while (o->val[i]) {
-                         o->used = True;
-                         ret[i] = string_to_opt(o->val[i]);
-                         i++;
-                    }
-                    ret[i] = opt_type_null;
-                    return ret;
-               }
-     }
-
-     ret[0] = string_to_opt(dfl);
-     ret[1] = opt_type_null;
-
-     return ret;
-}
-
-struct opt_type
-fetch_opt_first(struct conf_sec *s, char *dfl, char *name)
-{
-     struct conf_opt *o;
-
-     if (!name)
-          return opt_type_null;
-     else if (s)
-          SLIST_FOREACH(o, &s->optlist, entry)
-               if (!strcmp(o->name, name)) {
-                    o->used = True;
-                    return string_to_opt(o->val[0]);
-               }
-     return string_to_opt(dfl);
-}
-
-size_t
-fetch_opt_count(struct opt_type *o)
-{
-     size_t ret;
-     for(ret = 0; o[ret].str; ret++);
-     return ret;
-}
-
-static struct opt_type
-string_to_opt(char *s)
-{
-     struct opt_type ret = opt_type_null;
-
-     if (!s || !strlen(s))
-          return ret;
-
-     ret.num = strtol(s, (char**)NULL, 10);
-     ret.fnum = strtod(s, NULL);
-
-     if (!strcmp(s, "true") || !strcmp(s, "True") ||
-               !strcmp(s, "TRUE") || !strcmp(s, "1"))
-          ret.bool = True;
-     else
-          ret.bool = False;
-
-     ret.str = s;
-
-     return ret;
-}
-

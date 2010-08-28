@@ -4,6 +4,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/parse)
 
 SET(WMFS_SOURCES
 	parse/parse.c
+	parse/api.c
 	barwin.c
 	client.c
 	config.c
