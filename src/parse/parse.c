@@ -292,16 +292,16 @@ include(struct keyword *head)
      /* replace ~ by user directory */
      if (head->name && head->name[0] == '~') {
           if ( (user = getpwuid(getuid())) && user->pw_dir)
-               asprintf(&filename, "%s%s", user->pw_dir, head->name+1);
+               xasprintf(&filename, "%s%s", user->pw_dir, head->name+1);
           else if (getenv("HOME"))
-               asprintf(&filename, "%s%s", getenv("HOME"), head->name+1);
+               xasprintf(&filename, "%s%s", getenv("HOME"), head->name+1);
           else /* to warning ? */
                filename = head->name;
      }
      /* relative path from parent file */
      else if (head->name && head->name[0] != '/') {
           base = strdup(kw->file->parent->name);
-          asprintf(&filename, "%s/%s", dirname(base), head->name);
+          xasprintf(&filename, "%s/%s", dirname(base), head->name);
           free(base);
      }
      else
@@ -471,6 +471,7 @@ get_conf(const char *filename)
 }
 
 
+/* calloc wrapper */
 void *
 xcalloc(size_t nmemb, size_t size)
 {
@@ -479,5 +480,21 @@ xcalloc(size_t nmemb, size_t size)
      if (!(ret = calloc(nmemb, size)))
           warn("calloc");
 
+     return ret;
+}
+
+/* asprintf wrapper */
+int
+xasprintf(char **strp, const char *fmt, ...)
+{
+     int ret;
+     va_list args;
+
+     va_start(args, fmt);
+     ret = vasprintf(strp, fmt, args);
+     va_end(args);
+
+     if (ret == -1)
+          err(EXIT_FAILURE, "asprintf");
      return ret;
 }

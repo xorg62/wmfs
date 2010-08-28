@@ -30,11 +30,6 @@
 *      OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* conforming to glib use _GNU_SOURCE for asprintf declaration */
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-
 #include "wmfs.h"
 
 static char *complete_on_command(char*, size_t);
@@ -257,7 +252,7 @@ complete_on_command(char *start, size_t hits)
      struct dirent *content;
 
      char **namelist = NULL;
-     int n = 0;
+     int n = 0, i;
      void *temp = NULL;
 
      if (!getenv("PATH") || !start || hits <= 0)
@@ -291,12 +286,15 @@ complete_on_command(char *start, size_t hits)
      qsort(namelist, n, sizeof(char *), qsort_string_compare);
 
      free(path);
+
      if(n > 0)
+     {
          ret = _strdup(namelist[((hits > 0) ? hits - 1 : 0) % n] + strlen(start));
 
-     int i;
-     for(i = 0; i < n; i++)
-         free(namelist[i]);
+          for(i = 0; i < n; i++)
+              free(namelist[i]);
+     }
+
      free(namelist);
      return ret;
 }
@@ -331,7 +329,7 @@ complete_on_files(char *start, size_t hits)
      {
           /* remplace ~ by $HOME in dirname */
           if (!strncmp(p, "~/", 2) && getenv("HOME"))
-               asprintf(&dirname, "%s%s", getenv("HOME"), p+1);
+               xasprintf(&dirname, "%s%s", getenv("HOME"), p+1);
           else
                dirname = _strdup(p);
 
@@ -362,12 +360,12 @@ complete_on_files(char *start, size_t hits)
                if (!strncmp(content->d_name, p, strlen(p)) && ++count == hits)
                {
                     /* If it's a directory append '/' to the completion */
-                    asprintf(&filepath, "%s/%s", path, content->d_name);
+                    xasprintf(&filepath, "%s/%s", path, content->d_name);
 
                     if (filepath && stat(filepath, &st) != -1)
                     {
                          if (S_ISDIR(st.st_mode))
-                              asprintf(&ret, "%s/", content->d_name + strlen(p));
+                              xasprintf(&ret, "%s/", content->d_name + strlen(p));
                          else
                               ret = _strdup(content->d_name + strlen(p));
                     }

@@ -118,5 +118,7 @@ size_t fetch_opt_count(struct opt_type *);
 
 /* wrapper for calloc */
 void *xcalloc(size_t, size_t);
+/* wrapper for asprintf */
+int xasprintf(char **, const char *, ...);
 
 #endif /* PARSE_H */
