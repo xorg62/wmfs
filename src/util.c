@@ -356,3 +356,10 @@ patht(char *path)
 
      return ret;
 }
+
+int
+qsort_string_compare (const void * a, const void * b)
+{
+     return (strcmp(*(char **)a, *(char **)b));
+}
+

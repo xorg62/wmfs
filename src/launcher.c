@@ -37,7 +37,6 @@
 
 #include "wmfs.h"
 
-
 static char *complete_on_command(char*, size_t);
 static char *complete_on_files(char*, size_t);
 
@@ -256,7 +255,10 @@ complete_on_command(char *start, size_t hits)
      char *ret = NULL;
      DIR *dir;
      struct dirent *content;
-     size_t count = 0;
+
+     char **namelist = NULL;
+     int n = 0;
+     void *temp = NULL;
 
      if (!getenv("PATH") || !start || hits <= 0)
          return NULL;
@@ -265,27 +267,37 @@ complete_on_command(char *start, size_t hits)
      dirname = strtok(path, ":");
 
      /* recursively open PATH */
-     while (dirname)
+     while (dirname != NULL)
      {
           if ((dir = opendir(dirname)))
           {
                while ((content = readdir(dir)))
-                    if (!strncmp(content->d_name, start, strlen(start)) && ++count == hits)
+               {
+                    if(strncmp(content->d_name, ".", 1))
                     {
-                         ret = _strdup(content->d_name + strlen(start));
-                         break;
+                         if (!strncmp(content->d_name, start, strlen(start)))
+                         {
+                              temp = realloc(namelist, ++n * sizeof(*namelist));
+                              if ( temp != NULL )
+                                   namelist = temp;
+                              namelist[n-1] = strdup(content->d_name);
+                         }
                     }
+               }
                closedir(dir);
           }
-
-          if (ret)
-              break;
-
           dirname = strtok(NULL, ":");
      }
+     qsort(namelist, n, sizeof(char *), qsort_string_compare);
 
      free(path);
+     if(n > 0)
+         ret = _strdup(namelist[((hits > 0) ? hits - 1 : 0) % n] + strlen(start));
 
+     int i;
+     for(i = 0; i < n; i++)
+         free(namelist[i]);
+     free(namelist);
      return ret;
 }
 
