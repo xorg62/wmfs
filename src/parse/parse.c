@@ -36,6 +36,7 @@ extern char *__progname;
 
 enum keyword_t { SEC_START, SEC_END, INCLUDE, WORD, EQUAL, LIST_START, LIST_END, NONE };
 
+#ifdef DEBUG
 static struct {
      const char *name;
      enum keyword_t type;
@@ -49,6 +50,7 @@ static struct {
      {"LIST_END", LIST_END},
      {"NONE", NONE},
 };
+#endif
 
 struct files {
      char *name;
@@ -114,6 +116,26 @@ push_keyword(struct keyword *tail, enum keyword_t type, char *buf, size_t *offse
 
      return kw;
 }
+
+static void
+syntax(struct keyword *kw, const char *fmt, ...)
+{
+     va_list args;
+
+     fprintf(stderr, "%s: %s:%d", __progname, kw->file->name, kw->line);
+     if (kw->name)
+          fprintf(stderr, ", near '%s'", kw->name);
+     fprintf(stderr, ": ");
+
+     va_start(args, fmt);
+     vfprintf(stderr, fmt, args);
+     va_end(args);
+
+     fprintf(stderr, "\n");
+
+     exit(EXIT_FAILURE);
+}
+
 
 #define PUSH_KEYWORD(type) tail = push_keyword(tail, type, bufname, &j, file, line)
 static struct keyword *
@@ -205,11 +227,15 @@ parse_keywords(const char *filename)
                     type = SEC_START;
                }
 
+               /* get section name */
                while (buf[i] != ']') {
-                    if (i >= (size_t)st.st_size)
-                    {
-                         /* TODO ERREUR */
+
+                    if (i >= ((size_t)st.st_size-1) || j >= (BUFSIZ-1)) {
+                         bufname[j] = '\0';
+                         syntax(NULL, "word too long in %s:%d near '%s'",
+                                   file->name, line, bufname);
                     }
+
                     bufname[j++] = buf[i++];
                }
                PUSH_KEYWORD(type);
@@ -248,30 +274,17 @@ parse_keywords(const char *filename)
                continue;
           }
 
+          if (j >= (BUFSIZ - 1)) {
+               bufname[j] = '\0';
+               syntax(NULL, "word too long in %s:%d near '%s'",
+                         file->name, line, bufname);
+          }
+
           bufname[j++] = buf[i];
      }
      munmap(buf, st.st_size);
      warnx("%s read", file->name);
      return head;
-}
-
-static void
-syntax(struct keyword *kw, const char *fmt, ...)
-{
-     va_list args;
-
-     fprintf(stderr, "%s: %s:%d", __progname, kw->file->name, kw->line);
-     if (kw->name)
-          fprintf(stderr, ", near '%s'", kw->name);
-     fprintf(stderr, ": ");
-
-     va_start(args, fmt);
-     vfprintf(stderr, fmt, args);
-     va_end(args);
-
-     fprintf(stderr, "\n");
-
-     exit(EXIT_FAILURE);
 }
 
 static struct keyword *
@@ -478,7 +491,7 @@ xcalloc(size_t nmemb, size_t size)
      void *ret;
 
      if (!(ret = calloc(nmemb, size)))
-          warn("calloc");
+          err(EXIT_FAILURE, "calloc");
 
      return ret;
 }
@@ -496,5 +509,6 @@ xasprintf(char **strp, const char *fmt, ...)
 
      if (ret == -1)
           err(EXIT_FAILURE, "asprintf");
+
      return ret;
 }
