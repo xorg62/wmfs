@@ -126,7 +126,7 @@ quit(void)
      IFREE(conf.client.mouse);
      IFREE(conf.root.mouse);
 
-     free_conf(NULL);
+     free_conf();
 
      XSync(dpy, False);
      XCloseDisplay(dpy);

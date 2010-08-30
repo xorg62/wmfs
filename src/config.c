@@ -181,7 +181,8 @@ void
 conf_bar_section(void)
 {
      struct conf_sec *bar, **mouse, *selbar, *systray;
-     char *barbg, sc = screen_count();
+     char *barbg;
+     int sc = screen_count();
 
      bar = fetch_section_first(NULL, "bar");
 
@@ -230,7 +231,6 @@ conf_bar_section(void)
      }
 
      free(mouse);
-     free(barbg);
 
      return;
 }

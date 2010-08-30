@@ -122,8 +122,12 @@ syntax(struct keyword *kw, const char *fmt, ...)
 {
      va_list args;
 
-     fprintf(stderr, "%s: %s:%d", __progname, kw->file->name, kw->line);
-     if (kw->name)
+     fprintf(stderr, "%s:", __progname);
+
+     if (kw && kw->file && kw->file->name)
+          fprintf(stderr, "%s:%d", kw->file->name, kw->line);
+
+     if (kw && kw->name)
           fprintf(stderr, ", near '%s'", kw->name);
      fprintf(stderr, ": ");
 
@@ -132,8 +136,6 @@ syntax(struct keyword *kw, const char *fmt, ...)
      va_end(args);
 
      fprintf(stderr, "\n");
-
-     exit(EXIT_FAILURE);
 }
 
 
@@ -154,16 +156,10 @@ parse_keywords(const char *filename)
      char path[PATH_MAX];
      size_t i, j;
      int line;
+     bool_t error = False;
 
 
      if ((fd = open(filename, O_RDONLY)) == -1 || stat(filename, &st) == -1) {
-          warn("%s", filename);
-          return NULL;
-     }
-
-     buf = (char *)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, SEEK_SET);
-
-     if (buf == (char*)MAP_FAILED) {
           warn("%s", filename);
           return NULL;
      }
@@ -174,15 +170,21 @@ parse_keywords(const char *filename)
      }
 
      file = xcalloc(1, sizeof(*file));
+     bufname = xcalloc(1, sizeof(*bufname) * BUFSIZ);
      file->name = strdup(path);
      file->parent = NULL;
 
-     bufname = xcalloc(1, sizeof(*bufname) * BUFSIZ);
+     buf = (char *)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, SEEK_SET);
+
+     if (buf == (char*)MAP_FAILED) {
+          warn("%s", filename);
+          return NULL;
+     }
 
 
      for(i = 0, j = 0, line = 1; i < (size_t)st.st_size; i++) {
 
-          if (tail && !head)
+          if (!head && tail)
                head = tail;
 
           if (buf[i] == '\n' && s.comment == True) {
@@ -199,94 +201,106 @@ parse_keywords(const char *filename)
           if (s.comment == True)
                continue;
 
-          if (buf[i] == s.quote_char && s.quote == True) {
+          if (s.quote == True && buf[i] == s.quote_char) {
                /* end of quotted string */
                PUSH_KEYWORD(WORD);
                s.quote = False;
                continue;
           }
 
-          if ((buf[i] == '"' || buf[i] == '\'') &&
-                    s.quote == False)
-          {
-               PUSH_KEYWORD(WORD);
-               /* begin quotted string */
-               s.quote_char = buf[i];
-               s.quote = True;
-               continue;
-          }
-
-          if (buf[i] == '[' && s.quote == False) {
-               PUSH_KEYWORD(WORD);
-               if (buf[i+1] == '/') {
-                    i +=2;
-                    type = SEC_END;
-               }
-               else {
-                    i++;
-                    type = SEC_START;
+          if (s.quote == False) {
+               if ((buf[i] == '"' || buf[i] == '\'')) {
+                    PUSH_KEYWORD(WORD);
+                    /* begin quotted string */
+                    s.quote_char = buf[i];
+                    s.quote = True;
+                    continue;
                }
 
-               /* get section name */
-               while (buf[i] != ']') {
-
-                    if (i >= ((size_t)st.st_size-1) || j >= (BUFSIZ-1)) {
-                         bufname[j] = '\0';
-                         syntax(NULL, "word too long in %s:%d near '%s'",
-                                   file->name, line, bufname);
+               if (buf[i] == '[') {
+                    PUSH_KEYWORD(WORD);
+                    if (buf[i+1] == '/') {
+                         i +=2;
+                         type = SEC_END;
+                    }
+                    else {
+                         i++;
+                         type = SEC_START;
                     }
 
-                    bufname[j++] = buf[i++];
+                    /* get section name */
+                    while (buf[i] != ']') {
+
+                         if (i >= ((size_t)st.st_size-1) || j >= (BUFSIZ-1)) {
+                              bufname[j] = '\0';
+                              syntax(NULL, "word too long in %s:%d near '%s'",
+                                        file->name, line, bufname);
+                              error = True;
+                              break;
+                         }
+
+                         bufname[j++] = buf[i++];
+                    }
+                    PUSH_KEYWORD(type);
+                    continue;
                }
-               PUSH_KEYWORD(type);
-               continue;
-          }
 
-          if (buf[i] == '{' && s.quote == False) {
-               PUSH_KEYWORD(WORD);
-               PUSH_KEYWORD(LIST_START);
-               continue;
-          }
+               if (buf[i] == '{') {
+                    PUSH_KEYWORD(WORD);
+                    PUSH_KEYWORD(LIST_START);
+                    continue;
+               }
 
-          if (buf[i] == '}' && s.quote == False) {
-               PUSH_KEYWORD(WORD);
-               PUSH_KEYWORD(LIST_END);
-               continue;
-          }
+               if (buf[i] == '}') {
+                    PUSH_KEYWORD(WORD);
+                    PUSH_KEYWORD(LIST_END);
+                    continue;
+               }
 
-          if (buf[i] == ',' && s.quote == False) {
-               PUSH_KEYWORD(WORD);
-               continue;
-          }
+               if (buf[i] == ',') {
+                    PUSH_KEYWORD(WORD);
+                    continue;
+               }
 
-          if (buf[i] == '=' && s.quote == False) {
-               PUSH_KEYWORD(WORD);
-               PUSH_KEYWORD(EQUAL);
-               continue;
-          }
+               if (buf[i] == '=') {
+                    PUSH_KEYWORD(WORD);
+                    PUSH_KEYWORD(EQUAL);
+                    continue;
+               }
 
-          if (strchr("\t\n ", buf[i]) && s.quote == False) {
-               PUSH_KEYWORD(WORD);
+               if (strchr("\t\n ", buf[i])) {
+                    PUSH_KEYWORD(WORD);
 
-               if (buf[i] == '\n')
-                    line++;
+                    if (buf[i] == '\n')
+                         line++;
 
-               continue;
-          }
+                    continue;
+               }
+          } /* s.quote == False */
 
           if (j >= (BUFSIZ - 1)) {
                bufname[j] = '\0';
                syntax(NULL, "word too long in %s:%d near '%s'",
                          file->name, line, bufname);
+               error = True;
+               break;
           }
 
           bufname[j++] = buf[i];
      }
+
      munmap(buf, st.st_size);
+     free(bufname);
      warnx("%s read", file->name);
-     return head;
+
+     return (error ? NULL: head);
 }
 
+/*
+ * return NULL on failure and head->next if
+ * no config found (of file doesn't exist)
+ * NOTE to devs: head->name is the file to include
+ */
 static struct keyword *
 include(struct keyword *head)
 {
@@ -299,8 +313,10 @@ include(struct keyword *head)
 
      head = head->next;
 
-     if (!head || head->type != WORD)
+     if (!head || head->type != WORD) {
           syntax(head, "missing filename to include");
+          return NULL;
+     }
 
      /* replace ~ by user directory */
      if (head->name && head->name[0] == '~') {
@@ -322,18 +338,28 @@ include(struct keyword *head)
 
      if (!(kw = parse_keywords(filename))) {
           warnx("no config fond in include file %s", head->name);
-          return head->next;
+
+          if (filename != head->name)
+               free(filename);
+
+          return NULL;
      }
 
      kw->file->parent = head->file;
-     head = head->next;
 
      /* detect circular include */
-     for (file = kw->file->parent; file != NULL; file = file->parent)
-     {
-          if (!strcmp(file->name, kw->file->name))
+     for (file = kw->file->parent; file != NULL; file = file->parent) {
+          if (!strcmp(file->name, kw->file->name)) {
                syntax(kw, "circular include of %s", kw->file->name);
+
+               if (filename != head->name)
+                    free(filename);
+
+               return NULL;
+          }
      }
+
+     head = head->next;
 
      if (kw) {
           for (tail = kw; tail->next; tail = tail->next);
@@ -341,6 +367,20 @@ include(struct keyword *head)
      }
 
      return kw;
+}
+
+static void *
+free_opt(struct conf_opt *o)
+{
+     int i;
+     if (o) {
+          if (o->name)
+               free(o->name);
+          for (i = 0; o->val[i]; i++)
+               free(o->val[i]);
+          free(o);
+     }
+     return NULL;
 }
 
 static struct conf_opt *
@@ -358,18 +398,23 @@ get_option(struct keyword **head)
 
      kw = kw->next;
 
-     if (kw->type != EQUAL)
+     if (kw->type != EQUAL) {
           syntax(kw, "missing '=' here");
+          return free_opt(o);
+     }
 
      kw = kw->next;
 
-     if (!kw)
+     if (!kw) {
           syntax(kw, "missing value");
+          return free_opt(o);
+     }
 
 
      switch (kw->type) {
           case INCLUDE:
-               kw = include(kw);
+               if (!(kw = include(kw)))
+                    return free_opt(o);
                break;
           case WORD:
                o->val[0] = kw->name;
@@ -381,32 +426,62 @@ get_option(struct keyword **head)
                while (kw && kw->type != LIST_END) {
                     switch (kw->type) {
                          case WORD:
-                              if (j > 9)
+                              if (j > (PARSE_MAX_LIST - 1)) {
                                    syntax(kw, "too much values in list");
+                                   return free_opt(o);
+                              }
                               o->val[j++] = kw->name;
                               kw = kw->next;
                               break;
                          case INCLUDE:
-                              kw = include(kw);
+                              if (!(kw = include(kw)))
+                                   return free_opt(o);
                               break;
                          default:
                               syntax(kw, "declaration into a list");
+                              return free_opt(o);
                               break;
                     }
                }
 
-               if (!kw)
+               if (!kw) {
                     syntax(kw, "list unclosed");
+                    return free_opt(o);
+               }
 
                kw = kw->next;
                break;
           default:
                syntax(kw, "missing value");
+               return free_opt(o);
                break;
      }
 
      *head = kw;
      return o;
+}
+
+static void *
+free_sec(struct conf_sec *sec)
+{
+     struct conf_opt *o;
+     struct conf_sec *s;
+
+     if (sec) {
+          while (!SLIST_EMPTY(&sec->optlist)) {
+               o = SLIST_FIRST(&sec->optlist);
+               SLIST_REMOVE_HEAD(&sec->optlist, entry);
+               free_opt(o);
+          }
+          while (!TAILQ_EMPTY(&sec->sub)) {
+               s = TAILQ_FIRST(&sec->sub);
+               TAILQ_REMOVE(&sec->sub, s, entry);
+               free_sec(s);
+          }
+          free(sec->name);
+          free(sec);
+     }
+     return NULL;
 }
 
 static struct conf_sec *
@@ -427,31 +502,51 @@ get_section(struct keyword **head)
      while (kw && kw->type != SEC_END) {
           switch (kw->type) {
                case INCLUDE:
-                    kw = include(kw);
+                    if (!(kw = include(kw)))
+                         return free_sec(s);
                     break;
                case SEC_START:
-                    sub = get_section(&kw);
+                    if (!(sub = get_section(&kw)))
+                         return free_sec(s);
                     TAILQ_INSERT_TAIL(&s->sub, sub, entry);
                     s->nsub++;
                     break;
                case WORD:
-                    o = get_option(&kw);
+                    if (!(o = get_option(&kw)))
+                         return free_sec(s);
                     SLIST_INSERT_HEAD(&s->optlist, o, entry);
                     s->nopt++;
                     break;
                default:
                     syntax(kw, "syntax error");
+                    return free_sec(s);
                     break;
           }
      }
 
-     if (!kw || strcmp(kw->name, s->name))
+     if (!kw || strcmp(kw->name, s->name)) {
           syntax(kw, "missing end section %s", s->name);
+          return free_sec(s);
+     }
 
      kw = kw->next;
      *head = kw;
 
      return s;
+}
+
+int
+free_conf(void)
+{
+     struct conf_sec *s;
+     struct keyword *kw = NULL;
+
+     while (!TAILQ_EMPTY(&config)) {
+          s = TAILQ_FIRST(&config);
+          TAILQ_REMOVE(&config, s, entry);
+          free_sec(s);
+     }
+     return -1;
 }
 
 int
@@ -461,6 +556,7 @@ get_conf(const char *filename)
      struct keyword *head, *kw;
 
      kw = head = parse_keywords(filename);
+
      if (!head)
           return -1; /* TODO ERREUR */
 
@@ -469,14 +565,17 @@ get_conf(const char *filename)
      while (kw) {
           switch (kw->type) {
                case INCLUDE:
-                    kw = include(kw);
+                    if (!(kw = include(kw)))
+                         return free_conf();
                     break;
                case SEC_START:
-                    s = get_section(&kw);
+                    if (!(s = get_section(&kw)))
+                         return free_conf();
                     TAILQ_INSERT_TAIL(&config, s, entry);
                     break;
                default:
                     syntax(kw, "out of any section");
+                    return free_conf();
                     break;
           }
      }

@@ -71,45 +71,6 @@ print_unused(struct conf_sec *sec)
                print_unused(s);
 }
 
-void
-free_conf(struct conf_sec *sec)
-{
-     struct conf_sec *s;
-     struct conf_opt *o;
-     size_t n;
-
-     if (!sec)
-     {
-          TAILQ_FOREACH(s, &config, entry)
-          {
-               free(s->name);
-               free_conf(s);
-               free(s);
-          }
-          return;
-     }
-
-     while (!SLIST_EMPTY(&sec->optlist))
-     {
-          o = SLIST_FIRST(&sec->optlist);
-          SLIST_REMOVE_HEAD(&sec->optlist, entry);
-          free(o->name);
-
-          for (n = 0; o->val[n]; n++)
-               free(o->val[n]);
-
-          free(o);
-     }
-
-     while (!TAILQ_EMPTY(&sec->sub))
-     {
-          s = TAILQ_FIRST(&sec->sub);
-          TAILQ_REMOVE(&sec->sub, s, entry);
-          free_conf(s);
-     }
-
-}
-
 struct conf_sec **
 fetch_section(struct conf_sec *s, char *name)
 {

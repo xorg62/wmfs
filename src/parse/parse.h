@@ -20,6 +20,7 @@
 #include <sys/queue.h>
 
 #define INCLUDE_CMD "@include"
+#define PARSE_MAX_LIST 10
 
 #if defined(Bool)
 #define bool_t Bool
@@ -29,7 +30,7 @@ typedef enum { False, True } bool_t;
 
 struct conf_opt {
      char *name;
-     char *val[10];
+     char *val[PARSE_MAX_LIST];
      size_t nval;
      bool_t used;
      int line;
@@ -70,7 +71,7 @@ void print_unused(struct conf_sec *s);
  * WARNING: This make all string
  * returned by fetch_(opt|section)(_first) unusable.
  */
-void free_conf(struct conf_sec *s);
+int free_conf(void);
 
 /*
  * Get all subsection matching the given name on the given
