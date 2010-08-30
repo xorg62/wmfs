@@ -21,10 +21,11 @@
 
 #define INCLUDE_CMD "@include"
 
-#define False 0
-#define True 1
-
-#define bool_t int
+#if defined(Bool)
+#define bool_t Bool
+#else
+typedef enum { False, True } bool_t;
+#endif /* Bool */
 
 struct conf_opt {
      char *name;
