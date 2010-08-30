@@ -74,6 +74,7 @@ struct state {
 
 /* TO REMOVE (use a identifier for config and fallback XDG in api functions) */
 TAILQ_HEAD(, conf_sec) config;
+static struct keyword *keywords = NULL;
 
 static struct keyword *
 push_keyword(struct keyword *tail, enum keyword_t type, char *buf, size_t *offset, struct files *file, int line)
@@ -372,14 +373,8 @@ include(struct keyword *head)
 static void *
 free_opt(struct conf_opt *o)
 {
-     int i;
-     if (o) {
-          if (o->name)
-               free(o->name);
-          for (i = 0; o->val[i]; i++)
-               free(o->val[i]);
+     if (o)
           free(o);
-     }
      return NULL;
 }
 
@@ -478,7 +473,6 @@ free_sec(struct conf_sec *sec)
                TAILQ_REMOVE(&sec->sub, s, entry);
                free_sec(s);
           }
-          free(sec->name);
           free(sec);
      }
      return NULL;
@@ -539,12 +533,41 @@ int
 free_conf(void)
 {
      struct conf_sec *s;
-     struct keyword *kw = NULL;
+     struct keyword *kw, *nkw;
+     struct files **f = NULL;
+     int i, nf = 0;
 
      while (!TAILQ_EMPTY(&config)) {
           s = TAILQ_FIRST(&config);
           TAILQ_REMOVE(&config, s, entry);
           free_sec(s);
+     }
+
+     kw = keywords;
+
+     while (kw) {
+          nkw = kw->next;
+
+          if (kw->name)
+               free(kw->name);
+
+          for (i = 0; i < nf; i++) {
+               if (f[i] == kw->file) {
+                    if (!(f = realloc(f, sizeof(*f) * (++i))))
+                         err(EXIT_FAILURE, "realloc");
+                    f[i-1] = kw->file;
+               }
+          }
+
+          kw = nkw;
+     }
+
+     if (nf > 0) {
+          for (i = 0; i < nf; i++) {
+               free(f[i]->name);
+               free(f[i]);
+          }
+          free(f);
      }
      return -1;
 }
@@ -559,6 +582,8 @@ get_conf(const char *filename)
 
      if (!head)
           return -1; /* TODO ERREUR */
+
+     keywords = head;
 
      TAILQ_INIT(&config);
 
