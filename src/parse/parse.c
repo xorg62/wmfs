@@ -330,7 +330,7 @@ include(struct keyword *head)
      }
      /* relative path from parent file */
      else if (head->name && head->name[0] != '/') {
-          base = strdup(kw->file->parent->name);
+          base = strdup(head->file->name);
           xasprintf(&filename, "%s/%s", dirname(base), head->name);
           free(base);
      }
