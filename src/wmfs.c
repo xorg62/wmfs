@@ -118,6 +118,7 @@ quit(void)
      }
 
      IFREE(conf.launcher);
+     IFREE(conf.rule);
 
      IFREE(conf.bars.mouse);
      IFREE(conf.selbar.mouse);
@@ -125,7 +126,7 @@ quit(void)
      IFREE(conf.client.mouse);
      IFREE(conf.root.mouse);
 
-     free_conf(NULL);
+     free_conf();
 
      XSync(dpy, False);
      XCloseDisplay(dpy);

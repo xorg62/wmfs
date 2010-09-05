@@ -30,13 +30,7 @@
 *      OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* conforming to glib use _GNU_SOURCE for asprintf declaration */
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-
 #include "wmfs.h"
-
 
 static char *complete_on_command(char*, size_t);
 static char *complete_on_files(char*, size_t);
@@ -61,7 +55,7 @@ launcher_execute(Launcher *launcher)
 
      x = (conf.layout_placement)
           ? (infobar[selscreen].tags_board->geo.x + infobar[selscreen].tags_board->geo.width)
-          : (infobar[selscreen].layout_button->geo.x + textw(tags[selscreen][seltag[selscreen]].layout.symbol) + PAD);
+          : (infobar[selscreen].layout_button->geo.x + infobar[selscreen].layout_button->geo.width);
 
      XGrabKeyboard(dpy, ROOT, True, GrabModeAsync, GrabModeAsync, CurrentTime);
 
@@ -256,7 +250,10 @@ complete_on_command(char *start, size_t hits)
      char *ret = NULL;
      DIR *dir;
      struct dirent *content;
-     size_t count = 0;
+
+     char **namelist = NULL;
+     int n = 0, i;
+     void *temp = NULL;
 
      if (!getenv("PATH") || !start || hits <= 0)
          return NULL;
@@ -265,27 +262,40 @@ complete_on_command(char *start, size_t hits)
      dirname = strtok(path, ":");
 
      /* recursively open PATH */
-     while (dirname)
+     while (dirname != NULL)
      {
           if ((dir = opendir(dirname)))
           {
                while ((content = readdir(dir)))
-                    if (!strncmp(content->d_name, start, strlen(start)) && ++count == hits)
+               {
+                    if(strncmp(content->d_name, ".", 1))
                     {
-                         ret = _strdup(content->d_name + strlen(start));
-                         break;
+                         if (!strncmp(content->d_name, start, strlen(start)))
+                         {
+                              temp = realloc(namelist, ++n * sizeof(*namelist));
+                              if ( temp != NULL )
+                                   namelist = temp;
+                              namelist[n-1] = strdup(content->d_name);
+                         }
                     }
+               }
                closedir(dir);
           }
-
-          if (ret)
-              break;
-
           dirname = strtok(NULL, ":");
      }
+     qsort(namelist, n, sizeof(char *), qsort_string_compare);
 
      free(path);
 
+     if(n > 0)
+     {
+         ret = _strdup(namelist[((hits > 0) ? hits - 1 : 0) % n] + strlen(start));
+
+          for(i = 0; i < n; i++)
+              free(namelist[i]);
+     }
+
+     free(namelist);
      return ret;
 }
 
@@ -319,7 +329,7 @@ complete_on_files(char *start, size_t hits)
      {
           /* remplace ~ by $HOME in dirname */
           if (!strncmp(p, "~/", 2) && getenv("HOME"))
-               asprintf(&dirname, "%s%s", getenv("HOME"), p+1);
+               xasprintf(&dirname, "%s%s", getenv("HOME"), p+1);
           else
                dirname = _strdup(p);
 
@@ -350,12 +360,12 @@ complete_on_files(char *start, size_t hits)
                if (!strncmp(content->d_name, p, strlen(p)) && ++count == hits)
                {
                     /* If it's a directory append '/' to the completion */
-                    asprintf(&filepath, "%s/%s", path, content->d_name);
+                    xasprintf(&filepath, "%s/%s", path, content->d_name);
 
                     if (filepath && stat(filepath, &st) != -1)
                     {
                          if (S_ISDIR(st.st_mode))
-                              asprintf(&ret, "%s/", content->d_name + strlen(p));
+                              xasprintf(&ret, "%s/", content->d_name + strlen(p));
                          else
                               ret = _strdup(content->d_name + strlen(p));
                     }

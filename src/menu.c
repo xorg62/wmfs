@@ -68,7 +68,11 @@ menu_draw(Menu menu, int x, int y)
      BarWindow *item[menu.nitem];
      BarWindow *frame;
 
-     width = menu_get_longer_string(menu.item, menu.nitem) + PAD * 3;
+     int chcklen = 0;
+     if(menu_get_checkstring_needed(menu.item, menu.nitem))
+        chcklen = textw(conf.selected_layout_symbol) + PAD / 3;
+
+     width = menu_get_longer_string(menu.item, menu.nitem) + chcklen + textw(">") + PAD * 3;
      height = menu.nitem * (INFOBARH - SHADH);
 
      /* Frame barwin */
@@ -99,7 +103,7 @@ menu_draw(Menu menu, int x, int y)
 
           barwin_map(item[i]);
           barwin_refresh_color(item[i]);
-          menu_draw_item_name(&menu, i, item);
+          menu_draw_item_name(&menu, i, item, chcklen);
           barwin_refresh(item[i]);
      }
 
@@ -209,6 +213,9 @@ Bool
 menu_activate_item(Menu *menu, int i)
 {
      int j, x, y;
+     int chcklen = 0;
+     if(menu_get_checkstring_needed(menu->item, menu->nitem))
+        chcklen = textw(conf.selected_layout_symbol) + PAD / 3;
 
      if(menu->item[i].submenu)
      {
@@ -216,7 +223,7 @@ menu_activate_item(Menu *menu, int i)
                if(!strcmp(menu->item[i].submenu, conf.menu[j].name))
                {
                     y = menu->y + ((i - 1) * INFOBARH + PAD) - SHADH * 2;
-                    x = menu->x + menu_get_longer_string(menu->item, menu->nitem) + PAD * 3;
+                    x = menu->x + menu_get_longer_string(menu->item, menu->nitem) + chcklen + textw(">") + PAD * 3;
 
                     menu_draw(conf.menu[j], x, y);
 
@@ -238,6 +245,10 @@ menu_focus_item(Menu *menu, int item, BarWindow *winitem[])
 {
      int i;
 
+     int chcklen = 0;
+     if(menu_get_checkstring_needed(menu->item, menu->nitem))
+        chcklen = textw(conf.selected_layout_symbol) + PAD / 3;
+
      menu->focus_item = item;
 
      if(menu->focus_item > menu->nitem - 1)
@@ -251,7 +262,7 @@ menu_focus_item(Menu *menu, int item, BarWindow *winitem[])
           winitem[i]->bg = ((i == menu->focus_item) ? menu->colors.focus.bg : menu->colors.normal.bg);
 
           barwin_refresh_color(winitem[i]);
-          menu_draw_item_name(menu, i, winitem);
+          menu_draw_item_name(menu, i, winitem, chcklen);
           barwin_refresh(winitem[i]);
      }
 
@@ -259,29 +270,29 @@ menu_focus_item(Menu *menu, int item, BarWindow *winitem[])
 }
 
 void
-menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[])
+menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[], int chcklen)
 {
      int x;
-     int width = menu_get_longer_string(menu->item, menu->nitem);
+     int width = menu_get_longer_string(menu->item, menu->nitem) + chcklen + PAD / 3;
 
      switch(menu->align)
      {
      case MA_Left:
-          x = PAD * 3 / 2;
+          x = chcklen + PAD / 2;
           break;
      case MA_Right:
           x = width - textw(menu->item[item].name) + PAD * 3 / 2;
           break;
      default:
      case MA_Center:
-          x = width / 2 - textw(menu->item[item].name) / 2 + PAD * 3 / 2;
+          x = (width - (chcklen + PAD / 3)) / 2 - textw(menu->item[item].name) / 2 + chcklen + PAD / 3;
           break;
      }
-     barwin_draw_text(winitem[item], x, FHINFOBAR, menu->item[item].name);
+     barwin_draw_image_ofset_text(winitem[item], x, FHINFOBAR, menu->item[item].name, chcklen + PAD / 2, 0);
 
      if(menu->item[item].check)
           if(menu->item[item].check(menu->item[item].cmd))
-               barwin_draw_text(winitem[item], PAD / 3, FHINFOBAR, conf.selected_layout_symbol);
+               barwin_draw_image_ofset_text(winitem[item], PAD / 3, FHINFOBAR, conf.selected_layout_symbol, PAD / 3, 0);
 
      if(menu->item[item].submenu)
           barwin_draw_text(winitem[item], width + PAD * 2, FHINFOBAR, ">");
@@ -338,5 +349,11 @@ menu_clear(Menu *menu)
      menu->nitem = 0;
 
      return;
+}
+
+Bool
+menu_get_checkstring_needed(MenuItem *mi, int nitem)
+{
+     return True;
 }
 

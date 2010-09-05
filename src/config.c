@@ -181,7 +181,8 @@ void
 conf_bar_section(void)
 {
      struct conf_sec *bar, **mouse, *selbar, *systray;
-     char *barbg, sc = screen_count();
+     char *barbg;
+     int sc = screen_count();
 
      bar = fetch_section_first(NULL, "bar");
 
@@ -219,7 +220,7 @@ conf_bar_section(void)
 
      conf.selbar.bg = getcolor(fetch_opt_first(selbar, barbg, "bg").str);
      conf.selbar.fg = fetch_opt_first(selbar, conf.colors.text, "fg").str;
-     conf.selbar.maxlenght = fetch_opt_first(selbar, "-1", "max_lenght").num;
+     conf.selbar.maxlength = fetch_opt_first(selbar, "-1", "max_length").num;
 
      mouse = fetch_section(selbar, "mouse");
 
@@ -230,7 +231,6 @@ conf_bar_section(void)
      }
 
      free(mouse);
-     free(barbg);
 
      return;
 }
@@ -393,6 +393,7 @@ conf_layout_section(void)
 
      layouts = fetch_section_first(NULL, "layouts");
 
+     conf.layout_button_width    = fetch_opt_first(layouts, "O", "layout_button_width").num;
      conf.border.layout          = fetch_opt_first(layouts, "false", "border").bool;
      conf.colors.layout_fg       = fetch_opt_first(layouts, "#ffffff", "fg").str;
      conf.colors.layout_bg       = getcolor((fetch_opt_first(layouts, "#000000", "bg").str));
@@ -606,6 +607,36 @@ conf_tag_section(void)
 }
 
 void
+conf_rule_section(void)
+{
+     int i;
+     struct conf_sec *rules, **rule;
+
+     rules = fetch_section_first(NULL, "rules");
+
+     rule = fetch_section(rules, "rule");
+
+     CHECK((conf.nrule = fetch_section_count(rule)));
+
+     conf.rule = emalloc(conf.nrule, sizeof(Rule));
+
+     for(i = 0; i < conf.nrule; ++i)
+     {
+          conf.rule[i].class     = fetch_opt_first(rule[i], "", "class").str;
+          conf.rule[i].instance  = fetch_opt_first(rule[i], "", "instance").str;
+          conf.rule[i].role      = fetch_opt_first(rule[i], "", "role").str;
+          conf.rule[i].screen    = fetch_opt_first(rule[i], "-1", "screen").num;
+          conf.rule[i].tag       = fetch_opt_first(rule[i], "-1", "tag").num;
+          conf.rule[i].free      = fetch_opt_first(rule[i], "false", "free").bool;
+          conf.rule[i].max       = fetch_opt_first(rule[i], "false", "max").bool;
+     }
+
+     free(rule);
+
+     return;
+}
+
+void
 conf_menu_section(void)
 {
      char *tmp2;
@@ -618,7 +649,7 @@ conf_menu_section(void)
 
      CHECK((conf.nmenu = fetch_section_count(set_menu)));
 
-     conf.menu = calloc(conf.nmenu, sizeof(Menu));
+     conf.menu = emalloc(conf.nmenu, sizeof(Menu));
 
      for(i = 0; i < conf.nmenu; ++i)
      {
@@ -756,6 +787,7 @@ init_conf(void)
      conf_client_section();
      conf_layout_section();
      conf_tag_section();
+     conf_rule_section();
      conf_menu_section();
      conf_launcher_section();
      conf_keybind_section();

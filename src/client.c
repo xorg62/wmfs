@@ -93,6 +93,8 @@ client_get_next(void)
 {
      Client *c = NULL;
 
+     screen_get_sel();
+
      if(!sel || ishide(sel, selscreen))
           return NULL;
 
@@ -111,6 +113,8 @@ Client*
 client_get_prev(void)
 {
      Client *c = NULL, *d;
+
+     screen_get_sel();
 
      if(!sel || ishide(sel, selscreen))
           return NULL;
@@ -987,7 +991,11 @@ void
 client_set_rules(Client *c)
 {
      XClassHint xch = { 0 };
-     int i, j, k;
+     int i, j, k, f;
+     Atom rf;
+     ulong n, il;
+     uchar *data = NULL;
+     char wwrole[256] = { 0 };
 
      if(conf.ignore_next_client_rules)
      {
@@ -995,7 +1003,18 @@ client_set_rules(Client *c)
           return;
      }
 
+     /* Get WM_CLASS */
      XGetClassHint(dpy, c->win, &xch);
+
+     /* Get WM_WINDOW_ROLE */
+     if(XGetWindowProperty(dpy, c->win, ATOM("WM_WINDOW_ROLE"), 0L, 0x7FFFFFFFL, False,
+                    XA_STRING, &rf, &f, &n, &il, &data) == Success && data)
+     {
+          strcpy(wwrole, (char*)data);
+          XFree(data);
+     }
+
+     /* Following features is *DEPRECATED*, will be removed in some revision.  {{{ */
 
      /* Auto free */
      if(conf.client.autofree && ((xch.res_name && strstr(conf.client.autofree, xch.res_name))
@@ -1029,6 +1048,42 @@ client_set_rules(Client *c)
 
                               tags[c->screen][c->tag].layout.func(c->screen);
                          }
+
+     /* }}} */
+
+     /* Apply Rule if class || instance || role match */
+     for(i = 0; i < conf.nrule; ++i)
+     {
+          if((xch.res_class && conf.rule[i].class && !strcmp(xch.res_class, conf.rule[i].class))
+                    || (xch.res_name && conf.rule[i].instance && !strcmp(xch.res_name, conf.rule[i].instance)))
+          {
+               if((strlen(wwrole) && conf.rule[i].role && !strcmp(wwrole, conf.rule[i].role)) || (!strlen(wwrole) || !conf.rule[i].role))
+               {
+                    if(conf.rule[i].screen != -1)
+                         c->screen = conf.rule[i].screen;
+
+                    if(conf.rule[i].tag != -1)
+                         c->tag = conf.rule[i].tag;
+
+                    if(conf.rule[i].free)
+                         c->flags |= FreeFlag;
+
+                    if(conf.rule[i].max)
+                    {
+                         client_maximize(c);
+                         c->flags |= MaxFlag;
+                    }
+
+                    if(c->tag != seltag[selscreen])
+                    {
+                         tags[c->screen][c->tag].request_update = True;
+                         client_focus(NULL);
+                    }
+
+                    tags[c->screen][c->tag].layout.func(c->screen);
+               }
+          }
+     }
 
      return;
 }
@@ -1342,13 +1397,17 @@ uicb_clientlist(uicb_t cmd)
 {
      int i, d, u, x, y;
      int n = 0;
+     Bool all = False;
      Window w;
      Client *c = NULL;
 
      screen_get_sel();
 
+     if(cmd && !strcmp(cmd, "all"))
+          all = True;
+
      for(c = clients; c; c = c->next)
-          if(!ishide(c, selscreen))
+          if(!ishide(c, selscreen) || all)
                ++n;
 
      if(n > 0)
@@ -1363,8 +1422,10 @@ uicb_clientlist(uicb_t cmd)
                     conf.colors.bar,
                     conf.colors.text);
 
+          clientlist.align = MA_Left;
+
           for(i = 0, c = clients; c; c = c->next)
-               if(!ishide(c, selscreen))
+               if(!ishide(c, selscreen) || all)
                {
                     sprintf(clist_index[i].key, "%d", i);
                     clist_index[i].client = c;
@@ -1401,6 +1462,12 @@ uicb_client_select(uicb_t cmd)
      for(i = 0; i < MAXCLIST && clist_index[i].client; ++i)
           if(!strcmp(cmd, clist_index[i].key))
           {
+               if(clist_index[i].client->screen != selscreen)
+                    screen_set_sel(clist_index[i].client->screen);
+
+               if(clist_index[i].client->tag != seltag[clist_index[i].client->screen])
+                    tag_set(clist_index[i].client->tag);
+
                client_focus(clist_index[i].client);
                client_raise(clist_index[i].client);
 

@@ -3,6 +3,9 @@
 # ~/.config/wmfs/wmfsrc and edit it.
 #
 
+# Include file to split configuration
+# @include "~/.config/wmfs/menu-wmfsrc"
+
 [misc]
         font               = "dejavu-10"
         raisefocus         = false
@@ -36,8 +39,8 @@
                 bg = "#191919"
                 fg = "#D4D4ff"
 
-                # Cut title lenght
-                # max_lenght = 25
+                # Cut title length
+                # max_length = 25
 
                 [mouse] button = "3" func = "clientlist"  [/mouse]
                 [mouse] button = "4" func = "client_next" [/mouse]
@@ -64,6 +67,9 @@
 
         # Symbol displayed for the selected layout in the list
         selected_layout_symbol = "*"
+
+        # Width of layout button
+        # layout_button_width = x
 
         # Tiling layouts.
         [layout] type = "tile_right"         symbol = "RIGHT"    [/layout]
@@ -127,6 +133,7 @@
                 #[mouse] [/mouse] Possible multi mouse section
         [/tag]
 
+        # clients option is *DEPRECATED* but works, see [rules] section
         [tag] name = "two"  clients = {"Browser"} [/tag]
         [tag] name = "three" [/tag]
         [tag] name = "four"  [/tag]
@@ -161,6 +168,7 @@
         # Modifier for mouse use
         modifier = "Alt"
 
+        # *DEPRECATED* but works, see [rules] section
         # Set automatic free or max client
         # autofree = "xterm|MPlayer"
         # automax  = "Navigator"
@@ -194,6 +202,19 @@
                 [/button]
         [/titlebar]
 [/client]
+
+[rules]
+       # Example of rule for Mplayer
+       [rule]
+               instance = "xv"       # First part of WM_CLASS
+               class    = "MPlayer"  # Seconf part of WM_CLASS, not needed if first part is correct
+               # role = ""           # WM_WINDOW_ROLE
+               screen   = 0          # Screen to use
+               tag      = 2          # Tag number of apps
+               free     = true       # Set automatic free client
+               max      = false      # Set automatic maximized client
+       [/rule]
+[/rules]
 
 [menu]
         # Default menu, binded on the root window, button 3.

@@ -19,12 +19,22 @@
 
 #include <sys/queue.h>
 
+#define INCLUDE_CMD "@include"
+#define PARSE_MAX_LIST 10
+
+#if defined(Bool)
+#define bool_t Bool
+#else
+typedef enum { False, True } bool_t;
+#endif /* Bool */
+
 struct conf_opt {
      char *name;
-     char *val[10];
+     char *val[PARSE_MAX_LIST];
      size_t nval;
-     Bool used;
+     bool_t used;
      int line;
+     char *filename;
      SLIST_ENTRY(conf_opt) entry;
 };
 
@@ -40,7 +50,7 @@ struct conf_sec {
 struct opt_type {
      long int num;
      float fnum;
-     Bool bool;
+     bool_t bool;
      char *str;
 };
 
@@ -61,7 +71,7 @@ void print_unused(struct conf_sec *s);
  * WARNING: This make all string
  * returned by fetch_(opt|section)(_first) unusable.
  */
-void free_conf(struct conf_sec *s);
+int free_conf(void);
 
 /*
  * Get all subsection matching the given name on the given
@@ -106,5 +116,11 @@ struct opt_type *fetch_opt(struct conf_sec *, char *, char *);
  * Count member of a opt_type *
  */
 size_t fetch_opt_count(struct opt_type *);
+
+
+/* wrapper for calloc */
+void *xcalloc(size_t, size_t);
+/* wrapper for asprintf */
+int xasprintf(char **, const char *, ...);
 
 #endif /* PARSE_H */

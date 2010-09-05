@@ -352,6 +352,18 @@ typedef struct
      char *content;
 } Alias;
 
+/* Rule struct */
+typedef struct
+{
+     char *class;
+     char *instance;
+     char *role;
+     int screen;
+     int tag;
+     Bool free;
+     Bool max;
+} Rule;
+
 /* Configuration structure */
 typedef struct
 {
@@ -402,7 +414,7 @@ typedef struct
      {
           char *fg;
           uint bg;
-          int maxlenght;
+          int maxlength;
           MouseBinding *mouse;
           int nmouse;
      } selbar;
@@ -457,9 +469,11 @@ typedef struct
      } systray;
      Alias alias[256];
      uint mouse_tag_action[TagActionLast];
+     int layout_button_width;
      Layout layout[NUM_OF_LAYOUT];
      Menu *menu;
      Launcher *launcher;
+     Rule *rule;
      int *ntag;
      Bool tag_round;
      Bool client_round;
@@ -472,6 +486,7 @@ typedef struct
      int nlayout;
      int nmenu;
      int nlauncher;
+     int nrule;
 } Conf;
 
 typedef struct
