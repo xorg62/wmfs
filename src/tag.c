@@ -47,7 +47,8 @@ tag_set(int tag)
 
      screen_get_sel();
 
-     prevseltag[selscreen] = seltag[selscreen];
+     if(seltag[selscreen] != tag)
+          prevseltag[selscreen] = seltag[selscreen];
 
      if(conf.tag_round)
      {
