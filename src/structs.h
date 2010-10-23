@@ -399,6 +399,7 @@ typedef struct
           uint tagurbg;
           uint tagselbg;
           uint tag_occupied_bg;
+          char *tag_occupied_fg;
           uint tagbord;
           char *layout_fg;
           uint layout_bg;

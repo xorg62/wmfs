@@ -99,6 +99,7 @@
 
         tag_round      = false
         occupied_bg    = "#003366"
+        occupied_fg    = "#D4D4D4"
         sel_fg         = "#191919"
         sel_bg         = "#7E89A2"
         urgent_bg      = "#DD1111"
