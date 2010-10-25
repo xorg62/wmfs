@@ -368,6 +368,8 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
                XResizeWindow(dpy, c->win,
                              spgeo[c->screen].width,
                              spgeo[c->screen].height);
+               XChangeProperty(dpy, c->win, net_atom[net_wm_state], XA_ATOM, 32,
+                               PropModeReplace, (uchar *)&net_atom[net_wm_state_fullscreen], 1);
 
                c->tmp_geo = c->geo;
 
@@ -382,6 +384,7 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
           }
           else if(data_l[0] == _NET_WM_STATE_REMOVE && (c->flags & FSSFlag))
           {
+               XChangeProperty(dpy, c->win, net_atom[net_wm_state], XA_ATOM, 32, PropModeReplace, (uchar *)0, 0);
                c->flags &= ~(FSSFlag | MaxFlag);
                client_map(c);
                XReparentWindow(dpy, c->win, c->frame, BORDH, TBARH);
