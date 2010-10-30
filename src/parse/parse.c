@@ -165,8 +165,15 @@ parse_keywords(const char *filename)
           return NULL;
      }
 
+     if (st.st_size == 0) {
+          warnx("%s: empty file", filename);
+          close(fd);
+          return NULL;
+     }
+
      if (!realpath(filename, path)) {
           warn("%s", filename);
+          close(fd);
           return NULL;
      }
 
