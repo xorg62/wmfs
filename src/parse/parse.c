@@ -338,7 +338,7 @@ include(struct keyword *head)
           filename = head->name;
 
      if (!(kw = parse_keywords(filename))) {
-          warnx("no config fond in include file %s", head->name);
+          warnx("no config found in include file %s", head->name);
 
           if (filename != head->name)
                free(filename);
