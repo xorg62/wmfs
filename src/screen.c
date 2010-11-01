@@ -123,7 +123,8 @@ screen_set_sel(int screen)
      if(screen < 0 || screen > screen_count() - 1)
           screen = 0;
 
-     prevselscreen = selscreen;
+     if(selscreen != screen)
+          prevselscreen = selscreen;
 
      client_focus(NULL);
      XWarpPointer(dpy, None, ROOT, 0, 0, 0, 0,
@@ -162,7 +163,7 @@ screen_get_sel(void)
      XChangeProperty(dpy, ROOT, net_atom[wmfs_current_screen], XA_CARDINAL, 32,
                      PropModeReplace, (uchar*)&selscreen, 1);
 
-     if(os != selscreen)
+     if(os != selscreen && os != prevselscreen)
           prevselscreen = os;
 
      return selscreen;

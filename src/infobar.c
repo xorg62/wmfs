@@ -268,7 +268,9 @@ infobar_draw_taglist(int sc)
                ? conf.colors.tagurfg
                : ((i == seltag[sc] || tags[sc][seltag[sc]].tagad & TagFlag(i))
                     ? conf.colors.tagselfg
-                    : conf.colors.text);
+                    : (is_occupied[i]
+                         ? conf.colors.tag_occupied_fg
+                         : conf.colors.text));
 
           barwin_refresh_color(infobar[sc].tags[i]);
 

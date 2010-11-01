@@ -472,10 +472,10 @@ conf_tag_section(void)
      conf.colors.tagurfg          = fetch_opt_first(sec, "#000000", "urgent_fg").str;
      conf.colors.tagurbg          = getcolor(fetch_opt_first(sec, "#DD1111", "urgent_bg").str);
      conf.colors.tag_occupied_bg  = getcolor(fetch_opt_first(sec, "#222222", "occupied_bg").str);
+     conf.colors.tag_occupied_fg  = fetch_opt_first(sec, conf.colors.text, "occupied_fg").str;
      conf.border.tag              = fetch_opt_first(sec, "false", "border").bool;
      conf.tagautohide             = fetch_opt_first(sec, "false", "autohide").bool;
      conf.tagnamecount            = fetch_opt_first(sec, "false", "name_count").bool;
-
 
      def_tag = fetch_section_first(sec, "default_tag");
 
