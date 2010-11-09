@@ -231,7 +231,7 @@
                 fg_focus  = "#191919" bg_focus  = "#7E89A2"
                 fg_normal = "#9F9AB3" bg_normal = "#191919"
 
-                [item] name = "Terminal"        func = "spawn" cmd = "xterm" [/item]
+                [item] name = "Terminal"        func = "spawn" cmd = "urxvt || xterm || gnome-terminal" [/item]
                 [item] name = "Applications" submenu = "appmenu"                   [/item]
                 [item] name = "Next tag"        func = "tag_next"                  [/item]
                 [item] name = "Previous tag"    func = "tag_prev"                  [/item]
