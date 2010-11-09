@@ -41,7 +41,7 @@ endif
 
 all: options wmfs
 
-.c.o:
+%.o: %.c config.mk
 	@echo CC $<
 	@${CC} -c ${CFLAGS} $< -o $@
 
@@ -50,7 +50,7 @@ options:
 	@echo - CFLAGS ${CFLAGS}
 	@echo - LDFLAGS ${LDFLAGS}
 
-wmfs: ${OBJ}
+wmfs: ${OBJ} config.mk
 	@echo CC -o $@
 	@${CC} -o $@ ${OBJ} ${LDFLAGS}
 
