@@ -17,3 +17,4 @@ LDFLAGS= $(shell pkg-config --libs ${LIBS}) -lpthread
 CFLAGS+= -DWMFS_VERSION=\"${VERSION}\"
 
 CC = cc
+O = __build__

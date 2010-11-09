@@ -25,7 +25,7 @@ src/util.c \
 src/viwmfs.c \
 src/wmfs.c
 
-OBJ = ${SRC:.c=.o}
+OBJ = ${patsubst %.c,${O}/%.o,${SRC}}
 
 ifneq ($(findstring xrandr, ${LIBS}),)
 	CFLAGS+= -DHAVE_XRANDR
@@ -39,9 +39,10 @@ ifneq ($(findstring imlib2, ${LIBS}),)
 	CFLAGS+= -DHAVE_IMLIB2
 endif
 
-all: options wmfs
+all: options ${O}/wmfs
 
-%.o: %.c config.mk
+${O}/%.o: %.c config.mk
+	@if [ ! -d `dirname ${O}/$<` ]; then mkdir -p `dirname ${O}/$<`; fi
 	@echo CC $<
 	@${CC} -c ${CFLAGS} $< -o $@
 
@@ -49,8 +50,11 @@ options:
 	@echo wmfs compile with ${LIBS}
 	@echo - CFLAGS ${CFLAGS}
 	@echo - LDFLAGS ${LDFLAGS}
+	@echo - OUTPUT ${O}
 
-wmfs: ${OBJ} config.mk
+	@if [ ! -d ${O} ]; then mkdir -p ${O}; fi
+
+${O}/wmfs: ${OBJ} config.mk src/structs.h src/wmfs.h src/parse/parse.h
 	@echo CC -o $@
 	@${CC} -o $@ ${OBJ} ${LDFLAGS}
 
@@ -77,3 +81,4 @@ uninstall:
 
 
 .PHONY: all clean install uninstall
+
