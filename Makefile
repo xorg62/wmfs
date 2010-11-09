@@ -64,7 +64,7 @@ clean:
 install: all
 	@echo installing executable file to ${DESTDIR}${PREFIX}/bin
 	@mkdir -p ${DESTDIR}${PREFIX}/bin
-	@install wmfs ${DESTDIR}${PREFIX}/bin
+	@install ${O}/wmfs ${DESTDIR}${PREFIX}/bin
 	@echo installing manual page to ${DESTDIR}${MANPREFIX}/man1
 	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
 	@install -m 644 wmfs.1 ${DESTDIR}${MANPREFIX}/man1/
