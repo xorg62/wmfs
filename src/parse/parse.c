@@ -80,7 +80,9 @@ static struct keyword *
 push_keyword(struct keyword *tail, enum keyword_t type, char *buf, size_t *offset, struct files *file, int line)
 {
      struct keyword *kw;
+#ifdef DEBUG
      int i = 0;
+#endif
 
      if (type == WORD && *offset == 0)
           return tail;
