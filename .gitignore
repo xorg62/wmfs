@@ -1,17 +1,5 @@
-CMakeCache.txt
-CMakeFiles/
-cmake_install.cmake
-cmake_uninstall.cmake
-Makefile
 *.o
 .*.sw?
 wmfs
-src/config.h
-changelog
-config.h
 #*
 \#*
-build/
-doc/
-wmfs.doxygen
-wmfsrc

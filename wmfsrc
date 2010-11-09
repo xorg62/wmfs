@@ -231,7 +231,7 @@
                 fg_focus  = "#191919" bg_focus  = "#7E89A2"
                 fg_normal = "#9F9AB3" bg_normal = "#191919"
 
-                [item] name = "Terminal"        func = "spawn" cmd = "@WMFS_TERM@" [/item]
+                [item] name = "Terminal"        func = "spawn" cmd = "xterm" [/item]
                 [item] name = "Applications" submenu = "appmenu"                   [/item]
                 [item] name = "Next tag"        func = "tag_next"                  [/item]
                 [item] name = "Previous tag"    func = "tag_prev"                  [/item]
@@ -285,7 +285,7 @@
         [key] mod = {"Alt", "Control"} key = "r" func = "reload" [/key]
 
         # Open a terminal.
-        [key] mod = {"Control"} key = "Return" func = "spawn" cmd = "@WMFS_TERM@" [/key]
+        [key] mod = {"Control"} key = "Return" func = "spawn" cmd = "xterm" [/key]
 
         # Kill the selected client.
         [key] mod = {"Alt"} key = "q" func = "client_kill" [/key]
