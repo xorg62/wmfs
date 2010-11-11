@@ -18,6 +18,6 @@ LIBS= x11 xft freetype2 xrandr xinerama imlib2
 
 # paths
 PREFIX= /usr/local
-MANPREFIX= ${PREFIX}/share/man
+MANPREFIX= ${PREFIX}/man
 XDG_CONFIG_DIR= /usr/local/etc/xdg/wmfs
 
