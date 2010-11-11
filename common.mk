@@ -24,8 +24,10 @@ src/viwmfs.c \
 src/wmfs.c
 
 # flags
-CFLAGS= -Wall -DXDG_CONFIG_DIR=\"${XDG_CONFIG_DIR}\"
+CFLAGS+= ${C_FLAGS}
+CFLAGS+= -DXDG_CONFIG_DIR=\"${XDG_CONFIG_DIR}\"
 CFLAGS+= -DWMFS_VERSION=\"${VERSION}\"
+LDFLAGS+= ${LD_FLAGS}
 
 # build directory
 O?= build

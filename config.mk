@@ -21,3 +21,7 @@ PREFIX= /usr/local
 MANPREFIX= ${PREFIX}/man
 XDG_CONFIG_DIR= /usr/local/etc/xdg/wmfs
 
+
+# CFLAGS LDFLAGS can be customised here
+C_FLAGS= -Wall
+LD_FLAGS=""
