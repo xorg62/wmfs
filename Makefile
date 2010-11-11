@@ -4,19 +4,27 @@ include common.mk
 OBJ = ${patsubst %.c,${O}/%.o,${SRCS}}
 
 ifneq ($(findstring xrandr, ${LIBS}),)
-	CFLAGS+= -DHAVE_XRANDR
+CFLAGS+= -DHAVE_XRANDR
 endif
 
 ifneq ($(findstring xinerama, ${LIBS}),)
-	CFLAGS+= -DHAVE_XINERAMA
+CFLAGS+= -DHAVE_XINERAMA
 endif
 
 ifneq ($(findstring imlib2, ${LIBS}),)
-	CFLAGS+= -DHAVE_IMLIB2
+CFLAGS+= -DHAVE_IMLIB2
 endif
 
-CFLAGS+= $(shell pkg-config --cflags-only-I ${LIBS})
-LDFLAGS+= $(shell pkg-config --libs ${LIBS}) -lpthread
+ifndef CFLAGS_LIBS
+CFLAGS_LIBS= $(shell pkg-config --cflags-only-I ${LIBS})
+endif
+
+ifndef LDFLAGS_LIBS
+LDFLAGS_LIBS= $(shell pkg-config --libs ${LIBS})
+endif
+
+CFLAGS+= ${CFLAGS_LIBS}
+LDFLAGS+= ${LDFLAGS_LIBS} -lpthread
 
 all: options ${O}/wmfs ${O}/wmfs.1.gz
 

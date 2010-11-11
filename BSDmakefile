@@ -10,11 +10,16 @@ CFLAGS+= -DHAVE_${lib:U}
 .endif
 .endfor
 
-CFLAGS_LIB!= pkg-config --cflags-only-I ${LIBS}
-LDFLAGS_LIB!= pkg-config --libs ${LIBS}
+.if !defined(CFLAGS_LIBS)
+CFLAGS_LIBS!= pkg-config --cflags-only-I ${LIBS}
+.endif
 
-CFLAGS+= ${CFLAGS_LIB}
-LDADD+= ${LDFLAGS_LIB} -lpthread
+.if !defined(LDFLAGS_LIBS)
+LDFLAGS_LIBS!= pkg-config --libs ${LIBS}
+.endif
+
+CFLAGS+= ${CFLAGS_LIBS}
+LDADD+= ${LDFLAGS_LIBS} -lpthread
 
 install: all
 	@echo installing executable file to ${DESTDIR}${PREFIX}/bin
