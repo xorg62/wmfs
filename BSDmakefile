@@ -29,7 +29,8 @@ install: all
 	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
 	@install -m 644 ${.OBJDIR}/wmfs.1.gz ${DESTDIR}${MANPREFIX}/man1/
 	@echo installing xsession file to ${DESTDIR}${PREFIX}/share/xsessions
-	@install -m 644 ${.CURDIR}/wmfs.desktop ${DESTDIR}${PREFIX}/share/xsessions
+	@mkdir -p ${DESTDIR}${PREFIX}/share/xsessions
+	@install -m 644 ${.CURDIR}/wmfs.desktop ${DESTDIR}${PREFIX}/share/xsessions/
 	@echo installing default config file to ${DESTDIR}${XDG_CONFIG_DIR}
 	@mkdir -p ${DESTDIR}${XDG_CONFIG_DIR}
 	@install -m 444 ${.CURDIR}/wmfsrc ${DESTDIR}${XDG_CONFIG_DIR}
@@ -39,7 +40,7 @@ uninstall:
 	@rm -f ${DESTDIR}${PREFIX}/bin/wmfs
 	@echo removing manual page from ${DESTDIR}${MANPREFIX}/man1
 	@rm -f ${DESTDIR}${MANPREFIX}/man1/wmfs.1.gz
-	@echo removing xsession file from ${DESTDIR}${PREFIX}/share/xsessions
+	@echo removing xsession file from ${DESTDIR}${PREFIX}/share/xsessions/
 	@rm -f ${DESTDIR}${PREFIX}/share/xsessions/wmfs.desktop
 	@echo removing config file from ${DESTDIR}${XDG_CONFIG_DIR}
 	@rm -f ${DESTDIR}${XDG_CONFIG_DIR}/wmfsrc
