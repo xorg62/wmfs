@@ -12,7 +12,7 @@ CFLAGS+= -DHAVE_XINERAMA
 endif
 
 ifneq ($(findstring imlib2, ${LIBS}),)
-CFLAGS+= -DHAVE_IMLIB2
+CFLAGS+= -DHAVE_IMLIB
 endif
 
 ifndef CFLAGS_LIBS

@@ -4,11 +4,15 @@
 PROG= wmfs
 MAN1= wmfs.1
 
-.for lib in xrandr xinerama imlib2
+.for lib in xrandr xinerama
 .if !empty(LIBS:M${lib})
 CFLAGS+= -DHAVE_${lib:U}
 .endif
 .endfor
+
+.if !empty(LIBS:Mimlib2)
+CFLAGS+= -DHAVE_IMLIB
+.endif
 
 .if !defined(CFLAGS_LIBS)
 CFLAGS_LIBS!= pkg-config --cflags-only-I ${LIBS}
