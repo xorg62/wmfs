@@ -11,6 +11,10 @@ OPTIONS= xrandr xinerama imlib2
 # FreeBSD example
 # CFLAGS_LIBS= -I/usr/local/include -I/usr/local/include/freetype2
 # LDFLAGS_LIBS= -L/usr/local/lib -lXft -lXrender -lfontconfig -lX11 -lfreetype -lXrandr -lXinerama -lImlib2
+#
+# OpenBSD example
+# CFLAGS_LIBS= -I/usr/X11R6/include -I/usr/X11R6/include/freetype2 -I/usr/local/include
+# LDFLAGS_LIBS= -L/usr/X11R6/lib -L/usr/local/lib -lXft -lfontconfig -lexpat -lXrandr -lXrender -lXinerama -lxcb -lpthread-subs -lXau -lXdmcp -lImlib2 -lfreetype -lz -lX11 -lXext -lm
 
 # paths
 PREFIX= /usr/local
