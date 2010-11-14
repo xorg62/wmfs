@@ -4,33 +4,34 @@ WMFS Window Manager.
 
 A highly configurable and manageable tiling Window Manager created from scratch
 
-AUTHORS :
-  Martin Duquesnoy <xorg62@gmail.com>
+AUTHORS : (in order of commits and > 5 commits)
+ - Martin Duquesnoy <xorg62@gmail.com>
+ - Philippe Pepiot <phil@philpep.org>
+ - Marc Lagrange <markocpc@gmail.com>
+ - OldMan <tele-post@mail.ru>
+ - Raphael Khaiat <raphael@khaiat.org>
+ - Tomáš Chvátal <scarabeus@gentoo.org>
+ - David Delassus <linkdd@ydb.me>
+
 
 LICENSE : BSD
 
 REQUIREMENT :
   - freetype2
+  - libxft
+  - libx11
   - libxinerama (optional)
   - libxrandr   (optional)
   - imlib2      (optional)
-  - libxft
-  - libx11
-  - CMake >= 2.6
 
 OS :
   - GNU/Linux : Supported.
-  - FreeBSD : Supported.
+  - FreeBSD/OpenBSD/NetBSD : Supported.
 
 INSTALL :
-  - mkdir build
-  - cd build
-  - cmake ..
-  - make
-  - sudo make install
-  - sudo make uninstall # if you would to remove it.
-
-If you have doxygen installed you can generate doxygen documentation via custom target 'make doc' in the build dir.
+$EDITOR config.mk
+make
+sudo make install
 
 DISTROS :
   - wmfs port for FreeBSD at x11-wm/wmfs
