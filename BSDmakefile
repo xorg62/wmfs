@@ -4,6 +4,8 @@
 PROG= wmfs
 MAN1= wmfs.1
 
+MANDIR= ${MANPREFIX}/man
+
 .for lib in xrandr xinerama
 .if !empty(LIBS:M${lib})
 CFLAGS+= -DHAVE_${lib:U}
@@ -32,13 +34,10 @@ options:
 	@echo - OUTPUT ${.OBJDIR}
 
 
-install: all
+install: all maninstall
 	@echo installing executable file to ${DESTDIR}${PREFIX}/bin
 	@mkdir -p ${DESTDIR}${PREFIX}/bin
 	@install ${.OBJDIR}/wmfs ${DESTDIR}${PREFIX}/bin
-	@echo installing manual page to ${DESTDIR}${MANPREFIX}/man1
-	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
-	@install -m 644 ${.OBJDIR}/wmfs.1.gz ${DESTDIR}${MANPREFIX}/man1/
 	@echo installing xsession file to ${DESTDIR}${PREFIX}/share/xsessions
 	@mkdir -p ${DESTDIR}${PREFIX}/share/xsessions
 	@install -m 644 ${.CURDIR}/wmfs.desktop ${DESTDIR}${PREFIX}/share/xsessions/
