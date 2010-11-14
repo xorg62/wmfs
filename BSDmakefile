@@ -25,6 +25,13 @@ LDFLAGS_LIBS!= pkg-config --libs ${LIBS}
 CFLAGS+= ${CFLAGS_LIBS}
 LDADD+= ${LDFLAGS_LIBS} -lpthread
 
+options:
+	@echo wmfs compile with ${LIBS}
+	@echo - CFLAGS ${CFLAGS}
+	@echo - LDFLAGS ${LDFLAGS}
+	@echo - OUTPUT ${.OBJDIR}
+
+
 install: all
 	@echo installing executable file to ${DESTDIR}${PREFIX}/bin
 	@mkdir -p ${DESTDIR}${PREFIX}/bin
@@ -49,10 +56,11 @@ uninstall:
 	@echo removing config file from ${DESTDIR}${XDG_CONFIG_DIR}
 	@rm -f ${DESTDIR}${XDG_CONFIG_DIR}/wmfsrc
 
+all: options
 
 .include <bsd.prog.mk>
 
 .c.o: config.mk
 	@if [ ! -d `dirname ${.TARGET}` ]; then mkdir -p `dirname ${.TARGET}`; fi
-	@echo CC ${.IMPSRC}
-	@${CC} ${CFLAGS} -c ${.IMPSRC} -o ${.TARGET}
+	${CC} ${CFLAGS} -c ${.IMPSRC} -o ${.TARGET}
+

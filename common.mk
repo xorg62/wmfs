@@ -1,3 +1,6 @@
+# wmfs version
+VERSION= 201011
+
 SRCS= \
 src/barwin.c \
 src/client.c \
@@ -23,11 +26,12 @@ src/util.c \
 src/viwmfs.c \
 src/wmfs.c
 
+# Used libs
+LIBS= x11 xft freetype2 ${OPTIONS}
+
 # flags
-CFLAGS+= ${C_FLAGS}
 CFLAGS+= -DXDG_CONFIG_DIR=\"${XDG_CONFIG_DIR}\"
 CFLAGS+= -DWMFS_VERSION=\"${VERSION}\"
-LDFLAGS+= ${LD_FLAGS}
 
 # build directory
 O?= build
