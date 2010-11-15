@@ -80,7 +80,9 @@ static struct keyword *
 push_keyword(struct keyword *tail, enum keyword_t type, char *buf, size_t *offset, struct files *file, int line)
 {
      struct keyword *kw;
+#ifdef DEBUG
      int i = 0;
+#endif
 
      if (type == WORD && *offset == 0)
           return tail;
@@ -165,8 +167,15 @@ parse_keywords(const char *filename)
           return NULL;
      }
 
+     if (st.st_size == 0) {
+          warnx("%s: empty file", filename);
+          close(fd);
+          return NULL;
+     }
+
      if (!realpath(filename, path)) {
           warn("%s", filename);
+          close(fd);
           return NULL;
      }
 
@@ -338,7 +347,7 @@ include(struct keyword *head)
           filename = head->name;
 
      if (!(kw = parse_keywords(filename))) {
-          warnx("no config fond in include file %s", head->name);
+          warnx("no config found in include file %s", head->name);
 
           if (filename != head->name)
                free(filename);

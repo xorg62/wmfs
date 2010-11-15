@@ -449,11 +449,7 @@ main(int argc, char **argv)
                break;
 
           case 'v':
-               printf("WMFS version : "WMFS_VERSION"\n"
-                      "  Compilation settings :\n"
-                      "    - Flags : "WMFS_COMPILE_FLAGS"\n"
-                      "    - Linked Libs : "WMFS_LINKED_LIBS"\n"
-                      "    - On "WMFS_COMPILE_MACHINE" by "WMFS_COMPILE_BY".\n");
+               printf("WMFS "WMFS_VERSION"\n");
                exit(EXIT_SUCCESS);
                break;
 
