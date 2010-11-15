@@ -60,7 +60,6 @@
 
 /* Local headers */
 #include "parse/parse.h"
-#include "config.h"
 #include "structs.h"
 
 /* Optional dependencies */
