@@ -29,7 +29,7 @@ OS :
   - FreeBSD/OpenBSD/NetBSD : Supported.
 
 INSTALL :
-$EDITOR config.mk
+./configure [--without-imlib2|--without-xrandr|--without-xinerama] (./configure -h)
 make
 sudo make install
 

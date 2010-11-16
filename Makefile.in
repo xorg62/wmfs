@@ -1,10 +1,3 @@
-PREFIX=/usr/local
-XDG_CONFIG_DIR=/usr/local/etc/xdg/wmfs
-MANPREFIX=/usr/local/man
-
-CFLAGS=-I/usr/include/freetype2   -DHAVE_XINERAMA -DHAVE_XRANDR -DHAVE_IMLIB2
-LDFLAGS=-lX11 -lXft -lfreetype -lXinerama -lXrandr -lImlib2   -lpthread
-
 PROG=wmfs
 MAN=wmfs.1
 
