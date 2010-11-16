@@ -281,9 +281,10 @@ uicb_reload(uicb_t cmd)
      quit();
 
      for(; argv_global[0] && argv_global[0] == ' '; ++argv_global);
-     
-     execvp(argv_global, all_argv);
-    
+
+     // add -C to always load the same config file
+     execlp(argv_global, argv_global, "-C", conf.confpath, NULL);
+
      return;
 }
 
@@ -417,8 +418,6 @@ main(int argc, char **argv)
      char *ol = "csgVS";
 
      argv_global  = _strdup(argv[0]);
-     all_argv = argv;
-
      sprintf(conf.confpath, "%s/"DEF_CONF, getenv("HOME"));
 
      while((i = getopt(argc, argv, "hviSc:s:g:C:V:")) != -1)

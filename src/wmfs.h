@@ -440,7 +440,6 @@ XRectangle *sgeo;
 XRectangle *spgeo;
 Cursor cursor[CurLast];
 char *argv_global;
-char **all_argv;
 int xrandr_event;
 uint timing;
 
