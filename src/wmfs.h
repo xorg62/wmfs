@@ -469,7 +469,7 @@ Client *clients;
 Client *sel;
 
 /* Other */
-func_name_list_t *func_list;
+extern const func_name_list_t func_list[];
 extern const func_name_list_t layout_list[];
 uint numlockmask;
 Systray *trayicons;

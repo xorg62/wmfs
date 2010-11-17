@@ -32,7 +32,7 @@
 
 #include "wmfs.h"
 
-func_name_list_t tmp_func_list[] =
+const func_name_list_t func_list[] =
 {
      {"spawn",                    uicb_spawn },
      {"client_kill",              uicb_client_kill },
@@ -776,10 +776,6 @@ init_conf(void)
                errx(1, "parsing configuration file (%s) failed.", conf.confpath);
 
      }
-
-     /* Set func_list */
-     func_list = emalloc(LEN(tmp_func_list), sizeof(func_name_list_t));
-     memcpy(func_list, tmp_func_list, LEN(tmp_func_list) * sizeof(func_name_list_t));
 
      conf_misc_section();
      conf_bar_section();

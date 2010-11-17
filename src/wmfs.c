@@ -104,7 +104,6 @@ quit(void)
      IFREE(spgeo);
      IFREE(infobar);
      IFREE(keys);
-     IFREE(func_list);
      IFREE(net_atom);
 
      /* Clean conf alloced thing */
