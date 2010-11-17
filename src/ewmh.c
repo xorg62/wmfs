@@ -357,7 +357,7 @@ void
 ewmh_manage_net_wm_state(long data_l[], Client *c)
 {
      /* Manage _NET_WM_STATE_FULLSCREEN */
-     if(data_l[1] == net_atom[net_wm_state_fullscreen])
+     if(data_l[1] == (long)net_atom[net_wm_state_fullscreen])
      {
           if(data_l[0] == _NET_WM_STATE_ADD && !(c->flags & FSSFlag))
           {
@@ -392,14 +392,14 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
           }
      }
      /* Manage _NET_WM_STATE_STICKY */
-     else if(data_l[1] == net_atom[net_wm_state_sticky])
+     else if(data_l[1] == (long)net_atom[net_wm_state_sticky])
      {
           /* == client_ignore_tag */
           c->tag = MAXTAG + 1;
           arrange(c->screen, True);
      }
      /* Manage _NET_WM_STATE_DEMANDS_ATTENTION */
-     else if(data_l[1] == net_atom[net_wm_state_demands_attention])
+     else if(data_l[1] == (long)net_atom[net_wm_state_demands_attention])
      {
           if(data_l[0] == _NET_WM_STATE_ADD)
                client_focus(c);
@@ -419,8 +419,8 @@ void
 ewmh_manage_window_type(Client *c)
 {
      Atom *atom, rf;
-     int i, f;
-     ulong n, il;
+     int f;
+     ulong n, il, i;
      uchar *data = NULL;
      long ldata[5] = { 0 };
 

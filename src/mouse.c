@@ -319,7 +319,7 @@ mouse_resize(Client *c)
 void
 mouse_grabbuttons(Client *c, Bool focused)
 {
-     int i;
+     size_t i;
      uint but[] = {Button1, Button2, Button3, Button4, Button5};
 
      XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
@@ -348,6 +348,7 @@ mouse_grabbuttons(Client *c, Bool focused)
 void
 uicb_mouse_move(uicb_t cmd)
 {
+     (void)cmd;
      CHECK(sel);
 
      mouse_move(sel);
@@ -361,6 +362,7 @@ uicb_mouse_move(uicb_t cmd)
 void
 uicb_mouse_resize(uicb_t cmd)
 {
+     (void)cmd;
      CHECK(sel);
 
      mouse_resize(sel);

@@ -725,7 +725,8 @@ conf_launcher_section(void)
 void
 conf_keybind_section(void)
 {
-     int i, j;
+     int i;
+     size_t j;
      struct conf_sec *sec, **ks;
      struct opt_type *opt;
 

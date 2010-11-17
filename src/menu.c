@@ -354,6 +354,8 @@ menu_clear(Menu *menu)
 Bool
 menu_get_checkstring_needed(MenuItem *mi, int nitem)
 {
+     (void)mi;
+     (void)nitem;
      return True;
 }
 
