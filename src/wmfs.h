@@ -33,7 +33,9 @@
 #ifndef WMFS_H
 #define WMFS_H
 
+/* glibc stuff */
 #define _BSD_SOURCE /* vsnprintf */
+#define _POSIX_SOURCE /* kill() */
 
 /* Lib headers */
 #include <stdio.h>
