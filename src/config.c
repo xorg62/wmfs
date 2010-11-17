@@ -69,6 +69,7 @@ func_name_list_t tmp_func_list[] =
      {"tag_new",                  uicb_tag_new },
      {"tag_del",                  uicb_tag_del },
      {"tag_rename",               uicb_tag_rename },
+     {"tag_last",                 uicb_tag_last },
      {"set_mwfact",               uicb_set_mwfact },
      {"set_nmaster",              uicb_set_nmaster },
      {"quit",                     uicb_quit },

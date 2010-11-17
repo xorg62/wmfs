@@ -281,6 +281,19 @@ uicb_tag_prev_visible(uicb_t cmd)
      return;
 }
 
+/** Go to the last tag
+ * \param cmd uicb_t type unused
+*/
+void
+uicb_tag_last(uicb_t cmd)
+{
+     screen_get_sel();
+
+     tag_set(conf.ntag[selscreen]);
+
+     return;
+}
+
 /** Transfert the selected client to
  *  the wanted tag
  * \param cmd Wanted tag, uicb_t type
@@ -622,4 +635,3 @@ uicb_tag_rename(uicb_t cmd)
 
      return;
 }
-
