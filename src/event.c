@@ -275,7 +275,6 @@ clientmessageevent(XClientMessageEvent *ev)
           ewmh_get_client_list();
           ewmh_get_desktop_names();
           ewmh_set_desktop_geometry();
-          ewmh_set_workarea();
           screen_count();
           screen_get_sel();
      }

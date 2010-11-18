@@ -215,7 +215,6 @@ screen_init_geo(void)
 #endif /* HAVE_XRANDR */
 
      ewmh_set_desktop_geometry();
-     ewmh_set_workarea();
 
      return;
 }

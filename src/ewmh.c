@@ -60,7 +60,6 @@ ewmh_init_hints(void)
      net_atom[net_current_desktop]            = ATOM("_NET_CURRENT_DESKTOP");
      net_atom[net_desktop_names]              = ATOM("_NET_DESKTOP_NAMES");
      net_atom[net_desktop_geometry]           = ATOM("_NET_DESKTOP_GEOMETRY");
-     net_atom[net_workarea]                   = ATOM("_NET_WORKAREA");
      net_atom[net_active_window]              = ATOM("_NET_ACTIVE_WINDOW");
      net_atom[net_close_window]               = ATOM("_NET_CLOSE_WINDOW");
      net_atom[net_wm_name]                    = ATOM("_NET_WM_NAME");
@@ -315,38 +314,6 @@ ewmh_set_desktop_geometry(void)
 
      XChangeProperty(dpy, ROOT, net_atom[net_desktop_geometry], XA_CARDINAL, 32,
                      PropModeReplace, (uchar*)&data, 2);
-
-     return;
-}
-
-/** Manage _NET_WORKAREA
-*/
-void
-ewmh_set_workarea(void)
-{
-     long *data;
-     int i, s, j, tag_c = 0, pos = 0;
-
-     s = screen_count();
-
-     for(i = 0; i < s; ++i)
-          tag_c += conf.ntag[i];
-
-     data = emalloc(tag_c * 4, sizeof(long));
-
-     for(i = 0; i < s; ++i)
-          for(j = 0; j < conf.ntag[i]; ++j)
-          {
-               data[pos++] = spgeo[i].x;
-               data[pos++] = spgeo[i].y;
-               data[pos++] = spgeo[i].width;
-               data[pos++] = spgeo[i].height;
-          }
-
-     XChangeProperty(dpy, ROOT, net_atom[net_workarea], XA_CARDINAL, 32,
-                     PropModeReplace, (uchar*)data, 4 * tag_c);
-
-     free(data);
 
      return;
 }

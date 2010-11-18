@@ -108,7 +108,6 @@ enum
      net_current_desktop,
      net_desktop_names,
      net_desktop_geometry,
-     net_workarea,
      net_active_window,
      net_close_window,
      net_wm_icon_name,
