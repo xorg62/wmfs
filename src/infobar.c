@@ -95,7 +95,7 @@ infobar_init(void)
           /* Create layout switch barwindow */
           infobar[sc].layout_button = barwin_create(infobar[sc].bar->win,
                     ((conf.layout_placement) ? 0 : (j + PAD / 2)), 0,
-                    ((conf.layout_button_width > 0) ? conf.layout_button_width : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)),
+                    ((conf.layout_button_width > 0) ? (uint)conf.layout_button_width : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)),
                     infobar[sc].geo.height,
                     conf.colors.layout_bg, conf.colors.layout_fg,
                     False, False, conf.border.layout);
@@ -159,7 +159,7 @@ infobar_draw_layout(int sc)
      if(!conf.layout_placement)
           barwin_move(infobar[sc].layout_button, infobar[sc].tags_board->geo.width + PAD / 2, 0);
 
-     barwin_resize(infobar[sc].layout_button, ((conf.layout_button_width > 0) ? conf.layout_button_width : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)), infobar[sc].geo.height);
+     barwin_resize(infobar[sc].layout_button, ((conf.layout_button_width > 0) ? (uint)conf.layout_button_width : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)), infobar[sc].geo.height);
      barwin_refresh_color(infobar[sc].layout_button);
 
      if(tags[sc][seltag[sc]].layout.symbol)
@@ -193,7 +193,7 @@ infobar_draw_selbar(int sc)
           str = emalloc(conf.selbar.maxlength + 4, sizeof(char));
           strncpy(str, sel->title, conf.selbar.maxlength);
 
-          if(strlen(sel->title) > conf.selbar.maxlength)
+          if(strlen(sel->title) > (size_t)conf.selbar.maxlength)
                strcat(str, "...");
      }
 
@@ -225,7 +225,7 @@ infobar_draw_taglist(int sc)
      Bool is_occupied[MAXTAG + 1];
 
      if(conf.layout_placement)
-          barwin_move(infobar[sc].tags_board, ((conf.layout_button_width > 0) ? conf.layout_button_width : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)) + PAD / 2, 0);
+          barwin_move(infobar[sc].tags_board, ((conf.layout_button_width > 0) ? (uint)conf.layout_button_width : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)) + PAD / 2, 0);
 
      for(i = 0; i < MAXTAG; i++)
           is_occupied[i] = False;
@@ -392,6 +392,7 @@ infobar_set_position(int pos)
 void
 uicb_infobar_togglepos(uicb_t cmd)
 {
+     (void)cmd;
      screen_get_sel();
 
      infobar_set_position((tags[selscreen][seltag[selscreen]].barpos
@@ -409,6 +410,7 @@ void
 uicb_toggle_tagautohide(uicb_t cmd)
 {
      int i, x;
+     (void)cmd;
 
      screen_get_sel();
      conf.tagautohide = !conf.tagautohide;

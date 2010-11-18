@@ -236,6 +236,7 @@ uicb_screen_select(uicb_t cmd)
 void
 uicb_screen_next(uicb_t cmd)
 {
+     (void)cmd;
      screen_get_sel();
 
      selscreen = (selscreen + 1 > screen_count() - 1) ? 0 : selscreen + 1;
@@ -251,6 +252,7 @@ uicb_screen_next(uicb_t cmd)
 void
 uicb_screen_prev(uicb_t cmd)
 {
+     (void)cmd;
      screen_get_sel();
 
      selscreen = (selscreen - 1 < 0) ? screen_count() - 1 : selscreen - 1;
@@ -266,6 +268,7 @@ uicb_screen_prev(uicb_t cmd)
 void
 uicb_screen_prev_sel(uicb_t cmd)
 {
+     (void)cmd;
      screen_get_sel();
 
      screen_set_sel(prevselscreen);

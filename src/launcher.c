@@ -108,14 +108,14 @@ launcher_execute(Launcher *launcher)
                case XK_Up:
                     if(launcher->nhisto)
                     {
-                         if(histpos >= launcher->nhisto)
+                         if(histpos >= (int)launcher->nhisto)
                               histpos = 0;
                          strncpy(buf, launcher->histo[launcher->nhisto - ++histpos], sizeof(buf));
                          pos = strlen(buf);
                     }
                     break;
                case XK_Down:
-                    if(launcher->nhisto && histpos > 0 && histpos < launcher->nhisto)
+                    if(launcher->nhisto && histpos > 0 && histpos < (int)launcher->nhisto)
                     {
                          strncpy(buf, launcher->histo[launcher->nhisto - --histpos], sizeof(buf));
                          pos = strlen(buf);

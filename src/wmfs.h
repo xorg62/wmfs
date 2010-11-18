@@ -33,7 +33,9 @@
 #ifndef WMFS_H
 #define WMFS_H
 
+/* glibc stuff */
 #define _BSD_SOURCE /* vsnprintf */
+#define _POSIX_SOURCE /* kill() */
 
 /* Lib headers */
 #include <stdio.h>
@@ -468,7 +470,7 @@ Client *clients;
 Client *sel;
 
 /* Other */
-func_name_list_t *func_list;
+extern const func_name_list_t func_list[];
 extern const func_name_list_t layout_list[];
 uint numlockmask;
 Systray *trayicons;
