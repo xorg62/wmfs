@@ -286,12 +286,7 @@ uicb_reload(uicb_t cmd)
 
      for(; argv_global[0] && argv_global[0] == ' '; ++argv_global);
 
-<<<<<<< HEAD
      execvp(argv_global, all_argv);
-=======
-     /* add -C to always load the same config file */
-     execlp(argv_global, argv_global, "-C", conf.confpath, NULL);
->>>>>>> master
 
      return;
 }
