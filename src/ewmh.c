@@ -60,7 +60,6 @@ ewmh_init_hints(void)
      net_atom[net_current_desktop]            = ATOM("_NET_CURRENT_DESKTOP");
      net_atom[net_desktop_names]              = ATOM("_NET_DESKTOP_NAMES");
      net_atom[net_desktop_geometry]           = ATOM("_NET_DESKTOP_GEOMETRY");
-     net_atom[net_workarea]                   = ATOM("_NET_WORKAREA");
      net_atom[net_active_window]              = ATOM("_NET_ACTIVE_WINDOW");
      net_atom[net_close_window]               = ATOM("_NET_CLOSE_WINDOW");
      net_atom[net_wm_name]                    = ATOM("_NET_WM_NAME");
@@ -319,45 +318,13 @@ ewmh_set_desktop_geometry(void)
      return;
 }
 
-/** Manage _NET_WORKAREA
-*/
-void
-ewmh_set_workarea(void)
-{
-     long *data;
-     int i, s, j, tag_c = 0, pos = 0;
-
-     s = screen_count();
-
-     for(i = 0; i < s; ++i)
-          tag_c += conf.ntag[i];
-
-     data = emalloc(tag_c * 4, sizeof(long));
-
-     for(i = 0; i < s; ++i)
-          for(j = 0; j < conf.ntag[i]; ++j)
-          {
-               data[pos++] = spgeo[i].x;
-               data[pos++] = spgeo[i].y;
-               data[pos++] = spgeo[i].width;
-               data[pos++] = spgeo[i].height;
-          }
-
-     XChangeProperty(dpy, ROOT, net_atom[net_workarea], XA_CARDINAL, 32,
-                     PropModeReplace, (uchar*)data, 4 * tag_c);
-
-     free(data);
-
-     return;
-}
-
 /** Manage _NET_WM_STATE_* ewmh
  */
 void
 ewmh_manage_net_wm_state(long data_l[], Client *c)
 {
      /* Manage _NET_WM_STATE_FULLSCREEN */
-     if(data_l[1] == net_atom[net_wm_state_fullscreen])
+     if(data_l[1] == (long)net_atom[net_wm_state_fullscreen])
      {
           if(data_l[0] == _NET_WM_STATE_ADD && !(c->flags & FSSFlag))
           {
@@ -392,14 +359,14 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
           }
      }
      /* Manage _NET_WM_STATE_STICKY */
-     else if(data_l[1] == net_atom[net_wm_state_sticky])
+     else if(data_l[1] == (long)net_atom[net_wm_state_sticky])
      {
           /* == client_ignore_tag */
           c->tag = MAXTAG + 1;
           arrange(c->screen, True);
      }
      /* Manage _NET_WM_STATE_DEMANDS_ATTENTION */
-     else if(data_l[1] == net_atom[net_wm_state_demands_attention])
+     else if(data_l[1] == (long)net_atom[net_wm_state_demands_attention])
      {
           if(data_l[0] == _NET_WM_STATE_ADD)
                client_focus(c);
@@ -419,8 +386,8 @@ void
 ewmh_manage_window_type(Client *c)
 {
      Atom *atom, rf;
-     int i, f;
-     ulong n, il;
+     int f;
+     ulong n, il, i;
      uchar *data = NULL;
      long ldata[5] = { 0 };
 

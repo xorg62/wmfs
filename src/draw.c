@@ -51,6 +51,7 @@ draw_image_ofset_text(Drawable d, int x, int y, char* fg, int pad, char *str, in
 {
      XftColor xftcolor;
      XftDraw *xftd;
+     (void)pad;
 
      if(!str)
           return;
@@ -130,7 +131,7 @@ draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color)
 void
 draw_graph(Drawable dr, int x, int y, uint w, uint h, uint color, char *data)
 {
-     int i;
+     uint i;
 
      XSetForeground(dpy, gc, color);
 

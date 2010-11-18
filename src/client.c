@@ -181,6 +181,7 @@ void
 uicb_client_prev(uicb_t cmd)
 {
      Client *c;
+     (void)cmd;
 
      if((c = client_get_prev()))
      {
@@ -198,6 +199,7 @@ void
 uicb_client_next(uicb_t cmd)
 {
      Client *c;
+     (void)cmd;
 
      if((c = client_get_next()))
      {
@@ -215,6 +217,7 @@ void
 uicb_client_swap_next(uicb_t cmd)
 {
      Client *c;
+     (void)cmd;
 
     if((c = client_get_next()))
      {
@@ -232,6 +235,7 @@ void
 uicb_client_swap_prev(uicb_t cmd)
 {
      Client *c;
+     (void)cmd;
 
      if((c = client_get_prev()))
      {
@@ -249,6 +253,7 @@ void
 uicb_client_focus_right(uicb_t cmd)
 {
      Client *c;
+     (void)cmd;
 
      if((c = client_get_next_with_direction(Right)))
      {
@@ -267,6 +272,7 @@ void
 uicb_client_focus_left(uicb_t cmd)
 {
      Client *c;
+     (void)cmd;
 
      if((c = client_get_next_with_direction(Left)))
      {
@@ -284,6 +290,7 @@ void
 uicb_client_focus_top(uicb_t cmd)
 {
      Client *c;
+     (void)cmd;
 
      if((c = client_get_next_with_direction(Top)))
      {
@@ -301,6 +308,7 @@ void
 uicb_client_focus_bottom(uicb_t cmd)
 {
      Client *c;
+     (void)cmd;
 
      if((c = client_get_next_with_direction(Bottom)))
      {
@@ -317,7 +325,9 @@ uicb_client_focus_bottom(uicb_t cmd)
 void
 client_above(Client *c)
 {
-     XRectangle geo = { 0 };
+     XRectangle geo;
+
+     memset(&geo, 0, sizeof(geo));
 
      if(c->flags & AboveFlag)
           return;
@@ -373,7 +383,7 @@ client_focus(Client *c)
 
           /* Set focusontag option */
           for(cc = clients; cc; cc = cc->next)
-               if(cc->focusontag == c->tag)
+               if(cc->focusontag == (int)c->tag)
                     cc->focusontag = -1;
 
           c->focusontag = seltag[selscreen];
@@ -559,7 +569,7 @@ client_hide(Client *c)
 Bool
 ishide(Client *c, int screen)
 {
-     if(((c->tag == seltag[screen] || c->tag == MAXTAG + 1) && c->screen == screen)
+     if(((c->tag == (uint)seltag[screen] || c->tag == MAXTAG + 1) && c->screen == screen)
                || tags[screen][seltag[screen]].tagad & TagFlag(c->tag))
           return False;
 
@@ -614,6 +624,7 @@ client_kill(Client *c)
 void
 uicb_client_kill(uicb_t cmd)
 {
+     (void)cmd;
      CHECK(sel);
 
      client_kill(sel);
@@ -990,12 +1001,14 @@ client_swap(Client *c1, Client *c2)
 void
 client_set_rules(Client *c)
 {
-     XClassHint xch = { 0 };
+     XClassHint xch;
      int i, j, k, f;
      Atom rf;
      ulong n, il;
      uchar *data = NULL;
      char wwrole[256] = { 0 };
+
+     memset(&xch, 0, sizeof(xch));
 
      if(conf.ignore_next_client_rules)
      {
@@ -1040,7 +1053,7 @@ client_set_rules(Client *c)
                               c->screen = i;
                               c->tag = j;
 
-                              if(c->tag != seltag[selscreen])
+                              if(c->tag != (uint)seltag[selscreen])
                               {
                                    tags[c->screen][c->tag].request_update = True;
                                    client_focus(NULL);
@@ -1074,7 +1087,7 @@ client_set_rules(Client *c)
                          c->flags |= MaxFlag;
                     }
 
-                    if(c->tag != seltag[selscreen])
+                    if(c->tag != (uint)seltag[selscreen])
                     {
                          tags[c->screen][c->tag].request_update = True;
                          client_focus(NULL);
@@ -1131,6 +1144,7 @@ client_raise(Client *c)
 void
 uicb_client_raise(uicb_t cmd)
 {
+     (void)cmd;
      CHECK(sel);
 
      client_raise(sel);
@@ -1167,7 +1181,7 @@ client_focus_next(Client *c)
               && c_next->screen != c->screen;
          c_next = c_next->next);
 
-     if(c_next && c_next->tag == seltag[selscreen]
+     if(c_next && c_next->tag == (uint)seltag[selscreen]
         && c_next->screen == selscreen)
           client_focus(c_next);
 
@@ -1204,7 +1218,7 @@ client_unmanage(Client *c)
 
      /* Arrange */
      for(i = 0; i < screen_count() && !b; ++i)
-          if(c->tag == seltag[i] || tags[i][seltag[i]].tagad & TagFlag(c->tag))
+          if(c->tag == (uint)seltag[i] || tags[i][seltag[i]].tagad & TagFlag(c->tag))
                b = True;
 
      if(b)
@@ -1299,6 +1313,7 @@ client_set_screen(Client *c, int s)
 void
 uicb_client_screen_next(uicb_t cmd)
 {
+     (void)cmd;
      CHECK(sel);
 
      client_set_screen(sel, (sel->screen + 1 > screen_count() - 1) ? 0 : sel->screen + 1);
@@ -1312,6 +1327,7 @@ uicb_client_screen_next(uicb_t cmd)
 void
 uicb_client_screen_prev(uicb_t cmd)
 {
+     (void)cmd;
      CHECK(sel);
 
      client_set_screen(sel, (sel->screen - 1 < 0) ? screen_count() - 1 : sel->screen - 1);
@@ -1384,6 +1400,7 @@ uicb_client_resize(uicb_t cmd)
 void
 uicb_ignore_next_client_rules(uicb_t cmd)
 {
+     (void)cmd;
      conf.ignore_next_client_rules = !conf.ignore_next_client_rules;
 
      return;
@@ -1465,7 +1482,7 @@ uicb_client_select(uicb_t cmd)
                if(clist_index[i].client->screen != selscreen)
                     screen_set_sel(clist_index[i].client->screen);
 
-               if(clist_index[i].client->tag != seltag[clist_index[i].client->screen])
+               if(clist_index[i].client->tag != (uint)seltag[clist_index[i].client->screen])
                     tag_set(clist_index[i].client->tag);
 
                client_focus(clist_index[i].client);
@@ -1487,6 +1504,7 @@ uicb_client_select(uicb_t cmd)
 Bool
 uicb_checkclist(uicb_t cmd)
 {
+     (void)cmd;
      return True;
 }
 
@@ -1496,6 +1514,7 @@ uicb_checkclist(uicb_t cmd)
 void
 uicb_client_ignore_tag(uicb_t cmd)
 {
+     (void)cmd;
      CHECK(sel);
 
      screen_get_sel();

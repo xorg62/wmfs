@@ -44,7 +44,7 @@ statustext_rectangle(StatusRec *r, char *str)
      char as;
      int n, i, j, k;
 
-     for(i = j = n = 0; i < strlen(str); ++i, ++j)
+     for(i = j = n = 0; i < (int)strlen(str); ++i, ++j)
           if(sscanf(&str[i], "\\b[%d;%d;%d;%d;#%x]%c", &r[n].x, &r[n].y, &r[n].w, &r[n].h, &r[n].color, &as) == 6
                     && as == '\\')
                for(++n, ++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
@@ -68,7 +68,7 @@ statustext_graph(StatusGraph *g, char *str)
      char as, c, *p;
      int n, i, j, k, m, w;
 
-     for(i = j = n = 0; i < strlen(str); ++i, ++j)
+     for(i = j = n = 0; i < (int)strlen(str); ++i, ++j)
           if(sscanf(&str[i], "\\g[%d;%d;%d;%d;#%x;%512[^]]]%c",
                     &g[n].x, &g[n].y, &g[n].w, &g[n].h, &g[n].color, g[n].data, &as) == 7
                     && as == '\\')
@@ -84,7 +84,7 @@ statustext_graph(StatusGraph *g, char *str)
                     /* height limits */
                     if(c < 0)
                          c = 0;
-                    if(c > g[n].h)
+                    if(c > (char)g[n].h)
                          c = g[n].h;
                     g[n].data[m] = c;
                     p = strtok(NULL, ";");
@@ -118,7 +118,7 @@ statustext_text(StatusText *s, char *str)
      char as;
      int n, i, j, k;
 
-     for(i = j = n = 0; i < strlen(str); ++i, ++j)
+     for(i = j = n = 0; i < (int)strlen(str); ++i, ++j)
           if(sscanf(&str[i], "\\s[%d;%d;%7[^;];%512[^]]]%c", &s[n].x, &s[n].y, s[n].color, s[n].text, &as) == 5
                     && as == '\\')
                for(++n, ++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
@@ -146,7 +146,7 @@ statustext_normal(int sc, char *str)
      if(sc == conf.systray.screen)
           sw = systray_get_width();
 
-     for(i = j = n = 0; i < strlen(str); ++i, ++j)
+     for(i = j = n = 0; i < (int)strlen(str); ++i, ++j)
           if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
           {
                ++n;
@@ -164,7 +164,7 @@ statustext_normal(int sc, char *str)
      {
           strcpy(buf, strwc);
 
-          for(i = k = 0; i < strlen(str); ++i, ++k)
+          for(i = k = 0; i < (int)strlen(str); ++i, ++k)
                if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
                {
                     /* Store current color in col[] */

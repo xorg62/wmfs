@@ -33,7 +33,9 @@
 #ifndef WMFS_H
 #define WMFS_H
 
+/* glibc stuff */
 #define _BSD_SOURCE /* vsnprintf */
+#define _POSIX_SOURCE /* kill() */
 
 /* Lib headers */
 #include <stdio.h>
@@ -220,7 +222,6 @@ void ewmh_update_current_tag_prop(void);
 void ewmh_get_client_list(void);
 void ewmh_get_desktop_names(void);
 void ewmh_set_desktop_geometry(void);
-void ewmh_set_workarea(void);
 void ewmh_manage_net_wm_state(long data_l[], Client *c);
 void ewmh_manage_window_type(Client *c);
 
@@ -471,7 +472,7 @@ Client *clients;
 Client *sel;
 
 /* Other */
-func_name_list_t *func_list;
+extern const func_name_list_t func_list[];
 extern const func_name_list_t layout_list[];
 uint numlockmask;
 Systray *trayicons;

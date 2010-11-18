@@ -65,7 +65,7 @@ vicmd_to_uicb vicmd[] =
 void
 viwmfs_help(void)
 {
-     int i;
+     size_t i;
      char s[20];
 
      printf("ViWMFS commands list:\n");
@@ -85,7 +85,7 @@ viwmfs_help(void)
 void
 viwmfs(int argc, char **argv)
 {
-     int i;
+     size_t i;
      char *cmd, str[256] = { 0 };
      Bool e;
 
@@ -94,7 +94,7 @@ viwmfs(int argc, char **argv)
 
      if(argc > 3)
      {
-          for(i = 2; i < argc; ++i)
+          for(i = 2; i < (size_t)argc; ++i)
           {
                strcat(str, argv[i]);
 

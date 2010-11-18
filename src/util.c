@@ -209,7 +209,8 @@ spawn(const char *format, ...)
      char cmd[512];
      va_list ap;
      pid_t pid, ret;
-     int p[2], len;
+     int p[2];
+     size_t len;
 
      va_start(ap, format);
      len = vsnprintf(cmd, sizeof(cmd), format, ap);
@@ -307,7 +308,7 @@ parse_image_block(ImageAttr *im, char *str)
      char as;
      int n, i, j, k;
 
-     for(i = j = n = 0; i < strlen(str); ++i, ++j)
+     for(i = j = n = 0; i < (int)strlen(str); ++i, ++j)
           if(sscanf(&str[i], "\\i[%d;%d;%d;%d;%512[^]]]%c", &im[n].x, &im[n].y, &im[n].w, &im[n].h, im[n].name, &as) == 6
                     && as == '\\')
                for(++n, ++i, --j; str[i] != as || str[i - 1] != ']'; ++i);

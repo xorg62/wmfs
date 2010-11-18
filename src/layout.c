@@ -65,6 +65,7 @@ void
 freelayout(int screen)
 {
      Client *c;
+     (void)screen;
 
      for(c = clients; c; c = c->next)
           if(!ishide(c, selscreen)
@@ -92,7 +93,7 @@ layoutswitch(Bool b)
      screen_get_sel();
 
      if(tags[selscreen][seltag[selscreen]].layout.func == freelayout)
-          for(c = clients; c && (c->tag != seltag[selscreen] && c->screen != selscreen); c = c->next)
+          for(c = clients; c && (c->tag != (uint)seltag[selscreen] && c->screen != selscreen); c = c->next)
           {
                c->ogeo = c->geo;
                c->free_geo = c->geo;
@@ -124,6 +125,7 @@ layoutswitch(Bool b)
 void
 uicb_layout_next(uicb_t cmd)
 {
+     (void)cmd;
      layoutswitch(True);
 
      return;
@@ -135,6 +137,7 @@ uicb_layout_next(uicb_t cmd)
 void
 uicb_layout_prev(uicb_t cmd)
 {
+     (void)cmd;
      layoutswitch(False);
 
      return;
@@ -321,15 +324,15 @@ multi_tile(int screen, Position type)
      if(type == Top || type == Bottom)
      {
           if(type == Top)
-               mastergeo.y = (n <= nmaster) ? sg.y : sg.y + (sg.height - mwfact) - BORDH;
+               mastergeo.y = (n <= nmaster) ? (uint)sg.y : sg.y + (sg.height - mwfact) - BORDH;
           mastergeo.width = (sg.width / nmaster) - (BORDH * 4);
-          mastergeo.height = (n <= nmaster) ? sg.height - BORDH : mwfact;
+          mastergeo.height = (n <= nmaster) ? (uint)(sg.height - BORDH) : mwfact;
      }
      else
      {
           if(type == Left)
-               mastergeo.x = (n <= nmaster) ? sg.x : (sg.x + sg.width) - mwfact - (BORDH * 2);
-          mastergeo.width = (n <= nmaster) ? sg.width - (BORDH * 2) : mwfact;
+               mastergeo.x = (n <= nmaster) ? (uint)sg.x : (sg.x + sg.width) - mwfact - (BORDH * 2);
+          mastergeo.width = (n <= nmaster) ? (uint)(sg.width - (BORDH * 2)) : mwfact;
           mastergeo.height = (sg.height / nmaster) - BORDH;
      }
 
@@ -434,11 +437,14 @@ mirror(int screen, Bool horizontal)
      XRectangle sg = sgeo[screen];
      XRectangle mastergeo = {sg.x, sg.y, sg.width, sg.height};
      XRectangle cgeo = {sg.x, sg.y , sg.width, sg.height};
-     XRectangle nextg[2] = { {0} };
+     XRectangle nextg[2];
      uint i, n, tilesize = 0, mwfact;
      uint nmaster = tags[screen][seltag[screen]].nmaster;
      int pa, imp;
      Bool isp = 0;
+
+     memset(&nextg[0], 0, sizeof(nextg[0]));
+     memset(&nextg[1], 0, sizeof(nextg[2]));
 
      for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
      CHECK(n);
@@ -687,6 +693,7 @@ grid_vertical(int screen)
 void
 uicb_tile_switch(uicb_t cmd)
 {
+     (void)cmd;
      layout_set_client_master (sel);
      return;
 }
@@ -697,6 +704,8 @@ uicb_tile_switch(uicb_t cmd)
 void
 uicb_togglefree(uicb_t cmd)
 {
+     (void)cmd;
+
      if(!sel || sel->screen != screen_get_sel() || (sel->flags & FSSFlag))
           return;
 
@@ -728,6 +737,8 @@ uicb_togglefree(uicb_t cmd)
 void
 uicb_togglemax(uicb_t cmd)
 {
+     (void)cmd;
+
      if(!sel || ishide(sel, selscreen)
         || (sel->flags & HintFlag)|| (sel->flags & FSSFlag))
           return;
@@ -759,6 +770,7 @@ void
 uicb_toggle_resizehint(uicb_t cmd)
 {
      screen_get_sel();
+     (void)cmd;
 
      tags[selscreen][seltag[selscreen]].resizehint = !tags[selscreen][seltag[selscreen]].resizehint;
 
@@ -774,6 +786,7 @@ void
 uicb_toggle_abovefc(uicb_t cmd)
 {
      Client *c;
+     (void)cmd;
 
      screen_get_sel();
 
@@ -782,7 +795,7 @@ uicb_toggle_abovefc(uicb_t cmd)
           for(c = clients; c; c = c->next)
                if(c->flags & AboveFlag
                          && c->screen == selscreen
-                         && c->tag == seltag[selscreen])
+                         && c->tag == (uint)seltag[selscreen])
                {
                     c->flags &= ~AboveFlag;
                     break;
@@ -802,7 +815,7 @@ uicb_toggle_abovefc(uicb_t cmd)
 void
 uicb_set_layout(uicb_t cmd)
 {
-     int i, j, n;
+     size_t i, j, n;
 
      screen_get_sel();
 
@@ -850,6 +863,8 @@ layout_set_client_master(Client *c)
 Bool
 uicb_checkmax(uicb_t cmd)
 {
+     (void)cmd;
+
      if(!sel)
           return False;
 
@@ -865,6 +880,8 @@ uicb_checkmax(uicb_t cmd)
 Bool
 uicb_checkfree(uicb_t cmd)
 {
+     (void)cmd;
+
      if(!sel)
           return False;
 

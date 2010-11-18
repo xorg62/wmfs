@@ -114,7 +114,7 @@ tag_set(int tag)
      /* No focusontag option found on any client, try to find the first of the tag */
      if(!c)
           for(c = clients; c; c = c->next)
-               if(c->tag == seltag[selscreen] && c->screen == selscreen)
+               if(c->tag == (uint)seltag[selscreen] && c->screen == selscreen)
                     break;
 
      client_focus((c) ? c : NULL);
@@ -175,6 +175,7 @@ uicb_tag(uicb_t cmd)
 void
 uicb_tag_next(uicb_t cmd)
 {
+     (void)cmd;
      screen_get_sel();
 
      tag_set(seltag[selscreen] + 1);
@@ -188,6 +189,7 @@ uicb_tag_next(uicb_t cmd)
 void
 uicb_tag_prev(uicb_t cmd)
 {
+     (void)cmd;
      screen_get_sel();
 
      tag_set(seltag[selscreen] - 1);
@@ -204,6 +206,7 @@ uicb_tag_next_visible(uicb_t cmd)
      int i, tag;
      Client *c;
      Bool is_occupied[MAXTAG];
+     (void)cmd;
 
      screen_get_sel();
 
@@ -247,6 +250,7 @@ uicb_tag_prev_visible(uicb_t cmd)
      int i, tag;
      Client *c;
      Bool is_occupied[MAXTAG];
+     (void)cmd;
 
      screen_get_sel();
 
@@ -314,6 +318,7 @@ uicb_tagtransfert(uicb_t cmd)
 void
 uicb_tag_prev_sel(uicb_t cmd)
 {
+     (void)cmd;
      screen_get_sel();
 
      tag_set(prevseltag[selscreen]);
@@ -329,6 +334,7 @@ uicb_tagtransfert_next(uicb_t cmd)
 {
      CHECK(sel);
      int tag = seltag[selscreen] + 1;
+     (void)cmd;
 
      if(tag > conf.ntag[selscreen])
      {
@@ -349,6 +355,7 @@ uicb_tagtransfert_prev(uicb_t cmd)
 {
      CHECK(sel);
      int tag = seltag[selscreen] - 1;
+     (void)cmd;
 
      if(tag <= 0)
      {
@@ -369,6 +376,8 @@ uicb_tag_urgent(uicb_t cmd)
 {
      Client *c;
      Bool b = False;
+
+     (void)cmd;
 
      /* Check if there is a urgent client */
      for(c = clients; c; c = c->next)
@@ -441,9 +450,9 @@ tag_swap(int s, int t1, int t2)
 
      for(c = clients; c; c = c->next)
      {
-          if(c->screen == s && c->tag == t1)
+          if(c->screen == s && c->tag == (uint)t1)
                c->tag = t2;
-          else if(c->screen == s && c->tag == t2)
+          else if(c->screen == s && c->tag == (uint)t2)
                c->tag = t1;
      }
 
@@ -472,6 +481,7 @@ uicb_tag_swap(uicb_t cmd)
 void
 uicb_tag_swap_next(uicb_t cmd)
 {
+     (void)cmd;
      screen_get_sel();
 
      tag_swap(selscreen, seltag[selscreen], seltag[selscreen] + 1);
@@ -485,6 +495,7 @@ uicb_tag_swap_next(uicb_t cmd)
 void
 uicb_tag_swap_previous(uicb_t cmd)
 {
+     (void)cmd;
      screen_get_sel();
 
      tag_swap(selscreen, seltag[selscreen], seltag[selscreen] - 1);
@@ -559,15 +570,17 @@ uicb_tag_new(uicb_t cmd)
 void
 tag_delete(int s, int tag)
 {
-     Tag t = { 0 };
+     Tag t;
      Client *c;
-     int i;
+     size_t i;
+
+     memset(&t, 0, sizeof(t));
 
      if(tag < 0 || tag > conf.ntag[s] || conf.ntag[s] == 1)
           return;
 
      for(c = clients; c; c = c->next)
-          if(c->screen == s && c->tag == tag)
+          if(c->screen == s && c->tag == (uint)tag)
           {
                warnx("Client(s) present in this tag, can't delete it");
 
@@ -579,7 +592,7 @@ tag_delete(int s, int tag)
      tags[s][tag] = t;
      infobar[s].tags[tag] = NULL;
 
-     for(i = tag; i < conf.ntag[s] + 1; ++i)
+     for(i = tag; i < (size_t)conf.ntag[s] + 1; ++i)
      {
           /* Set clients tag because of shift */
           for(c = clients; c; c = c->next)

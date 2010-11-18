@@ -236,7 +236,7 @@ clientmessageevent(XClientMessageEvent *ev)
 
      /* Manage _NET_WM_DESKTOP */
      if(mess_t == net_wm_desktop)
-          if((c = client_gb_win(ev->window)) && ev->data.l[0] != 0xFFFFFFFF)
+          if((c = client_gb_win(ev->window)) && ev->data.l[0] != (long)0xFFFFFFFF)
                tag_transfert(c, ev->data.l[0]);
 
      /* Manage _WMFS_STATUSTEXT_x */
@@ -275,7 +275,6 @@ clientmessageevent(XClientMessageEvent *ev)
           ewmh_get_client_list();
           ewmh_get_desktop_names();
           ewmh_set_desktop_geometry();
-          ewmh_set_workarea();
           screen_count();
           screen_get_sel();
      }
@@ -446,7 +445,7 @@ focusin(XFocusChangeEvent *ev)
 void
 grabkeys(void)
 {
-     uint i;
+     int i;
      KeyCode code;
 
      XUngrabKey(dpy, AnyKey, AnyModifier, ROOT);
@@ -468,7 +467,7 @@ grabkeys(void)
 void
 keypress(XKeyPressedEvent *ev)
 {
-     uint i;
+     int i;
      KeySym keysym;
 
      keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
@@ -607,6 +606,7 @@ propertynotify(XPropertyEvent *ev)
 void
 reparentnotify(XReparentEvent *ev)
 {
+     (void)ev;
 
      return;
 }

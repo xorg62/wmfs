@@ -68,6 +68,8 @@ errorhandler(Display *d, XErrorEvent *event)
 int
 errorhandlerdummy(Display *d, XErrorEvent *event)
 {
+     (void)d;
+     (void)event;
      return 0;
 }
 
@@ -77,7 +79,7 @@ void
 quit(void)
 {
      Client *c;
-     int i;
+     size_t i, len;
 
      /* Set the silent error handler */
      XSetErrorHandler(errorhandlerdummy);
@@ -104,7 +106,6 @@ quit(void)
      IFREE(spgeo);
      IFREE(infobar);
      IFREE(keys);
-     IFREE(func_list);
      IFREE(net_atom);
 
      /* Clean conf alloced thing */
@@ -112,7 +113,8 @@ quit(void)
 
      if(conf.menu)
      {
-          for(i = 0; i < LEN(conf.menu); ++i)
+          len = LEN(conf.menu);
+          for(i = 0; i < len; ++i)
                IFREE(conf.menu[i].item);
           IFREE(conf.menu);
      }
@@ -193,6 +195,7 @@ mainloop(void)
 void
 uicb_quit(uicb_t cmd)
 {
+     (void)cmd;
      exiting = True;
 
      return;
@@ -204,11 +207,11 @@ uicb_quit(uicb_t cmd)
 void
 scan(void)
 {
-     uint i, n;
+     uint n;
      XWindowAttributes wa;
      Window usl, usl2, *w = NULL;
      Atom rt;
-     int s, rf, tag = -1, screen = -1, free = -1;
+     int s, rf, tag = -1, screen = -1, free = -1, i;
      ulong ir, il;
      uchar *ret;
      Client *c;
@@ -259,7 +262,7 @@ scan(void)
      /* Set update layout request */
      for(c = clients; c; c = c->next)
      {
-          if(c->tag > conf.ntag[c->screen])
+          if(c->tag > (uint)conf.ntag[c->screen])
                c->tag = conf.ntag[c->screen];
           tags[c->screen][c->tag].request_update = True;
      }
@@ -278,11 +281,17 @@ scan(void)
 void
 uicb_reload(uicb_t cmd)
 {
+     (void)cmd;
      quit();
 
      for(; argv_global[0] && argv_global[0] == ' '; ++argv_global);
 
+<<<<<<< HEAD
      execvp(argv_global, all_argv);
+=======
+     /* add -C to always load the same config file */
+     execlp(argv_global, argv_global, "-C", conf.confpath, NULL);
+>>>>>>> master
 
      return;
 }
@@ -398,6 +407,7 @@ update_status(void)
 void
 signal_handle(int sig)
 {
+     (void)sig;
      exiting = True;
      quit();
      exit(EXIT_SUCCESS);
