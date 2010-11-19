@@ -42,7 +42,7 @@ infobar_init(void)
      s = screen_count();
 
      if(!infobar)
-          infobar = emalloc(s, sizeof(InfoBar));
+          infobar = xcalloc(s, sizeof(InfoBar));
 
      for(sc = 0; sc < s; ++sc)
      {
@@ -127,7 +127,7 @@ infobar_init(void)
           barwin_refresh(infobar[sc].bar);
 
           /* Default statustext is set here */
-          infobar[sc].statustext = _strdup(WMFS_VERSION);
+          infobar[sc].statustext = xstrdup(WMFS_VERSION);
 
           infobar_draw(sc);
      }
@@ -190,7 +190,7 @@ infobar_draw_selbar(int sc)
 
      if(conf.selbar.maxlength >= 0 && sel)
      {
-          str = emalloc(conf.selbar.maxlength + 4, sizeof(char));
+          str = xcalloc(conf.selbar.maxlength + 4, sizeof(char));
           strncpy(str, sel->title, conf.selbar.maxlength);
 
           if(strlen(sel->title) > (size_t)conf.selbar.maxlength)

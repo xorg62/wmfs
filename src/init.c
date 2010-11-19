@@ -196,7 +196,7 @@ init_status(void)
                return;
           }
 
-          conf.status_path = emalloc(strlen(home) + strlen(DEF_STATUS) + 2, sizeof(char));
+          conf.status_path = zmalloc(strlen(home) + strlen(DEF_STATUS) + 2);
           sprintf(conf.status_path, "%s/"DEF_STATUS, home);
      }
 

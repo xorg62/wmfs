@@ -17,6 +17,7 @@
 #ifndef PARSE_H
 #define PARSE_H
 
+#include "wmfs.h"
 #include <sys/queue.h>
 
 #define INCLUDE_CMD "@include"
@@ -116,11 +117,5 @@ struct opt_type *fetch_opt(struct conf_sec *, char *, char *);
  * Count member of a opt_type *
  */
 size_t fetch_opt_count(struct opt_type *);
-
-
-/* wrapper for calloc */
-void *xcalloc(size_t, size_t);
-/* wrapper for asprintf */
-int xasprintf(char **, const char *, ...);
 
 #endif /* PARSE_H */

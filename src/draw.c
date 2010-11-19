@@ -62,7 +62,7 @@ draw_image_ofset_text(Drawable d, int x, int y, char* fg, int pad, char *str, in
      int i, ni, sw = 0;
      ImageAttr im[128];
 
-     ostr = _strdup(str);
+     ostr = xstrdup(str);
 
      if(strstr(str, "i["))
      {
@@ -204,7 +204,7 @@ textw(char *text)
 
      ImageAttr im[128];
 
-     ostr = _strdup(text);
+     ostr = xstrdup(text);
 
      if(strstr(text, "i["))
           parse_image_block(im, text);

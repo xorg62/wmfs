@@ -422,7 +422,7 @@ main(int argc, char **argv)
      int i;
      char *ol = "csgVS";
 
-     argv_global  = _strdup(argv[0]);
+     argv_global  = xstrdup(argv[0]);
      sprintf(conf.confpath, "%s/"DEF_CONF, getenv("HOME"));
 
      while((i = getopt(argc, argv, "hviSc:s:g:C:V:")) != -1)

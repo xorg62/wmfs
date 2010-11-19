@@ -823,7 +823,7 @@ uicb_set_layout(uicb_t cmd)
      for(n = 0; layout_list[n].name != NULL && layout_list[n].func != NULL; ++n);
 
      for(i = 0; i < n; ++i)
-          if(!strcmp(cmd, _strdup(layout_list[i].name)))
+          if(!strcmp(cmd, xstrdup(layout_list[i].name)))
                for(j = 0; j < LEN(conf.layout); ++j)
                     if(layout_list[i].func == conf.layout[j].func)
                          tags[selscreen][seltag[selscreen]].layout = conf.layout[j];

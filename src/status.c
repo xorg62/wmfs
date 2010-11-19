@@ -212,7 +212,7 @@ statustext_handle(int sc, char *str)
      /* save last status text address (for free at the end) */
      lastst = infobar[sc].statustext;
 
-     infobar[sc].statustext = _strdup(str);
+     infobar[sc].statustext = xstrdup(str);
      len = ((strlen(str) > MAXSTATUS) ? MAXSTATUS : strlen(str));
 
      /* Store rectangles, located text & images properties. */

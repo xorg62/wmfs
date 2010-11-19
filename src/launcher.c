@@ -253,12 +253,11 @@ complete_on_command(char *start, size_t hits)
 
      char **namelist = NULL;
      int n = 0, i;
-     void *temp = NULL;
 
      if (!getenv("PATH") || !start || hits <= 0)
          return NULL;
 
-     path = _strdup(getenv("PATH"));
+     path = xstrdup(getenv("PATH"));
      dirname = strtok(path, ":");
 
      /* recursively open PATH */
@@ -272,10 +271,8 @@ complete_on_command(char *start, size_t hits)
                     {
                          if (!strncmp(content->d_name, start, strlen(start)))
                          {
-                              temp = realloc(namelist, ++n * sizeof(*namelist));
-                              if ( temp != NULL )
-                                   namelist = temp;
-                              namelist[n-1] = strdup(content->d_name);
+                              namelist = xrealloc(namelist, ++n, sizeof(*namelist));
+                              namelist[n-1] = xstrdup(content->d_name);
                          }
                     }
                }
@@ -289,7 +286,7 @@ complete_on_command(char *start, size_t hits)
 
      if(n > 0)
      {
-         ret = _strdup(namelist[((hits > 0) ? hits - 1 : 0) % n] + strlen(start));
+         ret = xstrdup(namelist[((hits > 0) ? hits - 1 : 0) % n] + strlen(start));
 
           for(i = 0; i < n; i++)
               free(namelist[i]);
@@ -324,14 +321,14 @@ complete_on_files(char *start, size_t hits)
       * the beginning of file to complete on pointer 'p'.
       */
      if (*(++p) == '\0' || !strrchr(p, '/'))
-          path = _strdup(".");
+          path = xstrdup(".");
      else
      {
           /* remplace ~ by $HOME in dirname */
           if (!strncmp(p, "~/", 2) && getenv("HOME"))
                xasprintf(&dirname, "%s%s", getenv("HOME"), p+1);
           else
-               dirname = _strdup(p);
+               dirname = xstrdup(p);
 
           /* Set p to filename to be complete
            * and path the directory containing the file
@@ -342,11 +339,11 @@ complete_on_files(char *start, size_t hits)
           if (p != dirname)
           {
                *(p++) = '\0';
-               path = _strdup(dirname);
+               path = xstrdup(dirname);
           }
           else
           {
-               path = _strdup("/");
+               path = xstrdup("/");
                p++;
           }
      }
@@ -367,7 +364,7 @@ complete_on_files(char *start, size_t hits)
                          if (S_ISDIR(st.st_mode))
                               xasprintf(&ret, "%s/", content->d_name + strlen(p));
                          else
-                              ret = _strdup(content->d_name + strlen(p));
+                              ret = xstrdup(content->d_name + strlen(p));
                     }
                     else
                          warn("%s", filepath);

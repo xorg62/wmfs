@@ -177,8 +177,8 @@ screen_init_geo(void)
      int i;
      int s = screen_count();
 
-     sgeo = emalloc(s, sizeof(XRectangle));
-     spgeo = emalloc(s, sizeof(XRectangle));
+     sgeo = xcalloc(s, sizeof(XRectangle));
+     spgeo = xcalloc(s, sizeof(XRectangle));
 
      for(i = 0; i < s; ++i)
           sgeo[i] = screen_get_geo(i);

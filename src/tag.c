@@ -512,7 +512,7 @@ tag_new(int s, char *name)
      {
          if(conf.tagnamecount)
          {
-             displayedName = (char*) malloc( sizeof(char)*2 );
+             displayedName = zmalloc(2);
              sprintf(displayedName, "[%d]", conf.ntag[s]);
          }
          else

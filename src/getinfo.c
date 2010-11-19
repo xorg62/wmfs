@@ -60,14 +60,14 @@ getinfo_tag(void)
      if(XGetWindowProperty(dpy, ROOT, ATOM("_WMFS_CURRENT_TAG"), 0L, 4096,
                            False, ATOM("UTF8_STRING"), &rt, &rf, &ir, &il, &ret) == Success && ret)
      {
-          tag_name = _strdup((char*)ret);
+          tag_name = xstrdup((char*)ret);
           XFree(ret);
      }
 
      if(XGetWindowProperty(dpy, ROOT, ATOM("_WMFS_TAG_LIST"), 0L, 4096,
                            False, ATOM("UTF8_STRING"), &rt, &rf, &ir, &il, &ret) == Success && ret)
      {
-          tag_list = _strdup((char*)ret);
+          tag_list = xstrdup((char*)ret);
           XFree(ret);
      }
 
@@ -116,7 +116,7 @@ getinfo_layout(void)
      if(XGetWindowProperty(dpy, ROOT, ATOM("_WMFS_CURRENT_LAYOUT"), 0L, 4096,
                            False, ATOM("UTF8_STRING"), &rt, &rf, &ir, &il, &ret) == Success && ret)
      {
-          layout = _strdup((char*)ret);
+          layout = xstrdup((char*)ret);
           XFree(ret);
      }
 
@@ -137,7 +137,7 @@ getinfo_mwfact(void)
      if(XGetWindowProperty(dpy, ROOT, ATOM("_WMFS_MWFACT"), 0L, 4096,
                            False, XA_STRING, &rt, &rf, &ir, &il, &ret) == Success && ret)
      {
-          mwfact = _strdup((char*)ret);
+          mwfact = xstrdup((char*)ret);
           XFree(ret);
      }
 

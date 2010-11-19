@@ -58,7 +58,7 @@ barwin_create(Window parent,
      BarWindow *bw;
 
      /* Allocate memory */
-     bw = emalloc(1, sizeof(BarWindow));
+     bw = zcalloc(sizeof(*bw));
 
      /* Barwin attributes */
      at.override_redirect = True;

@@ -32,21 +32,99 @@
 
 #include "wmfs.h"
 
-/** Calloc with an error message if there is a probleme
- * \param element Element
- * \param size Size
- * \return void pointer
-*/
-void*
-emalloc(uint element, uint size)
+/** malloc with error support and size_t overflow protection
+ * \param nmemb number of objects
+ * \param size size of single object
+ * \return non null void pointer
+ */
+void *
+xmalloc(size_t nmemb, size_t size)
 {
-     void *ret = calloc(element, size);
+     void *ret;
 
-     if(!ret)
-          warn("calloc()");
+     if (SIZE_MAX / nmemb < size)
+          err(EXIT_FAILURE, "xmalloc(%zu, %zu), "
+                    "size_t overflow detected", nmemb, size);
+
+     if ((ret = malloc(nmemb * size)) == NULL)
+          err(EXIT_FAILURE, "malloc(%zu)", nmemb * size);
 
      return ret;
 }
+
+/** calloc with error support
+ * \param nmemb Number of objects
+ * \param size size of single object
+ * \return non null void pointer
+*/
+void *
+xcalloc(size_t nmemb, size_t size)
+{
+     void *ret;
+
+     if ((ret = calloc(nmemb, size)) == NULL)
+          err(EXIT_FAILURE, "calloc(%zu * %zu)", nmemb, size);
+
+     return ret;
+}
+
+/** realloc with error support and size_t overflow check
+ * \param ptr old pointer
+ * \param nmemb number of objects
+ * \param size size of single object
+ * \return non null void pointer
+ */
+void *
+xrealloc(void *ptr, size_t nmemb, size_t size)
+{
+     void *ret;
+
+     if (SIZE_MAX / nmemb < size)
+          err(EXIT_FAILURE, "xrealloc(%p, %zu, %zu), "
+                    "size_t overflow detected", ptr, nmemb, size);
+
+     if ((ret = realloc(ptr, nmemb * size)) == NULL)
+          err(EXIT_FAILURE, "realloc(%p, %zu)", ptr, nmemb * size);
+
+     return ret;
+}
+
+/** strdup with error support
+ * \param str char pointer
+ * \retun non null void pointer
+ */
+char *
+xstrdup(const char *str)
+{
+     char *ret;
+
+     if (str == NULL || (ret = strdup(str)) == NULL)
+          err(EXIT_FAILURE, "strdup(%s)", str);
+
+     return ret;
+}
+
+/** asprintf wrapper
+ * \param strp target string
+ * \param fmt format
+ * \return non zero integer
+ */
+int
+xasprintf(char **strp, const char *fmt, ...)
+{
+     int ret;
+     va_list args;
+
+     va_start(args, fmt);
+     ret = vasprintf(strp, fmt, args);
+     va_end(args);
+
+     if (ret == -1)
+          err(EXIT_FAILURE, "asprintf(%s)", fmt);
+
+     return ret;
+}
+
 
 /** Get a color with a string
  * \param color Color string
@@ -91,20 +169,6 @@ setwinstate(Window win, long state)
                      PropModeReplace, (uchar *)data, 2);
 
      return;
-}
-
-/** My strdup. the strdup of string.h isn't ansi compatible..
- * Thanks linkdd.
- * \param str char pointer
-*/
-char*
-_strdup(const char *str)
-{
-     char *ret = emalloc(strlen(str) + 1, sizeof(char));
-
-     strcpy(ret, str);
-
-     return ret;
 }
 
 /* The following function are for configuration
@@ -176,9 +240,9 @@ alias_to_str(char *conf_choice)
                     tmpchar = conf.alias[i].content;
 
      if(tmpchar)
-          return _strdup(tmpchar);
+          return xstrdup(tmpchar);
      else
-          return _strdup(conf_choice);
+          return xstrdup(conf_choice);
 
      return NULL;
 }
@@ -327,7 +391,7 @@ clean_value(char *str)
      int i;
      char c, *p;
 
-     if(!str || !(p = _strdup(str)))
+     if(!str || !(p = xstrdup(str)))
           return NULL;
 
      /* Remove useless spaces */
