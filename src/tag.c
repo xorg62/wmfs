@@ -286,12 +286,30 @@ uicb_tag_prev_visible(uicb_t cmd)
 }
 
 /** Go to the last tag
- * \param cmd uicb_t type unused
+  *\param cmd uicb_t type unused
 */
 void
 uicb_tag_last(uicb_t cmd)
 {
+     (void)cmd;
      screen_get_sel();
+
+     tag_set(conf.ntag[selscreen]);
+
+     return;
+}
+
+/** Keep that tag the last one
+  *\param cmd uicb_t type unused
+*/
+void
+uicb_tag_stay_last(uicb_t cmd)
+{
+     /*warnx("in uicb_tag_stay_last\n");*/
+     (void)cmd;
+     screen_get_sel();
+
+     remove_old_last_tag(selscreen);
 
      tag_set(conf.ntag[selscreen]);
 
@@ -538,7 +556,7 @@ tag_new(int s, char *name)
                conf.default_tag.mwfact, conf.default_tag.nmaster,
                False, conf.default_tag.resizehint, False, False,
                conf.default_tag.barpos, conf.default_tag.layout,
-               0, NULL, 0 };
+               0, NULL, 0, False };
 
 
      tags[s][conf.ntag[s]] = t;
@@ -645,6 +663,28 @@ uicb_tag_rename(uicb_t cmd)
      strcpy(tags[selscreen][seltag[selscreen]].name, cmd);
      infobar_update_taglist(selscreen);
      infobar_draw(selscreen);
+
+     return;
+}
+
+/**
+  *\param selscreen int
+*/
+void
+remove_old_last_tag(int selscreen)
+{
+     /*warnx("in remove_old_last_tag\n");*/
+     /*warnx("il y a %d tag sur l ecran %d\n", conf.ntag[selscreen], selscreen);*/
+     int i;
+     for(i = 0; i < conf.ntag[selscreen]; i++)
+     {
+         /*warnx("i = %d", i);*/
+          if(tags[selscreen][i].stay_last)
+          {
+              tags[selscreen][i].stay_last = False;
+              break;
+          }
+     }
 
      return;
 }

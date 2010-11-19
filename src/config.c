@@ -70,6 +70,7 @@ const func_name_list_t func_list[] =
      {"tag_del",                  uicb_tag_del },
      {"tag_rename",               uicb_tag_rename },
      {"tag_last",                 uicb_tag_last },
+     {"tag_stay_last",            uicb_tag_stay_last },
      {"set_mwfact",               uicb_set_mwfact },
      {"set_nmaster",              uicb_set_nmaster },
      {"quit",                     uicb_quit },
@@ -500,7 +501,7 @@ conf_tag_section(void)
                          False, fetch_opt_first(def_tag, "false", "resizehint").bool,
                          False, False, bar_pos,
                          layout_name_to_struct(conf.layout, fetch_opt_first(def_tag, "title_right", "layout").str, conf.nlayout, layout_list),
-                         0, NULL, 0 };
+                         0, NULL, 0, False };
 
      conf.default_tag = default_tag;
 

@@ -331,6 +331,8 @@ void tag_delete(int s, int tag);
 void uicb_tag_del(uicb_t);
 void uicb_tag_rename(uicb_t cmd);
 void uicb_tag_last(uicb_t cmd);
+void uicb_tag_stay_last(uicb_t cmd);
+void remove_old_last_tag(int selscreen);
 
 /* screen.c */
 int screen_count(void);

@@ -288,6 +288,7 @@ typedef struct
      uint tagad;
      MouseBinding *mouse;
      int nmouse;
+     Bool stay_last;
 } Tag;
 
 /* Menu Item Struct */
