@@ -14,8 +14,12 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
+#ifndef _BSD_SOURCE
 #define _BSD_SOURCE
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -87,7 +91,7 @@ push_keyword(struct keyword *tail, enum keyword_t type, char *buf, size_t *offse
      if (type == WORD && *offset == 0)
           return tail;
 
-     kw = xcalloc(1, sizeof(*kw));
+     kw = zcalloc(sizeof(*kw));
      kw->type = type;
      kw->line = line;
      kw->file = file;
@@ -96,7 +100,7 @@ push_keyword(struct keyword *tail, enum keyword_t type, char *buf, size_t *offse
      if (*offset != 0) {
           buf[*offset] = '\0';
           if (!strcmp(buf, INCLUDE_CMD))
-               type = kw->type = INCLUDE;
+               kw->type = INCLUDE;
           else
                kw->name = strdup(buf);
           *offset = 0;
@@ -179,8 +183,8 @@ parse_keywords(const char *filename)
           return NULL;
      }
 
-     file = xcalloc(1, sizeof(*file));
-     bufname = xcalloc(1, sizeof(*bufname) * BUFSIZ);
+     file = zcalloc(sizeof(*file));
+     bufname = zcalloc(sizeof(*bufname) * BUFSIZ);
      file->name = strdup(path);
      file->parent = NULL;
 
@@ -394,7 +398,7 @@ get_option(struct keyword **head)
      size_t j = 0;
      struct keyword *kw = *head;
 
-     o = xcalloc(1, sizeof(*o));
+     o = zcalloc(sizeof(*o));
      o->name = kw->name;
      o->used = False;
      o->line = kw->line;
@@ -495,7 +499,7 @@ get_section(struct keyword **head)
      struct conf_sec *sub;
      struct keyword *kw = *head;
 
-     s = xcalloc(1, sizeof(*s));
+     s = zcalloc(sizeof(*s));
      s->name = kw->name;
      TAILQ_INIT(&s->sub);
      SLIST_INIT(&s->optlist);
@@ -616,32 +620,3 @@ get_conf(const char *filename)
      return 0;
 }
 
-
-/* calloc wrapper */
-void *
-xcalloc(size_t nmemb, size_t size)
-{
-     void *ret;
-
-     if (!(ret = calloc(nmemb, size)))
-          err(EXIT_FAILURE, "calloc");
-
-     return ret;
-}
-
-/* asprintf wrapper */
-int
-xasprintf(char **strp, const char *fmt, ...)
-{
-     int ret;
-     va_list args;
-
-     va_start(args, fmt);
-     ret = vasprintf(strp, fmt, args);
-     va_end(args);
-
-     if (ret == -1)
-          err(EXIT_FAILURE, "asprintf");
-
-     return ret;
-}

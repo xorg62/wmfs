@@ -85,7 +85,7 @@ systray_add(Window win)
      if(!conf.systray.active)
           return;
 
-     s = emalloc(1, sizeof(Systray));
+     s = zcalloc(sizeof(Systray));
      s->win = win;
 
      s->geo.height = infobar[conf.systray.screen].bar->geo.height;
@@ -98,8 +98,8 @@ systray_add(Window win)
      ewmh_send_message(s->win, s->win, "_XEMBED", CurrentTime, XEMBED_EMBEDDED_NOTIFY, 0, traywin, 0);
 
      /* Attach */
-	if(trayicons)
-		trayicons->prev = s;
+     if(trayicons)
+          trayicons->prev = s;
 
      s->next = trayicons;
      trayicons = s;

@@ -95,7 +95,8 @@ const func_name_list_t func_list[] =
      {"check_layout",             uicb_checklayout },
      {"clientlist",               uicb_clientlist },
      {"check_clist",              uicb_checkclist },
-     {"toggle_tagautohide",       uicb_toggle_tagautohide }
+     {"toggle_tagautohide",       uicb_toggle_tagautohide },
+     {NULL, NULL}
 };
 
 key_name_list_t key_list[] =
@@ -197,7 +198,7 @@ conf_bar_section(void)
 
      if ((conf.bars.nmouse = fetch_section_count(mouse)) > 0)
      {
-          conf.bars.mouse = emalloc(conf.bars.nmouse, sizeof(MouseBinding));
+          conf.bars.mouse = xcalloc(conf.bars.nmouse, sizeof(MouseBinding));
           mouse_section(conf.bars.mouse, mouse);
      }
 
@@ -228,7 +229,7 @@ conf_bar_section(void)
 
      if ((conf.selbar.nmouse = fetch_section_count(mouse)))
      {
-          conf.selbar.mouse = emalloc(conf.selbar.nmouse, sizeof(MouseBinding));
+          conf.selbar.mouse = xcalloc(conf.selbar.nmouse, sizeof(MouseBinding));
           mouse_section(conf.selbar.mouse, mouse);
      }
 
@@ -250,7 +251,7 @@ conf_root_section(void)
 
      if ((conf.root.nmouse = fetch_section_count(mouse)) > 0)
      {
-          conf.root.mouse = emalloc(conf.root.nmouse, sizeof(MouseBinding));
+          conf.root.mouse = xcalloc(conf.root.nmouse, sizeof(MouseBinding));
           mouse_section(conf.root.mouse, mouse);
      }
 
@@ -290,7 +291,7 @@ conf_client_section(void)
 
      if((conf.client.nmouse = fetch_section_count(mouse)) > 0)
      {
-          conf.client.mouse = emalloc(conf.client.nmouse, sizeof(MouseBinding));
+          conf.client.mouse = xcalloc(conf.client.nmouse, sizeof(MouseBinding));
           mouse_section(conf.client.mouse, mouse);
      }
 
@@ -318,7 +319,7 @@ conf_client_section(void)
 
      if((conf.titlebar.nmouse = fetch_section_count(mouse)) > 0)
      {
-          conf.titlebar.mouse = emalloc(conf.titlebar.nmouse, sizeof(MouseBinding));
+          conf.titlebar.mouse = xcalloc(conf.titlebar.nmouse, sizeof(MouseBinding));
           mouse_section(conf.titlebar.mouse, mouse);
      }
 
@@ -329,7 +330,7 @@ conf_client_section(void)
 
      if((conf.titlebar.nbutton = fetch_section_count(button)) > 0)
      {
-          conf.titlebar.button = emalloc(conf.titlebar.nbutton, sizeof(Button));
+          conf.titlebar.button = xcalloc(conf.titlebar.nbutton, sizeof(Button));
           for(i = 0; i < conf.titlebar.nbutton; ++i)
           {
                flags = fetch_opt_first(button[i], "none", "flags").str;
@@ -347,7 +348,7 @@ conf_client_section(void)
 
                if((conf.titlebar.button[i].nmouse = fetch_section_count(mouse)) > 0)
                {
-                    conf.titlebar.button[i].mouse = emalloc(conf.titlebar.button[i].nmouse, sizeof(MouseBinding));
+                    conf.titlebar.button[i].mouse = xcalloc(conf.titlebar.button[i].nmouse, sizeof(MouseBinding));
                     mouse_section(conf.titlebar.button[i].mouse, mouse);
                }
 
@@ -358,7 +359,7 @@ conf_client_section(void)
 
                if((conf.titlebar.button[i].nlines = fetch_section_count(line)) > 0)
                {
-                    conf.titlebar.button[i].linecoord = emalloc(conf.titlebar.button[i].nlines, sizeof(XSegment));
+                    conf.titlebar.button[i].linecoord = xcalloc(conf.titlebar.button[i].nlines, sizeof(XSegment));
 
                     for(j = 0; j < conf.titlebar.button[i].nlines; ++j)
                     {
@@ -415,7 +416,7 @@ conf_layout_section(void)
      {
           warnx("configuration : Too many or no layouts (%d).", conf.nlayout);
           conf.nlayout          = 1;
-          conf.layout[0].symbol = _strdup("TILE");
+          conf.layout[0].symbol = xstrdup("TILE");
           conf.layout[0].func   = tile;
      }
 
@@ -520,10 +521,10 @@ conf_tag_section(void)
      sc = screen_count();
 
      /* Alloc all */
-     conf.ntag  = emalloc(sc, sizeof(int));
-     tags       = emalloc(sc, sizeof(Tag*));
-     seltag     = emalloc(sc, sizeof(int));
-     prevseltag = emalloc(sc, sizeof(int));
+     conf.ntag  = xcalloc(sc, sizeof(*conf.ntag));
+     tags       = xcalloc(sc, sizeof(*tags));
+     seltag     = xcalloc(sc, sizeof(*seltag));
+     prevseltag = xcalloc(sc, sizeof(*prevseltag));
 
      for(i = 0; i < sc; ++i)
           seltag[i] = 1;
@@ -533,7 +534,7 @@ conf_tag_section(void)
      n = fetch_section_count(tag);
 
      for(i = 0; i < sc; ++i)
-          tags[i] = emalloc(n + 2, sizeof(Tag));
+          tags[i] = xcalloc(n + 2, sizeof(Tag));
 
      for(i = 0; i < n; i++)
      {
@@ -574,7 +575,7 @@ conf_tag_section(void)
                if ((count = fetch_opt_count(opt)))
                {
                     tags[k][conf.ntag[k]].nclients = count;
-                    tags[k][conf.ntag[k]].clients = emalloc(count, sizeof(char *));
+                    tags[k][conf.ntag[k]].clients = xcalloc(count, sizeof(char *));
                     for(m = 0; m < count; ++m)
                          tags[k][conf.ntag[k]].clients[m] = opt[m].str;
                }
@@ -586,7 +587,7 @@ conf_tag_section(void)
 
                if((tags[k][conf.ntag[k]].nmouse = fetch_section_count(mouse)))
                {
-                    tags[k][conf.ntag[k]].mouse = emalloc(tags[k][conf.ntag[k]].nmouse, sizeof(MouseBinding));
+                    tags[k][conf.ntag[k]].mouse = xcalloc(tags[k][conf.ntag[k]].nmouse, sizeof(MouseBinding));
                     mouse_section(tags[k][conf.ntag[k]].mouse, mouse);
                }
 
@@ -620,7 +621,7 @@ conf_rule_section(void)
 
      CHECK((conf.nrule = fetch_section_count(rule)));
 
-     conf.rule = emalloc(conf.nrule, sizeof(Rule));
+     conf.rule = xcalloc(conf.nrule, sizeof(Rule));
 
      for(i = 0; i < conf.nrule; ++i)
      {
@@ -651,7 +652,7 @@ conf_menu_section(void)
 
      CHECK((conf.nmenu = fetch_section_count(set_menu)));
 
-     conf.menu = emalloc(conf.nmenu, sizeof(Menu));
+     conf.menu = xcalloc(conf.nmenu, sizeof(Menu));
 
      for(i = 0; i < conf.nmenu; ++i)
      {
@@ -682,7 +683,7 @@ conf_menu_section(void)
 
           if((conf.menu[i].nitem = fetch_section_count(item)))
           {
-               conf.menu[i].item = emalloc(conf.menu[i].nitem, sizeof(MenuItem));
+               conf.menu[i].item = xcalloc(conf.menu[i].nitem, sizeof(MenuItem));
                for(j = 0; j < conf.menu[i].nitem; ++j)
                {
                     conf.menu[i].item[j].name = fetch_opt_first(item[j], "item_wname", "name").str;
@@ -710,7 +711,7 @@ conf_launcher_section(void)
 
      CHECK((conf.nlauncher = fetch_section_count(set_launcher)));
 
-     conf.launcher = emalloc(conf.nlauncher, sizeof(Launcher));
+     conf.launcher = xcalloc(conf.nlauncher, sizeof(Launcher));
 
      for(i = 0; i < conf.nlauncher; ++i)
      {
@@ -736,7 +737,7 @@ conf_keybind_section(void)
      ks = fetch_section(sec, "key");
 
      conf.nkeybind = fetch_section_count(ks);
-     keys = emalloc(conf.nkeybind, sizeof(Key));
+     keys = xcalloc(conf.nkeybind, sizeof(Key));
 
      for(i = 0; i < conf.nkeybind; ++i)
      {

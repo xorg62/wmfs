@@ -103,7 +103,7 @@ viwmfs(int argc, char **argv)
           }
      }
      else
-          strcpy(str, argv[2]);
+          strncpy(str, argv[2], sizeof(str));
 
      if(!strcmp(str, "help"))
      {
@@ -116,7 +116,7 @@ viwmfs(int argc, char **argv)
      {
           for(i = 0; i < strlen(str); str[i] = str[i + 1], ++i);
 
-          cmd = _strdup(str);
+          cmd = xstrdup(str);
 
           for(i = 0; cmd[i] && cmd[i] != ' '; ++i);
           cmd[i] = '\0';

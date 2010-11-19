@@ -543,7 +543,7 @@ tag_new(int s, char *name)
      {
          if(conf.tagnamecount)
          {
-             displayedName = (char*) malloc( sizeof(char)*2 );
+             displayedName = zmalloc(2);
              sprintf(displayedName, "[%d]", conf.ntag[s]);
          }
          else
@@ -656,11 +656,22 @@ void
 uicb_tag_rename(uicb_t cmd)
 {
      screen_get_sel();
+     char *str;
+     size_t len;
 
      if(!cmd || !strlen(cmd))
           return;
 
-     strcpy(tags[selscreen][seltag[selscreen]].name, cmd);
+     str = tags[selscreen][seltag[selscreen]].name;
+     len = strlen(str);
+
+     /* TODO: if strlen(cmd) > len, the tag name
+      * will be truncated...
+      * We can't do a realloc because if the pointer change
+      * free() on paser will segfault.on free_conf()...
+      */
+     strncpy(str, cmd, len);
+
      infobar_update_taglist(selscreen);
      infobar_draw(selscreen);
 

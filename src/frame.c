@@ -83,7 +83,7 @@ frame_create(Client *c)
           /* Buttons */
           if(BUTTONWH >= 1)
           {
-               c->button = emalloc(conf.titlebar.nbutton, sizeof(Window));
+               c->button = xcalloc(conf.titlebar.nbutton, sizeof(Window));
                for(i = 0; i < conf.titlebar.nbutton; ++i)
                {
                     CWIN(c->button[i], c->titlebar->win,

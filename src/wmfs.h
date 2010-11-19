@@ -34,14 +34,22 @@
 #define WMFS_H
 
 /* glibc stuff */
+#ifndef _BSD_SOURCE
 #define _BSD_SOURCE /* vsnprintf */
-#define _POSIX_SOURCE /* kill() */
+#endif
+#ifndef _POSIX_SOURCE
+#define _POSIX_SOURCE /* kill */
+#endif
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE /* asprintf */
+#endif
 
 /* Lib headers */
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdint.h>
 #include <signal.h>
 #include <unistd.h>
 #include <ctype.h>
@@ -61,7 +69,7 @@
 #include <X11/Xft/Xft.h>
 
 /* Local headers */
-#include "parse/parse.h"
+#include "parse.h"
 #include "structs.h"
 
 /* Optional dependencies */
@@ -136,8 +144,8 @@ void barwin_refresh_color(BarWindow *bw);
 void barwin_refresh(BarWindow *bw);
 
 /* draw.c */
-void draw_text(Drawable d, int x, int y, char* fg, int pad, char *str);
-void draw_image_ofset_text(Drawable d, int x, int y, char* fg, int pad, char *str, int x_image_ofset, int y_image_ofset);
+void draw_text(Drawable d, int x, int y, char* fg, char *str);
+void draw_image_ofset_text(Drawable d, int x, int y, char* fg, char *str, int x_image_ofset, int y_image_ofset);
 void draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color);
 void draw_graph(Drawable dr, int x, int y, uint w, uint h, uint color, char *data);
 
@@ -281,11 +289,18 @@ void uicb_mouse_move(uicb_t);
 void uicb_mouse_resize(uicb_t);
 
 /* util.c */
+void *xmalloc(size_t, size_t);
+void *xcalloc(size_t, size_t);
+void *xrealloc(void *, size_t, size_t);
+/* simples wrappers for allocating only one object */
+#define zmalloc(size) xmalloc(1, (size))
+#define zcalloc(size) xcalloc(1, (size))
+#define zrealloc(ptr, size) xrealloc((ptr), 1, (size))
+char *xstrdup(const char *);
+int xasprintf(char **, const char *, ...);
 ulong color_enlight(ulong col);
-void *emalloc(uint element, uint size);
 long getcolor(char *color);
 void setwinstate(Window win, long state);
-char* _strdup(char const *str);
 /* Conf usage {{{ */
 void* name_to_func(char *name, const func_name_list_t *l);
 ulong char_to_modkey(char *name, key_name_list_t key_l[]);

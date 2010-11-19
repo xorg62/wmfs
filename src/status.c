@@ -158,11 +158,11 @@ statustext_normal(int sc, char *str)
 
      /* Draw normal text without any blocks */
      draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - (textw(strwc) + sw),
-               FHINFOBAR, infobar[sc].bar->fg, 0, strwc);
+               FHINFOBAR, infobar[sc].bar->fg, strwc);
 
      if(n)
      {
-          strcpy(buf, strwc);
+          strncpy(buf, strwc, sizeof(buf));
 
           for(i = k = 0; i < (int)strlen(str); ++i, ++k)
                if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
@@ -177,9 +177,9 @@ statustext_normal(int sc, char *str)
 
                     /* Draw text with its color */
                     draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - (textw(&buf[k]) + sw),
-                              FHINFOBAR,  col, 0, &buf[k]);
+                              FHINFOBAR,  col, &buf[k]);
 
-                    strcpy(buf, strwc);
+                    strncpy(buf, strwc, sizeof(buf));
                     ++i;
                }
      }
@@ -195,7 +195,7 @@ void
 statustext_handle(int sc, char *str)
 {
      char *lastst;
-     int i, nr, ng, ns, len, sw = 0;
+     int i, nr, ng, ns, sw = 0;
      StatusRec r[128];
      StatusGraph g[128];
      StatusText s[128];
@@ -212,8 +212,7 @@ statustext_handle(int sc, char *str)
      /* save last status text address (for free at the end) */
      lastst = infobar[sc].statustext;
 
-     infobar[sc].statustext = _strdup(str);
-     len = ((strlen(str) > MAXSTATUS) ? MAXSTATUS : strlen(str));
+     infobar[sc].statustext = xstrdup(str);
 
      /* Store rectangles, located text & images properties. */
      nr = statustext_rectangle(r, str);
@@ -233,7 +232,7 @@ statustext_handle(int sc, char *str)
 
      /* Draw located text with stored properties. */
      for(i = 0; i < ns; ++i)
-          draw_text(infobar[sc].bar->dr, s[i].x - sw, s[i].y, s[i].color, 0, s[i].text);
+          draw_text(infobar[sc].bar->dr, s[i].x - sw, s[i].y, s[i].color, s[i].text);
 
      barwin_refresh(infobar[sc].bar);
 

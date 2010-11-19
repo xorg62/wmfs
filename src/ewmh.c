@@ -50,7 +50,7 @@ ewmh_init_hints(void)
 
 
      s = screen_count();
-     net_atom = emalloc(net_last + s, sizeof(Atom));
+     net_atom = xcalloc(net_last + s, sizeof(Atom));
 
      /* EWMH hints */
      net_atom[net_supported]                  = ATOM("_NET_SUPPORTED");
@@ -252,7 +252,7 @@ ewmh_get_client_list(void)
      int win_n;
 
      for(win_n = 0, c = clients; c; c = c->next, ++win_n);
-     list = emalloc(win_n, sizeof(Window));
+     list = xcalloc(win_n, sizeof(Window));
 
      for(win_n = 0, c = clients; c; c = c->next, ++win_n)
           list[win_n] = c->win;
@@ -279,7 +279,7 @@ ewmh_get_desktop_names(void)
           for(i = 1; i < conf.ntag[s] + 1; ++i)
                len += strlen(tags[s][i].name);
 
-     str = emalloc(len + i + 1, sizeof(char*));
+     str = xcalloc(len + i + 1, sizeof(char*));
 
      for(s = 0; s < S; ++s)
           for(i = 1; i < conf.ntag[s] + 1; ++i, ++pos)

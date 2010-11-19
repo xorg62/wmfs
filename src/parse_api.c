@@ -14,7 +14,9 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#ifndef _BSD_SOURCE
 #define _BSD_SOURCE
+#endif
 #include <string.h>
 #include <stdlib.h>
 #include <err.h>

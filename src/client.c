@@ -536,7 +536,7 @@ client_get_name(Client *c)
           XFetchName(dpy, c->win, &(c->title));
 
           if(!c->title)
-               c->title = _strdup("WMFS");
+               c->title = xstrdup("WMFS");
      }
 
      frame_update(c);
@@ -676,7 +676,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
 
      screen_get_sel();
 
-     c = emalloc(1, sizeof(Client));
+     c = zmalloc(sizeof(Client));
      c->win = w;
      c->screen = selscreen;
      c->flags = 0;
@@ -1023,7 +1023,7 @@ client_set_rules(Client *c)
      if(XGetWindowProperty(dpy, c->win, ATOM("WM_WINDOW_ROLE"), 0L, 0x7FFFFFFFL, False,
                     XA_STRING, &rf, &f, &n, &il, &data) == Success && data)
      {
-          strcpy(wwrole, (char*)data);
+          strncpy(wwrole, (char*)data, sizeof(wwrole));
           XFree(data);
      }
 

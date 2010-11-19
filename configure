@@ -7,7 +7,7 @@ USE_IMLIB2="imlib2"
 OS=`uname -s`
 PREFIX=/usr/local
 MANPREFIX="$PREFIX/man"
-XDG_CONFIG_DIR="$PREFIX/etc/xdg/wmfs"
+XDG_CONFIG_DIR="$PREFIX/etc/xdg"
 
 while true; do
 	case "$1" in

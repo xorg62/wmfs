@@ -42,7 +42,7 @@ infobar_init(void)
      s = screen_count();
 
      if(!infobar)
-          infobar = emalloc(s, sizeof(InfoBar));
+          infobar = xcalloc(s, sizeof(InfoBar));
 
      for(sc = 0; sc < s; ++sc)
      {
@@ -127,7 +127,7 @@ infobar_init(void)
           barwin_refresh(infobar[sc].bar);
 
           /* Default statustext is set here */
-          infobar[sc].statustext = _strdup(WMFS_VERSION);
+          infobar[sc].statustext = xstrdup(WMFS_VERSION);
 
           infobar_draw(sc);
      }
@@ -190,7 +190,7 @@ infobar_draw_selbar(int sc)
 
      if(conf.selbar.maxlength >= 0 && sel)
      {
-          str = emalloc(conf.selbar.maxlength + 4, sizeof(char));
+          str = xcalloc(conf.selbar.maxlength + 4, sizeof(char));
           strncpy(str, sel->title, conf.selbar.maxlength);
 
           if(strlen(sel->title) > (size_t)conf.selbar.maxlength)
@@ -220,7 +220,7 @@ infobar_draw_selbar(int sc)
 void
 infobar_draw_taglist(int sc)
 {
-     int i, x, j;
+     int i, x;
      Client *c = NULL;
      Bool is_occupied[MAXTAG + 1];
 
@@ -234,7 +234,7 @@ infobar_draw_taglist(int sc)
           if(c->screen == sc)
                is_occupied[c->tag] = True;
 
-     for(i = 1, x = j = 0; i < conf.ntag[sc] + 1; ++i)
+     for(i = 1, x = 0; i < conf.ntag[sc] + 1; ++i)
      {
           /* Autohide tag feature */
           if(conf.tagautohide)

@@ -37,7 +37,7 @@ menu_init(Menu *menu, char *name, int nitem, uint bg_f, char *fg_f, uint bg_n, c
 {
      /* Item */
      menu->nitem = nitem;
-     menu->item = emalloc(sizeof(MenuItem), nitem);
+     menu->item = xcalloc(nitem, sizeof(*menu->item));
      menu->name = name;
 
      /* Colors */

@@ -36,7 +36,6 @@ int
 errorhandler(Display *d, XErrorEvent *event)
 {
      char mess[256];
-     Client *c;
 
      /* Check if there is another WM running */
      if(BadAccess == event->error_code
@@ -48,7 +47,7 @@ errorhandler(Display *d, XErrorEvent *event)
       * 42 = X_SetInputFocus
       * 28 = X_GrabButton
       */
-     if((c = client_gb_win(event->resourceid)))
+     if(client_gb_win(event->resourceid))
           if(event->error_code == BadWindow
              || event->request_code == 42
                ||  event->request_code == 28)
@@ -421,9 +420,8 @@ main(int argc, char **argv)
      int i;
      char *ol = "csgVS";
 
-     argv_global  = _strdup(argv[0]);
+     argv_global  = xstrdup(argv[0]);
      all_argv = argv;
-
      sprintf(conf.confpath, "%s/"DEF_CONF, getenv("HOME"));
 
      while((i = getopt(argc, argv, "hviSc:s:g:C:V:")) != -1)
@@ -467,7 +465,7 @@ main(int argc, char **argv)
                break;
 
           case 'C':
-               strcpy(conf.confpath, optarg);
+               strncpy(conf.confpath, optarg, sizeof(conf.confpath));
                break;
 
           case 'c':

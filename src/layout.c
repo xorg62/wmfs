@@ -325,7 +325,10 @@ multi_tile(int screen, Position type)
      {
           if(type == Top)
                mastergeo.y = (n <= nmaster) ? (uint)sg.y : sg.y + (sg.height - mwfact) - BORDH;
-          mastergeo.width = (sg.width / nmaster) - (BORDH * 4);
+          if (nmaster != 0)
+               mastergeo.width = (sg.width / nmaster) - (BORDH * 4);
+          else
+               mastergeo.width = sg.width - (BORDH * 4);
           mastergeo.height = (n <= nmaster) ? (uint)(sg.height - BORDH) : mwfact;
      }
      else
@@ -333,7 +336,10 @@ multi_tile(int screen, Position type)
           if(type == Left)
                mastergeo.x = (n <= nmaster) ? (uint)sg.x : (sg.x + sg.width) - mwfact - (BORDH * 2);
           mastergeo.width = (n <= nmaster) ? (uint)(sg.width - (BORDH * 2)) : mwfact;
-          mastergeo.height = (sg.height / nmaster) - BORDH;
+          if (nmaster != 0)
+               mastergeo.height = sg.height - BORDH;
+          else
+               mastergeo.height = BORDH;
      }
 
      /* TILED SIZE */
@@ -823,7 +829,7 @@ uicb_set_layout(uicb_t cmd)
      for(n = 0; layout_list[n].name != NULL && layout_list[n].func != NULL; ++n);
 
      for(i = 0; i < n; ++i)
-          if(!strcmp(cmd, _strdup(layout_list[i].name)))
+          if(!strcmp(cmd, xstrdup(layout_list[i].name)))
                for(j = 0; j < LEN(conf.layout); ++j)
                     if(layout_list[i].func == conf.layout[j].func)
                          tags[selscreen][seltag[selscreen]].layout = conf.layout[j];
