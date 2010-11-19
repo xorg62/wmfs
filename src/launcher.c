@@ -179,7 +179,7 @@ launcher_execute(Launcher *launcher)
                     lastwastab = True;
 
                     /* start a new round of tabbing */
-                    if (!found)
+                    if (found == False)
                          tabhits = 0;
 
                     pos = strlen(buf);
@@ -280,19 +280,20 @@ complete_on_command(char *start, size_t hits)
           }
           dirname = strtok(NULL, ":");
      }
-     qsort(namelist, n, sizeof(char *), qsort_string_compare);
 
      free(path);
 
      if(n > 0)
      {
-         ret = xstrdup(namelist[((hits > 0) ? hits - 1 : 0) % n] + strlen(start));
+          qsort(namelist, n, sizeof(char *), qsort_string_compare);
+          ret = xstrdup(namelist[((hits > 0) ? hits - 1 : 0) % n] + strlen(start));
 
           for(i = 0; i < n; i++)
-              free(namelist[i]);
+               free(namelist[i]);
+
+          free(namelist);
      }
 
-     free(namelist);
      return ret;
 }
 

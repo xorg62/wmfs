@@ -625,10 +625,10 @@ void
 uicb_tag_rename(uicb_t cmd)
 {
      screen_get_sel();
-     size_t len;
      char *str;
+     size_t len;
 
-     if(!cmd || !(len = strlen(cmd)))
+     if(!cmd || !strlen(cmd))
           return;
 
      str = tags[selscreen][seltag[selscreen]].name;

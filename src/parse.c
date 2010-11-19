@@ -100,7 +100,7 @@ push_keyword(struct keyword *tail, enum keyword_t type, char *buf, size_t *offse
      if (*offset != 0) {
           buf[*offset] = '\0';
           if (!strcmp(buf, INCLUDE_CMD))
-               type = kw->type = INCLUDE;
+               kw->type = INCLUDE;
           else
                kw->name = strdup(buf);
           *offset = 0;

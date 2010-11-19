@@ -370,7 +370,6 @@ void
 enternotify(XCrossingEvent *ev)
 {
      Client *c;
-     Systray *s;
      int n;
 
      if((ev->mode != NotifyNormal
@@ -379,7 +378,7 @@ enternotify(XCrossingEvent *ev)
           return;
 
      /* Don't handle EnterNotify event if it's about systray */
-     if((s = systray_find(ev->window)) || ev->window == traywin)
+     if(systray_find(ev->window) || ev->window == traywin)
           return;
 
      if(conf.focus_fmouse)
@@ -525,7 +524,6 @@ void
 maprequest(XMapRequestEvent *ev)
 {
      XWindowAttributes at;
-     Client *c;
      Systray *s;
 
      CHECK(XGetWindowAttributes(dpy, ev->window, &at));
@@ -536,7 +534,7 @@ maprequest(XMapRequestEvent *ev)
           ewmh_send_message(s->win, s->win, "_XEMBED", CurrentTime, XEMBED_WINDOW_ACTIVATE, 0, 0, 0);
           systray_update();
      }
-     else if(!(c = client_gb_win(ev->window)))
+     else if(!client_gb_win(ev->window))
           client_manage(ev->window, &at, True);
 
      return;

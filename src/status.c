@@ -195,7 +195,7 @@ void
 statustext_handle(int sc, char *str)
 {
      char *lastst;
-     int i, nr, ng, ns, len, sw = 0;
+     int i, nr, ng, ns, sw = 0;
      StatusRec r[128];
      StatusGraph g[128];
      StatusText s[128];
@@ -213,7 +213,6 @@ statustext_handle(int sc, char *str)
      lastst = infobar[sc].statustext;
 
      infobar[sc].statustext = xstrdup(str);
-     len = ((strlen(str) > MAXSTATUS) ? MAXSTATUS : strlen(str));
 
      /* Store rectangles, located text & images properties. */
      nr = statustext_rectangle(r, str);

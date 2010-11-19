@@ -220,7 +220,7 @@ infobar_draw_selbar(int sc)
 void
 infobar_draw_taglist(int sc)
 {
-     int i, x, j;
+     int i, x;
      Client *c = NULL;
      Bool is_occupied[MAXTAG + 1];
 
@@ -234,7 +234,7 @@ infobar_draw_taglist(int sc)
           if(c->screen == sc)
                is_occupied[c->tag] = True;
 
-     for(i = 1, x = j = 0; i < conf.ntag[sc] + 1; ++i)
+     for(i = 1, x = 0; i < conf.ntag[sc] + 1; ++i)
      {
           /* Autohide tag feature */
           if(conf.tagautohide)

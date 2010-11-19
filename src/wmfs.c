@@ -36,7 +36,6 @@ int
 errorhandler(Display *d, XErrorEvent *event)
 {
      char mess[256];
-     Client *c;
 
      /* Check if there is another WM running */
      if(BadAccess == event->error_code
@@ -48,7 +47,7 @@ errorhandler(Display *d, XErrorEvent *event)
       * 42 = X_SetInputFocus
       * 28 = X_GrabButton
       */
-     if((c = client_gb_win(event->resourceid)))
+     if(client_gb_win(event->resourceid))
           if(event->error_code == BadWindow
              || event->request_code == 42
                ||  event->request_code == 28)
