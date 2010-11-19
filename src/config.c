@@ -93,7 +93,8 @@ const func_name_list_t func_list[] =
      {"check_layout",             uicb_checklayout },
      {"clientlist",               uicb_clientlist },
      {"check_clist",              uicb_checkclist },
-     {"toggle_tagautohide",       uicb_toggle_tagautohide }
+     {"toggle_tagautohide",       uicb_toggle_tagautohide },
+     {NULL, NULL}
 };
 
 key_name_list_t key_list[] =
