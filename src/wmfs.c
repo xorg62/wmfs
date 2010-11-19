@@ -466,7 +466,7 @@ main(int argc, char **argv)
                break;
 
           case 'C':
-               strcpy(conf.confpath, optarg);
+               strncpy(conf.confpath, optarg, sizeof(conf.confpath));
                break;
 
           case 'c':

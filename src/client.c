@@ -1023,7 +1023,7 @@ client_set_rules(Client *c)
      if(XGetWindowProperty(dpy, c->win, ATOM("WM_WINDOW_ROLE"), 0L, 0x7FFFFFFFL, False,
                     XA_STRING, &rf, &f, &n, &il, &data) == Success && data)
      {
-          strcpy(wwrole, (char*)data);
+          strncpy(wwrole, (char*)data, sizeof(wwrole));
           XFree(data);
      }
 

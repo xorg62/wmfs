@@ -156,7 +156,7 @@ launcher_execute(Launcher *launcher)
                     else
                     {
                          tabhits = 1;
-                         strcpy(tmpbuf, buf);
+                         strncpy(tmpbuf, buf, sizeof(tmpbuf));
                     }
 
 
@@ -169,7 +169,7 @@ launcher_execute(Launcher *launcher)
 
                          if (complete)
                          {
-                              strcpy(buf, tmpbuf);
+                              strncpy(buf, tmpbuf, sizeof(buf));
                               strncat(buf, complete, sizeof(buf));
                               found = True;
                               free(complete);

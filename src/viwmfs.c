@@ -103,7 +103,7 @@ viwmfs(int argc, char **argv)
           }
      }
      else
-          strcpy(str, argv[2]);
+          strncpy(str, argv[2], sizeof(str));
 
      if(!strcmp(str, "help"))
      {

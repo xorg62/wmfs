@@ -91,6 +91,8 @@ screen_get_geo(int s)
 
           XFree(xsi);
      }
+#else
+     (void)s;
 #endif /* HAVE_XINERAMA */
 
      return geo;

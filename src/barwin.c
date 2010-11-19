@@ -116,7 +116,7 @@ barwin_draw_text(BarWindow *bw, int x, int y, char *text)
           draw_rectangle(bw->dr, x - 4, 0, textw(text) + 8, bw->geo.height, bw->bg);
 
      /* Draw text */
-     draw_text(bw->dr, x, y, bw->fg, 0, text);
+     draw_text(bw->dr, x, y, bw->fg, text);
 
      barwin_refresh(bw);
 
@@ -136,7 +136,7 @@ barwin_draw_image_ofset_text(BarWindow *bw, int x, int y, char *text, int x_imag
           draw_rectangle(bw->dr, x - 4, 0, textw(text) + 8, bw->geo.height, bw->bg);
 
      /* Draw text */
-     draw_image_ofset_text(bw->dr, x, y, bw->fg, 0, text, x_image_ofset, y_image_ofset);
+     draw_image_ofset_text(bw->dr, x, y, bw->fg, text, x_image_ofset, y_image_ofset);
 
      barwin_refresh(bw);
 

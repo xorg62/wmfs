@@ -144,8 +144,8 @@ void barwin_refresh_color(BarWindow *bw);
 void barwin_refresh(BarWindow *bw);
 
 /* draw.c */
-void draw_text(Drawable d, int x, int y, char* fg, int pad, char *str);
-void draw_image_ofset_text(Drawable d, int x, int y, char* fg, int pad, char *str, int x_image_ofset, int y_image_ofset);
+void draw_text(Drawable d, int x, int y, char* fg, char *str);
+void draw_image_ofset_text(Drawable d, int x, int y, char* fg, char *str, int x_image_ofset, int y_image_ofset);
 void draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color);
 void draw_graph(Drawable dr, int x, int y, uint w, uint h, uint color, char *data);
 

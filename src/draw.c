@@ -33,9 +33,9 @@
 #include "wmfs.h"
 
 void
-draw_text(Drawable d, int x, int y, char* fg, int pad, char *str)
+draw_text(Drawable d, int x, int y, char* fg, char *str)
 {
-	 draw_image_ofset_text(d, x, y, fg, pad, str, 0, 0);
+     draw_image_ofset_text(d, x, y, fg, str, 0, 0);
 }
 
 /** Draw a string in a Drawable
@@ -47,22 +47,28 @@ draw_text(Drawable d, int x, int y, char* fg, int pad, char *str)
  * \param str String that will be draw
 */
 void
-draw_image_ofset_text(Drawable d, int x, int y, char* fg, int pad, char *str, int x_image_ofset, int y_image_ofset)
+draw_image_ofset_text(Drawable d, int x, int y, char* fg, char *str, int x_image_ofset, int y_image_ofset)
 {
      XftColor xftcolor;
      XftDraw *xftd;
-     (void)pad;
+#ifdef HAVE_IMLIB
+     char *ostr = NULL;
+     int i, ni, sw = 0;
+     ImageAttr im[128];
+     size_t textlen;
+#else
+     (void)x_image_ofset;
+     (void)y_image_ofset;
+#endif /* HAVE_IMLIB */
 
      if(!str)
           return;
 
      /* To draw image everywhere we can draw text */
 #ifdef HAVE_IMLIB
-     char *ostr = NULL;
-     int i, ni, sw = 0;
-     ImageAttr im[128];
 
      ostr = xstrdup(str);
+     textlen = strlen(ostr);
 
      if(strstr(str, "i["))
      {
@@ -92,7 +98,7 @@ draw_image_ofset_text(Drawable d, int x, int y, char* fg, int pad, char *str, in
 
 #ifdef HAVE_IMLIB
      if(strstr(ostr, "i["))
-          strcpy(str, ostr);
+          strncpy(str, ostr, textlen);
 
      IFREE(ostr);
 #endif /* HAVE_IMLIB */
@@ -195,16 +201,20 @@ ushort
 textw(char *text)
 {
      XGlyphInfo gl;
+#ifdef HAVE_IMLIB
+     char *ostr = NULL;
+     ImageAttr im[128];
+     size_t textlen;
+#endif /* HAVE_IMLIB */
 
      if(!text)
           return 0;
 
-#ifdef HAVE_IMLIB
-     char *ostr = NULL;
 
-     ImageAttr im[128];
+#ifdef HAVE_IMLIB
 
      ostr = xstrdup(text);
+     textlen = strlen(ostr);
 
      if(strstr(text, "i["))
           parse_image_block(im, text);
@@ -214,7 +224,7 @@ textw(char *text)
 
 #ifdef HAVE_IMLIB
      if(strstr(ostr, "i["))
-          strcpy(text, ostr);
+          strncpy(text, ostr, textlen);
 
      IFREE(ostr);
 #endif /* HAVE_IMLIB */

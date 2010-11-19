@@ -417,7 +417,7 @@ patht(char *path)
      if(!path)
           return NULL;
 
-     strcpy(ret, path);
+     strncpy(ret, path, sizeof(ret));
 
      if(strstr(path, "~/"))
           sprintf(ret, "%s/%s", getenv("HOME"), path + 2);
