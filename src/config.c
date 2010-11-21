@@ -496,8 +496,8 @@ conf_tag_section(void)
      /* If there is no tag in the conf or more than
       * MAXTAG (36) print an error and create only one.
       */
-     Tag default_tag = { fetch_opt_first(def_tag, "new tag", "name").str, NULL, 0, 1,
-                         fetch_opt_first(def_tag, "0.5", "mwfact").fnum,
+     Tag default_tag = { fetch_opt_first(def_tag, "new tag", "").str, NULL, 0, 1,
+                         fetch_opt_first(def_tag, "0.6", "mwfact").fnum,
                          fetch_opt_first(def_tag, "1", "nmaster").num,
                          False, fetch_opt_first(def_tag, "False", "resizehint").bool,
                          False, False, bar_pos,
@@ -548,10 +548,10 @@ conf_tag_section(void)
               ((j == -1) ? ++k : --l))
           {
                ++conf.ntag[k];
-               tags[k][conf.ntag[k]].name       = fetch_opt_first(tag[i], default_tag.name, "name").str;
-               tags[k][conf.ntag[k]].mwfact     = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "0.5", "mwfact").str, "mwfact").fnum;
+               tags[k][conf.ntag[k]].name       = fetch_opt_first(tag[i], default_tag.name, "").str;
+               tags[k][conf.ntag[k]].mwfact     = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "0.6", "mwfact").str, "mwfact").fnum;
                tags[k][conf.ntag[k]].nmaster    = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "1", "nmaster").str, "nmaster").num;
-               tags[k][conf.ntag[k]].resizehint = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "False", "resizehint").str, "resizehint").bool;
+               tags[k][conf.ntag[k]].resizehint = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "false", "resizehint").str, "resizehint").bool;
                tags[k][conf.ntag[k]].abovefc    = fetch_opt_first(tag[i], "false", "abovefc").bool;
                tags[k][conf.ntag[k]].layers = 1;
 
