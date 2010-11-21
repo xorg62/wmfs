@@ -305,13 +305,28 @@ uicb_tag_last(uicb_t cmd)
 void
 uicb_tag_stay_last(uicb_t cmd)
 {
-     /*warnx("in uicb_tag_stay_last\n");*/
      (void)cmd;
+
      screen_get_sel();
 
-     remove_old_last_tag(selscreen);
+     if(tags[selscreen][seltag[selscreen]].stay_last)
+          tags[selscreen][seltag[selscreen]].stay_last = False;
 
-     tag_set(conf.ntag[selscreen]);
+     else
+     {
+          int i;
+          remove_old_last_tag(selscreen);
+          
+          for(i = seltag[selscreen]; i <= conf.ntag[selscreen]; i++)
+          {
+               tag_swap(selscreen, seltag[selscreen], seltag[selscreen] + 1);
+          }
+
+          tag_set(conf.ntag[selscreen]);
+          tags[selscreen][seltag[selscreen]].stay_last = True;
+          arrange(selscreen, True);
+     }
+
 
      return;
 }
@@ -502,7 +517,15 @@ uicb_tag_swap_next(uicb_t cmd)
      (void)cmd;
      screen_get_sel();
 
-     tag_swap(selscreen, seltag[selscreen], seltag[selscreen] + 1);
+     /* Check if the next one does have the stay_last bool */
+     if(!tags[selscreen][conf.ntag[selscreen]].stay_last)
+     {
+          tag_swap(selscreen, seltag[selscreen], seltag[selscreen] + 1);
+     }
+     else
+     {
+          warnx("The next tag is set to always stay the last one");
+     }
 
      return;
 }
@@ -529,6 +552,7 @@ void
 tag_new(int s, char *name)
 {
      char * displayedName;
+     int goToTag;
 
      if(conf.ntag[s] + 1 > MAXTAG)
      {
@@ -558,12 +582,20 @@ tag_new(int s, char *name)
                conf.default_tag.barpos, conf.default_tag.layout,
                0, NULL, 0, False };
 
-
      tags[s][conf.ntag[s]] = t;
+
+     /* For stay_last_tag */
+     if(tags[s][conf.ntag[s]-1].stay_last)
+     {
+          tag_swap(s, conf.ntag[s], conf.ntag[s]-1);
+          goToTag = conf.ntag[s]-1;
+     }
+     else
+          goToTag = conf.ntag[s];
 
      infobar_update_taglist(s);
      infobar_draw(s);
-     tag_set(conf.ntag[s]);
+     tag_set(goToTag);
 
      return;
 }
@@ -684,12 +716,9 @@ uicb_tag_rename(uicb_t cmd)
 void
 remove_old_last_tag(int selscreen)
 {
-     /*warnx("in remove_old_last_tag\n");*/
-     /*warnx("il y a %d tag sur l ecran %d\n", conf.ntag[selscreen], selscreen);*/
      int i;
-     for(i = 0; i < conf.ntag[selscreen]; i++)
+     for(i = 0; i <= conf.ntag[selscreen]; i++)
      {
-         /*warnx("i = %d", i);*/
           if(tags[selscreen][i].stay_last)
           {
               tags[selscreen][i].stay_last = False;
