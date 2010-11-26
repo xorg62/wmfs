@@ -105,6 +105,7 @@ ewmh_init_hints(void)
      net_atom[wmfs_nmaster]                   = ATOM("_WMFS_NMASTER");
      net_atom[wmfs_function]                  = ATOM("_WMFS_FUNCTION");
      net_atom[wmfs_cmd]                       = ATOM("_WMFS_CMD");
+     net_atom[wmfs_font]                      = ATOM("_WMFS_FONT");
 
      /* Multi atom _WMFS_STATUSTEXT_<screennum> */
      for(j = 0; j < s; ++j)

@@ -148,6 +148,7 @@ enum
      wmfs_screen_count,
      wmfs_function,
      wmfs_cmd,
+     wmfs_font,
      wmfs_statustext,
      net_last
 };
