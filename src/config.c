@@ -716,6 +716,7 @@ conf_launcher_section(void)
           conf.launcher[i].name    = fetch_opt_first(set_launcher[i], "launcher", "name").str;
           conf.launcher[i].prompt  = fetch_opt_first(set_launcher[i], "Exec:", "prompt").str;
           conf.launcher[i].command = fetch_opt_first(set_launcher[i], "exec", "command").str;
+          conf.launcher[i].width   = fetch_opt_first(set_launcher[i], "0", "width_limit").num;
           conf.launcher[i].nhisto  = 1;
      }
      free(set_launcher);

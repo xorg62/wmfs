@@ -46,7 +46,7 @@ launcher_execute(Launcher *launcher)
      char buf[512] = { 0 };
      char tmpbuf[512] = { 0 };
      char *complete;
-     int i, pos = 0, histpos = 0, x;
+     int i, pos = 0, histpos = 0, x, w;
      int tabhits = 0;
      KeySym ks;
      XEvent ev;
@@ -59,8 +59,10 @@ launcher_execute(Launcher *launcher)
 
      XGrabKeyboard(dpy, ROOT, True, GrabModeAsync, GrabModeAsync, CurrentTime);
 
-     bw = barwin_create(infobar[selscreen].bar->win, x, 1,
-                        infobar[selscreen].bar->geo.width - x - 1,
+     w = (launcher->width ? launcher->width : infobar[selscreen].bar->geo.width - x - 1);
+
+     bw = barwin_create(infobar[selscreen].bar->win, x, 1, w,
+                        /* infobar[selscreen].bar->geo.width - x - 1, */
                         infobar[selscreen].bar->geo.height - 2,
                         infobar[selscreen].bar->bg,
                         infobar[selscreen].bar->fg,
@@ -71,9 +73,7 @@ launcher_execute(Launcher *launcher)
 
      /* First draw of the cursor */
      XSetForeground(dpy, gc, getcolor(infobar[selscreen].bar->fg));
-     /*XDrawLine(dpy, bw->dr, gc, 1 + textw(launcher->prompt) + textw(" "),
-               , 1 + textw(launcher->prompt) + textw(" "), INFOBARH - 4);
-      */
+
      XDrawLine(dpy, bw->dr, gc,
                1 + textw(launcher->prompt) + textw(" ") + textw(buf), 2,
                1 + textw(launcher->prompt) + textw(" ") + textw(buf), INFOBARH - 4);

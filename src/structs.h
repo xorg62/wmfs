@@ -333,6 +333,7 @@ typedef struct
      char *command;
      char histo[HISTOLEN][512];
      uint nhisto;
+     int width;
 } Launcher;
 
 /* Button struct */

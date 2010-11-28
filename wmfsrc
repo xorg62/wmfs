@@ -267,6 +267,9 @@
 
 [launcher]
         [set_launcher]
+                # Limit size of the launcher window (px)
+                width_limit = 300
+
                 name = "launcher_exec"
                 prompt = "Exec: "
                 command = "exec"
