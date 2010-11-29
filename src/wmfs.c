@@ -420,6 +420,8 @@ main(int argc, char **argv)
 {
      int i;
      char *ol = "csgVS";
+     extern char *optarg;
+     extern int optind;
 
      argv_global  = xstrdup(argv[0]);
      sprintf(conf.confpath, "%s/"DEF_CONF, getenv("HOME"));
