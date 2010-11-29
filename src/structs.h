@@ -148,6 +148,7 @@ enum
      wmfs_screen_count,
      wmfs_function,
      wmfs_cmd,
+     wmfs_font,
      wmfs_statustext,
      net_last
 };
@@ -333,6 +334,7 @@ typedef struct
      char *command;
      char histo[HISTOLEN][512];
      uint nhisto;
+     int width;
 } Launcher;
 
 /* Button struct */

@@ -91,6 +91,10 @@ init_font(void)
           font = XftFontOpenName(dpy, SCREEN, "sans-10");
      }
 
+     /* Set font in _WMFS_FONT for eventual status tools */
+     XChangeProperty(dpy, ROOT, net_atom[wmfs_font], net_atom[utf8_string], 8,
+                    PropModeReplace, (uchar*)&conf.font, strlen(conf.font));
+
      return;
 }
 
