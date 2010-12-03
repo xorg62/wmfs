@@ -309,7 +309,7 @@ Layout layout_name_to_struct(Layout lt[], char *name, int n, const func_name_lis
 char* alias_to_str(char *conf_choice);
 /* }}} */
 char *char_to_str(const char c);
-int spawn(const char *str, ...);
+pid_t spawn(const char *str, ...);
 void swap_ptr(void **x, void **y);
 void uicb_spawn(uicb_t);
 char *clean_value(char *str);

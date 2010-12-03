@@ -134,7 +134,7 @@ quit(void)
 
      /* kill status script */
      if (conf.status_pid != (pid_t)-1)
-         kill(conf.status_pid, SIGQUIT);
+         kill(conf.status_pid, SIGTERM);
 
      return;
 }
