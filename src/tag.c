@@ -508,18 +508,20 @@ tag_new(int s, char *name)
 
      ++conf.ntag[s];
 
+     /* TODO: memleak here */
      if(!name || strlen(name) == 0)
      {
          if(conf.tagnamecount)
          {
-             displayedName = zmalloc(2);
-             sprintf(displayedName, "[%d]", conf.ntag[s]);
+             /* displayedName = zmalloc(2); */
+             xasprintf(&displayedName, "[%d]", conf.ntag[s]);
          }
          else
              displayedName = conf.default_tag.name;
      }
      else
-         displayedName = name;
+         displayedName = xstrdup(name);
+
 
      Tag t = { displayedName, NULL, 0, 0,
                conf.default_tag.mwfact, conf.default_tag.nmaster,
