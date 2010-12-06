@@ -30,7 +30,7 @@
 *      OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <string.h>
+#define _GNU_SOURCE
 #include "wmfs.h"
 
 /** malloc with error support and size_t overflow protection
