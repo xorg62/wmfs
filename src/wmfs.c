@@ -141,49 +141,19 @@ quit(void)
      return;
 }
 
-void *
-thread_process(void *arg)
-{
-     XEvent ev;
-
-     /* X event loop */
-     if(arg)
-     {
-          while(!exiting && !XNextEvent(dpy, &ev))
-               getevent(ev);
-     }
-     /* Status checking loop with timing */
-     else
-     {
-          pthread_detach(pthread_self());
-          do
-          {
-               conf.status_pid = spawn(conf.status_path);
-               sleep(conf.status_timing);
-          } while (!exiting && conf.status_timing != 0);
-     }
-     pthread_exit(NULL);
-}
-
 /** WMFS main loop.
  */
 void
 mainloop(void)
 {
      XEvent ev;
-     pthread_t evloop, evstatus;
-     void *ret;
 
-     if(!estatus)
-          while(!exiting && !XNextEvent(dpy, &ev))
-               getevent(ev);
-     else
-     {
-          pthread_create(&evloop, NULL, thread_process, "1");
-          pthread_create(&evstatus, NULL, thread_process, NULL);
+     /* launch status loop */
+     if (estatus)
+          signal_handle(SIGALRM);
 
-          (void)pthread_join(evloop, &ret);
-     }
+     while(!exiting && !XNextEvent(dpy, &ev))
+          getevent(ev);
 
      return;
 }
@@ -417,6 +387,16 @@ signal_handle(int sig)
                if (signal(SIGCHLD, &signal_handle) == SIG_ERR)
                     warn("signal(%d)", SIGCHLD);
                while (waitpid(-1, NULL, WNOHANG) > 0);
+               break;
+          case SIGALRM:
+               /* re-set signal handler */
+               if (signal(SIGALRM, &signal_handle) == SIG_ERR)
+                    warn("signal(%d)", SIGALRM);
+               /* exec status script */
+               conf.status_pid = spawn(conf.status_path);
+               /* re-set timer */
+               if (conf.status_timing > 0)
+                    alarm(conf.status_timing);
                break;
      }
 
