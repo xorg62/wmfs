@@ -55,24 +55,12 @@ const func_name_list_t layout_list[] =
      { NULL, NULL }
 };
 
-static void sigchld(int);
-
-static void
-sigchld(int sig)
-{
-     (void)sig;
-     if (signal(SIGCHLD, sigchld) == SIG_ERR)
-          warn("signal(SIGCHLD)");
-     while (waitpid(-1, NULL, WNOHANG) > 0);
-}
-
 /** Init WMFS
 */
 void
 init(void)
 {
      /* First init */
-     sigchld(0);
      ewmh_init_hints();
      init_conf();
      init_gc();

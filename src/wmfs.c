@@ -32,6 +32,8 @@
 
 #include "wmfs.h"
 
+static void signal_handle(int);
+
 int
 errorhandler(Display *d, XErrorEvent *event)
 {
@@ -399,13 +401,24 @@ update_status(void)
 
 /** Signal handle function
 */
-void
+static void
 signal_handle(int sig)
 {
-     (void)sig;
-     exiting = True;
-     quit();
-     exit(EXIT_SUCCESS);
+     switch (sig)
+     {
+          case SIGQUIT:
+          case SIGTERM:
+               exiting = True;
+               quit();
+               exit(EXIT_SUCCESS);
+               break;
+          case SIGCHLD:
+               /* re-set signal handler and wait childs */
+               if (signal(SIGCHLD, &signal_handle) == SIG_ERR)
+                    warn("signal(%d)", SIGCHLD);
+               while (waitpid(-1, NULL, WNOHANG) > 0);
+               break;
+     }
 
      return;
 }
@@ -422,6 +435,7 @@ main(int argc, char **argv)
      char *ol = "csgVS";
      extern char *optarg;
      extern int optind;
+     int sigs[] = { SIGTERM, SIGQUIT, SIGCHLD };
 
      argv_global  = xstrdup(argv[0]);
      sprintf(conf.confpath, "%s/"DEF_CONF, getenv("HOME"));
@@ -503,8 +517,9 @@ main(int argc, char **argv)
           errx(EXIT_FAILURE, "cannot open X server.");
 
      /* Set signal handler */
-     (void)signal(SIGTERM, &signal_handle);
-     (void)signal(SIGINT, &signal_handle);
+     for (i = sigs[0]; i < (int)LEN(sigs); i++)
+          if (signal(sigs[i], &signal_handle) == SIG_ERR)
+               warn("signal(%d)", sigs[i]);
 
      /* Check if an other WM is already running; set the error handler */
      XSetErrorHandler(errorhandler);
