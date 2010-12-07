@@ -33,17 +33,6 @@
 #ifndef WMFS_H
 #define WMFS_H
 
-/* glibc stuff */
-#ifndef _BSD_SOURCE
-#define _BSD_SOURCE /* vsnprintf */
-#endif
-#ifndef _POSIX_SOURCE
-#define _POSIX_SOURCE /* kill */
-#endif
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE /* asprintf */
-#endif
-
 /* Lib headers */
 #include <stdio.h>
 #include <stdlib.h>
@@ -308,9 +297,8 @@ uint char_to_button(char *name, name_to_uint_t blist[]);
 Layout layout_name_to_struct(Layout lt[], char *name, int n, const func_name_list_t llist[]);
 char* alias_to_str(char *conf_choice);
 /* }}} */
-XRectangle get_mouse_pos(void);
 char *char_to_str(const char c);
-int spawn(const char *str, ...);
+pid_t spawn(const char *str, ...);
 void swap_ptr(void **x, void **y);
 void uicb_spawn(uicb_t);
 char *clean_value(char *str);

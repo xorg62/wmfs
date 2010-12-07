@@ -695,7 +695,5 @@ getevent(XEvent ev)
           break;
      }
 
-     wait((int[]){0});
-
      return;
 }

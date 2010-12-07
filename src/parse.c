@@ -30,7 +30,6 @@
 #include <libgen.h>
 #include <pwd.h>
 #include <sys/stat.h>
-#include <sys/mman.h>
 #include <sys/param.h>
 #include <err.h>
 
@@ -183,18 +182,21 @@ parse_keywords(const char *filename)
           return NULL;
      }
 
+     buf = zmalloc(st.st_size+1);
+
+     if (read(fd, buf, st.st_size) == -1) {
+          warn("%s", filename);
+          free(buf);
+          close(fd);
+          return NULL;
+     }
+
+     buf[st.st_size] = '\0';
+
      file = zcalloc(sizeof(*file));
      bufname = zcalloc(sizeof(*bufname) * BUFSIZ);
      file->name = strdup(path);
      file->parent = NULL;
-
-     buf = (char *)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, SEEK_SET);
-
-     if (buf == (char*)MAP_FAILED) {
-          warn("%s", filename);
-          return NULL;
-     }
-
 
      for(i = 0, j = 0, line = 1; i < (size_t)st.st_size; i++) {
 
@@ -303,7 +305,7 @@ parse_keywords(const char *filename)
           bufname[j++] = buf[i];
      }
 
-     munmap(buf, st.st_size);
+     free(buf);
      free(bufname);
      warnx("%s read", file->name);
 

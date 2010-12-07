@@ -549,7 +549,7 @@ conf_tag_section(void)
           {
                ++conf.ntag[k];
                tags[k][conf.ntag[k]].name       = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "", "name").str, "name").str;
-               tags[k][conf.ntag[k]].mwfact     = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "0.6", "mwfact").str, "mwfact").fnum;
+               tags[k][conf.ntag[k]].mwfact     = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "0.65", "mwfact").str, "mwfact").fnum;
                tags[k][conf.ntag[k]].nmaster    = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "1", "nmaster").str, "nmaster").num;
                tags[k][conf.ntag[k]].resizehint = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "false", "resizehint").str, "resizehint").bool;
                tags[k][conf.ntag[k]].abovefc    = fetch_opt_first(tag[i], "false", "abovefc").bool;

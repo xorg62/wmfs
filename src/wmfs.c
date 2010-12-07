@@ -32,6 +32,8 @@
 
 #include "wmfs.h"
 
+static void signal_handle(int);
+
 int
 errorhandler(Display *d, XErrorEvent *event)
 {
@@ -133,34 +135,10 @@ quit(void)
      XCloseDisplay(dpy);
 
      /* kill status script */
-     if (conf.status_pid != (pid_t)-1)
-         kill(conf.status_pid, SIGQUIT);
+     if (conf.status_pid != -1)
+         kill(conf.status_pid, SIGTERM);
 
      return;
-}
-
-void *
-thread_process(void *arg)
-{
-     XEvent ev;
-
-     /* X event loop */
-     if(arg)
-     {
-          while(!exiting && !XNextEvent(dpy, &ev))
-               getevent(ev);
-     }
-     /* Status checking loop with timing */
-     else
-     {
-          pthread_detach(pthread_self());
-          do
-          {
-               conf.status_pid = spawn(conf.status_path);
-               sleep(conf.status_timing);
-          } while (!exiting && conf.status_timing != 0);
-     }
-     pthread_exit(NULL);
 }
 
 /** WMFS main loop.
@@ -169,19 +147,13 @@ void
 mainloop(void)
 {
      XEvent ev;
-     pthread_t evloop, evstatus;
-     void *ret;
 
-     if(!estatus)
-          while(!exiting && !XNextEvent(dpy, &ev))
-               getevent(ev);
-     else
-     {
-          pthread_create(&evloop, NULL, thread_process, "1");
-          pthread_create(&evstatus, NULL, thread_process, NULL);
+     /* launch status loop */
+     if (estatus)
+          signal_handle(SIGALRM);
 
-          (void)pthread_join(evloop, &ret);
-     }
+     while(!exiting && !XNextEvent(dpy, &ev))
+          getevent(ev);
 
      return;
 }
@@ -398,13 +370,39 @@ update_status(void)
 
 /** Signal handle function
 */
-void
+static void
 signal_handle(int sig)
 {
-     (void)sig;
-     exiting = True;
-     quit();
-     exit(EXIT_SUCCESS);
+     pid_t pid;
+
+     switch (sig)
+     {
+          case SIGQUIT:
+          case SIGTERM:
+               exiting = True;
+               quit();
+               exit(EXIT_SUCCESS);
+               break;
+          case SIGCHLD:
+               /* re-set signal handler and wait childs */
+               if (signal(SIGCHLD, &signal_handle) == SIG_ERR)
+                    warn("signal(%d)", SIGCHLD);
+               while ((pid = waitpid(-1, NULL, WNOHANG)) > 0)
+                    if (pid == conf.status_pid)
+                         conf.status_pid = -1;
+               break;
+          case SIGALRM:
+               /* re-set signal handler */
+               if (signal(SIGALRM, &signal_handle) == SIG_ERR)
+                    warn("signal(%d)", SIGALRM);
+               /* exec status script (only if still not running) */
+               if (conf.status_pid == (pid_t)-1)
+                    conf.status_pid = spawn(conf.status_path);
+               /* re-set timer */
+               if (conf.status_timing > 0)
+                    alarm(conf.status_timing);
+               break;
+     }
 
      return;
 }
@@ -419,6 +417,9 @@ main(int argc, char **argv)
 {
      int i;
      char *ol = "csgVS";
+     extern char *optarg;
+     extern int optind;
+     int sigs[] = { SIGTERM, SIGQUIT, SIGCHLD };
 
      argv_global  = xstrdup(argv[0]);
      all_argv = argv;
@@ -502,8 +503,9 @@ main(int argc, char **argv)
           errx(EXIT_FAILURE, "cannot open X server.");
 
      /* Set signal handler */
-     (void)signal(SIGTERM, &signal_handle);
-     (void)signal(SIGINT, &signal_handle);
+     for (i = 0; i < (int)LEN(sigs); i++)
+          if (signal(sigs[i], &signal_handle) == SIG_ERR)
+               warn("signal(%d)", sigs[i]);
 
      /* Check if an other WM is already running; set the error handler */
      XSetErrorHandler(errorhandler);
