@@ -546,14 +546,14 @@ conf_tag_section(void)
               ((j == -1) ? ++k : --l))
           {
                ++conf.ntag[k];
-               tags[k][conf.ntag[k]].name       = fetch_opt_first(tag[i], "", "name").str;
-               tags[k][conf.ntag[k]].mwfact     = fetch_opt_first(tag[i], "0.65", "mwfact").fnum;
-               tags[k][conf.ntag[k]].nmaster    = fetch_opt_first(tag[i], "1", "nmaster").num;
-               tags[k][conf.ntag[k]].resizehint = fetch_opt_first(tag[i], "false", "resizehint").bool;
+               tags[k][conf.ntag[k]].name       = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "", "name").str, "name").str;
+               tags[k][conf.ntag[k]].mwfact     = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "0.65", "mwfact").str, "mwfact").fnum;
+               tags[k][conf.ntag[k]].nmaster    = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "1", "nmaster").str, "nmaster").num;
+               tags[k][conf.ntag[k]].resizehint = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "false", "resizehint").str, "resizehint").bool;
                tags[k][conf.ntag[k]].abovefc    = fetch_opt_first(tag[i], "false", "abovefc").bool;
                tags[k][conf.ntag[k]].layers = 1;
 
-               tmp = fetch_opt_first(tag[i], "top", "infobar_position").str;
+               tmp = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "top", "infobar_position").str, "infobar_position").str;
 
                if(!strcmp(tmp ,"none") || !strcmp(tmp, "hide") || !strcmp(tmp, "hidden"))
                     tags[k][conf.ntag[k]].barpos = IB_Hide;
@@ -563,7 +563,7 @@ conf_tag_section(void)
                     tags[k][conf.ntag[k]].barpos = IB_Top;
 
                tags[k][conf.ntag[k]].layout = layout_name_to_struct(conf.layout,
-                                                                    fetch_opt_first(tag[i], "tile_right", "layout").str,
+                                                                    fetch_opt_first(tag[i], fetch_opt_first(def_tag, "title_right", "layout").str, "layout").str,
                                                                     conf.nlayout,
                                                                     layout_list);
 
