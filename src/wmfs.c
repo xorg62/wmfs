@@ -135,7 +135,7 @@ quit(void)
      XCloseDisplay(dpy);
 
      /* kill status script */
-     if (conf.status_pid != (pid_t)-1)
+     if (conf.status_pid != -1)
          kill(conf.status_pid, SIGTERM);
 
      return;
@@ -374,6 +374,8 @@ update_status(void)
 static void
 signal_handle(int sig)
 {
+     pid_t pid;
+
      switch (sig)
      {
           case SIGQUIT:
@@ -386,14 +388,17 @@ signal_handle(int sig)
                /* re-set signal handler and wait childs */
                if (signal(SIGCHLD, &signal_handle) == SIG_ERR)
                     warn("signal(%d)", SIGCHLD);
-               while (waitpid(-1, NULL, WNOHANG) > 0);
+               while ((pid = waitpid(-1, NULL, WNOHANG)) > 0)
+                    if (pid == conf.status_pid)
+                         conf.status_pid = -1;
                break;
           case SIGALRM:
                /* re-set signal handler */
                if (signal(SIGALRM, &signal_handle) == SIG_ERR)
                     warn("signal(%d)", SIGALRM);
-               /* exec status script */
-               conf.status_pid = spawn(conf.status_path);
+               /* exec status script (only if still not running) */
+               if (conf.status_pid == (pid_t)-1)
+                    conf.status_pid = spawn(conf.status_path);
                /* re-set timer */
                if (conf.status_timing > 0)
                     alarm(conf.status_timing);
