@@ -497,7 +497,7 @@ main(int argc, char **argv)
           errx(EXIT_FAILURE, "cannot open X server.");
 
      /* Set signal handler */
-     for (i = sigs[0]; i < (int)LEN(sigs); i++)
+     for (i = 0; i < (int)LEN(sigs); i++)
           if (signal(sigs[i], &signal_handle) == SIG_ERR)
                warn("signal(%d)", sigs[i]);
 
