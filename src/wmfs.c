@@ -444,7 +444,7 @@ main(int argc, char **argv)
                       "   -V <viwmfs cmd>           Manage WMFS with vi-like command\n"
                       "   -S                        Update status script\n"
                       "   -h                        Show this page\n"
-                      "   -i                        Show informations\n"
+                      "   -i                        Show information\n"
                       "   -v                        Show WMFS version\n", argv[0]);
                exit(EXIT_SUCCESS);
                break;
