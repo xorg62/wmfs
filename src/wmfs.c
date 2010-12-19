@@ -253,6 +253,7 @@ void
 uicb_reload(uicb_t cmd)
 {
      (void)cmd;
+     signal(SIGALRM, SIG_IGN);
      quit();
 
      for(; argv_global[0] && argv_global[0] == ' '; ++argv_global);
