@@ -205,7 +205,7 @@
 [/client]
 
 [rules]
-       # Example of rule for Mplayer
+       # Example of rule for MPlayer
        [rule]
                instance = "xv"       # First part of WM_CLASS
                class    = "MPlayer"  # Seconf part of WM_CLASS, not needed if first part is correct
