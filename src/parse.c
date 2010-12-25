@@ -436,7 +436,7 @@ get_option(struct keyword **head)
                while (kw && kw->type != LIST_END) {
                     switch (kw->type) {
                          case WORD:
-                              if (j > (PARSE_MAX_LIST - 1)) {
+                              if (j >= (PARSE_MAX_LIST - 1)) {
                                    syntax(kw, "too much values in list");
                                    return free_opt(o);
                               }
