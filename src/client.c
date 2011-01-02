@@ -1233,7 +1233,8 @@ client_unmanage(Client *c)
           infobar_draw(c->screen);
      }
 
-     XFree(c->title);
+
+     /*XFree(c->title);*/
 
      client_focus_next(c);
 

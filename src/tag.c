@@ -61,11 +61,14 @@ tag_set(int tag)
      }
      else
      {
-          if(!tag || tag == seltag[selscreen]
+          if(!tag || (tag == seltag[selscreen] && tag == prevseltag[selscreen])
              || tag > conf.ntag[selscreen])
                return;
 
-          seltag[selscreen] = tag;
+          if(tag == seltag[selscreen] && tag != prevseltag[selscreen])
+               tag = seltag[selscreen] = prevseltag[selscreen];
+          else
+               seltag[selscreen] = tag;
      }
 
      ewmh_update_current_tag_prop();

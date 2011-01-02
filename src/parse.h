@@ -21,7 +21,7 @@
 #include <sys/queue.h>
 
 #define INCLUDE_CMD "@include"
-#define PARSE_MAX_LIST 10
+#define PARSE_MAX_LIST 32
 
 #if defined(Bool)
 #define bool_t Bool
