@@ -74,7 +74,8 @@ tag_set(int tag)
      ewmh_update_current_tag_prop();
 
      /* Arrange infobar position */
-     if(tags[selscreen][prevseltag[selscreen]].barpos != tags[selscreen][seltag[selscreen]].barpos)
+     if(tags[selscreen][prevseltag[selscreen]].barpos != tags[selscreen][seltag[selscreen]].barpos
+               || prevseltag[selscreen] == seltag[selscreen])
           infobar_set_position(tags[selscreen][seltag[selscreen]].barpos);
 
      /* Check if a layout update is needed with additional tags */
