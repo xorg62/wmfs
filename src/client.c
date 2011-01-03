@@ -1081,6 +1081,9 @@ client_set_rules(Client *c)
                     if(conf.rule[i].free)
                          c->flags |= FreeFlag;
 
+                    if(conf.rule[i].ignoretags)
+                         c->tag = MAXTAG + 1;
+
                     if(conf.rule[i].max)
                     {
                          client_maximize(c);
@@ -1093,7 +1096,8 @@ client_set_rules(Client *c)
                          client_focus(NULL);
                     }
 
-                    tags[c->screen][c->tag].layout.func(c->screen);
+                    if(! conf.rule[i].ignoretags)
+                         tags[c->screen][c->tag].layout.func(c->screen);
                }
           }
      }

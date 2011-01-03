@@ -623,13 +623,14 @@ conf_rule_section(void)
 
      for(i = 0; i < conf.nrule; ++i)
      {
-          conf.rule[i].class     = fetch_opt_first(rule[i], "", "class").str;
-          conf.rule[i].instance  = fetch_opt_first(rule[i], "", "instance").str;
-          conf.rule[i].role      = fetch_opt_first(rule[i], "", "role").str;
-          conf.rule[i].screen    = fetch_opt_first(rule[i], "-1", "screen").num;
-          conf.rule[i].tag       = fetch_opt_first(rule[i], "-1", "tag").num;
-          conf.rule[i].free      = fetch_opt_first(rule[i], "false", "free").bool;
-          conf.rule[i].max       = fetch_opt_first(rule[i], "false", "max").bool;
+          conf.rule[i].class      = fetch_opt_first(rule[i], "", "class").str;
+          conf.rule[i].instance   = fetch_opt_first(rule[i], "", "instance").str;
+          conf.rule[i].role       = fetch_opt_first(rule[i], "", "role").str;
+          conf.rule[i].screen     = fetch_opt_first(rule[i], "-1", "screen").num;
+          conf.rule[i].tag        = fetch_opt_first(rule[i], "-1", "tag").num;
+          conf.rule[i].free       = fetch_opt_first(rule[i], "false", "free").bool;
+          conf.rule[i].max        = fetch_opt_first(rule[i], "false", "max").bool;
+          conf.rule[i].ignoretags = fetch_opt_first(rule[i], "false", "ignoretags").bool;
      }
 
      free(rule);

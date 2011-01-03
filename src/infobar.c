@@ -231,7 +231,7 @@ infobar_draw_taglist(int sc)
           is_occupied[i] = False;
 
      for(c = clients; c; c = c->next)
-          if(c->screen == sc)
+          if(c->screen == sc && c->tag != MAXTAG + 1)
                is_occupied[c->tag] = True;
 
      for(i = 1, x = 0; i < conf.ntag[sc] + 1; ++i)

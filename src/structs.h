@@ -363,6 +363,7 @@ typedef struct
      int tag;
      Bool free;
      Bool max;
+     Bool ignoretags;
 } Rule;
 
 /* Configuration structure */
