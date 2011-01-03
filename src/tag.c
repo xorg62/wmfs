@@ -47,8 +47,12 @@ tag_set(int tag)
 
      screen_get_sel();
 
-     if(seltag[selscreen] != tag)
+     if(seltag[selscreen] != tag && prevseltag[selscreen] != tag)
           prevseltag[selscreen] = seltag[selscreen];
+     else if(tag == seltag[selscreen] && tag != prevseltag[selscreen])
+          tag = seltag[selscreen] = prevseltag[selscreen];
+     else
+          seltag[selscreen] = tag;
 
      if(conf.tag_round)
      {
@@ -61,20 +65,17 @@ tag_set(int tag)
      }
      else
      {
-          if(!tag || (tag == seltag[selscreen] && tag == prevseltag[selscreen])
-             || tag > conf.ntag[selscreen])
+          if(!tag || tag > conf.ntag[selscreen])
                return;
 
-          if(tag == seltag[selscreen] && tag != prevseltag[selscreen])
-               tag = seltag[selscreen] = prevseltag[selscreen];
-          else
-               seltag[selscreen] = tag;
+          seltag[selscreen] = tag;
      }
 
      ewmh_update_current_tag_prop();
 
      /* Arrange infobar position */
-     if(tags[selscreen][prevseltag[selscreen]].barpos != tags[selscreen][seltag[selscreen]].barpos)
+     if(tags[selscreen][prevseltag[selscreen]].barpos != tags[selscreen][seltag[selscreen]].barpos
+               || prevseltag[selscreen] == seltag[selscreen])
           infobar_set_position(tags[selscreen][seltag[selscreen]].barpos);
 
      /* Check if a layout update is needed with additional tags */
