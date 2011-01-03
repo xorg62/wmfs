@@ -325,10 +325,7 @@ multi_tile(int screen, Position type)
      {
           if(type == Top)
                mastergeo.y = (n <= nmaster) ? (uint)sg.y : sg.y + (sg.height - mwfact) - BORDH;
-          if (nmaster != 0)
-               mastergeo.width = (sg.width / nmaster) - (BORDH * 4);
-          else
-               mastergeo.width = sg.width - (BORDH * 4);
+          mastergeo.width = (sg.width / nmaster) - (BORDH * 4);
           mastergeo.height = (n <= nmaster) ? (uint)(sg.height - BORDH) : mwfact;
      }
      else
@@ -336,10 +333,7 @@ multi_tile(int screen, Position type)
           if(type == Left)
                mastergeo.x = (n <= nmaster) ? (uint)sg.x : (sg.x + sg.width) - mwfact - (BORDH * 2);
           mastergeo.width = (n <= nmaster) ? (uint)(sg.width - (BORDH * 2)) : mwfact;
-          if (nmaster != 0)
-               mastergeo.height = sg.height - BORDH;
-          else
-               mastergeo.height = BORDH;
+          mastergeo.height = (sg.height / nmaster) - BORDH;
      }
 
      /* TILED SIZE */
