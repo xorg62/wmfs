@@ -269,7 +269,10 @@ void
 uicb_reload(uicb_t cmd)
 {
      (void)cmd;
-     signal(SIGALRM, SIG_IGN);
+     struct itimerval notimer = { { 0, 0}, { 0, 0 } };
+     /* disable status timer */
+     if (estatus)
+          setitimer(ITIMER_REAL, &notimer, NULL);
      quit();
 
      for(; argv_global[0] && argv_global[0] == ' '; ++argv_global);
