@@ -141,16 +141,32 @@ quit(void)
      return;
 }
 
+/** launch status timer
+ */
+void
+status_timer(void)
+{
+     struct itimerval timer = {
+          .it_interval = {
+               .tv_usec = 0,
+               .tv_sec = conf.status_timing,
+          },
+          .it_value = {
+               .tv_usec = 1,
+               .tv_sec = 0,
+          },
+     };
+
+     signal(SIGALRM, &signal_handle);
+     setitimer(ITIMER_REAL, &timer, NULL);
+}
+
 /** WMFS main loop.
  */
 void
 mainloop(void)
 {
      XEvent ev;
-
-     /* launch status loop */
-     if (estatus)
-          signal_handle(SIGALRM);
 
      while(!exiting && !XNextEvent(dpy, &ev))
           getevent(ev);
@@ -400,9 +416,6 @@ signal_handle(int sig)
                /* exec status script (only if still not running) */
                if (conf.status_pid == (pid_t)-1)
                     conf.status_pid = spawn(conf.status_path);
-               /* re-set timer */
-               if (conf.status_timing > 0)
-                    alarm(conf.status_timing);
                break;
      }
 
@@ -513,6 +526,8 @@ main(int argc, char **argv)
      /* Let's Go ! */
      init();
      scan();
+     if (estatus)
+          status_timer();
      mainloop();
      quit();
 
