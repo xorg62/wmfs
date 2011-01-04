@@ -878,7 +878,7 @@ client_maximize(Client *c)
      c->geo.width  = sgeo[c->screen].width  - BORDH * 2;
      c->geo.height = sgeo[c->screen].height - BORDH;
 
-     client_moveresize(c, c->geo, False);
+     client_moveresize(c, c->geo, True);
 
      return;
 }

@@ -47,8 +47,12 @@ tag_set(int tag)
 
      screen_get_sel();
 
-     if(seltag[selscreen] != tag)
+     if(seltag[selscreen] != tag && prevseltag[selscreen] != tag)
           prevseltag[selscreen] = seltag[selscreen];
+     else if(tag == seltag[selscreen] && tag != prevseltag[selscreen])
+          tag = seltag[selscreen] = prevseltag[selscreen];
+     else
+          seltag[selscreen] = tag;
 
      if(conf.tag_round)
      {
@@ -61,14 +65,10 @@ tag_set(int tag)
      }
      else
      {
-          if(!tag || (tag == seltag[selscreen] && tag == prevseltag[selscreen])
-             || tag > conf.ntag[selscreen])
+          if(!tag || tag > conf.ntag[selscreen])
                return;
 
-          if(tag == seltag[selscreen] && tag != prevseltag[selscreen])
-               tag = seltag[selscreen] = prevseltag[selscreen];
-          else
-               seltag[selscreen] = tag;
+          seltag[selscreen] = tag;
      }
 
      ewmh_update_current_tag_prop();
