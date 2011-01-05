@@ -49,7 +49,7 @@ tag_set(int tag)
 
      if(seltag[selscreen] != tag)
           prevseltag[selscreen] = seltag[selscreen];
-     else if(tag == seltag[selscreen] && tag != prevseltag[selscreen])
+     else if(tag == seltag[selscreen] && tag != prevseltag[selscreen] && conf.tag_auto_prev)
           tag = seltag[selscreen] = prevseltag[selscreen];
      else
           seltag[selscreen] = tag;

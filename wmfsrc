@@ -98,6 +98,7 @@
         [/default_tag]
 
         tag_round      = false
+        tag_auto_prev  = true
         occupied_bg    = "#003366"
         occupied_fg    = "#D4D4D4"
         sel_fg         = "#191919"
