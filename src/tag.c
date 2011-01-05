@@ -47,7 +47,7 @@ tag_set(int tag)
 
      screen_get_sel();
 
-     if(seltag[selscreen] != tag && prevseltag[selscreen] != tag)
+     if(seltag[selscreen] != tag)
           prevseltag[selscreen] = seltag[selscreen];
      else if(tag == seltag[selscreen] && tag != prevseltag[selscreen])
           tag = seltag[selscreen] = prevseltag[selscreen];
