@@ -1111,7 +1111,8 @@ client_set_rules(Client *c)
           }
      }
 
-     if(!applied_tag_rule && conf.client.default_open_tag > 0 && conf.client.default_open_tag < (uint)conf.ntag[selscreen])
+     if(!applied_tag_rule && conf.client.default_open_tag > 0 
+          && conf.client.default_open_tag < (uint)conf.ntag[selscreen])
      {
           c->tag = conf.client.default_open_tag;
           
@@ -1119,7 +1120,8 @@ client_set_rules(Client *c)
           tags[c->screen][c->tag].request_update = True;
      }
      
-     if(!applied_screen_rule && conf.client.default_open_screen > -1 && conf.client.default_open_screen < screen_count())
+     if(!applied_screen_rule && conf.client.default_open_screen > -1 
+          && conf.client.default_open_screen < screen_count())
      {
           c->screen = conf.client.default_open_screen;
           
