@@ -443,6 +443,8 @@ typedef struct
           uint padding;
           MouseBinding *mouse;
           int nmouse;
+          uint default_open_tag;
+          int default_open_screen;
      } client;
      struct
      {

@@ -286,6 +286,8 @@ conf_client_section(void)
      conf.client.padding             = fetch_opt_first(sec, "0", "padding").num;
      conf.client.autofree            = fetch_opt_first(sec, "", "autofree").str;
      conf.client.automax             = fetch_opt_first(sec, "", "automax").str;
+     conf.client.default_open_tag    = fetch_opt_first(sec, "0", "default_open_tag").num;
+     conf.client.default_open_screen = fetch_opt_first(sec, "-1", "default_open_screen").num;
 
      mouse = fetch_section(sec, "mouse");
 

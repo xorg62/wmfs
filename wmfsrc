@@ -163,6 +163,9 @@
         resize_corner_normal = "#191919"
         resize_corner_focus  = "#003366"
 
+#        default_open_tag     = 4 # send all client that have no tag rule in this default tag
+#        default_open_screen  = 1 # same as above but for the screen
+
         # Space between tiled clients
         padding = 0
 

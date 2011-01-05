@@ -58,7 +58,7 @@ tag_set(int tag)
      {
           if(tag <= 0)
                seltag[selscreen] = conf.ntag[selscreen];
-          else if(tag  > conf.ntag[selscreen])
+          else if(tag > conf.ntag[selscreen])
                seltag[selscreen] = 1;
           else
                seltag[selscreen] = tag;

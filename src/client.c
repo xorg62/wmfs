@@ -1007,6 +1007,8 @@ client_set_rules(Client *c)
      ulong n, il;
      uchar *data = NULL;
      char wwrole[256] = { 0 };
+     Bool applied_tag_rule = False;
+     Bool applied_screen_rule = False;
 
      memset(&xch, 0, sizeof(xch));
 
@@ -1060,6 +1062,10 @@ client_set_rules(Client *c)
                               }
 
                               tags[c->screen][c->tag].layout.func(c->screen);
+
+                              /* Deprecated but still in use */
+                              applied_tag_rule = True;
+                              applied_screen_rule = True;
                          }
 
      /* }}} */
@@ -1076,7 +1082,10 @@ client_set_rules(Client *c)
                          c->screen = conf.rule[i].screen;
 
                     if(conf.rule[i].tag != -1)
+                    {
                          c->tag = conf.rule[i].tag;
+                         applied_tag_rule = True;
+                    }
 
                     if(conf.rule[i].free)
                          c->flags |= FreeFlag;
@@ -1096,10 +1105,26 @@ client_set_rules(Client *c)
                          client_focus(NULL);
                     }
 
-                    if(! conf.rule[i].ignoretags)
+                    if(!conf.rule[i].ignoretags)
                          tags[c->screen][c->tag].layout.func(c->screen);
                }
           }
+     }
+
+     if(!applied_tag_rule && conf.client.default_open_tag > 0 && conf.client.default_open_tag < (uint)conf.ntag[selscreen])
+     {
+          c->tag = conf.client.default_open_tag;
+          
+          client_focus_next(c);
+          tags[c->screen][c->tag].request_update = True;
+     }
+     
+     if(!applied_screen_rule && conf.client.default_open_screen > -1 && conf.client.default_open_screen < screen_count())
+     {
+          c->screen = conf.client.default_open_screen;
+          
+          client_focus_next(c);
+          tags[c->screen][c->tag].request_update = True;
      }
 
      return;
