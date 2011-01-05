@@ -480,6 +480,7 @@ typedef struct
      Rule *rule;
      int *ntag;
      Bool tag_round;
+     Bool tag_auto_prev;
      Bool client_round;
      Bool layout_system; /* Switch: False, Menu: True. */
      Bool layout_placement; /* Right (normal): False, Left: True. */

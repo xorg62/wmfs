@@ -470,6 +470,7 @@ conf_tag_section(void)
      sec = fetch_section_first(NULL, "tags");
 
      conf.tag_round               = fetch_opt_first(sec, "false", "tag_round").bool;
+     conf.tag_auto_prev           = fetch_opt_first(sec, "true", "tag_auto_prev").bool;
      conf.colors.tagselfg         = fetch_opt_first(sec, "#ffffff", "sel_fg").str;
      conf.colors.tagselbg         = getcolor(fetch_opt_first(sec, "#000000", "sel_bg").str);
      conf.colors.tagurfg          = fetch_opt_first(sec, "#000000", "urgent_fg").str;
