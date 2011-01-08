@@ -141,16 +141,37 @@ quit(void)
      return;
 }
 
+/** launch status timer
+ */
+void
+status_timer(void)
+{
+     struct sigaction sa;
+     struct itimerval timer = {
+          .it_interval = {
+               .tv_usec = 0,
+               .tv_sec = conf.status_timing,
+          },
+          .it_value = {
+               .tv_usec = 1,
+               .tv_sec = 0,
+          },
+     };
+
+     memset(&sa, 0, sizeof(sa));
+     sa.sa_handler = signal_handle;
+     sigemptyset(&sa.sa_mask);
+     sigaddset(&sa.sa_mask, SIGCHLD);
+     sigaction(SIGALRM, &sa, NULL);
+     setitimer(ITIMER_REAL, &timer, NULL);
+}
+
 /** WMFS main loop.
  */
 void
 mainloop(void)
 {
      XEvent ev;
-
-     /* launch status loop */
-     if (estatus)
-          signal_handle(SIGALRM);
 
      while(!exiting && !XNextEvent(dpy, &ev))
           getevent(ev);
@@ -253,7 +274,10 @@ void
 uicb_reload(uicb_t cmd)
 {
      (void)cmd;
-     signal(SIGALRM, SIG_IGN);
+     struct itimerval notimer = { { 0, 0}, { 0, 0 } };
+     /* disable status timer */
+     if (estatus)
+          setitimer(ITIMER_REAL, &notimer, NULL);
      quit();
 
      for(; argv_global[0] && argv_global[0] == ' '; ++argv_global);
@@ -385,23 +409,15 @@ signal_handle(int sig)
                exit(EXIT_SUCCESS);
                break;
           case SIGCHLD:
-               /* re-set signal handler and wait childs */
-               if (signal(SIGCHLD, &signal_handle) == SIG_ERR)
-                    warn("signal(%d)", SIGCHLD);
+               /* wait childs */
                while ((pid = waitpid(-1, NULL, WNOHANG)) > 0)
                     if (pid == conf.status_pid)
                          conf.status_pid = -1;
                break;
           case SIGALRM:
-               /* re-set signal handler */
-               if (signal(SIGALRM, &signal_handle) == SIG_ERR)
-                    warn("signal(%d)", SIGALRM);
                /* exec status script (only if still not running) */
                if (conf.status_pid == (pid_t)-1)
                     conf.status_pid = spawn(conf.status_path);
-               /* re-set timer */
-               if (conf.status_timing > 0)
-                    alarm(conf.status_timing);
                break;
      }
 
@@ -420,7 +436,7 @@ main(int argc, char **argv)
      char *ol = "csgVS";
      extern char *optarg;
      extern int optind;
-     int sigs[] = { SIGTERM, SIGQUIT, SIGCHLD };
+     struct sigaction sa;
 
      argv_global  = xstrdup(argv[0]);
      all_argv = argv;
@@ -503,17 +519,24 @@ main(int argc, char **argv)
      if(!(dpy = XOpenDisplay(NULL)))
           errx(EXIT_FAILURE, "cannot open X server.");
 
-     /* Set signal handler */
-     for (i = 0; i < (int)LEN(sigs); i++)
-          if (signal(sigs[i], &signal_handle) == SIG_ERR)
-               warn("signal(%d)", sigs[i]);
-
      /* Check if an other WM is already running; set the error handler */
      XSetErrorHandler(errorhandler);
 
      /* Let's Go ! */
      init();
      scan();
+
+     /* set signal handler */
+     memset(&sa, 0, sizeof(sa));
+     sa.sa_handler = signal_handle;
+     sigemptyset(&sa.sa_mask);
+     sigaction(SIGQUIT, &sa, NULL);
+     sigaction(SIGTERM, &sa, NULL);
+     sigaddset(&sa.sa_mask, SIGALRM);
+     sigaction(SIGCHLD, &sa, NULL);
+
+     if (estatus)
+          status_timer();
      mainloop();
      quit();
 
