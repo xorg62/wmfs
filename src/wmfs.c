@@ -135,35 +135,34 @@ quit(void)
      XCloseDisplay(dpy);
 
      /* kill status script */
-     if (conf.status_pid != -1)
+     if (conf.status_pid != (pid_t)-1)
          kill(conf.status_pid, SIGTERM);
 
      return;
 }
 
-/** launch status timer
- */
-void
-status_timer(void)
+void *
+thread_process(void *arg)
 {
-     struct sigaction sa;
-     struct itimerval timer = {
-          .it_interval = {
-               .tv_usec = 0,
-               .tv_sec = conf.status_timing,
-          },
-          .it_value = {
-               .tv_usec = 1,
-               .tv_sec = 0,
-          },
-     };
+     XEvent ev;
 
-     memset(&sa, 0, sizeof(sa));
-     sa.sa_handler = signal_handle;
-     sigemptyset(&sa.sa_mask);
-     sigaddset(&sa.sa_mask, SIGCHLD);
-     sigaction(SIGALRM, &sa, NULL);
-     setitimer(ITIMER_REAL, &timer, NULL);
+     /* X event loop */
+     if(arg)
+     {
+          while(!exiting && !XNextEvent(dpy, &ev))
+               getevent(ev);
+     }
+     /* Status checking loop with timing */
+     else
+     {
+          pthread_detach(pthread_self());
+          do
+          {
+               conf.status_pid = spawn(conf.status_path);
+               sleep(conf.status_timing);
+          } while (!exiting && conf.status_timing != 0);
+     }
+     pthread_exit(NULL);
 }
 
 /** WMFS main loop.
@@ -172,9 +171,19 @@ void
 mainloop(void)
 {
      XEvent ev;
+     pthread_t evloop, evstatus;
+     void *ret;
 
-     while(!exiting && !XNextEvent(dpy, &ev))
-          getevent(ev);
+     if(!estatus)
+          while(!exiting && !XNextEvent(dpy, &ev))
+               getevent(ev);
+     else
+     {
+          pthread_create(&evloop, NULL, thread_process, "1");
+          pthread_create(&evstatus, NULL, thread_process, NULL);
+
+          (void)pthread_join(evloop, &ret);
+     }
 
      return;
 }
@@ -274,15 +283,12 @@ void
 uicb_reload(uicb_t cmd)
 {
      (void)cmd;
-     struct itimerval notimer = { { 0, 0}, { 0, 0 } };
-     /* disable status timer */
-     if (estatus)
-          setitimer(ITIMER_REAL, &notimer, NULL);
      quit();
 
      for(; argv_global[0] && argv_global[0] == ' '; ++argv_global);
 
-     execvp(argv_global, all_argv);
+     /* add -C to always load the same config file */
+     execlp(argv_global, argv_global, "-C", conf.confpath, NULL);
 
      return;
 }
@@ -398,8 +404,6 @@ update_status(void)
 static void
 signal_handle(int sig)
 {
-     pid_t pid;
-
      switch (sig)
      {
           case SIGQUIT:
@@ -409,15 +413,10 @@ signal_handle(int sig)
                exit(EXIT_SUCCESS);
                break;
           case SIGCHLD:
-               /* wait childs */
-               while ((pid = waitpid(-1, NULL, WNOHANG)) > 0)
-                    if (pid == conf.status_pid)
-                         conf.status_pid = -1;
-               break;
-          case SIGALRM:
-               /* exec status script (only if still not running) */
-               if (conf.status_pid == (pid_t)-1)
-                    conf.status_pid = spawn(conf.status_path);
+               /* re-set signal handler and wait childs */
+               if (signal(SIGCHLD, &signal_handle) == SIG_ERR)
+                    warn("signal(%d)", SIGCHLD);
+               while (waitpid(-1, NULL, WNOHANG) > 0);
                break;
      }
 
@@ -436,11 +435,9 @@ main(int argc, char **argv)
      char *ol = "csgVS";
      extern char *optarg;
      extern int optind;
-     struct sigaction sa;
+     int sigs[] = { SIGTERM, SIGQUIT, SIGCHLD };
 
      argv_global  = xstrdup(argv[0]);
-     all_argv = argv;
-     
      sprintf(conf.confpath, "%s/"DEF_CONF, getenv("HOME"));
 
      while((i = getopt(argc, argv, "hviSc:s:g:C:V:")) != -1)
@@ -462,7 +459,7 @@ main(int argc, char **argv)
                       "   -V <viwmfs cmd>           Manage WMFS with vi-like command\n"
                       "   -S                        Update status script\n"
                       "   -h                        Show this page\n"
-                      "   -i                        Show information\n"
+                      "   -i                        Show informations\n"
                       "   -v                        Show WMFS version\n", argv[0]);
                exit(EXIT_SUCCESS);
                break;
@@ -519,24 +516,17 @@ main(int argc, char **argv)
      if(!(dpy = XOpenDisplay(NULL)))
           errx(EXIT_FAILURE, "cannot open X server.");
 
+     /* Set signal handler */
+     for (i = sigs[0]; i < (int)LEN(sigs); i++)
+          if (signal(sigs[i], &signal_handle) == SIG_ERR)
+               warn("signal(%d)", sigs[i]);
+
      /* Check if an other WM is already running; set the error handler */
      XSetErrorHandler(errorhandler);
 
      /* Let's Go ! */
      init();
      scan();
-
-     /* set signal handler */
-     memset(&sa, 0, sizeof(sa));
-     sa.sa_handler = signal_handle;
-     sigemptyset(&sa.sa_mask);
-     sigaction(SIGQUIT, &sa, NULL);
-     sigaction(SIGTERM, &sa, NULL);
-     sigaddset(&sa.sa_mask, SIGALRM);
-     sigaction(SIGCHLD, &sa, NULL);
-
-     if (estatus)
-          status_timer();
      mainloop();
      quit();
 
