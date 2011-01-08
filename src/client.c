@@ -1249,11 +1249,22 @@ client_unmanage(Client *c)
 
      /* Arrange */
      for(i = 0; i < screen_count() && !b; ++i)
-          if(c->tag == (uint)seltag[i] || tags[i][seltag[i]].tagad & TagFlag(c->tag))
+          if(c->tag == MAXTAG + 1 || c->tag == (uint)seltag[i] || tags[i][seltag[i]].tagad & TagFlag(c->tag))
                b = True;
 
      if(b)
-          tags[c->screen][c->tag].layout.func(c->screen);
+     {
+          if(c->tag == MAXTAG + 1)
+          {
+               if(c->tag == MAXTAG+1){
+                    for(i = 0; i < conf.ntag[c->screen]; i++)
+                         tags[c->screen][i].request_update = True;
+                    tags[c->screen][seltag[c->screen]].layout.func(c->screen);
+               }
+          }
+          else
+               tags[c->screen][c->tag].layout.func(c->screen);
+     }
      else
      {
           tags[c->screen][c->tag].request_update = True;
