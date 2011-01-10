@@ -438,6 +438,7 @@ main(int argc, char **argv)
      int sigs[] = { SIGTERM, SIGQUIT, SIGCHLD };
 
      argv_global  = xstrdup(argv[0]);
+     all_argv = argv;
      sprintf(conf.confpath, "%s/"DEF_CONF, getenv("HOME"));
 
      while((i = getopt(argc, argv, "hviSc:s:g:C:V:")) != -1)
