@@ -253,14 +253,15 @@ alias_to_str(char *conf_choice)
  * \param cmd Command
  * \return child pid
 */
-pid_t
+int
 spawn(const char *format, ...)
 {
      char *sh = NULL;
      char cmd[512];
      va_list ap;
+     pid_t pid, ret;
+     int p[2];
      size_t len;
-     pid_t pid;
 
      va_start(ap, format);
      len = vsnprintf(cmd, sizeof(cmd), format, ap);
@@ -275,18 +276,48 @@ spawn(const char *format, ...)
      if(!(sh = getenv("SHELL")))
           sh = "/bin/sh";
 
+     if (pipe(p) == -1)
+     {
+          warn("pipe");
+          return -1;
+     }
+
      if((pid = fork()) == 0)
      {
-          if(dpy)
-               close(ConnectionNumber(dpy));
-          setsid();
-          execl(sh, sh, "-c", cmd, (char*)NULL);
-          err(1, "execl(%s)", cmd);
-     }
-     if (pid == -1)
-          warn("fork()");
+          close(p[0]);
+          if((pid = fork()) == 0)
+          {
+               if(dpy)
+                    close(ConnectionNumber(dpy));
+               setsid();
+               execl(sh, sh, "-c", cmd, (char*)NULL);
+               exit(EXIT_FAILURE);
+          }
 
-     return pid;
+          if (sizeof(pid_t) != write(p[1], &pid, sizeof(pid_t)))
+               warn("write");
+
+          close(p[1]);
+          exit(EXIT_SUCCESS);
+     }
+     else if (pid != -1)
+     {
+          close(p[1]);
+          if (sizeof(pid_t) != read(p[0], &ret, sizeof(pid_t)))
+          {
+               warn("read");
+               ret = -1;
+          }
+          close(p[0]);
+          waitpid(pid, NULL, 0);
+     }
+     else
+     {
+          warn("fork");
+          ret = -1;
+     }
+
+     return ret;
 }
 
 /** Swap two pointer.
