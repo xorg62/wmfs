@@ -157,6 +157,7 @@
 
 [client]
         client_round         = true
+        client_auto_center   = false
         border_height        = 3
         border_shadow        = true
         border_normal        = "#191919"

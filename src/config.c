@@ -271,6 +271,7 @@ conf_client_section(void)
      sec = fetch_section_first(NULL, "client");
 
      conf.client_round               = fetch_opt_first(sec, "true", "client_round").bool;
+     conf.client_auto_center         = fetch_opt_first(sec, "false", "client_auto_center").bool;
 
      if ((conf.client.borderheight = fetch_opt_first(sec, "1", "border_height").num) < 1)
           conf.client.borderheight = 1;

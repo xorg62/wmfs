@@ -706,7 +706,16 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
                mx += spgeo[selscreen].x;
                my += spgeo[selscreen].y;
           }
+          
+          if(conf.client_auto_center)
+          {
+               XRectangle tmp;
+               tmp = screen_get_geo(selscreen);
+               mx = (tmp.width + mx - wa->width) / 2;
+               my = (tmp.height + my - wa->height) / 2;
+          }
      }
+     
      c->ogeo.x = c->geo.x = mx;
      c->ogeo.y = c->geo.y = my;
      c->ogeo.width = c->geo.width = wa->width;
