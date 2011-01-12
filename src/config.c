@@ -126,6 +126,7 @@ name_to_uint_t mouse_button_list[] =
      {"3", Button3 },
      {"4", Button4 },
      {"5", Button5 },
+     {NULL, NoSymbol}
 };
 
 static void
