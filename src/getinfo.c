@@ -74,8 +74,8 @@ getinfo_tag(void)
      printf("Current tag:  %d - %s\n", tag, tag_name);
      printf("Tag list:  %s\n", tag_list);
 
-     IFREE(tag_name);
-     IFREE(tag_list);
+     free(tag_name);
+     free(tag_list);
 
      return;
 }
@@ -122,7 +122,7 @@ getinfo_layout(void)
 
      printf("Current layout:  %s\n", layout);
 
-     IFREE(layout);
+     free(layout);
 
      return;
 }
@@ -143,7 +143,7 @@ getinfo_mwfact(void)
 
      printf("Current mwfact:  %s\n", mwfact);
 
-     IFREE(mwfact);
+     free(mwfact);
 
      return;
 }

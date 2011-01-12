@@ -108,7 +108,6 @@
 #define FRAMEH(h)    ((h) + (BORDH  + TBARH))
 #define ROUND(x)     (float)((x > 0) ? x + (float)0.5 : x - (float)0.5)
 #define CHECK(x)     if(!(x)) return
-#define IFREE(x)     if(x) free(x)
 #define LEN(x)       (sizeof(x) / sizeof((x)[0]))
 #define MAXCLIST     (64)
 
