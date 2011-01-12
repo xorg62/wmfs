@@ -388,8 +388,7 @@ include(struct keyword *head)
 static void *
 free_opt(struct conf_opt *o)
 {
-     if (o)
-          free(o);
+     free(o);
      return NULL;
 }
 
@@ -563,8 +562,7 @@ free_conf(void)
      while (kw) {
           nkw = kw->next;
 
-          if (kw->name)
-               free(kw->name);
+          free(kw->name);
 
           for (i = 0; i < nf; i++) {
                if (f[i] == kw->file) {
