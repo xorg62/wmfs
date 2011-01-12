@@ -706,7 +706,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
                mx += spgeo[selscreen].x;
                my += spgeo[selscreen].y;
           }
-          
+
           if(conf.client_auto_center)
           {
                XRectangle tmp;
@@ -715,7 +715,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
                my = (tmp.height + my - wa->height) / 2;
           }
      }
-     
+
      c->ogeo.x = c->geo.x = mx;
      c->ogeo.y = c->geo.y = my;
      c->ogeo.width = c->geo.width = wa->width;
@@ -887,7 +887,7 @@ client_maximize(Client *c)
      c->geo.width  = sgeo[c->screen].width  - BORDH * 2;
      c->geo.height = sgeo[c->screen].height - BORDH;
 
-     client_moveresize(c, c->geo, True);
+     client_moveresize(c, c->geo, False);
 
      return;
 }
@@ -1120,20 +1120,20 @@ client_set_rules(Client *c)
           }
      }
 
-     if(!applied_tag_rule && conf.client.default_open_tag > 0 
+     if(!applied_tag_rule && conf.client.default_open_tag > 0
           && conf.client.default_open_tag < (uint)conf.ntag[selscreen])
      {
           c->tag = conf.client.default_open_tag;
-          
+
           client_focus_next(c);
           tags[c->screen][c->tag].request_update = True;
      }
-     
-     if(!applied_screen_rule && conf.client.default_open_screen > -1 
+
+     if(!applied_screen_rule && conf.client.default_open_screen > -1
           && conf.client.default_open_screen < screen_count())
      {
           c->screen = conf.client.default_open_screen;
-          
+
           client_focus_next(c);
           tags[c->screen][c->tag].request_update = True;
      }
