@@ -307,6 +307,7 @@ parse_keywords(const char *filename)
 
      free(buf);
      free(bufname);
+     close(fd);
      warnx("%s read", file->name);
 
      return (error ? NULL: head);
