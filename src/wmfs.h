@@ -400,20 +400,8 @@ Bool uicb_checklayout(uicb_t);
 
 /* init.c */
 void init(void);
-void init_root(void);
-void init_font(void);
-void init_gc(void);
-void init_cursor(void);
-void init_key(void);
-void init_geometry(void);
-void init_status(void);
 
 /* getinfo.c */
-void getinfo_tag(void);
-void getinfo_screen(void);
-void getinfo_layout(void);
-void getinfo_mwfact(void);
-void getinfo_nmaster(void);
 void getinfo(char *info);
 
 /* viwmfs.c */

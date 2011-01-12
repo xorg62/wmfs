@@ -42,7 +42,7 @@ uchar *ret;
 
 /** Get information about tag (current, list, names)
  */
-void
+static void
 getinfo_tag(void)
 {
      int tag = 0;
@@ -82,7 +82,7 @@ getinfo_tag(void)
 
 /** Get information about screens
  */
-void
+static void
 getinfo_screen(void)
 {
      int screen = 1;
@@ -108,7 +108,7 @@ getinfo_screen(void)
 
 /** Get current layout name
  */
-void
+static void
 getinfo_layout(void)
 {
      char *layout = NULL;
@@ -129,7 +129,7 @@ getinfo_layout(void)
 
 /** Get information about current mwfact
  */
-void
+static void
 getinfo_mwfact(void)
 {
      char *mwfact = NULL;
@@ -150,7 +150,7 @@ getinfo_mwfact(void)
 
 /** Get information about current nmaster
  */
-void
+static void
 getinfo_nmaster(void)
 {
      int nmaster = 1;
