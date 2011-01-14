@@ -345,7 +345,7 @@ uicb_menu(uicb_t cmd)
 void
 menu_clear(Menu *menu)
 {
-     IFREE(menu->item);
+     free(menu->item);
      menu->nitem = 0;
 
      return;

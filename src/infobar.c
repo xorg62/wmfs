@@ -209,7 +209,7 @@ infobar_draw_selbar(int sc)
 
      barwin_refresh(infobar[sc].selbar);
 
-     IFREE(str);
+     free(str);
 
      return;
 }

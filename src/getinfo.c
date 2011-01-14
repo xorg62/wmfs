@@ -42,7 +42,7 @@ uchar *ret;
 
 /** Get information about tag (current, list, names)
  */
-void
+static void
 getinfo_tag(void)
 {
      int tag = 0;
@@ -74,15 +74,15 @@ getinfo_tag(void)
      printf("Current tag:  %d - %s\n", tag, tag_name);
      printf("Tag list:  %s\n", tag_list);
 
-     IFREE(tag_name);
-     IFREE(tag_list);
+     free(tag_name);
+     free(tag_list);
 
      return;
 }
 
 /** Get information about screens
  */
-void
+static void
 getinfo_screen(void)
 {
      int screen = 1;
@@ -108,7 +108,7 @@ getinfo_screen(void)
 
 /** Get current layout name
  */
-void
+static void
 getinfo_layout(void)
 {
      char *layout = NULL;
@@ -122,14 +122,14 @@ getinfo_layout(void)
 
      printf("Current layout:  %s\n", layout);
 
-     IFREE(layout);
+     free(layout);
 
      return;
 }
 
 /** Get information about current mwfact
  */
-void
+static void
 getinfo_mwfact(void)
 {
      char *mwfact = NULL;
@@ -143,14 +143,14 @@ getinfo_mwfact(void)
 
      printf("Current mwfact:  %s\n", mwfact);
 
-     IFREE(mwfact);
+     free(mwfact);
 
      return;
 }
 
 /** Get information about current nmaster
  */
-void
+static void
 getinfo_nmaster(void)
 {
      int nmaster = 1;

@@ -370,7 +370,7 @@ complete_on_files(char *start, size_t hits)
                     else
                          warn("%s", filepath);
 
-                    IFREE(filepath);
+                    free(filepath);
 
                     break;
                }
@@ -378,8 +378,8 @@ complete_on_files(char *start, size_t hits)
           closedir(dir);
      }
 
-     IFREE(dirname);
-     IFREE(path);
+     free(dirname);
+     free(path);
 
      return ret;
 }

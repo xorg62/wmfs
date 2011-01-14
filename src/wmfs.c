@@ -92,8 +92,8 @@ quit(void)
           XReparentWindow(dpy, c->win, ROOT, c->geo.x, c->geo.y);
      }
 
-     IFREE(tags);
-     IFREE(seltag);
+     free(tags);
+     free(seltag);
 
      systray_freeicons();
 
@@ -103,31 +103,31 @@ quit(void)
      XFreeGC(dpy, gc_stipple);
      infobar_destroy();
 
-     IFREE(sgeo);
-     IFREE(spgeo);
-     IFREE(infobar);
-     IFREE(keys);
-     IFREE(net_atom);
+     free(sgeo);
+     free(spgeo);
+     free(infobar);
+     free(keys);
+     free(net_atom);
 
      /* Clean conf alloced thing */
-     IFREE(menulayout.item);
+     free(menulayout.item);
 
      if(conf.menu)
      {
           len = LEN(conf.menu);
           for(i = 0; i < len; ++i)
-               IFREE(conf.menu[i].item);
-          IFREE(conf.menu);
+               free(conf.menu[i].item);
+          free(conf.menu);
      }
 
-     IFREE(conf.launcher);
-     IFREE(conf.rule);
+     free(conf.launcher);
+     free(conf.rule);
 
-     IFREE(conf.bars.mouse);
-     IFREE(conf.selbar.mouse);
-     IFREE(conf.titlebar.button);
-     IFREE(conf.client.mouse);
-     IFREE(conf.root.mouse);
+     free(conf.bars.mouse);
+     free(conf.selbar.mouse);
+     free(conf.titlebar.button);
+     free(conf.client.mouse);
+     free(conf.root.mouse);
 
      free_conf();
 

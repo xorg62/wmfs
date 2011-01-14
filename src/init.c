@@ -55,32 +55,9 @@ const func_name_list_t layout_list[] =
      { NULL, NULL }
 };
 
-/** Init WMFS
-*/
-void
-init(void)
-{
-     /* First init */
-     ewmh_init_hints();
-     init_conf();
-     init_gc();
-     init_font();
-     init_cursor();
-     init_key();
-     init_root();
-     screen_init_geo();
-     infobar_init();
-     systray_acquire();
-     init_status();
-     ewmh_update_current_tag_prop();
-     grabkeys();
-
-     return;
-}
-
 /** Init the font
 */
-void
+static void
 init_font(void)
 {
      font = XftFontOpenName(dpy, SCREEN, conf.font);
@@ -100,7 +77,7 @@ init_font(void)
 
 /** Init the graphic context
 */
-void
+static void
 init_gc(void)
 {
      XGCValues gcv;
@@ -127,7 +104,7 @@ init_gc(void)
 
 /** Init WMFS cursor
 */
-void
+static void
 init_cursor(void)
 {
      cursor[CurNormal]      = XCreateFontCursor(dpy, XC_left_ptr);
@@ -141,7 +118,7 @@ init_cursor(void)
 
 /** Init key modifier
 */
-void
+static void
 init_key(void)
 {
      int i, j;
@@ -160,7 +137,7 @@ init_key(void)
 
 /** Init root Window
 */
-void
+static void
 init_root(void)
 {
      XSetWindowAttributes at;
@@ -183,7 +160,7 @@ init_root(void)
 
 /** Init statustext shell script
   */
-void
+static void
 init_status(void)
 {
      struct stat st;
@@ -214,6 +191,29 @@ init_status(void)
           estatus = True;
      else
           warnx("status file specified in configuratin (status_path) or present in wmfs directory can't be executed, try 'chmod +x %s'.", patht(conf.status_path));
+
+     return;
+}
+
+/** Init WMFS
+*/
+void
+init(void)
+{
+     /* First init */
+     ewmh_init_hints();
+     init_conf();
+     init_gc();
+     init_font();
+     init_cursor();
+     init_key();
+     init_root();
+     screen_init_geo();
+     infobar_init();
+     systray_acquire();
+     init_status();
+     ewmh_update_current_tag_prop();
+     grabkeys();
 
      return;
 }

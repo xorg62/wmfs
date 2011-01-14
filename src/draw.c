@@ -100,7 +100,7 @@ draw_image_ofset_text(Drawable d, int x, int y, char* fg, char *str, int x_image
      if(strstr(ostr, "i["))
           strncpy(str, ostr, textlen);
 
-     IFREE(ostr);
+     free(ostr);
 #endif /* HAVE_IMLIB */
 
      return;
@@ -226,7 +226,7 @@ textw(char *text)
      if(strstr(ostr, "i["))
           strncpy(text, ostr, textlen);
 
-     IFREE(ostr);
+     free(ostr);
 #endif /* HAVE_IMLIB */
 
      return gl.width + font->descent;

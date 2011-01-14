@@ -443,8 +443,7 @@ mirror(int screen, Bool horizontal)
      int pa, imp;
      Bool isp = 0;
 
-     memset(&nextg[0], 0, sizeof(nextg[0]));
-     memset(&nextg[1], 0, sizeof(nextg[2]));
+     memset(nextg, 0, sizeof(nextg));
 
      for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
      CHECK(n);
