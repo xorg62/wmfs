@@ -69,6 +69,7 @@ ewmh_init_hints(void)
      net_atom[net_wm_icon_name]               = ATOM("_NET_WM_ICON_NAME");
      net_atom[net_wm_window_type]             = ATOM("_NET_WM_WINDOW_TYPE");
      net_atom[net_supporting_wm_check]        = ATOM("_NET_SUPPORTING_WM_CHECK");
+     net_atom[net_wm_window_opacity]          = ATOM("_NET_WM_WINDOW_OPACITY");
      net_atom[net_wm_window_type_normal]      = ATOM("_NET_WM_WINDOW_TYPE_NORMAL");
      net_atom[net_wm_window_type_dock]        = ATOM("_NET_WM_WINDOW_TYPE_DOCK");
      net_atom[net_wm_window_type_splash]      = ATOM("_NET_WM_WINDOW_TYPE_SPLASH");
@@ -370,7 +371,7 @@ ewmh_manage_net_wm_state(long data_l[], Client *c)
      else if(data_l[1] == (long)net_atom[net_wm_state_demands_attention])
      {
           if(data_l[0] == _NET_WM_STATE_ADD)
-               client_focus(c);
+               client_urgent(c, True);
           if(data_l[0] == _NET_WM_STATE_REMOVE)
                if(c == sel)
                     client_focus(NULL);
