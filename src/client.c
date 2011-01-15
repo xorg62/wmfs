@@ -370,8 +370,8 @@ client_focus(Client *c)
           if(sel->flags & AboveFlag)
                sel->flags &= ~AboveFlag;
 
-          XChangeProperty(dpy,sel->frame,net_atom[net_wm_window_opacity],XA_CARDINAL,
-                          32,PropModeReplace,(uchar *)&conf.opacity,1);
+          XChangeProperty(dpy, sel->frame, net_atom[net_wm_window_opacity], XA_CARDINAL,
+                          32, PropModeReplace, (uchar *)&conf.opacity, 1);
 
           frame_update(sel);
 
@@ -394,7 +394,7 @@ client_focus(Client *c)
           if(TBARH - BORDH && c->titlebar->stipple)
                c->titlebar->stipple_color = conf.titlebar.stipple.colors.focus;
 
-          XDeleteProperty(dpy,c->frame,net_atom[net_wm_window_opacity]);
+          XDeleteProperty(dpy, c->frame, net_atom[net_wm_window_opacity]);
 
           frame_update(c);
           mouse_grabbuttons(c, True);
@@ -787,9 +787,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
           layout_set_client_master(c);
 
      if(c->tag == (uint)seltag[selscreen])
-     {
           client_focus(c);
-     }
 
      return c;
 }
@@ -1087,13 +1085,9 @@ client_set_rules(Client *c)
                               c->tag = j;
 
                               if(c->tag != (uint)seltag[selscreen])
-                              {
                                    tags[c->screen][c->tag].request_update = True;
-                              }
                               else
-                              {
                                    tags[c->screen][c->tag].layout.func(c->screen);
-                              }
 
                               /* Deprecated but still in use */
                               applied_tag_rule = True;
