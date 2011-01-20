@@ -32,6 +32,9 @@
 
 #include "wmfs.h"
 
+static volatile Bool exiting = False, sig_chld = False;
+static pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
+
 static void signal_handle(int);
 
 int
@@ -141,27 +144,43 @@ quit(void)
      return;
 }
 
-void *
-thread_process(void *arg)
+static void
+wait_childs_and_status(void)
 {
-     XEvent ev;
+     int pid;
 
-     /* X event loop */
-     if(arg)
-     {
-          while(!exiting && !XNextEvent(dpy, &ev))
-               getevent(ev);
+     pthread_mutex_lock(&mtx);
+     if (sig_chld) {
+          while ((pid = waitpid(-1, NULL, WNOHANG)) > 0)
+               if (pid == conf.status_pid)
+                    conf.status_pid = -1;
+          sig_chld = False;
      }
-     /* Status checking loop with timing */
-     else
+     pthread_mutex_unlock(&mtx);
+}
+
+void *
+thread_status(void *arg)
+{
+     (void)arg;
+     int left = conf.status_timing;
+
+     pthread_detach(pthread_self());
+
+     do
      {
-          pthread_detach(pthread_self());
-          do
-          {
+          wait_childs_and_status();
+
+          pthread_mutex_lock(&mtx);
+          if (conf.status_pid == -1)
                conf.status_pid = spawn(conf.status_path);
-               sleep(conf.status_timing);
-          } while (!exiting && conf.status_timing != 0);
-     }
+          pthread_mutex_unlock(&mtx);
+
+          while ((left = sleep(left)) > 0);
+          left = conf.status_timing;
+
+     } while (!exiting);
+
      pthread_exit(NULL);
 }
 
@@ -171,19 +190,22 @@ void
 mainloop(void)
 {
      XEvent ev;
-     pthread_t evloop, evstatus;
-     void *ret;
+     pthread_t th_status;
 
-     if(!estatus)
-          while(!exiting && !XNextEvent(dpy, &ev))
-               getevent(ev);
-     else
-     {
-          pthread_create(&evloop, NULL, thread_process, "1");
-          pthread_create(&evstatus, NULL, thread_process, NULL);
-
-          (void)pthread_join(evloop, &ret);
+     if (estatus && conf.status_timing == 0)
+          conf.status_pid = spawn(conf.status_path);
+     else if (estatus && pthread_create(&th_status, NULL, thread_status, NULL) != 0) {
+          warnx("pthread_create");
+          estatus = False;
      }
+
+     while (!exiting && !XNextEvent(dpy, &ev)) {
+          getevent(ev);
+          wait_childs_and_status();
+     }
+
+     if (estatus)
+          pthread_join(th_status, NULL);
 
      return;
 }
@@ -409,14 +431,9 @@ signal_handle(int sig)
           case SIGQUIT:
           case SIGTERM:
                exiting = True;
-               quit();
-               exit(EXIT_SUCCESS);
                break;
           case SIGCHLD:
-               /* re-set signal handler and wait childs */
-               if (signal(SIGCHLD, &signal_handle) == SIG_ERR)
-                    warn("signal(%d)", SIGCHLD);
-               while (waitpid(-1, NULL, WNOHANG) > 0);
+               sig_chld = True;
                break;
      }
 
@@ -435,7 +452,7 @@ main(int argc, char **argv)
      char *ol = "csgVS";
      extern char *optarg;
      extern int optind;
-     int sigs[] = { SIGTERM, SIGQUIT, SIGCHLD };
+     struct sigaction sa;
 
      argv_global  = xstrdup(argv[0]);
      all_argv = argv;
@@ -518,9 +535,12 @@ main(int argc, char **argv)
           errx(EXIT_FAILURE, "cannot open X server.");
 
      /* Set signal handler */
-     for (i = sigs[0]; i < (int)LEN(sigs); i++)
-          if (signal(sigs[i], &signal_handle) == SIG_ERR)
-               warn("signal(%d)", sigs[i]);
+     memset(&sa, 0, sizeof(sa));
+     sa.sa_handler = signal_handle;
+     sigemptyset(&sa.sa_mask);
+     sigaction(SIGQUIT, &sa, NULL);
+     sigaction(SIGTERM, &sa, NULL);
+     sigaction(SIGCHLD, &sa, NULL);
 
      /* Check if an other WM is already running; set the error handler */
      XSetErrorHandler(errorhandler);
