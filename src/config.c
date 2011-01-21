@@ -148,6 +148,7 @@ static void
 conf_misc_section(void)
 {
      int pad = 12;
+     uint opacity = 255;
      struct conf_sec *sec;
 
      sec = fetch_section_first(NULL, "misc");
@@ -162,6 +163,12 @@ conf_misc_section(void)
      conf.autostart_path    = fetch_opt_first(sec, "", "autostart_path").str;
      conf.autostart_command = fetch_opt_first(sec, "", "autostart_command").str;
      pad                    = fetch_opt_first(sec, "12", "pad").num;
+     opacity                = fetch_opt_first(sec, "255", "opacity").num;
+
+     if(opacity > 255)
+          opacity = 255;
+
+     conf.opacity = opacity << 24;
 
      if(pad > 24 || pad < 1)
      {

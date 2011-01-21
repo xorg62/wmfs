@@ -577,11 +577,7 @@ propertynotify(XPropertyEvent *ev)
           case XA_WM_HINTS:
                if((h = XGetWMHints(dpy, c->win)) && (h->flags & XUrgencyHint) && c != sel)
                {
-                    c->flags |= UrgentFlag;
-
-                    tags[c->screen][c->tag].urgent = True;
-                    infobar_draw_taglist(c->screen);
-
+                    client_urgent(c, True);
                     XFree(h);
                }
                break;

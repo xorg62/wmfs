@@ -85,7 +85,7 @@ systray_add(Window win)
      if(!conf.systray.active)
           return;
 
-     s = zcalloc(sizeof(Systray));
+     s = xcalloc(1, sizeof(Systray));
      s->win = win;
 
      s->geo.height = infobar[conf.systray.screen].bar->geo.height;

@@ -115,6 +115,7 @@ enum
      net_wm_pid,
      net_showing_desktop,
      net_supporting_wm_check,
+     net_wm_window_opacity,
      net_wm_window_type_normal,
      net_wm_window_type_dock,
      net_wm_window_type_splash,
@@ -375,6 +376,7 @@ typedef struct
 
      /* Misc option */
      char *font;
+     uint opacity;
      Bool raisefocus;
      Bool raiseswitch;
      Bool focus_fmouse;

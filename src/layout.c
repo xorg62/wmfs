@@ -849,7 +849,6 @@ layout_set_client_master(Client *c)
 
      client_detach(c);
      client_attach(c);
-     client_focus(c);
 
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);
 

@@ -370,6 +370,9 @@ client_focus(Client *c)
           if(sel->flags & AboveFlag)
                sel->flags &= ~AboveFlag;
 
+          XChangeProperty(dpy, sel->frame, net_atom[net_wm_window_opacity], XA_CARDINAL,
+                          32, PropModeReplace, (uchar *)&conf.opacity, 1);
+
           frame_update(sel);
 
           mouse_grabbuttons(sel, !conf.focus_pclick);
@@ -390,6 +393,9 @@ client_focus(Client *c)
 
           if(TBARH - BORDH && c->titlebar->stipple)
                c->titlebar->stipple_color = conf.titlebar.stipple.colors.focus;
+
+          XDeleteProperty(dpy, c->frame, net_atom[net_wm_window_opacity]);
+
           frame_update(c);
           mouse_grabbuttons(c, True);
 
@@ -407,11 +413,7 @@ client_focus(Client *c)
                client_above(sel);
 
           if(c->flags & UrgentFlag)
-          {
-               c->flags &= ~UrgentFlag;
-               tags[c->screen][c->tag].urgent = False;
-               infobar_draw_taglist(c->screen);
-          }
+               client_urgent(c, False);
 
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 
@@ -426,6 +428,22 @@ client_focus(Client *c)
      }
 
      return;
+}
+
+/** Set urgency flag of the client
+ * \param c Client pointer
+ * \param u Bool
+*/
+void
+client_urgent(Client *c, Bool u)
+{
+     if(u)
+          c->flags |= UrgentFlag;
+     else
+          c->flags &= ~UrgentFlag;
+
+     tags[c->screen][c->tag].urgent = u;
+     infobar_draw_taglist(c->screen);
 }
 
 /* The following functions have the same point :
@@ -761,13 +779,15 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      client_update_attributes(c);
      client_map(c);
      ewmh_manage_window_type(c);
-     client_focus(c);
 
      if(ar)
           arrange(c->screen, True);
 
      if(!conf.client.set_new_win_master)
           layout_set_client_master(c);
+
+     if(c->tag == (uint)seltag[selscreen])
+          client_focus(c);
 
      return c;
 }
@@ -1065,12 +1085,9 @@ client_set_rules(Client *c)
                               c->tag = j;
 
                               if(c->tag != (uint)seltag[selscreen])
-                              {
                                    tags[c->screen][c->tag].request_update = True;
-                                   client_focus(NULL);
-                              }
-
-                              tags[c->screen][c->tag].layout.func(c->screen);
+                              else
+                                   tags[c->screen][c->tag].layout.func(c->screen);
 
                               /* Deprecated but still in use */
                               applied_tag_rule = True;
@@ -1246,7 +1263,7 @@ client_unmanage(Client *c)
           client_focus(NULL);
 
      if(c->flags & UrgentFlag)
-          tags[c->screen][c->tag].urgent = False;
+          client_urgent(c, False);
 
      client_detach(c);
      XUngrabButton(dpy, AnyButton, AnyModifier, c->win);

@@ -190,6 +190,7 @@ void client_unmanage(Client *c);
 void client_unmap(Client *c);
 void client_set_rules(Client *c);
 void client_update_attributes(Client *c);
+void client_urgent(Client *c, Bool u);
 void uicb_client_raise(uicb_t);
 void uicb_client_next(uicb_t);
 void uicb_client_prev(uicb_t);
