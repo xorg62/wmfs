@@ -115,6 +115,7 @@ enum
      net_wm_pid,
      net_showing_desktop,
      net_supporting_wm_check,
+     net_wm_window_opacity,
      net_wm_window_type_normal,
      net_wm_window_type_dock,
      net_wm_window_type_splash,
@@ -376,6 +377,7 @@ typedef struct
 
      /* Misc option */
      char *font;
+     uint opacity;
      Bool raisefocus;
      Bool raiseswitch;
      Bool focus_fmouse;
@@ -485,6 +487,7 @@ typedef struct
      Bool tag_round;
      Bool tag_auto_prev;
      Bool client_round;
+     Bool client_auto_center;
      Bool layout_system; /* Switch: False, Menu: True. */
      Bool layout_placement; /* Right (normal): False, Left: True. */
      Bool keep_layout_geo;

@@ -370,6 +370,9 @@ client_focus(Client *c)
           if(sel->flags & AboveFlag)
                sel->flags &= ~AboveFlag;
 
+          XChangeProperty(dpy, sel->frame, net_atom[net_wm_window_opacity], XA_CARDINAL,
+                          32, PropModeReplace, (uchar *)&conf.opacity, 1);
+
           frame_update(sel);
 
           mouse_grabbuttons(sel, !conf.focus_pclick);
@@ -390,6 +393,9 @@ client_focus(Client *c)
 
           if(TBARH - BORDH && c->titlebar->stipple)
                c->titlebar->stipple_color = conf.titlebar.stipple.colors.focus;
+
+          XDeleteProperty(dpy, c->frame, net_atom[net_wm_window_opacity]);
+
           frame_update(c);
           mouse_grabbuttons(c, True);
 
@@ -407,11 +413,7 @@ client_focus(Client *c)
                client_above(sel);
 
           if(c->flags & UrgentFlag)
-          {
-               c->flags &= ~UrgentFlag;
-               tags[c->screen][c->tag].urgent = False;
-               infobar_draw_taglist(c->screen);
-          }
+               client_urgent(c, False);
 
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 
@@ -426,6 +428,22 @@ client_focus(Client *c)
      }
 
      return;
+}
+
+/** Set urgency flag of the client
+ * \param c Client pointer
+ * \param u Bool
+*/
+void
+client_urgent(Client *c, Bool u)
+{
+     if(u)
+          c->flags |= UrgentFlag;
+     else
+          c->flags &= ~UrgentFlag;
+
+     tags[c->screen][c->tag].urgent = u;
+     infobar_draw_taglist(c->screen);
 }
 
 /* The following functions have the same point :
@@ -706,7 +724,16 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
                mx += spgeo[selscreen].x;
                my += spgeo[selscreen].y;
           }
+
+          if(conf.client_auto_center)
+          {
+               XRectangle tmp;
+               tmp = screen_get_geo(selscreen);
+               mx = (tmp.width + mx - wa->width) / 2;
+               my = (tmp.height + my - wa->height) / 2;
+          }
      }
+
      c->ogeo.x = c->geo.x = mx;
      c->ogeo.y = c->geo.y = my;
      c->ogeo.width = c->geo.width = wa->width;
@@ -752,13 +779,15 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      client_update_attributes(c);
      client_map(c);
      ewmh_manage_window_type(c);
-     client_focus(c);
 
      if(ar)
           arrange(c->screen, True);
 
      if(!conf.client.set_new_win_master)
           layout_set_client_master(c);
+
+     if(c->tag == (uint)seltag[selscreen])
+          client_focus(c);
 
      return c;
 }
@@ -878,7 +907,7 @@ client_maximize(Client *c)
      c->geo.width  = sgeo[c->screen].width  - BORDH * 2;
      c->geo.height = sgeo[c->screen].height - BORDH;
 
-     client_moveresize(c, c->geo, True);
+     client_moveresize(c, c->geo, False);
 
      return;
 }
@@ -1056,12 +1085,9 @@ client_set_rules(Client *c)
                               c->tag = j;
 
                               if(c->tag != (uint)seltag[selscreen])
-                              {
                                    tags[c->screen][c->tag].request_update = True;
-                                   client_focus(NULL);
-                              }
-
-                              tags[c->screen][c->tag].layout.func(c->screen);
+                              else
+                                   tags[c->screen][c->tag].layout.func(c->screen);
 
                               /* Deprecated but still in use */
                               applied_tag_rule = True;
@@ -1114,20 +1140,20 @@ client_set_rules(Client *c)
           }
      }
 
-     if(!applied_tag_rule && conf.client.default_open_tag > 0 
+     if(!applied_tag_rule && conf.client.default_open_tag > 0
           && conf.client.default_open_tag < (uint)conf.ntag[selscreen])
      {
           c->tag = conf.client.default_open_tag;
-          
+
           client_focus_next(c);
           tags[c->screen][c->tag].request_update = True;
      }
-     
-     if(!applied_screen_rule && conf.client.default_open_screen > -1 
+
+     if(!applied_screen_rule && conf.client.default_open_screen > -1
           && conf.client.default_open_screen < screen_count())
      {
           c->screen = conf.client.default_open_screen;
-          
+
           client_focus_next(c);
           tags[c->screen][c->tag].request_update = True;
      }
@@ -1240,7 +1266,7 @@ client_unmanage(Client *c)
           client_focus(NULL);
 
      if(c->flags & UrgentFlag)
-          tags[c->screen][c->tag].urgent = False;
+          client_urgent(c, False);
 
      client_detach(c);
      XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
@@ -1250,18 +1276,31 @@ client_unmanage(Client *c)
      XUngrabServer(dpy);
      ewmh_get_client_list();
 
-     /* Arrange */
-     for(i = 0; i < screen_count() && !b; ++i)
-          if(c->tag == (uint)seltag[i] || tags[i][seltag[i]].tagad & TagFlag(c->tag))
-               b = True;
 
-     if(b)
-          tags[c->screen][c->tag].layout.func(c->screen);
+     if(c->tag == MAXTAG + 1)
+     {
+          for(i = 0; i < conf.ntag[c->screen]; i++)
+               tags[c->screen][i].request_update = True;
+          tags[c->screen][seltag[c->screen]].layout.func(c->screen);
+     }
      else
      {
-          tags[c->screen][c->tag].request_update = True;
-          infobar_draw(c->screen);
+          /* Arrange */
+          for(i = 0; i < screen_count() && !b; ++i)
+               if(c->tag == (uint)seltag[i] || tags[i][seltag[i]].tagad & TagFlag(c->tag))
+                    b = True;
+
+          if(b)
+          {
+               tags[c->screen][c->tag].layout.func(c->screen);
+          }
+          else
+          {
+               tags[c->screen][c->tag].request_update = True;
+               infobar_draw(c->screen);
+          }
      }
+
 
 
      /*XFree(c->title);*/

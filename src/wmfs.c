@@ -92,8 +92,8 @@ quit(void)
           XReparentWindow(dpy, c->win, ROOT, c->geo.x, c->geo.y);
      }
 
-     IFREE(tags);
-     IFREE(seltag);
+     free(tags);
+     free(seltag);
 
      systray_freeicons();
 
@@ -103,31 +103,31 @@ quit(void)
      XFreeGC(dpy, gc_stipple);
      infobar_destroy();
 
-     IFREE(sgeo);
-     IFREE(spgeo);
-     IFREE(infobar);
-     IFREE(keys);
-     IFREE(net_atom);
+     free(sgeo);
+     free(spgeo);
+     free(infobar);
+     free(keys);
+     free(net_atom);
 
      /* Clean conf alloced thing */
-     IFREE(menulayout.item);
+     free(menulayout.item);
 
      if(conf.menu)
      {
           len = LEN(conf.menu);
           for(i = 0; i < len; ++i)
-               IFREE(conf.menu[i].item);
-          IFREE(conf.menu);
+               free(conf.menu[i].item);
+          free(conf.menu);
      }
 
-     IFREE(conf.launcher);
-     IFREE(conf.rule);
+     free(conf.launcher);
+     free(conf.rule);
 
-     IFREE(conf.bars.mouse);
-     IFREE(conf.selbar.mouse);
-     IFREE(conf.titlebar.button);
-     IFREE(conf.client.mouse);
-     IFREE(conf.root.mouse);
+     free(conf.bars.mouse);
+     free(conf.selbar.mouse);
+     free(conf.titlebar.button);
+     free(conf.client.mouse);
+     free(conf.root.mouse);
 
      free_conf();
 
@@ -135,10 +135,34 @@ quit(void)
      XCloseDisplay(dpy);
 
      /* kill status script */
-     if (conf.status_pid != -1)
+     if (conf.status_pid != (pid_t)-1)
          kill(conf.status_pid, SIGTERM);
 
      return;
+}
+
+void *
+thread_process(void *arg)
+{
+     XEvent ev;
+
+     /* X event loop */
+     if(arg)
+     {
+          while(!exiting && !XNextEvent(dpy, &ev))
+               getevent(ev);
+     }
+     /* Status checking loop with timing */
+     else
+     {
+          pthread_detach(pthread_self());
+          do
+          {
+               conf.status_pid = spawn(conf.status_path);
+               sleep(conf.status_timing);
+          } while (!exiting && conf.status_timing != 0);
+     }
+     pthread_exit(NULL);
 }
 
 /** WMFS main loop.
@@ -147,13 +171,19 @@ void
 mainloop(void)
 {
      XEvent ev;
+     pthread_t evloop, evstatus;
+     void *ret;
 
-     /* launch status loop */
-     if (estatus)
-          signal_handle(SIGALRM);
+     if(!estatus)
+          while(!exiting && !XNextEvent(dpy, &ev))
+               getevent(ev);
+     else
+     {
+          pthread_create(&evloop, NULL, thread_process, "1");
+          pthread_create(&evstatus, NULL, thread_process, NULL);
 
-     while(!exiting && !XNextEvent(dpy, &ev))
-          getevent(ev);
+          (void)pthread_join(evloop, &ret);
+     }
 
      return;
 }
@@ -253,11 +283,11 @@ void
 uicb_reload(uicb_t cmd)
 {
      (void)cmd;
-     signal(SIGALRM, SIG_IGN);
      quit();
 
      for(; argv_global[0] && argv_global[0] == ' '; ++argv_global);
 
+     /* add -C to always load the same config file */
      execvp(argv_global, all_argv);
 
      return;
@@ -374,8 +404,6 @@ update_status(void)
 static void
 signal_handle(int sig)
 {
-     pid_t pid;
-
      switch (sig)
      {
           case SIGQUIT:
@@ -388,20 +416,7 @@ signal_handle(int sig)
                /* re-set signal handler and wait childs */
                if (signal(SIGCHLD, &signal_handle) == SIG_ERR)
                     warn("signal(%d)", SIGCHLD);
-               while ((pid = waitpid(-1, NULL, WNOHANG)) > 0)
-                    if (pid == conf.status_pid)
-                         conf.status_pid = -1;
-               break;
-          case SIGALRM:
-               /* re-set signal handler */
-               if (signal(SIGALRM, &signal_handle) == SIG_ERR)
-                    warn("signal(%d)", SIGALRM);
-               /* exec status script (only if still not running) */
-               if (conf.status_pid == (pid_t)-1)
-                    conf.status_pid = spawn(conf.status_path);
-               /* re-set timer */
-               if (conf.status_timing > 0)
-                    alarm(conf.status_timing);
+               while (waitpid(-1, NULL, WNOHANG) > 0);
                break;
      }
 
@@ -424,7 +439,6 @@ main(int argc, char **argv)
 
      argv_global  = xstrdup(argv[0]);
      all_argv = argv;
-     
      sprintf(conf.confpath, "%s/"DEF_CONF, getenv("HOME"));
 
      while((i = getopt(argc, argv, "hviSc:s:g:C:V:")) != -1)
@@ -446,7 +460,7 @@ main(int argc, char **argv)
                       "   -V <viwmfs cmd>           Manage WMFS with vi-like command\n"
                       "   -S                        Update status script\n"
                       "   -h                        Show this page\n"
-                      "   -i                        Show information\n"
+                      "   -i                        Show informations\n"
                       "   -v                        Show WMFS version\n", argv[0]);
                exit(EXIT_SUCCESS);
                break;
@@ -504,7 +518,7 @@ main(int argc, char **argv)
           errx(EXIT_FAILURE, "cannot open X server.");
 
      /* Set signal handler */
-     for (i = 0; i < (int)LEN(sigs); i++)
+     for (i = sigs[0]; i < (int)LEN(sigs); i++)
           if (signal(sigs[i], &signal_handle) == SIG_ERR)
                warn("signal(%d)", sigs[i]);
 

@@ -126,9 +126,10 @@ name_to_uint_t mouse_button_list[] =
      {"3", Button3 },
      {"4", Button4 },
      {"5", Button5 },
+     {NULL, NoSymbol}
 };
 
-void
+static void
 mouse_section(MouseBinding mb[], struct conf_sec **sec)
 {
      int n;
@@ -143,10 +144,11 @@ mouse_section(MouseBinding mb[], struct conf_sec **sec)
      }
 }
 
-void
+static void
 conf_misc_section(void)
 {
      int pad = 12;
+     uint opacity = 255;
      struct conf_sec *sec;
 
      sec = fetch_section_first(NULL, "misc");
@@ -161,6 +163,12 @@ conf_misc_section(void)
      conf.autostart_path    = fetch_opt_first(sec, "", "autostart_path").str;
      conf.autostart_command = fetch_opt_first(sec, "", "autostart_command").str;
      pad                    = fetch_opt_first(sec, "12", "pad").num;
+     opacity                = fetch_opt_first(sec, "255", "opacity").num;
+
+     if(opacity > 255)
+          opacity = 255;
+
+     conf.opacity = opacity << 24;
 
      if(pad > 24 || pad < 1)
      {
@@ -180,7 +188,7 @@ conf_misc_section(void)
      return;
 }
 
-void
+static void
 conf_bar_section(void)
 {
      struct conf_sec *bar, **mouse, *selbar, *systray;
@@ -238,7 +246,7 @@ conf_bar_section(void)
      return;
 }
 
-void
+static void
 conf_root_section(void)
 {
      struct conf_sec *root, **mouse;
@@ -260,7 +268,7 @@ conf_root_section(void)
      return;
 }
 
-void
+static void
 conf_client_section(void)
 {
      int i, j;
@@ -271,6 +279,7 @@ conf_client_section(void)
      sec = fetch_section_first(NULL, "client");
 
      conf.client_round               = fetch_opt_first(sec, "true", "client_round").bool;
+     conf.client_auto_center         = fetch_opt_first(sec, "false", "client_auto_center").bool;
 
      if ((conf.client.borderheight = fetch_opt_first(sec, "1", "border_height").num) < 1)
           conf.client.borderheight = 1;
@@ -382,7 +391,7 @@ conf_client_section(void)
      return;
 }
 
-void
+static void
 conf_layout_section(void)
 {
      int i;
@@ -460,7 +469,7 @@ conf_layout_section(void)
      return;
 }
 
-void
+static void
 conf_tag_section(void)
 {
      int i, j, k, l = 0, m, n, sc, count, bar_pos;
@@ -612,7 +621,7 @@ conf_tag_section(void)
      return;
 }
 
-void
+static void
 conf_rule_section(void)
 {
      int i;
@@ -644,7 +653,7 @@ conf_rule_section(void)
      return;
 }
 
-void
+static void
 conf_menu_section(void)
 {
      char *tmp2;
@@ -705,7 +714,7 @@ conf_menu_section(void)
      return;
 }
 
-void
+static void
 conf_launcher_section(void)
 {
      int i;
@@ -731,7 +740,7 @@ conf_launcher_section(void)
      return;
 }
 
-void
+static void
 conf_keybind_section(void)
 {
      int i;

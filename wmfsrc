@@ -10,6 +10,7 @@
         font               = "dejavu-10"
         raisefocus         = false
         focus_follow_mouse = true
+        opacity            = 255
         # focus_pointer_click: click on unfocused client area:
         # true  -- default, set focus
         # false -- click go to client; including dockapps
@@ -157,6 +158,7 @@
 
 [client]
         client_round         = true
+        client_auto_center   = false
         border_height        = 3
         border_shadow        = true
         border_normal        = "#191919"

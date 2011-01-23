@@ -52,6 +52,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/cursorfont.h>
@@ -107,7 +108,6 @@
 #define FRAMEH(h)    ((h) + (BORDH  + TBARH))
 #define ROUND(x)     (float)((x > 0) ? x + (float)0.5 : x - (float)0.5)
 #define CHECK(x)     if(!(x)) return
-#define IFREE(x)     if(x) free(x)
 #define LEN(x)       (sizeof(x) / sizeof((x)[0]))
 #define MAXCLIST     (64)
 
@@ -190,6 +190,7 @@ void client_unmanage(Client *c);
 void client_unmap(Client *c);
 void client_set_rules(Client *c);
 void client_update_attributes(Client *c);
+void client_urgent(Client *c, Bool u);
 void uicb_client_raise(uicb_t);
 void uicb_client_next(uicb_t);
 void uicb_client_prev(uicb_t);
@@ -399,20 +400,8 @@ Bool uicb_checklayout(uicb_t);
 
 /* init.c */
 void init(void);
-void init_root(void);
-void init_font(void);
-void init_gc(void);
-void init_cursor(void);
-void init_key(void);
-void init_geometry(void);
-void init_status(void);
 
 /* getinfo.c */
-void getinfo_tag(void);
-void getinfo_screen(void);
-void getinfo_layout(void);
-void getinfo_mwfact(void);
-void getinfo_nmaster(void);
 void getinfo(char *info);
 
 /* viwmfs.c */

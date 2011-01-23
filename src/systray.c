@@ -85,7 +85,7 @@ systray_add(Window win)
      if(!conf.systray.active)
           return;
 
-     s = zcalloc(sizeof(Systray));
+     s = xcalloc(1, sizeof(Systray));
      s->win = win;
 
      s->geo.height = infobar[conf.systray.screen].bar->geo.height;
@@ -118,7 +118,7 @@ systray_del(Systray *s)
      for(ss = &trayicons; *ss && *ss != s; ss = &(*ss)->next);
      *ss = s->next;
 
-     IFREE(s);
+     free(s);
 
      return;
 }
@@ -162,7 +162,7 @@ systray_freeicons(void)
      {
           XUnmapWindow(dpy, i->win);
 		XReparentWindow(dpy, i->win, ROOT, 0, 0);
-          IFREE(i);
+          free(i);
      }
 
      XSetSelectionOwner(dpy, net_atom[net_system_tray_s], None, CurrentTime);
