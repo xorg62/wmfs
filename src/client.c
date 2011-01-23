@@ -1107,6 +1107,9 @@ client_set_rules(Client *c)
 
                     if(!conf.rule[i].ignoretags)
                          tags[c->screen][c->tag].layout.func(c->screen);
+
+                    if(conf.rule[i].follow_client)
+                         seltag[c->screen] = c->tag;
                }
           }
      }

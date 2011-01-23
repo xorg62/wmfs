@@ -365,6 +365,7 @@ typedef struct
      Bool free;
      Bool max;
      Bool ignoretags;
+     Bool follow_client;
 } Rule;
 
 /* Configuration structure */
