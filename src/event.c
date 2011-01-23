@@ -685,7 +685,7 @@ getevent(XEvent ev)
                /* Reload WMFS to update the screen(s) geometry changement */
                quit();
                for(; argv_global[0] && argv_global[0] == ' '; ++argv_global);
-               execlp(argv_global, argv_global, NULL);
+               execvp(argv_global, all_argv);
           }
 #endif /* HAVE_XRANDR */
           break;
