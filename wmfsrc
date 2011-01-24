@@ -213,13 +213,14 @@
 [rules]
        # Example of rule for MPlayer
        [rule]
-               instance = "xv"       # First part of WM_CLASS
-               class    = "MPlayer"  # Seconf part of WM_CLASS, not needed if first part is correct
-               # role = ""           # WM_WINDOW_ROLE
-               screen   = 0          # Screen to use
-               tag      = 2          # Tag number of apps
-               free     = true       # Set automatic free client
-               max      = false      # Set automatic maximized client
+               instance      = "xv"       # First part of WM_CLASS
+               class         = "MPlayer"  # Seconf part of WM_CLASS, not needed if first part is correct
+               # role        = ""         # WM_WINDOW_ROLE
+               screen        = 0          # Screen to use
+               tag           = 2          # Tag number of apps
+               free          = true       # Set automatic free client
+               max           = false      # Set automatic maximized client
+               follow_client = false      # follow the client
        [/rule]
 [/rules]
 
