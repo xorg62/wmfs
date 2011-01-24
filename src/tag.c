@@ -585,7 +585,7 @@ tag_new(int s, char *name)
      Tag t = { displayedName, NULL, 0, 0,
                conf.default_tag.mwfact, conf.default_tag.nmaster,
                False, conf.default_tag.resizehint, False, False,
-               conf.default_tag.barpos, conf.default_tag.layout,
+               conf.default_tag.barpos, conf.default_tag.barpos, conf.default_tag.layout,
                0, NULL, 0, False };
 
      tags[s][conf.ntag[s]] = t;

@@ -286,6 +286,7 @@ typedef struct
      Bool request_update;
      Bool abovefc;
      int barpos;
+     int prev_barpos;
      Layout layout;
      uint tagad;
      MouseBinding *mouse;
