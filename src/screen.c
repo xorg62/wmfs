@@ -241,9 +241,12 @@ uicb_screen_next(uicb_t cmd)
      (void)cmd;
      screen_get_sel();
 
-     selscreen = (selscreen + 1 > screen_count() - 1) ? 0 : selscreen + 1;
+     if(screen_count() > 1)
+     {
+          selscreen = (selscreen + 1 > screen_count() - 1) ? 0 : selscreen + 1;
 
-     screen_set_sel(selscreen);
+          screen_set_sel(selscreen);
+     }
 
      return;
 }
