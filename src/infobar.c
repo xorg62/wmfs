@@ -403,6 +403,29 @@ uicb_infobar_togglepos(uicb_t cmd)
      return;
 }
 
+/** Toggle hide/display infobar
+ * \param cmd uicb_t type unused
+*/
+void
+uicb_infobar_toggledisplay(uicb_t cmd)
+{
+     (void)cmd;
+     screen_get_sel();
+     int new_pos;
+
+     new_pos = (tags[selscreen][seltag[selscreen]].barpos
+               ? 0 : (tags[selscreen][seltag[selscreen]].prev_barpos
+               ? tags[selscreen][seltag[selscreen]].prev_barpos : 2
+               ));
+    
+     tags[selscreen][seltag[selscreen]].prev_barpos = tags[selscreen][seltag[selscreen]].barpos;
+     tags[selscreen][seltag[selscreen]].barpos = new_pos;
+
+     infobar_set_position(new_pos);
+
+     return;
+}
+
 /** Toggle the tag_autohide mode
  * \param cmd uicb_t type unused
 */

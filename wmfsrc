@@ -317,6 +317,7 @@
 
         # Toggle the position of the infobar.
         [key] mod = {"Alt"} key = "b" func = "toggle_infobar_position" [/key]
+        [key] mod = {"Alt", "Shift"} key = "b" func = "toggle_infobar_display" [/key]
 
         # Toggle the resizehint of the current tag/screen
         [key] mod = {"Shift", "Control"} key = "r" func = "toggle_resizehint" [/key]
