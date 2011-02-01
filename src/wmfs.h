@@ -432,7 +432,7 @@ int selscreen;
 int prevselscreen;
 Conf conf;
 Key *keys;
-Bool exiting, estatus;
+Bool estatus;
 XRectangle *sgeo;
 XRectangle *spgeo;
 Cursor cursor[CurLast];
