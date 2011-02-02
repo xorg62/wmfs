@@ -400,6 +400,13 @@
         [key] mod = {"Alt", "Super"} key = "F8" func = "tag_toggle_additional" cmd ="8" [/key]
         [key] mod = {"Alt", "Super"} key = "F9" func = "tag_toggle_additional" cmd ="9" [/key]
 
+        # change screen
+        [key] mod = {"Super"} key = "Tab" func = "screen_next" [/key]
+        [key] mod = {"Super", "Shift"} key = "Tab" func = "screen_prev" [/key]
+        
+        # swap client in the next/prev screen
+        [key] mod = {"Super", "Shift"} key = "a" func = "client_screen_next" [/key]
+        [key] mod = {"Super", "Shift"} key = "z" func = "client_screen_prev" [/key]
 [/keys]
 
 
