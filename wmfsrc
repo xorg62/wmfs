@@ -9,6 +9,7 @@
 [misc]
         font               = "dejavu-10"
         raisefocus         = false
+        raiseswitch        = false
         focus_follow_mouse = true
         opacity            = 255
         # focus_pointer_click: click on unfocused client area:
@@ -16,14 +17,17 @@
         # false -- click go to client; including dockapps
         focus_pointer_click = true
         status_timing      = 1     #seconds
+        conf.status_path       = "$HOME/.config/wmfs/status.sh"
+        conf.autostart_path    = ""
+        conf.autostart_command = ""
 [/misc]
 
 [bar]
         bg     = "#191919"
         fg     = "#D4D4D4"
         border = true
-        # selbar = false   #not worked now, see section [selbar]
-
+        #height = "-1"
+        
         [systray]
                 # Enable/disable systray
                 active = true
@@ -98,14 +102,20 @@
              infobar_position = "top"
         [/default_tag]
 
+        # whether client_next on the last tag will send you on the first
+        # and client_prev on the first tag will send you on the last one
         tag_round      = false
+        
+        # Going twice on the same tag will bring you back on the previous one
         tag_auto_prev  = true
+
         occupied_bg    = "#003366"
         occupied_fg    = "#D4D4D4"
         sel_fg         = "#191919"
         sel_bg         = "#7E89A2"
         urgent_bg      = "#DD1111"
         urgent_fg      = "#000000"
+        
         # If true, number of the tag will be used for name
         name_count     = false
         #default_name   = "new tag" # deprecated, use [default_tag] instead
@@ -132,7 +142,7 @@
                 layout           = "tile_right"
                 resizehint       = false
                 infobar_position = "top"
-
+                above_fc         = false
                 #[mouse] [/mouse] Possible multi mouse section
         [/tag]
 
@@ -163,11 +173,15 @@
         border_shadow        = true
         border_normal        = "#191919"
         border_focus         = "#003366"
+        place_at_mouse       = false
         resize_corner_normal = "#191919"
         resize_corner_focus  = "#003366"
+        set_new_win_master   = true
 
-#        default_open_tag     = 4 # send all client that have no tag rule in this default tag
-#        default_open_screen  = 1 # same as above but for the screen
+        # send all client that have no tag rule in this default tag
+        #default_open_tag     = 4 
+        # same as above but for the screen
+        #default_open_screen  = 1 
 
         # Space between tiled clients
         padding = 0
@@ -198,7 +212,7 @@
                 [mouse] button = "3" func = "mouse_resize" [/mouse]
 
                 [button]
-                        # Available "free", "max", "tile" flags of button.
+                        # Available "free", "max", "tile" flags or button.
                         flags = "free,max,tile"
                         [mouse] button = "1" func = "client_kill"             [/mouse]
                         [mouse] button = "3" func = "menu" cmd = "clientmenu" [/mouse]
@@ -221,6 +235,8 @@
                free          = true       # Set automatic free client
                max           = false      # Set automatic maximized client
                follow_client = false      # follow the client
+               ignore_tags   = false      # ignore tag (free mode)
+               follow_client = false      # if the client open in an other tag/screen, follow it.
        [/rule]
 [/rules]
 
@@ -407,6 +423,18 @@
         # swap client in the next/prev screen
         [key] mod = {"Super", "Shift"} key = "a" func = "client_screen_next" [/key]
         [key] mod = {"Super", "Shift"} key = "z" func = "client_screen_prev" [/key]
+
+        # unlisted fonctions that can be used in [key] func = ""
+        # client_focus_{right, left, top, bottom}
+        # client_ignore_tag # Toggle the client in ignore_tag (display the client on all tags)
+        # tag_prev_sel # go back to the previous selected tag
+        # tag_transfert_{next, prev} 
+        # tag_urgent # go to the urgent tag
+        # tag_swap_{next, prev} # swap tag with the previous/next one
+        # tag_last # go to the last tag
+        # tag_stay_last # toggle the current tag as the last one
+        # toggle_abovefc 
+        # screen_prev_sel # go to the previous screen selected
+        # set_layout # set layout. need to be called with cmd = "<layout_name>"
+        # ignore_next_client_rules # ignore the rule the next time a rule is called
 [/keys]
-
-
