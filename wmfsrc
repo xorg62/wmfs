@@ -18,8 +18,6 @@
         focus_pointer_click = true
         status_timing      = 1     #seconds
         conf.status_path       = "$HOME/.config/wmfs/status.sh"
-        conf.autostart_path    = ""
-        conf.autostart_command = ""
 [/misc]
 
 [bar]
