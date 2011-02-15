@@ -175,6 +175,7 @@
         resize_corner_normal = "#191919"
         resize_corner_focus  = "#003366"
         set_new_win_master   = true
+        client_tile_raise    = false
 
         # send all client that have no tag rule in this default tag
         #default_open_tag     = 4 

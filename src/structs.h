@@ -489,6 +489,7 @@ typedef struct
      Bool tag_auto_prev;
      Bool client_round;
      Bool client_auto_center;
+     Bool client_tile_raise;
      Bool layout_system; /* Switch: False, Menu: True. */
      Bool layout_placement; /* Right (normal): False, Left: True. */
      Bool keep_layout_geo;
