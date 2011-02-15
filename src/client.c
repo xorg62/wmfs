@@ -995,12 +995,21 @@ client_size_hints(Client *c)
 void
 client_swap(Client *c1, Client *c2)
 {
+     int tmp;
+
      /* Check if no one of these clients are free */
      CHECK(!(c1->flags & FreeFlag));
      CHECK(!(c2->flags & FreeFlag));
 
      if(c1 == c2)
           return;
+
+     if(c1->tag != c2->tag)
+     {
+          tmp = c1->tag;
+          c1->tag = c2->tag;
+          c2->tag = tmp;
+     }
 
      /* Swap only the windows */
      swap_ptr((void**)&c1->win, (void**)&c2->win);
@@ -1133,9 +1142,6 @@ client_set_rules(Client *c)
 
                     if(!conf.rule[i].ignoretags)
                          tags[c->screen][c->tag].layout.func(c->screen);
-
-                    if(conf.rule[i].follow_client)
-                         seltag[c->screen] = c->tag;
                }
           }
      }
