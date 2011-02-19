@@ -17,7 +17,7 @@
         # false -- click go to client; including dockapps
         focus_pointer_click = true
         status_timing      = 1     #seconds
-        conf.status_path       = "$HOME/.config/wmfs/status.sh"
+        # status_path       = "~/.config/wmfs/status.sh"
 [/misc]
 
 [bar]
