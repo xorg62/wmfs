@@ -919,6 +919,9 @@ client_maximize(Client *c)
 
      client_moveresize(c, c->geo, False);
 
+     /* Raise for maximized clients, client_raise has too much condition */
+     XRaiseWindow(dpy, c->frame);
+
      return;
 }
 
@@ -1210,7 +1213,7 @@ void
 client_raise(Client *c)
 {
      if(!c || !(c->flags & AboveFlag)
-           || ((c->flags & TileFlag) && !conf.client_tile_raise))
+               || ((c->flags & TileFlag) && (!conf.client_tile_raise)))
           return;
 
      XRaiseWindow(dpy, c->frame);

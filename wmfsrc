@@ -8,7 +8,7 @@
 
 [misc]
         font               = "dejavu-10"
-        raisefocus         = false
+        raisefocus         = true
         raiseswitch        = false
         focus_follow_mouse = true
         opacity            = 255

@@ -748,7 +748,6 @@ uicb_togglemax(uicb_t cmd)
           sel->free_geo = sel->geo;
           sel->flags &= ~(TileFlag | FreeFlag);
           client_maximize(sel);
-          client_raise(sel);
           sel->flags |= MaxFlag;
      }
      else
