@@ -437,6 +437,7 @@ typedef struct
           Bool set_new_win_master;
           Bool place_at_mouse;
           Bool border_shadow;
+          Bool new_client_get_mouse;
           int borderheight;
           char *autofree, *automax;
           uint bordernormal;

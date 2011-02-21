@@ -286,19 +286,20 @@ conf_client_section(void)
      if ((conf.client.borderheight = fetch_opt_first(sec, "1", "border_height").num) < 1)
           conf.client.borderheight = 1;
 
-     conf.client.border_shadow       = fetch_opt_first(sec, "false", "border_shadow").bool;
-     conf.client.place_at_mouse      = fetch_opt_first(sec, "false", "place_at_mouse").bool;
-     conf.client.bordernormal        = getcolor(fetch_opt_first(sec, "#000000", "border_normal").str);
-     conf.client.borderfocus         = getcolor(fetch_opt_first(sec, "#ffffff", "border_focus").str);
-     conf.client.resizecorner_normal = getcolor(fetch_opt_first(sec, "#222222", "resize_corner_normal").str);
-     conf.client.resizecorner_focus  = getcolor(fetch_opt_first(sec, "#DDDDDD", "resize_corner_focus").str);
-     conf.client.mod                 |= char_to_modkey(fetch_opt_first(sec, "Alt", "modifier").str, key_list);
-     conf.client.set_new_win_master  = fetch_opt_first(sec, "true", "set_new_win_master").bool;
-     conf.client.padding             = fetch_opt_first(sec, "0", "padding").num;
-     conf.client.autofree            = fetch_opt_first(sec, "", "autofree").str;
-     conf.client.automax             = fetch_opt_first(sec, "", "automax").str;
-     conf.client.default_open_tag    = fetch_opt_first(sec, "0", "default_open_tag").num;
-     conf.client.default_open_screen = fetch_opt_first(sec, "-1", "default_open_screen").num;
+     conf.client.border_shadow        = fetch_opt_first(sec, "false", "border_shadow").bool;
+     conf.client.place_at_mouse       = fetch_opt_first(sec, "false", "place_at_mouse").bool;
+     conf.client.bordernormal         = getcolor(fetch_opt_first(sec, "#000000", "border_normal").str);
+     conf.client.borderfocus          = getcolor(fetch_opt_first(sec, "#ffffff", "border_focus").str);
+     conf.client.resizecorner_normal  = getcolor(fetch_opt_first(sec, "#222222", "resize_corner_normal").str);
+     conf.client.resizecorner_focus   = getcolor(fetch_opt_first(sec, "#DDDDDD", "resize_corner_focus").str);
+     conf.client.mod                  |= char_to_modkey(fetch_opt_first(sec, "Alt", "modifier").str, key_list);
+     conf.client.set_new_win_master   = fetch_opt_first(sec, "true", "set_new_win_master").bool;
+     conf.client.padding              = fetch_opt_first(sec, "0", "padding").num;
+     conf.client.autofree             = fetch_opt_first(sec, "", "autofree").str;
+     conf.client.automax              = fetch_opt_first(sec, "", "automax").str;
+     conf.client.default_open_tag     = fetch_opt_first(sec, "0", "default_open_tag").num;
+     conf.client.default_open_screen  = fetch_opt_first(sec, "-1", "default_open_screen").num;
+     conf.client.new_client_get_mouse = fetch_opt_first(sec, "false", "new_client_get_mouse").bool;
 
      mouse = fetch_section(sec, "mouse");
 

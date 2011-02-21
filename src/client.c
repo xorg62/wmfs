@@ -689,7 +689,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      Window trans, dw;
      Status rettrans;
      XSetWindowAttributes at;
-     int  mx, my, dint;
+     int  mx, my, dint, x, y, d;
      uint duint;
 
      screen_get_sel();
@@ -788,6 +788,16 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
 
      if(c->tag == (uint)seltag[selscreen])
           client_focus(c);
+
+     if(conf.client.new_client_get_mouse)
+     {
+          /* Move pointer on client */
+          XQueryPointer(dpy, ROOT, &dw, &dw, &x, &y, &d, &d, (uint *)&d);
+          XWarpPointer(dpy, ROOT, ROOT, x, y, d, d,
+                    c->geo.x + c->geo.width / 2,
+                    c->geo.y + c->geo.height / 2);
+     }
+
 
      return c;
 }
@@ -1199,7 +1209,7 @@ client_update_attributes(Client *c)
 void
 client_raise(Client *c)
 {
-     if(!c || !(c->flags & AboveFlag) 
+     if(!c || !(c->flags & AboveFlag)
            || ((c->flags & TileFlag) && !conf.client_tile_raise))
           return;
 
