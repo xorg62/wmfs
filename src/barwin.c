@@ -31,6 +31,7 @@
 */
 
 #include "wmfs.h"
+#include "color.h"
 
 /** Create a BarWindow
  * \param parent Parent window of the BarWindow
@@ -82,10 +83,10 @@ barwin_create(Window parent,
      {
           bw->bord = True;
 
-          CWIN(bw->border.left, bw->win, 0, 0, SHADH, h, 0, CWBackPixel, color_enlight(bg), &at);
-          CWIN(bw->border.top, bw->win, 0, 0, w, SHADH, 0, CWBackPixel, color_enlight(bg), &at);
-          CWIN(bw->border.bottom, bw->win, 0, h - SHADH, w, SHADH, 0, CWBackPixel, SHADC, &at);
-          CWIN(bw->border.right, bw->win, w - SHADH, 0, SHADH, h, 0, CWBackPixel, SHADC, &at);
+          CWIN(bw->border.left, bw->win, 0, 0, SHADH, h, 0, CWBackPixel, bg, &at);
+          CWIN(bw->border.top, bw->win, 0, 0, w, SHADH, 0, CWBackPixel, bg, &at);
+          CWIN(bw->border.bottom, bw->win, 0, h - SHADH, w, SHADH, 0, CWBackPixel, bg, &at);
+          CWIN(bw->border.right, bw->win, w - SHADH, 0, SHADH, h, 0, CWBackPixel, bg, &at);
      }
 
      /* Property */
@@ -95,8 +96,8 @@ barwin_create(Window parent,
      bw->geo.height = h;
      bw->bg = bg;
      bw->fg = fg;
-     bw->border.light = color_enlight(bg);
-     bw->border.dark = SHADC;
+     bw->border.light = color_shade(bg, 0.10);
+     bw->border.dark = color_shade(bg, -0.10);
      bw->stipple = stipple;
      bw->stipple_color = -1;
 

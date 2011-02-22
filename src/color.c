@@ -30,7 +30,13 @@
 *      OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "color.h"
+#include "wmfs.h"
+
+static void   color_unpack_rgb(uint, uint*, uint*, uint*);
+static void   color_rgb_to_hsl(uint, uint, uint, double*, double*, double*);
+static void   color_hsl_to_rgb(double, double, double, uint*, uint*, uint*);
+static double color_clamp(double, double, double);
+static uint   color_pack_rgb(uint, uint, uint);
 
 uint
 color_shade(uint rgb, double shadeVal)
@@ -38,20 +44,20 @@ color_shade(uint rgb, double shadeVal)
     uint   r, g, b;
     double h, s, l;
 
-    unpack_rgb(rgb, &r, &g, &b);
-    rgb_to_hsl(r, g, b, &h, &s, &l);
+    color_unpack_rgb(rgb, &r, &g, &b);
+    color_rgb_to_hsl(r, g, b, &h, &s, &l);
 
     l += shadeVal;
 
-    l = clamp(l, 0, 1);
+    l = color_clamp(l, 0, 1);
 
-    hsl_to_rgb(h, s, l, &r, &g, &b);
-    rgb = pack_rgb(r, g, b);
+    color_hsl_to_rgb(h, s, l, &r, &g, &b);
+    rgb = color_pack_rgb(r, g, b);
 
     return rgb;
 }
 
-double
+static double
 color_clamp(double x, double a, double b)
 {
     if(x < a)
@@ -62,13 +68,13 @@ color_clamp(double x, double a, double b)
         return x;
 }
 
-uint
+static uint
 color_pack_rgb(uint r, uint g, uint b)
 {
     return (r << 16) | (g << 8) | b;
 }
 
-void
+static void
 color_unpack_rgb(uint rgb, uint *r, uint *g, uint *b)
 {
     *r = (rgb >> 16) & 0xFF;
@@ -76,7 +82,7 @@ color_unpack_rgb(uint rgb, uint *r, uint *g, uint *b)
     *b =  rgb        & 0xFF;
 }
 
-void
+static void
 color_rgb_to_hsl(uint xr, uint xg, uint xb, double *h, double *s, double *l)
 {
     double r = xr/255.0;
@@ -92,10 +98,13 @@ color_rgb_to_hsl(uint xr, uint xg, uint xb, double *h, double *s, double *l)
     *s = 0;
     *l = 0;
 
-    v = MAX(r, g);
-    v = MAX(v, b);
-    m = MIN(r, g);
-    m = MIN(m, b);
+    /* v is max(r, g, b)
+     * m is min(r, g, b)
+     */
+    v = r > g ? r : g;
+    v = v > b ? v : b;
+    m = r < g ? r : g;
+    m = m < b ? m : b;
 
     *l = (m + v)/2.0;
 
@@ -124,7 +133,7 @@ color_rgb_to_hsl(uint xr, uint xg, uint xb, double *h, double *s, double *l)
     *h /= 6.0;
 }
 
-void
+static void
 color_hsl_to_rgb(double h, double sl, double l, uint *rx, uint *gx, uint *bx)
 {
     double v;
