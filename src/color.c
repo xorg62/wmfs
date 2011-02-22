@@ -134,7 +134,8 @@ color_hsl_to_rgb(double h, double sl, double l, uint *rx, uint *gx, uint *bx)
     g = l;
     b = l;
     v = (l <= 0.5) ? (l * (1.0 + sl)) : (l + sl - l * sl);
-    if (v > 0) {
+    if(v > 0)
+    {
         double m;
         double sv;
         int    sextant;
