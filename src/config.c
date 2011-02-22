@@ -789,12 +789,12 @@ conf_keybind_section(void)
 void
 init_conf(void)
 {
-     if (get_conf(conf.confpath) == -1)
+     if(get_conf(conf.confpath) == -1)
      {
           warnx("parsing configuration file (%s) failed.", conf.confpath);
           sprintf(conf.confpath, "%s/wmfs/wmfsrc", XDG_CONFIG_DIR);
           warnx("Use the default configuration (%s).", conf.confpath);
-          if (get_conf(conf.confpath) == -1)
+          if(get_conf(conf.confpath) == -1)
                errx(1, "parsing configuration file (%s) failed.", conf.confpath);
 
      }
