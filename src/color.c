@@ -38,6 +38,12 @@ static void   color_hsl_to_rgb(double, double, double, uint*, uint*, uint*);
 static double color_clamp(double, double, double);
 static uint   color_pack_rgb(uint, uint, uint);
 
+/** Shades a color by the amount. This works by converting a packed RGB
+ * color to HSL, adding the amount to the lightness,
+ * and then converting back to RGB. 1.0 is max lightness, 0.0 is min lightness.
+ * \param shadeVal the amount to shade the lightness by.
+ * \return the shaded color
+ */
 uint
 color_shade(uint rgb, double shadeVal)
 {
@@ -57,6 +63,12 @@ color_shade(uint rgb, double shadeVal)
     return rgb;
 }
 
+/** Clamp a number x within the range [a, b].
+ * \param x the number which to clamp
+ * \param a the lowest possible value
+ * \param b the highest possible value
+ * \return the clamped number
+ */
 static double
 color_clamp(double x, double a, double b)
 {
@@ -68,12 +80,24 @@ color_clamp(double x, double a, double b)
         return x;
 }
 
+/** Pack a triplet of RGB values into a single uint
+ * \param r the red value
+ * \param g the green value
+ * \param b the blue value
+ * \return the packed RGB value
+ */
 static uint
 color_pack_rgb(uint r, uint g, uint b)
 {
     return (r << 16) | (g << 8) | b;
 }
 
+/** Unpack an RGB uint into three separate values
+ * \param rgb the packed color
+ * \param r a pointer to a uint where the red value will be stored
+ * \param g a pointer to a uint where the green value will be stored
+ * \param b a pointer to a uint where the blue value will be stored
+ */
 static void
 color_unpack_rgb(uint rgb, uint *r, uint *g, uint *b)
 {
@@ -82,6 +106,9 @@ color_unpack_rgb(uint rgb, uint *r, uint *g, uint *b)
     *b =  rgb        & 0xFF;
 }
 
+/** Convert unpacked RGB values into HSL, storing in the doubles referenced
+ * by the pointers h, s, l
+ */
 static void
 color_rgb_to_hsl(uint xr, uint xg, uint xb, double *h, double *s, double *l)
 {
@@ -133,6 +160,9 @@ color_rgb_to_hsl(uint xr, uint xg, uint xb, double *h, double *s, double *l)
     *h /= 6.0;
 }
 
+/** Convert h, s, l values to RGB and store them in the three uint
+ * referenced by the last three parameters.
+ */
 static void
 color_hsl_to_rgb(double h, double sl, double l, uint *rx, uint *gx, uint *bx)
 {
