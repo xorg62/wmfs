@@ -1212,8 +1212,8 @@ client_update_attributes(Client *c)
 void
 client_raise(Client *c)
 {
-     if(!c || !(c->flags & AboveFlag)
-               || ((c->flags & TileFlag) && (!conf.client_tile_raise)))
+     if((!c || ((c->flags & TileFlag) && !(c->flags & AboveFlag)))
+          && !conf.client_tile_raise)
           return;
 
      XRaiseWindow(dpy, c->frame);
