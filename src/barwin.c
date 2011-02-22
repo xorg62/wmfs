@@ -31,7 +31,6 @@
 */
 
 #include "wmfs.h"
-#include "color.h"
 
 /** Create a BarWindow
  * \param parent Parent window of the BarWindow
@@ -96,8 +95,8 @@ barwin_create(Window parent,
      bw->geo.height = h;
      bw->bg = bg;
      bw->fg = fg;
-     bw->border.light = color_shade(bg, 0.10);
-     bw->border.dark = color_shade(bg, -0.10);
+     bw->border.light = color_shade(bg, conf.colors.bar_light_shade);
+     bw->border.dark = color_shade(bg, conf.colors.bar_dark_shade);
      bw->stipple = stipple;
      bw->stipple_color = -1;
 

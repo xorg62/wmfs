@@ -258,10 +258,10 @@ frame_update(Client *c)
 
      if(conf.client.border_shadow)
      {
-          XSetWindowBackground(dpy, c->left, color_shade(c->colors.frame, 0.01));
-          XSetWindowBackground(dpy, c->top, color_shade(c->colors.frame, 0.01));
-          XSetWindowBackground(dpy, c->right, color_shade(c->colors.frame, -0.01));
-          XSetWindowBackground(dpy, c->bottom, color_shade(c->colors.frame, -0.01));
+          XSetWindowBackground(dpy, c->left, color_shade(c->colors.frame, conf.colors.client_light_shade));
+          XSetWindowBackground(dpy, c->top, color_shade(c->colors.frame, conf.colors.client_light_shade));
+          XSetWindowBackground(dpy, c->right, color_shade(c->colors.frame, conf.colors.client_dark_shade));
+          XSetWindowBackground(dpy, c->bottom, color_shade(c->colors.frame, conf.colors.client_dark_shade));
 
           XClearWindow(dpy, c->left);
           XClearWindow(dpy, c->top);
