@@ -135,6 +135,24 @@ infobar_init(void)
      return;
 }
 
+/** Draw the layout button in the InfoBar
+ *\param sc Screen number
+ */
+static void
+infobar_draw_layout(int sc)
+{
+     if(!conf.layout_placement)
+          barwin_move(infobar[sc].layout_button, infobar[sc].tags_board->geo.width + PAD / 2, 0);
+
+     barwin_resize(infobar[sc].layout_button, ((conf.layout_button_width > 0) ? (uint)conf.layout_button_width : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)), infobar[sc].geo.height);
+     barwin_refresh_color(infobar[sc].layout_button);
+
+     if(tags[sc][seltag[sc]].layout.symbol)
+          barwin_draw_text(infobar[sc].layout_button, PAD / 2, FHINFOBAR, tags[sc][seltag[sc]].layout.symbol);
+
+     return;
+}
+
 /** Draw the Infobar
  *\param sc Screen number
 */
@@ -146,24 +164,6 @@ infobar_draw(int sc)
      infobar_draw_selbar(sc);
      barwin_refresh_color(infobar[sc].bar);
      statustext_handle(sc, infobar[sc].statustext);
-
-     return;
-}
-
-/** Draw the layout button in the InfoBar
- *\param sc Screen number
- */
-void
-infobar_draw_layout(int sc)
-{
-     if(!conf.layout_placement)
-          barwin_move(infobar[sc].layout_button, infobar[sc].tags_board->geo.width + PAD / 2, 0);
-
-     barwin_resize(infobar[sc].layout_button, ((conf.layout_button_width > 0) ? (uint)conf.layout_button_width : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)), infobar[sc].geo.height);
-     barwin_refresh_color(infobar[sc].layout_button);
-
-     if(tags[sc][seltag[sc]].layout.symbol)
-          barwin_draw_text(infobar[sc].layout_button, PAD / 2, FHINFOBAR, tags[sc][seltag[sc]].layout.symbol);
 
      return;
 }
@@ -272,6 +272,7 @@ infobar_draw_taglist(int sc)
                          ? conf.colors.tag_occupied_fg
                          : conf.colors.text));
 
+          barwin_color_set(infobar[sc].tags[i], infobar[sc].tags[i]->bg, infobar[sc].tags[i]->fg);
           barwin_refresh_color(infobar[sc].tags[i]);
 
           if(tags[sc][i].name)
@@ -319,7 +320,6 @@ infobar_update_taglist(int sc)
 
      return;
 }
-
 
 /** Destroy the InfoBar
 */
@@ -417,7 +417,7 @@ uicb_infobar_toggledisplay(uicb_t cmd)
                ? 0 : (tags[selscreen][seltag[selscreen]].prev_barpos
                ? tags[selscreen][seltag[selscreen]].prev_barpos : 2
                ));
-    
+
      tags[selscreen][seltag[selscreen]].prev_barpos = tags[selscreen][seltag[selscreen]].barpos;
      tags[selscreen][seltag[selscreen]].barpos = new_pos;
 

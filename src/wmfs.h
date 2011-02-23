@@ -86,7 +86,6 @@
 #define INFOBARH     ((conf.bars.height > 0) ? conf.bars.height : (font->height * 1.5))
 #define FHINFOBAR    ((font->height - font->descent) + (INFOBARH - font->height) / 2)
 #define SHADH        (1)
-#define SHADC        (0x000000) /* 'Cause i don't know how darken a color yet */
 #define BORDH        conf.client.borderheight
 #define TBARH        ((conf.titlebar.height < BORDH) ? BORDH : conf.titlebar.height)
 #define RESHW        (6 * (BORDH))
@@ -121,6 +120,7 @@ BarWindow *barwin_create(Window parent,
                          Bool border);
 void barwin_draw_text(BarWindow *bw, int x, int y, char *text);
 void barwin_draw_image_ofset_text(BarWindow *bw, int x, int y, char *text, int x_image_ofset, int y_image_ofset);
+void barwin_color_set(BarWindow *bw, uint bg, char *fg);
 void barwin_delete(BarWindow *bw);
 void barwin_delete_subwin(BarWindow *bw);
 void barwin_map(BarWindow *bw);
@@ -138,16 +138,11 @@ void draw_image_ofset_text(Drawable d, int x, int y, char* fg, char *str, int x_
 void draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color);
 void draw_graph(Drawable dr, int x, int y, uint w, uint h, uint color, char *data);
 
-#ifdef HAVE_IMLIB
-void draw_image(Drawable dr, int x, int y, int w, int h, char *name);
-#endif /* HAVE_IMLIB */
-
 ushort textw(char *text);
 
 /* infobar.c */
 void infobar_init(void);
 void infobar_draw(int sc);
-void infobar_draw_layout(int sc);
 void infobar_draw_selbar(int sc);
 void infobar_draw_taglist(int sc);
 void infobar_update_taglist(int sc);
@@ -161,11 +156,7 @@ void uicb_toggle_tagautohide(uicb_t);
 void client_attach(Client *c);
 void client_configure(Client *c);
 void client_detach(Client *c);
-void client_above(Client *c);
 void client_focus(Client *c);
-Client* client_get_next(void);
-Client* client_get_prev(void);
-Client* client_get_next_with_direction(Position pos);
 /* client_gb_*() {{{ */
 Client* client_gb_win(Window w);
 Client* client_gb_frame(Window w);
@@ -189,7 +180,6 @@ void client_unhide(Client *c);
 void client_focus_next(Client *c);
 void client_unmanage(Client *c);
 void client_unmap(Client *c);
-void client_set_rules(Client *c);
 void client_update_attributes(Client *c);
 void client_urgent(Client *c, Bool u);
 void uicb_client_raise(uicb_t);
@@ -208,7 +198,6 @@ void uicb_client_move(uicb_t cmd);
 void uicb_client_resize(uicb_t cmd);
 void uicb_ignore_next_client_rules(uicb_t cmd);
 void uicb_clientlist(uicb_t cmd);
-void uicb_client_select(uicb_t cmd);
 Bool uicb_checkclist(uicb_t);
 void uicb_client_ignore_tag(uicb_t);
 
@@ -228,52 +217,30 @@ void ewmh_manage_window_type(Client *c);
 void frame_create(Client *c);
 void frame_delete(Client *c);
 void frame_moveresize(Client *c, XRectangle geo);
+void frame_update_color(Client *c, Bool focused);
 void frame_update(Client *c);
 
 /* config.c */
 void init_conf(void);
 
+/* color.c */
+uint color_shade(uint, double);
+
 /* event.c */
-void buttonpress(XButtonEvent *ev);
-void configureevent(XConfigureRequestEvent *ev);
-void clientmessageevent(XClientMessageEvent *ev);
-void destroynotify(XDestroyWindowEvent *ev);
-void enternotify(XCrossingEvent *ev);
-void expose(XExposeEvent *ev);
-void focusin(XFocusChangeEvent *ev);
 void grabkeys(void);
-void keypress(XKeyPressedEvent *ev);
-void mappingnotify(XMappingEvent *ev);
-void mapnotify(XMapEvent *ev);
-void maprequest(XMapRequestEvent *ev);
-void reparentnotify(XReparentEvent *ev);
-void selectionclearevent(XSelectionClearEvent *ev);
-void propertynotify(XPropertyEvent *ev);
-void unmapnotify(XUnmapEvent *ev);
 void getevent(XEvent ev);
 
 /* menu.c */
 void menu_init(Menu *menu, char *name, int nitem, uint bg_f, char *fg_f, uint bg_n, char *fg_n);
 void menu_new_item(MenuItem *mi, char *name, void *func, char *cmd);
 void menu_draw(Menu menu, int x, int y);
-Bool menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[]);
-Bool menu_activate_item(Menu *menu, int i);
-void menu_focus_item(Menu *menu, int item, BarWindow *winitem[]);
-void menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[], int chcklen);
-int menu_get_longer_string(MenuItem *mi, int nitem);
 void uicb_menu(uicb_t cmd);
 void menu_clear(Menu *menu);
-Bool menu_get_checkstring_needed(MenuItem *mi, int nitem);
 
 /* launcher.c */
-void launcher_execute(Launcher *launcher);
 void uicb_launcher(uicb_t);
 
 /* mouse.c */
-void mouse_dragborder(XRectangle geo, GC g);
-void mouse_move_tile_client(Client **c);
-void mouse_move_tag_client(Client *c);
-void mouse_move(Client *c);
 void mouse_resize(Client *c);
 void mouse_grabbuttons(Client *c, Bool focused);
 void uicb_mouse_move(uicb_t);
@@ -289,7 +256,6 @@ void *xrealloc(void *, size_t, size_t);
 #define zrealloc(ptr, size) xrealloc((ptr), 1, (size))
 char *xstrdup(const char *);
 int xasprintf(char **, const char *, ...);
-ulong color_enlight(ulong col);
 long getcolor(char *color);
 void setwinstate(Window win, long state);
 /* Conf usage {{{ */
@@ -297,7 +263,6 @@ void* name_to_func(char *name, const func_name_list_t *l);
 ulong char_to_modkey(char *name, key_name_list_t key_l[]);
 uint char_to_button(char *name, name_to_uint_t blist[]);
 Layout layout_name_to_struct(Layout lt[], char *name, int n, const func_name_list_t llist[]);
-char* alias_to_str(char *conf_choice);
 /* }}} */
 char *char_to_str(const char c);
 pid_t spawn(const char *str, ...);
@@ -326,18 +291,14 @@ void uicb_tagtransfert_prev(uicb_t);
 void uicb_tag_urgent(uicb_t cmd);
 void tag_additional(int sc, int tag, int adtag);
 void uicb_tag_toggle_additional(uicb_t);
-void tag_swap(int s, int t1, int t2);
 void uicb_tag_swap(uicb_t);
 void uicb_tag_swap_next(uicb_t);
 void uicb_tag_swap_previous(uicb_t);
-void tag_new(int s, char *name);
 void uicb_tag_new(uicb_t);
-void tag_delete(int s, int tag);
 void uicb_tag_del(uicb_t);
 void uicb_tag_rename(uicb_t cmd);
 void uicb_tag_last(uicb_t cmd);
 void uicb_tag_stay_last(uicb_t cmd);
-void remove_old_last_tag(int selscreen);
 
 /* screen.c */
 int screen_count(void);
@@ -352,10 +313,6 @@ void uicb_screen_prev(uicb_t);
 void uicb_screen_prev_sel(uicb_t);
 
 /* status.c */
-int statustext_rectangle(StatusRec *r, char *str);
-int statustext_graph(StatusGraph *g, char *str);
-int statustext_text(StatusText *s, char *str);
-void statustext_normal(int sc, char *str);
 void statustext_handle(int sc, char *str);
 
 /* systray.c */
@@ -373,9 +330,7 @@ void arrange(int screen, Bool update_layout);
 void freelayout(int screen);
 void layoutswitch(Bool b);
 void maxlayout(int screen);
-Client *tiled_client(int screen, Client *c);
 /* tile {{{ */
- void grid(int screen, Bool horizontal);
  void tile(int screen);
  void tile_left(int screen);
  void tile_top(int screen);
@@ -413,12 +368,8 @@ int errorhandler(Display *d, XErrorEvent *event);
 int errorhandlerdummy(Display *d, XErrorEvent *event);
 void quit(void);
 void *thread_process(void *arg);
-void mainloop(void);
-void scan(void);
 Bool check_wmfs_running(void);
 void exec_uicb_function(char *func, char *cmd);
-void set_statustext(int s, char *str);
-void update_status(void);
 void handle_signal(int signum);
 void uicb_quit(uicb_t);
 void uicb_reload(uicb_t);

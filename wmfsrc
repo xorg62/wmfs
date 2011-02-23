@@ -26,6 +26,9 @@
         border = true
         #height = "-1"
 
+        light_shade =  0.10
+        dark_shade  = -0.10
+
         [systray]
                 # Enable/disable systray
                 active = true
@@ -188,6 +191,9 @@
 
         # Modifier for mouse use
         modifier = "Alt"
+
+        light_shade =  0.10
+        dark_shade  = -0.10
 
         # *DEPRECATED* but works, see [rules] section
         # Set automatic free or max client

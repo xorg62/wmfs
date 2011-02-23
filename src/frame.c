@@ -118,10 +118,13 @@ frame_create(Client *c)
      /* Border (for shadow) */
      if(conf.client.border_shadow)
      {
-          CWIN(c->left, c->frame, 0, 0, SHADH, c->frame_geo.height, 0, CWBackPixel, color_enlight(c->colors.frame), &at);
-          CWIN(c->top, c->frame, 0, 0, c->frame_geo.width, SHADH, 0, CWBackPixel, color_enlight(c->colors.frame), &at);
-          CWIN(c->bottom, c->frame, 0, c->frame_geo.height - SHADH, c->frame_geo.width, SHADH, 0, CWBackPixel, SHADC, &at);
-          CWIN(c->right, c->frame, c->frame_geo.width - SHADH, 0, SHADH, c->frame_geo.height, 0, CWBackPixel, SHADC, &at);
+          c->colors.borddark  = color_shade(c->colors.frame, conf.colors.client_dark_shade);
+          c->colors.bordlight = color_shade(c->colors.frame, conf.colors.client_light_shade);
+
+          CWIN(c->left, c->frame, 0, 0, SHADH, c->frame_geo.height, 0, CWBackPixel,  c->colors.bordlight, &at);
+          CWIN(c->top, c->frame, 0, 0, c->frame_geo.width, SHADH, 0, CWBackPixel, c->colors.bordlight, &at);
+          CWIN(c->bottom, c->frame, 0, c->frame_geo.height - SHADH, c->frame_geo.width, SHADH, 0, CWBackPixel, c->colors.borddark, &at);
+          CWIN(c->right, c->frame, c->frame_geo.width - SHADH, 0, SHADH, c->frame_geo.height, 0, CWBackPixel, c->colors.borddark, &at);
      }
 
      /* Reparent window with the frame */
@@ -186,6 +189,44 @@ frame_moveresize(Client *c, XRectangle geo)
           XResizeWindow(dpy, c->top, c->frame_geo.width, SHADH);
           XMoveResizeWindow(dpy, c->bottom, 0, c->frame_geo.height - SHADH, c->frame_geo.width, SHADH);
           XMoveResizeWindow(dpy, c->right, c->frame_geo.width - SHADH, 0, SHADH, c->frame_geo.height);
+     }
+
+     return;
+}
+
+/** Update frame colors for focus event
+  *\param c Client pointer
+*/
+void
+frame_update_color(Client *c, Bool focused)
+{
+     CHECK(c);
+
+     /* Not focused client */
+     if(focused)
+     {
+          c->colors.frame        = conf.client.bordernormal;
+          c->colors.fg           = conf.titlebar.fg_normal;
+          c->colors.resizecorner = conf.client.resizecorner_normal;
+
+          if(TBARH - BORDH && c->titlebar->stipple)
+               c->titlebar->stipple_color = conf.titlebar.stipple.colors.normal;
+     }
+     /* Focused */
+     else
+     {
+          c->colors.frame        = conf.client.borderfocus;
+          c->colors.fg           = conf.titlebar.fg_focus;
+          c->colors.resizecorner = conf.client.resizecorner_focus;
+
+          if(TBARH - BORDH && c->titlebar->stipple)
+               c->titlebar->stipple_color = conf.titlebar.stipple.colors.focus;
+     }
+
+     if(conf.client.border_shadow)
+     {
+          c->colors.borddark  = color_shade(c->colors.frame, conf.colors.client_dark_shade);
+          c->colors.bordlight = color_shade(c->colors.frame, conf.colors.client_light_shade);
      }
 
      return;
@@ -258,10 +299,10 @@ frame_update(Client *c)
 
      if(conf.client.border_shadow)
      {
-          XSetWindowBackground(dpy, c->left, color_enlight(c->colors.frame));
-          XSetWindowBackground(dpy, c->top, color_enlight(c->colors.frame));
-          XSetWindowBackground(dpy, c->right, SHADC);
-          XSetWindowBackground(dpy, c->bottom, SHADC);
+          XSetWindowBackground(dpy, c->left,   c->colors.bordlight);
+          XSetWindowBackground(dpy, c->top,    c->colors.bordlight);
+          XSetWindowBackground(dpy, c->right,  c->colors.borddark);
+          XSetWindowBackground(dpy, c->bottom, c->colors.borddark);
 
           XClearWindow(dpy, c->left);
           XClearWindow(dpy, c->top);

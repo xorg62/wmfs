@@ -143,6 +143,27 @@ uicb_layout_prev(uicb_t cmd)
      return;
 }
 
+/** Sort all the client that can be
+ *  tiled
+ * \param c Client pointer
+ * \return a client pointer
+*/
+static Client*
+tiled_client(int screen, Client *c)
+{
+     for(;c && ((c->flags & MaxFlag)
+                || (c->flags & FreeFlag)
+                || (c->flags & FSSFlag)
+                || (c->flags & AboveFlag)
+                || c->screen != screen
+                || ishide(c, screen)); c = c->next);
+
+     if(c)
+          c->flags |= FLayFlag;
+
+     return c;
+}
+
 /** Max layout function
 */
 void
@@ -161,27 +182,6 @@ maxlayout(int screen)
      ewmh_update_current_tag_prop();
 
      return;
-}
-
-/** Sort all the client that can be
- *  tiled
- * \param c Client pointer
- * \return a client pointer
-*/
-Client*
-tiled_client(int screen, Client *c)
-{
-     for(;c && ((c->flags & MaxFlag)
-                || (c->flags & FreeFlag)
-                || (c->flags & FSSFlag)
-                || (c->flags & AboveFlag)
-                || c->screen != screen
-                || ishide(c, screen)); c = c->next);
-
-     if(c)
-          c->flags |= FLayFlag;
-
-     return c;
 }
 
 /** Set the mwfact
@@ -235,7 +235,7 @@ uicb_set_nmaster(uicb_t cmd)
 
 /** Grid layout function
 */
-void
+static void
 grid(int screen, Bool horizontal)
 {
      Client *c;
@@ -300,7 +300,7 @@ grid(int screen, Bool horizontal)
 /** Multi tile function
  * \param type Postion type { Top, Bottom, Left, Right }
 */
-void
+static void
 multi_tile(int screen, Position type)
 {
      Client *c;
@@ -430,7 +430,7 @@ multi_tile(int screen, Position type)
  * \param screen Screen to execute this function
  * \param horizont To specify the mirror mode (vertical/horizontal)
  */
-void
+static void
 mirror(int screen, Bool horizontal)
 {
      Client *c;
@@ -689,13 +689,6 @@ grid_vertical(int screen)
 /** Put the selected client to the master postion
  * \param cmd uicb_t type unused
 */
-void
-uicb_tile_switch(uicb_t cmd)
-{
-     (void)cmd;
-     layout_set_client_master (sel);
-     return;
-}
 
 /** Toggle the selected client to free
  * \param cmd uicb_t type unused
@@ -729,7 +722,6 @@ uicb_togglefree(uicb_t cmd)
      return;
 }
 
-
 /** Toggle the selected client to max
  * \param cmd uicb_t type unused
 */
@@ -748,7 +740,9 @@ uicb_togglemax(uicb_t cmd)
           sel->free_geo = sel->geo;
           sel->flags &= ~(TileFlag | FreeFlag);
           client_maximize(sel);
+          XRaiseWindow(dpy, sel->frame);
           sel->flags |= MaxFlag;
+
      }
      else
      {

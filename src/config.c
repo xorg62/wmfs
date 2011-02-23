@@ -100,7 +100,7 @@ const func_name_list_t func_list[] =
      {NULL, NULL}
 };
 
-key_name_list_t key_list[] =
+static key_name_list_t key_list[] =
 {
      {"Control", ControlMask },
      {"Shift",   ShiftMask },
@@ -115,7 +115,7 @@ key_name_list_t key_list[] =
      {NULL,      NoSymbol }
 };
 
-name_to_uint_t mouse_button_list[] =
+static name_to_uint_t mouse_button_list[] =
 {
      {"Button1", Button1 },
      {"Button2", Button2 },
@@ -202,6 +202,9 @@ conf_bar_section(void)
      conf.bars.height = fetch_opt_first(bar, "-1", "height").num;
      conf.colors.bar  = getcolor((barbg = fetch_opt_first(bar, "#000000", "bg").str));
      conf.colors.text = fetch_opt_first(bar, "#ffffff", "fg").str;
+
+     conf.colors.bar_light_shade = fetch_opt_first(bar, "0.25", "light_shade").fnum;
+     conf.colors.bar_dark_shade  = fetch_opt_first(bar, "-0.25", "dark_shade").fnum;
 
      mouse = fetch_section(bar, "mouse");
 
@@ -300,6 +303,9 @@ conf_client_section(void)
      conf.client.default_open_tag     = fetch_opt_first(sec, "0", "default_open_tag").num;
      conf.client.default_open_screen  = fetch_opt_first(sec, "-1", "default_open_screen").num;
      conf.client.new_client_get_mouse = fetch_opt_first(sec, "false", "new_client_get_mouse").bool;
+
+     conf.colors.client_light_shade = fetch_opt_first(sec, "0.25", "light_shade").fnum;
+     conf.colors.client_dark_shade  = fetch_opt_first(sec, "-0.25", "dark_shade").fnum;
 
      mouse = fetch_section(sec, "mouse");
 
@@ -789,12 +795,12 @@ conf_keybind_section(void)
 void
 init_conf(void)
 {
-     if (get_conf(conf.confpath) == -1)
+     if(get_conf(conf.confpath) == -1)
      {
           warnx("parsing configuration file (%s) failed.", conf.confpath);
           sprintf(conf.confpath, "%s/wmfs/wmfsrc", XDG_CONFIG_DIR);
           warnx("Use the default configuration (%s).", conf.confpath);
-          if (get_conf(conf.confpath) == -1)
+          if(get_conf(conf.confpath) == -1)
                errx(1, "parsing configuration file (%s) failed.", conf.confpath);
 
      }

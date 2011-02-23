@@ -88,7 +88,7 @@ client_detach(Client *c)
 /** Get the next client
  *\return The next client or NULL
  */
-Client*
+static Client*
 client_get_next(void)
 {
      Client *c = NULL;
@@ -109,7 +109,7 @@ client_get_next(void)
 /** Get the previous client
  *\return The previous client or NULL
  */
-Client*
+static Client*
 client_get_prev(void)
 {
      Client *c = NULL, *d;
@@ -135,7 +135,7 @@ client_get_prev(void)
   *\param pos Position (Left/Right/Top/Bottom
   *\return Client found
 */
-Client*
+static Client*
 client_get_next_with_direction(Position pos)
 {
      Client *c = NULL;
@@ -322,7 +322,7 @@ uicb_client_focus_bottom(uicb_t cmd)
 /** Set the client c above
   *\param c Client pointer
 */
-void
+static void
 client_above(Client *c)
 {
      XRectangle geo;
@@ -360,19 +360,13 @@ client_focus(Client *c)
 
      if(sel && sel != c)
      {
-          sel->colors.frame = conf.client.bordernormal;
-          sel->colors.fg = conf.titlebar.fg_normal;
-          sel->colors.resizecorner = conf.client.resizecorner_normal;
-
-          if(TBARH - BORDH && sel->titlebar->stipple)
-               sel->titlebar->stipple_color = conf.titlebar.stipple.colors.normal;
-
           if(sel->flags & AboveFlag)
                sel->flags &= ~AboveFlag;
 
           XChangeProperty(dpy, sel->frame, net_atom[net_wm_window_opacity], XA_CARDINAL,
                           32, PropModeReplace, (uchar *)&conf.opacity, 1);
 
+          frame_update_color(sel, True);
           frame_update(sel);
 
           mouse_grabbuttons(sel, !conf.focus_pclick);
@@ -380,10 +374,6 @@ client_focus(Client *c)
 
      if((sel = c))
      {
-          c->colors.frame = conf.client.borderfocus;
-          c->colors.fg = conf.titlebar.fg_focus;
-          c->colors.resizecorner = conf.client.resizecorner_focus;
-
           /* Set focusontag option */
           for(cc = clients; cc; cc = cc->next)
                if(cc->focusontag == (int)c->tag)
@@ -391,11 +381,9 @@ client_focus(Client *c)
 
           c->focusontag = seltag[selscreen];
 
-          if(TBARH - BORDH && c->titlebar->stipple)
-               c->titlebar->stipple_color = conf.titlebar.stipple.colors.focus;
-
           XDeleteProperty(dpy, c->frame, net_atom[net_wm_window_opacity]);
 
+          frame_update_color(c, False);
           frame_update(c);
           mouse_grabbuttons(c, True);
 
@@ -671,6 +659,143 @@ client_map(Client *c)
           }
           XMapSubwindows(dpy, c->frame);
           c->flags &= ~UnmapFlag;
+     }
+
+     return;
+}
+
+/** Set the wanted tag or autofree/max of a client
+ *\param c Client pointer
+*/
+static void
+client_set_rules(Client *c)
+{
+     XClassHint xch;
+     int i, j, k, f;
+     Atom rf;
+     ulong n, il;
+     uchar *data = NULL;
+     char wwrole[256] = { 0 };
+     Bool applied_tag_rule = False;
+     Bool applied_screen_rule = False;
+
+     memset(&xch, 0, sizeof(xch));
+
+     if(conf.ignore_next_client_rules)
+     {
+          conf.ignore_next_client_rules = False;
+          return;
+     }
+
+     /* Get WM_CLASS */
+     XGetClassHint(dpy, c->win, &xch);
+
+     /* Get WM_WINDOW_ROLE */
+     if(XGetWindowProperty(dpy, c->win, ATOM("WM_WINDOW_ROLE"), 0L, 0x7FFFFFFFL, False,
+                    XA_STRING, &rf, &f, &n, &il, &data) == Success && data)
+     {
+          strncpy(wwrole, (char*)data, sizeof(wwrole));
+          XFree(data);
+     }
+
+     /* Following features is *DEPRECATED*, will be removed in some revision.  {{{ */
+
+     /* Auto free */
+     if(conf.client.autofree && ((xch.res_name && strstr(conf.client.autofree, xch.res_name))
+               || (xch.res_class && strstr(conf.client.autofree, xch.res_class))))
+          c->flags |= FreeFlag;
+
+     /* Auto maximize */
+     if(conf.client.automax && ((xch.res_name && strstr(conf.client.automax, xch.res_name))
+                    || (xch.res_class && strstr(conf.client.automax, xch.res_class))))
+     {
+          client_maximize(c);
+          c->flags |= MaxFlag;
+     }
+
+     /* Wanted tag */
+     for(i = 0; i < screen_count(); ++i)
+          for(j = 1; j < conf.ntag[i] + 1; ++j)
+               if(tags[i][j].clients)
+                    for(k = 0; k < tags[i][j].nclients; ++k)
+                         if((xch.res_name && strstr(xch.res_name, tags[i][j].clients[k]))
+                            || (xch.res_class && strstr(xch.res_class, tags[i][j].clients[k])))
+                         {
+                              c->screen = i;
+                              c->tag = j;
+
+                              if(c->tag != (uint)seltag[selscreen])
+                                   tags[c->screen][c->tag].request_update = True;
+                              else
+                                   tags[c->screen][c->tag].layout.func(c->screen);
+
+                              /* Deprecated but still in use */
+                              applied_tag_rule = True;
+                              applied_screen_rule = True;
+                         }
+
+     /* }}} */
+
+     /* Apply Rule if class || instance || role match */
+     for(i = 0; i < conf.nrule; ++i)
+     {
+          if((xch.res_class && conf.rule[i].class && !strcmp(xch.res_class, conf.rule[i].class))
+                    || (xch.res_name && conf.rule[i].instance && !strcmp(xch.res_name, conf.rule[i].instance)))
+          {
+               if((strlen(wwrole) && conf.rule[i].role && !strcmp(wwrole, conf.rule[i].role)) || (!strlen(wwrole) || !conf.rule[i].role))
+               {
+                    if(conf.rule[i].screen != -1)
+                         c->screen = conf.rule[i].screen;
+
+                    if(conf.rule[i].tag != -1)
+                    {
+                         c->tag = conf.rule[i].tag;
+                         applied_tag_rule = True;
+                    }
+
+                    if(conf.rule[i].free)
+                         c->flags |= FreeFlag;
+
+                    if(conf.rule[i].ignoretags)
+                         c->tag = MAXTAG + 1;
+
+                    if(conf.rule[i].max)
+                    {
+                         client_maximize(c);
+                         c->flags |= MaxFlag;
+                    }
+
+                    if(c->tag != (uint)seltag[selscreen])
+                    {
+                         tags[c->screen][c->tag].request_update = True;
+                         client_focus(NULL);
+                    }
+
+                    if(!conf.rule[i].ignoretags)
+                         tags[c->screen][c->tag].layout.func(c->screen);
+
+                    if(conf.rule[i].follow_client)
+                         seltag[c->screen] = c->tag;
+               }
+          }
+     }
+
+     if(!applied_tag_rule && conf.client.default_open_tag > 0
+          && conf.client.default_open_tag < (uint)conf.ntag[selscreen])
+     {
+          c->tag = conf.client.default_open_tag;
+
+          client_focus_next(c);
+          tags[c->screen][c->tag].request_update = True;
+     }
+
+     if(!applied_screen_rule && conf.client.default_open_screen > -1
+          && conf.client.default_open_screen < screen_count())
+     {
+          c->screen = conf.client.default_open_screen;
+
+          client_focus_next(c);
+          tags[c->screen][c->tag].request_update = True;
      }
 
      return;
@@ -1046,143 +1171,6 @@ client_swap(Client *c1, Client *c2)
      return;
 }
 
-/** Set the wanted tag or autofree/max of a client
- *\param c Client pointer
-*/
-void
-client_set_rules(Client *c)
-{
-     XClassHint xch;
-     int i, j, k, f;
-     Atom rf;
-     ulong n, il;
-     uchar *data = NULL;
-     char wwrole[256] = { 0 };
-     Bool applied_tag_rule = False;
-     Bool applied_screen_rule = False;
-
-     memset(&xch, 0, sizeof(xch));
-
-     if(conf.ignore_next_client_rules)
-     {
-          conf.ignore_next_client_rules = False;
-          return;
-     }
-
-     /* Get WM_CLASS */
-     XGetClassHint(dpy, c->win, &xch);
-
-     /* Get WM_WINDOW_ROLE */
-     if(XGetWindowProperty(dpy, c->win, ATOM("WM_WINDOW_ROLE"), 0L, 0x7FFFFFFFL, False,
-                    XA_STRING, &rf, &f, &n, &il, &data) == Success && data)
-     {
-          strncpy(wwrole, (char*)data, sizeof(wwrole));
-          XFree(data);
-     }
-
-     /* Following features is *DEPRECATED*, will be removed in some revision.  {{{ */
-
-     /* Auto free */
-     if(conf.client.autofree && ((xch.res_name && strstr(conf.client.autofree, xch.res_name))
-               || (xch.res_class && strstr(conf.client.autofree, xch.res_class))))
-          c->flags |= FreeFlag;
-
-     /* Auto maximize */
-     if(conf.client.automax && ((xch.res_name && strstr(conf.client.automax, xch.res_name))
-                    || (xch.res_class && strstr(conf.client.automax, xch.res_class))))
-     {
-          client_maximize(c);
-          c->flags |= MaxFlag;
-     }
-
-     /* Wanted tag */
-     for(i = 0; i < screen_count(); ++i)
-          for(j = 1; j < conf.ntag[i] + 1; ++j)
-               if(tags[i][j].clients)
-                    for(k = 0; k < tags[i][j].nclients; ++k)
-                         if((xch.res_name && strstr(xch.res_name, tags[i][j].clients[k]))
-                            || (xch.res_class && strstr(xch.res_class, tags[i][j].clients[k])))
-                         {
-                              c->screen = i;
-                              c->tag = j;
-
-                              if(c->tag != (uint)seltag[selscreen])
-                                   tags[c->screen][c->tag].request_update = True;
-                              else
-                                   tags[c->screen][c->tag].layout.func(c->screen);
-
-                              /* Deprecated but still in use */
-                              applied_tag_rule = True;
-                              applied_screen_rule = True;
-                         }
-
-     /* }}} */
-
-     /* Apply Rule if class || instance || role match */
-     for(i = 0; i < conf.nrule; ++i)
-     {
-          if((xch.res_class && conf.rule[i].class && !strcmp(xch.res_class, conf.rule[i].class))
-                    || (xch.res_name && conf.rule[i].instance && !strcmp(xch.res_name, conf.rule[i].instance)))
-          {
-               if((strlen(wwrole) && conf.rule[i].role && !strcmp(wwrole, conf.rule[i].role)) || (!strlen(wwrole) || !conf.rule[i].role))
-               {
-                    if(conf.rule[i].screen != -1)
-                         c->screen = conf.rule[i].screen;
-
-                    if(conf.rule[i].tag != -1)
-                    {
-                         c->tag = conf.rule[i].tag;
-                         applied_tag_rule = True;
-                    }
-
-                    if(conf.rule[i].free)
-                         c->flags |= FreeFlag;
-
-                    if(conf.rule[i].ignoretags)
-                         c->tag = MAXTAG + 1;
-
-                    if(conf.rule[i].max)
-                    {
-                         client_maximize(c);
-                         c->flags |= MaxFlag;
-                    }
-
-                    if(c->tag != (uint)seltag[selscreen])
-                    {
-                         tags[c->screen][c->tag].request_update = True;
-                         client_focus(NULL);
-                    }
-
-                    if(!conf.rule[i].ignoretags)
-                         tags[c->screen][c->tag].layout.func(c->screen);
-
-                    if(conf.rule[i].follow_client)
-                         seltag[c->screen] = c->tag;
-               }
-          }
-     }
-
-     if(!applied_tag_rule && conf.client.default_open_tag > 0
-          && conf.client.default_open_tag < (uint)conf.ntag[selscreen])
-     {
-          c->tag = conf.client.default_open_tag;
-
-          client_focus_next(c);
-          tags[c->screen][c->tag].request_update = True;
-     }
-
-     if(!applied_screen_rule && conf.client.default_open_screen > -1
-          && conf.client.default_open_screen < screen_count())
-     {
-          c->screen = conf.client.default_open_screen;
-
-          client_focus_next(c);
-          tags[c->screen][c->tag].request_update = True;
-     }
-
-     return;
-}
-
 /** Update client attributes (_WMFS_TAG _WMFS_SCREEN)
  *\param c Client pointer
 */
@@ -1270,7 +1258,6 @@ client_focus_next(Client *c)
 
      return;
 }
-
 
 /** Unmanage a client
  * \param c Client pointer
@@ -1365,7 +1352,7 @@ client_unmap(Client *c)
  *\param c Client pointer
  *\param s Screen id
  */
-void
+static void
 client_set_screen(Client *c, int s)
 {
      int os;
@@ -1431,7 +1418,6 @@ uicb_client_screen_prev(uicb_t cmd)
 
      return;
 }
-
 
 /** Move a client
  *\param cmd uicb_t type
@@ -1503,6 +1489,39 @@ uicb_ignore_next_client_rules(uicb_t cmd)
      return;
 }
 
+/** Select client
+ *\param cmd uicb_t type clientlist index
+ */
+static void
+uicb_client_select(uicb_t cmd)
+{
+     int i;
+     Window w;
+     int d, x, y;
+
+
+     for(i = 0; i < MAXCLIST && clist_index[i].client; ++i)
+          if(!strcmp(cmd, clist_index[i].key))
+          {
+               if(clist_index[i].client->screen != selscreen)
+                    screen_set_sel(clist_index[i].client->screen);
+
+               if(clist_index[i].client->tag != (uint)seltag[clist_index[i].client->screen])
+                    tag_set(clist_index[i].client->tag);
+
+               client_focus(clist_index[i].client);
+               client_raise(clist_index[i].client);
+
+               /* Move pointer on client */
+               XQueryPointer(dpy, ROOT, &w, &w, &x, &y, &d, &d, (uint *)&d);
+               XWarpPointer(dpy, ROOT, ROOT, x, y, d, d,
+                         clist_index[i].client->geo.x + clist_index[i].client->geo.width / 2,
+                         clist_index[i].client->geo.y + clist_index[i].client->geo.height / 2);
+          }
+
+     return;
+}
+
 /** Show clientlist menu
  *\param cmd uicb_t type
  */
@@ -1562,39 +1581,6 @@ uicb_clientlist(uicb_t cmd)
      return;
 }
 
-/** Select client
- *\param cmd uicb_t type clientlist index
- */
-void
-uicb_client_select(uicb_t cmd)
-{
-     int i;
-     Window w;
-     int d, x, y;
-
-
-     for(i = 0; i < MAXCLIST && clist_index[i].client; ++i)
-          if(!strcmp(cmd, clist_index[i].key))
-          {
-               if(clist_index[i].client->screen != selscreen)
-                    screen_set_sel(clist_index[i].client->screen);
-
-               if(clist_index[i].client->tag != (uint)seltag[clist_index[i].client->screen])
-                    tag_set(clist_index[i].client->tag);
-
-               client_focus(clist_index[i].client);
-               client_raise(clist_index[i].client);
-
-               /* Move pointer on client */
-               XQueryPointer(dpy, ROOT, &w, &w, &x, &y, &d, &d, (uint *)&d);
-               XWarpPointer(dpy, ROOT, ROOT, x, y, d, d,
-                         clist_index[i].client->geo.x + clist_index[i].client->geo.width / 2,
-                         clist_index[i].client->geo.y + clist_index[i].client->geo.height / 2);
-          }
-
-     return;
-}
-
 /** Check clientlist menu fake function
  * \param cmd uicb_t type unused
 */
@@ -1622,4 +1608,3 @@ uicb_client_ignore_tag(uicb_t cmd)
 
      return;
 }
-

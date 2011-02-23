@@ -32,10 +32,153 @@
 
 #include "wmfs.h"
 
-static char *complete_on_command(char*, size_t);
-static char *complete_on_files(char*, size_t);
+/*
+ * Just search command in PATH.
+ * Return the characters to complete the command.
+ */
+static char *
+complete_on_command(char *start, size_t hits)
+{
+     char *path;
+     char *dirname;
+     char *ret = NULL;
+     DIR *dir;
+     struct dirent *content;
 
-void
+     char **namelist = NULL;
+     int n = 0, i;
+
+     if (!getenv("PATH") || !start || hits <= 0)
+         return NULL;
+
+     path = xstrdup(getenv("PATH"));
+     dirname = strtok(path, ":");
+
+     /* recursively open PATH */
+     while (dirname != NULL)
+     {
+          if ((dir = opendir(dirname)))
+          {
+               while ((content = readdir(dir)))
+               {
+                    if(strncmp(content->d_name, ".", 1))
+                    {
+                         if (!strncmp(content->d_name, start, strlen(start)))
+                         {
+                              namelist = xrealloc(namelist, ++n, sizeof(*namelist));
+                              namelist[n-1] = xstrdup(content->d_name);
+                         }
+                    }
+               }
+               closedir(dir);
+          }
+          dirname = strtok(NULL, ":");
+     }
+
+     free(path);
+
+     if(n > 0)
+     {
+          qsort(namelist, n, sizeof(char *), qsort_string_compare);
+          ret = xstrdup(namelist[((hits > 0) ? hits - 1 : 0) % n] + strlen(start));
+
+          for(i = 0; i < n; i++)
+               free(namelist[i]);
+
+          free(namelist);
+     }
+
+     return ret;
+}
+
+/*
+ * Complete a filename or directory name.
+ * works like complete_on_command.
+ */
+static char *
+complete_on_files(char *start, size_t hits)
+{
+     char *ret = NULL;
+     char *p = NULL;
+     char *dirname = NULL;
+     char *path = NULL;
+     char *filepath = NULL;
+     DIR *dir = NULL;
+     struct dirent *content = NULL;
+     struct stat st;
+     size_t count = 0;
+
+     if (!start || hits <= 0 || !(p = strrchr(start, ' ')))
+          return NULL;
+
+     /*
+      * Search the directory to open and set
+      * the beginning of file to complete on pointer 'p'.
+      */
+     if (*(++p) == '\0' || !strrchr(p, '/'))
+          path = xstrdup(".");
+     else
+     {
+          /* remplace ~ by $HOME in dirname */
+          if (!strncmp(p, "~/", 2) && getenv("HOME"))
+               xasprintf(&dirname, "%s%s", getenv("HOME"), p+1);
+          else
+               dirname = xstrdup(p);
+
+          /* Set p to filename to be complete
+           * and path the directory containing the file
+           * /foooooo/baaaaaar/somethinglikethis<tab>
+           * <---- path - ---><------- p ------>
+           */
+          p = strrchr(dirname, '/');
+          if (p != dirname)
+          {
+               *(p++) = '\0';
+               path = xstrdup(dirname);
+          }
+          else
+          {
+               path = xstrdup("/");
+               p++;
+          }
+     }
+
+     if ((dir = opendir(path)))
+     {
+          while ((content = readdir(dir)))
+          {
+               if (!strcmp(content->d_name, ".") || !strcmp(content->d_name, ".."))
+                    continue;
+               if (!strncmp(content->d_name, p, strlen(p)) && ++count == hits)
+               {
+                    /* If it's a directory append '/' to the completion */
+                    xasprintf(&filepath, "%s/%s", path, content->d_name);
+
+                    if (filepath && stat(filepath, &st) != -1)
+                    {
+                         if (S_ISDIR(st.st_mode))
+                              xasprintf(&ret, "%s/", content->d_name + strlen(p));
+                         else
+                              ret = xstrdup(content->d_name + strlen(p));
+                    }
+                    else
+                         warn("%s", filepath);
+
+                    free(filepath);
+
+                    break;
+               }
+          }
+          closedir(dir);
+     }
+
+     free(dirname);
+     free(path);
+
+     return ret;
+}
+
+static void
 launcher_execute(Launcher *launcher)
 {
      BarWindow *bw;
@@ -236,150 +379,4 @@ uicb_launcher(uicb_t cmd)
                launcher_execute(&conf.launcher[i]);
 
      return;
-}
-
-/*
- * Just search command in PATH.
- * Return the characters to complete the command.
- */
-static char *
-complete_on_command(char *start, size_t hits)
-{
-     char *path;
-     char *dirname;
-     char *ret = NULL;
-     DIR *dir;
-     struct dirent *content;
-
-     char **namelist = NULL;
-     int n = 0, i;
-
-     if (!getenv("PATH") || !start || hits <= 0)
-         return NULL;
-
-     path = xstrdup(getenv("PATH"));
-     dirname = strtok(path, ":");
-
-     /* recursively open PATH */
-     while (dirname != NULL)
-     {
-          if ((dir = opendir(dirname)))
-          {
-               while ((content = readdir(dir)))
-               {
-                    if(strncmp(content->d_name, ".", 1))
-                    {
-                         if (!strncmp(content->d_name, start, strlen(start)))
-                         {
-                              namelist = xrealloc(namelist, ++n, sizeof(*namelist));
-                              namelist[n-1] = xstrdup(content->d_name);
-                         }
-                    }
-               }
-               closedir(dir);
-          }
-          dirname = strtok(NULL, ":");
-     }
-
-     free(path);
-
-     if(n > 0)
-     {
-          qsort(namelist, n, sizeof(char *), qsort_string_compare);
-          ret = xstrdup(namelist[((hits > 0) ? hits - 1 : 0) % n] + strlen(start));
-
-          for(i = 0; i < n; i++)
-               free(namelist[i]);
-
-          free(namelist);
-     }
-
-     return ret;
-}
-
-/*
- * Complete a filename or directory name.
- * works like complete_on_command.
- */
-static char *
-complete_on_files(char *start, size_t hits)
-{
-     char *ret = NULL;
-     char *p = NULL;
-     char *dirname = NULL;
-     char *path = NULL;
-     char *filepath = NULL;
-     DIR *dir = NULL;
-     struct dirent *content = NULL;
-     struct stat st;
-     size_t count = 0;
-
-     if (!start || hits <= 0 || !(p = strrchr(start, ' ')))
-          return NULL;
-
-     /*
-      * Search the directory to open and set
-      * the beginning of file to complete on pointer 'p'.
-      */
-     if (*(++p) == '\0' || !strrchr(p, '/'))
-          path = xstrdup(".");
-     else
-     {
-          /* remplace ~ by $HOME in dirname */
-          if (!strncmp(p, "~/", 2) && getenv("HOME"))
-               xasprintf(&dirname, "%s%s", getenv("HOME"), p+1);
-          else
-               dirname = xstrdup(p);
-
-          /* Set p to filename to be complete
-           * and path the directory containing the file
-           * /foooooo/baaaaaar/somethinglikethis<tab>
-           * <---- path - ---><------- p ------>
-           */
-          p = strrchr(dirname, '/');
-          if (p != dirname)
-          {
-               *(p++) = '\0';
-               path = xstrdup(dirname);
-          }
-          else
-          {
-               path = xstrdup("/");
-               p++;
-          }
-     }
-
-     if ((dir = opendir(path)))
-     {
-          while ((content = readdir(dir)))
-          {
-               if (!strcmp(content->d_name, ".") || !strcmp(content->d_name, ".."))
-                    continue;
-               if (!strncmp(content->d_name, p, strlen(p)) && ++count == hits)
-               {
-                    /* If it's a directory append '/' to the completion */
-                    xasprintf(&filepath, "%s/%s", path, content->d_name);
-
-                    if (filepath && stat(filepath, &st) != -1)
-                    {
-                         if (S_ISDIR(st.st_mode))
-                              xasprintf(&ret, "%s/", content->d_name + strlen(p));
-                         else
-                              ret = xstrdup(content->d_name + strlen(p));
-                    }
-                    else
-                         warn("%s", filepath);
-
-                    free(filepath);
-
-                    break;
-               }
-          }
-          closedir(dir);
-     }
-
-     free(dirname);
-     free(path);
-
-     return ret;
 }

@@ -142,21 +142,6 @@ getcolor(char *color)
      return xcolor.pixel;
 }
 
-/** Enlight an hexadecimal color
- * \param col Color
- * \return The clarified color
-*/
-ulong
-color_enlight(ulong col)
-{
-     if((col + 0x330000) < 0xffffff
-        && (col + 0x003300) < 0xffffff
-        && (col + 0x000033) < 0xffffff)
-          return col + 0x333333;
-     else
-          return col;
-}
-
 /** Set the window WM State
  * \param win Window target
  * \param state WM State
@@ -224,28 +209,6 @@ layout_name_to_struct(Layout lt[], char *name, int n, const func_name_list_t lli
                return lt[i];
 
      return lt[0];
-}
-
-char*
-alias_to_str(char *conf_choice)
-{
-     int i;
-     char *tmpchar = NULL;
-
-     if(!conf_choice)
-          return 0;
-
-     if(conf.alias)
-          for(i = 0; conf.alias[i].name; i++)
-               if(!strcmp(conf_choice, conf.alias[i].name))
-                    tmpchar = conf.alias[i].content;
-
-     if(tmpchar)
-          return xstrdup(tmpchar);
-     else
-          return xstrdup(conf_choice);
-
-     return NULL;
 }
 /* }}} */
 
@@ -375,9 +338,9 @@ patht(char *path)
           return NULL;
 
      strncpy(ret, path, sizeof(ret));
-
+     ret[sizeof(ret) - 1] = 0;
      if(strstr(path, "~/"))
-          sprintf(ret, "%s/%s", getenv("HOME"), path + 2);
+          snprintf(ret, sizeof(ret), "%s/%s", getenv("HOME"), path + 2);
 
      return ret;
 }
