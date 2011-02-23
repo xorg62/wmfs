@@ -35,7 +35,7 @@
 static char *complete_on_command(char*, size_t);
 static char *complete_on_files(char*, size_t);
 
-void
+static void
 launcher_execute(Launcher *launcher)
 {
      BarWindow *bw;

@@ -32,6 +32,14 @@
 
 #include "wmfs.h"
 
+static Bool menu_activate_item(Menu *menu, int i);
+static Bool menu_get_checkstring_needed(MenuItem *mi, int nitem);
+static Bool menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[]);
+static Bool menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[]);
+static int menu_get_longer_string(MenuItem *mi, int nitem);
+static void menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[], int chcklen);
+static void menu_focus_item(Menu *menu, int item, BarWindow *winitem[]);
+
 void
 menu_init(Menu *menu, char *name, int nitem, uint bg_f, char *fg_f, uint bg_n, char *fg_n)
 {
@@ -122,7 +130,7 @@ menu_draw(Menu menu, int x, int y)
      return;
 }
 
-Bool
+static Bool
 menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
 {
      int i, c = 0;
@@ -208,7 +216,7 @@ menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
      return quit;
 }
 
-Bool
+static Bool
 menu_activate_item(Menu *menu, int i)
 {
      int j, x, y;
@@ -239,7 +247,7 @@ menu_activate_item(Menu *menu, int i)
      return False;
 }
 
-void
+static void
 menu_focus_item(Menu *menu, int item, BarWindow *winitem[])
 {
      int i;
@@ -268,7 +276,7 @@ menu_focus_item(Menu *menu, int item, BarWindow *winitem[])
      return;
 }
 
-void
+static void
 menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[], int chcklen)
 {
      int x;
@@ -299,7 +307,7 @@ menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[], int chcklen)
      return;
 }
 
-int
+static int
 menu_get_longer_string(MenuItem *mi, int nitem)
 {
      int i, w, l = 0;
@@ -350,7 +358,7 @@ menu_clear(Menu *menu)
      return;
 }
 
-Bool
+static Bool
 menu_get_checkstring_needed(MenuItem *mi, int nitem)
 {
      (void)mi;

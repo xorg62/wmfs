@@ -32,6 +32,10 @@
 
 #include "wmfs.h"
 
+#ifdef HAVE_IMLIB
+static void draw_image(Drawable dr, int x, int y, int w, int h, char *name);
+#endif /* HAVE_IMLIB */
+
 void
 draw_text(Drawable d, int x, int y, char* fg, char *str)
 {

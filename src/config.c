@@ -100,7 +100,7 @@ const func_name_list_t func_list[] =
      {NULL, NULL}
 };
 
-key_name_list_t key_list[] =
+static key_name_list_t key_list[] =
 {
      {"Control", ControlMask },
      {"Shift",   ShiftMask },
@@ -115,7 +115,7 @@ key_name_list_t key_list[] =
      {NULL,      NoSymbol }
 };
 
-name_to_uint_t mouse_button_list[] =
+static name_to_uint_t mouse_button_list[] =
 {
      {"Button1", Button1 },
      {"Button2", Button2 },

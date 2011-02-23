@@ -35,7 +35,7 @@
 /** ButtonPress handle event
  * \param ev XButtonEvent pointer
 */
-void
+static void
 buttonpress(XButtonEvent *ev)
 {
      Client *c;
@@ -162,7 +162,7 @@ buttonpress(XButtonEvent *ev)
 /* ClientMessage handle event
  *\param ev XClientMessageEvent pointer
 */
-void
+static void
 clientmessageevent(XClientMessageEvent *ev)
 {
      Client *c;
@@ -289,7 +289,7 @@ clientmessageevent(XClientMessageEvent *ev)
 /** ConfigureRequesthandle events
  * \param ev XConfigureRequestEvent pointer
 */
-void
+static void
 configureevent(XConfigureRequestEvent *ev)
 {
      XWindowChanges wc;
@@ -342,7 +342,7 @@ configureevent(XConfigureRequestEvent *ev)
 /** DestroyNotify handle event
  * \param ev XDestroyWindowEvent pointer
 */
-void
+static void
 destroynotify(XDestroyWindowEvent *ev)
 {
      Client *c;
@@ -366,7 +366,7 @@ destroynotify(XDestroyWindowEvent *ev)
 /** EnterNotify handle event
  * \param ev XCrossingEvent pointer
 */
-void
+static void
 enternotify(XCrossingEvent *ev)
 {
      Client *c;
@@ -399,7 +399,7 @@ enternotify(XCrossingEvent *ev)
 /** ExposeEvent handle event
  * \param ev XExposeEvent pointer
 */
-void
+static void
 expose(XExposeEvent *ev)
 {
      Client *c;
@@ -430,7 +430,7 @@ expose(XExposeEvent *ev)
  * \param ev XFocusChangeEvent pointer
  * \return
 */
-void
+static void
 focusin(XFocusChangeEvent *ev)
 {
      if(sel && ev->window != sel->win)
@@ -463,7 +463,7 @@ grabkeys(void)
 /** KeyPress handle event
  * \param ev XKeyPressedEvent pointer
 */
-void
+static void
 keypress(XKeyPressedEvent *ev)
 {
      int i;
@@ -483,7 +483,7 @@ keypress(XKeyPressedEvent *ev)
 /** MappingNotify handle event
  * \param ev XMappingEvent pointer
 */
-void
+static void
 mappingnotify(XMappingEvent *ev)
 {
      XRefreshKeyboardMapping(ev);
@@ -497,7 +497,7 @@ mappingnotify(XMappingEvent *ev)
 /** MapNotify handle event
   * \param ev XMapEvent pointer
   */
-void
+static void
 mapnotify(XMapEvent *ev)
 {
      Client *c;
@@ -520,7 +520,7 @@ mapnotify(XMapEvent *ev)
 /** MapRequest handle event
  * \param ev XMapRequestEvent pointer
 */
-void
+static void
 maprequest(XMapRequestEvent *ev)
 {
      XWindowAttributes at;
@@ -543,7 +543,7 @@ maprequest(XMapRequestEvent *ev)
 /** PropertyNotify handle event
  * \param ev XPropertyEvent pointer
 */
-void
+static void
 propertynotify(XPropertyEvent *ev)
 {
      Client *c;
@@ -597,7 +597,7 @@ propertynotify(XPropertyEvent *ev)
 /** XReparentEvent handle event
  * \param ev XReparentEvent pointer
  */
-void
+static void
 reparentnotify(XReparentEvent *ev)
 {
      (void)ev;
@@ -608,7 +608,7 @@ reparentnotify(XReparentEvent *ev)
 /** SelectionClearEvent handle event
  * \param ev XSelectionClearEvent pointer
  */
-void
+static void
 selectionclearevent(XSelectionClearEvent *ev)
 {
      /* Getting selection if lost it */
@@ -623,7 +623,7 @@ selectionclearevent(XSelectionClearEvent *ev)
 /** UnmapNotify handle event
  * \param ev XUnmapEvent pointer
  */
-void
+static void
 unmapnotify(XUnmapEvent *ev)
 {
      Client *c;

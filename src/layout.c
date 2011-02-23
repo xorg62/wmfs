@@ -168,7 +168,7 @@ maxlayout(int screen)
  * \param c Client pointer
  * \return a client pointer
 */
-Client*
+static Client*
 tiled_client(int screen, Client *c)
 {
      for(;c && ((c->flags & MaxFlag)
@@ -235,7 +235,7 @@ uicb_set_nmaster(uicb_t cmd)
 
 /** Grid layout function
 */
-void
+static void
 grid(int screen, Bool horizontal)
 {
      Client *c;
@@ -300,7 +300,7 @@ grid(int screen, Bool horizontal)
 /** Multi tile function
  * \param type Postion type { Top, Bottom, Left, Right }
 */
-void
+static void
 multi_tile(int screen, Position type)
 {
      Client *c;
@@ -430,7 +430,7 @@ multi_tile(int screen, Position type)
  * \param screen Screen to execute this function
  * \param horizont To specify the mirror mode (vertical/horizontal)
  */
-void
+static void
 mirror(int screen, Bool horizontal)
 {
      Client *c;

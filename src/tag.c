@@ -303,6 +303,9 @@ uicb_tag_last(uicb_t cmd)
      return;
 }
 
+static void tag_swap(int s, int t1, int t2);
+static void remove_old_last_tag(int selscreen);
+
 /** Keep that tag the last one
   *\param cmd uicb_t type unused
 */
@@ -471,7 +474,7 @@ uicb_tag_toggle_additional(uicb_t cmd)
   *\param t1 Tag 1
   *\param t2 Tag 2
 */
-void
+static void
 tag_swap(int s, int t1, int t2)
 {
      Client *c;
@@ -552,7 +555,7 @@ uicb_tag_swap_previous(uicb_t cmd)
   *\param s Screen number
   *\param name New tag name
 */
-void
+static void
 tag_new(int s, char *name)
 {
      char * displayedName;
@@ -623,7 +626,7 @@ uicb_tag_new(uicb_t cmd)
   *\param s Screen number
   *\param tag Tag number
 */
-void
+static void
 tag_delete(int s, int tag)
 {
      Tag t;
@@ -719,7 +722,7 @@ uicb_tag_rename(uicb_t cmd)
 /**
   *\param selscreen int
 */
-void
+static void
 remove_old_last_tag(int selscreen)
 {
      int i;

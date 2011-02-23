@@ -159,7 +159,7 @@ wait_childs_and_status(void)
      pthread_mutex_unlock(&mtx);
 }
 
-void *
+static void *
 thread_status(void *arg)
 {
      (void)arg;
@@ -186,7 +186,7 @@ thread_status(void *arg)
 
 /** WMFS main loop.
  */
-void
+static void
 mainloop(void)
 {
      XEvent ev;
@@ -227,7 +227,7 @@ uicb_quit(uicb_t cmd)
 /** Scan if there are windows on X
  *  for manage it
 */
-void
+static void
 scan(void)
 {
      uint n;
@@ -374,7 +374,7 @@ exec_uicb_function(char *func, char *cmd)
 /** Set statustext
  *\param str Statustext string
 */
-void
+static void
 set_statustext(int s, char *str)
 {
      int i;
@@ -410,7 +410,7 @@ set_statustext(int s, char *str)
 
 /** Update status script by ewmh hint
   */
-void
+static void
 update_status(void)
 {
      if(!check_wmfs_running())

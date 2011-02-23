@@ -135,6 +135,8 @@ infobar_init(void)
      return;
 }
 
+static void infobar_draw_layout(int sc);
+
 /** Draw the Infobar
  *\param sc Screen number
 */
@@ -153,7 +155,7 @@ infobar_draw(int sc)
 /** Draw the layout button in the InfoBar
  *\param sc Screen number
  */
-void
+static void
 infobar_draw_layout(int sc)
 {
      if(!conf.layout_placement)

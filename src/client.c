@@ -88,7 +88,7 @@ client_detach(Client *c)
 /** Get the next client
  *\return The next client or NULL
  */
-Client*
+static Client*
 client_get_next(void)
 {
      Client *c = NULL;
@@ -109,7 +109,7 @@ client_get_next(void)
 /** Get the previous client
  *\return The previous client or NULL
  */
-Client*
+static Client*
 client_get_prev(void)
 {
      Client *c = NULL, *d;
@@ -135,7 +135,7 @@ client_get_prev(void)
   *\param pos Position (Left/Right/Top/Bottom
   *\return Client found
 */
-Client*
+static Client*
 client_get_next_with_direction(Position pos)
 {
      Client *c = NULL;
@@ -322,7 +322,7 @@ uicb_client_focus_bottom(uicb_t cmd)
 /** Set the client c above
   *\param c Client pointer
 */
-void
+static void
 client_above(Client *c)
 {
      XRectangle geo;
@@ -663,6 +663,8 @@ client_map(Client *c)
 
      return;
 }
+
+static void client_set_rules(Client *c);
 
 /** Manage a client with a window and his attributes
  * \param w Cient's futur Window
@@ -1037,7 +1039,7 @@ client_swap(Client *c1, Client *c2)
 /** Set the wanted tag or autofree/max of a client
  *\param c Client pointer
 */
-void
+static void
 client_set_rules(Client *c)
 {
      XClassHint xch;
@@ -1352,7 +1354,7 @@ client_unmap(Client *c)
  *\param c Client pointer
  *\param s Screen id
  */
-void
+static void
 client_set_screen(Client *c, int s)
 {
      int os;
@@ -1489,6 +1491,8 @@ uicb_ignore_next_client_rules(uicb_t cmd)
      return;
 }
 
+static void uicb_client_select(uicb_t cmd);
+
 /** Show clientlist menu
  *\param cmd uicb_t type
  */
@@ -1551,7 +1555,7 @@ uicb_clientlist(uicb_t cmd)
 /** Select client
  *\param cmd uicb_t type clientlist index
  */
-void
+static void
 uicb_client_select(uicb_t cmd)
 {
      int i;
