@@ -362,7 +362,7 @@ patht(char *path)
      strncpy(ret, path, sizeof(ret));
      ret[sizeof(ret) - 1] = 0;
      if(strstr(path, "~/"))
-          sprintf(ret, "%s/%s", getenv("HOME"), path + 2);
+          snprintf(ret, sizeof(ret), "%s/%s", getenv("HOME"), path + 2);
 
      return ret;
 }
