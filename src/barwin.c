@@ -299,15 +299,10 @@ barwin_refresh_color(BarWindow *bw)
 
      if(bw->bord)
      {
-          //XSetWindowBackground(dpy, bw->border.left, bw->border.light);
-          //XSetWindowBackground(dpy, bw->border.top, bw->border.light);
-          //XSetWindowBackground(dpy, bw->border.bottom, bw->border.dark);
-          //XSetWindowBackground(dpy, bw->border.right, bw->border.dark);
-
-          XSetWindowBackground(dpy, bw->border.left, color_shade(bw->border.light, conf.colors.bar_light_shade));
-          XSetWindowBackground(dpy, bw->border.top, color_shade(bw->border.light, conf.colors.bar_light_shade));
-          XSetWindowBackground(dpy, bw->border.bottom, color_shade(bw->border.dark, conf.colors.bar_dark_shade));
-          XSetWindowBackground(dpy, bw->border.right, color_shade(bw->border.dark, conf.colors.bar_dark_shade));
+          XSetWindowBackground(dpy, bw->border.left, color_shade(bw->bg, conf.colors.bar_light_shade));
+          XSetWindowBackground(dpy, bw->border.top, color_shade(bw->bg, conf.colors.bar_light_shade));
+          XSetWindowBackground(dpy, bw->border.bottom, color_shade(bw->bg, conf.colors.bar_dark_shade));
+          XSetWindowBackground(dpy, bw->border.right, color_shade(bw->bg, conf.colors.bar_dark_shade));
 
           XClearWindow(dpy, bw->border.left);
           XClearWindow(dpy, bw->border.top);
