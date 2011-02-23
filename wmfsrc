@@ -236,7 +236,6 @@
                max           = false      # Set automatic maximized client
                follow_client = false      # follow the client
                ignore_tags   = false      # ignore tag (free mode)
-               follow_client = false      # if the client open in an other tag/screen, follow it.
        [/rule]
 [/rules]
 
