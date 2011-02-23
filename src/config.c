@@ -304,8 +304,8 @@ conf_client_section(void)
      conf.client.default_open_screen  = fetch_opt_first(sec, "-1", "default_open_screen").num;
      conf.client.new_client_get_mouse = fetch_opt_first(sec, "false", "new_client_get_mouse").bool;
 
-     conf.colors.client_light_shade = fetch_opt_first(bar, "0.25", "light_shade").fnum;
-     conf.colors.client_dark_shade  = fetch_opt_first(bar, "-0.25", "dark_shade").fnum;
+     conf.colors.client_light_shade = fetch_opt_first(sec, "0.25", "light_shade").fnum;
+     conf.colors.client_dark_shade  = fetch_opt_first(sec, "-0.25", "dark_shade").fnum;
 
      mouse = fetch_section(sec, "mouse");
 
