@@ -381,7 +381,6 @@ typedef struct
      char *font;
      uint opacity;
      Bool raisefocus;
-     Bool raiseswitch;
      Bool focus_fmouse;
      Bool focus_pclick;
      Bool ignore_next_client_rules;
