@@ -605,7 +605,6 @@ reparentnotify(XReparentEvent *ev)
      return;
 }
 
-
 /** SelectionClearEvent handle event
  * \param ev XSelectionClearEvent pointer
  */
@@ -620,7 +619,6 @@ selectionclearevent(XSelectionClearEvent *ev)
 
      return;
 }
-
 
 /** UnmapNotify handle event
  * \param ev XUnmapEvent pointer

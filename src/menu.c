@@ -49,7 +49,6 @@ menu_init(Menu *menu, char *name, int nitem, uint bg_f, char *fg_f, uint bg_n, c
      return;
 }
 
-
 void
 menu_new_item(MenuItem *mi, char *name, void *func, char *cmd)
 {
@@ -358,4 +357,3 @@ menu_get_checkstring_needed(MenuItem *mi, int nitem)
      (void)nitem;
      return True;
 }
-

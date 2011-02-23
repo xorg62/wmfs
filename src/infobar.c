@@ -321,7 +321,6 @@ infobar_update_taglist(int sc)
      return;
 }
 
-
 /** Destroy the InfoBar
 */
 void

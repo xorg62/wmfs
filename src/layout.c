@@ -729,7 +729,6 @@ uicb_togglefree(uicb_t cmd)
      return;
 }
 
-
 /** Toggle the selected client to max
  * \param cmd uicb_t type unused
 */

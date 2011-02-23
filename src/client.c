@@ -1259,7 +1259,6 @@ client_focus_next(Client *c)
      return;
 }
 
-
 /** Unmanage a client
  * \param c Client pointer
 */
@@ -1419,7 +1418,6 @@ uicb_client_screen_prev(uicb_t cmd)
 
      return;
 }
-
 
 /** Move a client
  *\param cmd uicb_t type
@@ -1610,4 +1608,3 @@ uicb_client_ignore_tag(uicb_t cmd)
 
      return;
 }
-

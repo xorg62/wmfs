@@ -231,5 +231,3 @@ textw(char *text)
 
      return gl.width + font->descent;
 }
-
-
