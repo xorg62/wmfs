@@ -142,21 +142,6 @@ getcolor(char *color)
      return xcolor.pixel;
 }
 
-/** Enlight an hexadecimal color
- * \param col Color
- * \return The clarified color
-*/
-ulong
-color_enlight(ulong col)
-{
-     if((col + 0x330000) < 0xffffff
-        && (col + 0x003300) < 0xffffff
-        && (col + 0x000033) < 0xffffff)
-          return col + 0x333333;
-     else
-          return col;
-}
-
 /** Set the window WM State
  * \param win Window target
  * \param state WM State

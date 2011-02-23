@@ -86,7 +86,6 @@
 #define INFOBARH     ((conf.bars.height > 0) ? conf.bars.height : (font->height * 1.5))
 #define FHINFOBAR    ((font->height - font->descent) + (INFOBARH - font->height) / 2)
 #define SHADH        (1)
-#define SHADC        (0x000000) /* 'Cause i don't know how darken a color yet */
 #define BORDH        conf.client.borderheight
 #define TBARH        ((conf.titlebar.height < BORDH) ? BORDH : conf.titlebar.height)
 #define RESHW        (6 * (BORDH))
@@ -233,6 +232,9 @@ void frame_update(Client *c);
 /* config.c */
 void init_conf(void);
 
+/* color.c */
+uint color_shade(uint, double);
+
 /* event.c */
 void buttonpress(XButtonEvent *ev);
 void configureevent(XConfigureRequestEvent *ev);
@@ -289,7 +291,6 @@ void *xrealloc(void *, size_t, size_t);
 #define zrealloc(ptr, size) xrealloc((ptr), 1, (size))
 char *xstrdup(const char *);
 int xasprintf(char **, const char *, ...);
-ulong color_enlight(ulong col);
 long getcolor(char *color);
 void setwinstate(Window win, long state);
 /* Conf usage {{{ */

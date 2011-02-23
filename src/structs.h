@@ -410,6 +410,10 @@ typedef struct
           uint tagbord;
           char *layout_fg;
           uint layout_bg;
+          float client_light_shade;
+          float client_dark_shade;
+          float bar_light_shade;
+          float bar_dark_shade;
      } colors;
      struct
      {

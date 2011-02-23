@@ -82,10 +82,10 @@ barwin_create(Window parent,
      {
           bw->bord = True;
 
-          CWIN(bw->border.left, bw->win, 0, 0, SHADH, h, 0, CWBackPixel, color_enlight(bg), &at);
-          CWIN(bw->border.top, bw->win, 0, 0, w, SHADH, 0, CWBackPixel, color_enlight(bg), &at);
-          CWIN(bw->border.bottom, bw->win, 0, h - SHADH, w, SHADH, 0, CWBackPixel, SHADC, &at);
-          CWIN(bw->border.right, bw->win, w - SHADH, 0, SHADH, h, 0, CWBackPixel, SHADC, &at);
+          CWIN(bw->border.left, bw->win, 0, 0, SHADH, h, 0, CWBackPixel, bg, &at);
+          CWIN(bw->border.top, bw->win, 0, 0, w, SHADH, 0, CWBackPixel, bg, &at);
+          CWIN(bw->border.bottom, bw->win, 0, h - SHADH, w, SHADH, 0, CWBackPixel, bg, &at);
+          CWIN(bw->border.right, bw->win, w - SHADH, 0, SHADH, h, 0, CWBackPixel, bg, &at);
      }
 
      /* Property */
@@ -95,8 +95,8 @@ barwin_create(Window parent,
      bw->geo.height = h;
      bw->bg = bg;
      bw->fg = fg;
-     bw->border.light = color_enlight(bg);
-     bw->border.dark = SHADC;
+     bw->border.light = color_shade(bg, conf.colors.bar_light_shade);
+     bw->border.dark = color_shade(bg, conf.colors.bar_dark_shade);
      bw->stipple = stipple;
      bw->stipple_color = -1;
 
@@ -299,10 +299,10 @@ barwin_refresh_color(BarWindow *bw)
 
      if(bw->bord)
      {
-          XSetWindowBackground(dpy, bw->border.left, bw->border.light);
-          XSetWindowBackground(dpy, bw->border.top, bw->border.light);
-          XSetWindowBackground(dpy, bw->border.bottom, bw->border.dark);
-          XSetWindowBackground(dpy, bw->border.right, bw->border.dark);
+          XSetWindowBackground(dpy, bw->border.left, color_shade(bw->bg, conf.colors.bar_light_shade));
+          XSetWindowBackground(dpy, bw->border.top, color_shade(bw->bg, conf.colors.bar_light_shade));
+          XSetWindowBackground(dpy, bw->border.bottom, color_shade(bw->bg, conf.colors.bar_dark_shade));
+          XSetWindowBackground(dpy, bw->border.right, color_shade(bw->bg, conf.colors.bar_dark_shade));
 
           XClearWindow(dpy, bw->border.left);
           XClearWindow(dpy, bw->border.top);

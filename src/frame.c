@@ -118,10 +118,10 @@ frame_create(Client *c)
      /* Border (for shadow) */
      if(conf.client.border_shadow)
      {
-          CWIN(c->left, c->frame, 0, 0, SHADH, c->frame_geo.height, 0, CWBackPixel, color_enlight(c->colors.frame), &at);
-          CWIN(c->top, c->frame, 0, 0, c->frame_geo.width, SHADH, 0, CWBackPixel, color_enlight(c->colors.frame), &at);
-          CWIN(c->bottom, c->frame, 0, c->frame_geo.height - SHADH, c->frame_geo.width, SHADH, 0, CWBackPixel, SHADC, &at);
-          CWIN(c->right, c->frame, c->frame_geo.width - SHADH, 0, SHADH, c->frame_geo.height, 0, CWBackPixel, SHADC, &at);
+          CWIN(c->left, c->frame, 0, 0, SHADH, c->frame_geo.height, 0, CWBackPixel, c->colors.frame, &at);
+          CWIN(c->top, c->frame, 0, 0, c->frame_geo.width, SHADH, 0, CWBackPixel, c->colors.frame, &at);
+          CWIN(c->bottom, c->frame, 0, c->frame_geo.height - SHADH, c->frame_geo.width, SHADH, 0, CWBackPixel, c->colors.frame, &at);
+          CWIN(c->right, c->frame, c->frame_geo.width - SHADH, 0, SHADH, c->frame_geo.height, 0, CWBackPixel, c->colors.frame, &at);
      }
 
      /* Reparent window with the frame */
@@ -258,10 +258,10 @@ frame_update(Client *c)
 
      if(conf.client.border_shadow)
      {
-          XSetWindowBackground(dpy, c->left, color_enlight(c->colors.frame));
-          XSetWindowBackground(dpy, c->top, color_enlight(c->colors.frame));
-          XSetWindowBackground(dpy, c->right, SHADC);
-          XSetWindowBackground(dpy, c->bottom, SHADC);
+          XSetWindowBackground(dpy, c->left, color_shade(c->colors.frame, conf.colors.client_light_shade));
+          XSetWindowBackground(dpy, c->top, color_shade(c->colors.frame, conf.colors.client_light_shade));
+          XSetWindowBackground(dpy, c->right, color_shade(c->colors.frame, conf.colors.client_dark_shade));
+          XSetWindowBackground(dpy, c->bottom, color_shade(c->colors.frame, conf.colors.client_dark_shade));
 
           XClearWindow(dpy, c->left);
           XClearWindow(dpy, c->top);
