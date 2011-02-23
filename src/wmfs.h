@@ -300,7 +300,6 @@ void* name_to_func(char *name, const func_name_list_t *l);
 ulong char_to_modkey(char *name, key_name_list_t key_l[]);
 uint char_to_button(char *name, name_to_uint_t blist[]);
 Layout layout_name_to_struct(Layout lt[], char *name, int n, const func_name_list_t llist[]);
-char* alias_to_str(char *conf_choice);
 /* }}} */
 char *char_to_str(const char c);
 pid_t spawn(const char *str, ...);

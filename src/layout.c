@@ -689,13 +689,6 @@ grid_vertical(int screen)
 /** Put the selected client to the master postion
  * \param cmd uicb_t type unused
 */
-void
-uicb_tile_switch(uicb_t cmd)
-{
-     (void)cmd;
-     layout_set_client_master (sel);
-     return;
-}
 
 /** Toggle the selected client to free
  * \param cmd uicb_t type unused

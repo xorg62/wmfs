@@ -210,28 +210,6 @@ layout_name_to_struct(Layout lt[], char *name, int n, const func_name_list_t lli
 
      return lt[0];
 }
-
-char*
-alias_to_str(char *conf_choice)
-{
-     int i;
-     char *tmpchar = NULL;
-
-     if(!conf_choice)
-          return 0;
-
-     if(conf.alias)
-          for(i = 0; conf.alias[i].name; i++)
-               if(!strcmp(conf_choice, conf.alias[i].name))
-                    tmpchar = conf.alias[i].content;
-
-     if(tmpchar)
-          return xstrdup(tmpchar);
-     else
-          return xstrdup(conf_choice);
-
-     return NULL;
-}
 /* }}} */
 
 /** Execute a sh command
