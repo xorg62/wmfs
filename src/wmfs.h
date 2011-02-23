@@ -120,6 +120,7 @@ BarWindow *barwin_create(Window parent,
                          Bool border);
 void barwin_draw_text(BarWindow *bw, int x, int y, char *text);
 void barwin_draw_image_ofset_text(BarWindow *bw, int x, int y, char *text, int x_image_ofset, int y_image_ofset);
+void barwin_color_set(BarWindow *bw, uint bg, char *fg);
 void barwin_delete(BarWindow *bw);
 void barwin_delete_subwin(BarWindow *bw);
 void barwin_map(BarWindow *bw);
@@ -227,6 +228,7 @@ void ewmh_manage_window_type(Client *c);
 void frame_create(Client *c);
 void frame_delete(Client *c);
 void frame_moveresize(Client *c, XRectangle geo);
+void frame_update_color(Client *c, Bool focused);
 void frame_update(Client *c);
 
 /* config.c */

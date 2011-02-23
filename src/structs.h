@@ -216,6 +216,7 @@ struct Client
           uint frame;
           char *fg;
           uint resizecorner;
+          uint bordlight, borddark;
      } colors;
      /* Client Information by flags */
      uint flags;

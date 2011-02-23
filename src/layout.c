@@ -748,7 +748,9 @@ uicb_togglemax(uicb_t cmd)
           sel->free_geo = sel->geo;
           sel->flags &= ~(TileFlag | FreeFlag);
           client_maximize(sel);
+          XRaiseWindow(dpy, sel->frame);
           sel->flags |= MaxFlag;
+
      }
      else
      {

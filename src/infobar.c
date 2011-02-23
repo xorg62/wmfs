@@ -272,6 +272,7 @@ infobar_draw_taglist(int sc)
                          ? conf.colors.tag_occupied_fg
                          : conf.colors.text));
 
+          barwin_color_set(infobar[sc].tags[i], infobar[sc].tags[i]->bg, infobar[sc].tags[i]->fg);
           barwin_refresh_color(infobar[sc].tags[i]);
 
           if(tags[sc][i].name)
@@ -417,7 +418,7 @@ uicb_infobar_toggledisplay(uicb_t cmd)
                ? 0 : (tags[selscreen][seltag[selscreen]].prev_barpos
                ? tags[selscreen][seltag[selscreen]].prev_barpos : 2
                ));
-    
+
      tags[selscreen][seltag[selscreen]].prev_barpos = tags[selscreen][seltag[selscreen]].barpos;
      tags[selscreen][seltag[selscreen]].barpos = new_pos;
 

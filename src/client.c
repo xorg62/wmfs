@@ -360,19 +360,13 @@ client_focus(Client *c)
 
      if(sel && sel != c)
      {
-          sel->colors.frame = conf.client.bordernormal;
-          sel->colors.fg = conf.titlebar.fg_normal;
-          sel->colors.resizecorner = conf.client.resizecorner_normal;
-
-          if(TBARH - BORDH && sel->titlebar->stipple)
-               sel->titlebar->stipple_color = conf.titlebar.stipple.colors.normal;
-
           if(sel->flags & AboveFlag)
                sel->flags &= ~AboveFlag;
 
           XChangeProperty(dpy, sel->frame, net_atom[net_wm_window_opacity], XA_CARDINAL,
                           32, PropModeReplace, (uchar *)&conf.opacity, 1);
 
+          frame_update_color(sel, True);
           frame_update(sel);
 
           mouse_grabbuttons(sel, !conf.focus_pclick);
@@ -380,10 +374,6 @@ client_focus(Client *c)
 
      if((sel = c))
      {
-          c->colors.frame = conf.client.borderfocus;
-          c->colors.fg = conf.titlebar.fg_focus;
-          c->colors.resizecorner = conf.client.resizecorner_focus;
-
           /* Set focusontag option */
           for(cc = clients; cc; cc = cc->next)
                if(cc->focusontag == (int)c->tag)
@@ -391,11 +381,9 @@ client_focus(Client *c)
 
           c->focusontag = seltag[selscreen];
 
-          if(TBARH - BORDH && c->titlebar->stipple)
-               c->titlebar->stipple_color = conf.titlebar.stipple.colors.focus;
-
           XDeleteProperty(dpy, c->frame, net_atom[net_wm_window_opacity]);
 
+          frame_update_color(c, False);
           frame_update(c);
           mouse_grabbuttons(c, True);
 
