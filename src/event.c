@@ -439,27 +439,6 @@ focusin(XFocusChangeEvent *ev)
      return;
 }
 
-/** Key grabbing function
-*/
-void
-grabkeys(void)
-{
-     int i;
-     KeyCode code;
-
-     XUngrabKey(dpy, AnyKey, AnyModifier, ROOT);
-     for(i = 0; i < conf.nkeybind; ++i)
-          if((code = XKeysymToKeycode(dpy, keys[i].keysym)))
-          {
-               XGrabKey(dpy, code, keys[i].mod, ROOT, True, GrabModeAsync, GrabModeAsync);
-               XGrabKey(dpy, code, keys[i].mod | LockMask, ROOT, True, GrabModeAsync, GrabModeAsync);
-               XGrabKey(dpy, code, keys[i].mod | numlockmask, ROOT, True, GrabModeAsync, GrabModeAsync);
-               XGrabKey(dpy, code, keys[i].mod | LockMask | numlockmask, ROOT, True, GrabModeAsync, GrabModeAsync);
-          }
-
-     return;
-}
-
 /** KeyPress handle event
  * \param ev XKeyPressedEvent pointer
 */
@@ -642,6 +621,27 @@ unmapnotify(XUnmapEvent *ev)
           systray_del(s);
           systray_update();
      }
+
+     return;
+}
+
+/** Key grabbing function
+*/
+void
+grabkeys(void)
+{
+     int i;
+     KeyCode code;
+
+     XUngrabKey(dpy, AnyKey, AnyModifier, ROOT);
+     for(i = 0; i < conf.nkeybind; ++i)
+          if((code = XKeysymToKeycode(dpy, keys[i].keysym)))
+          {
+               XGrabKey(dpy, code, keys[i].mod, ROOT, True, GrabModeAsync, GrabModeAsync);
+               XGrabKey(dpy, code, keys[i].mod | LockMask, ROOT, True, GrabModeAsync, GrabModeAsync);
+               XGrabKey(dpy, code, keys[i].mod | numlockmask, ROOT, True, GrabModeAsync, GrabModeAsync);
+               XGrabKey(dpy, code, keys[i].mod | LockMask | numlockmask, ROOT, True, GrabModeAsync, GrabModeAsync);
+          }
 
      return;
 }

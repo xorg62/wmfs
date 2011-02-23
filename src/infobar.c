@@ -135,23 +135,6 @@ infobar_init(void)
      return;
 }
 
-static void infobar_draw_layout(int sc);
-
-/** Draw the Infobar
- *\param sc Screen number
-*/
-void
-infobar_draw(int sc)
-{
-     infobar_draw_taglist(sc);
-     infobar_draw_layout(sc);
-     infobar_draw_selbar(sc);
-     barwin_refresh_color(infobar[sc].bar);
-     statustext_handle(sc, infobar[sc].statustext);
-
-     return;
-}
-
 /** Draw the layout button in the InfoBar
  *\param sc Screen number
  */
@@ -166,6 +149,21 @@ infobar_draw_layout(int sc)
 
      if(tags[sc][seltag[sc]].layout.symbol)
           barwin_draw_text(infobar[sc].layout_button, PAD / 2, FHINFOBAR, tags[sc][seltag[sc]].layout.symbol);
+
+     return;
+}
+
+/** Draw the Infobar
+ *\param sc Screen number
+*/
+void
+infobar_draw(int sc)
+{
+     infobar_draw_taglist(sc);
+     infobar_draw_layout(sc);
+     infobar_draw_selbar(sc);
+     barwin_refresh_color(infobar[sc].bar);
+     statustext_handle(sc, infobar[sc].statustext);
 
      return;
 }

@@ -35,8 +35,6 @@
 static volatile Bool exiting = False, sig_chld = False;
 static pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
 
-static void signal_handle(int);
-
 int
 errorhandler(Display *d, XErrorEvent *event)
 {

@@ -303,8 +303,57 @@ uicb_tag_last(uicb_t cmd)
      return;
 }
 
-static void tag_swap(int s, int t1, int t2);
-static void remove_old_last_tag(int selscreen);
+/**
+  *\param selscreen int
+*/
+static void
+remove_old_last_tag(int selscreen)
+{
+     int i;
+     for(i = 0; i <= conf.ntag[selscreen]; i++)
+     {
+          if(tags[selscreen][i].stay_last)
+          {
+              tags[selscreen][i].stay_last = False;
+              break;
+          }
+     }
+
+     return;
+}
+
+/** Swap 2 tags
+  *\param s  Screen
+  *\param t1 Tag 1
+  *\param t2 Tag 2
+*/
+static void
+tag_swap(int s, int t1, int t2)
+{
+     Client *c;
+     Tag t;
+
+     if(t1 > conf.ntag[s] || t1 < 1
+               || t2 > conf.ntag[s] || t2 < 1 || t1 == t2)
+          return;
+
+     t = tags[s][t1];
+     tags[s][t1] = tags[s][t2];
+     tags[s][t2] = t;
+
+     for(c = clients; c; c = c->next)
+     {
+          if(c->screen == s && c->tag == (uint)t1)
+               c->tag = t2;
+          else if(c->screen == s && c->tag == (uint)t2)
+               c->tag = t1;
+     }
+
+     infobar_update_taglist(s);
+     tag_set(t2);
+
+     return;
+}
 
 /** Keep that tag the last one
   *\param cmd uicb_t type unused
@@ -465,39 +514,6 @@ uicb_tag_toggle_additional(uicb_t cmd)
      screen_get_sel();
 
      tag_additional(selscreen, seltag[selscreen], atoi(cmd));
-
-     return;
-}
-
-/** Swap 2 tags
-  *\param s  Screen
-  *\param t1 Tag 1
-  *\param t2 Tag 2
-*/
-static void
-tag_swap(int s, int t1, int t2)
-{
-     Client *c;
-     Tag t;
-
-     if(t1 > conf.ntag[s] || t1 < 1
-               || t2 > conf.ntag[s] || t2 < 1 || t1 == t2)
-          return;
-
-     t = tags[s][t1];
-     tags[s][t1] = tags[s][t2];
-     tags[s][t2] = t;
-
-     for(c = clients; c; c = c->next)
-     {
-          if(c->screen == s && c->tag == (uint)t1)
-               c->tag = t2;
-          else if(c->screen == s && c->tag == (uint)t2)
-               c->tag = t1;
-     }
-
-     infobar_update_taglist(s);
-     tag_set(t2);
 
      return;
 }
@@ -715,25 +731,6 @@ uicb_tag_rename(uicb_t cmd)
 
      infobar_update_taglist(selscreen);
      infobar_draw(selscreen);
-
-     return;
-}
-
-/**
-  *\param selscreen int
-*/
-static void
-remove_old_last_tag(int selscreen)
-{
-     int i;
-     for(i = 0; i <= conf.ntag[selscreen]; i++)
-     {
-          if(tags[selscreen][i].stay_last)
-          {
-              tags[selscreen][i].stay_last = False;
-              break;
-          }
-     }
 
      return;
 }

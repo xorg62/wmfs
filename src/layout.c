@@ -143,26 +143,6 @@ uicb_layout_prev(uicb_t cmd)
      return;
 }
 
-/** Max layout function
-*/
-void
-maxlayout(int screen)
-{
-     Client *c;
-     int i;
-
-     for(i = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
-     {
-          c->flags &= ~TileFlag;
-          c->flags |= LMaxFlag;
-          client_maximize(c);
-     }
-
-     ewmh_update_current_tag_prop();
-
-     return;
-}
-
 /** Sort all the client that can be
  *  tiled
  * \param c Client pointer
@@ -182,6 +162,26 @@ tiled_client(int screen, Client *c)
           c->flags |= FLayFlag;
 
      return c;
+}
+
+/** Max layout function
+*/
+void
+maxlayout(int screen)
+{
+     Client *c;
+     int i;
+
+     for(i = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
+     {
+          c->flags &= ~TileFlag;
+          c->flags |= LMaxFlag;
+          client_maximize(c);
+     }
+
+     ewmh_update_current_tag_prop();
+
+     return;
 }
 
 /** Set the mwfact
