@@ -33,7 +33,7 @@ src/wmfs.c
 # flags
 CFLAGS+= -DXDG_CONFIG_DIR=\"${XDG_CONFIG_DIR}\"
 CFLAGS+= -DWMFS_VERSION=\"${VERSION}\"
-CFLAGS+= -W -Wall -Wextra
+CFLAGS+= -Wall -Wextra
 
 OBJS= ${SRCS:.c=.o}
 
