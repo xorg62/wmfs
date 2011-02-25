@@ -194,6 +194,7 @@ void uicb_client_focus_bottom(uicb_t cmd);
 void uicb_client_kill(uicb_t);
 void uicb_client_screen_next(uicb_t);
 void uicb_client_screen_prev(uicb_t);
+void uicb_client_screen_set(uicb_t);
 void uicb_client_move(uicb_t cmd);
 void uicb_client_resize(uicb_t cmd);
 void uicb_ignore_next_client_rules(uicb_t cmd);

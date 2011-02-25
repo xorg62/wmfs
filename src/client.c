@@ -1419,6 +1419,20 @@ uicb_client_screen_prev(uicb_t cmd)
      return;
 }
 
+/** Change client of screen to n
+ * \param cmd uicb_t type screen
+*/
+void
+uicb_client_screen_set(uicb_t cmd)
+{
+     (void)cmd;
+     CHECK(sel);
+
+     client_set_screen(sel, atoi(cmd));
+
+     return;
+}
+
 /** Move a client
  *\param cmd uicb_t type
  */

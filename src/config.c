@@ -42,6 +42,7 @@ const func_name_list_t func_list[] =
      {"client_swap_prev",         uicb_client_swap_prev },
      {"client_screen_next",       uicb_client_screen_next },
      {"client_screen_prev",       uicb_client_screen_prev },
+     {"client_screen_set",        uicb_client_screen_set },
      {"client_focus_right",       uicb_client_focus_right },
      {"client_focus_left" ,       uicb_client_focus_left },
      {"client_focus_top",         uicb_client_focus_top },
