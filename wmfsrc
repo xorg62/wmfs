@@ -7,11 +7,13 @@
 # @include "~/.config/wmfs/menu-wmfsrc"
 
 [misc]
-        font               = "dejavu-10"
-        raisefocus         = true
-        raiseswitch        = false
-        focus_follow_mouse = true
-        opacity            = 255
+        font                  = "dejavu-10"
+        raisefocus            = true
+        raiseswitch           = false
+        focus_follow_mouse    = true
+        focus_follow_movement = false
+        opacity               = 255
+
         # focus_pointer_click: click on unfocused client area:
         # true  -- default, set focus
         # false -- click go to client; including dockapps

@@ -159,6 +159,7 @@ conf_misc_section(void)
      conf.raisefocus        = fetch_opt_first(sec, "false", "raisefocus").bool;
      conf.raiseswitch       = fetch_opt_first(sec, "false", "raiseswitch").bool;
      conf.focus_fmouse      = fetch_opt_first(sec, "true", "focus_follow_mouse").bool;
+     conf.focus_fmov        = fetch_opt_first(sec, "false", "focus_follow_movement").bool;
      conf.focus_pclick      = fetch_opt_first(sec, "true", "focus_pointer_click").bool;
      conf.status_timing     = fetch_opt_first(sec, "1", "status_timing").num;
      conf.status_path       = fetch_opt_first(sec, "", "status_path").str;

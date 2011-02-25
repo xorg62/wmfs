@@ -625,6 +625,23 @@ unmapnotify(XUnmapEvent *ev)
      return;
 }
 
+/** XMotionNotify handle event
+ * \param ev XMotionEvent pointer
+ */
+static void
+motionnotify(XMotionEvent *ev)
+{
+     Client *c;
+
+     if(!conf.focus_fmouse || !conf.focus_fmov)
+          return;
+
+     if((c = client_gb_win(ev->subwindow)))
+          client_focus(c);
+     
+     return;
+}
+
 /** Key grabbing function
 */
 void
@@ -667,6 +684,7 @@ getevent(XEvent ev)
      case MapNotify:        mapnotify(&ev.xmap);                      break;
      case MapRequest:       maprequest(&ev.xmaprequest);              break;
      case MappingNotify:    mappingnotify(&ev.xmapping);              break;
+     case MotionNotify:     motionnotify(&ev.xmotion);                break;
      case PropertyNotify:   propertynotify(&ev.xproperty);            break;
      case ReparentNotify:   reparentnotify(&ev.xreparent);            break;
      case SelectionClear:   selectionclearevent(&ev.xselectionclear); break;

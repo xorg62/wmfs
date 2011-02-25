@@ -383,6 +383,7 @@ typedef struct
      Bool raisefocus;
      Bool raiseswitch;
      Bool focus_fmouse;
+     Bool focus_fmov;
      Bool focus_pclick;
      Bool ignore_next_client_rules;
      Bool tagautohide;
