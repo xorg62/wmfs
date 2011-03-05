@@ -163,6 +163,7 @@ conf_misc_section(void)
      conf.status_path       = fetch_opt_first(sec, "", "status_path").str;
      conf.autostart_path    = fetch_opt_first(sec, "", "autostart_path").str;
      conf.autostart_command = fetch_opt_first(sec, "", "autostart_command").str;
+     conf.colors.one_shadow = fetch_opt_first(sec, "false", "one_shadow").bool;
      pad                    = fetch_opt_first(sec, "12", "pad").num;
      opacity                = fetch_opt_first(sec, "255", "opacity").num;
 

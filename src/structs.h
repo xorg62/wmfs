@@ -414,6 +414,7 @@ typedef struct
           float client_dark_shade;
           float bar_light_shade;
           float bar_dark_shade;
+          Bool  one_shadow;
      } colors;
      struct
      {
