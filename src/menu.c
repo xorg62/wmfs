@@ -357,3 +357,5 @@ menu_draw(Menu menu, int x, int y)
 
      return;
 }
+/* vim: et ts=5 sts=5 sw=5:
+ */

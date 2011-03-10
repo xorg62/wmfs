@@ -351,3 +351,5 @@ qsort_string_compare (const void * a, const void * b)
      return (strcmp(*(char **)a, *(char **)b));
 }
 
+/* vim: et ts=5 sts=5 sw=5:
+ */

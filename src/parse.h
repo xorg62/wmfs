@@ -119,3 +119,5 @@ struct opt_type *fetch_opt(struct conf_sec *, char *, char *);
 size_t fetch_opt_count(struct opt_type *);
 
 #endif /* PARSE_H */
+/* vim: et ts=5 sts=5 sw=5:
+ */

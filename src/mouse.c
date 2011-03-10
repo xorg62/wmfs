@@ -371,3 +371,5 @@ uicb_mouse_resize(uicb_t cmd)
 }
 
 
+/* vim: et ts=5 sts=5 sw=5:
+ */

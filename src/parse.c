@@ -621,3 +621,5 @@ get_conf(const char *filename)
      return 0;
 }
 
+/* vim: et ts=5 sts=5 sw=5:
+ */

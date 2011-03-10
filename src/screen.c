@@ -282,3 +282,5 @@ uicb_screen_prev_sel(uicb_t cmd)
 }
 
 
+/* vim: et ts=5 sts=5 sw=5:
+ */

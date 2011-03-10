@@ -552,3 +552,5 @@ main(int argc, char **argv)
      return 0;
 }
 
+/* vim: et ts=5 sts=5 sw=5:
+ */

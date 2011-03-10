@@ -351,3 +351,5 @@ barwin_refresh(BarWindow *bw)
 
      return;
 }
+/* vim: et ts=5 sts=5 sw=5:
+ */

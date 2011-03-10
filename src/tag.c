@@ -734,3 +734,5 @@ uicb_tag_rename(uicb_t cmd)
 
      return;
 }
+/* vim: et ts=5 sts=5 sw=5:
+ */

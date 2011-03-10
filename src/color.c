@@ -221,3 +221,5 @@ color_shade(uint rgb, double shadeVal)
 
     return rgb;
 }
+/* vim: et ts=5 sts=5 sw=5:
+ */

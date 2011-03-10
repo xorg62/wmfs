@@ -201,3 +201,5 @@ getinfo(char *info)
      return;
 }
 
+/* vim: et ts=5 sts=5 sw=5:
+ */

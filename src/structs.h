@@ -568,3 +568,5 @@ typedef struct
 } xembed_info;
 
 #endif /* STRUCTS_H */
+/* vim: et ts=5 sts=5 sw=5:
+ */

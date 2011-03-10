@@ -896,3 +896,5 @@ uicb_checklayout(uicb_t cmd)
      return False;
 }
 
+/* vim: et ts=5 sts=5 sw=5:
+ */

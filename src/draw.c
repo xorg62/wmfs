@@ -230,3 +230,5 @@ textw(char *text)
 
      return gl.width + font->descent;
 }
+/* vim: et ts=5 sts=5 sw=5:
+ */

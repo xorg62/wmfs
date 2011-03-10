@@ -456,3 +456,5 @@ uicb_toggle_tagautohide(uicb_t cmd)
 
      return;
 }
+/* vim: et ts=5 sts=5 sw=5:
+ */

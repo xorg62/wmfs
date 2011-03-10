@@ -195,3 +195,5 @@ fetch_opt_count(struct opt_type *o)
 }
 
 
+/* vim: et ts=5 sts=5 sw=5:
+ */

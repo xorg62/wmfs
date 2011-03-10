@@ -447,3 +447,5 @@ ewmh_manage_window_type(Client *c)
      return;
 }
 
+/* vim: et ts=5 sts=5 sw=5:
+ */
