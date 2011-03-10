@@ -35,7 +35,7 @@
 /** ButtonPress handle event
  * \param ev XButtonEvent pointer
 */
-void
+static void
 buttonpress(XButtonEvent *ev)
 {
      Client *c;
@@ -162,7 +162,7 @@ buttonpress(XButtonEvent *ev)
 /* ClientMessage handle event
  *\param ev XClientMessageEvent pointer
 */
-void
+static void
 clientmessageevent(XClientMessageEvent *ev)
 {
      Client *c;
@@ -289,7 +289,7 @@ clientmessageevent(XClientMessageEvent *ev)
 /** ConfigureRequesthandle events
  * \param ev XConfigureRequestEvent pointer
 */
-void
+static void
 configureevent(XConfigureRequestEvent *ev)
 {
      XWindowChanges wc;
@@ -342,7 +342,7 @@ configureevent(XConfigureRequestEvent *ev)
 /** DestroyNotify handle event
  * \param ev XDestroyWindowEvent pointer
 */
-void
+static void
 destroynotify(XDestroyWindowEvent *ev)
 {
      Client *c;
@@ -366,7 +366,7 @@ destroynotify(XDestroyWindowEvent *ev)
 /** EnterNotify handle event
  * \param ev XCrossingEvent pointer
 */
-void
+static void
 enternotify(XCrossingEvent *ev)
 {
      Client *c;
@@ -399,7 +399,7 @@ enternotify(XCrossingEvent *ev)
 /** ExposeEvent handle event
  * \param ev XExposeEvent pointer
 */
-void
+static void
 expose(XExposeEvent *ev)
 {
      Client *c;
@@ -430,7 +430,7 @@ expose(XExposeEvent *ev)
  * \param ev XFocusChangeEvent pointer
  * \return
 */
-void
+static void
 focusin(XFocusChangeEvent *ev)
 {
      if(sel && ev->window != sel->win)
@@ -439,31 +439,10 @@ focusin(XFocusChangeEvent *ev)
      return;
 }
 
-/** Key grabbing function
-*/
-void
-grabkeys(void)
-{
-     int i;
-     KeyCode code;
-
-     XUngrabKey(dpy, AnyKey, AnyModifier, ROOT);
-     for(i = 0; i < conf.nkeybind; ++i)
-          if((code = XKeysymToKeycode(dpy, keys[i].keysym)))
-          {
-               XGrabKey(dpy, code, keys[i].mod, ROOT, True, GrabModeAsync, GrabModeAsync);
-               XGrabKey(dpy, code, keys[i].mod | LockMask, ROOT, True, GrabModeAsync, GrabModeAsync);
-               XGrabKey(dpy, code, keys[i].mod | numlockmask, ROOT, True, GrabModeAsync, GrabModeAsync);
-               XGrabKey(dpy, code, keys[i].mod | LockMask | numlockmask, ROOT, True, GrabModeAsync, GrabModeAsync);
-          }
-
-     return;
-}
-
 /** KeyPress handle event
  * \param ev XKeyPressedEvent pointer
 */
-void
+static void
 keypress(XKeyPressedEvent *ev)
 {
      int i;
@@ -483,7 +462,7 @@ keypress(XKeyPressedEvent *ev)
 /** MappingNotify handle event
  * \param ev XMappingEvent pointer
 */
-void
+static void
 mappingnotify(XMappingEvent *ev)
 {
      XRefreshKeyboardMapping(ev);
@@ -497,7 +476,7 @@ mappingnotify(XMappingEvent *ev)
 /** MapNotify handle event
   * \param ev XMapEvent pointer
   */
-void
+static void
 mapnotify(XMapEvent *ev)
 {
      Client *c;
@@ -520,7 +499,7 @@ mapnotify(XMapEvent *ev)
 /** MapRequest handle event
  * \param ev XMapRequestEvent pointer
 */
-void
+static void
 maprequest(XMapRequestEvent *ev)
 {
      XWindowAttributes at;
@@ -543,7 +522,7 @@ maprequest(XMapRequestEvent *ev)
 /** PropertyNotify handle event
  * \param ev XPropertyEvent pointer
 */
-void
+static void
 propertynotify(XPropertyEvent *ev)
 {
      Client *c;
@@ -597,7 +576,7 @@ propertynotify(XPropertyEvent *ev)
 /** XReparentEvent handle event
  * \param ev XReparentEvent pointer
  */
-void
+static void
 reparentnotify(XReparentEvent *ev)
 {
      (void)ev;
@@ -605,11 +584,10 @@ reparentnotify(XReparentEvent *ev)
      return;
 }
 
-
 /** SelectionClearEvent handle event
  * \param ev XSelectionClearEvent pointer
  */
-void
+static void
 selectionclearevent(XSelectionClearEvent *ev)
 {
      /* Getting selection if lost it */
@@ -621,11 +599,10 @@ selectionclearevent(XSelectionClearEvent *ev)
      return;
 }
 
-
 /** UnmapNotify handle event
  * \param ev XUnmapEvent pointer
  */
-void
+static void
 unmapnotify(XUnmapEvent *ev)
 {
      Client *c;
@@ -644,6 +621,44 @@ unmapnotify(XUnmapEvent *ev)
           systray_del(s);
           systray_update();
      }
+
+     return;
+}
+
+/** XMotionNotify handle event
+ * \param ev XMotionEvent pointer
+ */
+static void
+motionnotify(XMotionEvent *ev)
+{
+     Client *c;
+
+     if(!conf.focus_fmouse || !conf.focus_fmov)
+          return;
+
+     if((c = client_gb_win(ev->subwindow)))
+          client_focus(c);
+     
+     return;
+}
+
+/** Key grabbing function
+*/
+void
+grabkeys(void)
+{
+     int i;
+     KeyCode code;
+
+     XUngrabKey(dpy, AnyKey, AnyModifier, ROOT);
+     for(i = 0; i < conf.nkeybind; ++i)
+          if((code = XKeysymToKeycode(dpy, keys[i].keysym)))
+          {
+               XGrabKey(dpy, code, keys[i].mod, ROOT, True, GrabModeAsync, GrabModeAsync);
+               XGrabKey(dpy, code, keys[i].mod | LockMask, ROOT, True, GrabModeAsync, GrabModeAsync);
+               XGrabKey(dpy, code, keys[i].mod | numlockmask, ROOT, True, GrabModeAsync, GrabModeAsync);
+               XGrabKey(dpy, code, keys[i].mod | LockMask | numlockmask, ROOT, True, GrabModeAsync, GrabModeAsync);
+          }
 
      return;
 }
@@ -669,6 +684,7 @@ getevent(XEvent ev)
      case MapNotify:        mapnotify(&ev.xmap);                      break;
      case MapRequest:       maprequest(&ev.xmaprequest);              break;
      case MappingNotify:    mappingnotify(&ev.xmapping);              break;
+     case MotionNotify:     motionnotify(&ev.xmotion);                break;
      case PropertyNotify:   propertynotify(&ev.xproperty);            break;
      case ReparentNotify:   reparentnotify(&ev.xreparent);            break;
      case SelectionClear:   selectionclearevent(&ev.xselectionclear); break;

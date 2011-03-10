@@ -38,7 +38,7 @@
   *\param str String
   *\return n Length of r
   */
-int
+static int
 statustext_rectangle(StatusRec *r, char *str)
 {
      char as;
@@ -62,7 +62,7 @@ statustext_rectangle(StatusRec *r, char *str)
   *\param str String
   *\return n Length of g
   */
-int
+static int
 statustext_graph(StatusGraph *g, char *str)
 {
      char as, c, *p;
@@ -112,7 +112,7 @@ statustext_graph(StatusGraph *g, char *str)
   *\param str String
   *\return n Length of s
   */
-int
+static int
 statustext_text(StatusText *s, char *str)
 {
      char as;
@@ -135,7 +135,7 @@ statustext_text(StatusText *s, char *str)
   *\param sc Screen
   *\param str String
   */
-void
+static void
 statustext_normal(int sc, char *str)
 {
      char strwc[MAXSTATUS] = { 0 };

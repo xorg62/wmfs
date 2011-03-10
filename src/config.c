@@ -42,6 +42,7 @@ const func_name_list_t func_list[] =
      {"client_swap_prev",         uicb_client_swap_prev },
      {"client_screen_next",       uicb_client_screen_next },
      {"client_screen_prev",       uicb_client_screen_prev },
+     {"client_screen_set",        uicb_client_screen_set },
      {"client_focus_right",       uicb_client_focus_right },
      {"client_focus_left" ,       uicb_client_focus_left },
      {"client_focus_top",         uicb_client_focus_top },
@@ -100,7 +101,7 @@ const func_name_list_t func_list[] =
      {NULL, NULL}
 };
 
-key_name_list_t key_list[] =
+static key_name_list_t key_list[] =
 {
      {"Control", ControlMask },
      {"Shift",   ShiftMask },
@@ -115,7 +116,7 @@ key_name_list_t key_list[] =
      {NULL,      NoSymbol }
 };
 
-name_to_uint_t mouse_button_list[] =
+static name_to_uint_t mouse_button_list[] =
 {
      {"Button1", Button1 },
      {"Button2", Button2 },
@@ -158,6 +159,7 @@ conf_misc_section(void)
      conf.raisefocus        = fetch_opt_first(sec, "false", "raisefocus").bool;
      conf.raiseswitch       = fetch_opt_first(sec, "false", "raiseswitch").bool;
      conf.focus_fmouse      = fetch_opt_first(sec, "true", "focus_follow_mouse").bool;
+     conf.focus_fmov        = fetch_opt_first(sec, "false", "focus_follow_movement").bool;
      conf.focus_pclick      = fetch_opt_first(sec, "true", "focus_pointer_click").bool;
      conf.status_timing     = fetch_opt_first(sec, "1", "status_timing").num;
      conf.status_path       = fetch_opt_first(sec, "", "status_path").str;

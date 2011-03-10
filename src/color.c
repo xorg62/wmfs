@@ -32,37 +32,6 @@
 
 #include "wmfs.h"
 
-static void   color_unpack_rgb(uint, uint*, uint*, uint*);
-static void   color_rgb_to_hsl(uint, uint, uint, double*, double*, double*);
-static void   color_hsl_to_rgb(double, double, double, uint*, uint*, uint*);
-static double color_clamp(double, double, double);
-static uint   color_pack_rgb(uint, uint, uint);
-
-/** Shades a color by the amount. This works by converting a packed RGB
- * color to HSL, adding the amount to the lightness,
- * and then converting back to RGB. 1.0 is max lightness, 0.0 is min lightness.
- * \param shadeVal the amount to shade the lightness by.
- * \return the shaded color
- */
-uint
-color_shade(uint rgb, double shadeVal)
-{
-    uint   r, g, b;
-    double h, s, l;
-
-    color_unpack_rgb(rgb, &r, &g, &b);
-    color_rgb_to_hsl(r, g, b, &h, &s, &l);
-
-    l += shadeVal;
-
-    l = color_clamp(l, 0, 1);
-
-    color_hsl_to_rgb(h, s, l, &r, &g, &b);
-    rgb = color_pack_rgb(r, g, b);
-
-    return rgb;
-}
-
 /** Clamp a number x within the range [a, b].
  * \param x the number which to clamp
  * \param a the lowest possible value
@@ -226,4 +195,29 @@ color_hsl_to_rgb(double h, double sl, double l, uint *rx, uint *gx, uint *bx)
     *rx = r * 255.0;
     *gx = g * 255.0;
     *bx = b * 255.0;
+}
+
+/** Shades a color by the amount. This works by converting a packed RGB
+ * color to HSL, adding the amount to the lightness,
+ * and then converting back to RGB. 1.0 is max lightness, 0.0 is min lightness.
+ * \param shadeVal the amount to shade the lightness by.
+ * \return the shaded color
+ */
+uint
+color_shade(uint rgb, double shadeVal)
+{
+    uint   r, g, b;
+    double h, s, l;
+
+    color_unpack_rgb(rgb, &r, &g, &b);
+    color_rgb_to_hsl(r, g, b, &h, &s, &l);
+
+    l += shadeVal;
+
+    l = color_clamp(l, 0, 1);
+
+    color_hsl_to_rgb(h, s, l, &r, &g, &b);
+    rgb = color_pack_rgb(r, g, b);
+
+    return rgb;
 }

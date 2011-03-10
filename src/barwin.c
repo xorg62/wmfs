@@ -81,6 +81,8 @@ barwin_create(Window parent,
      if(border)
      {
           bw->bord = True;
+          bw->border.light = color_shade(bg, conf.colors.bar_light_shade);
+          bw->border.dark = color_shade(bg, conf.colors.bar_dark_shade);
 
           CWIN(bw->border.left, bw->win, 0, 0, SHADH, h, 0, CWBackPixel, bg, &at);
           CWIN(bw->border.top, bw->win, 0, 0, w, SHADH, 0, CWBackPixel, bg, &at);
@@ -95,8 +97,6 @@ barwin_create(Window parent,
      bw->geo.height = h;
      bw->bg = bg;
      bw->fg = fg;
-     bw->border.light = color_shade(bg, conf.colors.bar_light_shade);
-     bw->border.dark = color_shade(bg, conf.colors.bar_dark_shade);
      bw->stipple = stipple;
      bw->stipple_color = -1;
 
@@ -139,6 +139,23 @@ barwin_draw_image_ofset_text(BarWindow *bw, int x, int y, char *text, int x_imag
      draw_image_ofset_text(bw->dr, x, y, bw->fg, text, x_image_ofset, y_image_ofset);
 
      barwin_refresh(bw);
+
+     return;
+}
+
+void
+barwin_color_set(BarWindow *bw, uint bg, char *fg)
+{
+     CHECK(bw);
+
+     bw->bg = bg;
+     bw->fg = fg;
+
+     if(bw->bord)
+     {
+          bw->border.light = color_shade(bg, conf.colors.bar_light_shade);
+          bw->border.dark = color_shade(bg, conf.colors.bar_dark_shade);
+     }
 
      return;
 }
@@ -303,13 +320,13 @@ barwin_refresh_color(BarWindow *bw)
           XSetWindowBackground(dpy, bw->border.top, color_shade(bw->bg, conf.colors.bar_light_shade));
           if(conf.colors.one_shadow)
           {
-              XSetWindowBackground(dpy, bw->border.bottom, bw->border.dark);
-              XSetWindowBackground(dpy, bw->border.right, bw->border.dark);
+               XSetWindowBackground(dpy, bw->border.right, color_shade(conf.colors.bar, conf.colors.client_dark_shade));
+               XSetWindowBackground(dpy, bw->border.bottom, color_shade(conf.colors.bar, conf.colors.client_dark_shade));
           }
           else
           {
-              XSetWindowBackground(dpy, bw->border.bottom, color_shade(bw->bg, conf.colors.bar_dark_shade));
-              XSetWindowBackground(dpy, bw->border.right, color_shade(bw->bg, conf.colors.bar_dark_shade));
+               XSetWindowBackground(dpy, bw->border.bottom, color_shade(bw->bg, conf.colors.bar_dark_shade));
+               XSetWindowBackground(dpy, bw->border.right, color_shade(bw->bg, conf.colors.bar_dark_shade));
           }
 
           XClearWindow(dpy, bw->border.left);

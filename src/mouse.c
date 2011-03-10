@@ -34,7 +34,7 @@
 
 /** Draw the border when a client in dragging/resizing with mouse
  */
-void
+static void
 mouse_dragborder(XRectangle geo, GC g)
 {
      XDrawRectangle(dpy, ROOT, g,
@@ -49,7 +49,7 @@ mouse_dragborder(XRectangle geo, GC g)
 /** Move a client in tile grid with the mouse
  *\param c Client double pointer
  */
-void
+static void
 mouse_move_tile_client(Client **c)
 {
      Client *sc;
@@ -76,7 +76,7 @@ mouse_move_tile_client(Client **c)
 /** Move a client from one tag to another with dah mouse
  *\param c client pointer
  */
-void
+static void
 mouse_move_tag_client(Client *c)
 {
      Window w;
@@ -110,7 +110,7 @@ mouse_move_tag_client(Client *c)
 /** Move the client with the mouse
  * \param c Client pointer
 */
-void
+static void
 mouse_move(Client *c)
 {
      int ocx, ocy, mx, my;

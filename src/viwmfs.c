@@ -32,7 +32,7 @@
 
 #include "wmfs.h"
 
-vicmd_to_uicb vicmd[] =
+static vicmd_to_uicb vicmd[] =
 {
      {"r",       "reload"},
      {"q",       "quit"},
@@ -62,7 +62,7 @@ vicmd_to_uicb vicmd[] =
      {"tf",      "toggle_free"},
 };
 
-void
+static void
 viwmfs_help(void)
 {
      size_t i;
