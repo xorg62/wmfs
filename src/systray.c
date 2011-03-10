@@ -153,7 +153,7 @@ systray_state(Systray *s)
 void
 systray_freeicons(void)
 {
-	Systray *i;
+     Systray *i;
 
      if(!conf.systray.active)
           return;
@@ -161,7 +161,7 @@ systray_freeicons(void)
      for(i = trayicons; i; i = i->next)
      {
           XUnmapWindow(dpy, i->win);
-		XReparentWindow(dpy, i->win, ROOT, 0, 0);
+          XReparentWindow(dpy, i->win, ROOT, 0, 0);
           free(i);
      }
 
@@ -176,7 +176,7 @@ systray_freeicons(void)
 Systray*
 systray_find(Window win)
 {
-	Systray *i;
+     Systray *i;
 
      if(!conf.systray.active)
           return NULL;
