@@ -1297,13 +1297,19 @@ client_unmanage(Client *c)
      {
           /* Arrange */
           for(i = 0; i < screen_count() && !b; ++i)
-               if(c->tag == (uint)seltag[i] || tags[i][seltag[i]].tagad & TagFlag(c->tag))
+               if(c->tag == (uint)seltag[i])
+               {
                     b = True;
+                    break;
+               }
+               else if(tags[i][seltag[i]].tagad & TagFlag(c->tag))
+               {
+                    tags[i][seltag[i]].layout.func(c->screen);
+                    break;
+               }
 
           if(b)
-          {
                tags[c->screen][c->tag].layout.func(c->screen);
-          }
           else
           {
                tags[c->screen][c->tag].request_update = True;
@@ -1415,6 +1421,20 @@ uicb_client_screen_prev(uicb_t cmd)
      CHECK(sel);
 
      client_set_screen(sel, (sel->screen - 1 < 0) ? screen_count() - 1 : sel->screen - 1);
+
+     return;
+}
+
+/** Change client of screen to n
+ * \param cmd uicb_t type screen
+*/
+void
+uicb_client_screen_set(uicb_t cmd)
+{
+     (void)cmd;
+     CHECK(sel);
+
+     client_set_screen(sel, atoi(cmd));
 
      return;
 }
