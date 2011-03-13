@@ -637,8 +637,9 @@ motionnotify(XMotionEvent *ev)
           return;
 
      if((c = client_gb_win(ev->subwindow)))
-          client_focus(c);
-     
+          if(c != sel)
+               client_focus(c);
+
      return;
 }
 
