@@ -320,8 +320,8 @@ barwin_refresh_color(BarWindow *bw)
           XSetWindowBackground(dpy, bw->border.top, color_shade(bw->bg, conf.colors.bar_light_shade));
           if(conf.colors.one_shadow)
           {
-               XSetWindowBackground(dpy, bw->border.right, color_shade(conf.colors.bar, conf.colors.client_dark_shade));
-               XSetWindowBackground(dpy, bw->border.bottom, color_shade(conf.colors.bar, conf.colors.client_dark_shade));
+               XSetWindowBackground(dpy, bw->border.right, color_shade(conf.colors.bar, conf.colors.bar_dark_shade));
+               XSetWindowBackground(dpy, bw->border.bottom, color_shade(conf.colors.bar, conf.colors.bar_dark_shade));
           }
           else
           {
