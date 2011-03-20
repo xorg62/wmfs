@@ -898,11 +898,18 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      client_attach(c);
      client_set_rules(c);
      client_get_name(c);
-     client_raise(c);
-     setwinstate(c->win, NormalState);
+     if(c->tag == (uint)seltag[selscreen])
+     {
+          client_raise(c);
+          setwinstate(c->win, NormalState);
+     }
+     else
+          client_hide(c);
+
      ewmh_get_client_list();
      client_update_attributes(c);
-     client_map(c);
+     if(c->tag == (uint)seltag[selscreen])
+          client_map(c);
      ewmh_manage_window_type(c);
 
      if(ar)
