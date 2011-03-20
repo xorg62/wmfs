@@ -1628,3 +1628,27 @@ uicb_client_ignore_tag(uicb_t cmd)
 
      return;
 }
+
+/** Set current client as master
+  *\para cmd uicb_t type unused
+*/
+void
+uicb_client_set_master(uicb_t cmd)
+{
+     Client *c;
+     (void)cmd;
+     
+     /* get the first client */
+     screen_get_sel();
+     if(!sel || ishide(sel, selscreen))
+          return;
+     
+     for(c = clients; c && ishide(c, selscreen); c = c->next);
+     
+     if (c && c != sel)
+     {
+          client_swap(c, sel); 
+          client_focus(c);
+     }
+     return;
+}

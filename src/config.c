@@ -50,6 +50,7 @@ const func_name_list_t func_list[] =
      {"client_move",              uicb_client_move },
      {"client_resize",            uicb_client_resize },
      {"client_ignore_tag",        uicb_client_ignore_tag },
+     {"client_set_master",        uicb_client_set_master },
      {"toggle_max",               uicb_togglemax },
      {"layout_next",              uicb_layout_next },
      {"layout_prev",              uicb_layout_prev },
