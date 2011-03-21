@@ -734,3 +734,43 @@ uicb_tag_rename(uicb_t cmd)
 
      return;
 }
+
+void
+uicb_tag_toggle_expose(uicb_t cmd)
+{
+     (void)cmd;
+     int i;
+
+     screen_get_sel();
+
+     for(i = 1; i <= conf.ntag[selscreen]; i++)
+     {
+          if(strcmp(tags[selscreen][i].name, conf.tag_expose_name) == 0)
+          {
+               tag_set(sel->tag);
+               arrange(selscreen, True);
+               tag_delete(selscreen, i);
+               return;
+          }
+     }
+     
+     tag_new(selscreen, conf.tag_expose_name);
+
+     for(i = 0; i < conf.nlayout; ++i)
+     {
+          if(strcmp(conf.expose_layout, conf.layout[i].type) == 0)
+          {
+               tags[selscreen][conf.ntag[selscreen]].layout = conf.layout[i];
+          }
+     }
+
+     for(i = 1; i < conf.ntag[selscreen]; ++i)
+     {
+          tags[selscreen][conf.ntag[selscreen]].tagad ^= TagFlag(i);
+     }
+     
+     arrange(selscreen, True);
+     tags[selscreen][conf.ntag[selscreen]].request_update = True;
+
+     return;
+}

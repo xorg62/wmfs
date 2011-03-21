@@ -300,6 +300,7 @@ void uicb_tag_del(uicb_t);
 void uicb_tag_rename(uicb_t cmd);
 void uicb_tag_last(uicb_t cmd);
 void uicb_tag_stay_last(uicb_t cmd);
+void uicb_tag_toggle_expose(uicb_t cmd);
 
 /* screen.c */
 int screen_count(void);

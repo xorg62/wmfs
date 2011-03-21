@@ -124,6 +124,9 @@
         #default_name   = "new tag" # deprecated, use [default_tag] instead
         #default_layout = "tile_right" # deprecated, use [default_tag] instead
 
+        expose_name     = "EXPOSE"
+        expose_layout   = "tile_left"
+        
         # Border around the tag buttons.
         border      = true
 
@@ -430,6 +433,8 @@
         # swap client in the next/prev screen
         [key] mod = {"Super", "Shift"} key = "a" func = "client_screen_next" [/key]
         [key] mod = {"Super", "Shift"} key = "z" func = "client_screen_prev" [/key]
+
+        [key] mod = {"Alt"} key = "e" func = "toggle_tag_expose" [/key]
 
         # unlisted fonctions that can be used in [key] func = ""
         # client_focus_{right, left, top, bottom}

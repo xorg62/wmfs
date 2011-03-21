@@ -98,6 +98,7 @@ const func_name_list_t func_list[] =
      {"clientlist",               uicb_clientlist },
      {"check_clist",              uicb_checkclist },
      {"toggle_tagautohide",       uicb_toggle_tagautohide },
+     {"toggle_tag_expose",        uicb_tag_toggle_expose},
      {NULL, NULL}
 };
 
@@ -501,6 +502,8 @@ conf_tag_section(void)
      conf.border.tag              = fetch_opt_first(sec, "false", "border").bool;
      conf.tagautohide             = fetch_opt_first(sec, "false", "autohide").bool;
      conf.tagnamecount            = fetch_opt_first(sec, "false", "name_count").bool;
+     conf.tag_expose_name         = fetch_opt_first(sec, "EXPOSE", "expose_name").str;
+     conf.expose_layout           = fetch_opt_first(sec, "tile_grid_vertical", "expose_layout").str;
 
      def_tag = fetch_section_first(sec, "default_tag");
 
