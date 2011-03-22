@@ -748,7 +748,6 @@ uicb_tag_toggle_expose(uicb_t cmd)
           if(strcmp(tags[selscreen][i].name, conf.tag_expose_name) == 0)
           {
                tag_set(sel->tag);
-               arrange(selscreen, True);
                tag_delete(selscreen, i);
                arrange(selscreen, True);
                return;
