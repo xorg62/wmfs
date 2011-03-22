@@ -750,6 +750,7 @@ uicb_tag_toggle_expose(uicb_t cmd)
                tag_set(sel->tag);
                arrange(selscreen, True);
                tag_delete(selscreen, i);
+               arrange(selscreen, True);
                return;
           }
      }
@@ -769,8 +770,8 @@ uicb_tag_toggle_expose(uicb_t cmd)
           tags[selscreen][conf.ntag[selscreen]].tagad ^= TagFlag(i);
      }
      
-     arrange(selscreen, True);
      tags[selscreen][conf.ntag[selscreen]].request_update = True;
+     arrange(selscreen, True);
 
      return;
 }
