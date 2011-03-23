@@ -334,6 +334,9 @@
 
         # Swap current client with the previous.
         [key] mod = {"Alt", "Shift"} key = "t" func = "client_swap_prev" [/key]
+        
+        # Set the selected client as Master
+        [key] mod = {"Control"} key = "m" func = "client_set_master" [/key]
 
         # Toggle maximum the selected client
         [key] mod = {"Alt"} key = "m" func = "toggle_max" [/key]
