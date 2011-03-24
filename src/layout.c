@@ -51,10 +51,13 @@ arrange(int screen, Bool update_layout)
                     client_hide(c);
           }
 
-     if(update_layout)
-          tags[screen][seltag[screen]].layout.func(screen);
+     if(tags[screen][seltag[screen]].layout.func)
+     {
+          if(update_layout)
+               tags[screen][seltag[screen]].layout.func(screen);
 
-     infobar_draw(screen);
+          infobar_draw(screen);
+     }
 
      return;
 }
