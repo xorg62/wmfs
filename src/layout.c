@@ -889,8 +889,9 @@ Bool
 uicb_checklayout(uicb_t cmd)
 {
      screen_get_sel();
+     char *type = tags[selscreen][seltag[selscreen]].layout.type;
 
-     if(!strcmp(cmd, tags[selscreen][seltag[selscreen]].layout.type))
+     if(type && !strcmp(cmd, type))
           return True;
 
      return False;
