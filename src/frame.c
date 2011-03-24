@@ -118,7 +118,9 @@ frame_create(Client *c)
      /* Border (for shadow) */
      if(conf.client.border_shadow)
      {
-          c->colors.borddark  = color_shade(c->colors.frame, conf.colors.client_dark_shade);
+          uint dark_bg = conf.colors.one_shadow ? conf.client.bordernormal
+                                                : c->colors.frame;
+          c->colors.borddark  = color_shade(dark_bg,         conf.colors.client_dark_shade);
           c->colors.bordlight = color_shade(c->colors.frame, conf.colors.client_light_shade);
 
           CWIN(c->left, c->frame, 0, 0, SHADH, c->frame_geo.height, 0, CWBackPixel,  c->colors.bordlight, &at);
@@ -225,7 +227,9 @@ frame_update_color(Client *c, Bool focused)
 
      if(conf.client.border_shadow)
      {
-          c->colors.borddark  = color_shade(c->colors.frame, conf.colors.client_dark_shade);
+          uint dark_bg = conf.colors.one_shadow ? conf.client.bordernormal
+                                                : c->colors.frame;
+          c->colors.borddark  = color_shade(dark_bg,         conf.colors.client_dark_shade);
           c->colors.bordlight = color_shade(c->colors.frame, conf.colors.client_light_shade);
      }
 
@@ -301,16 +305,8 @@ frame_update(Client *c)
      {
           XSetWindowBackground(dpy, c->left,   c->colors.bordlight);
           XSetWindowBackground(dpy, c->top,    c->colors.bordlight);
-          if(conf.colors.one_shadow)
-          {
-              XSetWindowBackground(dpy, c->right, color_shade(conf.client.bordernormal, conf.colors.client_dark_shade));
-              XSetWindowBackground(dpy, c->bottom, color_shade(conf.client.bordernormal, conf.colors.client_dark_shade));
-          }
-          else
-          {
-              XSetWindowBackground(dpy, c->right,  c->colors.borddark);
-              XSetWindowBackground(dpy, c->bottom, c->colors.borddark);
-          }
+          XSetWindowBackground(dpy, c->right,  c->colors.borddark);
+          XSetWindowBackground(dpy, c->bottom, c->colors.borddark);
 
           XClearWindow(dpy, c->left);
           XClearWindow(dpy, c->top);
