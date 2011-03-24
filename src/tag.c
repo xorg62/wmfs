@@ -739,7 +739,7 @@ void
 uicb_tag_toggle_expose(uicb_t cmd)
 {
      (void)cmd;
-     int i,  j;
+     int i, j;
 
      screen_get_sel();
 
@@ -747,12 +747,16 @@ uicb_tag_toggle_expose(uicb_t cmd)
      {
           if(strcmp(tags[selscreen][i].name, conf.tag_expose_name) == 0)
           {
-               tag_set(sel->tag);
+               if(clients && sel->tag)
+                    tag_set(sel->tag);
+
                tag_delete(selscreen, i);
+
                for(j = 0; j < conf.ntag[selscreen]; j++)
                     tags[selscreen][j].request_update = True;
 
                arrange(selscreen, True);
+
                return;
           }
      }

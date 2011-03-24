@@ -131,7 +131,7 @@
         border      = true
 
         # Hide empty tags in tag list
-        autohide    = false
+        autohide    = true
 
         # Mouse buttons action on tag.
         mouse_button_tag_sel       = "1"
