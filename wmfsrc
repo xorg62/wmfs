@@ -124,14 +124,14 @@
         #default_name   = "new tag" # deprecated, use [default_tag] instead
         #default_layout = "tile_right" # deprecated, use [default_tag] instead
 
-        expose_name     = "EXPOSE"
-        expose_layout   = "tile_left"
+        expose_name    = "EXPOSE"
+        expose_layout  = "tile_left"
         
         # Border around the tag buttons.
-        border      = true
+        border = true
 
         # Hide empty tags in tag list
-        autohide    = true
+        autohide = false
 
         # Mouse buttons action on tag.
         mouse_button_tag_sel       = "1"
