@@ -734,3 +734,50 @@ uicb_tag_rename(uicb_t cmd)
 
      return;
 }
+
+void
+uicb_tag_toggle_expose(uicb_t cmd)
+{
+     (void)cmd;
+     int i, j;
+
+     screen_get_sel();
+
+     for(i = 1; i <= conf.ntag[selscreen]; i++)
+     {
+          if(strcmp(tags[selscreen][i].name, conf.tag_expose_name) == 0)
+          {
+               if(clients && sel->tag)
+                    tag_set(sel->tag);
+
+               tag_delete(selscreen, i);
+
+               for(j = 0; j < conf.ntag[selscreen]; j++)
+                    tags[selscreen][j].request_update = True;
+
+               arrange(selscreen, True);
+
+               return;
+          }
+     }
+     
+     tag_new(selscreen, conf.tag_expose_name);
+
+     for(i = 0; i < conf.nlayout; ++i)
+     {
+          if(strcmp(conf.expose_layout, conf.layout[i].type) == 0)
+          {
+               tags[selscreen][conf.ntag[selscreen]].layout = conf.layout[i];
+          }
+     }
+
+     for(i = 1; i < conf.ntag[selscreen]; ++i)
+     {
+          tags[selscreen][conf.ntag[selscreen]].tagad ^= TagFlag(i);
+     }
+     
+     tags[selscreen][conf.ntag[selscreen]].request_update = True;
+     arrange(selscreen, True);
+
+     return;
+}

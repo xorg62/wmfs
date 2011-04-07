@@ -50,6 +50,7 @@ const func_name_list_t func_list[] =
      {"client_move",              uicb_client_move },
      {"client_resize",            uicb_client_resize },
      {"client_ignore_tag",        uicb_client_ignore_tag },
+     {"client_set_master",        uicb_client_set_master },
      {"toggle_max",               uicb_togglemax },
      {"layout_next",              uicb_layout_next },
      {"layout_prev",              uicb_layout_prev },
@@ -98,6 +99,7 @@ const func_name_list_t func_list[] =
      {"clientlist",               uicb_clientlist },
      {"check_clist",              uicb_checkclist },
      {"toggle_tagautohide",       uicb_toggle_tagautohide },
+     {"toggle_tag_expose",        uicb_tag_toggle_expose},
      {NULL, NULL}
 };
 
@@ -157,7 +159,6 @@ conf_misc_section(void)
 
      conf.font              = fetch_opt_first(sec, "sans-9", "font").str;
      conf.raisefocus        = fetch_opt_first(sec, "false", "raisefocus").bool;
-     conf.raiseswitch       = fetch_opt_first(sec, "false", "raiseswitch").bool;
      conf.focus_fmouse      = fetch_opt_first(sec, "true", "focus_follow_mouse").bool;
      conf.focus_fmov        = fetch_opt_first(sec, "false", "focus_follow_movement").bool;
      conf.focus_pclick      = fetch_opt_first(sec, "true", "focus_pointer_click").bool;
@@ -502,6 +503,8 @@ conf_tag_section(void)
      conf.border.tag              = fetch_opt_first(sec, "false", "border").bool;
      conf.tagautohide             = fetch_opt_first(sec, "false", "autohide").bool;
      conf.tagnamecount            = fetch_opt_first(sec, "false", "name_count").bool;
+     conf.tag_expose_name         = fetch_opt_first(sec, "EXPOSE", "expose_name").str;
+     conf.expose_layout           = fetch_opt_first(sec, "tile_grid_vertical", "expose_layout").str;
 
      def_tag = fetch_section_first(sec, "default_tag");
 

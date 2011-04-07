@@ -124,11 +124,14 @@
         #default_name   = "new tag" # deprecated, use [default_tag] instead
         #default_layout = "tile_right" # deprecated, use [default_tag] instead
 
+        expose_name     = "EXPOSE"
+        expose_layout   = "tile_left"
+        
         # Border around the tag buttons.
         border      = true
 
         # Hide empty tags in tag list
-        autohide    = false
+        autohide    = true
 
         # Mouse buttons action on tag.
         mouse_button_tag_sel       = "1"
@@ -244,7 +247,6 @@
                max           = false      # Set automatic maximized client
                follow_client = false      # follow the client
                ignore_tags   = false      # ignore tag (free mode)
-               follow_client = false      # if the client open in an other tag/screen, follow it.
        [/rule]
 [/rules]
 
@@ -332,6 +334,9 @@
 
         # Swap current client with the previous.
         [key] mod = {"Alt", "Shift"} key = "t" func = "client_swap_prev" [/key]
+        
+        # Set the selected client as Master
+        [key] mod = {"Control"} key = "m" func = "client_set_master" [/key]
 
         # Toggle maximum the selected client
         [key] mod = {"Alt"} key = "m" func = "toggle_max" [/key]
@@ -431,6 +436,8 @@
         # swap client in the next/prev screen
         [key] mod = {"Super", "Shift"} key = "a" func = "client_screen_next" [/key]
         [key] mod = {"Super", "Shift"} key = "z" func = "client_screen_prev" [/key]
+
+        [key] mod = {"Alt"} key = "e" func = "toggle_tag_expose" [/key]
 
         # unlisted fonctions that can be used in [key] func = ""
         # client_focus_{right, left, top, bottom}

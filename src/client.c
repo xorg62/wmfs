@@ -898,11 +898,18 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      client_attach(c);
      client_set_rules(c);
      client_get_name(c);
-     client_raise(c);
-     setwinstate(c->win, NormalState);
+     if(c->tag == (uint)seltag[selscreen])
+     {
+          client_raise(c);
+          setwinstate(c->win, NormalState);
+     }
+     else
+          client_hide(c);
+
      ewmh_get_client_list();
      client_update_attributes(c);
-     client_map(c);
+     if(c->tag == (uint)seltag[selscreen])
+          client_map(c);
      ewmh_manage_window_type(c);
 
      if(ar)
@@ -1626,5 +1633,29 @@ uicb_client_ignore_tag(uicb_t cmd)
 
      arrange(sel->screen, True);
 
+     return;
+}
+
+/** Set current client as master
+  *\para cmd uicb_t type unused
+*/
+void
+uicb_client_set_master(uicb_t cmd)
+{
+     Client *c;
+     (void)cmd;
+
+     /* get the first client */
+     screen_get_sel();
+     if(!sel || ishide(sel, selscreen))
+          return;
+
+     for(c = clients; c && ishide(c, selscreen); c = c->next);
+
+     if (c && c != sel)
+     {
+          client_swap(c, sel);
+          client_focus(c);
+     }
      return;
 }

@@ -201,6 +201,7 @@ void uicb_ignore_next_client_rules(uicb_t cmd);
 void uicb_clientlist(uicb_t cmd);
 Bool uicb_checkclist(uicb_t);
 void uicb_client_ignore_tag(uicb_t);
+void uicb_client_set_master(uicb_t);
 
 /* ewmh.c */
 void ewmh_init_hints(void);
@@ -300,6 +301,7 @@ void uicb_tag_del(uicb_t);
 void uicb_tag_rename(uicb_t cmd);
 void uicb_tag_last(uicb_t cmd);
 void uicb_tag_stay_last(uicb_t cmd);
+void uicb_tag_toggle_expose(uicb_t cmd);
 
 /* screen.c */
 int screen_count(void);

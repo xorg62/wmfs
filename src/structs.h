@@ -381,7 +381,6 @@ typedef struct
      char *font;
      uint opacity;
      Bool raisefocus;
-     Bool raiseswitch;
      Bool focus_fmouse;
      Bool focus_fmov;
      Bool focus_pclick;
@@ -500,6 +499,8 @@ typedef struct
      Bool layout_system; /* Switch: False, Menu: True. */
      Bool layout_placement; /* Right (normal): False, Left: True. */
      Bool keep_layout_geo;
+     char *tag_expose_name;
+     char *expose_layout;
      char *selected_layout_symbol;
      /* Number of... */
      int nkeybind;
