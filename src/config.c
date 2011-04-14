@@ -641,7 +641,8 @@ conf_rule_section(void)
      int i;
      struct conf_sec *rules, **rule;
 
-     rules = fetch_section_first(NULL, "rules");
+     if ((rules = fetch_section_first(NULL, "rules")) == NULL)
+         return;
 
      rule = fetch_section(rules, "rule");
 
