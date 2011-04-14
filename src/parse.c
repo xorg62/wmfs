@@ -376,6 +376,9 @@ include(struct keyword *head)
           }
      }
 
+     if (filename != head->name)
+         free(filename);
+
      head = head->next;
 
      if (kw) {
