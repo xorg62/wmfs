@@ -2,7 +2,7 @@ PROG=wmfs
 MAN=wmfs.1
 
 # wmfs version
-VERSION= 201011
+VERSION=$(shell scripts/setlocalversion)
 
 SRCS= \
 src/barwin.c \

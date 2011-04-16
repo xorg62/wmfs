@@ -486,7 +486,7 @@ main(int argc, char **argv)
                break;
 
           case 'v':
-               printf("WMFS "WMFS_VERSION"\n");
+               printf("wmfs"WMFS_VERSION"\n");
                exit(EXIT_SUCCESS);
                break;
 

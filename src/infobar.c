@@ -127,7 +127,7 @@ infobar_init(void)
           barwin_refresh(infobar[sc].bar);
 
           /* Default statustext is set here */
-          infobar[sc].statustext = xstrdup(WMFS_VERSION);
+          infobar[sc].statustext = xstrdup("wmfs"WMFS_VERSION);
 
           infobar_draw(sc);
      }
