@@ -70,3 +70,6 @@ if rev=`svn info 2>/dev/null | grep '^Last Changed Rev'`; then
 	# All done with svn
 	exit
 fi
+
+# default version
+printf -- '-%s' "`date +%Y%m`"

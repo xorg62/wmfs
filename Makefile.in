@@ -48,12 +48,13 @@ ${MAN}.gz: ${MAN}
 .c.o:
 	${CC} -c ${CFLAGS} $< -o $@
 
+.PHONY: all clean distclean install uninstall dist
+
 clean:
 	rm -f ${OBJS} wmfs ${MAN}.gz
 
 distclean: clean
 	rm -f Makefile
-
 
 install: all
 	@echo installing executable file to ${DESTDIR}${PREFIX}/bin
@@ -80,7 +81,7 @@ uninstall:
 	rm -f ${DESTDIR}${XDG_CONFIG_DIR}/wmfs/wmfsrc
 	rmdir ${DESTDIR}${XDG_CONFIG_DIR}/wmfs/
 
-
-
-.PHONY: all clean distclean install uninstall
+dist:
+	@echo "Generate wmfs-`date +%Y%m`.tar.gz"
+	git archive --format=tar --prefix=wmfs-`date +%Y%m`/ master | gzip -c > wmfs-`date +%Y%m`.tar.gz
 
