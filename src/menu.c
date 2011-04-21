@@ -151,6 +151,7 @@ menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
      Bool quit = False;
      char acc = 0;
 
+     XNextEvent(dpy, ev);
      switch(ev->type)
      {
      /* Mouse events */
@@ -224,7 +225,6 @@ menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
           getevent(*ev);
           break;
      }
-     XNextEvent(dpy, ev);
 
      return quit;
 }

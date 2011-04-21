@@ -227,6 +227,7 @@ launcher_execute(Launcher *launcher)
 
      while(my_guitar_gently_wheeps)
      {
+          XNextEvent(dpy, &ev);
           if(ev.type == KeyPress)
           {
                XLookupString(&ev.xkey, tmp, sizeof(tmp), &ks, 0);
@@ -356,7 +357,6 @@ launcher_execute(Launcher *launcher)
           }
           else
                getevent(ev);
-          XNextEvent(dpy, &ev);
      }
 
      barwin_unmap(bw);
