@@ -95,7 +95,7 @@ enum { MA_Center = 0, MA_Left = 1, MA_Right = 2 };
 /* Infobar position */
 enum { IB_Hide = 0, IB_Bottom = 1, IB_Top = 2 };
 
-typedef enum { Right, Left, Top, Bottom, Center, PositionLast } Position;
+typedef enum { Right = 0, Left, Top, Bottom, Center, PositionLast } Position;
 
 /* Ewmh hints list */
 enum

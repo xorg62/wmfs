@@ -435,7 +435,7 @@ client_urgent(Client *c, Bool u)
 }
 
 /* The following functions have the same point :
- * find a client member with a Window {{{
+ * find a client member with a Window or values {{{
  */
 
 /* Get Client with a window */
@@ -514,6 +514,35 @@ client_urgent(Client *c, Bool u)
                          *n = i;
                          return c;
                     }
+
+          return NULL;
+     }
+
+/** Get a client with a position
+ * \param x x value
+ * \param y y value
+ * \return The client
+*/
+     Client* get_client_with_pos(int x, int y)
+     {
+          Client *c, *psel = sel;
+          Window w;
+          int d, dx, dy, basex, basey;
+
+          if(x < 1 || x > sgeo[selscreen].width
+               || y < 1 || y > sgeo[selscreen].height)
+               return NULL;
+
+          XQueryPointer(dpy, ROOT, &w, &w, &basex, &basey, &d, &d, (uint *)&d);
+          XWarpPointer(dpy, None, ROOT, 0, 0, 0, 0, x, y);
+          XQueryPointer(dpy, ROOT, &w, &w, &dx, &dy, &d, &d, (uint *)&d);
+          XWarpPointer(dpy, None, ROOT, 0, 0, 0, 0, basex, basey);
+
+          if(psel)
+               client_focus(psel);
+
+          if((c = client_gb_frame(w)) || (c = client_gb_win(w)))
+               return c;
 
           return NULL;
      }
@@ -1659,3 +1688,127 @@ uicb_client_set_master(uicb_t cmd)
      }
      return;
 }
+
+/** Manual resizing of tiled clients
+  * \param c Client pointer
+  * \param p Direction of resizing
+  * \param fac Factor of resizing
+*/
+static void
+client_tile_factor_set(Client *c, Position p, int fac)
+{
+     Client *gc = NULL;
+     int x, y;
+     XRectangle cgeo, scgeo;
+     char scanfac[4][3] =
+     {
+          {  1,  0 }, { -1, 0 }, /* Right, Left */
+          {  0, -1 }, {  0, 1 }  /* Top, Bottom */
+     };
+
+     if(!c || !(c->flags & TileFlag) || p > Bottom)
+          return;
+
+     cgeo = c->geo;
+
+     /* Scan in right direction to next(p) physical client */
+     x = c->geo.x + ((p == Right)  ? c->geo.width  : 0);
+     y = c->geo.y + ((p == Bottom) ? c->geo.height : 0);
+     for(; (gc = get_client_with_pos(x, y)) == c; x += scanfac[p][0], y += scanfac[p][1]);
+
+     if(!gc)
+          return;
+
+     scgeo = gc->geo;
+
+     /* Modify client geometry */
+     switch(p)
+     {
+          default:
+          case Right:
+               scgeo.x += fac;
+               cgeo.width += fac;
+               scgeo.width -= fac;
+               break;
+          case Left:
+               cgeo.x -= fac;
+               cgeo.width += fac;
+               scgeo.width -= fac;
+               break;
+          case Top:
+               cgeo.y -= fac;
+               cgeo.height += fac;
+               scgeo.height -= fac;
+               break;
+          case Bottom:
+               scgeo.y += fac;
+               cgeo.height += fac;
+               scgeo.height -= fac;
+               break;
+     }
+
+     /* Too big */
+     if(scgeo.width > (1 << 15) || scgeo.height > (1 << 15)
+          || cgeo.width > (1 << 15) || cgeo.height > (1 << 15))
+          return;
+
+     /* Too small */
+     if(scgeo.width < 1 || scgeo.height < 1
+          || cgeo.width < 1 || cgeo.height < 1)
+          return;
+
+     /* Magic moment */
+     client_moveresize(c,  cgeo,  tags[c->screen][c->tag].resizehint);
+     client_moveresize(gc, scgeo, tags[gc->screen][gc->tag].resizehint);
+
+     return;
+}
+
+void
+uicb_client_resize_right(uicb_t cmd)
+{
+     int n = atoi(cmd);
+
+     CHECK(sel);
+
+     client_tile_factor_set(sel, Right, n);
+
+     return;
+}
+
+void
+uicb_client_resize_left(uicb_t cmd)
+{
+     int n = atoi(cmd);
+
+     CHECK(sel);
+
+     client_tile_factor_set(sel, Left, n);
+
+     return;
+}
+
+void
+uicb_client_resize_top(uicb_t cmd)
+{
+     int n = atoi(cmd);
+
+     CHECK(sel);
+
+     client_tile_factor_set(sel, Top, n);
+
+     return;
+}
+
+void
+uicb_client_resize_bottom(uicb_t cmd)
+{
+     int n = atoi(cmd);
+
+     CHECK(sel);
+
+     client_tile_factor_set(sel, Bottom, n);
+
+     return;
+}
+

@@ -163,6 +163,7 @@ Client* client_gb_frame(Window w);
 Client* client_gb_titlebar(Window w);
 Client* client_gb_resize(Window w);
 Client* client_gb_button(Window w, int *n);
+Client* get_client_with_pos(int x, int y);
 /* }}} */
 void client_get_name(Client *c);
 void client_hide(Client *c);
@@ -202,6 +203,10 @@ void uicb_clientlist(uicb_t cmd);
 Bool uicb_checkclist(uicb_t);
 void uicb_client_ignore_tag(uicb_t);
 void uicb_client_set_master(uicb_t);
+void uicb_client_resize_right(uicb_t cmd);
+void uicb_client_resize_left(uicb_t cmd);
+void uicb_client_resize_top(uicb_t cmd);
+void uicb_client_resize_bottom(uicb_t cmd);
 
 /* ewmh.c */
 void ewmh_init_hints(void);
