@@ -530,7 +530,7 @@ conf_tag_section(void)
                          fetch_opt_first(def_tag, "0.6", "mwfact").fnum,
                          fetch_opt_first(def_tag, "1", "nmaster").num,
                          False, fetch_opt_first(def_tag, "False", "resizehint").bool,
-                         False, False, bar_pos, bar_pos,
+                         False, False, False, bar_pos, bar_pos,
                          layout_name_to_struct(conf.layout, fetch_opt_first(def_tag, "title_right", "layout").str, conf.nlayout, layout_list),
                          0, NULL, 0, False };
 

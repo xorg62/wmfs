@@ -188,16 +188,16 @@ struct Client
      int focusontag;
      /* Screen */
      int screen;
-     /* Layer */
-     int layer;
      /* Window attribute */
-     XRectangle geo;
+     XRectangle geo, pgeo;
      XRectangle tmp_geo;
      XRectangle frame_geo;
      /* Old window attribute */
      XRectangle ogeo;
      /* Free window attribute */
      XRectangle free_geo;
+     /* Tile size factors */
+     int tilefact[4];
      /* For resizehint usage */
      int basew, baseh, incw, inch;
      int maxw, maxh, minw, minh;
@@ -286,6 +286,7 @@ typedef struct
      Bool resizehint;
      Bool request_update;
      Bool abovefc;
+     Bool cleanfact;
      int barpos;
      int prev_barpos;
      Layout layout;

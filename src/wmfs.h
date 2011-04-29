@@ -163,7 +163,7 @@ Client* client_gb_frame(Window w);
 Client* client_gb_titlebar(Window w);
 Client* client_gb_resize(Window w);
 Client* client_gb_button(Window w, int *n);
-Client* get_client_with_pos(int x, int y);
+Client* client_gb_pos(Client *c, int x, int y);
 /* }}} */
 void client_get_name(Client *c);
 void client_hide(Client *c);
@@ -183,6 +183,8 @@ void client_unmanage(Client *c);
 void client_unmap(Client *c);
 void client_update_attributes(Client *c);
 void client_urgent(Client *c, Bool u);
+void client_clean_tile_fact(Client *c);
+XRectangle client_get_geo_factor(XRectangle geo, int fact[4]);
 void uicb_client_raise(uicb_t);
 void uicb_client_next(uicb_t);
 void uicb_client_prev(uicb_t);
@@ -335,6 +337,7 @@ void systray_update(void);
 
 /* layout.c */
 void arrange(int screen, Bool update_layout);
+Client *tiled_client(int screen, Client *c);
 void freelayout(int screen);
 void layoutswitch(Bool b);
 void maxlayout(int screen);

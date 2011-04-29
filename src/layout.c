@@ -54,7 +54,10 @@ arrange(int screen, Bool update_layout)
      if(tags[screen][seltag[screen]].layout.func)
      {
           if(update_layout)
+          {
+               tags[screen][seltag[screen]].cleanfact = True;
                tags[screen][seltag[screen]].layout.func(screen);
+          }
 
           infobar_draw(screen);
      }
@@ -116,6 +119,7 @@ layoutswitch(Bool b)
      }
 
      ewmh_update_current_tag_prop();
+     tags[selscreen][seltag[selscreen]].cleanfact = True;
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);
      infobar_draw(selscreen);
 
@@ -151,7 +155,7 @@ uicb_layout_prev(uicb_t cmd)
  * \param c Client pointer
  * \return a client pointer
 */
-static Client*
+Client*
 tiled_client(int screen, Client *c)
 {
      for(;c && ((c->flags & MaxFlag)
@@ -229,6 +233,7 @@ uicb_set_nmaster(uicb_t cmd)
           return;
 
      tags[selscreen][seltag[selscreen]].nmaster += n;
+     tags[c->screen][c->tag].cleanfact = True;
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);
 
      ewmh_update_current_tag_prop();
@@ -270,6 +275,9 @@ grid(int screen, Bool horizontal)
           c->flags &= ~(MaxFlag | LMaxFlag);
           c->flags |= TileFlag;
           ++cpcols;
+
+          client_clean_tile_fact(c);
+
           cgeo.width = (sg.width / cols) - (BORDH * 2);
           cgeo.height = (sg.height / rows) - BORDH;
 
@@ -282,19 +290,20 @@ grid(int screen, Bool horizontal)
                cgeo.width = sg.width - (cgeo.x - (sg.x - (BORDH * 2)));
 
           /* Resize */
-          client_moveresize(c, cgeo, tags[screen][seltag[screen]].resizehint);
+          client_moveresize(c, (c->pgeo = cgeo), tags[screen][seltag[screen]].resizehint);
 
           /* Set all the other size with current client info */
-          cgeo.y = c->geo.y + c->geo.height + BORDH + TBARH;
+          cgeo.y = c->pgeo.y + c->pgeo.height + BORDH + TBARH;
 
           if(cpcols + 1 > rows)
           {
                cpcols = 0;
-               cgeo.x = c->geo.x + c->geo.width + (BORDH * 2);
+               cgeo.x = c->pgeo.x + c->pgeo.width + (BORDH * 2);
                cgeo.y = sg.y;
           }
      }
 
+     tags[screen][seltag[screen]].cleanfact = False;
      ewmh_update_current_tag_prop();
 
      return;
@@ -354,6 +363,8 @@ multi_tile(int screen, Position type)
           /* Set client property */
           c->flags &= ~(MaxFlag | LMaxFlag);
           c->flags |= TileFlag;
+
+          client_clean_tile_fact(c);
 
           /* MASTER */
           if(i < nmaster)
@@ -415,15 +426,16 @@ multi_tile(int screen, Position type)
           }
 
           /* Magic instant */
-          client_moveresize(c, cgeo, tags[screen][seltag[screen]].resizehint);
+          client_moveresize(c, (c->pgeo = cgeo), tags[screen][seltag[screen]].resizehint);
 
           /* Set the position of the next client */
           if(type == Top || type == Bottom)
-               cgeo.x = c->geo.x + c->geo.width + (BORDH * 2);
+               cgeo.x = c->pgeo.x + c->pgeo.width + (BORDH * 2);
           else
-               cgeo.y = c->geo.y + c->geo.height + BORDH + TBARH;
+               cgeo.y = c->pgeo.y + c->pgeo.height + BORDH + TBARH;
      }
 
+     tags[screen][seltag[screen]].cleanfact = False;
      ewmh_update_current_tag_prop();
 
      return;
@@ -444,7 +456,7 @@ mirror(int screen, Bool horizontal)
      uint i, n, tilesize = 0, mwfact;
      uint nmaster = tags[screen][seltag[screen]].nmaster;
      int pa, imp;
-     Bool isp = 0;
+     Bool isp = False;
 
      memset(nextg, 0, sizeof(nextg));
 
@@ -510,6 +522,8 @@ mirror(int screen, Bool horizontal)
           c->flags &= ~(MaxFlag | LMaxFlag);
           c->flags |= TileFlag;
 
+          client_clean_tile_fact(c);
+
           if(i < nmaster)
           {
                cgeo = mastergeo;
@@ -571,10 +585,10 @@ mirror(int screen, Bool horizontal)
                }
           }
 
-          client_moveresize(c, cgeo, tags[screen][seltag[screen]].resizehint);
+          client_moveresize(c, (c->pgeo = cgeo), tags[screen][seltag[screen]].resizehint);
 
           if(i >= nmaster)
-               nextg[!isp] = c->geo;
+               nextg[!isp] = c->pgeo;
 
           /* Next y/x position */
           if(i >= nmaster - 1)
@@ -604,6 +618,7 @@ mirror(int screen, Bool horizontal)
 
      }
 
+     tags[screen][seltag[screen]].cleanfact = False;
      ewmh_update_current_tag_prop();
 
      return;
@@ -720,6 +735,7 @@ uicb_togglefree(uicb_t cmd)
 
      client_update_attributes(sel);
 
+     tags[selscreen][seltag[selscreen]].cleanfact = True;
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);
 
      return;
@@ -752,6 +768,7 @@ uicb_togglemax(uicb_t cmd)
           sel->geo = sel->ogeo;
           client_moveresize(sel, sel->geo, True);
           sel->flags &= ~MaxFlag;
+          tags[selscreen][seltag[selscreen]].cleanfact = True;
           tags[selscreen][seltag[selscreen]].layout.func(selscreen);
      }
 
@@ -796,6 +813,7 @@ uicb_toggle_abovefc(uicb_t cmd)
                     break;
                }
 
+          tags[selscreen][seltag[selscreen]].cleanfact = True;
           tags[selscreen][seltag[selscreen]].layout.func(selscreen);
      }
 
@@ -846,6 +864,7 @@ layout_set_client_master(Client *c)
      client_detach(c);
      client_attach(c);
 
+     tags[selscreen][seltag[selscreen]].cleanfact = True;
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);
 
      return;
