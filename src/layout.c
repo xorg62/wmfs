@@ -233,7 +233,7 @@ uicb_set_nmaster(uicb_t cmd)
           return;
 
      tags[selscreen][seltag[selscreen]].nmaster += n;
-     tags[c->screen][c->tag].cleanfact = True;
+     tags[selscreen][seltag[selscreen]].cleanfact = True;
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);
 
      ewmh_update_current_tag_prop();
