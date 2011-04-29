@@ -529,8 +529,8 @@ client_urgent(Client *c, Bool u)
           Window w;
           int d, dx, dy, basex, basey;
 
-          if(x < 1 || x > sgeo[selscreen].width
-               || y < 1 || y > sgeo[selscreen].height)
+          if(x < 1 || x > sgeo[selscreen].x + sgeo[selscreen].width
+                    || y < 1 || y > sgeo[selscreen].y + sgeo[selscreen].height)
                return NULL;
 
           XQueryPointer(dpy, ROOT, &w, &w, &basex, &basey, &d, &d, (uint *)&d);
