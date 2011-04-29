@@ -54,10 +54,7 @@ arrange(int screen, Bool update_layout)
      if(tags[screen][seltag[screen]].layout.func)
      {
           if(update_layout)
-          {
-               tags[screen][seltag[screen]].cleanfact = True;
-               tags[screen][seltag[screen]].layout.func(screen);
-          }
+                tags[screen][seltag[screen]].layout.func(screen);
 
           infobar_draw(screen);
      }
@@ -841,6 +838,7 @@ uicb_set_layout(uicb_t cmd)
                     if(layout_list[i].func == conf.layout[j].func)
                          tags[selscreen][seltag[selscreen]].layout = conf.layout[j];
 
+     tags[selscreen][seltag[selscreen]].cleanfact = True;
      arrange(selscreen, True);
 
      return;
