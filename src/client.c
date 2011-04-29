@@ -525,26 +525,19 @@ client_urgent(Client *c, Bool u)
 */
      Client* client_gb_pos(Client *c, int x, int y)
      {
-          Client *ret;
-          Window w;
-          int d, dx, dy, basex, basey;
+          Client *cc;
 
-          if(x < 1 || x > sgeo[selscreen].x + sgeo[selscreen].width
-                    || y < 1 || y > sgeo[selscreen].y + sgeo[selscreen].height)
+          if(x < 0 || x > sgeo[selscreen].x + sgeo[selscreen].width
+                    || y < 0 || y > sgeo[selscreen].y + sgeo[selscreen].height)
                return NULL;
 
-          XQueryPointer(dpy, ROOT, &w, &w, &basex, &basey, &d, &d, (uint *)&d);
-          XWarpPointer(dpy, None, ROOT, 0, 0, 0, 0, x, y);
-          XQueryPointer(dpy, ROOT, &w, &w, &dx, &dy, &d, &d, (uint *)&d);
-          XWarpPointer(dpy, None, ROOT, 0, 0, 0, 0, basex, basey);
+          for(cc = clients; cc; cc = cc->next)
+               if(!ishide(cc, selscreen) && cc != c)
+                    if(cc->frame_geo.x <= x && cc->frame_geo.x + cc->frame_geo.width >= x
+                              && cc->frame_geo.y <= y && cc->frame_geo.y + cc->frame_geo.height >= y)
+                         return cc;
 
-          if(w == ROOT)
-               return c;
-
-          if((ret = client_gb_frame(w)) || (ret = client_gb_win(w)))
-               return ret;
-
-          return NULL;
+          return c;
      }
 
 /* }}} */
@@ -1764,6 +1757,8 @@ client_tile_factor_set(Client *c, Position p, int fac)
      /* Start place of pointer for faster scanning */
      x = c->geo.x + ((p == Right)  ? c->geo.width  : 0);
      y = c->geo.y + ((p == Bottom) ? c->geo.height : 0);
+     y += ((p < Top)  ? c->geo.height / 2 : 0);
+     x += ((p > Left) ? c->geo.width  / 2 : 0);
 
      /* Scan in right direction to next(p) physical client */
      for(; (gc = client_gb_pos(c, x, y)) == c; x += scanfac[p][0], y += scanfac[p][1]);
