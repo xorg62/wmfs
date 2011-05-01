@@ -3,7 +3,6 @@
 wmfs
 #*
 \#*
-Makefile
 wmfs.1.gz
 tags
 *.patch

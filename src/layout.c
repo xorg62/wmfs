@@ -273,7 +273,7 @@ grid(int screen, Bool horizontal)
           c->flags |= TileFlag;
           ++cpcols;
 
-          client_clean_tile_fact(c);
+          cfactor_clean(c);
 
           cgeo.width = (sg.width / cols) - (BORDH * 2);
           cgeo.height = (sg.height / rows) - BORDH;
@@ -361,7 +361,7 @@ multi_tile(int screen, Position type)
           c->flags &= ~(MaxFlag | LMaxFlag);
           c->flags |= TileFlag;
 
-          client_clean_tile_fact(c);
+          cfactor_clean(c);
 
           /* MASTER */
           if(i < nmaster)
@@ -519,7 +519,7 @@ mirror(int screen, Bool horizontal)
           c->flags &= ~(MaxFlag | LMaxFlag);
           c->flags |= TileFlag;
 
-          client_clean_tile_fact(c);
+          cfactor_clean(c);
 
           if(i < nmaster)
           {

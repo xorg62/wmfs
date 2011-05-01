@@ -888,7 +888,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      c->free_geo = c->pgeo = c->geo;
      c->tag = seltag[c->screen];
      c->focusontag = -1;
-     client_clean_tile_fact(c);
+     cfactor_clean(c);
 
      at.event_mask = PropertyChangeMask;
 
@@ -1048,7 +1048,7 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
           c->tag = seltag[c->screen];
 
      if(c->flags & TileFlag)
-          c->geo = client_get_geo_factor(c->pgeo, c->tilefact);
+          c->geo = cfactor_geo(c->pgeo, c->tilefact);
 
      frame_moveresize(c, c->geo);
 
@@ -1352,10 +1352,6 @@ client_unmanage(Client *c)
                infobar_draw(c->screen);
           }
      }
-
-
-
-     /*XFree(c->title);*/
 
      client_focus_next(c);
 
@@ -1686,163 +1682,6 @@ uicb_client_set_master(uicb_t cmd)
           client_swap(c, sel);
           client_focus(c);
      }
-     return;
-}
-
-/** Clean client tile factors
-  *\param c Client pointer
-*/
-void
-client_clean_tile_fact(Client *c)
-{
-     CHECK(c);
-
-     if(!tags[c->screen][c->tag].cleanfact)
-          return;
-
-     c->tilefact[Right] = c->tilefact[Left]   = 0;
-     c->tilefact[Top]   = c->tilefact[Bottom] = 0;
-
-     return;
-}
-
-/** Return new geo of client with factors applied
-  *\param c Client pointer
-  *\return geo
-*/
-XRectangle
-client_get_geo_factor(XRectangle geo, int fact[4])
-{
-     XRectangle cgeo = { 0, 0, 0, 0 };
-
-     cgeo = geo;
-
-     /* Right factor */
-     cgeo.width += fact[Right];
-
-     /* Left factor */
-     cgeo.x -= fact[Left];
-     cgeo.width += fact[Left];
-
-     /* Top factor */
-     cgeo.y -= fact[Top];
-     cgeo.height += fact[Top];
-
-     /* Bottom factor */
-     cgeo.height += fact[Bottom];
-
-     return cgeo;
-}
-
-/** Manual resizing of tiled clients
-  * \param c Client pointer
-  * \param p Direction of resizing
-  * \param fac Factor of resizing
-*/
-static void
-client_tile_factor_set(Client *c, Position p, int fac)
-{
-     Client *gc = NULL;
-     int x, y;
-     XRectangle cgeo, scgeo;
-     Position reversepos[4] = { Left, Right, Bottom, Top };
-     int cfact[4] = { 0 }, scfact[4] = { 0 };
-     char scanfac[4][3] =
-     {
-          { 1,  0 }, { -1, 0 }, /* Right, Left */
-          { 0, -1 }, {  0, 1 }  /* Top, Bottom */
-     };
-
-     if(!c || p > Bottom)
-          return;
-
-     /* Start place of pointer for faster scanning */
-     x = c->geo.x + ((p == Right)  ? c->geo.width  : 0);
-     y = c->geo.y + ((p == Bottom) ? c->geo.height : 0);
-     y += ((p < Top)  ? c->geo.height / 2 : 0);
-     x += ((p > Left) ? c->geo.width  / 2 : 0);
-
-     /* Scan in right direction to next(p) physical client */
-     for(; (gc = client_gb_pos(c, x, y)) == c; x += scanfac[p][0], y += scanfac[p][1]);
-
-     if(!gc || c->screen != gc->screen)
-          return;
-
-     cfact[p] += fac;
-     scfact[reversepos[p]] -= fac;
-
-     cgeo  = client_get_geo_factor(c->geo,  cfact);
-     scgeo = client_get_geo_factor(gc->geo, scfact);
-
-     /* Too big */
-     if(scgeo.width > (1 << 15) || scgeo.height > (1 << 15)
-          || cgeo.width > (1 << 15) || cgeo.height > (1 << 15))
-          return;
-
-     /* Too small */
-     if(scgeo.width < 1 || scgeo.height < 1
-          || cgeo.width < 1 || cgeo.height < 1)
-          return;
-
-     /* Check if move/resize is needed for same col/row clients */
-     /*for(sc = tiled_client(c->screen, clients); sc; tiled_client(c->screen, c->next))
-          if(sc->geo.*/
-
-     c->tilefact[p] += fac;
-     gc->tilefact[reversepos[p]] -= fac;
-
-     /* Magic moment */
-     client_moveresize(c,  cgeo,  tags[c->screen][c->tag].resizehint);
-     client_moveresize(gc, scgeo, tags[gc->screen][gc->tag].resizehint);
-
-     return;
-}
-
-void
-uicb_client_resize_right(uicb_t cmd)
-{
-     int n = atoi(cmd);
-
-     CHECK(sel);
-
-     client_tile_factor_set(sel, Right, n);
-
-     return;
-}
-
-void
-uicb_client_resize_left(uicb_t cmd)
-{
-     int n = atoi(cmd);
-
-     CHECK(sel);
-
-     client_tile_factor_set(sel, Left, n);
-
-     return;
-}
-
-void
-uicb_client_resize_top(uicb_t cmd)
-{
-     int n = atoi(cmd);
-
-     CHECK(sel);
-
-     client_tile_factor_set(sel, Top, n);
-
-     return;
-}
-
-void
-uicb_client_resize_bottom(uicb_t cmd)
-{
-     int n = atoi(cmd);
-
-     CHECK(sel);
-
-     client_tile_factor_set(sel, Bottom, n);
-
      return;
 }
 

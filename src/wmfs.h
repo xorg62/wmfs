@@ -152,6 +152,14 @@ void uicb_infobar_togglepos(uicb_t);
 void uicb_infobar_toggledisplay(uicb_t);
 void uicb_toggle_tagautohide(uicb_t);
 
+/* cfactor.c */
+void cfactor_clean(Client *c);
+XRectangle cfactor_geo(XRectangle geo, int fact[4]);
+void uicb_client_resize_right(uicb_t cmd);
+void uicb_client_resize_left(uicb_t cmd);
+void uicb_client_resize_top(uicb_t cmd);
+void uicb_client_resize_bottom(uicb_t cmd);
+
 /* client.c */
 void client_attach(Client *c);
 void client_configure(Client *c);
@@ -183,8 +191,6 @@ void client_unmanage(Client *c);
 void client_unmap(Client *c);
 void client_update_attributes(Client *c);
 void client_urgent(Client *c, Bool u);
-void client_clean_tile_fact(Client *c);
-XRectangle client_get_geo_factor(XRectangle geo, int fact[4]);
 void uicb_client_raise(uicb_t);
 void uicb_client_next(uicb_t);
 void uicb_client_prev(uicb_t);
@@ -205,10 +211,6 @@ void uicb_clientlist(uicb_t cmd);
 Bool uicb_checkclist(uicb_t);
 void uicb_client_ignore_tag(uicb_t);
 void uicb_client_set_master(uicb_t);
-void uicb_client_resize_right(uicb_t cmd);
-void uicb_client_resize_left(uicb_t cmd);
-void uicb_client_resize_top(uicb_t cmd);
-void uicb_client_resize_bottom(uicb_t cmd);
 
 /* ewmh.c */
 void ewmh_init_hints(void);
