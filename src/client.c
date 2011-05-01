@@ -1320,7 +1320,8 @@ client_unmanage(Client *c)
      XUngrabServer(dpy);
      ewmh_get_client_list();
 
-     tags[c->screen][c->tag].cleanfact = True;
+     if(c->flags & TileFlag)
+          tags[c->screen][c->tag].cleanfact = True;
 
      if(c->tag == MAXTAG + 1)
      {
