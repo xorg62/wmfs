@@ -183,7 +183,7 @@ cfactor_set(Client *c, Position p, int fac)
      Client *gc = NULL;
      int x, y;
 
-     if(!c || p > Bottom)
+     if(!c || !(c->flags & TileFlag) || p > Bottom)
           return;
 
      /* Start place of pointer for faster scanning */

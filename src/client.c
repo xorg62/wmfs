@@ -532,7 +532,7 @@ client_urgent(Client *c, Bool u)
                return NULL;
 
           for(cc = clients; cc; cc = cc->next)
-               if(!ishide(cc, selscreen) && cc != c)
+               if(!ishide(cc, selscreen) && (cc->flags & TileFlag) && cc != c)
                     if(cc->frame_geo.x <= x && cc->frame_geo.x + cc->frame_geo.width >= x
                               && cc->frame_geo.y <= y && cc->frame_geo.y + cc->frame_geo.height >= y)
                          return cc;
