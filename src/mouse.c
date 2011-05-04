@@ -102,8 +102,6 @@ mouse_move_tag_client(Client *c)
                     arrange(c->screen, True);
           }
 
-     client_focus_next(c);
-
      return;
 }
 
@@ -206,7 +204,7 @@ mouse_resize(Client *c)
      int d, u, omx, omy;
      XGCValues xgc;
      GC gci;
-     float mwf = tags[selscreen][seltag[selscreen]].mwfact;
+     int f[4] = { 0 };
 
      if((c->flags & MaxFlag)
         || (c->flags & LMaxFlag)
@@ -247,24 +245,13 @@ mouse_resize(Client *c)
 
           if(ev.type == MotionNotify)
           {
-               /* To resize MWFACT in tile mode */
-               if((c->flags & TileFlag)
-                  && tags[selscreen][seltag[selscreen]].layout.func != grid_vertical
-                  && tags[selscreen][seltag[selscreen]].layout.func != grid_horizontal)
+               /* To resize client in tile mode with cfactor */
+               if(c->flags & TileFlag)
                {
-                    if(tags[selscreen][seltag[selscreen]].layout.func == tile)
-                         mwf += (ROUND(ev.xmotion.x_root) - omx) / (sgeo[c->screen].width);
-                    else if(tags[selscreen][seltag[selscreen]].layout.func == tile_left)
-                         mwf -= (ROUND(ev.xmotion.x_root) - omx) / (sgeo[c->screen].width);
-                    else if(tags[selscreen][seltag[selscreen]].layout.func == tile_top)
-                         mwf -= (ROUND(ev.xmotion.y_root) - omy) / (sgeo[c->screen].height);
-                    else
-                         mwf += (ROUND(ev.xmotion.y_root) - omy) / (sgeo[c->screen].height);
-
-                    omx = ROUND(ev.xmotion.x_root);
-                    omy = ROUND(ev.xmotion.y_root);
-
-                    tags[selscreen][seltag[selscreen]].mwfact = (mwf < 0.05) ? 0.05 : ((mwf > 0.95) ? 0.95 : mwf);
+                    f[Right]  = ev.xmotion.x_root - omx;
+                    f[Left]   = omx - ev.xmotion.x_root;
+                    f[Top]    = omy - ev.xmotion.y_root;
+                    f[Bottom] = ev.xmotion.y_root - omy;
                }
                /* Free mode */
                else if(!(c->flags & TileFlag))
@@ -303,7 +290,7 @@ mouse_resize(Client *c)
           XUngrabServer(dpy);
      }
      else
-          tags[selscreen][seltag[selscreen]].layout.func(c->screen);
+          cfactor_multi_set(c, f);
 
      client_update_attributes(c);
      XUngrabPointer(dpy, CurrentTime);

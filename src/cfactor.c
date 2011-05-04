@@ -106,10 +106,6 @@ cfactor_parentrow(XRectangle cg, XRectangle ccg, Position p)
 
      switch(p)
      {
-          default:
-          case Right:
-               ret = (ccg.x + ccg.width == cg.x + cg.width);
-               break;
           case Left:
                ret = (ccg.x == cg.x);
                break;
@@ -119,9 +115,13 @@ cfactor_parentrow(XRectangle cg, XRectangle ccg, Position p)
           case Bottom:
                ret = (ccg.y + ccg.height == cg.y + cg.height);
                break;
+          case Right:
+          default:
+               ret = (ccg.x + ccg.width == cg.x + cg.width);
+               break;
      }
 
-      return ret;
+     return ret;
 }
 
 /** Get c parents of row and resize
@@ -177,7 +177,7 @@ cfactor_check_geo(Client *c, Client *g, Position p, int fac)
   * \param p Direction of resizing
   * \param fac Factor of resizing
 */
-static void
+void
 cfactor_set(Client *c, Position p, int fac)
 {
      Client *gc = NULL;
@@ -205,6 +205,24 @@ cfactor_set(Client *c, Position p, int fac)
      /* Arrange client and row parents */
      cfactor_arrange_row(c, p, fac);
      cfactor_arrange_row(gc, RPOS(p), -fac);
+
+     return;
+}
+
+/** Apply a complete factor array to a client
+  * \param c Client pointer
+  * \param fac factor array
+*/
+void
+cfactor_multi_set(Client *c, int fac[4])
+{
+     if(!c)
+          return;
+
+     cfactor_set(c, Right,  fac[Right]);
+     cfactor_set(c, Left,   fac[Left]);
+     cfactor_set(c, Top,    fac[Top]);
+     cfactor_set(c, Bottom, fac[Bottom]);
 
      return;
 }

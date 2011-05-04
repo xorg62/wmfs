@@ -155,6 +155,8 @@ void uicb_toggle_tagautohide(uicb_t);
 /* cfactor.c */
 void cfactor_clean(Client *c);
 XRectangle cfactor_geo(XRectangle geo, int fact[4], int *err);
+void cfactor_set(Client *c, Position p, int fac);
+void cfactor_multi_set(Client *c, int fac[4]);
 void uicb_client_resize_right(uicb_t cmd);
 void uicb_client_resize_left(uicb_t cmd);
 void uicb_client_resize_top(uicb_t cmd);
