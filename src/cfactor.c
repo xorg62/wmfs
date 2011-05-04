@@ -62,10 +62,11 @@ cfactor_clean(Client *c)
   *\return geo
 */
 XRectangle
-cfactor_geo(XRectangle geo, int fact[4])
+cfactor_geo(XRectangle geo, int fact[4], int *err)
 {
      XRectangle cgeo = { 0, 0, 0, 0 };
 
+     *err = 0;
      cgeo = geo;
 
      /* Right factor */
@@ -82,55 +83,93 @@ cfactor_geo(XRectangle geo, int fact[4])
      /* Bottom factor */
      cgeo.height += fact[Bottom];
 
+     /* Too big/small */
+     if(cgeo.width > sgeo[selscreen].width || cgeo.height > sgeo[selscreen].height
+               || cgeo.width < 1 || cgeo.height < 1)
+     {
+          *err = 1;
+          return geo;
+     }
+
      return cgeo;
 }
 
+/** Return test of parent compatibility between cg & ccg client geometry
+  *\param cg First geo
+  *\param ccg Second geo
+  *\param p Direction of resizing
+*/
 static Bool
-cfactor_parentrow(Client *c, Client *cc, Position p)
+cfactor_parentrow(XRectangle cg, XRectangle ccg, Position p)
 {
      Bool ret;
-
-     if(!c || !cc)
-          return False;
 
      switch(p)
      {
           default:
           case Right:
-               ret = (cc->frame_geo.x + cc->frame_geo.width == c->frame_geo.x + c->frame_geo.width);
+               ret = (ccg.x + ccg.width == cg.x + cg.width);
                break;
           case Left:
-               ret = (cc->frame_geo.x == c->frame_geo.x);
+               ret = (ccg.x == cg.x);
                break;
           case Top:
-               ret = (cc->frame_geo.y == c->frame_geo.y);
+               ret = (ccg.y == cg.y);
                break;
           case Bottom:
-               ret = (cc->frame_geo.y + cc->frame_geo.height == c->frame_geo.y + c->frame_geo.height);
+               ret = (ccg.y + ccg.height == cg.y + cg.height);
                break;
      }
 
       return ret;
 }
 
+/** Get c parents of row and resize
+  *\param c Client pointer
+  *\param p Direction of resizing
+  *\param fac Factor of resizing
+*/
 static void
-cfactor_scan_row(Client *c, Position p, int fac)
+cfactor_arrange_row(Client *c, Position p, int fac)
 {
+     XRectangle cgeo = c->frame_geo;
      Client *cc;
 
+     /* Travel clients to search parents of row and apply fact */
      for(cc = tiled_client(c->screen, clients); cc; cc = tiled_client(c->screen, cc->next))
-     {
-          if(cc == c)
-               continue;
-
-          if(cfactor_parentrow(c, cc, p))
+          if(cfactor_parentrow(cgeo, cc->frame_geo, p))
           {
                cc->tilefact[p] += fac;
-               client_moveresize(cc, cc->geo,  tags[cc->screen][cc->tag].resizehint);
+               client_moveresize(cc, cc->geo, tags[cc->screen][cc->tag].resizehint);
           }
-     }
 
      return;
+}
+
+/** Check future geometry of factorized client
+  *\param c Client pointer
+  *\param g Client pointer
+  *\param p Direction of resizing
+  *\param fac Factor of resizing
+ */
+static Bool
+cfactor_check_geo(Client *c, Client *g, Position p, int fac)
+{
+     int e1, e2;
+     XRectangle cg, gg;
+     int cf[4] = { 0 }, gf[4] = { 0 };
+
+     cf[p] += fac;
+     gf[RPOS(p)] -= fac;
+
+     cg = cfactor_geo(c->geo, cf, &e1);
+     gg = cfactor_geo(g->geo, gf, &e2);
+
+     /* Size failure */
+     if(e1 || e2)
+          return False;
+
+     return True;
 }
 
 /** Manual resizing of tiled clients
@@ -143,8 +182,6 @@ cfactor_set(Client *c, Position p, int fac)
 {
      Client *gc = NULL;
      int x, y;
-     XRectangle cgeo, scgeo;
-     int cfact[4] = { 0 }, scfact[4] = { 0 };
 
      if(!c || p > Bottom)
           return;
@@ -161,36 +198,16 @@ cfactor_set(Client *c, Position p, int fac)
      if(!gc || c->screen != gc->screen)
           return;
 
-     cfact[p] += fac;
-     scfact[RPOS(p)] -= fac;
-
-     cgeo  = cfactor_geo(c->geo,  cfact);
-     scgeo = cfactor_geo(gc->geo, scfact);
-
-     /* Too big */
-     if(scgeo.width > (1 << 15) || scgeo.height > (1 << 15)
-          || cgeo.width > (1 << 15) || cgeo.height > (1 << 15))
+     /* Check size */
+     if(!cfactor_check_geo(c, gc, p, fac))
           return;
 
-     /* Too small */
-     if(scgeo.width < 1 || scgeo.height < 1
-          || cgeo.width < 1 || cgeo.height < 1)
-          return;
-
-     c->tilefact[p] += fac;
-     gc->tilefact[RPOS(p)] -= fac;
-
-     /* Arrange row parents */
-     cfactor_scan_row(c, p, fac);
-     cfactor_scan_row(gc, RPOS(p), -fac);
-
-     /* Magic moment */
-     client_moveresize(c,  cgeo,  tags[c->screen][c->tag].resizehint);
-     client_moveresize(gc, scgeo, tags[gc->screen][gc->tag].resizehint);
+     /* Arrange client and row parents */
+     cfactor_arrange_row(c, p, fac);
+     cfactor_arrange_row(gc, RPOS(p), -fac);
 
      return;
 }
-
 
 void
 uicb_client_resize_right(uicb_t cmd)

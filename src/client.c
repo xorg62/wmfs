@@ -1016,12 +1016,15 @@ client_geo_hints(XRectangle *geo, Client *c)
 void
 client_moveresize(Client *c, XRectangle geo, Bool r)
 {
-     int os;
+     int os, e;
 
      if(!c)
           return;
 
      os = c->screen;
+
+     if(c->flags & TileFlag)
+          geo = cfactor_geo(c->pgeo, c->tilefact, &e);
 
      if(r)
           client_geo_hints(&geo, c);
@@ -1046,9 +1049,6 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
      if((c->screen = screen_get_with_geo(c->geo.x, c->geo.y)) != os
                && c->tag != MAXTAG + 1)
           c->tag = seltag[c->screen];
-
-     if(c->flags & TileFlag)
-          c->geo = cfactor_geo(c->pgeo, c->tilefact);
 
      frame_moveresize(c, c->geo);
 
