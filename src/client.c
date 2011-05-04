@@ -527,8 +527,8 @@ client_urgent(Client *c, Bool u)
      {
           Client *cc;
 
-          if(x < 0 || x > sgeo[selscreen].x + sgeo[selscreen].width
-                    || y < 0 || y > sgeo[selscreen].y + sgeo[selscreen].height)
+          if(x < 0 || x > spgeo[selscreen].x + spgeo[selscreen].width
+                    || y < 0 || y > spgeo[selscreen].y + spgeo[selscreen].height)
                return NULL;
 
           for(cc = clients; cc; cc = cc->next)

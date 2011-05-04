@@ -32,6 +32,14 @@
 
 #include "wmfs.h"
 
+#define RPOS(x) (x % 2 ? p - 1 : p + 1)
+
+char scanfac[4][2] =
+{
+     { 1,  0 }, { -1, 0 }, /* Right, Left   */
+     { 0, -1 }, {  0, 1 }  /* Top,   Bottom */
+};
+
 /** Clean client tile factors
   *\param c Client pointer
 */
@@ -77,6 +85,53 @@ cfactor_geo(XRectangle geo, int fact[4])
      return cgeo;
 }
 
+static Bool
+cfactor_parentrow(Client *c, Client *cc, Position p)
+{
+     Bool ret;
+
+     if(!c || !cc)
+          return False;
+
+     switch(p)
+     {
+          default:
+          case Right:
+               ret = (cc->frame_geo.x + cc->frame_geo.width == c->frame_geo.x + c->frame_geo.width);
+               break;
+          case Left:
+               ret = (cc->frame_geo.x == c->frame_geo.x);
+               break;
+          case Top:
+               ret = (cc->frame_geo.y == c->frame_geo.y);
+               break;
+          case Bottom:
+               ret = (cc->frame_geo.y + cc->frame_geo.height == c->frame_geo.y + c->frame_geo.height);
+               break;
+     }
+
+      return ret;
+}
+
+static void
+cfactor_scan_row(Client *c, Position p, int fac)
+{
+     Client *cc;
+
+     for(cc = tiled_client(c->screen, clients); cc; cc = tiled_client(c->screen, cc->next))
+     {
+          if(cc == c)
+               continue;
+
+          if(cfactor_parentrow(c, cc, p))
+          {
+               cc->tilefact[p] += fac;
+               client_moveresize(cc, cc->geo,  tags[cc->screen][cc->tag].resizehint);
+          }
+     }
+
+     return;
+}
 
 /** Manual resizing of tiled clients
   * \param c Client pointer
@@ -89,13 +144,7 @@ cfactor_set(Client *c, Position p, int fac)
      Client *gc = NULL;
      int x, y;
      XRectangle cgeo, scgeo;
-     Position reversepos[4] = { Left, Right, Bottom, Top };
      int cfact[4] = { 0 }, scfact[4] = { 0 };
-     char scanfac[4][3] =
-     {
-          { 1,  0 }, { -1, 0 }, /* Right, Left */
-          { 0, -1 }, {  0, 1 }  /* Top, Bottom */
-     };
 
      if(!c || p > Bottom)
           return;
@@ -113,7 +162,7 @@ cfactor_set(Client *c, Position p, int fac)
           return;
 
      cfact[p] += fac;
-     scfact[reversepos[p]] -= fac;
+     scfact[RPOS(p)] -= fac;
 
      cgeo  = cfactor_geo(c->geo,  cfact);
      scgeo = cfactor_geo(gc->geo, scfact);
@@ -128,12 +177,12 @@ cfactor_set(Client *c, Position p, int fac)
           || cgeo.width < 1 || cgeo.height < 1)
           return;
 
-     /* Check if move/resize is needed for same col/row clients */
-     /*for(sc = tiled_client(c->screen, clients); sc; tiled_client(c->screen, c->next))
-          if(sc->geo.*/
-
      c->tilefact[p] += fac;
-     gc->tilefact[reversepos[p]] -= fac;
+     gc->tilefact[RPOS(p)] -= fac;
+
+     /* Arrange row parents */
+     cfactor_scan_row(c, p, fac);
+     cfactor_scan_row(gc, RPOS(p), -fac);
 
      /* Magic moment */
      client_moveresize(c,  cgeo,  tags[c->screen][c->tag].resizehint);
