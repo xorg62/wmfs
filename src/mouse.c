@@ -248,10 +248,15 @@ mouse_resize(Client *c)
                /* To resize client in tile mode with cfactor */
                if(c->flags & TileFlag)
                {
-                    f[Right]  = ev.xmotion.x_root - omx;
-                    f[Left]   = omx - ev.xmotion.x_root;
-                    f[Top]    = omy - ev.xmotion.y_root;
-                    f[Bottom] = ev.xmotion.y_root - omy;
+                    if(omx >= c->frame_geo.x + (c->frame_geo.width / 2))
+                         f[Right] = ev.xmotion.x_root - omx;
+                    else
+                         f[Left] = omx - ev.xmotion.x_root;
+
+                    if(omy >= c->frame_geo.y + (c->frame_geo.height / 2))
+                         f[Bottom] = ev.xmotion.y_root - omy;
+                    else
+                         f[Top] = omy - ev.xmotion.y_root;
                }
                /* Free mode */
                else if(!(c->flags & TileFlag))
