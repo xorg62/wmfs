@@ -932,8 +932,10 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
 
      ewmh_get_client_list();
      client_update_attributes(c);
+
      if(c->tag == (uint)seltag[selscreen])
           client_map(c);
+
      ewmh_manage_window_type(c);
 
      if(ar)

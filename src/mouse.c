@@ -46,6 +46,17 @@ mouse_dragborder(XRectangle geo, GC g)
      return;
 }
 
+
+static void
+mouse_cfactor_border(Client *c, int f[4], GC g)
+{
+     int  e;
+
+     mouse_dragborder(cfactor_geo(c->geo, f, &e), g);
+
+     return;
+}
+
 /** Move a client in tile grid with the mouse
  *\param c Client double pointer
  */
@@ -238,6 +249,8 @@ mouse_resize(Client *c)
                XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, 0, c->geo.height);
           mouse_dragborder(c->geo, gci);
      }
+     else
+          mouse_cfactor_border(c, f, gci);
 
      do
      {
@@ -248,6 +261,8 @@ mouse_resize(Client *c)
                /* To resize client in tile mode with cfactor */
                if(c->flags & TileFlag)
                {
+                    mouse_cfactor_border(c, f, gci);
+
                     if(omx >= c->frame_geo.x + (c->frame_geo.width / 2))
                          f[Right] = ev.xmotion.x_root - omx;
                     else
@@ -257,6 +272,8 @@ mouse_resize(Client *c)
                          f[Bottom] = ev.xmotion.y_root - omy;
                     else
                          f[Top] = omy - ev.xmotion.y_root;
+
+                    mouse_cfactor_border(c, f, gci);
                }
                /* Free mode */
                else if(!(c->flags & TileFlag))
@@ -295,7 +312,10 @@ mouse_resize(Client *c)
           XUngrabServer(dpy);
      }
      else
+     {
+          mouse_cfactor_border(c, f, gci);
           cfactor_multi_set(c, f);
+     }
 
      client_update_attributes(c);
      XUngrabPointer(dpy, CurrentTime);
