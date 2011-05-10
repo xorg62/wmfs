@@ -146,6 +146,12 @@ _cfactor_arrange_row(Client *c, Position p, int fac)
      return;
 }
 
+/* Resize only 2 client with applied factor
+   *\param c1 Client pointer
+   *\param c2 Client pointer
+   *\param p Direction of resizing
+   *\param fac Facotr
+*/
 static void
 cfactor_arrange_two(Client *c1, Client *c2, Position p, int fac)
 {
@@ -158,12 +164,17 @@ cfactor_arrange_two(Client *c1, Client *c2, Position p, int fac)
      return;
 }
 
+/** Get c parents of row and resize, exception checking same size before arranging row
+  *\param c Client pointer
+  *\param gc Client pointer
+  *\param p Direction of resizing
+  *\param fac Factor of resizing
+*/
 static void
 cfactor_arrange_row(Client *c, Client *gc, Position p, int fac)
 {
-
-     if(((p == Top || p == Bottom) && gc->geo.width == c->geo.width)
-               || ((p == Right || p == Left) && gc->geo.height == c->geo.height))
+     if(((p == Right || p == Left) && gc->geo.height == c->geo.height)
+               || ((p == Top || p == Bottom) && gc->geo.width == c->geo.width))
           cfactor_arrange_two(c, gc, p, fac);
      else
      {
