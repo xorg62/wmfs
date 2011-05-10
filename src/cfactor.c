@@ -130,7 +130,7 @@ cfactor_parentrow(XRectangle cg, XRectangle ccg, Position p)
   *\param fac Factor of resizing
 */
 static void
-cfactor_arrange_row(Client *c, Position p, int fac)
+_cfactor_arrange_row(Client *c, Position p, int fac)
 {
      XRectangle cgeo = c->frame_geo;
      Client *cc;
@@ -142,6 +142,34 @@ cfactor_arrange_row(Client *c, Position p, int fac)
                cc->tilefact[p] += fac;
                client_moveresize(cc, cc->geo, tags[cc->screen][cc->tag].resizehint);
           }
+
+     return;
+}
+
+static void
+cfactor_arrange_two(Client *c1, Client *c2, Position p, int fac)
+{
+     c1->tilefact[p] += fac;
+     c2->tilefact[RPOS(p)] -= fac;
+
+     client_moveresize(c1, c1->geo, tags[c1->screen][c1->tag].resizehint);
+     client_moveresize(c2, c2->geo, tags[c2->screen][c2->tag].resizehint);
+
+     return;
+}
+
+static void
+cfactor_arrange_row(Client *c, Client *gc, Position p, int fac)
+{
+
+     if(((p == Top || p == Bottom) && gc->geo.width == c->geo.width)
+               || ((p == Right || p == Left) && gc->geo.height == c->geo.height))
+          cfactor_arrange_two(c, gc, p, fac);
+     else
+     {
+          _cfactor_arrange_row(c, p, fac);
+          _cfactor_arrange_row(gc, RPOS(p), -fac);
+     }
 
      return;
 }
@@ -203,8 +231,7 @@ cfactor_set(Client *c, Position p, int fac)
           return;
 
      /* Arrange client and row parents */
-     cfactor_arrange_row(c, p, fac);
-     cfactor_arrange_row(gc, RPOS(p), -fac);
+     cfactor_arrange_row(c, gc, p, fac);
 
      return;
 }
