@@ -868,6 +868,90 @@ layout_set_client_master(Client *c)
      return;
 }
 
+/** Split client hor or vert to insert another client in the new area
+  *\param c Client pointer
+  *\param p True = Vertical, False = Horizontal
+*/
+static void
+layout_split_client(Client *c, Bool p)
+{
+     XRectangle geo, sgeo;
+
+     if(!c || !(c->flags & TileFlag)
+               || tags[c->screen][c->tag].split)
+          return;
+
+     tags[c->screen][c->tag].split = True;
+
+     cfactor_clean(c);
+
+     geo = sgeo = c->geo;
+
+     if(p)
+     {
+          geo.x += (geo.width / 2);
+          geo.width /= 2;
+          sgeo.width = (sgeo.width / 2) - (BORDH * 2);
+     }
+     else
+     {
+          geo.y += (geo.height / 2);
+          geo.height /= 2;
+          sgeo.height = (sgeo.height / 2) - (BORDH + TBARH);
+     }
+
+     tags[c->screen][c->tag].layout.sgeo = sgeo;
+
+     client_moveresize(c, (c->pgeo = geo), tags[c->screen][c->tag].resizehint);
+
+     return;
+}
+
+/** Apply new attributes to splitted client
+  *\param c Client pointer
+*/
+void
+layout_split_apply(Client *c)
+{
+     if(!c || !tags[c->screen][c->tag].split)
+          return;
+
+     c->flags &= ~(MaxFlag | LMaxFlag);
+     c->flags |= TileFlag;
+
+     cfactor_clean(c);
+     client_moveresize(c, (c->pgeo = tags[c->screen][c->tag].layout.sgeo),
+               tags[c->screen][c->tag].resizehint);
+
+     tags[c->screen][c->tag].split = False;
+
+     return;
+}
+
+void
+uicb_split_client_vertical(uicb_t cmd)
+{
+     (void)cmd;
+
+     CHECK(sel);
+
+     layout_split_client(sel, True);
+
+     return;
+}
+
+void
+uicb_split_client_horizontal(uicb_t cmd)
+{
+     (void)cmd;
+
+     CHECK(sel);
+
+     layout_split_client(sel, False);
+
+     return;
+}
+
 /** Check the selected client is max
  * \param cmd uicb_t type unused
 */

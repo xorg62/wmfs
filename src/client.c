@@ -938,11 +938,13 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
 
      ewmh_manage_window_type(c);
 
-     if(ar)
+     if(ar && !tags[c->screen][c->tag].split)
           arrange(c->screen, True);
 
-     if(!conf.client.set_new_win_master)
+     if(!conf.client.set_new_win_master && !tags[c->screen][c->tag].split)
           layout_set_client_master(c);
+
+     layout_split_apply(c);
 
      if(c->tag == (uint)seltag[selscreen])
           client_focus(c);
@@ -1028,6 +1030,8 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
      if(c->flags & TileFlag)
           geo = cfactor_geo(c->pgeo, c->tilefact, &e);
 
+     if(e)
+          printf("EE: &e\n");
      if(r)
           client_geo_hints(&geo, c);
 

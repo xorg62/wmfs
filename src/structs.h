@@ -259,6 +259,8 @@ typedef struct
 /* Layout Structure */
 typedef struct
 {
+     XRectangle sgeo;
+     int sfact[4];
      char *symbol;
      char *type;
      void (*func)(int screen);
@@ -279,9 +281,9 @@ typedef struct
      char *name;
      char **clients;
      int nclients;
-     int layers;
      float mwfact;
      int nmaster;
+     Bool split;
      Bool urgent;
      Bool resizehint;
      Bool request_update;

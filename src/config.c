@@ -104,6 +104,8 @@ const func_name_list_t func_list[] =
      {"check_clist",              uicb_checkclist },
      {"toggle_tagautohide",       uicb_toggle_tagautohide },
      {"toggle_tag_expose",        uicb_tag_toggle_expose},
+     {"split_client_vertical",    uicb_split_client_vertical },
+     {"split_client_horizontal",  uicb_split_client_horizontal },
      {NULL, NULL}
 };
 
@@ -526,11 +528,11 @@ conf_tag_section(void)
      /* If there is no tag in the conf or more than
       * MAXTAG (36) print an error and create only one.
       */
-     Tag default_tag = { fetch_opt_first(def_tag, "new tag", "name").str, NULL, 0, 1,
+     Tag default_tag = { fetch_opt_first(def_tag, "new tag", "name").str, NULL, 1,
                          fetch_opt_first(def_tag, "0.6", "mwfact").fnum,
                          fetch_opt_first(def_tag, "1", "nmaster").num,
                          False, fetch_opt_first(def_tag, "False", "resizehint").bool,
-                         False, False, False, bar_pos, bar_pos,
+                         False, False, False, False, bar_pos, bar_pos,
                          layout_name_to_struct(conf.layout, fetch_opt_first(def_tag, "tile_right", "layout").str, conf.nlayout, layout_list),
                          0, NULL, 0, False };
 
@@ -583,7 +585,6 @@ conf_tag_section(void)
                tags[k][conf.ntag[k]].nmaster    = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "1", "nmaster").str, "nmaster").num;
                tags[k][conf.ntag[k]].resizehint = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "false", "resizehint").str, "resizehint").bool;
                tags[k][conf.ntag[k]].abovefc    = fetch_opt_first(tag[i], "false", "abovefc").bool;
-               tags[k][conf.ntag[k]].layers = 1;
 
                tmp = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "top", "infobar_position").str, "infobar_position").str;
 
