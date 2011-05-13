@@ -533,8 +533,8 @@ client_urgent(Client *c, Bool u)
 
           for(cc = clients; cc; cc = cc->next)
                if(!ishide(cc, selscreen) && (cc->flags & TileFlag) && cc != c)
-                    if(cc->frame_geo.x <= x && cc->frame_geo.x + cc->frame_geo.width >= x
-                              && cc->frame_geo.y <= y && cc->frame_geo.y + cc->frame_geo.height >= y)
+                    if(cc->frame_geo.x < x && cc->frame_geo.x + cc->frame_geo.width > x
+                              && cc->frame_geo.y < y && cc->frame_geo.y + cc->frame_geo.height > y)
                          return cc;
 
           return c;
@@ -1021,42 +1021,50 @@ void
 client_moveresize(Client *c, XRectangle geo, Bool r)
 {
      int os, e;
+     XRectangle fg;
 
      if(!c)
           return;
 
      os = c->screen;
 
+     /* Apply padding and cfactor */
      if(c->flags & TileFlag)
+     {
           geo = cfactor_geo(c->pgeo, c->tilefact, &e);
 
-     if(e)
-          printf("EE: &e\n");
-     if(r)
-          client_geo_hints(&geo, c);
+          if(conf.client.padding && (c->flags & FLayFlag))
+          {
+               geo.x += conf.client.padding;
+               geo.y += conf.client.padding;
+               geo.width -= conf.client.padding * 2;
+               geo.height -= conf.client.padding * 2;
+
+               c->flags &= ~FLayFlag;
+          }
+     }
 
      c->flags &= ~MaxFlag;
 
-     if(conf.client.padding && c->flags & TileFlag && c->flags & FLayFlag)
-     {
-          geo.x += conf.client.padding;
-          geo.y += conf.client.padding;
-          geo.width -= conf.client.padding * 2;
-          geo.height -= conf.client.padding * 2;
+     fg = geo;
 
-          c->flags &= ~FLayFlag;
-     }
+     /* Apply geometry hints */
+     if(r)
+          client_geo_hints(&geo, c);
 
      c->geo = geo;
 
-     if(c->flags & FreeFlag || !(c->flags & (TileFlag | LMaxFlag)) || conf.keep_layout_geo)
+     /* Sett free_geo */
+     if(c->flags & FreeFlag || !(c->flags & (TileFlag | LMaxFlag))
+               || conf.keep_layout_geo)
           c->free_geo = c->geo;
 
+     /* Check to set new screen if needed */
      if((c->screen = screen_get_with_geo(c->geo.x, c->geo.y)) != os
                && c->tag != MAXTAG + 1)
           c->tag = seltag[c->screen];
 
-     frame_moveresize(c, c->geo);
+     frame_moveresize(c, fg);
 
      XMoveResizeWindow(dpy, c->win, BORDH, TBARH, c->geo.width, c->geo.height);
 

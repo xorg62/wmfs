@@ -32,7 +32,7 @@
 
 #include "wmfs.h"
 
-#define RPOS(x) (x % 2 ? p - 1 : p + 1)
+#define RPOS(x) (x % 2 ? x - 1 : x + 1)
 
 char scanfac[4][2] =
 {
@@ -64,10 +64,9 @@ cfactor_clean(Client *c)
 XRectangle
 cfactor_geo(XRectangle geo, int fact[4], int *err)
 {
-     XRectangle cgeo = { 0, 0, 0, 0 };
+     XRectangle cgeo = geo;
 
      *err = 0;
-     cgeo = geo;
 
      /* Right factor */
      cgeo.width += fact[Right];
@@ -155,13 +154,37 @@ _cfactor_arrange_row(Client *c, Position p, int fac)
 static void
 cfactor_arrange_two(Client *c1, Client *c2, Position p, int fac)
 {
+
      c1->tilefact[p] += fac;
      c2->tilefact[RPOS(p)] -= fac;
+
+     /* Needed in case of padding */
+     if(conf.client.padding)
+     {
+           c1->flags |= FLayFlag;
+           c2->flags |= FLayFlag;
+     }
 
      client_moveresize(c1, c1->geo, tags[c1->screen][c1->tag].resizehint);
      client_moveresize(c2, c2->geo, tags[c2->screen][c2->tag].resizehint);
 
      return;
+
+}
+
+/* Check 2 clients parenting compatibility
+   *\param g1 client1 geo
+   *\param g2 client2 geo
+   *\param p Direction of resizing
+   *\returm 1/0
+*/
+static Bool
+cfactor_check_2pc(XRectangle g1, XRectangle g2, Position p)
+{
+     if(p < Top)
+          return (g1.height == g2.height);
+     else
+          return (g1.width == g2.width);
 }
 
 /** Get c parents of row and resize, exception checking same size before arranging row
@@ -173,8 +196,8 @@ cfactor_arrange_two(Client *c1, Client *c2, Position p, int fac)
 static void
 cfactor_arrange_row(Client *c, Client *gc, Position p, int fac)
 {
-     if(((p == Right || p == Left) && gc->geo.height == c->geo.height)
-               || ((p == Top || p == Bottom) && gc->geo.width == c->geo.width))
+
+     if(cfactor_check_2pc(c->frame_geo, gc->frame_geo, p))
           cfactor_arrange_two(c, gc, p, fac);
      else
      {

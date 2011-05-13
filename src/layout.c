@@ -887,17 +887,19 @@ layout_split_client(Client *c, Bool p)
 
      geo = sgeo = c->geo;
 
+     /* Vertical */
      if(p)
      {
-          geo.x += (geo.width / 2);
           geo.width /= 2;
           sgeo.width = (sgeo.width / 2) - (BORDH * 2);
+          sgeo.x = FRAMEW(geo.x + geo.width);
      }
+     /* Horizontal */
      else
      {
-          geo.y += (geo.height / 2);
-          geo.height /= 2;
-          sgeo.height = (sgeo.height / 2) - (BORDH + TBARH);
+          geo.height = (geo.height / 2) - TBARH;
+          sgeo.height = (sgeo.height / 2) - BORDH;
+          sgeo.y = FRAMEH(geo.y + geo.height);
      }
 
      tags[c->screen][c->tag].layout.sgeo = sgeo;

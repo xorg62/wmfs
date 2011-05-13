@@ -126,7 +126,7 @@
 
         expose_name    = "EXPOSE"
         expose_layout  = "tile_left"
-        
+
         # Border around the tag buttons.
         border = true
 
@@ -191,7 +191,7 @@
         # same as above but for the screen
         #default_open_screen  = 1
 
-        # Space between tiled clients
+        # Space between tiled clients (px)
         padding = 0
 
         # Modifier for mouse use
@@ -334,7 +334,7 @@
 
         # Swap current client with the previous.
         [key] mod = {"Alt", "Shift"} key = "t" func = "client_swap_prev" [/key]
-        
+
         # Set the selected client as Master
         [key] mod = {"Control"} key = "m" func = "client_set_master" [/key]
 
