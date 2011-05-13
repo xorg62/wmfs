@@ -885,7 +885,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      c->ogeo.y = c->geo.y = my;
      c->ogeo.width = c->geo.width = wa->width;
      c->ogeo.height = c->geo.height = wa->height;
-     c->free_geo = c->pgeo = c->geo;
+     c->free_geo = c->pgeo = c->wrgeo = c->geo;
      c->tag = seltag[c->screen];
      c->focusontag = -1;
      cfactor_clean(c);
@@ -1021,7 +1021,6 @@ void
 client_moveresize(Client *c, XRectangle geo, Bool r)
 {
      int os, e;
-     XRectangle fg;
 
      if(!c)
           return;
@@ -1046,7 +1045,8 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
 
      c->flags &= ~MaxFlag;
 
-     fg = geo;
+     /* Set geo without resizehint applied */
+     c->wrgeo = geo;
 
      /* Apply geometry hints */
      if(r)
@@ -1064,7 +1064,7 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
                && c->tag != MAXTAG + 1)
           c->tag = seltag[c->screen];
 
-     frame_moveresize(c, fg);
+     frame_moveresize(c, c->wrgeo);
 
      XMoveResizeWindow(dpy, c->win, BORDH, TBARH, c->geo.width, c->geo.height);
 

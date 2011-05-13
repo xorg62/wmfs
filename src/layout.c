@@ -885,21 +885,28 @@ layout_split_client(Client *c, Bool p)
 
      cfactor_clean(c);
 
-     geo = sgeo = c->geo;
+     /* Use geometry without resizehint applied on it */
+     geo = sgeo = c->wrgeo;
 
      /* Vertical */
      if(p)
      {
           geo.width /= 2;
-          sgeo.width = (sgeo.width / 2) - (BORDH * 2);
           sgeo.x = FRAMEW(geo.x + geo.width);
-     }
+          sgeo.width = (sgeo.width / 2) - (BORDH * 2);
+
+          /* Remainder */
+          sgeo.width += (c->wrgeo.x + c->wrgeo.width) - (sgeo.x + sgeo.width);
+      }
      /* Horizontal */
      else
      {
           geo.height = (geo.height / 2) - TBARH;
-          sgeo.height = (sgeo.height / 2) - BORDH;
           sgeo.y = FRAMEH(geo.y + geo.height);
+          sgeo.height = (sgeo.height / 2) - BORDH;
+
+          /* Remainder */
+          sgeo.height += (c->wrgeo.y + c->wrgeo.height) - (sgeo.y + sgeo.height);
      }
 
      tags[c->screen][c->tag].layout.sgeo = sgeo;
