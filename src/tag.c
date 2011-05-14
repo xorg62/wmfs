@@ -500,6 +500,8 @@ tag_additional(int sc, int tag, int adtag)
 
      tags[sc][tag].tagad ^= TagFlag(adtag);
      tags[sc][adtag].request_update = True;
+     tags[sc][tag].cleanfact = True;
+     tags[sc][adtag].cleanfact = True;
      arrange(sc, True);
 
      return;

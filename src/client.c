@@ -1021,6 +1021,7 @@ void
 client_moveresize(Client *c, XRectangle geo, Bool r)
 {
      int os, e;
+     int rhx = 0, rhy = 0;
 
      if(!c)
           return;
@@ -1050,7 +1051,13 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
 
      /* Apply geometry hints */
      if(r)
+     {
           client_geo_hints(&geo, c);
+
+          /* To balance position of window in frame */
+          rhx = ((c->wrgeo.width) - geo.width) / 2;
+          rhy = ((c->wrgeo.height) - geo.height) / 2;
+     }
 
      c->geo = geo;
 
@@ -1066,7 +1073,7 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
 
      frame_moveresize(c, c->wrgeo);
 
-     XMoveResizeWindow(dpy, c->win, BORDH, TBARH, c->geo.width, c->geo.height);
+     XMoveResizeWindow(dpy, c->win, BORDH + rhx, TBARH + rhy, c->geo.width, c->geo.height);
 
      client_update_attributes(c);
      client_configure(c);

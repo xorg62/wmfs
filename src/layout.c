@@ -778,12 +778,15 @@ uicb_togglemax(uicb_t cmd)
 void
 uicb_toggle_resizehint(uicb_t cmd)
 {
+     Client *c;
+
      screen_get_sel();
      (void)cmd;
 
      tags[selscreen][seltag[selscreen]].resizehint = !tags[selscreen][seltag[selscreen]].resizehint;
 
-     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
+     for(c = tiled_client(selscreen, clients); c; c = tiled_client(selscreen, c->next))
+          client_moveresize(c, c->geo, tags[selscreen][seltag[selscreen]].resizehint);
 
      return;
 }
