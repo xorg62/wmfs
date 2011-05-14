@@ -1097,10 +1097,7 @@ client_maximize(Client *c)
      c->geo.width  = sgeo[c->screen].width  - BORDH * 2;
      c->geo.height = sgeo[c->screen].height - BORDH;
 
-     client_moveresize(c, c->geo, False);
-
-     /* Raise for maximized clients, client_raise has too much condition */
-     XRaiseWindow(dpy, c->frame);
+     client_moveresize(c, c->geo, tags[c->screen][c->tag].resizehint);
 
      return;
 }
