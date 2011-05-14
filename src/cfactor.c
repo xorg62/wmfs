@@ -48,7 +48,8 @@ cfactor_clean(Client *c)
 {
      CHECK(c);
 
-     if(!tags[c->screen][c->tag].cleanfact)
+     if(!tags[c->screen][c->tag].cleanfact
+               && !tags[c->screen][c->tag].split)
           return;
 
      c->tilefact[Right] = c->tilefact[Left]   = 0;
