@@ -1320,7 +1320,10 @@ client_unmanage(Client *c)
      ewmh_get_client_list();
 
      if(c->flags & TileFlag)
+     {
+          tags[c->screen][c->tag].cleanfact = True;
           split_arrange_closed(*c);
+     }
 
      if(c->tag == MAXTAG + 1)
      {
