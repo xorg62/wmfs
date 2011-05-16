@@ -129,10 +129,10 @@ split_arrange_closed(Client ghost)
      return;
 }
 
-
 /** Split client hor or vert to insert another client in the new area
   *\param c Client pointer
   *\param p True = Vertical, False = Horizontal
+  *\return sgeo Geo of future integrated client
 */
 XRectangle
 split_client(Client *c, Bool p)

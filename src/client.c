@@ -888,7 +888,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      XSetWindowBorderWidth(dpy, c->win, 0);
      mouse_grabbuttons(c, False);
 
-     /* Transient */
+     /* Transient for tag setting */
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
           for(t = clients; t && t->win != trans; t = t->next);
 
@@ -897,45 +897,40 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
           c->tag = t->tag;
           c->screen = t->screen;
      }
-
      if(!(c->flags & FreeFlag)
           && (rettrans == Success || (c->flags & HintFlag)))
                c->flags |= FreeFlag;
-
      free(t);
 
+     /* Handle client from here */
      client_attach(c);
      client_set_rules(c);
+     client_get_name(c);
 
      tags[c->screen][c->tag].cleanfact = True;
 
-     client_get_name(c);
+     /* Case of split layout */
+     split_client_integrate(c, sel);
+
+     /* If client will be visible soon so.. */
      if(c->tag == (uint)seltag[selscreen])
      {
-          client_raise(c);
           setwinstate(c->win, NormalState);
+          client_raise(c);
+          client_map(c);
+          client_focus(c);
      }
      else
           client_hide(c);
 
-     ewmh_get_client_list();
-     client_update_attributes(c);
-
-     if(c->tag == (uint)seltag[selscreen])
-          client_map(c);
-
      ewmh_manage_window_type(c);
 
+     /* Need arrange for dynamic layouts */
      if(ar)
           arrange(c->screen, True);
 
-     split_client_integrate(c, sel);
-
      if(!conf.client.set_new_win_master)
           layout_set_client_master(c);
-
-     if(c->tag == (uint)seltag[selscreen])
-          client_focus(c);
 
      if(conf.client.new_client_get_mouse)
      {
@@ -945,7 +940,6 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
                     c->geo.x + c->geo.width / 2,
                     c->geo.y + c->geo.height / 2);
      }
-
 
      return c;
 }
