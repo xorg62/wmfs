@@ -88,6 +88,7 @@
         [layout] type = "tile_grid_vertical" symbol = "GRID_V"   [/layout]
         [layout] type = "mirror_vertical"    symbol = "MIRROR_V" [/layout]
         [layout] type = "mirror_horizontal"  symbol = "MIRROR_H" [/layout]
+        [layout] type = "split"              symbol = "$PLIT"    [/layout]
 
         # Other layouts.
         [layout] type = "max"   symbol = "MAX"  [/layout]

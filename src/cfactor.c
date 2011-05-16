@@ -32,14 +32,6 @@
 
 #include "wmfs.h"
 
-#define RPOS(x) (x % 2 ? x - 1 : x + 1)
-
-char scanfac[4][2] =
-{
-     { 1,  0 }, { -1, 0 }, /* Right, Left   */
-     { 0, -1 }, {  0, 1 }  /* Top,   Bottom */
-};
-
 /** Clean client tile factors
   *\param c Client pointer
 */
@@ -99,7 +91,7 @@ cfactor_geo(XRectangle geo, int fact[4], int *err)
   *\param ccg Second geo
   *\param p Direction of resizing
 */
-static Bool
+Bool
 cfactor_parentrow(XRectangle cg, XRectangle ccg, Position p)
 {
      Bool ret;
@@ -179,7 +171,7 @@ cfactor_arrange_two(Client *c1, Client *c2, Position p, int fac)
    *\param p Direction of resizing
    *\returm 1/0
 */
-static Bool
+Bool
 cfactor_check_2pc(XRectangle g1, XRectangle g2, Position p)
 {
      if(p < Top)
@@ -244,19 +236,12 @@ void
 cfactor_set(Client *c, Position p, int fac)
 {
      Client *gc = NULL;
-     int x, y;
 
      if(!c || !(c->flags & TileFlag) || p > Bottom)
           return;
 
-     /* Start place of pointer for faster scanning */
-     x = c->geo.x + ((p == Right)  ? c->geo.width  : 0);
-     y = c->geo.y + ((p == Bottom) ? c->geo.height : 0);
-     y += ((p < Top)  ? c->geo.height / 2 : 0);
-     x += ((p > Left) ? c->geo.width  / 2 : 0);
-
-     /* Scan in right direction to next(p) physical client */
-     for(; (gc = client_gb_pos(c, x, y)) == c; x += scanfac[p][0], y += scanfac[p][1]);
+     /* Get next client with direction of resize */
+     gc = client_get_next_with_direction(c, p);
 
      if(!gc || c->screen != gc->screen)
           return;

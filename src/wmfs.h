@@ -109,6 +109,7 @@
 #define CHECK(x)     if(!(x)) return
 #define LEN(x)       (sizeof(x) / sizeof((x)[0]))
 #define MAXCLIST     (64)
+#define RPOS(x)      (x % 2 ? x - 1 : x + 1)
 
 /* barwin.c */
 BarWindow *barwin_create(Window parent,
@@ -155,6 +156,8 @@ void uicb_toggle_tagautohide(uicb_t);
 /* cfactor.c */
 void cfactor_clean(Client *c);
 XRectangle cfactor_geo(XRectangle geo, int fact[4], int *err);
+Bool cfactor_check_2pc(XRectangle g1, XRectangle g2, Position p);
+Bool cfactor_parentrow(XRectangle cg, XRectangle ccg, Position p);
 void cfactor_set(Client *c, Position p, int fac);
 void cfactor_multi_set(Client *c, int fac[4]);
 void uicb_client_resize_right(uicb_t cmd);
@@ -193,6 +196,7 @@ void client_unmanage(Client *c);
 void client_unmap(Client *c);
 void client_update_attributes(Client *c);
 void client_urgent(Client *c, Bool u);
+Client* client_get_next_with_direction(Client *bc, Position pos);
 void uicb_client_raise(uicb_t);
 void uicb_client_next(uicb_t);
 void uicb_client_prev(uicb_t);
@@ -345,6 +349,7 @@ Client *tiled_client(int screen, Client *c);
 void freelayout(int screen);
 void layoutswitch(Bool b);
 void maxlayout(int screen);
+void split(int screen);
 /* tile {{{ */
  void tile(int screen);
  void tile_left(int screen);
@@ -365,7 +370,9 @@ void uicb_set_layout(uicb_t);
 void uicb_toggle_resizehint(uicb_t);
 void uicb_toggle_abovefc(uicb_t cmd);
 void layout_set_client_master(Client *c);
+void layout_split_client(Client *c, Bool p);
 void layout_split_apply(Client *c);
+void layout_split_arrange_closed(int screen);
 void uicb_split_client_vertical(uicb_t);
 void uicb_split_client_horizontal(uicb_t);
 Bool uicb_checkmax(uicb_t);

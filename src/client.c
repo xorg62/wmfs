@@ -132,46 +132,34 @@ client_get_prev(void)
 }
 
 /** Get client left/right/top/bottom of selected client
+  *\param bc Base client
   *\param pos Position (Left/Right/Top/Bottom
   *\return Client found
 */
-static Client*
-client_get_next_with_direction(Position pos)
+Client*
+client_get_next_with_direction(Client *bc, Position pos)
 {
-     Client *c = NULL;
-     Client *ret = NULL;
+     Client *c;
+     int x, y;
+     char scanfac[4][2] =
+     {
+          { 1,  0 }, { -1, 0 }, /* Right, Left   */
+          { 0, -1 }, {  0, 1 }  /* Top,   Bottom */
+     };
 
-     if(!sel || ishide(sel, selscreen))
+     if(!bc || ishide(bc, selscreen))
           return NULL;
 
-     for(c = clients; c; c = c->next)
-          if(c != sel && !ishide(c, sel->screen))
-               switch(pos)
-               {
-                    default:
-                    case Right:
-                         if(c->geo.x > sel->geo.x
-                                   && (!ret || (ret && ret->geo.x > sel->geo.x && c->geo.x < ret->geo.x)))
-                              ret = c;
-                         break;
-                    case Left:
-                         if(c->geo.x < sel->geo.x
-                                   && (!ret || (ret && ret->geo.x < sel->geo.x && c->geo.x > ret->geo.x)))
-                              ret = c;
-                         break;
-                    case Top:
-                         if(c->geo.y < sel->geo.y
-                                   && (!ret || (ret && ret->geo.y < sel->geo.y && c->geo.y > ret->geo.y)))
-                              ret = c;
-                         break;
-                    case Bottom:
-                         if(c->geo.y > sel->geo.y
-                                   && (!ret || (ret && ret->geo.y > sel->geo.y && c->geo.y < ret->geo.y)))
-                              ret = c;
-                         break;
-               }
+     /* Start place of pointer for faster scanning */
+     x = bc->geo.x + ((pos == Right)  ? bc->geo.width  : 0);
+     y = bc->geo.y + ((pos == Bottom) ? bc->geo.height : 0);
+     y += ((pos < Top)  ? bc->geo.height / 2 : 0);
+     x += ((pos > Left) ? bc->geo.width  / 2 : 0);
 
-     return ret;
+      /* Scan in right direction to next(p) physical client */
+     for(; (c = client_gb_pos(bc, x, y)) == bc; x += scanfac[pos][0], y += scanfac[pos][1]);
+
+     return c;
 }
 
 /** Switch to the previous client
@@ -255,7 +243,7 @@ uicb_client_focus_right(uicb_t cmd)
      Client *c;
      (void)cmd;
 
-     if((c = client_get_next_with_direction(Right)))
+     if((c = client_get_next_with_direction(sel, Right)))
      {
           client_focus(c);
           client_raise(c);
@@ -274,7 +262,7 @@ uicb_client_focus_left(uicb_t cmd)
      Client *c;
      (void)cmd;
 
-     if((c = client_get_next_with_direction(Left)))
+     if((c = client_get_next_with_direction(sel, Left)))
      {
           client_focus(c);
           client_raise(c);
@@ -292,7 +280,7 @@ uicb_client_focus_top(uicb_t cmd)
      Client *c;
      (void)cmd;
 
-     if((c = client_get_next_with_direction(Top)))
+     if((c = client_get_next_with_direction(sel, Top)))
      {
           client_focus(c);
           client_raise(c);
@@ -310,7 +298,7 @@ uicb_client_focus_bottom(uicb_t cmd)
      Client *c;
      (void)cmd;
 
-     if((c = client_get_next_with_direction(Bottom)))
+     if((c = client_get_next_with_direction(sel, Bottom)))
      {
           client_focus(c);
           client_raise(c);
@@ -1021,7 +1009,7 @@ void
 client_moveresize(Client *c, XRectangle geo, Bool r)
 {
      int os, e;
-     int rhx = 0, rhy = 0;
+     int rhx = 0;
 
      if(!c)
           return;
@@ -1056,8 +1044,7 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
 
           /* To balance position of window in frame */
           rhx = ((c->wrgeo.width) - geo.width) / 2;
-          rhy = ((c->wrgeo.height) - geo.height) / 2;
-     }
+      }
 
      c->geo = geo;
 
@@ -1073,7 +1060,7 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
 
      frame_moveresize(c, c->wrgeo);
 
-     XMoveResizeWindow(dpy, c->win, BORDH + rhx, TBARH + rhy, c->geo.width, c->geo.height);
+     XMoveResizeWindow(dpy, c->win, BORDH + rhx, TBARH, c->geo.width, c->geo.height);
 
      client_update_attributes(c);
      client_configure(c);
@@ -1093,7 +1080,7 @@ client_maximize(Client *c)
      c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
 
      c->geo.x = sgeo[c->screen].x;
-     c->geo.y = sgeo[c->screen].y;
+     c->geo.y = sgeo[c->screen].y ;
      c->geo.width  = sgeo[c->screen].width  - BORDH * 2;
      c->geo.height = sgeo[c->screen].height - BORDH;
 
@@ -1213,8 +1200,8 @@ client_swap(Client *c1, Client *c2)
      client_size_hints(c2);
 
      /* Resize the windows */
-     client_moveresize(c1, c1->geo, False);
-     client_moveresize(c2, c2->geo, False);
+     client_moveresize(c1, c1->geo, tags[c1->screen][c1->tag].resizehint);
+     client_moveresize(c2, c2->geo, tags[c2->screen][c2->tag].resizehint);
 
      /* Get the new client name */
      client_get_name(c1);
@@ -1339,7 +1326,7 @@ client_unmanage(Client *c)
      ewmh_get_client_list();
 
      if(c->flags & TileFlag)
-          tags[c->screen][c->tag].cleanfact = True;
+          tags[c->screen][c->tag].layout.ghost = *c;
 
      if(c->tag == MAXTAG + 1)
      {

@@ -238,6 +238,46 @@ uicb_set_nmaster(uicb_t cmd)
      return;
 }
 
+/** Split layout function
+*/
+void
+split(int screen)
+{
+     Client *c, *last;
+     unsigned int n, on;
+
+     on = tags[screen][seltag[screen]].nclients;
+
+     for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
+     CHECK((tags[screen][seltag[screen]].nclients = n));
+
+     if(!(last = tiled_client(screen, clients)))
+          return;
+
+     /* New client (After manage) */
+     if(on && n > on)
+     {
+          layout_split_client(sel, (sel->frame_geo.height < sel->frame_geo.width));
+          layout_split_apply(last);
+     }
+     /* Client in less (After unmanage) */
+     else if(on && n < on)
+          layout_split_arrange_closed(screen);
+
+     /* First or the only client is maximized */
+     if(n == 1)
+     {
+          client_maximize(last);
+
+          last->flags &= ~(MaxFlag | LMaxFlag);
+          last->flags |= TileFlag;
+     }
+
+     ewmh_update_current_tag_prop();
+
+     return;
+}
+
 /** Grid layout function
 */
 static void
@@ -249,7 +289,7 @@ grid(int screen, Bool horizontal)
      unsigned int i, n, temp, cols, rows, cpcols = 0;
 
      for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
-     CHECK(n);
+     CHECK((tags[screen][seltag[screen]].nclients = n));
 
      for(rows = 0; rows <= n / 2; ++rows)
           if(rows * rows >= n)
@@ -319,7 +359,7 @@ multi_tile(int screen, Position type)
      uint i, n, tilesize = 0, mwfact, nmaster = tags[screen][seltag[screen]].nmaster;
 
      for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
-     CHECK(n);
+     CHECK((tags[screen][seltag[screen]].nclients = n));
 
      /* FIX NMASTER */
      nmaster = (n < nmaster) ? n : nmaster;
@@ -458,7 +498,7 @@ mirror(int screen, Bool horizontal)
      memset(nextg, 0, sizeof(nextg));
 
      for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
-     CHECK(n);
+     CHECK((tags[screen][seltag[screen]].nclients = n));
 
      /* Fix nmaster */
      nmaster = (n < nmaster) ? n : nmaster;
@@ -875,7 +915,7 @@ layout_set_client_master(Client *c)
   *\param c Client pointer
   *\param p True = Vertical, False = Horizontal
 */
-static void
+void
 layout_split_client(Client *c, Bool p)
 {
      XRectangle geo, sgeo;
@@ -936,6 +976,91 @@ layout_split_apply(Client *c)
                tags[c->screen][c->tag].resizehint);
 
      tags[c->screen][c->tag].split = False;
+
+     return;
+}
+
+static void
+_layout_split_arrange_size(XRectangle g, XRectangle *cg, Position p)
+{
+     if(p < Top)
+          cg->width += FRAMEW(g.width);
+     else
+          cg->height += FRAMEH(g.height);
+
+     if(p == Right)
+          cg->x -= FRAMEW(g.width);
+
+     if(p == Bottom)
+          cg->y -= FRAMEH(g.height);
+
+     return;
+}
+
+static Bool
+_layout_split_check_row(XRectangle g1, XRectangle g2, Position p)
+{
+     if(p < Top)
+          return (g1.y >= g2.y && (g1.y + g1.height) <= (g2.y + g2.height));
+     else
+          return (g1.x >= g2.x && (g1.x + g1.width) <= (g2.x + g2.width));
+}
+
+/* Arrange clients after a client close
+   *\param screen Screen
+*/
+void
+layout_split_arrange_closed(int screen)
+{
+     Position p;
+     Bool b = False;
+     XRectangle cgeo;
+     Client *c, *cc, ghost;
+
+     /* Set GHOST client
+      *     .--.  ~   ~
+      *    /..  \   ~   ~
+      *    \ø _ (____     ~
+      *  __.|    .--'  ~    ~
+      * '---\    '.      ~  ,  ~
+      *      '.    '-.___.-'/   ~
+      *        '-.__     _.'  ~
+      *             `````   ~
+      */
+     ghost = tags[screen][seltag[screen]].layout.ghost;
+
+     tags[screen][seltag[screen]].split = True;
+
+     /* Search for individual parent for easy resize */
+     for(p = Right; p < Bottom + 1; ++p)
+          if((c = client_get_next_with_direction(&ghost, p)))
+               if(cfactor_check_2pc(ghost.frame_geo, c->frame_geo, p))
+               {
+                    _layout_split_arrange_size(ghost.wrgeo, &c->wrgeo, p);
+                    cfactor_clean(c);
+                    client_moveresize(c, (c->pgeo = c->wrgeo), tags[screen][c->tag].resizehint);
+                    tags[screen][seltag[screen]].split = False;
+
+                    return;
+               }
+
+     /* Check row parent for full resize */
+     for(p = Right; p < Bottom + 1 && !b; ++p)
+          if((c = client_get_next_with_direction(&ghost, p)))
+               for(cgeo = c->frame_geo, cc = tiled_client(c->screen, clients);
+                         cc; cc = tiled_client(c->screen, cc->next))
+               {
+                    if(cfactor_parentrow(cgeo, cc->frame_geo, RPOS(p))
+                              && _layout_split_check_row(cc->frame_geo, ghost.frame_geo, p))
+                    {
+                         _layout_split_arrange_size(ghost.wrgeo, &cc->wrgeo, p);
+                         cfactor_clean(cc);
+                         client_moveresize(cc, (cc->pgeo = cc->wrgeo), tags[screen][cc->tag].resizehint);
+                         b = True;
+                    }
+               }
+
+     tags[screen][seltag[screen]].split = False;
 
      return;
 }

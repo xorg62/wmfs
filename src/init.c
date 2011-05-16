@@ -52,6 +52,7 @@ const func_name_list_t layout_list[] =
      {"maxlayout",               maxlayout },
      {"freelayout",              freelayout },
      {"free",                    freelayout },
+     {"split",                   split },
      { NULL, NULL }
 };
 

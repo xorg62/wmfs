@@ -37,7 +37,7 @@
 
 #define NBUTTON        8
 #define MAXTAG         36
-#define NUM_OF_LAYOUT  10
+#define NUM_OF_LAYOUT  11
 #define HISTOLEN       128
 
 /* Clients flags definition */
@@ -196,6 +196,8 @@ struct Client
      XRectangle free_geo;       /* Free window attribute */
      /* Tile size factors */
      int tilefact[4];
+     /* Split direction */
+     Bool splitd;
      /* For resizehint usage */
      int basew, baseh, incw, inch;
      int maxw, maxh, minw, minh;
@@ -221,6 +223,8 @@ struct Client
      /* Struct in chains */
      Client *next;
      Client *prev;
+     /* Split parents */
+     Client *parent, *child;
 };
 
 /* Keybind Structure */
@@ -257,8 +261,8 @@ typedef struct
 /* Layout Structure */
 typedef struct
 {
-     XRectangle sgeo;
-     int sfact[4];
+     XRectangle sgeo; /* Last splitted geo */
+     Client ghost;
      char *symbol;
      char *type;
      void (*func)(int screen);
