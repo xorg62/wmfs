@@ -32,6 +32,8 @@
 
 #include "wmfs.h"
 
+/** Arrange size of parent client of last closed client
+*/
 static void
 _split_arrange_size(XRectangle g, XRectangle *cg, Position p)
 {
@@ -49,6 +51,8 @@ _split_arrange_size(XRectangle g, XRectangle *cg, Position p)
      return;
 }
 
+/** Check if parent client of last closed client is OK for row resize
+*/
 static Bool
 _split_check_row(XRectangle g1, XRectangle g2, Position p)
 {
@@ -70,19 +74,19 @@ split_arrange_closed(Client ghost)
      Client *c, *cc;
      int screen = ghost.screen;
 
+     if(tags[screen][seltag[screen]].layout.func != split)
+          return;
+
      /* Use ghost client to fix holes in tile
       *     .--.  ~   ~
-      *    /..  \   ~   ~
-      *    \ø _ (____     ~
-      *  __.|    .--'  ~    ~
+      *    /xx  \   ~   ~
+      *  ~~\O _ (____     ~
+      *  __.|    .--'-==~   ~
       * '---\    '.      ~  ,  ~
       *      '.    '-.___.-'/   ~
       *        '-.__     _.'  ~
       *             `````   ~
       */
-
-     if(tags[screen][seltag[screen]].layout.func != split)
-          return;
 
      /* Search for single parent for easy resize
       * Example case:
