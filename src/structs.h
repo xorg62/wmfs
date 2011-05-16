@@ -196,8 +196,6 @@ struct Client
      XRectangle free_geo;       /* Free window attribute */
      /* Tile size factors */
      int tilefact[4];
-     /* Split direction */
-     Bool splitd;
      /* For resizehint usage */
      int basew, baseh, incw, inch;
      int maxw, maxh, minw, minh;
@@ -223,8 +221,6 @@ struct Client
      /* Struct in chains */
      Client *next;
      Client *prev;
-     /* Split parents */
-     Client *parent, *child;
 };
 
 /* Keybind Structure */
@@ -261,8 +257,6 @@ typedef struct
 /* Layout Structure */
 typedef struct
 {
-     XRectangle sgeo; /* Last splitted geo */
-     Client ghost;
      char *symbol;
      char *type;
      void (*func)(int screen);
@@ -285,7 +279,6 @@ typedef struct
      int nclients;
      float mwfact;
      int nmaster;
-     Bool split;
      Bool urgent;
      Bool resizehint;
      Bool request_update;

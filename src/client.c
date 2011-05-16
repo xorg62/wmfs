@@ -926,13 +926,13 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
 
      ewmh_manage_window_type(c);
 
-     if(ar && !tags[c->screen][c->tag].split)
+     if(ar)
           arrange(c->screen, True);
 
-     if(!conf.client.set_new_win_master && !tags[c->screen][c->tag].split)
-          layout_set_client_master(c);
+     split_client_integrate(c, sel);
 
-     layout_split_apply(c);
+     if(!conf.client.set_new_win_master)
+          layout_set_client_master(c);
 
      if(c->tag == (uint)seltag[selscreen])
           client_focus(c);
@@ -1326,7 +1326,7 @@ client_unmanage(Client *c)
      ewmh_get_client_list();
 
      if(c->flags & TileFlag)
-          tags[c->screen][c->tag].layout.ghost = *c;
+          split_arrange_closed(*c);
 
      if(c->tag == MAXTAG + 1)
      {

@@ -385,6 +385,12 @@ void init(void);
 /* getinfo.c */
 void getinfo(char *info);
 
+/* split.c */
+void split_arrange_closed(Client ghost);
+XRectangle split_client(Client *c, Bool p);
+void split_client_fill(Client *c, XRectangle geo);
+void split_client_integrate(Client *c, Client *sc);
+
 /* viwmfs.c */
 void viwmfs(int argc, char **argv);
 

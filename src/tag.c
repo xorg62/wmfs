@@ -605,7 +605,7 @@ tag_new(int s, char *name)
 
      Tag t = { displayedName, NULL, 0,
                conf.default_tag.mwfact, conf.default_tag.nmaster,
-               False, conf.default_tag.resizehint, False, False, False, False,
+               False, conf.default_tag.resizehint, False, False, False,
                conf.default_tag.barpos, conf.default_tag.barpos,
                conf.default_tag.layout, 0, NULL, 0, False };
 
