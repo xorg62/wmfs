@@ -819,7 +819,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
 
      screen_get_sel();
 
-     c = zmalloc(sizeof(Client));
+     c = zcalloc(sizeof(Client));
      c->win = w;
      c->screen = selscreen;
      c->flags = 0;
