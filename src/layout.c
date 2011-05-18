@@ -239,11 +239,12 @@ uicb_set_nmaster(uicb_t cmd)
 }
 
 /** Split layout function
+  * This function is a trick compared to dynamic layout function, see split.c
 */
 void
 split(int screen)
 {
-     Client *c, *last;
+     Client *c;
      unsigned int n, on;
 
      on = tags[screen][seltag[screen]].nclients;
@@ -251,15 +252,13 @@ split(int screen)
      for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
      CHECK((tags[screen][seltag[screen]].nclients = n));
 
-     if(!(last = tiled_client(screen, clients)) || on == n)
-          return;
+     if((c = tiled_client(screen, clients)) && n == 1)
+          client_maximize(c);
 
-     if(n == 1)
+     for(c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next))
      {
-          client_maximize(last);
-
-          last->flags &= ~(MaxFlag | LMaxFlag);
-          last->flags |= TileFlag;
+          c->flags &= ~(MaxFlag | LMaxFlag);
+          c->flags |= (TileFlag | SplitFlag);
      }
 
      ewmh_update_current_tag_prop();
@@ -747,9 +746,10 @@ uicb_togglefree(uicb_t cmd)
 
      sel->flags ^= FreeFlag;
 
-     if((sel->flags & FreeFlag))
+     if(sel->flags & FreeFlag)
      {
-          sel->flags &= ~(TileFlag | MaxFlag | LMaxFlag);
+          split_arrange_closed(sel);
+          sel->flags &= ~(TileFlag | MaxFlag | LMaxFlag | SplitFlag);
           client_moveresize(sel, sel->free_geo, True);
           client_raise(sel);
      }
@@ -757,6 +757,7 @@ uicb_togglefree(uicb_t cmd)
      {
           sel->free_geo = sel->geo;
           sel->ogeo = sel->geo;
+          split_client_integrate(sel, client_get_next(), sel->screen, sel->tag);
      }
 
      client_update_attributes(sel);
@@ -779,21 +780,22 @@ uicb_togglemax(uicb_t cmd)
         || (sel->flags & HintFlag)|| (sel->flags & FSSFlag))
           return;
 
-     if(!(sel->flags & MaxFlag))
+     sel->flags ^= MaxFlag;
+
+     if(sel->flags & MaxFlag)
      {
           sel->ogeo = sel->geo;
           sel->free_geo = sel->geo;
           sel->flags &= ~(TileFlag | FreeFlag);
+          split_arrange_closed(sel);
           client_maximize(sel);
           XRaiseWindow(dpy, sel->frame);
-          sel->flags |= MaxFlag;
-
      }
      else
      {
           sel->geo = sel->ogeo;
           client_moveresize(sel, sel->geo, True);
-          sel->flags &= ~MaxFlag;
+          split_client_integrate(sel, client_get_next(), sel->screen, sel->tag);
           tags[selscreen][seltag[selscreen]].cleanfact = True;
           tags[selscreen][seltag[selscreen]].layout.func(selscreen);
      }
@@ -839,6 +841,7 @@ uicb_toggle_abovefc(uicb_t cmd)
                          && c->tag == (uint)seltag[selscreen])
                {
                     c->flags &= ~AboveFlag;
+                    split_client_integrate(c, NULL, sel->screen, sel->tag);
                     break;
                }
 

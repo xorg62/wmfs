@@ -53,6 +53,7 @@
 #define UrgentFlag (1 << 10)
 #define FLayFlag   (1 << 11)
 #define DockFlag   (1 << 12)
+#define SplitFlag  (1 << 13)
 
 #define TagFlag(t) (1 << (t))
 

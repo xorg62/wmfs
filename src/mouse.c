@@ -52,7 +52,7 @@ mouse_cfactor_border(Client *c, int f[4], GC g)
 {
      int  e;
 
-     mouse_dragborder(cfactor_geo(c->geo, f, &e), g);
+     mouse_dragborder(cfactor_geo(c->wrgeo, f, &e), g);
 
      return;
 }

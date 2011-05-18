@@ -73,5 +73,6 @@ LIBS+=  ${XRANDR_LIBS}
 LIBS+=  ${IMLIB2_LIBS}
 
 # Install man and wmfsrc
-install: ${INSTALL_DATA} wmfs.1 ${MANDIR}/man1 \
-          ${INSTALL_DATA} wmfsrc ${XDG_CONFIG_DIR}/wmfs/
+install:
+	${INSTALL_DATA} wmfs.1 ${MANDIR}/man1
+	${INSTALL_DATA} wmfsrc ${XDG_CONFIG_DIR}/wmfs/

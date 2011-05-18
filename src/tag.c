@@ -143,10 +143,14 @@ tag_transfert(Client *c, int tag)
      if(tag > conf.ntag[selscreen])
           return;
 
+     if(c->flags & SplitFlag)
+          split_arrange_closed(c);
+
      c->tag = tag;
      c->screen = selscreen;
 
      arrange(c->screen, True);
+     split_client_integrate(c, NULL, c->screen, c->tag);
 
      client_focus_next(c);
 
@@ -494,6 +498,8 @@ uicb_tag_urgent(uicb_t cmd)
 void
 tag_additional(int sc, int tag, int adtag)
 {
+     Client *c;
+
      if(tag < 0 || tag > conf.ntag[sc]
        || adtag < 1 || adtag > conf.ntag[sc] || adtag == seltag[sc])
           return;
@@ -502,6 +508,12 @@ tag_additional(int sc, int tag, int adtag)
      tags[sc][adtag].request_update = True;
      tags[sc][tag].cleanfact = True;
      tags[sc][adtag].cleanfact = True;
+
+     if(tags[sc][tag].tagad & TagFlag(adtag))
+          for(c = clients; c; c = c->next)
+               if(c->screen == sc && c->tag == adtag)
+                    split_client_integrate(c, client_get_next(), sc, tag);
+
      arrange(sc, True);
 
      return;

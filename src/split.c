@@ -66,13 +66,13 @@ _split_check_row(XRectangle g1, XRectangle g2, Position p)
   *\param ghost Ghost client
  */
 void
-split_arrange_closed(Client ghost)
+split_arrange_closed(Client *ghost)
 {
      Position p;
      Bool b = False;
      XRectangle cgeo;
      Client *c, *cc;
-     int screen = ghost.screen;
+     int screen = ghost->screen;
 
      if(tags[screen][seltag[screen]].layout.func != split)
           return;
@@ -97,10 +97,10 @@ split_arrange_closed(Client ghost)
       * |_____|_____| ->       -> |_____|_____|
       */
      for(p = Right; p < Bottom + 1; ++p)
-          if((c = client_get_next_with_direction(&ghost, p)))
-               if(cfactor_check_2pc(ghost.frame_geo, c->frame_geo, p))
+          if((c = client_get_next_with_direction(ghost, p)))
+               if(cfactor_check_2pc(ghost->frame_geo, c->frame_geo, p))
                {
-                    _split_arrange_size(ghost.wrgeo, &c->wrgeo, p);
+                    _split_arrange_size(ghost->wrgeo, &c->wrgeo, p);
                     cfactor_clean(c);
                     client_moveresize(c, (c->pgeo = c->wrgeo), tags[screen][c->tag].resizehint);
 
@@ -116,14 +116,14 @@ split_arrange_closed(Client ghost)
       * |_____|_____| ->       -> |___________|
       */
      for(p = Right; p < Bottom + 1 && !b; ++p)
-          if((c = client_get_next_with_direction(&ghost, p)))
+          if((c = client_get_next_with_direction(ghost, p)))
                for(cgeo = c->frame_geo, cc = tiled_client(c->screen, clients);
                          cc; cc = tiled_client(c->screen, cc->next))
                {
                     if(cfactor_parentrow(cgeo, cc->frame_geo, RPOS(p))
-                              && _split_check_row(cc->frame_geo, ghost.frame_geo, p))
+                              && _split_check_row(cc->frame_geo, ghost->frame_geo, p))
                     {
-                         _split_arrange_size(ghost.wrgeo, &cc->wrgeo, p);
+                         _split_arrange_size(ghost->wrgeo, &cc->wrgeo, p);
                          cfactor_clean(cc);
                          client_moveresize(cc, (cc->pgeo = cc->wrgeo), tags[screen][cc->tag].resizehint);
                          b = True;
@@ -148,6 +148,9 @@ split_client(Client *c, Bool p)
           return c->wrgeo;
 
      cfactor_clean(c);
+
+     c->flags &= ~(MaxFlag | LMaxFlag);
+     c->flags |= (TileFlag | SplitFlag);
 
      /* Use geometry without resizehint applied on it */
      geo = sgeo = c->wrgeo;
@@ -189,7 +192,7 @@ split_client_fill(Client *c, XRectangle geo)
           return;
 
      c->flags &= ~(MaxFlag | LMaxFlag);
-     c->flags |= TileFlag;
+     c->flags |= (TileFlag | SplitFlag);
 
      cfactor_clean(c);
      client_moveresize(c, (c->pgeo = geo), tags[c->screen][c->tag].resizehint);
@@ -202,13 +205,18 @@ split_client_fill(Client *c, XRectangle geo)
   *\param sc Splitted client pointer
 */
 void
-split_client_integrate(Client *c, Client *sc)
+split_client_integrate(Client *c, Client *sc, int screen, int tag)
 {
      XRectangle g;
 
-     if(tags[c->screen][c->tag].layout.func != split
-               || !sc || !c)
+     if(tags[screen][tag].layout.func != split
+               || c->flags & FreeFlag
+               || !tags[screen][tag].nclients || !c)
           return;
+
+     if(!sc || sc->screen != screen || sc->tag != tag)
+          if(!(sc = tiled_client(screen, clients)))
+               return;
 
      g = split_client(sc, (sc->frame_geo.height < sc->frame_geo.width));
      split_client_fill(c, g);

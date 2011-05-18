@@ -88,7 +88,7 @@ client_detach(Client *c)
 /** Get the next client
  *\return The next client or NULL
  */
-static Client*
+Client*
 client_get_next(void)
 {
      Client *c = NULL;
@@ -331,6 +331,7 @@ client_above(Client *c)
      client_moveresize(c, geo, tags[c->screen][c->tag].resizehint);
      client_raise(c);
 
+     split_arrange_closed(c);
      tags[c->screen][c->tag].layout.func(c->screen);
 
      return;
@@ -349,7 +350,10 @@ client_focus(Client *c)
      if(sel && sel != c)
      {
           if(sel->flags & AboveFlag)
+          {
                sel->flags &= ~AboveFlag;
+               split_client_integrate(sel, client_get_next(), sel->screen, sel->tag);
+          }
 
           XChangeProperty(dpy, sel->frame, net_atom[net_wm_window_opacity], XA_CARDINAL,
                           32, PropModeReplace, (uchar *)&conf.opacity, 1);
@@ -739,6 +743,8 @@ client_set_rules(Client *c)
                               else
                                    tags[c->screen][c->tag].layout.func(c->screen);
 
+                              split_client_integrate(c, NULL, i, j);
+
                               /* Deprecated but still in use */
                               applied_tag_rule = True;
                               applied_screen_rule = True;
@@ -908,9 +914,10 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      client_get_name(c);
 
      tags[c->screen][c->tag].cleanfact = True;
+     client_update_attributes(c);
 
      /* Case of split layout */
-     split_client_integrate(c, sel);
+     split_client_integrate(c, sel, c->screen, c->tag);
 
      /* If client will be visible soon so.. */
      if(c->tag == (uint)seltag[selscreen])
@@ -1025,8 +1032,6 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
                c->flags &= ~FLayFlag;
           }
      }
-
-     c->flags &= ~MaxFlag;
 
      /* Set geo without resizehint applied */
      c->wrgeo = geo;
@@ -1322,7 +1327,7 @@ client_unmanage(Client *c)
      if(c->flags & TileFlag)
      {
           tags[c->screen][c->tag].cleanfact = True;
-          split_arrange_closed(*c);
+          split_arrange_closed(c);
      }
 
      if(c->tag == MAXTAG + 1)
@@ -1421,6 +1426,7 @@ client_set_screen(Client *c, int s)
 
      arrange(s, True);
      arrange(os, True);
+     split_client_integrate(c, NULL, c->screen, c->tag);
 
      if(!(c->flags & TileFlag))
      {

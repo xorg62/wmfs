@@ -170,6 +170,7 @@ void client_attach(Client *c);
 void client_configure(Client *c);
 void client_detach(Client *c);
 void client_focus(Client *c);
+Client *client_get_next(void);
 /* client_gb_*() {{{ */
 Client* client_gb_win(Window w);
 Client* client_gb_frame(Window w);
@@ -386,10 +387,10 @@ void init(void);
 void getinfo(char *info);
 
 /* split.c */
-void split_arrange_closed(Client ghost);
+void split_arrange_closed(Client *ghost);
 XRectangle split_client(Client *c, Bool p);
 void split_client_fill(Client *c, XRectangle geo);
-void split_client_integrate(Client *c, Client *sc);
+void split_client_integrate(Client *c, Client *sc, int screen, int tag);
 
 /* viwmfs.c */
 void viwmfs(int argc, char **argv);
