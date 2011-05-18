@@ -245,14 +245,12 @@ void
 split(int screen)
 {
      Client *c;
-     unsigned int n, on;
-
-     on = tags[screen][seltag[screen]].nclients;
+     unsigned int n;
 
      for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
      CHECK((tags[screen][seltag[screen]].nclients = n));
 
-     if((c = tiled_client(screen, clients)) && n == 1)
+     if(n == 1 && (c = tiled_client(screen, clients)))
           client_maximize(c);
 
      for(c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next))

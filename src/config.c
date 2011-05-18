@@ -490,11 +490,10 @@ conf_layout_section(void)
 static void
 conf_tag_section(void)
 {
-     int i, j, k, l = 0, m, n, sc, count, bar_pos;
+     int i, j, k, l = 0, n, sc, bar_pos;
      char *tmp;
      char *position;
      struct conf_sec *sec, *def_tag, **tag, **mouse;
-     struct opt_type *opt;
 
      sec = fetch_section_first(NULL, "tags");
 
@@ -533,7 +532,7 @@ conf_tag_section(void)
                          fetch_opt_first(def_tag, "1", "nmaster").num,
                          False, fetch_opt_first(def_tag, "False", "resizehint").bool,
                          False, False, False, bar_pos, bar_pos,
-                         layout_name_to_struct(conf.layout, fetch_opt_first(def_tag, "tile_right", "layout").str, conf.nlayout, layout_list),
+                         layout_name_to_struct(conf.layout, fetch_opt_first(def_tag, "tile", "layout").str, conf.nlayout, layout_list),
                          0, NULL, 0, False };
 
      conf.default_tag = default_tag;
@@ -596,22 +595,9 @@ conf_tag_section(void)
                     tags[k][conf.ntag[k]].barpos = IB_Top;
 
                tags[k][conf.ntag[k]].layout = layout_name_to_struct(conf.layout,
-                                                                    fetch_opt_first(tag[i], fetch_opt_first(def_tag, "title_right", "layout").str, "layout").str,
-                                                                    conf.nlayout,
-                                                                    layout_list);
-
-               /* Clients list */
-               opt = fetch_opt(tag[i], "", "clients");
-
-               if ((count = fetch_opt_count(opt)))
-               {
-                    tags[k][conf.ntag[k]].nclients = count;
-                    tags[k][conf.ntag[k]].clients = xcalloc(count, sizeof(char *));
-                    for(m = 0; m < count; ++m)
-                         tags[k][conf.ntag[k]].clients[m] = opt[m].str;
-               }
-
-               free(opt);
+                         fetch_opt_first(tag[i], fetch_opt_first(def_tag, "tile", "layout").str, "layout").str,
+                         conf.nlayout,
+                         layout_list);
 
                /* Multi mouse sections */
                mouse = fetch_section(tag[i], "mouse");

@@ -685,7 +685,7 @@ static void
 client_set_rules(Client *c)
 {
      XClassHint xch;
-     int i, j, k, f;
+     int i, f;
      Atom rf;
      ulong n, il;
      uchar *data = NULL;
@@ -712,53 +712,14 @@ client_set_rules(Client *c)
           XFree(data);
      }
 
-     /* Following features is *DEPRECATED*, will be removed in some revision.  {{{ */
-
-     /* Auto free */
-     if(conf.client.autofree && ((xch.res_name && strstr(conf.client.autofree, xch.res_name))
-               || (xch.res_class && strstr(conf.client.autofree, xch.res_class))))
-          c->flags |= FreeFlag;
-
-     /* Auto maximize */
-     if(conf.client.automax && ((xch.res_name && strstr(conf.client.automax, xch.res_name))
-                    || (xch.res_class && strstr(conf.client.automax, xch.res_class))))
-     {
-          client_maximize(c);
-          c->flags |= MaxFlag;
-     }
-
-     /* Wanted tag */
-     for(i = 0; i < screen_count(); ++i)
-          for(j = 1; j < conf.ntag[i] + 1; ++j)
-               if(tags[i][j].clients)
-                    for(k = 0; k < tags[i][j].nclients; ++k)
-                         if((xch.res_name && strstr(xch.res_name, tags[i][j].clients[k]))
-                            || (xch.res_class && strstr(xch.res_class, tags[i][j].clients[k])))
-                         {
-                              c->screen = i;
-                              c->tag = j;
-
-                              if(c->tag != (uint)seltag[selscreen])
-                                   tags[c->screen][c->tag].request_update = True;
-                              else
-                                   tags[c->screen][c->tag].layout.func(c->screen);
-
-                              split_client_integrate(c, NULL, i, j);
-
-                              /* Deprecated but still in use */
-                              applied_tag_rule = True;
-                              applied_screen_rule = True;
-                         }
-
-     /* }}} */
-
      /* Apply Rule if class || instance || role match */
      for(i = 0; i < conf.nrule; ++i)
      {
           if((xch.res_class && conf.rule[i].class && !strcmp(xch.res_class, conf.rule[i].class))
                     || (xch.res_name && conf.rule[i].instance && !strcmp(xch.res_name, conf.rule[i].instance)))
           {
-               if((strlen(wwrole) && conf.rule[i].role && !strcmp(wwrole, conf.rule[i].role)) || (!strlen(wwrole) || !conf.rule[i].role))
+               if((strlen(wwrole) && conf.rule[i].role && !strcmp(wwrole, conf.rule[i].role))
+                         || (!strlen(wwrole) || !conf.rule[i].role))
                {
                     if(conf.rule[i].screen != -1)
                          c->screen = conf.rule[i].screen;
@@ -777,8 +738,8 @@ client_set_rules(Client *c)
 
                     if(conf.rule[i].max)
                     {
-                         client_maximize(c);
                          c->flags |= MaxFlag;
+                         client_maximize(c);
                     }
 
                     if(c->tag != (uint)seltag[selscreen])
@@ -910,14 +871,15 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
 
      /* Handle client from here */
      client_attach(c);
-     client_set_rules(c);
      client_get_name(c);
-
      tags[c->screen][c->tag].cleanfact = True;
-     client_update_attributes(c);
+
+     client_set_rules(c);
 
      /* Case of split layout */
      split_client_integrate(c, sel, c->screen, c->tag);
+
+     client_update_attributes(c);
 
      /* If client will be visible soon so.. */
      if(c->tag == (uint)seltag[selscreen])
