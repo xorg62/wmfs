@@ -76,7 +76,7 @@ cfactor_geo(XRectangle geo, int fact[4], int *err)
 
      /* Too big/small */
      if(cgeo.width > sgeo[selscreen].width || cgeo.height > sgeo[selscreen].height
-               || cgeo.width < 1 || cgeo.height < 1)
+               || cgeo.width < (BORDH * 2) || cgeo.height < (BORDH + TBARH))
      {
           *err = 1;
           return geo;
@@ -137,6 +137,33 @@ _cfactor_arrange_row(Client *c, Position p, int fac)
      return;
 }
 
+/** Get c parents of row and check geo with futur resize factor
+  *\param c Client pointer
+  *\param p Direction of resizing
+  *\param fac Factor of resizing
+  *\return False in case of error
+*/
+static Bool
+_cfactor_check_geo_row(Client *c, Position p, int fac)
+{
+     XRectangle cgeo = c->frame_geo;
+     Client *cc;
+     int e, f[4] = { 0 };
+
+     f[p] += fac;
+
+     /* Travel clients to search parents of row and check geos */
+     for(cc = tiled_client(c->screen, clients); cc; cc = tiled_client(c->screen, cc->next))
+          if(cfactor_parentrow(cgeo, cc->frame_geo, p))
+          {
+               (XRectangle)cfactor_geo(cc->wrgeo, f, &e);
+               if(e)
+                    return False;
+          }
+
+     return True;
+}
+
 /* Resize only 2 client with applied factor
    *\param c1 Client pointer
    *\param c2 Client pointer
@@ -146,7 +173,6 @@ _cfactor_arrange_row(Client *c, Position p, int fac)
 static void
 cfactor_arrange_two(Client *c1, Client *c2, Position p, int fac)
 {
-
      c1->tilefact[p] += fac;
      c2->tilefact[RPOS(p)] -= fac;
 
@@ -209,18 +235,19 @@ cfactor_arrange_row(Client *c, Client *gc, Position p, int fac)
 static Bool
 cfactor_check_geo(Client *c, Client *g, Position p, int fac)
 {
-     int e1, e2;
-     XRectangle cg, gg;
+     int e, ee;
      int cf[4] = { 0 }, gf[4] = { 0 };
 
+     /* Check c & g first */
      cf[p] += fac;
      gf[RPOS(p)] -= fac;
 
-     cg = cfactor_geo(c->geo, cf, &e1);
-     gg = cfactor_geo(g->geo, gf, &e2);
+     (XRectangle)cfactor_geo(c->geo, cf, &e);
+     (XRectangle)cfactor_geo(g->geo, gf, &ee);
 
      /* Size failure */
-     if(e1 || e2)
+     if(e || ee || !_cfactor_check_geo_row(c, p, fac)
+               || !_cfactor_check_geo_row(g, RPOS(p), -fac))
           return False;
 
      return True;
