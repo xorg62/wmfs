@@ -110,6 +110,7 @@
 #define LEN(x)       (sizeof(x) / sizeof((x)[0]))
 #define MAXCLIST     (64)
 #define RPOS(x)      (x % 2 ? x - 1 : x + 1)
+#define LDIR(x)      (x < Top)
 
 /* barwin.c */
 BarWindow *barwin_create(Window parent,

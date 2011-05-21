@@ -199,7 +199,7 @@ cfactor_arrange_two(Client *c1, Client *c2, Position p, int fac)
 Bool
 cfactor_check_2pc(XRectangle g1, XRectangle g2, Position p)
 {
-     if(p < Top)
+     if(LDIR(p))
           return (g1.height == g2.height);
      else
           return (g1.width == g2.width);

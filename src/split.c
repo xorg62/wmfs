@@ -37,7 +37,7 @@
 static void
 _split_arrange_size(XRectangle g, XRectangle *cg, Position p)
 {
-     if(p < Top)
+     if(LDIR(p))
           cg->width += FRAMEW(g.width);
      else
           cg->height += FRAMEH(g.height);
@@ -56,10 +56,41 @@ _split_arrange_size(XRectangle g, XRectangle *cg, Position p)
 static Bool
 _split_check_row(XRectangle g1, XRectangle g2, Position p)
 {
-     if(p < Top)
+     if(LDIR(p))
           return (g1.y >= g2.y && (g1.y + g1.height) <= (g2.y + g2.height));
      else
           return (g1.x >= g2.x && (g1.x + g1.width) <= (g2.x + g2.width));
+}
+
+/** Check if row direction is available to resize from it
+  *\param c Client pointer
+  *\param g Client pointer
+  *\param p Position
+  *\return True if available
+*/
+static Bool
+_split_check_row_dir(Client *c, Client *g, Position p)
+{
+     int s, cs;
+     XRectangle cgeo;
+     Client *cc;
+
+     cs  = (LDIR(p) ? g->frame_geo.height : g->frame_geo.width);
+
+     for(s = 0, cgeo = c->frame_geo, cc = tiled_client(c->screen, clients);
+               cc; cc = tiled_client(c->screen, cc->next))
+          if(cfactor_parentrow(cgeo, cc->frame_geo, RPOS(p))
+                    &&  _split_check_row(cc->frame_geo, g->frame_geo, p))
+          {
+               s += (LDIR(p) ? cc->frame_geo.height : cc->frame_geo.width);
+
+               if(s == cs)
+                    return True;
+               if(s > cs)
+                    return False;
+          }
+
+     return False;
 }
 
 /** Arrange clients after a client close
@@ -77,7 +108,7 @@ split_arrange_closed(Client *ghost)
      if(tags[screen][seltag[screen]].layout.func != split)
           return;
 
-     /* Use ghost client to fix holes in tile
+     /* Use ghost client properties to fix holes in tile
       *     .--.  ~   ~
       *    /xx  \   ~   ~
       *  ~~\O _ (____     ~
@@ -116,19 +147,19 @@ split_arrange_closed(Client *ghost)
       * |_____|_____| ->       -> |___________|
       */
      for(p = Right; p < Bottom + 1 && !b; ++p)
-          if((c = client_get_next_with_direction(ghost, p)))
+          if((c = client_get_next_with_direction(ghost, p)) && _split_check_row_dir(c, ghost, p))
+          {
                for(cgeo = c->frame_geo, cc = tiled_client(c->screen, clients);
                          cc; cc = tiled_client(c->screen, cc->next))
-               {
-                    if(cfactor_parentrow(cgeo, cc->frame_geo, RPOS(p))
-                              && _split_check_row(cc->frame_geo, ghost->frame_geo, p))
+                    if(cfactor_parentrow(cgeo, cc->frame_geo, RPOS(p)) &&
+                              _split_check_row(cc->frame_geo, ghost->frame_geo, p))
                     {
                          _split_arrange_size(ghost->wrgeo, &cc->wrgeo, p);
                          cfactor_clean(cc);
                          client_moveresize(cc, (cc->pgeo = cc->wrgeo), tags[screen][cc->tag].resizehint);
                          b = True;
                     }
-               }
+          }
 
      return;
 }
