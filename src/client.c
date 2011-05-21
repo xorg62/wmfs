@@ -153,7 +153,7 @@ client_get_next_with_direction(Client *bc, Position pos)
      /* Start place of pointer for faster scanning */
      x = bc->frame_geo.x + ((pos == Right)  ? bc->frame_geo.width  : 0);
      y = bc->frame_geo.y + ((pos == Bottom) ? bc->frame_geo.height : 0);
-     y += ((pos < Top)  ? bc->frame_geo.height / 2 : 0);
+     y += ((LDIR(pos))  ? bc->frame_geo.height / 2 : 0);
      x += ((pos > Left) ? bc->frame_geo.width  / 2 : 0);
 
       /* Scan in right direction to next(p) physical client */

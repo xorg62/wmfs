@@ -238,32 +238,6 @@ uicb_set_nmaster(uicb_t cmd)
      return;
 }
 
-/** Split layout function
-  * This function is a trick compared to dynamic layout function, see split.c
-*/
-void
-split(int screen)
-{
-     Client *c;
-     unsigned int n;
-
-     for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
-     CHECK((tags[screen][seltag[screen]].nclients = n));
-
-     if(n == 1 && (c = tiled_client(screen, clients)))
-          client_maximize(c);
-
-     for(c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next))
-     {
-          c->flags &= ~(MaxFlag | LMaxFlag);
-          c->flags |= (TileFlag | SplitFlag);
-     }
-
-     ewmh_update_current_tag_prop();
-
-     return;
-}
-
 /** Grid layout function
 */
 static void
@@ -327,6 +301,38 @@ grid(int screen, Bool horizontal)
      }
 
      tags[screen][seltag[screen]].cleanfact = False;
+     ewmh_update_current_tag_prop();
+
+     return;
+}
+
+/** Split layout function
+  * This function is a trick compared to dynamic layout function, see split.c
+*/
+void
+split(int screen)
+{
+     Client *c;
+     unsigned int n, ns;
+
+     for(n = ns = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n)
+          if(c->flags & SplitFlag)
+               ++ns;
+
+     CHECK((tags[screen][seltag[screen]].nclients = n));
+
+     if(n == 1 && (c = tiled_client(screen, clients)))
+          client_maximize(c);
+
+     if(!ns)
+          grid(screen, True);
+
+     for(c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next))
+     {
+          c->flags &= ~(MaxFlag | LMaxFlag);
+          c->flags |= (TileFlag | SplitFlag);
+     }
+
      ewmh_update_current_tag_prop();
 
      return;
