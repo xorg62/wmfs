@@ -219,7 +219,7 @@ split_client(Client *c, Bool p)
 void
 split_client_fill(Client *c, XRectangle geo)
 {
-     if(!c || tags[c->screen][c->tag].layout.func != split)
+     if(!c)
           return;
 
      c->flags &= ~(MaxFlag | LMaxFlag);
@@ -238,18 +238,36 @@ split_client_fill(Client *c, XRectangle geo)
 void
 split_client_integrate(Client *c, Client *sc, int screen, int tag)
 {
+     Bool b = True;
      XRectangle g;
 
-     if(tags[screen][tag].layout.func != split
-               || c->flags & FreeFlag
-               || !tags[screen][tag].nclients || !c)
+     if(!c || c->flags & FreeFlag)
           return;
 
      if(!sc || sc->screen != screen || sc->tag != tag)
-          if(!(sc = tiled_client(screen, clients)))
-               return;
+     {
+          /* Looking for first client on wanted tag */
+          for(b = False, sc = clients; sc; sc = sc->next)
+               if(sc->screen == screen && sc->tag == tag
+                         && (c->flags & TileFlag))
+               {
+                    b = True;
+                    break;
+               }
 
-     g = split_client(sc, (sc->frame_geo.height < sc->frame_geo.width));
+          /* No client on wanted tag to integrate */
+          if(!b)
+          {
+               g.x = sgeo[c->screen].x;
+               g.y = sgeo[c->screen].y ;
+               g.width  = sgeo[c->screen].width  - BORDH * 2;
+               g.height = sgeo[c->screen].height - BORDH;
+          }
+     }
+
+     if(b)
+          g = split_client(sc, (sc->frame_geo.height < sc->frame_geo.width));
+
      split_client_fill(c, g);
 
      return;

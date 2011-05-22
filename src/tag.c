@@ -144,13 +144,17 @@ tag_transfert(Client *c, int tag)
           return;
 
      if(c->flags & SplitFlag)
+     {
           split_arrange_closed(c);
+          split_client_integrate(c, NULL, selscreen, tag);
+          tags[c->screen][c->tag].cleanfact = True;
+          cfactor_clean(c);
+     }
 
      c->tag = tag;
      c->screen = selscreen;
 
      arrange(c->screen, True);
-     split_client_integrate(c, NULL, c->screen, c->tag);
 
      client_focus_next(c);
 
@@ -509,10 +513,17 @@ tag_additional(int sc, int tag, int adtag)
      tags[sc][tag].cleanfact = True;
      tags[sc][adtag].cleanfact = True;
 
-     if(tags[sc][tag].tagad & TagFlag(adtag))
-          for(c = clients; c; c = c->next)
-               if(c->screen == sc && c->tag == adtag)
-                    split_client_integrate(c, client_get_next(), sc, tag);
+     for(c = clients; c; c = c->next)
+          if(c->screen == sc && c->tag == adtag)
+          {
+               if(tags[sc][tag].tagad & TagFlag(adtag))
+                    split_client_integrate(c, NULL, sc, tag);
+               else
+               {
+                    split_client_integrate(c, NULL, sc, adtag);
+                    split_arrange_closed(c);
+               }
+          }
 
      arrange(sc, True);
 

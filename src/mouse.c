@@ -32,6 +32,8 @@
 
 #include "wmfs.h"
 
+Window prevwin;
+
 /** Draw the border when a client in dragging/resizing with mouse
  */
 static void
@@ -100,14 +102,16 @@ mouse_move_tag_client(Client *c)
 
      XQueryPointer(dpy, infobar[selscreen].tags_board->win, &w, &w, &d, &d, &d, &d, (uint*)&d);
 
+     if(w == prevwin)
+          return;
+
+     prevwin = w;
+
      for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
           if(infobar[selscreen].tags[i]->win == w
              && tags[selscreen][i].layout.func != freelayout)
           {
-               c->screen = selscreen;
-               c->tag = i;
-               tags[c->screen][c->tag].request_update = True;
-               arrange(s, True);
+               tag_transfert(c, i);
 
                if(s != c->screen)
                     arrange(c->screen, True);

@@ -321,9 +321,8 @@ split(int screen)
 
      CHECK((tags[screen][seltag[screen]].nclients = n));
 
-     if(n == 1 && (c = tiled_client(screen, clients)))
-          client_maximize(c);
-
+     if(n == 1)
+          client_maximize(tiled_client(screen, clients));
      if(!ns)
           grid(screen, True);
 
