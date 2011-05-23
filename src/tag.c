@@ -133,6 +133,8 @@ tag_set(int tag)
 void
 tag_transfert(Client *c, int tag)
 {
+     int s;
+
      screen_get_sel();
 
      CHECK(c);
@@ -140,8 +142,11 @@ tag_transfert(Client *c, int tag)
      if(tag <= 0)
           tag = 1;
 
-     if(tag > conf.ntag[selscreen])
+     if(tag > conf.ntag[selscreen]
+               || (c->screen == selscreen && c->tag == tag))
           return;
+
+     s = c->screen;
 
      if(c->flags & SplitFlag)
      {
@@ -155,6 +160,9 @@ tag_transfert(Client *c, int tag)
      c->screen = selscreen;
 
      arrange(c->screen, True);
+
+     if(s != c->screen)
+          arrange(s, True);
 
      client_focus_next(c);
 

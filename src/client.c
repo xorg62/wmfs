@@ -147,7 +147,7 @@ client_get_next_with_direction(Client *bc, Position pos)
           { 0, -1 }, {  0, 1 }  /* Top,   Bottom */
      };
 
-     if(!bc || ishide(bc, selscreen))
+     if(!bc)
           return NULL;
 
      /* Start place of pointer for faster scanning */
@@ -519,12 +519,13 @@ client_urgent(Client *c, Bool u)
      {
           Client *cc;
 
-          if(x < 0 || x > spgeo[selscreen].x + spgeo[selscreen].width
-                    || y < 0 || y > spgeo[selscreen].y + spgeo[selscreen].height)
+          if(x < 0 || x > spgeo[c->screen].x + spgeo[c->screen].width
+                    || y < 0 || y > spgeo[c->screen].y + spgeo[c->screen].height)
                return NULL;
 
           for(cc = clients; cc; cc = cc->next)
-               if(!ishide(cc, selscreen) && (cc->flags & TileFlag) && cc != c)
+               if(cc != c && cc->screen == c->screen && cc->tag == c->tag
+                         && (cc->flags & TileFlag))
                     if(cc->frame_geo.x < x && cc->frame_geo.x + cc->frame_geo.width > x
                               && cc->frame_geo.y < y && cc->frame_geo.y + cc->frame_geo.height > y)
                          return cc;
@@ -1038,6 +1039,7 @@ client_maximize(Client *c)
      if(!c || c->flags & FSSFlag)
           return;
 
+     cfactor_clean(c);
      c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
 
      c->geo.x = sgeo[c->screen].x;
@@ -1045,7 +1047,7 @@ client_maximize(Client *c)
      c->geo.width  = sgeo[c->screen].width  - BORDH * 2;
      c->geo.height = sgeo[c->screen].height - BORDH;
 
-     client_moveresize(c, c->geo, tags[c->screen][c->tag].resizehint);
+     client_moveresize(c, (c->pgeo = c->geo), tags[c->screen][c->tag].resizehint);
 
      return;
 }

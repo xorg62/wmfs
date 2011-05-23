@@ -104,8 +104,9 @@ split_arrange_closed(Client *ghost)
      XRectangle cgeo;
      Client *c, *cc;
      int screen = ghost->screen;
+     int tag = (ghost->tag ? ghost->tag : seltag[screen]);
 
-     if(tags[screen][seltag[screen]].layout.func != split)
+     if(tags[screen][tag].layout.func != split)
           return;
 
      /* Use ghost client properties to fix holes in tile
@@ -133,7 +134,7 @@ split_arrange_closed(Client *ghost)
                {
                     _split_arrange_size(ghost->wrgeo, &c->wrgeo, p);
                     cfactor_clean(c);
-                    client_moveresize(c, (c->pgeo = c->wrgeo), tags[screen][c->tag].resizehint);
+                    client_moveresize(c, (c->pgeo = c->wrgeo), tags[screen][tag].resizehint);
 
                     return;
                }
@@ -249,7 +250,7 @@ split_client_integrate(Client *c, Client *sc, int screen, int tag)
           /* Looking for first client on wanted tag */
           for(b = False, sc = clients; sc; sc = sc->next)
                if(sc->screen == screen && sc->tag == tag
-                         && (c->flags & TileFlag))
+                         && (c->flags & (TileFlag | SplitFlag)))
                {
                     b = True;
                     break;
@@ -258,16 +259,12 @@ split_client_integrate(Client *c, Client *sc, int screen, int tag)
           /* No client on wanted tag to integrate */
           if(!b)
           {
-               g.x = sgeo[c->screen].x;
-               g.y = sgeo[c->screen].y ;
-               g.width  = sgeo[c->screen].width  - BORDH * 2;
-               g.height = sgeo[c->screen].height - BORDH;
+               client_maximize(c);
+               return;
           }
      }
 
-     if(b)
-          g = split_client(sc, (sc->frame_geo.height < sc->frame_geo.width));
-
+     g = split_client(sc, (sc->frame_geo.height < sc->frame_geo.width));
      split_client_fill(c, g);
 
      return;
