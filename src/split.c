@@ -259,7 +259,15 @@ split_client_integrate(Client *c, Client *sc, int screen, int tag)
           /* No client on wanted tag to integrate */
           if(!b)
           {
+               /* client_maximize check position of client
+                * to maximize it; so in case of transfert one client
+                * on a tag from another screen, we need it.
+                */
+               c->geo.x = sgeo[screen].x;
+               c->geo.y = sgeo[screen].y;
+
                client_maximize(c);
+
                return;
           }
      }

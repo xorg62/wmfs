@@ -135,15 +135,15 @@ tag_transfert(Client *c, int tag)
 {
      int s;
 
-     screen_get_sel();
-
      CHECK(c);
+
+     screen_get_sel();
 
      if(tag <= 0)
           tag = 1;
 
      if(tag > conf.ntag[selscreen]
-               || (c->screen == selscreen && c->tag == tag))
+               || (c->tag == tag && c->screen == selscreen))
           return;
 
      s = c->screen;
@@ -159,13 +159,12 @@ tag_transfert(Client *c, int tag)
      c->tag = tag;
      c->screen = selscreen;
 
-     arrange(c->screen, True);
-
      if(s != c->screen)
           arrange(s, True);
 
-     client_focus_next(c);
+     arrange(c->screen, True);
 
+     client_focus_next(c);
      client_update_attributes(c);
 
      tags[c->screen][tag].request_update = True;
