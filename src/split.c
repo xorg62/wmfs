@@ -62,6 +62,25 @@ _split_check_row(XRectangle g1, XRectangle g2, Position p)
           return (g1.x >= g2.x && (g1.x + g1.width) <= (g2.x + g2.width));
 }
 
+/** Store split geos of clients
+*/
+void
+split_store_geo(int screen, int tag)
+{
+     int e;
+     Client *c;
+
+     if(tags[screen][tag].layout.func != split)
+          return;
+
+     for(c = clients; c; c = c->next)
+          if(c->screen == screen && c->tag == tag
+                    && (c->flags & (SplitFlag | TileFlag)))
+               c->split_geo = c->wrgeo;
+
+     return;
+}
+
 /** Check if row direction is available to resize from it
   *\param c Client pointer
   *\param g Client pointer
@@ -75,7 +94,7 @@ _split_check_row_dir(Client *c, Client *g, Position p)
      XRectangle cgeo;
      Client *cc;
 
-     cs  = (LDIR(p) ? g->frame_geo.height : g->frame_geo.width);
+     cs = (LDIR(p) ? g->frame_geo.height : g->frame_geo.width);
 
      for(s = 0, cgeo = c->frame_geo, cc = tiled_client(c->screen, clients);
                cc; cc = tiled_client(c->screen, cc->next))
@@ -161,6 +180,8 @@ split_arrange_closed(Client *ghost)
                          b = True;
                     }
           }
+
+     split_store_geo(screen, tag);
 
      return;
 }
@@ -274,6 +295,8 @@ split_client_integrate(Client *c, Client *sc, int screen, int tag)
 
      g = split_client(sc, (sc->frame_geo.height < sc->frame_geo.width));
      split_client_fill(c, g);
+
+     split_store_geo(screen, tag);
 
      return;
 }

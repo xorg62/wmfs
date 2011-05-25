@@ -223,6 +223,8 @@ cfactor_arrange_row(Client *c, Client *gc, Position p, int fac)
           _cfactor_arrange_row(gc, RPOS(p), -fac);
      }
 
+     split_store_geo(c->screen, c->tag);
+
      return;
 }
 

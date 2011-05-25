@@ -841,7 +841,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      c->ogeo.y = c->geo.y = my;
      c->ogeo.width = c->geo.width = wa->width;
      c->ogeo.height = c->geo.height = wa->height;
-     c->free_geo = c->pgeo = c->wrgeo = c->geo;
+     c->free_geo = c->pgeo = c->wrgeo = c->split_geo = c->geo;
      c->tag = seltag[c->screen];
      c->focusontag = -1;
      cfactor_clean(c);

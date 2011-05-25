@@ -312,17 +312,17 @@ grid(int screen, Bool horizontal)
 void
 split(int screen)
 {
-     Client *c;
+     Client *c, *tc;
      unsigned int n, ns;
 
-     for(n = ns = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n)
+     for(n = ns = 0, (c = tc = tiled_client(screen, clients)); c; c = tiled_client(screen, c->next), ++n)
           if(c->flags & SplitFlag)
                ++ns;
 
      CHECK((tags[screen][seltag[screen]].nclients = n));
 
-     if(n == 1)
-          client_maximize(tiled_client(screen, clients));
+     if(n == 1 && !(tc->flags & SplitFlag))
+          client_maximize(tc);
      if(!ns)
           grid(screen, True);
 
@@ -330,7 +330,14 @@ split(int screen)
      {
           c->flags &= ~(MaxFlag | LMaxFlag);
           c->flags |= (TileFlag | SplitFlag);
+
+          if(tags[screen][seltag[screen]].layout.splitusegeo)
+               client_moveresize(c, (c->pgeo = c->split_geo), tags[screen][seltag[screen]].resizehint);
+
      }
+
+     if(tags[screen][seltag[screen]].layout.splitusegeo)
+          tags[screen][seltag[screen]].layout.splitusegeo = False;
 
      ewmh_update_current_tag_prop();
 

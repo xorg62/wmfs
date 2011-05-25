@@ -388,6 +388,7 @@ void init(void);
 void getinfo(char *info);
 
 /* split.c */
+void split_store_geo(int screen, int tag);
 void split_arrange_closed(Client *ghost);
 XRectangle split_client(Client *c, Bool p);
 void split_client_fill(Client *c, XRectangle geo);

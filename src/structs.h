@@ -190,11 +190,11 @@ struct Client
      /* Screen */
      int screen;
      /* Window attribute */
-     XRectangle geo, pgeo;      /* Window geo, tiling pure geo */
-     XRectangle tmp_geo, wrgeo; /* Temporary geo, without resizehint geo */
-     XRectangle frame_geo;      /* Frame geo */
-     XRectangle ogeo;           /* Old window attribute */
-     XRectangle free_geo;       /* Free window attribute */
+     XRectangle geo, pgeo;            /* Window geo, tiling pure geo */
+     XRectangle tmp_geo, wrgeo;       /* Temporary geo, without resizehint geo */
+     XRectangle frame_geo;            /* Frame geo */
+     XRectangle ogeo;                 /* Old window attribute */
+     XRectangle split_geo, free_geo;  /* Split & Free window attribute */
      /* Tile size factors */
      int tilefact[4];
      /* For resizehint usage */
@@ -258,6 +258,7 @@ typedef struct
 /* Layout Structure */
 typedef struct
 {
+     Bool splitusegeo;
      char *symbol;
      char *type;
      void (*func)(int screen);

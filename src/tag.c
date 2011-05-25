@@ -479,7 +479,6 @@ void
 uicb_tag_urgent(uicb_t cmd)
 {
      Client *c;
-     Bool b = False;
 
      (void)cmd;
 
@@ -487,16 +486,12 @@ uicb_tag_urgent(uicb_t cmd)
      for(c = clients; c; c = c->next)
           if(c->flags & UrgentFlag)
           {
-               b = True;
+               screen_set_sel(c->screen);
+               tag_set(c->tag);
+               client_focus(c);
+
                break;
           }
-
-     if(!b)
-          return;
-
-    screen_set_sel(c->screen);
-    tag_set(c->tag);
-    client_focus(c);
 
     return;
 }
@@ -509,10 +504,12 @@ uicb_tag_urgent(uicb_t cmd)
 void
 tag_additional(int sc, int tag, int adtag)
 {
-     Client *c;
-
      if(tag < 0 || tag > conf.ntag[sc]
        || adtag < 1 || adtag > conf.ntag[sc] || adtag == seltag[sc])
+          return;
+
+     /* TODO: Find a way to use split + additional properly */
+     if(tags[sc][tag].layout.func == split)
           return;
 
      tags[sc][tag].tagad ^= TagFlag(adtag);
@@ -520,17 +517,8 @@ tag_additional(int sc, int tag, int adtag)
      tags[sc][tag].cleanfact = True;
      tags[sc][adtag].cleanfact = True;
 
-     for(c = clients; c; c = c->next)
-          if(c->screen == sc && c->tag == adtag)
-          {
-               if(tags[sc][tag].tagad & TagFlag(adtag))
-                    split_client_integrate(c, NULL, sc, tag);
-               else
-               {
-                    split_client_integrate(c, NULL, sc, adtag);
-                    split_arrange_closed(c);
-               }
-          }
+     if(tags[sc][adtag].layout.func == split)
+          tags[sc][adtag].layout.splitusegeo = True;
 
      arrange(sc, True);
 
