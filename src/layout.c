@@ -300,7 +300,7 @@ grid(int screen, Bool horizontal)
           }
      }
 
-     tags[selscreen][seltag[selscreen]].flags &= ~CleanFactFlag;
+     tags[screen][seltag[screen]].flags &= ~CleanFactFlag;
      ewmh_update_current_tag_prop();
 
      return;
@@ -432,7 +432,7 @@ multi_tile(int screen, Position type)
                cgeo.y = c->pgeo.y + c->pgeo.height + BORDH + TBARH;
      }
 
-     tags[selscreen][seltag[selscreen]].flags &= ~CleanFactFlag;
+     tags[screen][seltag[screen]].flags &= ~CleanFactFlag;
      ewmh_update_current_tag_prop();
 
      return;
@@ -615,7 +615,7 @@ mirror(int screen, Bool horizontal)
 
      }
 
-     tags[selscreen][seltag[selscreen]].flags &= ~CleanFactFlag;
+     tags[screen][seltag[screen]].flags &= ~CleanFactFlag;
      ewmh_update_current_tag_prop();
 
      return;

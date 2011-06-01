@@ -106,8 +106,8 @@ tag_set(int tag)
 
      if(tags[selscreen][tag].flags & RequestUpdateFlag)
      {
-          tags[selscreen][seltag[selscreen]].layout.func(selscreen);
-          tags[selscreen][seltag[selscreen]].flags &= ~RequestUpdateFlag;
+          tags[selscreen][tag].layout.func(selscreen);
+          tags[selscreen][tag].flags &= ~RequestUpdateFlag;
      }
 
      /* To focus selected client of the via focusontag option */
@@ -159,7 +159,7 @@ tag_transfert(Client *c, int tag)
      client_focus_next(c);
      client_update_attributes(c);
 
-     tags[c->screen][c->tag].flags |= RequestUpdateFlag;
+     tags[c->screen][tag].flags |= RequestUpdateFlag;
 
      return;
 }
