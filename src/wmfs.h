@@ -102,15 +102,16 @@
         XSetWindowBackground(dpy, win, (col));                                      \
     } while (/* CONSTCOND */ 0)
 
-#define ATOM(a)      XInternAtom(dpy, (a), False)
-#define FRAMEW(w)    ((w) + BORDH * 2)
-#define FRAMEH(h)    ((h) + (BORDH  + TBARH))
-#define ROUND(x)     (float)((x > 0) ? x + (float)0.5 : x - (float)0.5)
-#define CHECK(x)     if(!(x)) return
-#define LEN(x)       (sizeof(x) / sizeof((x)[0]))
-#define MAXCLIST     (64)
-#define RPOS(x)      (x % 2 ? x - 1 : x + 1)
-#define LDIR(x)      (x < Top)
+#define ATOM(a)            XInternAtom(dpy, (a), False)
+#define FRAMEW(w)          ((w) + BORDH * 2)
+#define FRAMEH(h)          ((h) + (BORDH  + TBARH))
+#define ROUND(x)           (float)((x > 0) ? x + (float)0.5 : x - (float)0.5)
+#define CHECK(x)           if(!(x)) return
+#define LEN(x)             (sizeof(x) / sizeof((x)[0]))
+#define MAXCLIST           (64)
+#define RPOS(x)            (x % 2 ? x - 1 : x + 1)
+#define LDIR(x)            (x < Top)
+#define FLAGAPPLY(v, b, f) ((b) ? (v |= (f)) : (v &= ~(f)))
 
 /* barwin.c */
 BarWindow *barwin_create(Window parent,
@@ -351,7 +352,6 @@ Client *tiled_client(int screen, Client *c);
 void freelayout(int screen);
 void layoutswitch(Bool b);
 void maxlayout(int screen);
-void split(int screen);
 /* tile {{{ */
  void tile(int screen);
  void tile_left(int screen);

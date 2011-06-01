@@ -67,15 +67,11 @@ _split_check_row(XRectangle g1, XRectangle g2, Position p)
 void
 split_store_geo(int screen, int tag)
 {
-     int e;
      Client *c;
-
-     if(tags[screen][tag].layout.func != split)
-          return;
 
      for(c = clients; c; c = c->next)
           if(c->screen == screen && c->tag == tag
-                    && (c->flags & (SplitFlag | TileFlag)))
+                    && (c->flags & TileFlag))
                c->split_geo = c->wrgeo;
 
      return;
@@ -125,9 +121,6 @@ split_arrange_closed(Client *ghost)
      int screen = ghost->screen;
      int tag = (ghost->tag ? ghost->tag : seltag[screen]);
 
-     if(tags[screen][tag].layout.func != split)
-          return;
-
      /* Use ghost client properties to fix holes in tile
       *     .--.  ~   ~
       *    /xx  \   ~   ~
@@ -153,7 +146,7 @@ split_arrange_closed(Client *ghost)
                {
                     _split_arrange_size(ghost->wrgeo, &c->wrgeo, p);
                     cfactor_clean(c);
-                    client_moveresize(c, (c->pgeo = c->wrgeo), tags[screen][tag].resizehint);
+                    client_moveresize(c, (c->pgeo = c->wrgeo), (tags[screen][tag].flags & ResizeHintFlag));
 
                     return;
                }
@@ -176,7 +169,7 @@ split_arrange_closed(Client *ghost)
                     {
                          _split_arrange_size(ghost->wrgeo, &cc->wrgeo, p);
                          cfactor_clean(cc);
-                         client_moveresize(cc, (cc->pgeo = cc->wrgeo), tags[screen][cc->tag].resizehint);
+                         client_moveresize(cc, (cc->pgeo = cc->wrgeo), (tags[screen][tag].flags & ResizeHintFlag));
                          b = True;
                     }
           }
@@ -196,14 +189,13 @@ split_client(Client *c, Bool p)
 {
      XRectangle geo, sgeo;
 
-     if(!c || !(c->flags & TileFlag)
-               || tags[c->screen][c->tag].layout.func != split)
+     if(!c || !(c->flags & TileFlag))
           return c->wrgeo;
 
      cfactor_clean(c);
 
      c->flags &= ~(MaxFlag | LMaxFlag);
-     c->flags |= (TileFlag | SplitFlag);
+     c->flags |= TileFlag;
 
      /* Use geometry without resizehint applied on it */
      geo = sgeo = c->wrgeo;
@@ -229,7 +221,7 @@ split_client(Client *c, Bool p)
           sgeo.height += (c->wrgeo.y + c->wrgeo.height) - (sgeo.y + sgeo.height);
      }
 
-     client_moveresize(c, (c->pgeo = geo), tags[c->screen][c->tag].resizehint);
+     client_moveresize(c, (c->pgeo = geo), (tags[c->screen][c->tag].flags & ResizeHintFlag));
 
      return sgeo;
 }
@@ -245,10 +237,10 @@ split_client_fill(Client *c, XRectangle geo)
           return;
 
      c->flags &= ~(MaxFlag | LMaxFlag);
-     c->flags |= (TileFlag | SplitFlag);
+     c->flags |= TileFlag;
 
      cfactor_clean(c);
-     client_moveresize(c, (c->pgeo = geo), tags[c->screen][c->tag].resizehint);
+     client_moveresize(c, (c->pgeo = geo), (tags[c->screen][c->tag].flags & ResizeHintFlag));
 
      return;
 }
@@ -271,7 +263,7 @@ split_client_integrate(Client *c, Client *sc, int screen, int tag)
           /* Looking for first client on wanted tag */
           for(b = False, sc = clients; sc; sc = sc->next)
                if(sc->screen == screen && sc->tag == tag
-                         && (c->flags & (TileFlag | SplitFlag)))
+                         && (c->flags & TileFlag))
                {
                     b = True;
                     break;

@@ -53,7 +53,14 @@
 #define UrgentFlag (1 << 10)
 #define FLayFlag   (1 << 11)
 #define DockFlag   (1 << 12)
-#define SplitFlag  (1 << 13)
+
+/* Tag flags definition */
+#define TagUrgentFlag     (1 << 1)
+#define ResizeHintFlag    (1 << 2)
+#define RequestUpdateFlag (1 << 3)
+#define AboveFCFlag       (1 << 4)
+#define CleanFactFlag     (1 << 5)
+#define StayLastFlag      (1 << 6)
 
 #define TagFlag(t) (1 << (t))
 
@@ -281,18 +288,13 @@ typedef struct
      int nclients;
      float mwfact;
      int nmaster;
-     Bool urgent;
-     Bool resizehint;
-     Bool request_update;
-     Bool abovefc;
-     Bool cleanfact;
+     uint flags;
      int barpos;
      int prev_barpos;
      Layout layout;
      uint tagad;
      MouseBinding *mouse;
      int nmouse;
-     Bool stay_last;
 } Tag;
 
 /* Menu Item Struct */

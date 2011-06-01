@@ -285,7 +285,7 @@ scan(void)
      {
           if(c->tag > (uint)conf.ntag[c->screen])
                c->tag = conf.ntag[c->screen];
-          tags[c->screen][c->tag].request_update = True;
+          tags[c->screen][c->tag].flags |= RequestUpdateFlag;
      }
 
      for(i = 0; i < s; ++i)

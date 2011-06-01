@@ -527,13 +527,25 @@ conf_tag_section(void)
      /* If there is no tag in the conf or more than
       * MAXTAG (36) print an error and create only one.
       */
-     Tag default_tag = { fetch_opt_first(def_tag, "new tag", "name").str, NULL, 1,
-                         fetch_opt_first(def_tag, "0.6", "mwfact").fnum,
-                         fetch_opt_first(def_tag, "1", "nmaster").num,
-                         False, fetch_opt_first(def_tag, "False", "resizehint").bool,
-                         False, False, False, bar_pos, bar_pos,
-                         layout_name_to_struct(conf.layout, fetch_opt_first(def_tag, "tile", "layout").str, conf.nlayout, layout_list),
-                         0, NULL, 0, False };
+     Tag default_tag =
+     {
+          fetch_opt_first(def_tag, "new tag", "name").str,
+          NULL,
+          1,
+          fetch_opt_first(def_tag, "0.6", "mwfact").fnum,
+          fetch_opt_first(def_tag, "1", "nmaster").num,
+          0,
+          bar_pos,
+          bar_pos,
+          layout_name_to_struct(conf.layout, fetch_opt_first(def_tag, "tile", "layout").str, conf.nlayout, layout_list),
+          0,
+          NULL,
+          0
+     };
+
+     FLAGAPPLY(default_tag.flags,
+               fetch_opt_first(def_tag, "False", "resizehint").bool,
+               ResizeHintFlag);
 
      conf.default_tag = default_tag;
 
@@ -582,8 +594,13 @@ conf_tag_section(void)
                tags[k][conf.ntag[k]].name       = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "", "name").str, "name").str;
                tags[k][conf.ntag[k]].mwfact     = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "0.65", "mwfact").str, "mwfact").fnum;
                tags[k][conf.ntag[k]].nmaster    = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "1", "nmaster").str, "nmaster").num;
-               tags[k][conf.ntag[k]].resizehint = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "false", "resizehint").str, "resizehint").bool;
-               tags[k][conf.ntag[k]].abovefc    = fetch_opt_first(tag[i], "false", "abovefc").bool;
+               FLAGAPPLY(tags[k][conf.ntag[k]].flags,
+                         fetch_opt_first(tag[i], fetch_opt_first(def_tag, "false", "resizehint").str, "resizehint").bool,
+                         ResizeHintFlag);
+
+               FLAGAPPLY(tags[k][conf.ntag[k]].flags,
+                         fetch_opt_first(tag[i], "false", "abovefc").bool,
+                         AboveFCFlag);
 
                tmp = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "top", "infobar_position").str, "infobar_position").str;
 

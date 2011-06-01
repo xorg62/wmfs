@@ -40,7 +40,7 @@ cfactor_clean(Client *c)
 {
      CHECK(c);
 
-     if(!tags[c->screen][c->tag].cleanfact)
+     if(!(tags[c->screen][c->tag].flags & CleanFactFlag))
           return;
 
      c->tilefact[Right] = c->tilefact[Left]   = 0;
@@ -131,7 +131,7 @@ _cfactor_arrange_row(Client *c, Position p, int fac)
           if(cfactor_parentrow(cgeo, cc->frame_geo, p))
           {
                cc->tilefact[p] += fac;
-               client_moveresize(cc, cc->geo, tags[cc->screen][cc->tag].resizehint);
+               client_moveresize(cc, cc->geo, (tags[cc->screen][cc->tag].flags & ResizeHintFlag));
           }
 
      return;
@@ -183,8 +183,8 @@ cfactor_arrange_two(Client *c1, Client *c2, Position p, int fac)
            c2->flags |= FLayFlag;
      }
 
-     client_moveresize(c1, c1->geo, tags[c1->screen][c1->tag].resizehint);
-     client_moveresize(c2, c2->geo, tags[c2->screen][c2->tag].resizehint);
+     client_moveresize(c1, c1->geo, (tags[c1->screen][c1->tag].flags & ResizeHintFlag));
+     client_moveresize(c2, c2->geo, (tags[c2->screen][c2->tag].flags & ResizeHintFlag));
 
      return;
 
@@ -214,7 +214,6 @@ cfactor_check_2pc(XRectangle g1, XRectangle g2, Position p)
 static void
 cfactor_arrange_row(Client *c, Client *gc, Position p, int fac)
 {
-
      if(cfactor_check_2pc(c->frame_geo, gc->frame_geo, p))
           cfactor_arrange_two(c, gc, p, fac);
      else
@@ -223,7 +222,8 @@ cfactor_arrange_row(Client *c, Client *gc, Position p, int fac)
           _cfactor_arrange_row(gc, RPOS(p), -fac);
      }
 
-     split_store_geo(c->screen, c->tag);
+     /* in case of tag additional, use selscreen/seltag */
+     split_store_geo(selscreen, seltag[selscreen]);
 
      return;
 }

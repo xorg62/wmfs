@@ -116,7 +116,7 @@ layoutswitch(Bool b)
      }
 
      ewmh_update_current_tag_prop();
-     tags[selscreen][seltag[selscreen]].cleanfact = True;
+     tags[selscreen][seltag[selscreen]].flags |= CleanFactFlag;
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);
      infobar_draw(selscreen);
 
@@ -230,7 +230,7 @@ uicb_set_nmaster(uicb_t cmd)
           return;
 
      tags[selscreen][seltag[selscreen]].nmaster += n;
-     tags[selscreen][seltag[selscreen]].cleanfact = True;
+     tags[selscreen][seltag[selscreen]].flags |= CleanFactFlag;
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);
 
      ewmh_update_current_tag_prop();
@@ -287,7 +287,7 @@ grid(int screen, Bool horizontal)
                cgeo.width = sg.width - (cgeo.x - (sg.x - (BORDH * 2)));
 
           /* Resize */
-          client_moveresize(c, (c->pgeo = cgeo), tags[screen][seltag[screen]].resizehint);
+          client_moveresize(c, (c->pgeo = cgeo), (tags[screen][seltag[screen]].flags & ResizeHintFlag));
 
           /* Set all the other size with current client info */
           cgeo.y = c->pgeo.y + c->pgeo.height + BORDH + TBARH;
@@ -300,45 +300,7 @@ grid(int screen, Bool horizontal)
           }
      }
 
-     tags[screen][seltag[screen]].cleanfact = False;
-     ewmh_update_current_tag_prop();
-
-     return;
-}
-
-/** Split layout function
-  * This function is a trick compared to dynamic layout function, see split.c
-*/
-void
-split(int screen)
-{
-     Client *c, *tc;
-     unsigned int n, ns;
-
-     for(n = ns = 0, (c = tc = tiled_client(screen, clients)); c; c = tiled_client(screen, c->next), ++n)
-          if(c->flags & SplitFlag)
-               ++ns;
-
-     CHECK((tags[screen][seltag[screen]].nclients = n));
-
-     if(n == 1 && !(tc->flags & SplitFlag))
-          client_maximize(tc);
-     if(!ns)
-          grid(screen, True);
-
-     for(c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next))
-     {
-          c->flags &= ~(MaxFlag | LMaxFlag);
-          c->flags |= (TileFlag | SplitFlag);
-
-          if(tags[screen][seltag[screen]].layout.splitusegeo)
-               client_moveresize(c, (c->pgeo = c->split_geo), tags[screen][seltag[screen]].resizehint);
-
-     }
-
-     if(tags[screen][seltag[screen]].layout.splitusegeo)
-          tags[screen][seltag[screen]].layout.splitusegeo = False;
-
+     tags[selscreen][seltag[selscreen]].flags &= ~CleanFactFlag;
      ewmh_update_current_tag_prop();
 
      return;
@@ -461,7 +423,7 @@ multi_tile(int screen, Position type)
           }
 
           /* Magic instant */
-          client_moveresize(c, (c->pgeo = cgeo), tags[screen][seltag[screen]].resizehint);
+          client_moveresize(c, (c->pgeo = cgeo), (tags[screen][seltag[screen]].flags & ResizeHintFlag));
 
           /* Set the position of the next client */
           if(type == Top || type == Bottom)
@@ -470,7 +432,7 @@ multi_tile(int screen, Position type)
                cgeo.y = c->pgeo.y + c->pgeo.height + BORDH + TBARH;
      }
 
-     tags[screen][seltag[screen]].cleanfact = False;
+     tags[selscreen][seltag[selscreen]].flags &= ~CleanFactFlag;
      ewmh_update_current_tag_prop();
 
      return;
@@ -620,7 +582,7 @@ mirror(int screen, Bool horizontal)
                }
           }
 
-          client_moveresize(c, (c->pgeo = cgeo), tags[screen][seltag[screen]].resizehint);
+          client_moveresize(c, (c->pgeo = cgeo), (tags[screen][seltag[screen]].flags & ResizeHintFlag));
 
           if(i >= nmaster)
                nextg[!isp] = c->pgeo;
@@ -653,7 +615,7 @@ mirror(int screen, Bool horizontal)
 
      }
 
-     tags[screen][seltag[screen]].cleanfact = False;
+     tags[selscreen][seltag[selscreen]].flags &= ~CleanFactFlag;
      ewmh_update_current_tag_prop();
 
      return;
@@ -758,8 +720,8 @@ uicb_togglefree(uicb_t cmd)
 
      if(sel->flags & FreeFlag)
      {
-          split_arrange_closed(sel);
-          sel->flags &= ~(TileFlag | MaxFlag | LMaxFlag | SplitFlag);
+          sel->flags &= ~(TileFlag | MaxFlag | LMaxFlag);
+
           client_moveresize(sel, sel->free_geo, True);
           client_raise(sel);
      }
@@ -767,12 +729,11 @@ uicb_togglefree(uicb_t cmd)
      {
           sel->free_geo = sel->geo;
           sel->ogeo = sel->geo;
-          split_client_integrate(sel, client_get_next(), sel->screen, sel->tag);
      }
 
      client_update_attributes(sel);
 
-     tags[selscreen][seltag[selscreen]].cleanfact = True;
+     tags[selscreen][seltag[selscreen]].flags |= CleanFactFlag;
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);
 
      return;
@@ -797,16 +758,17 @@ uicb_togglemax(uicb_t cmd)
           sel->ogeo = sel->geo;
           sel->free_geo = sel->geo;
           sel->flags &= ~(TileFlag | FreeFlag);
-          split_arrange_closed(sel);
+
           client_maximize(sel);
           XRaiseWindow(dpy, sel->frame);
      }
      else
      {
           sel->geo = sel->ogeo;
+
           client_moveresize(sel, sel->geo, True);
-          split_client_integrate(sel, client_get_next(), sel->screen, sel->tag);
-          tags[selscreen][seltag[selscreen]].cleanfact = True;
+
+          tags[selscreen][seltag[selscreen]].flags |= CleanFactFlag;
           tags[selscreen][seltag[selscreen]].layout.func(selscreen);
      }
 
@@ -824,10 +786,10 @@ uicb_toggle_resizehint(uicb_t cmd)
      screen_get_sel();
      (void)cmd;
 
-     tags[selscreen][seltag[selscreen]].resizehint = !tags[selscreen][seltag[selscreen]].resizehint;
+     tags[selscreen][seltag[selscreen]].flags ^= ResizeHintFlag;
 
      for(c = tiled_client(selscreen, clients); c; c = tiled_client(selscreen, c->next))
-          client_moveresize(c, c->geo, tags[selscreen][seltag[selscreen]].resizehint);
+          client_moveresize(c, c->geo, (tags[selscreen][seltag[selscreen]].flags & ResizeHintFlag));
 
      return;
 }
@@ -843,7 +805,9 @@ uicb_toggle_abovefc(uicb_t cmd)
 
      screen_get_sel();
 
-     if(!(tags[selscreen][seltag[selscreen]].abovefc = !tags[selscreen][seltag[selscreen]].abovefc))
+     tags[selscreen][seltag[selscreen]].flags ^= AboveFCFlag;
+
+     if(!(tags[selscreen][seltag[selscreen]].flags & AboveFCFlag))
      {
           for(c = clients; c; c = c->next)
                if(c->flags & AboveFlag
@@ -851,11 +815,10 @@ uicb_toggle_abovefc(uicb_t cmd)
                          && c->tag == (uint)seltag[selscreen])
                {
                     c->flags &= ~AboveFlag;
-                    split_client_integrate(c, NULL, sel->screen, sel->tag);
                     break;
                }
 
-          tags[selscreen][seltag[selscreen]].cleanfact = True;
+          tags[selscreen][seltag[selscreen]].flags |= CleanFactFlag;
           tags[selscreen][seltag[selscreen]].layout.func(selscreen);
      }
 
@@ -883,7 +846,7 @@ uicb_set_layout(uicb_t cmd)
                     if(layout_list[i].func == conf.layout[j].func)
                          tags[selscreen][seltag[selscreen]].layout = conf.layout[j];
 
-     tags[selscreen][seltag[selscreen]].cleanfact = True;
+     tags[selscreen][seltag[selscreen]].flags |= CleanFactFlag;
      arrange(selscreen, True);
 
      return;
@@ -907,7 +870,7 @@ layout_set_client_master(Client *c)
      client_detach(c);
      client_attach(c);
 
-     tags[selscreen][seltag[selscreen]].cleanfact = True;
+     tags[selscreen][seltag[selscreen]].flags |= CleanFactFlag;
      tags[selscreen][seltag[selscreen]].layout.func(selscreen);
 
      return;

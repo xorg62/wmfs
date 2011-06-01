@@ -80,7 +80,6 @@
         # layout_button_width = x
 
         # Tiling layouts.
-        [layout] type = "split"              symbol = "SPLI7"    [/layout]
         [layout] type = "tile_right"         symbol = "RIGHT"    [/layout]
         [layout] type = "tile_left"          symbol = "LEFT"     [/layout]
         [layout] type = "tile_top"           symbol = "TOP"      [/layout]

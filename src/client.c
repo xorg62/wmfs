@@ -328,10 +328,9 @@ client_above(Client *c)
      geo.y = spgeo[c->screen].y + (spgeo[c->screen].height / 2) - (geo.height / 2);
      geo.x = spgeo[c->screen].x + (spgeo[c->screen].width / 2)- (geo.width / 2);
 
-     client_moveresize(c, geo, tags[c->screen][c->tag].resizehint);
+     client_moveresize(c, geo, (tags[c->screen][c->tag].flags & ResizeHintFlag));
      client_raise(c);
 
-     split_arrange_closed(c);
      tags[c->screen][c->tag].layout.func(c->screen);
 
      return;
@@ -350,10 +349,7 @@ client_focus(Client *c)
      if(sel && sel != c)
      {
           if(sel->flags & AboveFlag)
-          {
                sel->flags &= ~AboveFlag;
-               split_client_integrate(sel, client_get_next(), sel->screen, sel->tag);
-          }
 
           XChangeProperty(dpy, sel->frame, net_atom[net_wm_window_opacity], XA_CARDINAL,
                           32, PropModeReplace, (uchar *)&conf.opacity, 1);
@@ -389,7 +385,8 @@ client_focus(Client *c)
                     client_raise(c);
           }
 
-          if(tags[sel->screen][sel->tag].abovefc && !conf.focus_fmouse)
+          if((tags[sel->screen][sel->tag].flags & AboveFCFlag)
+                    && !conf.focus_fmouse)
                client_above(sel);
 
           if(c->flags & UrgentFlag)
@@ -417,12 +414,9 @@ client_focus(Client *c)
 void
 client_urgent(Client *c, Bool u)
 {
-     if(u)
-          c->flags |= UrgentFlag;
-     else
-          c->flags &= ~UrgentFlag;
+     FLAGAPPLY(c->flags, u, UrgentFlag);
+     FLAGAPPLY(tags[c->screen][c->tag].flags, u, TagUrgentFlag);
 
-     tags[c->screen][c->tag].urgent = u;
      infobar_draw_taglist(c->screen);
 }
 
@@ -745,7 +739,7 @@ client_set_rules(Client *c)
 
                     if(c->tag != (uint)seltag[selscreen])
                     {
-                         tags[c->screen][c->tag].request_update = True;
+                         tags[c->screen][c->tag].flags |= RequestUpdateFlag;
                          client_focus(NULL);
                     }
 
@@ -764,7 +758,7 @@ client_set_rules(Client *c)
           c->tag = conf.client.default_open_tag;
 
           client_focus_next(c);
-          tags[c->screen][c->tag].request_update = True;
+          tags[c->screen][c->tag].flags |= RequestUpdateFlag;
      }
 
      if(!applied_screen_rule && conf.client.default_open_screen > -1
@@ -773,7 +767,7 @@ client_set_rules(Client *c)
           c->screen = conf.client.default_open_screen;
 
           client_focus_next(c);
-          tags[c->screen][c->tag].request_update = True;
+          tags[c->screen][c->tag].flags |= RequestUpdateFlag;
      }
 
      return;
@@ -873,12 +867,9 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      /* Handle client from here */
      client_attach(c);
      client_get_name(c);
-     tags[c->screen][c->tag].cleanfact = True;
+     tags[c->screen][c->tag].flags |= CleanFactFlag;;
 
      client_set_rules(c);
-
-     /* Case of split layout */
-     split_client_integrate(c, sel, c->screen, c->tag);
 
      client_update_attributes(c);
 
@@ -1047,7 +1038,7 @@ client_maximize(Client *c)
      c->geo.width  = sgeo[c->screen].width  - BORDH * 2;
      c->geo.height = sgeo[c->screen].height - BORDH;
 
-     client_moveresize(c, (c->pgeo = c->geo), tags[c->screen][c->tag].resizehint);
+     client_moveresize(c, (c->pgeo = c->geo), (tags[c->screen][c->tag].flags & ResizeHintFlag));
 
      return;
 }
@@ -1163,8 +1154,8 @@ client_swap(Client *c1, Client *c2)
      client_size_hints(c2);
 
      /* Resize the windows */
-     client_moveresize(c1, c1->geo, tags[c1->screen][c1->tag].resizehint);
-     client_moveresize(c2, c2->geo, tags[c2->screen][c2->tag].resizehint);
+     client_moveresize(c1, c1->geo, (tags[c1->screen][c1->tag].flags & ResizeHintFlag));
+     client_moveresize(c2, c2->geo, (tags[c2->screen][c2->tag].flags & ResizeHintFlag));
 
      /* Get the new client name */
      client_get_name(c1);
@@ -1288,16 +1279,10 @@ client_unmanage(Client *c)
      XUngrabServer(dpy);
      ewmh_get_client_list();
 
-     if(c->flags & TileFlag)
-     {
-          tags[c->screen][c->tag].cleanfact = True;
-          split_arrange_closed(c);
-     }
-
      if(c->tag == MAXTAG + 1)
      {
           for(i = 0; i < conf.ntag[c->screen]; i++)
-               tags[c->screen][i].request_update = True;
+               tags[c->screen][i].flags |= RequestUpdateFlag;
           tags[c->screen][seltag[c->screen]].layout.func(c->screen);
      }
      else
@@ -1319,7 +1304,7 @@ client_unmanage(Client *c)
                tags[c->screen][c->tag].layout.func(c->screen);
           else
           {
-               tags[c->screen][c->tag].request_update = True;
+               tags[c->screen][c->tag].flags |= RequestUpdateFlag;
                infobar_draw(c->screen);
           }
      }
@@ -1390,7 +1375,6 @@ client_set_screen(Client *c, int s)
 
      arrange(s, True);
      arrange(os, True);
-     split_client_integrate(c, NULL, c->screen, c->tag);
 
      if(!(c->flags & TileFlag))
      {

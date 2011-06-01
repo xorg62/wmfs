@@ -81,10 +81,10 @@ tag_set(int tag)
      /* Check if a layout update is needed with additional tags */
      if(tags[selscreen][seltag[selscreen]].tagad)
           al = True;
-     else if(tags[selscreen][seltag[selscreen]].request_update)
+     else if(tags[selscreen][seltag[selscreen]].flags & RequestUpdateFlag)
      {
           al = True;
-          tags[selscreen][seltag[selscreen]].request_update = False;
+          tags[selscreen][seltag[selscreen]].flags &= ~RequestUpdateFlag;
      }
 
      for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
@@ -104,10 +104,10 @@ tag_set(int tag)
 
      arrange(selscreen, al);
 
-     if(tags[selscreen][tag].request_update)
+     if(tags[selscreen][tag].flags & RequestUpdateFlag)
      {
           tags[selscreen][seltag[selscreen]].layout.func(selscreen);
-          tags[selscreen][tag].request_update = False;
+          tags[selscreen][seltag[selscreen]].flags &= ~RequestUpdateFlag;
      }
 
      /* To focus selected client of the via focusontag option */
@@ -148,14 +148,6 @@ tag_transfert(Client *c, int tag)
 
      s = c->screen;
 
-     if(c->flags & SplitFlag)
-     {
-          split_arrange_closed(c);
-          split_client_integrate(c, NULL, selscreen, tag);
-          tags[c->screen][c->tag].cleanfact = True;
-          cfactor_clean(c);
-     }
-
      c->tag = tag;
      c->screen = selscreen;
 
@@ -167,7 +159,7 @@ tag_transfert(Client *c, int tag)
      client_focus_next(c);
      client_update_attributes(c);
 
-     tags[c->screen][tag].request_update = True;
+     tags[c->screen][c->tag].flags |= RequestUpdateFlag;
 
      return;
 }
@@ -327,9 +319,9 @@ remove_old_last_tag(int selscreen)
      int i;
      for(i = 0; i <= conf.ntag[selscreen]; i++)
      {
-          if(tags[selscreen][i].stay_last)
+          if(tags[selscreen][i].flags & StayLastFlag)
           {
-              tags[selscreen][i].stay_last = False;
+              tags[selscreen][i].flags &= ~StayLastFlag;
               break;
           }
      }
@@ -380,8 +372,8 @@ uicb_tag_stay_last(uicb_t cmd)
 
      screen_get_sel();
 
-     if(tags[selscreen][seltag[selscreen]].stay_last)
-          tags[selscreen][seltag[selscreen]].stay_last = False;
+     if(tags[selscreen][seltag[selscreen]].flags & StayLastFlag)
+          tags[selscreen][seltag[selscreen]].flags &= ~StayLastFlag;
 
      else
      {
@@ -394,7 +386,7 @@ uicb_tag_stay_last(uicb_t cmd)
           }
 
           tag_set(conf.ntag[selscreen]);
-          tags[selscreen][seltag[selscreen]].stay_last = True;
+          tags[selscreen][seltag[selscreen]].flags |= StayLastFlag;
           arrange(selscreen, True);
      }
 
@@ -508,17 +500,10 @@ tag_additional(int sc, int tag, int adtag)
        || adtag < 1 || adtag > conf.ntag[sc] || adtag == seltag[sc])
           return;
 
-     /* TODO: Find a way to use split + additional properly */
-     if(tags[sc][tag].layout.func == split)
-          return;
-
      tags[sc][tag].tagad ^= TagFlag(adtag);
-     tags[sc][adtag].request_update = True;
-     tags[sc][tag].cleanfact = True;
-     tags[sc][adtag].cleanfact = True;
-
-     if(tags[sc][adtag].layout.func == split)
-          tags[sc][adtag].layout.splitusegeo = True;
+     tags[sc][adtag].flags |= RequestUpdateFlag;
+     tags[sc][tag].flags |= CleanFactFlag;
+     tags[sc][adtag].flags |= CleanFactFlag;
 
      arrange(sc, True);
 
@@ -561,14 +546,10 @@ uicb_tag_swap_next(uicb_t cmd)
      screen_get_sel();
 
      /* Check if the next one does have the stay_last bool */
-     if(!tags[selscreen][conf.ntag[selscreen]].stay_last)
-     {
+     if(!(tags[selscreen][conf.ntag[selscreen]].flags & StayLastFlag))
           tag_swap(selscreen, seltag[selscreen], seltag[selscreen] + 1);
-     }
      else
-     {
           warnx("The next tag is set to always stay the last one");
-     }
 
      return;
 }
@@ -622,18 +603,17 @@ tag_new(int s, char *name)
 
 
      Tag t = { displayedName, NULL, 0,
-               conf.default_tag.mwfact, conf.default_tag.nmaster,
-               False, conf.default_tag.resizehint, False, False, False,
+               conf.default_tag.mwfact, conf.default_tag.nmaster, conf.default_tag.flags,
                conf.default_tag.barpos, conf.default_tag.barpos,
-               conf.default_tag.layout, 0, NULL, 0, False };
+               conf.default_tag.layout, 0, NULL, 0 };
 
      tags[s][conf.ntag[s]] = t;
 
      /* For stay_last_tag */
-     if(tags[s][conf.ntag[s]-1].stay_last)
+     if(tags[s][conf.ntag[s] - 1].flags & StayLastFlag)
      {
-          tag_swap(s, conf.ntag[s], conf.ntag[s]-1);
-          goToTag = conf.ntag[s]-1;
+          tag_swap(s, conf.ntag[s], conf.ntag[s] - 1);
+          goToTag = conf.ntag[s] - 1;
      }
      else
           goToTag = conf.ntag[s];
@@ -773,7 +753,7 @@ uicb_tag_toggle_expose(uicb_t cmd)
                tag_delete(selscreen, i);
 
                for(j = 0; j < conf.ntag[selscreen]; j++)
-                    tags[selscreen][j].request_update = True;
+                    tags[selscreen][j].flags |= RequestUpdateFlag;
 
                arrange(selscreen, True);
 
@@ -784,19 +764,13 @@ uicb_tag_toggle_expose(uicb_t cmd)
      tag_new(selscreen, conf.tag_expose_name);
 
      for(i = 0; i < conf.nlayout; ++i)
-     {
           if(strcmp(conf.expose_layout, conf.layout[i].type) == 0)
-          {
-               tags[selscreen][conf.ntag[selscreen]].layout = conf.layout[i];
-          }
-     }
+                tags[selscreen][conf.ntag[selscreen]].layout = conf.layout[i];
 
      for(i = 1; i < conf.ntag[selscreen]; ++i)
-     {
           tags[selscreen][conf.ntag[selscreen]].tagad ^= TagFlag(i);
-     }
 
-     tags[selscreen][conf.ntag[selscreen]].request_update = True;
+     tags[selscreen][conf.ntag[selscreen]].flags |= RequestUpdateFlag;
      arrange(selscreen, True);
 
      return;

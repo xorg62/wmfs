@@ -256,7 +256,7 @@ infobar_draw_taglist(int sc)
                barwin_resize(infobar[sc].tags_board, x, infobar[sc].geo.height);
           }
 
-          infobar[sc].tags[i]->bg = tags[sc][i].urgent
+          infobar[sc].tags[i]->bg = (tags[sc][i].flags & TagUrgentFlag)
                ? conf.colors.tagurbg
                : ((i == seltag[sc] || tags[sc][seltag[sc]].tagad & TagFlag(i))
                     ? conf.colors.tagselbg
@@ -264,7 +264,7 @@ infobar_draw_taglist(int sc)
                          ? conf.colors.tag_occupied_bg
                          : conf.colors.bar));
 
-          infobar[sc].tags[i]->fg = tags[sc][i].urgent
+          infobar[sc].tags[i]->fg = (tags[sc][i].flags & TagUrgentFlag)
                ? conf.colors.tagurfg
                : ((i == seltag[sc] || tags[sc][seltag[sc]].tagad & TagFlag(i))
                     ? conf.colors.tagselfg
