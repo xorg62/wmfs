@@ -32,6 +32,20 @@
 
 #include "wmfs.h"
 
+#define CLIENT_RESIZE_DIR(d)         \
+void                                 \
+uicb_client_resize_##d(uicb_t cmd)   \
+{                                    \
+    CHECK(sel);                      \
+    cfactor_set(sel, d, atoi(cmd));  \
+}
+
+/* uicb_client_resize_dir() */
+CLIENT_RESIZE_DIR(Right);
+CLIENT_RESIZE_DIR(Left);
+CLIENT_RESIZE_DIR(Top);
+CLIENT_RESIZE_DIR(Bottom);
+
 /** Clean client tile factors
   *\param c Client pointer
 */
@@ -302,51 +316,4 @@ cfactor_multi_set(Client *c, int fac[4])
      return;
 }
 
-void
-uicb_client_resize_right(uicb_t cmd)
-{
-     int n = atoi(cmd);
-
-     CHECK(sel);
-
-     cfactor_set(sel, Right, n);
-
-     return;
-}
-
-void
-uicb_client_resize_left(uicb_t cmd)
-{
-     int n = atoi(cmd);
-
-     CHECK(sel);
-
-     cfactor_set(sel, Left, n);
-
-     return;
-}
-
-void
-uicb_client_resize_top(uicb_t cmd)
-{
-     int n = atoi(cmd);
-
-     CHECK(sel);
-
-     cfactor_set(sel, Top, n);
-
-     return;
-}
-
-void
-uicb_client_resize_bottom(uicb_t cmd)
-{
-     int n = atoi(cmd);
-
-     CHECK(sel);
-
-     cfactor_set(sel, Bottom, n);
-
-     return;
-}
 

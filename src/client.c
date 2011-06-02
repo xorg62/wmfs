@@ -32,6 +32,55 @@
 
 #include "wmfs.h"
 
+#define client_swapsel(c)        \
+     do                          \
+     {                           \
+          client_swap(sel, c);   \
+          client_focus(c);       \
+     } while(/* CONSTCOND */ 0)  \
+
+#define CLIENT_ACTION_LIST(A, L)      \
+void                                  \
+uicb_client_##A##_##L(uicb_t cmd)     \
+{                                     \
+     Client *c;                       \
+     (void)cmd;                       \
+                                      \
+     if((c = client_get_##L()))       \
+          client_##A(c);              \
+}
+
+#define CLIENT_ACTION_DIR(A, D)                       \
+void                                                  \
+uicb_client_##A##_##D(uicb_t cmd)                     \
+{                                                     \
+     Client *c;                                       \
+     (void)cmd;                                       \
+                                                      \
+     if((c = client_get_next_with_direction(sel, D))) \
+          client_##A(c);                              \
+}                                                     \
+
+/* uicb_client_focus_List() */
+CLIENT_ACTION_LIST(focus, next);
+CLIENT_ACTION_LIST(focus, prev);
+
+/* uicb_client_swap_List() */
+CLIENT_ACTION_LIST(swapsel, next);
+CLIENT_ACTION_LIST(swapsel, prev);
+
+/* uicb_client_focus_Dir() */
+CLIENT_ACTION_DIR(focus, Right);
+CLIENT_ACTION_DIR(focus, Left);
+CLIENT_ACTION_DIR(focus, Top);
+CLIENT_ACTION_DIR(focus, Bottom);
+
+/* uicb_client_swap_Dir() */
+CLIENT_ACTION_DIR(swapsel, Right);
+CLIENT_ACTION_DIR(swapsel, Left);
+CLIENT_ACTION_DIR(swapsel, Top);
+CLIENT_ACTION_DIR(swapsel, Bottom);
+
 /** Attach client in the client chain
  * \param c Client pointer
 */
@@ -109,7 +158,7 @@ client_get_next(void)
 /** Get the previous client
  *\return The previous client or NULL
  */
-static Client*
+Client*
 client_get_prev(void)
 {
      Client *c = NULL, *d;
@@ -160,151 +209,6 @@ client_get_next_with_direction(Client *bc, Position pos)
      for(; (c = client_gb_pos(bc, x, y)) == bc; x += scanfac[pos][0], y += scanfac[pos][1]);
 
      return c;
-}
-
-/** Switch to the previous client
- * \param cmd uicb_t type unused
-*/
-void
-uicb_client_prev(uicb_t cmd)
-{
-     Client *c;
-     (void)cmd;
-
-     if((c = client_get_prev()))
-     {
-          client_focus(c);
-          client_raise(c);
-     }
-
-     return;
-}
-
-/** Switch to the next client
- * \param cmd uicb_t type unused
-*/
-void
-uicb_client_next(uicb_t cmd)
-{
-     Client *c;
-     (void)cmd;
-
-     if((c = client_get_next()))
-     {
-          client_focus(c);
-          client_raise(c);
-     }
-
-     return;
-}
-
-/** Swap the current client with the next one
- *\param cmd uicb_t type unused
- */
-void
-uicb_client_swap_next(uicb_t cmd)
-{
-     Client *c;
-     (void)cmd;
-
-    if((c = client_get_next()))
-     {
-          client_swap(sel, c);
-          client_focus(c);
-     }
-
-     return;
-}
-
-/** Swap the current client with the previous one
- *\param cmd uicb_t type unused
- */
-void
-uicb_client_swap_prev(uicb_t cmd)
-{
-     Client *c;
-     (void)cmd;
-
-     if((c = client_get_prev()))
-     {
-          client_swap(sel, c);
-          client_focus(c);
-     }
-
-     return;
-}
-
-/** Select next client positioned to the right
-  *\param cmd uicb_t type unused
-*/
-void
-uicb_client_focus_right(uicb_t cmd)
-{
-     Client *c;
-     (void)cmd;
-
-     if((c = client_get_next_with_direction(sel, Right)))
-     {
-          client_focus(c);
-          client_raise(c);
-
-     }
-
-     return;
-}
-
-/** Select next client positioned to the left
-  *\param cmd uicb_t type unused
-*/
-void
-uicb_client_focus_left(uicb_t cmd)
-{
-     Client *c;
-     (void)cmd;
-
-     if((c = client_get_next_with_direction(sel, Left)))
-     {
-          client_focus(c);
-          client_raise(c);
-     }
-
-     return;
-}
-
-/** Select next client positioned to the top
-  *\param cmd uicb_t type unused
-*/
-void
-uicb_client_focus_top(uicb_t cmd)
-{
-     Client *c;
-     (void)cmd;
-
-     if((c = client_get_next_with_direction(sel, Top)))
-     {
-          client_focus(c);
-          client_raise(c);
-     }
-
-     return;
-}
-
-/** Select next client positioned to the bottom
-  *\param cmd uicb_t type unused
-*/
-void
-uicb_client_focus_bottom(uicb_t cmd)
-{
-     Client *c;
-     (void)cmd;
-
-     if((c = client_get_next_with_direction(sel, Bottom)))
-     {
-          client_focus(c);
-          client_raise(c);
-     }
-
-     return;
 }
 
 /** Set the client c above
