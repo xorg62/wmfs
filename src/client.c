@@ -864,34 +864,32 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
                c->flags |= FreeFlag;
      free(t);
 
-     /* Handle client from here */
      client_attach(c);
-     client_get_name(c);
-     tags[c->screen][c->tag].flags |= CleanFactFlag;;
-
      client_set_rules(c);
+     client_get_name(c);
+     tags[c->screen][c->tag].flags |= CleanFactFlag;
 
-     client_update_attributes(c);
-
-     /* If client will be visible soon so.. */
      if(c->tag == (uint)seltag[selscreen])
      {
-          setwinstate(c->win, NormalState);
           client_raise(c);
           client_map(c);
-          client_focus(c);
+          setwinstate(c->win, NormalState);
      }
      else
           client_hide(c);
 
+     client_update_attributes(c);
+     ewmh_get_client_list();
      ewmh_manage_window_type(c);
 
-     /* Need arrange for dynamic layouts */
      if(ar)
           arrange(c->screen, True);
 
      if(!conf.client.set_new_win_master)
           layout_set_client_master(c);
+
+     if(c->tag == (uint)seltag[selscreen])
+          client_focus(c);
 
      if(conf.client.new_client_get_mouse)
      {
@@ -1278,6 +1276,9 @@ client_unmanage(Client *c)
      XSync(dpy, False);
      XUngrabServer(dpy);
      ewmh_get_client_list();
+
+     if(c->flags & TileFlag)
+          tags[c->screen][c->tag].flags |= CleanFactFlag;
 
      if(c->tag == MAXTAG + 1)
      {

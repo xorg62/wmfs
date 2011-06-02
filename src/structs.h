@@ -61,6 +61,7 @@
 #define AboveFCFlag       (1 << 4)
 #define CleanFactFlag     (1 << 5)
 #define StayLastFlag      (1 << 6)
+#define SplitFlag         (1 << 7)
 
 #define TagFlag(t) (1 << (t))
 
