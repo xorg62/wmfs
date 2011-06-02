@@ -162,12 +162,10 @@ Bool cfactor_check_2pc(XRectangle g1, XRectangle g2, Position p);
 Bool cfactor_parentrow(XRectangle cg, XRectangle ccg, Position p);
 void cfactor_set(Client *c, Position p, int fac);
 void cfactor_multi_set(Client *c, int fac[4]);
-/* Generated with macro {{{ */
-void uicb_client_resize_Right(uicb_t cmd);
-void uicb_client_resize_Left(uicb_t cmd);
-void uicb_client_resize_Top(uicb_t cmd);
-void uicb_client_resize_Bottom(uicb_t cmd);
-/* }}} */
+void uicb_client_resize_right(uicb_t cmd);
+void uicb_client_resize_left(uicb_t cmd);
+void uicb_client_resize_top(uicb_t cmd);
+void uicb_client_resize_bottom(uicb_t cmd);
 
 /* client.c */
 void client_attach(Client *c);
@@ -175,7 +173,6 @@ void client_configure(Client *c);
 void client_detach(Client *c);
 void client_focus(Client *c);
 Client *client_get_next(void);
-Client *client_get_prev(void);
 /* client_gb_*() {{{ */
 Client* client_gb_win(Window w);
 Client* client_gb_frame(Window w);
@@ -204,20 +201,14 @@ void client_update_attributes(Client *c);
 void client_urgent(Client *c, Bool u);
 Client* client_get_next_with_direction(Client *bc, Position pos);
 void uicb_client_raise(uicb_t);
-/* Generated with macro {{{ */
-void uicb_client_focus_next(uicb_t);
-void uicb_client_focus_prev(uicb_t);
-void uicb_client_swapsel_next(uicb_t);
-void uicb_client_swapsel_prev(uicb_t);
-void uicb_client_swapsel_Right(uicb_t);
-void uicb_client_swapsel_Left(uicb_t);
-void uicb_client_swapsel_Top(uicb_t);
-void uicb_client_swapsel_Bottom(uicb_t);
-void uicb_client_focus_Right(uicb_t cmd);
-void uicb_client_focus_Left(uicb_t cmd);
-void uicb_client_focus_Top(uicb_t cmd);
-void uicb_client_focus_Bottom(uicb_t cmd);
-/* }}} */
+void uicb_client_next(uicb_t);
+void uicb_client_prev(uicb_t);
+void uicb_client_swap_next(uicb_t);
+void uicb_client_swap_prev(uicb_t);
+void uicb_client_focus_right(uicb_t cmd);
+void uicb_client_focus_left(uicb_t cmd);
+void uicb_client_focus_top(uicb_t cmd);
+void uicb_client_focus_bottom(uicb_t cmd);
 void uicb_client_kill(uicb_t);
 void uicb_client_screen_next(uicb_t);
 void uicb_client_screen_prev(uicb_t);
