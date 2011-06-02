@@ -377,12 +377,6 @@
         # Set the previous layout.
         [key] mod = {"Alt", "Shift"} key = "space" func = "layout_prev" [/key]
 
-        # Increase mwfact.
-        [key] mod = {"Alt"} key = "l" func = "set_mwfact" cmd = "+0.025" [/key]
-
-        # Decrease mwfact.
-        [key] mod = {"Alt"} key = "h" func = "set_mwfact" cmd = "-0.025" [/key]
-
         # Increase nmaster.
         [key] mod = {"Alt"} key = "d" func = "set_nmaster" cmd = "+1" [/key]
 
@@ -437,6 +431,28 @@
         [key] mod = {"Super", "Shift"} key = "z" func = "client_screen_prev" [/key]
 
         [key] mod = {"Alt"} key = "e" func = "toggle_tag_expose" [/key]
+
+        # Focus next client with direction
+        [key] mod = {"Alt"} key = "h" func = "client_focus_left"   [/key]
+        [key] mod = {"Alt"} key = "l" func = "client_focus_right"  [/key]
+        [key] mod = {"Alt"} key = "k" func = "client_focus_top"    [/key]
+        [key] mod = {"Alt"} key = "j" func = "client_focus_bottom" [/key]
+
+        # Swap next client with direction
+        [key] mod = {"Control"} key = "h" func = "client_swap_left"   [/key]
+        [key] mod = {"Control"} key = "l" func = "client_swap_right"  [/key]
+        [key] mod = {"Control"} key = "k" func = "client_swap_top"    [/key]
+        [key] mod = {"Control"} key = "j" func = "client_swap_bottom" [/key]
+
+        # Resize selected tiled client with direction
+        [key] mod = {"Super"} key = "h" func = "client_resize_left"   cmd = "20" [/key]
+        [key] mod = {"Super"} key = "l" func = "client_resize_right"  cmd = "20" [/key]
+        [key] mod = {"Super"} key = "k" func = "client_resize_top"    cmd = "20" [/key]
+        [key] mod = {"Super"} key = "j" func = "client_resize_bottom" cmd = "20" [/key]
+        [key] mod = { "Super", "Control"} key = "h" func = "client_resize_left"   cmd = "-20" [/key]
+        [key] mod = { "Super", "Control"} key = "l" func = "client_resize_right"  cmd = "-20" [/key]
+        [key] mod = { "Super", "Control"} key = "k" func = "client_resize_top"    cmd = "-20" [/key]
+        [key] mod = { "Super", "Control"} key = "j" func = "client_resize_bottom" cmd = "-20" [/key]
 
         # unlisted fonctions that can be used in [key] func = ""
         # client_focus_{right, left, top, bottom}
