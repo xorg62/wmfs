@@ -88,7 +88,7 @@ client_detach(Client *c)
 /** Get the next client
  *\return The next client or NULL
  */
-Client*
+static Client*
 client_get_next(void)
 {
      Client *c = NULL;
@@ -132,34 +132,46 @@ client_get_prev(void)
 }
 
 /** Get client left/right/top/bottom of selected client
-  *\param bc Base client
   *\param pos Position (Left/Right/Top/Bottom
   *\return Client found
 */
-Client*
-client_get_next_with_direction(Client *bc, Position pos)
+static Client*
+client_get_next_with_direction(Position pos)
 {
-     Client *c;
-     int x, y;
-     char scanfac[4][2] =
-     {
-          { 1,  0 }, { -1, 0 }, /* Right, Left   */
-          { 0, -1 }, {  0, 1 }  /* Top,   Bottom */
-     };
+     Client *c = NULL;
+     Client *ret = NULL;
 
-     if(!bc)
+     if(!sel || ishide(sel, selscreen))
           return NULL;
 
-     /* Start place of pointer for faster scanning */
-     x = bc->frame_geo.x + ((pos == Right)  ? bc->frame_geo.width  : 0);
-     y = bc->frame_geo.y + ((pos == Bottom) ? bc->frame_geo.height : 0);
-     y += ((LDIR(pos))  ? bc->frame_geo.height / 2 : 0);
-     x += ((pos > Left) ? bc->frame_geo.width  / 2 : 0);
+     for(c = clients; c; c = c->next)
+          if(c != sel && !ishide(c, sel->screen))
+               switch(pos)
+               {
+                    default:
+                    case Right:
+                         if(c->geo.x > sel->geo.x
+                                   && (!ret || (ret && ret->geo.x > sel->geo.x && c->geo.x < ret->geo.x)))
+                              ret = c;
+                         break;
+                    case Left:
+                         if(c->geo.x < sel->geo.x
+                                   && (!ret || (ret && ret->geo.x < sel->geo.x && c->geo.x > ret->geo.x)))
+                              ret = c;
+                         break;
+                    case Top:
+                         if(c->geo.y < sel->geo.y
+                                   && (!ret || (ret && ret->geo.y < sel->geo.y && c->geo.y > ret->geo.y)))
+                              ret = c;
+                         break;
+                    case Bottom:
+                         if(c->geo.y > sel->geo.y
+                                   && (!ret || (ret && ret->geo.y > sel->geo.y && c->geo.y < ret->geo.y)))
+                              ret = c;
+                         break;
+               }
 
-      /* Scan in right direction to next(p) physical client */
-     for(; (c = client_gb_pos(bc, x, y)) == bc; x += scanfac[pos][0], y += scanfac[pos][1]);
-
-     return c;
+     return ret;
 }
 
 /** Switch to the previous client
@@ -243,7 +255,7 @@ uicb_client_focus_right(uicb_t cmd)
      Client *c;
      (void)cmd;
 
-     if((c = client_get_next_with_direction(sel, Right)))
+     if((c = client_get_next_with_direction(Right)))
      {
           client_focus(c);
           client_raise(c);
@@ -262,7 +274,7 @@ uicb_client_focus_left(uicb_t cmd)
      Client *c;
      (void)cmd;
 
-     if((c = client_get_next_with_direction(sel, Left)))
+     if((c = client_get_next_with_direction(Left)))
      {
           client_focus(c);
           client_raise(c);
@@ -280,7 +292,7 @@ uicb_client_focus_top(uicb_t cmd)
      Client *c;
      (void)cmd;
 
-     if((c = client_get_next_with_direction(sel, Top)))
+     if((c = client_get_next_with_direction(Top)))
      {
           client_focus(c);
           client_raise(c);
@@ -298,7 +310,7 @@ uicb_client_focus_bottom(uicb_t cmd)
      Client *c;
      (void)cmd;
 
-     if((c = client_get_next_with_direction(sel, Bottom)))
+     if((c = client_get_next_with_direction(Bottom)))
      {
           client_focus(c);
           client_raise(c);
@@ -328,7 +340,7 @@ client_above(Client *c)
      geo.y = spgeo[c->screen].y + (spgeo[c->screen].height / 2) - (geo.height / 2);
      geo.x = spgeo[c->screen].x + (spgeo[c->screen].width / 2)- (geo.width / 2);
 
-     client_moveresize(c, geo, (tags[c->screen][c->tag].flags & ResizeHintFlag));
+     client_moveresize(c, geo, tags[c->screen][c->tag].resizehint);
      client_raise(c);
 
      tags[c->screen][c->tag].layout.func(c->screen);
@@ -385,8 +397,7 @@ client_focus(Client *c)
                     client_raise(c);
           }
 
-          if((tags[sel->screen][sel->tag].flags & AboveFCFlag)
-                    && !conf.focus_fmouse)
+          if(tags[sel->screen][sel->tag].abovefc && !conf.focus_fmouse)
                client_above(sel);
 
           if(c->flags & UrgentFlag)
@@ -414,14 +425,17 @@ client_focus(Client *c)
 void
 client_urgent(Client *c, Bool u)
 {
-     FLAGAPPLY(c->flags, u, UrgentFlag);
-     FLAGAPPLY(tags[c->screen][c->tag].flags, u, TagUrgentFlag);
+     if(u)
+          c->flags |= UrgentFlag;
+     else
+          c->flags &= ~UrgentFlag;
 
+     tags[c->screen][c->tag].urgent = u;
      infobar_draw_taglist(c->screen);
 }
 
 /* The following functions have the same point :
- * find a client member with a Window or values {{{
+ * find a client member with a Window {{{
  */
 
 /* Get Client with a window */
@@ -502,29 +516,6 @@ client_urgent(Client *c, Bool u)
                     }
 
           return NULL;
-     }
-
-/** Get a client with a position
- * \param x x value
- * \param y y value
- * \return The client
-*/
-     Client* client_gb_pos(Client *c, int x, int y)
-     {
-          Client *cc;
-
-          if(x < 0 || x > spgeo[c->screen].x + spgeo[c->screen].width
-                    || y < 0 || y > spgeo[c->screen].y + spgeo[c->screen].height)
-               return NULL;
-
-          for(cc = clients; cc; cc = cc->next)
-               if(cc != c && cc->screen == c->screen && cc->tag == c->tag
-                         && (cc->flags & TileFlag))
-                    if(cc->frame_geo.x < x && cc->frame_geo.x + cc->frame_geo.width > x
-                              && cc->frame_geo.y < y && cc->frame_geo.y + cc->frame_geo.height > y)
-                         return cc;
-
-          return c;
      }
 
 /* }}} */
@@ -680,7 +671,7 @@ static void
 client_set_rules(Client *c)
 {
      XClassHint xch;
-     int i, f;
+     int i, j, k, f;
      Atom rf;
      ulong n, il;
      uchar *data = NULL;
@@ -707,14 +698,51 @@ client_set_rules(Client *c)
           XFree(data);
      }
 
+     /* Following features is *DEPRECATED*, will be removed in some revision.  {{{ */
+
+     /* Auto free */
+     if(conf.client.autofree && ((xch.res_name && strstr(conf.client.autofree, xch.res_name))
+               || (xch.res_class && strstr(conf.client.autofree, xch.res_class))))
+          c->flags |= FreeFlag;
+
+     /* Auto maximize */
+     if(conf.client.automax && ((xch.res_name && strstr(conf.client.automax, xch.res_name))
+                    || (xch.res_class && strstr(conf.client.automax, xch.res_class))))
+     {
+          client_maximize(c);
+          c->flags |= MaxFlag;
+     }
+
+     /* Wanted tag */
+     for(i = 0; i < screen_count(); ++i)
+          for(j = 1; j < conf.ntag[i] + 1; ++j)
+               if(tags[i][j].clients)
+                    for(k = 0; k < tags[i][j].nclients; ++k)
+                         if((xch.res_name && strstr(xch.res_name, tags[i][j].clients[k]))
+                            || (xch.res_class && strstr(xch.res_class, tags[i][j].clients[k])))
+                         {
+                              c->screen = i;
+                              c->tag = j;
+
+                              if(c->tag != (uint)seltag[selscreen])
+                                   tags[c->screen][c->tag].request_update = True;
+                              else
+                                   tags[c->screen][c->tag].layout.func(c->screen);
+
+                              /* Deprecated but still in use */
+                              applied_tag_rule = True;
+                              applied_screen_rule = True;
+                         }
+
+     /* }}} */
+
      /* Apply Rule if class || instance || role match */
      for(i = 0; i < conf.nrule; ++i)
      {
           if((xch.res_class && conf.rule[i].class && !strcmp(xch.res_class, conf.rule[i].class))
                     || (xch.res_name && conf.rule[i].instance && !strcmp(xch.res_name, conf.rule[i].instance)))
           {
-               if((strlen(wwrole) && conf.rule[i].role && !strcmp(wwrole, conf.rule[i].role))
-                         || (!strlen(wwrole) || !conf.rule[i].role))
+               if((strlen(wwrole) && conf.rule[i].role && !strcmp(wwrole, conf.rule[i].role)) || (!strlen(wwrole) || !conf.rule[i].role))
                {
                     if(conf.rule[i].screen != -1)
                          c->screen = conf.rule[i].screen;
@@ -733,13 +761,13 @@ client_set_rules(Client *c)
 
                     if(conf.rule[i].max)
                     {
-                         c->flags |= MaxFlag;
                          client_maximize(c);
+                         c->flags |= MaxFlag;
                     }
 
                     if(c->tag != (uint)seltag[selscreen])
                     {
-                         tags[c->screen][c->tag].flags |= RequestUpdateFlag;
+                         tags[c->screen][c->tag].request_update = True;
                          client_focus(NULL);
                     }
 
@@ -758,7 +786,7 @@ client_set_rules(Client *c)
           c->tag = conf.client.default_open_tag;
 
           client_focus_next(c);
-          tags[c->screen][c->tag].flags |= RequestUpdateFlag;
+          tags[c->screen][c->tag].request_update = True;
      }
 
      if(!applied_screen_rule && conf.client.default_open_screen > -1
@@ -767,7 +795,7 @@ client_set_rules(Client *c)
           c->screen = conf.client.default_open_screen;
 
           client_focus_next(c);
-          tags[c->screen][c->tag].flags |= RequestUpdateFlag;
+          tags[c->screen][c->tag].request_update = True;
      }
 
      return;
@@ -835,10 +863,11 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      c->ogeo.y = c->geo.y = my;
      c->ogeo.width = c->geo.width = wa->width;
      c->ogeo.height = c->geo.height = wa->height;
-     c->free_geo = c->pgeo = c->wrgeo = c->split_geo = c->geo;
+     c->free_geo = c->geo;
      c->tag = seltag[c->screen];
      c->focusontag = -1;
-     cfactor_clean(c);
+
+     c->layer = (sel && sel->layer > 0) ? sel->layer : 1;
 
      at.event_mask = PropertyChangeMask;
 
@@ -850,7 +879,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      XSetWindowBorderWidth(dpy, c->win, 0);
      mouse_grabbuttons(c, False);
 
-     /* Transient for tag setting */
+     /* Transient */
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
           for(t = clients; t && t->win != trans; t = t->next);
 
@@ -859,27 +888,28 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
           c->tag = t->tag;
           c->screen = t->screen;
      }
+
      if(!(c->flags & FreeFlag)
           && (rettrans == Success || (c->flags & HintFlag)))
                c->flags |= FreeFlag;
+
      free(t);
 
      client_attach(c);
      client_set_rules(c);
      client_get_name(c);
-     tags[c->screen][c->tag].flags |= CleanFactFlag;
-
      if(c->tag == (uint)seltag[selscreen])
      {
           client_raise(c);
-          client_map(c);
           setwinstate(c->win, NormalState);
      }
      else
           client_hide(c);
 
-     client_update_attributes(c);
      ewmh_get_client_list();
+     client_update_attributes(c);
+     if(c->tag == (uint)seltag[selscreen])
+          client_map(c);
      ewmh_manage_window_type(c);
 
      if(ar)
@@ -899,6 +929,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
                     c->geo.x + c->geo.width / 2,
                     c->geo.y + c->geo.height / 2);
      }
+
 
      return c;
 }
@@ -961,57 +992,40 @@ client_geo_hints(XRectangle *geo, Client *c)
 void
 client_moveresize(Client *c, XRectangle geo, Bool r)
 {
-     int os, e;
-     int rhx = 0;
+     int os;
 
      if(!c)
           return;
 
      os = c->screen;
 
-     /* Apply padding and cfactor */
-     if(c->flags & TileFlag)
-     {
-          geo = cfactor_geo(c->pgeo, c->tilefact, &e);
-
-          if(conf.client.padding && (c->flags & FLayFlag))
-          {
-               geo.x += conf.client.padding;
-               geo.y += conf.client.padding;
-               geo.width -= conf.client.padding * 2;
-               geo.height -= conf.client.padding * 2;
-
-               c->flags &= ~FLayFlag;
-          }
-     }
-
-     /* Set geo without resizehint applied */
-     c->wrgeo = geo;
-
-     /* Apply geometry hints */
      if(r)
-     {
           client_geo_hints(&geo, c);
 
-          /* To balance position of window in frame */
-          rhx = ((c->wrgeo.width) - geo.width) / 2;
-      }
+     c->flags &= ~MaxFlag;
+
+     if(conf.client.padding && c->flags & TileFlag && c->flags & FLayFlag)
+     {
+          geo.x += conf.client.padding;
+          geo.y += conf.client.padding;
+          geo.width -= conf.client.padding * 2;
+          geo.height -= conf.client.padding * 2;
+
+          c->flags &= ~FLayFlag;
+     }
 
      c->geo = geo;
 
-     /* Sett free_geo */
-     if(c->flags & FreeFlag || !(c->flags & (TileFlag | LMaxFlag))
-               || conf.keep_layout_geo)
+     if(c->flags & FreeFlag || !(c->flags & (TileFlag | LMaxFlag)) || conf.keep_layout_geo)
           c->free_geo = c->geo;
 
-     /* Check to set new screen if needed */
      if((c->screen = screen_get_with_geo(c->geo.x, c->geo.y)) != os
                && c->tag != MAXTAG + 1)
           c->tag = seltag[c->screen];
 
-     frame_moveresize(c, c->wrgeo);
+     frame_moveresize(c, c->geo);
 
-     XMoveResizeWindow(dpy, c->win, BORDH + rhx, TBARH, c->geo.width, c->geo.height);
+     XMoveResizeWindow(dpy, c->win, BORDH, TBARH, c->geo.width, c->geo.height);
 
      client_update_attributes(c);
      client_configure(c);
@@ -1028,15 +1042,17 @@ client_maximize(Client *c)
      if(!c || c->flags & FSSFlag)
           return;
 
-     cfactor_clean(c);
      c->screen = screen_get_with_geo(c->geo.x, c->geo.y);
 
      c->geo.x = sgeo[c->screen].x;
-     c->geo.y = sgeo[c->screen].y ;
+     c->geo.y = sgeo[c->screen].y;
      c->geo.width  = sgeo[c->screen].width  - BORDH * 2;
      c->geo.height = sgeo[c->screen].height - BORDH;
 
-     client_moveresize(c, (c->pgeo = c->geo), (tags[c->screen][c->tag].flags & ResizeHintFlag));
+     client_moveresize(c, c->geo, False);
+
+     /* Raise for maximized clients, client_raise has too much condition */
+     XRaiseWindow(dpy, c->frame);
 
      return;
 }
@@ -1152,8 +1168,8 @@ client_swap(Client *c1, Client *c2)
      client_size_hints(c2);
 
      /* Resize the windows */
-     client_moveresize(c1, c1->geo, (tags[c1->screen][c1->tag].flags & ResizeHintFlag));
-     client_moveresize(c2, c2->geo, (tags[c2->screen][c2->tag].flags & ResizeHintFlag));
+     client_moveresize(c1, c1->geo, False);
+     client_moveresize(c2, c2->geo, False);
 
      /* Get the new client name */
      client_get_name(c1);
@@ -1277,13 +1293,11 @@ client_unmanage(Client *c)
      XUngrabServer(dpy);
      ewmh_get_client_list();
 
-     if(c->flags & TileFlag)
-          tags[c->screen][c->tag].flags |= CleanFactFlag;
 
      if(c->tag == MAXTAG + 1)
      {
           for(i = 0; i < conf.ntag[c->screen]; i++)
-               tags[c->screen][i].flags |= RequestUpdateFlag;
+               tags[c->screen][i].request_update = True;
           tags[c->screen][seltag[c->screen]].layout.func(c->screen);
      }
      else
@@ -1305,10 +1319,14 @@ client_unmanage(Client *c)
                tags[c->screen][c->tag].layout.func(c->screen);
           else
           {
-               tags[c->screen][c->tag].flags |= RequestUpdateFlag;
+               tags[c->screen][c->tag].request_update = True;
                infobar_draw(c->screen);
           }
      }
+
+
+
+     /*XFree(c->title);*/
 
      client_focus_next(c);
 
@@ -1641,4 +1659,3 @@ uicb_client_set_master(uicb_t cmd)
      }
      return;
 }
-
