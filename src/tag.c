@@ -106,7 +106,7 @@ tag_set(int tag)
 
      if(tags[selscreen][tag].flags & RequestUpdateFlag)
      {
-          tags[selscreen][tag].layout.func(selscreen);
+          layout_func(selscreen, tag);
           tags[selscreen][tag].flags &= ~RequestUpdateFlag;
      }
 
@@ -148,12 +148,22 @@ tag_transfert(Client *c, int tag)
 
      s = c->screen;
 
+     tags[c->screen][c->tag].flags |= CleanFactFlag;
+     cfactor_clean(c);
+
+     /* Case of tag in split mode */
+     if(tags[c->screen][c->tag].flags & SplitFlag)
+          split_arrange_closed(c);
+
+     if(tags[selscreen][tag].flags & SplitFlag)
+          split_client_integrate(c, NULL, selscreen, tag);
+
+     /* Set new location */
      c->tag = tag;
      c->screen = selscreen;
 
      if(s != c->screen)
           arrange(s, True);
-
      arrange(c->screen, True);
 
      client_focus_next(c);
@@ -500,10 +510,20 @@ tag_additional(int sc, int tag, int adtag)
        || adtag < 1 || adtag > conf.ntag[sc] || adtag == seltag[sc])
           return;
 
+     if(tags[sc][tag].flags & SplitFlag)
+          return;
+
      tags[sc][tag].tagad ^= TagFlag(adtag);
      tags[sc][adtag].flags |= RequestUpdateFlag;
      tags[sc][tag].flags |= CleanFactFlag;
      tags[sc][adtag].flags |= CleanFactFlag;
+
+     if(tags[sc][adtag].flags & SplitFlag)
+     {
+          tags[sc][adtag].layout.flags |= UseGeoFlag;
+          tags[sc][adtag].flags |= CleanFactFlag;
+          split_apply_current(sc, adtag);
+     }
 
      arrange(sc, True);
 

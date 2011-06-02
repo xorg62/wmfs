@@ -357,6 +357,7 @@ void systray_update(void);
 
 /* layout.c */
 void arrange(int screen, Bool update_layout);
+void layout_func(int screen, int tag);
 Client *tiled_client(int screen, Client *c);
 void freelayout(int screen);
 void layoutswitch(Bool b);
@@ -398,10 +399,13 @@ void getinfo(char *info);
 
 /* split.c */
 void split_store_geo(int screen, int tag);
+void split_set_current(Client *nc, Client *ghost);
+void split_apply_current(int screen, int tag);
 void split_arrange_closed(Client *ghost);
 XRectangle split_client(Client *c, Bool p);
 void split_client_fill(Client *c, XRectangle geo);
 void split_client_integrate(Client *c, Client *sc, int screen, int tag);
+void uicb_split_toggle(uicb_t cmd);
 
 /* viwmfs.c */
 void viwmfs(int argc, char **argv);

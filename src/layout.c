@@ -54,10 +54,23 @@ arrange(int screen, Bool update_layout)
      if(tags[screen][seltag[screen]].layout.func)
      {
           if(update_layout)
-                tags[screen][seltag[screen]].layout.func(screen);
+               layout_func(screen, seltag[screen]);
 
           infobar_draw(screen);
      }
+
+     return;
+}
+
+/** Apply layout function
+*/
+void
+layout_func(int screen, int tag)
+{
+     if(tags[screen][tag].flags & SplitFlag)
+          split_apply_current(screen, tag);
+     else
+          tags[screen][tag].layout.func(screen);
 
      return;
 }
@@ -117,7 +130,7 @@ layoutswitch(Bool b)
 
      ewmh_update_current_tag_prop();
      tags[selscreen][seltag[selscreen]].flags |= CleanFactFlag;
-     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
+     layout_func(selscreen, seltag[selscreen]);
      infobar_draw(selscreen);
 
      return;
@@ -205,7 +218,7 @@ uicb_set_mwfact(uicb_t cmd)
           return;
 
      tags[selscreen][seltag[selscreen]].mwfact += c;
-     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
+     layout_func(selscreen, seltag[selscreen]);
 
      ewmh_update_current_tag_prop();
 
@@ -231,7 +244,7 @@ uicb_set_nmaster(uicb_t cmd)
 
      tags[selscreen][seltag[selscreen]].nmaster += n;
      tags[selscreen][seltag[selscreen]].flags |= CleanFactFlag;
-     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
+     layout_func(selscreen, seltag[selscreen]);
 
      ewmh_update_current_tag_prop();
 
@@ -720,8 +733,8 @@ uicb_togglefree(uicb_t cmd)
 
      if(sel->flags & FreeFlag)
      {
+          split_set_current(NULL, sel);
           sel->flags &= ~(TileFlag | MaxFlag | LMaxFlag);
-
           client_moveresize(sel, sel->free_geo, True);
           client_raise(sel);
      }
@@ -729,12 +742,13 @@ uicb_togglefree(uicb_t cmd)
      {
           sel->free_geo = sel->geo;
           sel->ogeo = sel->geo;
+          split_set_current(sel, NULL);
      }
 
      client_update_attributes(sel);
 
      tags[selscreen][seltag[selscreen]].flags |= CleanFactFlag;
-     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
+     layout_func(selscreen, seltag[selscreen]);
 
      return;
 }
@@ -759,6 +773,7 @@ uicb_togglemax(uicb_t cmd)
           sel->free_geo = sel->geo;
           sel->flags &= ~(TileFlag | FreeFlag);
 
+          split_set_current(NULL, sel);
           client_maximize(sel);
           XRaiseWindow(dpy, sel->frame);
      }
@@ -769,7 +784,9 @@ uicb_togglemax(uicb_t cmd)
           client_moveresize(sel, sel->geo, True);
 
           tags[selscreen][seltag[selscreen]].flags |= CleanFactFlag;
-          tags[selscreen][seltag[selscreen]].layout.func(selscreen);
+
+          split_set_current(sel, NULL);
+          layout_func(selscreen, seltag[selscreen]);
      }
 
      return;
@@ -819,7 +836,7 @@ uicb_toggle_abovefc(uicb_t cmd)
                }
 
           tags[selscreen][seltag[selscreen]].flags |= CleanFactFlag;
-          tags[selscreen][seltag[selscreen]].layout.func(selscreen);
+          layout_func(selscreen, seltag[selscreen]);
      }
 
      client_focus(sel);
@@ -871,7 +888,7 @@ layout_set_client_master(Client *c)
      client_attach(c);
 
      tags[selscreen][seltag[selscreen]].flags |= CleanFactFlag;
-     tags[selscreen][seltag[selscreen]].layout.func(selscreen);
+     layout_func(selscreen, seltag[selscreen]);
 
      return;
 }

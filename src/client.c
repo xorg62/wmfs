@@ -39,15 +39,15 @@
           client_focus(c);       \
      } while(/* CONSTCOND */ 0)  \
 
-#define CLIENT_ACTION_LIST(A, L)      \
-void                                  \
-uicb_client_##A##_##L(uicb_t cmd)     \
-{                                     \
-     Client *c;                       \
-     (void)cmd;                       \
-                                      \
-     if((c = client_get_##L()))       \
-          client_##A(c);              \
+#define CLIENT_ACTION_LIST(A, L)  \
+void                              \
+uicb_client_##A##_##L(uicb_t cmd) \
+{                                 \
+     Client *c;                   \
+     (void)cmd;                   \
+                                  \
+     if((c = client_get_##L()))   \
+          client_##A(c);          \
 }
 
 #define CLIENT_ACTION_DIR(A, D)                       \
@@ -235,7 +235,7 @@ client_above(Client *c)
      client_moveresize(c, geo, (tags[c->screen][c->tag].flags & ResizeHintFlag));
      client_raise(c);
 
-     tags[c->screen][c->tag].layout.func(c->screen);
+     layout_func(c->screen, c->tag);
 
      return;
 }
@@ -648,7 +648,7 @@ client_set_rules(Client *c)
                     }
 
                     if(!conf.rule[i].ignoretags)
-                         tags[c->screen][c->tag].layout.func(c->screen);
+                         layout_func(c->screen, c->tag);
 
                     if(conf.rule[i].follow_client)
                          seltag[c->screen] = c->tag;
@@ -785,6 +785,8 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      client_update_attributes(c);
      ewmh_get_client_list();
      ewmh_manage_window_type(c);
+
+     split_set_current(c, NULL);
 
      if(ar)
           arrange(c->screen, True);
@@ -1182,13 +1184,16 @@ client_unmanage(Client *c)
      ewmh_get_client_list();
 
      if(c->flags & TileFlag)
+     {
           tags[c->screen][c->tag].flags |= CleanFactFlag;
+          split_set_current(NULL, c);
+     }
 
      if(c->tag == MAXTAG + 1)
      {
           for(i = 0; i < conf.ntag[c->screen]; i++)
                tags[c->screen][i].flags |= RequestUpdateFlag;
-          tags[c->screen][seltag[c->screen]].layout.func(c->screen);
+          layout_func(c->screen, seltag[c->screen]);
      }
      else
      {
@@ -1201,12 +1206,12 @@ client_unmanage(Client *c)
                }
                else if(tags[i][seltag[i]].tagad & TagFlag(c->tag))
                {
-                    tags[i][seltag[i]].layout.func(c->screen);
+                    layout_func(i, seltag[i]);
                     break;
                }
 
           if(b)
-               tags[c->screen][c->tag].layout.func(c->screen);
+               layout_func(c->screen, c->tag);
           else
           {
                tags[c->screen][c->tag].flags |= RequestUpdateFlag;

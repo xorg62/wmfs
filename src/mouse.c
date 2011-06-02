@@ -52,7 +52,7 @@ mouse_dragborder(XRectangle geo, GC g)
 static void
 mouse_cfactor_border(Client *c, int f[4], GC g)
 {
-     int  e;
+     int e;
 
      mouse_dragborder(cfactor_geo(c->wrgeo, f, &e), g);
 

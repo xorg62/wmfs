@@ -54,6 +54,11 @@
 #define FLayFlag   (1 << 11)
 #define DockFlag   (1 << 12)
 
+/* Layout flags definition */
+#define IntegrationFlag  (1 << 1)
+#define ArrangeFlag      (1 << 2)
+#define UseGeoFlag       (1 << 3)
+
 /* Tag flags definition */
 #define TagUrgentFlag     (1 << 1)
 #define ResizeHintFlag    (1 << 2)
@@ -267,6 +272,9 @@ typedef struct
 typedef struct
 {
      Bool splitusegeo;
+     uint flags;       /* Flags blibli */
+     Client *nc;       /* New client needing integration */
+     Client ghost;     /* Ghost client to arrange split */
      char *symbol;
      char *type;
      void (*func)(int screen);

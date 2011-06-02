@@ -62,6 +62,67 @@ _split_check_row(XRectangle g1, XRectangle g2, Position p)
           return (g1.x >= g2.x && (g1.x + g1.width) <= (g2.x + g2.width));
 }
 
+/** Set layout current clients to split/unsplit
+ */
+void
+split_set_current(Client *nc, Client *ghost)
+{
+     if(nc && (tags[nc->screen][nc->tag].flags & SplitFlag))
+     {
+          tags[nc->screen][nc->tag].layout.nc = nc;
+          tags[nc->screen][nc->tag].layout.flags |= IntegrationFlag;
+     }
+
+     if(ghost && (tags[ghost->screen][ghost->tag].flags & SplitFlag))
+     {
+          tags[ghost->screen][ghost->tag].layout.ghost = *ghost;
+          tags[ghost->screen][ghost->tag].layout.flags |= ArrangeFlag;
+     }
+
+     return;
+}
+
+/** Apply current operation about split
+*/
+void
+split_apply_current(int screen, int tag)
+{
+     Client *c;
+
+     /* Need to use split geo */
+     if(tags[screen][tag].layout.flags & UseGeoFlag)
+     {
+          for(c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next))
+          {
+               cfactor_clean(c);
+               client_moveresize(c, (c->pgeo = c->split_geo), (tags[screen][tag].flags & ResizeHintFlag));
+          }
+
+          tags[screen][tag].layout.flags &= ~UseGeoFlag;
+          tags[screen][tag].flags &= ~CleanFactFlag;
+     }
+
+     /* Integrate in split mode */
+     if(tags[screen][tag].layout.flags & IntegrationFlag)
+     {
+          if(tags[screen][tag].layout.nc == (c = sel)
+                    || c->screen != screen || c->tag != tag)
+               c = client_get_next();
+
+          split_client_integrate(tags[screen][tag].layout.nc, c, screen, tag);
+          tags[screen][tag].layout.flags &= ~IntegrationFlag;
+     }
+
+     /* Remove from split mode */
+     if(tags[screen][tag].layout.flags & ArrangeFlag)
+     {
+          split_arrange_closed(&tags[screen][tag].layout.ghost);
+          tags[screen][tag].layout.flags &= ~ArrangeFlag;
+     }
+
+     return;
+}
+
 /** Store split geos of clients
 */
 void
@@ -255,7 +316,8 @@ split_client_integrate(Client *c, Client *sc, int screen, int tag)
      Bool b = True;
      XRectangle g;
 
-     if(!c || c->flags & FreeFlag)
+     if(!c || c->flags & FreeFlag
+               || !(tags[screen][tag].flags & SplitFlag))
           return;
 
      if(!sc || sc->screen != screen || sc->tag != tag)
@@ -292,5 +354,22 @@ split_client_integrate(Client *c, Client *sc, int screen, int tag)
 
      return;
 }
+
+/** Toggle split mode
+*/
+void
+uicb_split_toggle(uicb_t cmd)
+{
+     (void)cmd;
+
+     if((tags[selscreen][seltag[selscreen]].flags ^= SplitFlag) & SplitFlag)
+          split_store_geo(selscreen, seltag[selscreen]);
+
+     layout_func(selscreen, seltag[selscreen]);
+
+     return;
+}
+
+
 
 
