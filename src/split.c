@@ -89,19 +89,6 @@ split_apply_current(int screen, int tag)
 {
      Client *c;
 
-     /* Need to use split geo */
-     if(tags[screen][tag].layout.flags & UseGeoFlag)
-     {
-          for(c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next))
-          {
-               cfactor_clean(c);
-               client_moveresize(c, (c->pgeo = c->split_geo), (tags[screen][tag].flags & ResizeHintFlag));
-          }
-
-          tags[screen][tag].layout.flags &= ~UseGeoFlag;
-          tags[screen][tag].flags &= ~CleanFactFlag;
-     }
-
      /* Integrate in split mode */
      if(tags[screen][tag].layout.flags & IntegrationFlag)
      {
@@ -119,21 +106,6 @@ split_apply_current(int screen, int tag)
           split_arrange_closed(&tags[screen][tag].layout.ghost);
           tags[screen][tag].layout.flags &= ~ArrangeFlag;
      }
-
-     return;
-}
-
-/** Store split geos of clients
-*/
-void
-split_store_geo(int screen, int tag)
-{
-     Client *c;
-
-     for(c = clients; c; c = c->next)
-          if(c->screen == screen && c->tag == tag
-                    && (c->flags & TileFlag))
-               c->split_geo = c->wrgeo;
 
      return;
 }
@@ -234,8 +206,6 @@ split_arrange_closed(Client *ghost)
                          b = True;
                     }
           }
-
-     split_store_geo(screen, tag);
 
      return;
 }
@@ -350,8 +320,6 @@ split_client_integrate(Client *c, Client *sc, int screen, int tag)
      g = split_client(sc, (sc->frame_geo.height < sc->frame_geo.width));
      split_client_fill(c, g);
 
-     split_store_geo(screen, tag);
-
      return;
 }
 
@@ -362,8 +330,7 @@ uicb_split_toggle(uicb_t cmd)
 {
      (void)cmd;
 
-     if((tags[selscreen][seltag[selscreen]].flags ^= SplitFlag) & SplitFlag)
-          split_store_geo(selscreen, seltag[selscreen]);
+     tags[selscreen][seltag[selscreen]].flags ^= SplitFlag;
 
      layout_func(selscreen, seltag[selscreen]);
 

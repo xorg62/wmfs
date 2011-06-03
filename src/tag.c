@@ -511,7 +511,7 @@ tag_additional(int sc, int tag, int adtag)
           return;
 
      if(tags[sc][tag].flags & SplitFlag)
-          return;
+          tags[sc][tag].flags &= ~SplitFlag;
 
      tags[sc][tag].tagad ^= TagFlag(adtag);
      tags[sc][adtag].flags |= RequestUpdateFlag;
@@ -519,11 +519,7 @@ tag_additional(int sc, int tag, int adtag)
      tags[sc][adtag].flags |= CleanFactFlag;
 
      if(tags[sc][adtag].flags & SplitFlag)
-     {
-          tags[sc][adtag].layout.flags |= UseGeoFlag;
-          tags[sc][adtag].flags |= CleanFactFlag;
-          split_apply_current(sc, adtag);
-     }
+          tags[sc][adtag].flags &= ~SplitFlag;
 
      arrange(sc, True);
 

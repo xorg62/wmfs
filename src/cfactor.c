@@ -236,9 +236,6 @@ cfactor_arrange_row(Client *c, Client *gc, Position p, int fac)
           _cfactor_arrange_row(gc, RPOS(p), -fac);
      }
 
-     /* in case of tag additional, use selscreen/seltag */
-     split_store_geo(selscreen, seltag[selscreen]);
-
      return;
 }
 

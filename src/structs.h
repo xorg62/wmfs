@@ -57,7 +57,6 @@
 /* Layout flags definition */
 #define IntegrationFlag  (1 << 1)
 #define ArrangeFlag      (1 << 2)
-#define UseGeoFlag       (1 << 3)
 
 /* Tag flags definition */
 #define TagUrgentFlag     (1 << 1)
