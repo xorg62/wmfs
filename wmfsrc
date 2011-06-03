@@ -430,7 +430,11 @@
         [key] mod = {"Super", "Shift"} key = "a" func = "client_screen_next" [/key]
         [key] mod = {"Super", "Shift"} key = "z" func = "client_screen_prev" [/key]
 
+        # Toggle tag explose
         [key] mod = {"Alt"} key = "e" func = "toggle_tag_expose" [/key]
+
+        # Toggle split mode
+        [key] mod = {"Alt"} key = "s" func = "split_toggle" [/key]
 
         # Focus next client with direction
         [key] mod = {"Alt"} key = "h" func = "client_focus_left"   [/key]
@@ -455,7 +459,6 @@
         [key] mod = { "Super", "Control"} key = "j" func = "client_resize_bottom" cmd = "-20" [/key]
 
         # unlisted fonctions that can be used in [key] func = ""
-        # client_focus_{right, left, top, bottom}
         # client_ignore_tag # Toggle the client in ignore_tag (display the client on all tags)
         # tag_prev_sel # go back to the previous selected tag
         # tag_transfert_{next, prev}

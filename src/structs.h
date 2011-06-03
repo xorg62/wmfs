@@ -270,10 +270,9 @@ typedef struct
 /* Layout Structure */
 typedef struct
 {
-     Bool splitusegeo;
-     uint flags;       /* Flags blibli */
+     uint flags;       /* Flags */
      Client *nc;       /* New client needing integration */
-     Client ghost;     /* Ghost client to arrange split */
+     Client ghost;     /* Ghost client to arrange hole in split */
      char *symbol;
      char *type;
      void (*func)(int screen);
