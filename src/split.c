@@ -87,16 +87,10 @@ split_set_current(Client *nc, Client *ghost)
 void
 split_apply_current(int screen, int tag)
 {
-     Client *c;
-
      /* Integrate in split mode */
      if(tags[screen][tag].layout.flags & IntegrationFlag)
      {
-          if(!(c = sel) || tags[screen][tag].layout.nc == c
-                    || c->screen != screen || c->tag != tag)
-               c = NULL;
-
-          split_client_integrate(tags[screen][tag].layout.nc, c, screen, tag);
+          split_client_integrate(tags[screen][tag].layout.nc, sel, screen, tag);
           tags[screen][tag].layout.flags &= ~IntegrationFlag;
      }
 
@@ -290,7 +284,7 @@ split_client_integrate(Client *c, Client *sc, int screen, int tag)
                || !(tags[screen][tag].flags & SplitFlag))
           return;
 
-     if(!sc || sc->screen != screen || sc->tag != tag)
+     if(!sc || sc == c || sc->screen != screen || sc->tag != tag)
      {
           /* Looking for first client on wanted tag */
           for(b = False, sc = clients; sc; sc = sc->next)
