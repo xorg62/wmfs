@@ -94,7 +94,7 @@ split_apply_current(int screen, int tag)
      {
           if(!(c = sel) || tags[screen][tag].layout.nc == c
                     || c->screen != screen || c->tag != tag)
-               c = client_get_next();
+               c = NULL;
 
           split_client_integrate(tags[screen][tag].layout.nc, c, screen, tag);
           tags[screen][tag].layout.flags &= ~IntegrationFlag;
@@ -294,8 +294,8 @@ split_client_integrate(Client *c, Client *sc, int screen, int tag)
      {
           /* Looking for first client on wanted tag */
           for(b = False, sc = clients; sc; sc = sc->next)
-               if(sc->screen == screen && sc->tag == tag
-                         && (c->flags & TileFlag))
+               if(sc != c && sc->screen == screen && sc->tag == tag
+                         && (sc->flags & TileFlag))
                {
                     b = True;
                     break;
