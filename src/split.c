@@ -284,7 +284,9 @@ split_client_integrate(Client *c, Client *sc, int screen, int tag)
                || !(tags[screen][tag].flags & SplitFlag))
           return;
 
-     if(!sc || sc == c || sc->screen != screen || sc->tag != tag)
+     /* Can't integrate in sc */
+     if(!sc || sc == c || !(sc->flags & TileFlag)
+               || sc->screen != screen || sc->tag != tag)
      {
           /* Looking for first client on wanted tag */
           for(b = False, sc = clients; sc; sc = sc->next)
