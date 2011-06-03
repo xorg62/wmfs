@@ -742,6 +742,9 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      c->free_geo = c->pgeo = c->wrgeo = c->split_geo = c->geo;
      c->tag = seltag[c->screen];
      c->focusontag = -1;
+
+     /* Set tilefact to 0 */
+     tags[c->screen][c->tag].flags |= CleanFactFlag;
      cfactor_clean(c);
 
      at.event_mask = PropertyChangeMask;
@@ -771,7 +774,6 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
      client_attach(c);
      client_set_rules(c);
      client_get_name(c);
-     tags[c->screen][c->tag].flags |= CleanFactFlag;
 
      if(c->tag == (uint)seltag[selscreen])
      {

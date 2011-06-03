@@ -92,7 +92,7 @@ split_apply_current(int screen, int tag)
      /* Integrate in split mode */
      if(tags[screen][tag].layout.flags & IntegrationFlag)
      {
-          if(tags[screen][tag].layout.nc == (c = sel)
+          if(!(c = sel) || tags[screen][tag].layout.nc == c
                     || c->screen != screen || c->tag != tag)
                c = client_get_next();
 
@@ -312,6 +312,7 @@ split_client_integrate(Client *c, Client *sc, int screen, int tag)
                c->geo.y = sgeo[screen].y;
 
                client_maximize(c);
+               c->flags |= TileFlag;
 
                return;
           }

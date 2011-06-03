@@ -549,8 +549,12 @@ conf_tag_section(void)
      };
 
      FLAGAPPLY(default_tag.flags,
-               fetch_opt_first(def_tag, "False", "resizehint").bool,
+               fetch_opt_first(def_tag, "false", "resizehint").bool,
                ResizeHintFlag);
+
+     FLAGAPPLY(default_tag.flags,
+               fetch_opt_first(def_tag, "false", "split").bool,
+               (SplitFlag | FirstArrangeFlag));
 
      conf.default_tag = default_tag;
 
@@ -606,6 +610,10 @@ conf_tag_section(void)
                FLAGAPPLY(tags[k][conf.ntag[k]].flags,
                          fetch_opt_first(tag[i], "false", "abovefc").bool,
                          AboveFCFlag);
+
+               FLAGAPPLY(tags[k][conf.ntag[k]].flags,
+                         fetch_opt_first(tag[i], "false", "split").bool,
+                         (SplitFlag | FirstArrangeFlag));
 
                tmp = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "top", "infobar_position").str, "infobar_position").str;
 

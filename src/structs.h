@@ -66,6 +66,7 @@
 #define CleanFactFlag     (1 << 5)
 #define StayLastFlag      (1 << 6)
 #define SplitFlag         (1 << 7)
+#define FirstArrangeFlag  (1 << 8)
 
 #define TagFlag(t) (1 << (t))
 

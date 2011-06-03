@@ -67,10 +67,14 @@ arrange(int screen, Bool update_layout)
 void
 layout_func(int screen, int tag)
 {
-     if(tags[screen][tag].flags & SplitFlag)
+     if((tags[screen][tag].flags & SplitFlag)
+               && !(tags[screen][tag].flags & FirstArrangeFlag))
           split_apply_current(screen, tag);
      else
+     {
           tags[screen][tag].layout.func(screen);
+          tags[screen][tag].flags &= ~FirstArrangeFlag;
+     }
 
      return;
 }
@@ -130,6 +134,7 @@ layoutswitch(Bool b)
 
      ewmh_update_current_tag_prop();
      tags[selscreen][seltag[selscreen]].flags |= CleanFactFlag;
+     tags[selscreen][seltag[selscreen]].flags &= ~SplitFlag;
      layout_func(selscreen, seltag[selscreen]);
      infobar_draw(selscreen);
 
@@ -864,6 +869,7 @@ uicb_set_layout(uicb_t cmd)
                          tags[selscreen][seltag[selscreen]].layout = conf.layout[j];
 
      tags[selscreen][seltag[selscreen]].flags |= CleanFactFlag;
+     tags[selscreen][seltag[selscreen]].flags &= ~SplitFlag;
      arrange(selscreen, True);
 
      return;

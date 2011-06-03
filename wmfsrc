@@ -103,6 +103,7 @@
              layout           = "tile"
              resizehint       = false
              infobar_position = "top"
+             split            = false
         [/default_tag]
 
         # whether client_next on the last tag will send you on the first
@@ -149,6 +150,7 @@
                 resizehint       = false
                 infobar_position = "top"
                 above_fc         = false
+                split            = false
                 #[mouse] [/mouse] Possible multi mouse section
         [/tag]
 
