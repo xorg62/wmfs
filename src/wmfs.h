@@ -103,7 +103,7 @@
     } while (/* CONSTCOND */ 0)
 
 #define ATOM(a)            XInternAtom(dpy, (a), False)
-#define FRAMEW(w)          ((w) + BORDH * 2)
+#define FRAMEW(w)          ((w) + (BORDH << 1))
 #define FRAMEH(h)          ((h) + (BORDH  + TBARH))
 #define ROUND(x)           (float)((x > 0) ? x + (float)0.5 : x - (float)0.5)
 #define CHECK(x)           if(!(x)) return

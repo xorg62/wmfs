@@ -106,14 +106,14 @@ screen_get_geo(int s)
 int
 screen_get_with_geo(int x, int y)
 {
-     int i, r = 0;
+     int i;
 
      for(i = 0; i < screen_count(); ++i)
           if((x >= spgeo[i].x && x < spgeo[i].x + spgeo[i].width)
              && y >= spgeo[i].y && y < spgeo[i].y + spgeo[i].height)
-               r = i;
+               return i;
 
-     return r;
+     return 0;
 }
 
 /** Set the selected screen
@@ -130,8 +130,8 @@ screen_set_sel(int screen)
 
      client_focus(NULL);
      XWarpPointer(dpy, None, ROOT, 0, 0, 0, 0,
-                  sgeo[screen].x + sgeo[screen].width / 2,
-                  sgeo[screen].y + sgeo[screen].height / 2);
+                  sgeo[screen].x + (sgeo[screen].width >> 1),
+                  sgeo[screen].y + (sgeo[screen].height >> 1));
 
      selscreen = screen;
 

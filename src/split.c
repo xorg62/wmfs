@@ -242,9 +242,9 @@ split_client(Client *c, Bool p)
      /* Vertical */
      if(p)
      {
-          geo.width /= 2;
+          geo.width >>= 1;
           sgeo.x = FRAMEW(geo.x + geo.width);
-          sgeo.width = (sgeo.width / 2) - (BORDH * 2);
+          sgeo.width = (sgeo.width >> 1) - (BORDH << 1);
 
           /* Remainder */
           sgeo.width += (c->wrgeo.x + c->wrgeo.width) - (sgeo.x + sgeo.width);
@@ -252,9 +252,9 @@ split_client(Client *c, Bool p)
      /* Horizontal */
      else
      {
-          geo.height = (geo.height / 2) - TBARH;
+          geo.height = (geo.height >> 1) - TBARH;
           sgeo.y = FRAMEH(geo.y + geo.height);
-          sgeo.height = (sgeo.height / 2) - BORDH;
+          sgeo.height = (sgeo.height >> 1) - BORDH;
 
           /* Remainder */
           sgeo.height += (c->wrgeo.y + c->wrgeo.height) - (sgeo.y + sgeo.height);
@@ -294,8 +294,7 @@ split_client_integrate(Client *c, Client *sc, int screen, int tag)
      Bool b = True;
      XRectangle g;
 
-     if(!c || c->flags & FreeFlag
-               || !(tags[screen][tag].flags & SplitFlag))
+     if(!c || c->flags & FreeFlag || !(tags[screen][tag].flags & SplitFlag))
           return;
 
      /* Can't integrate in sc */

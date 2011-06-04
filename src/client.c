@@ -202,8 +202,8 @@ client_get_next_with_direction(Client *bc, Position pos)
      /* Start place of pointer for faster scanning */
      x = bc->frame_geo.x + ((pos == Right)  ? bc->frame_geo.width  : 0);
      y = bc->frame_geo.y + ((pos == Bottom) ? bc->frame_geo.height : 0);
-     y += ((LDIR(pos))  ? bc->frame_geo.height / 2 : 0);
-     x += ((pos > Left) ? bc->frame_geo.width  / 2 : 0);
+     y += ((LDIR(pos))  ? (bc->frame_geo.height >> 1) : 0);
+     x += ((pos > Left) ? (bc->frame_geo.width  >> 1) : 0);
 
       /* Scan in right direction to next(p) physical client */
      for(; (c = client_gb_pos(bc, x, y)) == bc; x += scanfac[pos][0], y += scanfac[pos][1]);
@@ -229,8 +229,8 @@ client_above(Client *c)
      geo.height = spgeo[c->screen].height * 0.75;
      geo.width = spgeo[c->screen].width * 0.75;
 
-     geo.y = spgeo[c->screen].y + (spgeo[c->screen].height / 2) - (geo.height / 2);
-     geo.x = spgeo[c->screen].x + (spgeo[c->screen].width / 2)- (geo.width / 2);
+     geo.y = spgeo[c->screen].y + ((spgeo[c->screen].height - geo.height) >> 1);
+     geo.x = spgeo[c->screen].x + ((spgeo[c->screen].width - geo.width) >> 1);
 
      client_moveresize(c, geo, (tags[c->screen][c->tag].flags & ResizeHintFlag));
      client_raise(c);
@@ -417,8 +417,8 @@ client_urgent(Client *c, Bool u)
      {
           Client *cc;
 
-          if(x < 0 || x > spgeo[c->screen].x + spgeo[c->screen].width
-                    || y < 0 || y > spgeo[c->screen].y + spgeo[c->screen].height)
+          if((x | y) < 0 || x > spgeo[c->screen].x + spgeo[c->screen].width
+                    || y > spgeo[c->screen].y + spgeo[c->screen].height)
                return NULL;
 
           for(cc = clients; cc; cc = cc->next)
@@ -730,8 +730,8 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
           {
                XRectangle tmp;
                tmp = screen_get_geo(selscreen);
-               mx = (tmp.width + mx - wa->width) / 2;
-               my = (tmp.height + my - wa->height) / 2;
+               mx = (tmp.width + mx - wa->width) >> 1;
+               my = (tmp.height + my - wa->height) >> 1;
           }
      }
 
@@ -804,8 +804,8 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
           /* Move pointer on client */
           XQueryPointer(dpy, ROOT, &dw, &dw, &x, &y, &d, &d, (uint *)&d);
           XWarpPointer(dpy, ROOT, ROOT, x, y, d, d,
-                    c->geo.x + c->geo.width / 2,
-                    c->geo.y + c->geo.height / 2);
+                    c->geo.x + (c->geo.width  >> 1),
+                    c->geo.y + (c->geo.height >> 1));
      }
 
      return c;
@@ -829,8 +829,7 @@ client_geo_hints(XRectangle *geo, Client *c)
      geo->height -= c->baseh;
 
      /* aspect */
-     if(c->minay > 0 && c->maxay > 0
-               && c->minax > 0 && c->maxax > 0)
+     if((c->minay | c->maxay | c->minax | c->maxax) > 0)
      {
           if(geo->width * c->maxay > geo->height * c->maxax)
                geo->width = geo->height * c->maxax / c->maxay;
@@ -886,8 +885,8 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
           {
                geo.x += conf.client.padding;
                geo.y += conf.client.padding;
-               geo.width -= conf.client.padding * 2;
-               geo.height -= conf.client.padding * 2;
+               geo.width -= (conf.client.padding << 1);
+               geo.height -= (conf.client.padding << 1);
 
                c->flags &= ~FLayFlag;
           }
@@ -902,7 +901,7 @@ client_moveresize(Client *c, XRectangle geo, Bool r)
           client_geo_hints(&geo, c);
 
           /* To balance position of window in frame */
-          rhx = ((c->wrgeo.width) - geo.width) / 2;
+          rhx = (((c->wrgeo.width) - geo.width) >> 1);
       }
 
      c->geo = geo;
@@ -941,7 +940,7 @@ client_maximize(Client *c)
 
      c->geo.x = sgeo[c->screen].x;
      c->geo.y = sgeo[c->screen].y ;
-     c->geo.width  = sgeo[c->screen].width  - BORDH * 2;
+     c->geo.width  = sgeo[c->screen].width  - (BORDH << 1);
      c->geo.height = sgeo[c->screen].height - BORDH;
 
      client_moveresize(c, (c->pgeo = c->geo), (tags[c->screen][c->tag].flags & ResizeHintFlag));
@@ -1276,8 +1275,8 @@ client_set_screen(Client *c, int s)
         || tags[os][seltag[os]].layout.func == freelayout
         || tags[os][seltag[os]].layout.func == maxlayout)
      {
-          geo.x = (sgeo[s].x + sgeo[s].width / 2) - (c->geo.width / 2);
-          geo.y = (sgeo[s].y + sgeo[s].height / 2) - (c->geo.height / 2);
+          geo.x = ((sgeo[s].x + sgeo[s].width - c->geo.width) >> 1);
+          geo.y = ((sgeo[s].y + sgeo[s].height - c->geo.width) >> 1);
           client_moveresize(c, geo, False);
      }
 
@@ -1344,11 +1343,7 @@ uicb_client_move(uicb_t cmd)
      XRectangle geo;
      int xi = 0, yi = 0;
 
-     if((sel->flags & TileFlag)
-        || (sel->flags & MaxFlag)
-        || (sel->flags & LMaxFlag)
-        || (sel->flags & FSSFlag)
-        || !sel)
+     if(!sel || sel->flags & (TileFlag | MaxFlag | LMaxFlag | FSSFlag))
           return;
 
      geo = sel->geo;
@@ -1373,11 +1368,7 @@ uicb_client_resize(uicb_t cmd)
      XRectangle geo;
      int wi = 0, hi = 0;
 
-     if((sel->flags & TileFlag)
-        || (sel->flags & MaxFlag)
-        || (sel->flags & LMaxFlag)
-        || (sel->flags & FSSFlag)
-        || !sel)
+     if(!sel || sel->flags & (TileFlag | MaxFlag | LMaxFlag | FSSFlag))
           return;
 
      geo = sel->geo;
@@ -1431,8 +1422,8 @@ uicb_client_select(uicb_t cmd)
                /* Move pointer on client */
                XQueryPointer(dpy, ROOT, &w, &w, &x, &y, &d, &d, (uint *)&d);
                XWarpPointer(dpy, ROOT, ROOT, x, y, d, d,
-                         clist_index[i].client->geo.x + clist_index[i].client->geo.width / 2,
-                         clist_index[i].client->geo.y + clist_index[i].client->geo.height / 2);
+                         clist_index[i].client->geo.x + (clist_index[i].client->geo.width >> 1),
+                         clist_index[i].client->geo.y + (clist_index[i].client->geo.height >> 1));
           }
 
      return;

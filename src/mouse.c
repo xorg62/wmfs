@@ -40,8 +40,8 @@ static void
 mouse_dragborder(XRectangle geo, GC g)
 {
      XDrawRectangle(dpy, ROOT, g,
-                    geo.x - BORDH / 2,
-                    geo.y - (TBARH - (BORDH / 2)),
+                    geo.x - (BORDH >> 1),
+                    geo.y - (TBARH - (BORDH >> 1)),
                     geo.width + BORDH,
                     geo.height + TBARH);
 
@@ -228,7 +228,7 @@ mouse_resize(Client *c)
 
      XQueryPointer(dpy, ROOT, &w, &w, &omx, &omy, &d, &d, (uint *)&u);
 
-     if((omx - c->geo.x) < (c->geo.width / 2))
+     if((omx - c->geo.x) < (c->geo.width >> 1))
           pos = Left;
 
      if(XGrabPointer(dpy, ROOT, False, MouseMask, GrabModeAsync, GrabModeAsync, None,
@@ -267,12 +267,12 @@ mouse_resize(Client *c)
                {
                     mouse_cfactor_border(c, f, gci);
 
-                    if(omx >= c->frame_geo.x + (c->frame_geo.width / 2))
+                    if(omx >= c->frame_geo.x + (c->frame_geo.width >> 1))
                          f[Right] = ev.xmotion.x_root - omx;
                     else
                          f[Left] = omx - ev.xmotion.x_root;
 
-                    if(omy >= c->frame_geo.y + (c->frame_geo.height / 2))
+                    if(omy >= c->frame_geo.y + (c->frame_geo.height >> 1))
                          f[Bottom] = ev.xmotion.y_root - omy;
                     else
                          f[Top] = omy - ev.xmotion.y_root;

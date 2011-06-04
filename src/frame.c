@@ -87,8 +87,8 @@ frame_create(Client *c)
                for(i = 0; i < conf.titlebar.nbutton; ++i)
                {
                     CWIN(c->button[i], c->titlebar->win,
-                         (c->button_last_x = (BORDH + (BUTTONWH * i) + (4 * i))),
-                         ((BUTTONWH - 1) / 2), BUTTONWH, BUTTONWH,
+                         (c->button_last_x = (BORDH + (BUTTONWH * i) + (i << 2))),
+                         ((BUTTONWH - 1) >> 1), BUTTONWH, BUTTONWH,
                          1, CWEventMask|CWOverrideRedirect|CWBackPixmap,
                          c->colors.frame, &at);
 
@@ -254,8 +254,8 @@ frame_update(Client *c)
           if(conf.titlebar.nbutton && BUTTONWH >= 1)
           {
                if(conf.titlebar.stipple.active)
-                    draw_rectangle(c->titlebar->dr, 0, 0, c->button_last_x + TBARH - (TBARH / 4),
-                                   TBARH + BORDH * 2, c->colors.frame);
+                    draw_rectangle(c->titlebar->dr, 0, 0, c->button_last_x + TBARH - (TBARH >> 2),
+                                   TBARH + (BORDH << 2), c->colors.frame);
 
                for(i = 0; i < conf.titlebar.nbutton; ++i)
                {
@@ -265,8 +265,8 @@ frame_update(Client *c)
                     if((!conf.titlebar.button[i].flags)
                               || ((conf.titlebar.button[i].flags & FreeFlag)
                                    && ((c->flags & FreeFlag) || !(c->flags & (TileFlag | LMaxFlag))))
-                              || ((conf.titlebar.button[i].flags &  MaxFlag)
-                                   && ((c->flags &  MaxFlag) || (c->flags & LMaxFlag)))
+                              || ((conf.titlebar.button[i].flags & MaxFlag)
+                                   && ((c->flags & MaxFlag) || (c->flags & LMaxFlag)))
                               || ((conf.titlebar.button[i].flags & TileFlag) && (c->flags & TileFlag)))
                     {
 
@@ -312,9 +312,9 @@ frame_update(Client *c)
 
      if(TBARH - BORDH)
           barwin_draw_text(c->titlebar,
-                           (c->frame_geo.width / 2) - (textw(c->title) / 2),
-                           ((font->height - font->descent) + (TBARH - font->height) / 2),
-                           c->title);
+                    (c->frame_geo.width >> 1) - (textw(c->title) >> 1),
+                    ((font->height - font->descent) + ((TBARH - font->height) / 2)),
+                    c->title);
 
      return;
 }

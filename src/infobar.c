@@ -54,7 +54,7 @@ infobar_init(void)
           case IB_Hide:
                sgeo[sc].y = spgeo[sc].y + TBARH;
                sgeo[sc].height += INFOBARH;
-               infobar[sc].geo.y = -(infobar[sc].geo.height) * 2;
+               infobar[sc].geo.y = (-(infobar[sc].geo.height) << 2);
                break;
           case IB_Bottom:
                sgeo[sc].y = TBARH;
@@ -94,7 +94,7 @@ infobar_init(void)
 
           /* Create layout switch barwindow */
           infobar[sc].layout_button = barwin_create(infobar[sc].bar->win,
-                    ((conf.layout_placement) ? 0 : (j + PAD / 2)), 0,
+                    ((conf.layout_placement) ? 0 : (j + (PAD >> 1))), 0,
                     ((conf.layout_button_width > 0) ? (uint)conf.layout_button_width : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)),
                     infobar[sc].geo.height,
                     conf.colors.layout_bg, conf.colors.layout_fg,
@@ -104,8 +104,8 @@ infobar_init(void)
           if(conf.bars.selbar)
                infobar[sc].selbar = barwin_create(infobar[sc].bar->win,
                          ((conf.layout_placement)
-                          ? (j + PAD / 2)
-                          : infobar[sc].layout_button->geo.x + infobar[sc].layout_button->geo.width + PAD / 2), 1,
+                          ? (j + (PAD >> 1))
+                          : infobar[sc].layout_button->geo.x + infobar[sc].layout_button->geo.width + (PAD >> 1)), 1,
                          (sel) ? textw(sel->title) + PAD : 1,
                          infobar[sc].geo.height - 2,
                          conf.selbar.bg, conf.selbar.fg, False, False, False);
@@ -142,13 +142,13 @@ static void
 infobar_draw_layout(int sc)
 {
      if(!conf.layout_placement)
-          barwin_move(infobar[sc].layout_button, infobar[sc].tags_board->geo.width + PAD / 2, 0);
+          barwin_move(infobar[sc].layout_button, infobar[sc].tags_board->geo.width + (PAD >> 1), 0);
 
      barwin_resize(infobar[sc].layout_button, ((conf.layout_button_width > 0) ? (uint)conf.layout_button_width : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)), infobar[sc].geo.height);
      barwin_refresh_color(infobar[sc].layout_button);
 
      if(tags[sc][seltag[sc]].layout.symbol)
-          barwin_draw_text(infobar[sc].layout_button, PAD / 2, FHINFOBAR, tags[sc][seltag[sc]].layout.symbol);
+          barwin_draw_text(infobar[sc].layout_button, (PAD >> 1), FHINFOBAR, tags[sc][seltag[sc]].layout.symbol);
 
      return;
 }
@@ -201,11 +201,11 @@ infobar_draw_selbar(int sc)
 
      barwin_move(infobar[sc].selbar,
                ((conf.layout_placement)
-                ? (infobar[sc].tags_board->geo.x + infobar[sc].tags_board->geo.width + PAD / 2)
-                : (infobar[sc].layout_button->geo.x + infobar[sc].layout_button->geo.width + PAD / 2)), 1);
+                ? (infobar[sc].tags_board->geo.x + infobar[sc].tags_board->geo.width + (PAD >> 1))
+                : (infobar[sc].layout_button->geo.x + infobar[sc].layout_button->geo.width + (PAD >> 1))), 1);
 
      barwin_refresh_color(infobar[sc].selbar);
-     barwin_draw_text(infobar[sc].selbar, PAD / 2, FHINFOBAR - 1, ((str) ? str : sel->title));
+     barwin_draw_text(infobar[sc].selbar, (PAD >> 1), FHINFOBAR - 1, ((str) ? str : sel->title));
 
      barwin_refresh(infobar[sc].selbar);
 
@@ -225,7 +225,7 @@ infobar_draw_taglist(int sc)
      Bool is_occupied[MAXTAG + 1];
 
      if(conf.layout_placement)
-          barwin_move(infobar[sc].tags_board, ((conf.layout_button_width > 0) ? (uint)conf.layout_button_width : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)) + PAD / 2, 0);
+          barwin_move(infobar[sc].tags_board, ((conf.layout_button_width > 0) ? (uint)conf.layout_button_width : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)) + (PAD >> 1), 0);
 
      for(i = 0; i < MAXTAG; i++)
           is_occupied[i] = False;
@@ -276,7 +276,7 @@ infobar_draw_taglist(int sc)
           barwin_refresh_color(infobar[sc].tags[i]);
 
           if(tags[sc][i].name)
-               barwin_draw_text(infobar[sc].tags[i], PAD / 2, FHINFOBAR, tags[sc][i].name);
+               barwin_draw_text(infobar[sc].tags[i], (PAD >> 1), FHINFOBAR, tags[sc][i].name);
      }
 
      return;
@@ -362,7 +362,7 @@ infobar_set_position(int pos)
      case IB_Hide:
           sgeo[selscreen].y = spgeo[selscreen].y + TBARH;
           sgeo[selscreen].height = spgeo[selscreen].height - TBARH;
-          infobar[selscreen].geo.y = -(infobar[selscreen].geo.height) * 2;
+          infobar[selscreen].geo.y = (-(infobar[selscreen].geo.height) << 1);
           break;
      case IB_Bottom:
           sgeo[selscreen].y = spgeo[selscreen].y + TBARH;

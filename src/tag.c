@@ -350,8 +350,7 @@ tag_swap(int s, int t1, int t2)
      Client *c;
      Tag t;
 
-     if(t1 > conf.ntag[s] || t1 < 1
-               || t2 > conf.ntag[s] || t2 < 1 || t1 == t2)
+     if(t1 == t2 || (t1 & t2) < 1 || (t1 | t2) > conf.ntag[s])
           return;
 
      t = tags[s][t1];
@@ -378,6 +377,8 @@ tag_swap(int s, int t1, int t2)
 void
 uicb_tag_stay_last(uicb_t cmd)
 {
+     int i;
+
      (void)cmd;
 
      screen_get_sel();
@@ -387,13 +388,10 @@ uicb_tag_stay_last(uicb_t cmd)
 
      else
      {
-          int i;
           remove_old_last_tag(selscreen);
 
           for(i = seltag[selscreen]; i <= conf.ntag[selscreen]; i++)
-          {
                tag_swap(selscreen, seltag[selscreen], seltag[selscreen] + 1);
-          }
 
           tag_set(conf.ntag[selscreen]);
           tags[selscreen][seltag[selscreen]].flags |= StayLastFlag;
@@ -506,8 +504,8 @@ uicb_tag_urgent(uicb_t cmd)
 void
 tag_additional(int sc, int tag, int adtag)
 {
-     if(tag < 0 || tag > conf.ntag[sc]
-       || adtag < 1 || adtag > conf.ntag[sc] || adtag == seltag[sc])
+     if(tag < 0 || (tag | adtag) > conf.ntag[sc]
+               || adtag < 1 || adtag == seltag[sc])
           return;
 
      if(tags[sc][tag].flags & SplitFlag)

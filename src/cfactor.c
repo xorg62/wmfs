@@ -90,7 +90,7 @@ cfactor_geo(XRectangle geo, int fact[4], int *err)
 
      /* Too big/small */
      if(cgeo.width > sgeo[selscreen].width || cgeo.height > sgeo[selscreen].height
-               || cgeo.width < (BORDH * 2) || cgeo.height < (BORDH + TBARH))
+               || cgeo.width < (BORDH << 1) || cgeo.height < (BORDH + TBARH))
      {
           *err = 1;
           return geo;

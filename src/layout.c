@@ -173,12 +173,9 @@ uicb_layout_prev(uicb_t cmd)
 Client*
 tiled_client(int screen, Client *c)
 {
-     for(;c && ((c->flags & MaxFlag)
-                || (c->flags & FreeFlag)
-                || (c->flags & FSSFlag)
-                || (c->flags & AboveFlag)
-                || c->screen != screen
-                || ishide(c, screen)); c = c->next);
+     for(;c && ((c->flags & (MaxFlag | FreeFlag | FSSFlag | AboveFlag))
+                    || c->screen != screen
+                    || ishide(c, screen)); c = c->next);
 
      if(c)
           c->flags |= FLayFlag;
@@ -269,7 +266,7 @@ grid(int screen, Bool horizontal)
      for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
      CHECK((tags[screen][seltag[screen]].nclients = n));
 
-     for(rows = 0; rows <= n / 2; ++rows)
+     for(rows = 0; rows <= (n >> 1); ++rows)
           if(rows * rows >= n)
                break;
 
@@ -293,7 +290,7 @@ grid(int screen, Bool horizontal)
 
           cfactor_clean(c);
 
-          cgeo.width = (sg.width / cols) - (BORDH * 2);
+          cgeo.width = (sg.width / cols) - (BORDH << 1);
           cgeo.height = (sg.height / rows) - BORDH;
 
           /* Last row's and last client remainder */
@@ -302,7 +299,7 @@ grid(int screen, Bool horizontal)
 
           /* Last column's client remainder */
           if(i >= rows * (cols - 1))
-               cgeo.width = sg.width - (cgeo.x - (sg.x - (BORDH * 2)));
+               cgeo.width = sg.width - (cgeo.x - (sg.x - (BORDH << 1)));
 
           /* Resize */
           client_moveresize(c, (c->pgeo = cgeo), (tags[screen][seltag[screen]].flags & ResizeHintFlag));
@@ -313,7 +310,7 @@ grid(int screen, Bool horizontal)
           if(cpcols + 1 > rows)
           {
                cpcols = 0;
-               cgeo.x = c->pgeo.x + c->pgeo.width + (BORDH * 2);
+               cgeo.x = c->pgeo.x + c->pgeo.width + (BORDH << 1);
                cgeo.y = sg.y;
           }
      }
@@ -348,28 +345,27 @@ multi_tile(int screen, Position type)
           : tags[screen][seltag[screen]].mwfact * sg.width;
 
      /* MASTER SIZE */
-     if(type == Top || type == Bottom)
+     if(LDIR(type))
      {
-          if(type == Top)
-               mastergeo.y = (n <= nmaster) ? (uint)sg.y : sg.y + (sg.height - mwfact) - BORDH;
-          mastergeo.width = (sg.width / nmaster) - (BORDH * 4);
-          mastergeo.height = (n <= nmaster) ? (uint)(sg.height - BORDH) : mwfact;
+          if(type == Left)
+               mastergeo.x = (n <= nmaster) ? (uint)sg.x : (sg.x + sg.width) - mwfact - (BORDH << 1);
+          mastergeo.width = (n <= nmaster) ? (uint)(sg.width - (BORDH << 1)) : mwfact;
+          mastergeo.height = (sg.height / nmaster) - BORDH;
      }
      else
      {
-          if(type == Left)
-               mastergeo.x = (n <= nmaster) ? (uint)sg.x : (sg.x + sg.width) - mwfact - (BORDH * 2);
-          mastergeo.width = (n <= nmaster) ? (uint)(sg.width - (BORDH * 2)) : mwfact;
-          mastergeo.height = (sg.height / nmaster) - BORDH;
+          if(type == Top)
+               mastergeo.y = (n <= nmaster) ? (uint)sg.y : sg.y + (sg.height - mwfact) - BORDH;
+          mastergeo.width = (sg.width / nmaster) - (BORDH << 2);
+          mastergeo.height = (n <= nmaster) ? (uint)(sg.height - BORDH) : mwfact;
      }
-
      /* TILED SIZE */
      if(n > nmaster)
      {
-          if(type == Top || type == Bottom)
-               tilesize = sg.width / (n - nmaster) - (BORDH * 4);
+          if(LDIR(type))
+               tilesize = sg.height / (n - nmaster) - ((BORDH << 1) + TBARH);
           else
-               tilesize = sg.height / (n - nmaster) - ((BORDH * 2) + TBARH);
+               tilesize = sg.width / (n - nmaster) - (BORDH << 2);
      }
 
 
@@ -387,13 +383,13 @@ multi_tile(int screen, Position type)
                cgeo.width = mastergeo.width;
                cgeo.height = mastergeo.height;
 
-               if(type == Top || type == Bottom)
-                    cgeo.y = mastergeo.y;
-               else
+               if(LDIR(type))
                {
                     cgeo.x = mastergeo.x;
                     cgeo.height -= (TBARH + BORDH);
                }
+               else
+                    cgeo.y = mastergeo.y;
           }
 
           /* TILED */
@@ -414,40 +410,40 @@ multi_tile(int screen, Position type)
                          break;
                     default:
                     case Right:
-                         cgeo.x += mastergeo.width + (BORDH * 2);
+                         cgeo.x += mastergeo.width + (BORDH << 1);
                          cgeo.y = sg.y;
                          break;
                     }
                }
-               if(type == Top || type == Bottom)
+               if(LDIR(type))
                {
-                    cgeo.width = tilesize;
-                    cgeo.height = sg.height - mastergeo.height - TBARH - (BORDH * 2);
+                    cgeo.width = sg.width - mastergeo.width - (BORDH << 2);
+                    cgeo.height = tilesize;
                }
                else
                {
-                    cgeo.width = sg.width - mastergeo.width - (BORDH * 4);
-                    cgeo.height = tilesize;
+                    cgeo.width = tilesize;
+                    cgeo.height = sg.height - mastergeo.height - TBARH - (BORDH << 1);
                }
           }
 
           /* REMAINDER */
           if(i + 1 == n  || i + 1 == (n < nmaster ? n : nmaster))
           {
-               if(type == Top || type == Bottom)
-                    cgeo.width = sg.width - (cgeo.x - (sg.x - (BORDH * 2)));
-               else
+               if(LDIR(type))
                     cgeo.height = (sg.y + sg.height) - cgeo.y - BORDH;
+               else
+                    cgeo.width = sg.width - (cgeo.x - (sg.x - (BORDH << 1)));
           }
 
           /* Magic instant */
           client_moveresize(c, (c->pgeo = cgeo), (tags[screen][seltag[screen]].flags & ResizeHintFlag));
 
           /* Set the position of the next client */
-          if(type == Top || type == Bottom)
-               cgeo.x = c->pgeo.x + c->pgeo.width + (BORDH * 2);
-          else
+          if(LDIR(type))
                cgeo.y = c->pgeo.y + c->pgeo.height + BORDH + TBARH;
+          else
+               cgeo.x = c->pgeo.x + c->pgeo.width + (BORDH << 1);
      }
 
      tags[screen][seltag[screen]].flags &= ~CleanFactFlag;
@@ -481,8 +477,8 @@ mirror(int screen, Bool horizontal)
      /* Fix nmaster */
      nmaster = (n < nmaster) ? n : nmaster;
 
-     imp = ((n - (nmaster - 1)) / 2);
-     pa = ((n - (nmaster - 1)) / 2) - (((n - (nmaster - 1)) % 2) ? 0 : 1);
+     imp = ((n - (nmaster - 1)) >> 1);
+     pa = ((n - (nmaster - 1)) >> 1) - (((n - (nmaster - 1)) & 1) ? 0 : 1);
 
      /* Set mwfact */
      if(tags[screen][seltag[screen]].mwfact < 0.55)
@@ -493,26 +489,26 @@ mirror(int screen, Bool horizontal)
      /* Master size */
      if(horizontal)
      {
-          mastergeo.width = (sg.width / nmaster) - (BORDH * 2);
+          mastergeo.width = (sg.width / nmaster) - (BORDH << 1);
           mastergeo.height -= BORDH;
      }
      else
      {
-          mastergeo.width -= BORDH * 2;
-          mastergeo.height = (sg.height / nmaster) - (TBARH + (BORDH * 2));
+          mastergeo.width -= (BORDH << 1);
+          mastergeo.height = (sg.height / nmaster) - (TBARH + (BORDH << 1));
      }
 
      if(n == nmaster + 1)
      {
           if(horizontal)
           {
-               mastergeo.height = mwfact - ((BORDH * 2) + TBARH);
-               tilesize = (sg.height - mastergeo.height) - ((BORDH * 2) + TBARH);
+               mastergeo.height = mwfact - ((BORDH << 1) + TBARH);
+               tilesize = (sg.height - mastergeo.height) - ((BORDH << 1) + TBARH);
           }
           else
           {
                mastergeo.width = mwfact - (BORDH * 3);
-               tilesize = (sg.width - mastergeo.width) - (BORDH * 4);
+               tilesize = (sg.width - mastergeo.width) - (BORDH << 2);
           }
      }
      if(n > nmaster + 1)
@@ -520,13 +516,13 @@ mirror(int screen, Bool horizontal)
           if(horizontal)
           {
                mastergeo.y = (sg.y + (sg.height - mwfact)) + TBARH + BORDH;
-               mastergeo.height = (2 * mwfact - sg.height) - ((BORDH * 3) + (TBARH * 2));
-               tilesize = (mwfact - mastergeo.height) - ((BORDH * 3) + (TBARH * 2));
+               mastergeo.height = ((mwfact << 1) - sg.height) - ((BORDH * 3) + (TBARH << 1));
+               tilesize = (mwfact - mastergeo.height) - ((BORDH * 3) + (TBARH << 1));
           }
           else
           {
                mastergeo.x = (sg.x + (sg.width - mwfact)) + BORDH;
-               mastergeo.width = ((2 * mwfact - sg.width) - (BORDH * 4));
+               mastergeo.width = ((mwfact << 1) - sg.width) - (BORDH << 2);
                tilesize = (mwfact - mastergeo.width) - (BORDH * 5);
           }
      }
@@ -547,7 +543,7 @@ mirror(int screen, Bool horizontal)
                if(i + 1 == nmaster)
                {
                     if(horizontal)
-                         cgeo.width = (sg.x + sg.width) - (cgeo.x + (BORDH * 2));
+                         cgeo.width = (sg.x + sg.width) - (cgeo.x + (BORDH << 1));
                     else
                          cgeo.height = (sg.y + sg.height) - (cgeo.y + BORDH);
                }
@@ -566,12 +562,12 @@ mirror(int screen, Bool horizontal)
                     if(horizontal)
                     {
                          cgeo.y = sg.y;
-                         cgeo.width = (sg.width / pa) - (BORDH * 2);
+                         cgeo.width = (sg.width / pa) - (BORDH << 1);
                     }
                     else
                     {
                          cgeo.x = sg.x;
-                         cgeo.height = (sg.height / pa) - (TBARH + (BORDH * 2));
+                         cgeo.height = (sg.height / pa) - (TBARH + (BORDH << 1));
                     }
                }
                else
@@ -581,12 +577,12 @@ mirror(int screen, Bool horizontal)
                     if(horizontal)
                     {
                          cgeo.y = (sg.y + mwfact) - BORDH;
-                         cgeo.width = (sg.width / imp) - (BORDH * 2);
+                         cgeo.width = (sg.width / imp) - (BORDH << 1);
                     }
                     else
                     {
                          cgeo.x = (sg.x + mwfact) - BORDH;
-                         cgeo.height = (sg.height / imp) - (TBARH + (BORDH * 2));
+                         cgeo.height = (sg.height / imp) - (TBARH + (BORDH << 1));
                     }
                }
 
@@ -594,7 +590,7 @@ mirror(int screen, Bool horizontal)
                if(i + 1 == n || i + 1 == n - 1)
                {
                     if(horizontal)
-                         cgeo.width = (sg.x + sg.width) - (cgeo.x + (BORDH * 2));
+                         cgeo.width = (sg.x + sg.width) - (cgeo.x + (BORDH << 1));
                     else
                          cgeo.height = (sg.y + sg.height) - (cgeo.y + BORDH);
                }
@@ -613,7 +609,7 @@ mirror(int screen, Bool horizontal)
                     if(i == nmaster || i == nmaster - 1)
                          cgeo.x = sg.x;
                     else
-                         cgeo.x = nextg[isp].x + nextg[isp].width + BORDH * 2;
+                         cgeo.x = nextg[isp].x + nextg[isp].width + (BORDH << 1);
                }
                else
                {
@@ -626,9 +622,9 @@ mirror(int screen, Bool horizontal)
           else if (i <= nmaster - 1)
           {
                if(horizontal)
-                    mastergeo.x = c->geo.x + c->geo.width + BORDH * 2;
+                    mastergeo.x = cgeo.x + cgeo.width + (BORDH << 1);
                else
-                    mastergeo.y = c->geo.y + c->geo.height + BORDH + TBARH;
+                    mastergeo.y = cgeo.y + cgeo.height + BORDH + TBARH;
           }
 
      }
@@ -719,10 +715,6 @@ grid_vertical(int screen)
     return;
 }
 
-/** Put the selected client to the master postion
- * \param cmd uicb_t type unused
-*/
-
 /** Toggle the selected client to free
  * \param cmd uicb_t type unused
 */
@@ -766,8 +758,7 @@ uicb_togglemax(uicb_t cmd)
 {
      (void)cmd;
 
-     if(!sel || ishide(sel, selscreen)
-        || (sel->flags & HintFlag)|| (sel->flags & FSSFlag))
+     if(!sel || ishide(sel, selscreen) || (sel->flags & (HintFlag | FSSFlag)))
           return;
 
      sel->flags ^= MaxFlag;
@@ -883,8 +874,7 @@ layout_set_client_master(Client *c)
 {
      screen_get_sel();
 
-     if(!c || (c->flags & HintFlag) || !(c->flags & TileFlag)
-               || (c->flags & FSSFlag))
+     if(!c || (c->flags & (HintFlag | FSSFlag)) || !(c->flags & TileFlag))
           return;
 
      if(c == tiled_client(selscreen, clients))
