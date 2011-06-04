@@ -1076,8 +1076,6 @@ client_swap(Client *c1, Client *c2)
 void
 client_update_attributes(Client *c)
 {
-     Bool f;
-
      /* For reload use */
      XChangeProperty(dpy, c->win, ATOM("_WMFS_TAG"), XA_CARDINAL, 32,
                      PropModeReplace, (uchar*)&(c->tag), 1);
@@ -1085,10 +1083,8 @@ client_update_attributes(Client *c)
      XChangeProperty(dpy, c->win, ATOM("_WMFS_SCREEN"), XA_CARDINAL, 32,
                      PropModeReplace, (uchar*)&(c->screen), 1);
 
-     f = c->flags;
-
      XChangeProperty(dpy, c->win, ATOM("_WMFS_FLAGS"), XA_CARDINAL, 32,
-                     PropModeReplace, (uchar*)&f, 1);
+                     PropModeReplace, (uchar*)&(c->flags), 1);
 
      return;
 }
