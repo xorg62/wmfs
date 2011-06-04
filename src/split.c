@@ -362,6 +362,7 @@ uicb_split_toggle(uicb_t cmd)
      tags[selscreen][seltag[selscreen]].flags ^= SplitFlag;
 
      layout_func(selscreen, seltag[selscreen]);
+     infobar_draw_layout(selscreen);
 
      return;
 }

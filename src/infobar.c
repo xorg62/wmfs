@@ -32,6 +32,8 @@
 
 #include "wmfs.h"
 
+#define SPLIT_IND_S (3 + conf.border.layout)
+
 /** Init the Infobar
 */
 void
@@ -138,14 +140,26 @@ infobar_init(void)
 /** Draw the layout button in the InfoBar
  *\param sc Screen number
  */
-static void
+void
 infobar_draw_layout(int sc)
 {
+     int w;
+
      if(!conf.layout_placement)
           barwin_move(infobar[sc].layout_button, infobar[sc].tags_board->geo.width + (PAD >> 1), 0);
 
-     barwin_resize(infobar[sc].layout_button, ((conf.layout_button_width > 0) ? (uint)conf.layout_button_width : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)), infobar[sc].geo.height);
+     w = ((conf.layout_button_width > 0) ? (uint)conf.layout_button_width : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD));
+
+     barwin_resize(infobar[sc].layout_button, w, infobar[sc].geo.height);
      barwin_refresh_color(infobar[sc].layout_button);
+
+     /* Split mode indicator; little rectangle at bottom-right */
+     if(tags[sc][seltag[sc]].flags & SplitFlag)
+          draw_rectangle(infobar[sc].layout_button->dr,
+                    w - SPLIT_IND_S,
+                    infobar[sc].geo.height - SPLIT_IND_S,
+                    SPLIT_IND_S, SPLIT_IND_S,
+                    getcolor(infobar[sc].layout_button->fg));
 
      if(tags[sc][seltag[sc]].layout.symbol)
           barwin_draw_text(infobar[sc].layout_button, (PAD >> 1), FHINFOBAR, tags[sc][seltag[sc]].layout.symbol);

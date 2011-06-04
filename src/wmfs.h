@@ -145,6 +145,7 @@ ushort textw(char *text);
 
 /* infobar.c */
 void infobar_init(void);
+void infobar_draw_layout(int sc);
 void infobar_draw(int sc);
 void infobar_draw_selbar(int sc);
 void infobar_draw_taglist(int sc);
