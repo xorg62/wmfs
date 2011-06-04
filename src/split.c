@@ -32,6 +32,20 @@
 
 #include "wmfs.h"
 
+#define SPLIT_MOVE_DIR(d)       \
+void                            \
+uicb_split_move_##d(uicb_t cmd) \
+{                               \
+     CHECK(sel);                \
+     split_move_dir(sel, d);    \
+}
+
+/* uicb_split_move_dir() */
+SPLIT_MOVE_DIR(Right);
+SPLIT_MOVE_DIR(Left);
+SPLIT_MOVE_DIR(Top);
+SPLIT_MOVE_DIR(Bottom);
+
 /** Arrange size of parent client of last closed client
 */
 static void
@@ -316,6 +330,25 @@ split_client_integrate(Client *c, Client *sc, int screen, int tag)
 
      g = split_client(sc, (sc->frame_geo.height < sc->frame_geo.width));
      split_client_fill(c, g);
+
+     return;
+}
+
+/** Move splitted client by re-arranging it in next by direction client
+*/
+void
+split_move_dir(Client *c, Position p)
+{
+     Client *sc;
+
+     if(!c || !(tags[c->screen][c->tag].flags & SplitFlag))
+          return;
+
+     if((sc = client_get_next_with_direction(c, p)))
+     {
+          split_arrange_closed(c);
+          split_client_integrate(c, sc, sc->screen, sc->tag);
+     }
 
      return;
 }

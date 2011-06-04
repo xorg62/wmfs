@@ -405,7 +405,15 @@ void split_arrange_closed(Client *ghost);
 XRectangle split_client(Client *c, Bool p);
 void split_client_fill(Client *c, XRectangle geo);
 void split_client_integrate(Client *c, Client *sc, int screen, int tag);
+void split_move_dir(Client *c, Position p);
 void uicb_split_toggle(uicb_t cmd);
+/* Generated with macro {{{ */
+void uicb_split_move_Right(uicb_t);
+void uicb_split_move_Left(uicb_t);
+void uicb_split_move_Top(uicb_t);
+void uicb_split_move_Bottom(uicb_t);
+/* }}} */
+
 
 /* viwmfs.c */
 void viwmfs(int argc, char **argv);

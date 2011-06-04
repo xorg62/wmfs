@@ -450,6 +450,12 @@
         [key] mod = {"Control"} key = "k" func = "client_swap_top"    [/key]
         [key] mod = {"Control"} key = "j" func = "client_swap_bottom" [/key]
 
+        # Move next splitted client with direction
+        [key] mod = {"Control", "Shift"} key = "h" func = "split_move_left"   [/key]
+        [key] mod = {"Control", "Shift"} key = "l" func = "split_move_right"  [/key]
+        [key] mod = {"Control", "Shift"} key = "k" func = "split_move_top"    [/key]
+        [key] mod = {"Control", "Shift"} key = "j" func = "split_move_bottom" [/key]
+
         # Resize selected tiled client with direction
         [key] mod = {"Super"} key = "h" func = "client_resize_left"   cmd = "20" [/key]
         [key] mod = {"Super"} key = "l" func = "client_resize_right"  cmd = "20" [/key]

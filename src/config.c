@@ -109,7 +109,11 @@ const func_name_list_t func_list[] =
      {"toggle_tagautohide",       uicb_toggle_tagautohide },
      {"toggle_tag_expose",        uicb_tag_toggle_expose},
      {"split_toggle",             uicb_split_toggle },
-     /*{"split_client_vertical",    uicb_split_client_vertical },
+     {"split_move_right",         uicb_split_move_Right },
+     {"split_move_left",          uicb_split_move_Left },
+     {"split_move_top",           uicb_split_move_Top },
+     {"split_move_bottom",        uicb_split_move_Bottom },
+     /*{"split_client_vertical"   uicb_split_client_vertical },
      {"split_client_horizontal",  uicb_split_client_horizontal }, */
      {NULL, NULL}
 };
