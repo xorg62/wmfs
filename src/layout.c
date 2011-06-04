@@ -555,7 +555,7 @@ mirror(int screen, Bool horizontal)
                else
                     cgeo.width = tilesize;
 
-               if((i + nmaster) % 2)
+               if((i + nmaster) & 1)
                {
                     isp = 1;
 

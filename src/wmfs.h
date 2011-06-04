@@ -84,12 +84,12 @@
 #define MAXH         DisplayHeight(dpy, DefaultScreen(dpy))
 #define MAXW         DisplayWidth(dpy, DefaultScreen(dpy))
 #define INFOBARH     ((conf.bars.height > 0) ? conf.bars.height : (font->height * 1.5))
-#define FHINFOBAR    ((font->height - font->descent) + (INFOBARH - font->height) / 2)
+#define FHINFOBAR    ((font->height - font->descent) + (((int)INFOBARH - font->height) >> 1))
 #define SHADH        (1)
 #define BORDH        conf.client.borderheight
 #define TBARH        ((conf.titlebar.height < BORDH) ? BORDH : conf.titlebar.height)
 #define RESHW        (6 * (BORDH))
-#define BUTTONWH     (TBARH / 2)
+#define BUTTONWH     (TBARH >> 1)
 #define DEF_CONF     ".config/wmfs/wmfsrc"
 #define DEF_STATUS   ".config/wmfs/status.sh"
 #define PAD          conf.pad
@@ -109,7 +109,7 @@
 #define CHECK(x)           if(!(x)) return
 #define LEN(x)             (sizeof(x) / sizeof((x)[0]))
 #define MAXCLIST           (64)
-#define RPOS(x)            (x % 2 ? x - 1 : x + 1)
+#define RPOS(x)            (x & 1 ? x - 1 : x + 1)
 #define LDIR(x)            (x < Top)
 #define FLAGAPPLY(v, b, f) ((b) ? (v |= (f)) : (v &= ~(f)))
 

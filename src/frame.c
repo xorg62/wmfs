@@ -313,7 +313,7 @@ frame_update(Client *c)
      if(TBARH - BORDH)
           barwin_draw_text(c->titlebar,
                     (c->frame_geo.width >> 1) - (textw(c->title) >> 1),
-                    ((font->height - font->descent) + ((TBARH - font->height) / 2)),
+                    ((font->height - font->descent) + ((TBARH - font->height) >> 1)),
                     c->title);
 
      return;
