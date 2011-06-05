@@ -396,9 +396,6 @@ Bool uicb_checklayout(uicb_t);
 /* init.c */
 void init(void);
 
-/* getinfo.c */
-void getinfo(char *info);
-
 /* split.c */
 void split_store_geo(int screen, int tag);
 void split_set_current(Client *nc, Client *ghost);

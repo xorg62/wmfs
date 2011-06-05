@@ -458,7 +458,7 @@ main(int argc, char **argv)
      all_argv = argv;
      sprintf(conf.confpath, "%s/"DEF_CONF, getenv("HOME"));
 
-     while((i = getopt(argc, argv, "hviSc:s:g:C:V:")) != -1)
+     while((i = getopt(argc, argv, "hviSc:s:C:V:")) != -1)
      {
 
           /* For options who need WMFS running */
@@ -472,7 +472,6 @@ main(int argc, char **argv)
                printf("usage: %s [-ihvS] [-C <file>] [-c <uicb function> <cmd> ] [-g <argument>] [-s <screen_num> <string>] [-V <viwmfs cmd]\n"
                       "   -C <file>                 Load a configuration file\n"
                       "   -c <uicb_function> <cmd>  Execute an uicb function to control WMFS\n"
-                      "   -g <argument>             Show information about wmfs status\n"
                       "   -s <screen_num> <string>  Set the bar(s) statustext\n"
                       "   -V <viwmfs cmd>           Manage WMFS with vi-like command\n"
                       "   -S                        Update status script\n"
@@ -517,11 +516,6 @@ main(int argc, char **argv)
                exit(EXIT_SUCCESS);
                break;
 
-          case 'g':
-               getinfo(optarg);
-               XCloseDisplay(dpy);
-               exit(EXIT_SUCCESS);
-               break;
           case 'V':
                viwmfs(argc, argv);
                XCloseDisplay(dpy);

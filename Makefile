@@ -26,7 +26,6 @@ SRCS= src/barwin.c    \
       src/event.c     \
       src/ewmh.c      \
       src/frame.c     \
-      src/getinfo.c   \
       src/infobar.c   \
       src/init.c      \
       src/launcher.c  \
