@@ -261,6 +261,10 @@ uint color_shade(uint, double);
 void grabkeys(void);
 void event_make_array(void);
 
+#ifdef HAVE_XRANDR
+void xrandrevent(XEvent *e);
+#endif /* HAVE_XRANDR */
+
 /* menu.c */
 void menu_init(Menu *menu, char *name, int nitem, uint bg_f, char *fg_f, uint bg_n, char *fg_n);
 void menu_new_item(MenuItem *mi, char *name, void *func, char *cmd);

@@ -201,6 +201,7 @@ void
 init(void)
 {
      /* First init */
+     event_make_array();
      ewmh_init_hints();
      init_conf();
      init_gc();
@@ -214,7 +215,6 @@ init(void)
      init_status();
      ewmh_update_current_tag_prop();
      grabkeys();
-     event_make_array();
 
      return;
 }

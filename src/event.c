@@ -638,11 +638,12 @@ motionnotify(XEvent *e)
 /** XRandr handle event
  */
 #ifdef HAVE_XRANDR
-static void
+void
 xrandrevent(XEvent *e)
 {
      /* Update xrandr configuration */
-     XRRUpdateConfiguration(e);
+     if(!XRRUpdateConfiguration(e))
+          return;
 
      /* Reload WMFS to update the screen(s) geometry changement */
      quit();
@@ -700,10 +701,6 @@ event_make_array(void)
      event_handle[ReparentNotify]   = reparentnotify;
      event_handle[SelectionClear]   = selectionclearevent;
      event_handle[UnmapNotify]      = unmapnotify;
-
-#ifdef HAVE_XRANDR
-     event_handle[xrandr_event]     = xrandrevent;
-#endif /* HAVE_XRANDR */
 
      return;
 }

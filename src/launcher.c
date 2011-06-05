@@ -354,7 +354,12 @@ launcher_execute(Launcher *launcher)
                barwin_draw_text(bw, 1 + textw(launcher->prompt) + textw(" "), FHINFOBAR - 1, buf);
                barwin_refresh(bw);
           }
-          else if(ev.type < LASTEvent)
+          else
+#ifdef HAVE_XRANDR
+               if(ev.type == xrandr_event + RRScreenChangeNotify)
+                    xrandrevent(&ev);
+               else
+#endif /* HAVE_XRANDR */
                HANDLE_EVENT(&ev);
 
           XNextEvent(dpy, &ev);

@@ -221,6 +221,11 @@ menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
           break;
 
      default:
+#ifdef HAVE_XRANDR
+          if(ev->type == xrandr_event + RRScreenChangeNotify)
+               xrandrevent(ev);
+          else
+#endif /* HAVE_XRANDR */
           if(ev->type < LASTEvent)
                HANDLE_EVENT(ev);
           break;

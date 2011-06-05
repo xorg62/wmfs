@@ -200,7 +200,12 @@ mainloop(void)
 
      while(!exiting && !XNextEvent(dpy, &ev))
      {
-          HANDLE_EVENT(&ev);
+#ifdef HAVE_XRANDR
+          if(ev.type == xrandr_event + RRScreenChangeNotify)
+               xrandrevent(&ev);
+          else
+#endif /* HAVE_XRANDR */
+               HANDLE_EVENT(&ev);
           wait_childs_and_status();
      }
 
@@ -209,7 +214,6 @@ mainloop(void)
 
      return;
 }
-
 
 /** Set the exiting variable to True
  *  for stop the main loop
@@ -449,7 +453,7 @@ int
 main(int argc, char **argv)
 {
      int i;
-     char *ol = "csgVS";
+     char *ol = "csVS";
      extern char *optarg;
      extern int optind;
      struct sigaction sa;
