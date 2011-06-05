@@ -201,7 +201,6 @@ void
 init(void)
 {
      /* First init */
-     event_make_array();
      ewmh_init_hints();
      init_conf();
      init_gc();
@@ -210,6 +209,7 @@ init(void)
      init_key();
      init_root();
      screen_init_geo();
+     event_make_array();
      infobar_init();
      systray_acquire();
      init_status();

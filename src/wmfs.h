@@ -476,7 +476,8 @@ Client *clients;
 Client *sel;
 
 /* Other */
-void (*event_handle[LASTEvent])(XEvent*);
+int nevent;
+void (**event_handle)(XEvent*);
 extern const func_name_list_t func_list[];
 extern const func_name_list_t layout_list[];
 uint numlockmask;

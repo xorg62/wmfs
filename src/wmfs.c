@@ -135,6 +135,8 @@ quit(void)
      XSync(dpy, False);
      XCloseDisplay(dpy);
 
+     free(event_handle);
+
      /* kill status script */
      if (conf.status_pid != (pid_t)-1)
          kill(conf.status_pid, SIGTERM);
@@ -200,12 +202,7 @@ mainloop(void)
 
      while(!exiting && !XNextEvent(dpy, &ev))
      {
-#ifdef HAVE_XRANDR
-          if(ev.type == xrandr_event + RRScreenChangeNotify)
-               xrandrevent(&ev);
-          else
-#endif /* HAVE_XRANDR */
-               HANDLE_EVENT(&ev);
+          HANDLE_EVENT(&ev);
           wait_childs_and_status();
      }
 
