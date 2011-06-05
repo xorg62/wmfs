@@ -221,9 +221,11 @@ menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
           break;
 
      default:
-          getevent(*ev);
+          if(ev->type < LASTEvent)
+               HANDLE_EVENT(ev);
           break;
      }
+
      XNextEvent(dpy, ev);
 
      return quit;

@@ -190,19 +190,21 @@ mainloop(void)
      XEvent ev;
      pthread_t th_status;
 
-     if (estatus && conf.status_timing == 0)
+     if(estatus && !conf.status_timing)
           conf.status_pid = spawn(conf.status_path);
-     else if (estatus && pthread_create(&th_status, NULL, thread_status, NULL) != 0) {
+     else if(estatus && pthread_create(&th_status, NULL, thread_status, NULL) != 0)
+     {
           warnx("pthread_create");
           estatus = False;
      }
 
-     while (!exiting && !XNextEvent(dpy, &ev)) {
-          getevent(ev);
+     while(!exiting && !XNextEvent(dpy, &ev))
+     {
+          HANDLE_EVENT(&ev);
           wait_childs_and_status();
      }
 
-     if (estatus)
+     if(estatus)
           pthread_join(th_status, NULL);
 
      return;

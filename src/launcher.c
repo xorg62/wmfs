@@ -354,8 +354,9 @@ launcher_execute(Launcher *launcher)
                barwin_draw_text(bw, 1 + textw(launcher->prompt) + textw(" "), FHINFOBAR - 1, buf);
                barwin_refresh(bw);
           }
-          else
-               getevent(ev);
+          else if(ev.type < LASTEvent)
+               HANDLE_EVENT(&ev);
+
           XNextEvent(dpy, &ev);
      }
 

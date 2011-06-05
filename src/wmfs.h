@@ -100,8 +100,9 @@
         win = XCreateWindow(dpy, (parent), (x), (y), (w), (h), (b), CopyFromParent, \
         InputOutput, CopyFromParent, (mask), (at));                                 \
         XSetWindowBackground(dpy, win, (col));                                      \
-    } while (/* CONSTCOND */ 0)
+    } while(/* CONSTCOND */ 0)
 
+#define HANDLE_EVENT(e)    event_handle[(e)->type](e);
 #define ATOM(a)            XInternAtom(dpy, (a), False)
 #define FRAMEW(w)          ((w) + (BORDH << 1))
 #define FRAMEH(h)          ((h) + (BORDH  + TBARH))
@@ -258,7 +259,7 @@ uint color_shade(uint, double);
 
 /* event.c */
 void grabkeys(void);
-void getevent(XEvent ev);
+void event_make_array(void);
 
 /* menu.c */
 void menu_init(Menu *menu, char *name, int nitem, uint bg_f, char *fg_f, uint bg_n, char *fg_n);
@@ -474,6 +475,7 @@ Client *clients;
 Client *sel;
 
 /* Other */
+void (*event_handle[LASTEvent])(XEvent*);
 extern const func_name_list_t func_list[];
 extern const func_name_list_t layout_list[];
 uint numlockmask;

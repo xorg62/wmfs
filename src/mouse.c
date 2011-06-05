@@ -184,9 +184,8 @@ mouse_move(Client *c)
                     mouse_dragborder(geo, gci);
                }
           }
-          else if(ev.type == MapRequest
-                  || ev.type == ConfigureRequest)
-               getevent(ev);
+          else if((ev.type == MapRequest || ev.type == ConfigureRequest) && ev.type < LASTEvent)
+               HANDLE_EVENT(&ev);
      }
      while(ev.type != ButtonRelease);
 

@@ -33,11 +33,11 @@
 #include "wmfs.h"
 
 /** ButtonPress handle event
- * \param ev XButtonEvent pointer
 */
 static void
-buttonpress(XButtonEvent *ev)
+buttonpress(XEvent *e)
 {
+     XButtonEvent *ev = &e->xbutton;
      Client *c;
      int i, j, n;
 
@@ -160,11 +160,11 @@ buttonpress(XButtonEvent *ev)
 }
 
 /* ClientMessage handle event
- *\param ev XClientMessageEvent pointer
 */
 static void
-clientmessageevent(XClientMessageEvent *ev)
+clientmessageevent(XEvent *e)
 {
+     XClientMessageEvent *ev = &e->xclient;
      Client *c;
      Systray *sy;
      int s, i, mess_t = 0;
@@ -287,22 +287,18 @@ clientmessageevent(XClientMessageEvent *ev)
 }
 
 /** ConfigureRequesthandle events
- * \param ev XConfigureRequestEvent pointer
 */
 static void
-configureevent(XConfigureRequestEvent *ev)
+configureevent(XEvent *e)
 {
+     XConfigureRequestEvent *ev = &e->xconfigurerequest;
      XWindowChanges wc;
      Client *c;
 
      /* Check part */
      if((c = client_gb_win(ev->window))
         || (c = client_gb_win(ev->window)))
-     {
-          CHECK(!(c->flags & LMaxFlag));
-          CHECK(!(c->flags & MaxFlag));
-          CHECK(!(c->flags & FSSFlag));
-     }
+          CHECK(!(c->flags & (LMaxFlag | MaxFlag | FSSFlag)));
 
      if((c = client_gb_win(ev->window)))
      {
@@ -340,11 +336,11 @@ configureevent(XConfigureRequestEvent *ev)
 }
 
 /** DestroyNotify handle event
- * \param ev XDestroyWindowEvent pointer
 */
 static void
-destroynotify(XDestroyWindowEvent *ev)
+destroynotify(XEvent *e)
 {
+     XDestroyWindowEvent *ev = &e->xdestroywindow;
      Client *c;
      Systray *s;
 
@@ -364,11 +360,11 @@ destroynotify(XDestroyWindowEvent *ev)
 }
 
 /** EnterNotify handle event
- * \param ev XCrossingEvent pointer
 */
 static void
-enternotify(XCrossingEvent *ev)
+enternotify(XEvent *e)
 {
+     XCrossingEvent *ev = &e->xcrossing;
      Client *c;
      int n;
 
@@ -397,11 +393,11 @@ enternotify(XCrossingEvent *ev)
 }
 
 /** ExposeEvent handle event
- * \param ev XExposeEvent pointer
 */
 static void
-expose(XExposeEvent *ev)
+expose(XEvent *e)
 {
+     XExposeEvent *ev = &e->xexpose;
      Client *c;
      int i, sc;
 
@@ -427,26 +423,24 @@ expose(XExposeEvent *ev)
 }
 
 /** FocusChange handle event
- * \param ev XFocusChangeEvent pointer
- * \return
 */
 static void
-focusin(XFocusChangeEvent *ev)
+focusin(XEvent *e)
 {
-     if(sel && ev->window != sel->win)
+     if(sel && e->xfocus.window != sel->win)
           client_focus(sel);
 
      return;
 }
 
 /** KeyPress handle event
- * \param ev XKeyPressedEvent pointer
 */
 static void
-keypress(XKeyPressedEvent *ev)
+keypress(XEvent *e)
 {
-     int i;
+     XKeyPressedEvent *ev = &e->xkey;
      KeySym keysym;
+     int i;
 
      keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
      for(i = 0; i < conf.nkeybind; ++i)
@@ -460,11 +454,11 @@ keypress(XKeyPressedEvent *ev)
 }
 
 /** MappingNotify handle event
- * \param ev XMappingEvent pointer
 */
 static void
-mappingnotify(XMappingEvent *ev)
+mappingnotify(XEvent *e)
 {
+     XMappingEvent *ev = &e->xmapping;
      XRefreshKeyboardMapping(ev);
 
      if(ev->request == MappingKeyboard)
@@ -474,11 +468,11 @@ mappingnotify(XMappingEvent *ev)
 }
 
 /** MapNotify handle event
-  * \param ev XMapEvent pointer
   */
 static void
-mapnotify(XMapEvent *ev)
+mapnotify(XEvent *e)
 {
+     XMapEvent *ev = &e->xmap;
      Client *c;
      Systray *s;
 
@@ -497,11 +491,11 @@ mapnotify(XMapEvent *ev)
 }
 
 /** MapRequest handle event
- * \param ev XMapRequestEvent pointer
 */
 static void
-maprequest(XMapRequestEvent *ev)
+maprequest(XEvent *e)
 {
+     XMapRequestEvent *ev = &e->xmaprequest;
      XWindowAttributes at;
      Systray *s;
 
@@ -520,11 +514,11 @@ maprequest(XMapRequestEvent *ev)
 }
 
 /** PropertyNotify handle event
- * \param ev XPropertyEvent pointer
 */
 static void
-propertynotify(XPropertyEvent *ev)
+propertynotify(XEvent *e)
 {
+     XPropertyEvent *ev = &e->xproperty;
      Client *c;
      Systray *s;
      Window trans;
@@ -574,10 +568,9 @@ propertynotify(XPropertyEvent *ev)
 }
 
 /** XReparentEvent handle event
- * \param ev XReparentEvent pointer
  */
 static void
-reparentnotify(XReparentEvent *ev)
+reparentnotify(XEvent *ev)
 {
      (void)ev;
 
@@ -585,13 +578,12 @@ reparentnotify(XReparentEvent *ev)
 }
 
 /** SelectionClearEvent handle event
- * \param ev XSelectionClearEvent pointer
  */
 static void
-selectionclearevent(XSelectionClearEvent *ev)
+selectionclearevent(XEvent *ev)
 {
      /* Getting selection if lost it */
-     if(ev->window == traywin)
+     if(ev->xselectionclear.window == traywin)
           systray_acquire();
 
      systray_update();
@@ -600,11 +592,11 @@ selectionclearevent(XSelectionClearEvent *ev)
 }
 
 /** UnmapNotify handle event
- * \param ev XUnmapEvent pointer
  */
 static void
-unmapnotify(XUnmapEvent *ev)
+unmapnotify(XEvent *e)
 {
+     XUnmapEvent *ev = &e->xunmap;
      Client *c;
      Systray *s;
 
@@ -626,11 +618,11 @@ unmapnotify(XUnmapEvent *ev)
 }
 
 /** XMotionNotify handle event
- * \param ev XMotionEvent pointer
  */
 static void
-motionnotify(XMotionEvent *ev)
+motionnotify(XEvent *e)
 {
+     XMotionEvent *ev = &e->xmotion;
      Client *c;
 
      if(!conf.focus_fmouse || !conf.focus_fmov)
@@ -642,6 +634,23 @@ motionnotify(XMotionEvent *ev)
 
      return;
 }
+
+/** XRandr handle event
+ */
+#ifdef HAVE_XRANDR
+static void
+xrandrevent(XEvent *e)
+{
+     /* Update xrandr configuration */
+     XRRUpdateConfiguration(e);
+
+     /* Reload WMFS to update the screen(s) geometry changement */
+     quit();
+     for(; argv_global[0] && argv_global[0] == ' '; ++argv_global);
+     execvp(argv_global, all_argv);
+
+}
+#endif /* HAVE_XRANDR */
 
 /** Key grabbing function
 */
@@ -664,49 +673,39 @@ grabkeys(void)
      return;
 }
 
-/** Event handle function: execute every function
- * handle by event
- * \param ev Event
- */
+/** Make event handle function pointer array
+*/
 void
-getevent(XEvent ev)
+event_make_array(void)
 {
+     int i = LASTEvent;
 
-     switch(ev.type)
-     {
-     case ButtonPress:      buttonpress(&ev.xbutton);                 break;
-     case ClientMessage:    clientmessageevent(&ev.xclient);          break;
-     case ConfigureRequest: configureevent(&ev.xconfigurerequest);    break;
-     case DestroyNotify:    destroynotify(&ev.xdestroywindow);        break;
-     case EnterNotify:      enternotify(&ev.xcrossing);               break;
-     case Expose:           expose(&ev.xexpose);                      break;
-     case FocusIn:          focusin(&ev.xfocus);                      break;
-     case KeyPress:         keypress(&ev.xkey);                       break;
-     case MapNotify:        mapnotify(&ev.xmap);                      break;
-     case MapRequest:       maprequest(&ev.xmaprequest);              break;
-     case MappingNotify:    mappingnotify(&ev.xmapping);              break;
-     case MotionNotify:     motionnotify(&ev.xmotion);                break;
-     case PropertyNotify:   propertynotify(&ev.xproperty);            break;
-     case ReparentNotify:   reparentnotify(&ev.xreparent);            break;
-     case SelectionClear:   selectionclearevent(&ev.xselectionclear); break;
-     case UnmapNotify:      unmapnotify(&ev.xunmap);                  break;
-     default:
+     /* Fill array with non-used function (do nothing) */
+     while(i--)
+          event_handle[i] = reparentnotify;
+
+     event_handle[ButtonPress]      = buttonpress;
+     event_handle[ClientMessage]    = clientmessageevent;
+     event_handle[ConfigureRequest] = configureevent;
+     event_handle[DestroyNotify]    = destroynotify;
+     event_handle[EnterNotify]      = enternotify;
+     event_handle[Expose]           = expose;
+     event_handle[FocusIn]          = focusin;
+     event_handle[KeyPress]         = keypress;
+     event_handle[MapNotify]        = mapnotify;
+     event_handle[MapRequest]       = maprequest;
+     event_handle[MappingNotify]    = mappingnotify;
+     event_handle[MotionNotify]     = motionnotify;
+     event_handle[PropertyNotify]   = propertynotify;
+     event_handle[ReparentNotify]   = reparentnotify;
+     event_handle[SelectionClear]   = selectionclearevent;
+     event_handle[UnmapNotify]      = unmapnotify;
 
 #ifdef HAVE_XRANDR
-          /* Check Xrandr event */
-          if(ev.type == xrandr_event)
-          {
-               /* Update xrandr configuration */
-               XRRUpdateConfiguration(&ev);
-
-               /* Reload WMFS to update the screen(s) geometry changement */
-               quit();
-               for(; argv_global[0] && argv_global[0] == ' '; ++argv_global);
-               execvp(argv_global, all_argv);
-          }
+     event_handle[xrandr_event]     = xrandrevent;
 #endif /* HAVE_XRANDR */
-          break;
-     }
 
      return;
 }
+
+
