@@ -334,7 +334,14 @@ split_client_integrate(Client *c, Client *sc, int screen, int tag)
 }
 
 /** Move splitted client by re-arranging it in next by direction client
-*/
+  * Integrate c in next client by direction
+  * Example case, direction = left:
+  *  ___________      ___________
+  * |     |  B  | -> |  A  |     |
+  * |  A  |_____| -> |_____|  B  |
+  * |     |< C  | -> |  C  |v v v|
+  * |_____|_____| -> |_____|_____|
+ */
 void
 split_move_dir(Client *c, Position p)
 {
