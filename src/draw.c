@@ -156,7 +156,7 @@ draw_image_ofset_text(Drawable d, int x, int y, char* fg, char *str, int x_image
  * \param color Color of the rectangle
 */
 void
-draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color)
+draw_rectangle(Drawable dr, int x, int y, int w, int h, uint color)
 {
      XRectangle r = { x, y, w, h };
 
@@ -176,7 +176,7 @@ draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color)
  * \param data Array of bytes that will be draw
 */
 void
-draw_graph(Drawable dr, int x, int y, uint w, uint h, uint color, char *data)
+draw_graph(Drawable dr, int x, int y, int w, int h, uint color, char *data)
 {
      uint i;
 

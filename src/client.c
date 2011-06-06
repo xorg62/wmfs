@@ -217,7 +217,7 @@ client_get_next_with_direction(Client *bc, Position pos)
 static void
 client_above(Client *c)
 {
-     XRectangle geo;
+     Geo geo;
 
      memset(&geo, 0, sizeof(geo));
 
@@ -728,7 +728,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
 
           if(conf.client_auto_center)
           {
-               XRectangle tmp;
+               Geo tmp;
                tmp = screen_get_geo(selscreen);
                mx = (tmp.width + mx - wa->width) >> 1;
                my = (tmp.height + my - wa->height) >> 1;
@@ -816,7 +816,7 @@ client_manage(Window w, XWindowAttributes *wa, Bool ar)
  *\param c Client pointer
 */
 void
-client_geo_hints(XRectangle *geo, Client *c)
+client_geo_hints(Geo *geo, Client *c)
 {
      /* minimum possible */
      if(geo->width < 1)
@@ -866,7 +866,7 @@ client_geo_hints(XRectangle *geo, Client *c)
  * \param r Bool for resize hint or not
 */
 void
-client_moveresize(Client *c, XRectangle geo, Bool r)
+client_moveresize(Client *c, Geo geo, Bool r)
 {
      int os, e;
      int rhx = 0;
@@ -1257,7 +1257,7 @@ static void
 client_set_screen(Client *c, int s)
 {
      int os;
-     XRectangle geo;
+     Geo geo;
 
      if(!c || s < 0 || s > screen_count() - 1 || s == c->screen)
           return;
@@ -1340,7 +1340,7 @@ uicb_client_screen_set(uicb_t cmd)
 void
 uicb_client_move(uicb_t cmd)
 {
-     XRectangle geo;
+     Geo geo;
      int xi = 0, yi = 0;
 
      if(!sel || sel->flags & (TileFlag | MaxFlag | LMaxFlag | FSSFlag))
@@ -1365,7 +1365,7 @@ uicb_client_move(uicb_t cmd)
 void
 uicb_client_resize(uicb_t cmd)
 {
-     XRectangle geo;
+     Geo geo;
      int wi = 0, hi = 0;
 
      if(!sel || sel->flags & (TileFlag | MaxFlag | LMaxFlag | FSSFlag))

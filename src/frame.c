@@ -158,7 +158,7 @@ frame_delete(Client *c)
  * \param geo Coordinate info for move the frame
 */
 void
-frame_moveresize(Client *c, XRectangle geo)
+frame_moveresize(Client *c, Geo geo)
 {
      CHECK(c);
 

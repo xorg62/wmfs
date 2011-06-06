@@ -37,7 +37,7 @@ Window prevwin;
 /** Draw the border when a client in dragging/resizing with mouse
  */
 static void
-mouse_dragborder(XRectangle geo, GC g)
+mouse_dragborder(Geo geo, GC g)
 {
      XDrawRectangle(dpy, ROOT, g,
                     geo.x - (BORDH >> 1),
@@ -130,7 +130,7 @@ mouse_move(Client *c)
      int dint;
      uint duint;
      Window dw;
-     XRectangle geo = c->geo;
+     Geo geo = c->geo;
      XGCValues xgc;
      GC gci;
      XEvent ev;
@@ -211,7 +211,7 @@ mouse_move(Client *c)
 void
 mouse_resize(Client *c)
 {
-     XRectangle geo = c->geo, ogeo = c->geo;
+     Geo geo = c->geo, ogeo = c->geo;
      Position pos = Right;
      XEvent ev;
      Window w;

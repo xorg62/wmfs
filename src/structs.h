@@ -168,6 +168,13 @@ enum
      net_last
 };
 
+/* Geometry structure */
+typedef struct
+{
+     int x, y;
+     int width, height;
+} Geo;
+
 /*
  *  BarWindow Structure
  * (titlebar, infobar..)
@@ -187,7 +194,7 @@ typedef struct
      uint bg;
      char *fg;
      uint stipple_color;
-     XRectangle geo;
+     Geo geo;
      Bool mapped, stipple, bord;
 } BarWindow;
 
@@ -203,11 +210,11 @@ struct Client
      /* Screen */
      int screen;
      /* Window attribute */
-     XRectangle geo, pgeo;            /* Window geo, tiling pure geo */
-     XRectangle tmp_geo, wrgeo;       /* Temporary geo, without resizehint geo */
-     XRectangle frame_geo;            /* Frame geo */
-     XRectangle ogeo;                 /* Old window attribute */
-     XRectangle split_geo, free_geo;  /* Split & Free window attribute */
+     Geo geo, pgeo;            /* Window geo, tiling pure geo */
+     Geo tmp_geo, wrgeo;       /* Temporary geo, without resizehint geo */
+     Geo frame_geo;            /* Frame geo */
+     Geo ogeo;                 /* Old window attribute */
+     Geo split_geo, free_geo;  /* Split & Free window attribute */
      /* Tile size factors */
      int tilefact[4];
      /* For resizehint usage */
@@ -262,7 +269,7 @@ typedef struct
      BarWindow *bar, *selbar;
      BarWindow *layout_button;
      BarWindow *tags_board, *tags[MAXTAG];
-     XRectangle geo;
+     Geo geo;
      int position;
      char *statustext;
      Bool need_update;
@@ -284,7 +291,7 @@ typedef struct Systray Systray;
 struct Systray
 {
      Window win;
-     XRectangle geo;
+     Geo geo;
      Systray *next, *prev;
 };
 

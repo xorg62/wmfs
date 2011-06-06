@@ -117,7 +117,7 @@
 /* barwin.c */
 BarWindow *barwin_create(Window parent,
                          int x, int y,
-                         uint w, uint h,
+                         int w, int h,
                          uint bg, char*fg,
                          Bool entermask,
                          Bool stipple,
@@ -132,15 +132,15 @@ void barwin_map_subwin(BarWindow *bw);
 void barwin_unmap(BarWindow *bw);
 void barwin_unmap_subwin(BarWindow *bw);
 void barwin_move(BarWindow *bw, int x, int y);
-void barwin_resize(BarWindow *bw, uint w, uint h);
+void barwin_resize(BarWindow *bw, int w, int h);
 void barwin_refresh_color(BarWindow *bw);
 void barwin_refresh(BarWindow *bw);
 
 /* draw.c */
 void draw_text(Drawable d, int x, int y, char* fg, char *str);
 void draw_image_ofset_text(Drawable d, int x, int y, char* fg, char *str, int x_image_ofset, int y_image_ofset);
-void draw_rectangle(Drawable dr, int x, int y, uint w, uint h, uint color);
-void draw_graph(Drawable dr, int x, int y, uint w, uint h, uint color, char *data);
+void draw_rectangle(Drawable dr, int x, int y, int w, int h, uint color);
+void draw_graph(Drawable dr, int x, int y, int w, int h, uint color, char *data);
 
 ushort textw(char *text);
 
@@ -159,9 +159,9 @@ void uicb_toggle_tagautohide(uicb_t);
 
 /* cfactor.c */
 void cfactor_clean(Client *c);
-XRectangle cfactor_geo(XRectangle geo, int fact[4], int *err);
-Bool cfactor_check_2pc(XRectangle g1, XRectangle g2, Position p);
-Bool cfactor_parentrow(XRectangle cg, XRectangle ccg, Position p);
+Geo cfactor_geo(Geo geo, int fact[4], int *err);
+Bool cfactor_check_2pc(Geo g1, Geo g2, Position p);
+Bool cfactor_parentrow(Geo cg, Geo ccg, Position p);
 void cfactor_set(Client *c, Position p, int fac);
 void cfactor_multi_set(Client *c, int fac[4]);
 /* Generated with macro {{{ */
@@ -192,8 +192,8 @@ void client_kill(Client *c);
 Bool ishide(Client *c, int screen);
 void client_map(Client *c);
 Client* client_manage(Window w, XWindowAttributes *wa, Bool ar);
-void client_geo_hints(XRectangle *geo, Client *c);
-void client_moveresize(Client *c, XRectangle geo, Bool r);
+void client_geo_hints(Geo *geo, Client *c);
+void client_moveresize(Client *c, Geo geo, Bool r);
 void client_maximize(Client *c);
 void client_size_hints(Client *c);
 void client_swap(Client *c1, Client *c2);
@@ -247,7 +247,7 @@ void ewmh_manage_window_type(Client *c);
 /* frame.c */
 void frame_create(Client *c);
 void frame_delete(Client *c);
-void frame_moveresize(Client *c, XRectangle geo);
+void frame_moveresize(Client *c, Geo geo);
 void frame_update_color(Client *c, Bool focused);
 void frame_update(Client *c);
 
@@ -338,7 +338,7 @@ void uicb_tag_toggle_expose(uicb_t cmd);
 
 /* screen.c */
 int screen_count(void);
-XRectangle screen_get_geo(int s);
+Geo screen_get_geo(int s);
 int screen_get_with_geo(int x, int y);
 int screen_get_sel(void);
 void screen_set_sel(int screen);
@@ -405,8 +405,8 @@ void split_store_geo(int screen, int tag);
 void split_set_current(Client *nc, Client *ghost);
 void split_apply_current(int screen, int tag);
 void split_arrange_closed(Client *ghost);
-XRectangle split_client(Client *c, Bool p);
-void split_client_fill(Client *c, XRectangle geo);
+Geo split_client(Client *c, Bool p);
+void split_client_fill(Client *c, Geo geo);
 void split_client_integrate(Client *c, Client *sc, int screen, int tag);
 void split_move_dir(Client *c, Position p);
 void uicb_split_toggle(uicb_t cmd);
@@ -442,8 +442,8 @@ int prevselscreen;
 Conf conf;
 Key *keys;
 Bool estatus;
-XRectangle *sgeo;
-XRectangle *spgeo;
+Geo *sgeo;
+Geo *spgeo;
 Cursor cursor[CurLast];
 char *argv_global;
 char **all_argv;

@@ -57,13 +57,13 @@ screen_count(void)
 
 /** Get screen geometry by number
  *\param s Screen number
- *\return XRectangle struct
+ *\return Geo struct
 */
-XRectangle
+Geo
 screen_get_geo(int s)
 {
      int barpos = tags[selscreen][seltag[selscreen]].barpos;
-     XRectangle geo;
+     Geo geo;
 
      geo.x = BORDH;
      if(barpos == IB_Hide || barpos == IB_Bottom)
@@ -179,8 +179,8 @@ screen_init_geo(void)
      int i;
      int s = screen_count();
 
-     sgeo = xcalloc(s, sizeof(XRectangle));
-     spgeo = xcalloc(s, sizeof(XRectangle));
+     sgeo = xcalloc(s, sizeof(Geo));
+     spgeo = xcalloc(s, sizeof(Geo));
 
      for(i = 0; i < s; ++i)
           sgeo[i] = screen_get_geo(i);

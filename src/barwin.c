@@ -46,8 +46,8 @@ BarWindow*
 barwin_create(Window parent,
               int x,
               int y,
-              uint w,
-              uint h,
+              int w,
+              int h,
               uint bg,
               char *fg,
               Bool entermask,
@@ -269,7 +269,7 @@ barwin_move(BarWindow *bw, int x, int y)
  * \param h Height
 */
 void
-barwin_resize(BarWindow *bw, uint w, uint h)
+barwin_resize(BarWindow *bw, int w, int h)
 {
      if(!bw || (bw->geo.width == w && bw->geo.height == h))
           return;

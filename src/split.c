@@ -49,7 +49,7 @@ SPLIT_MOVE_DIR(Bottom);
 /** Arrange size of parent client of last closed client
 */
 static void
-_split_arrange_size(XRectangle g, XRectangle *cg, Position p)
+_split_arrange_size(Geo g, Geo *cg, Position p)
 {
      if(LDIR(p))
           cg->width += FRAMEW(g.width);
@@ -68,7 +68,7 @@ _split_arrange_size(XRectangle g, XRectangle *cg, Position p)
 /** Check if parent client of last closed client is OK for row resize
 */
 static Bool
-_split_check_row(XRectangle g1, XRectangle g2, Position p)
+_split_check_row(Geo g1, Geo g2, Position p)
 {
      if(LDIR(p))
           return (g1.y >= g2.y && (g1.y + g1.height) <= (g2.y + g2.height));
@@ -128,7 +128,7 @@ static Bool
 _split_check_row_dir(Client *c, Client *g, Position p)
 {
      int s, cs;
-     XRectangle cgeo;
+     Geo cgeo;
      Client *cc;
 
      cs = (LDIR(p) ? g->frame_geo.height : g->frame_geo.width);
@@ -157,7 +157,7 @@ split_arrange_closed(Client *ghost)
 {
      Position p;
      Bool b = False;
-     XRectangle cgeo;
+     Geo cgeo;
      Client *c, *cc;
      int screen = ghost->screen;
      int tag = (ghost->tag ? ghost->tag : seltag[screen]);
@@ -223,10 +223,10 @@ split_arrange_closed(Client *ghost)
   *\param p True = Vertical, False = Horizontal
   *\return sgeo Geo of future integrated client
 */
-XRectangle
+Geo
 split_client(Client *c, Bool p)
 {
-     XRectangle geo, sgeo;
+     Geo geo, sgeo;
 
      if(!c || !(c->flags & TileFlag))
           return c->wrgeo;
@@ -270,7 +270,7 @@ split_client(Client *c, Bool p)
   *\param geo New geo
 */
 void
-split_client_fill(Client *c, XRectangle geo)
+split_client_fill(Client *c, Geo geo)
 {
      if(!c)
           return;
@@ -292,7 +292,7 @@ void
 split_client_integrate(Client *c, Client *sc, int screen, int tag)
 {
      Bool b = True;
-     XRectangle g;
+     Geo g;
 
      if(!c || c->flags & FreeFlag || !(tags[screen][tag].flags & SplitFlag))
           return;

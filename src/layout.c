@@ -259,8 +259,8 @@ static void
 grid(int screen, Bool horizontal)
 {
      Client *c;
-     XRectangle sg = sgeo[screen];
-     XRectangle cgeo = {sg.x, sg.y, 0, 0};
+     Geo sg = sgeo[screen];
+     Geo cgeo = {sg.x, sg.y, 0, 0};
      unsigned int i, n, temp, cols, rows, cpcols = 0;
 
      for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
@@ -328,9 +328,9 @@ static void
 multi_tile(int screen, Position type)
 {
      Client *c;
-     XRectangle sg = sgeo[screen];
-     XRectangle mastergeo = {sg.x, sg.y, 0, 0};
-     XRectangle cgeo = {sg.x, sg.y, 0, 0};
+     Geo sg = sgeo[screen];
+     Geo mastergeo = {sg.x, sg.y, 0, 0};
+     Geo cgeo = {sg.x, sg.y, 0, 0};
      uint i, n, tilesize = 0, mwfact, nmaster = tags[screen][seltag[screen]].nmaster;
 
      for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
@@ -460,10 +460,10 @@ static void
 mirror(int screen, Bool horizontal)
 {
      Client *c;
-     XRectangle sg = sgeo[screen];
-     XRectangle mastergeo = {sg.x, sg.y, sg.width, sg.height};
-     XRectangle cgeo = {sg.x, sg.y , sg.width, sg.height};
-     XRectangle nextg[2];
+     Geo sg = sgeo[screen];
+     Geo mastergeo = {sg.x, sg.y, sg.width, sg.height};
+     Geo cgeo = {sg.x, sg.y , sg.width, sg.height};
+     Geo nextg[2];
      uint i, n, tilesize = 0, mwfact;
      uint nmaster = tags[screen][seltag[screen]].nmaster;
      int pa, imp;
