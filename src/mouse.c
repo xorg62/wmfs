@@ -69,7 +69,7 @@ mouse_move_tile_client(Client **c)
      Window w;
      int d;
 
-     if(!((*c)->flags & TileFlag) && !((*c)->flags & LMaxFlag))
+     if(!((*c)->flags & (TileFlag | LMaxFlag)))
           return;
 
      XQueryPointer(dpy, ROOT, &w, &w, &d, &d, &d, &d, (uint*)&d);
@@ -95,7 +95,7 @@ mouse_move_tag_client(Client *c)
      Window w;
      int i, d, s;
 
-     if(!(c->flags & TileFlag) && !(c->flags & LMaxFlag))
+     if(!(c->flags & (TileFlag | LMaxFlag)))
           return;
 
      s = c->screen;
@@ -135,7 +135,7 @@ mouse_move(Client *c)
      GC gci;
      XEvent ev;
 
-     if((c->flags & MaxFlag) || (c->flags & FSSFlag))
+     if(c->flags & (MaxFlag | FSSFlag))
           return;
 
      ocx =  c->geo.x;
@@ -220,9 +220,7 @@ mouse_resize(Client *c)
      GC gci;
      int f[4] = { 0 };
 
-     if((c->flags & MaxFlag)
-        || (c->flags & LMaxFlag)
-        || (c->flags & FSSFlag))
+     if(c->flags & (MaxFlag | LMaxFlag | FSSFlag))
           return;
 
      XQueryPointer(dpy, ROOT, &w, &w, &omx, &omy, &d, &d, (uint *)&u);

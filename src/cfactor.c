@@ -107,26 +107,20 @@ cfactor_geo(XRectangle geo, int fact[4], int *err)
 Bool
 cfactor_parentrow(XRectangle cg, XRectangle ccg, Position p)
 {
-     Bool ret;
-
      switch(p)
      {
           case Left:
-               ret = (ccg.x == cg.x);
-               break;
+               return (ccg.x == cg.x);
           case Top:
-               ret = (ccg.y == cg.y);
-               break;
+               return (ccg.y == cg.y);
           case Bottom:
-               ret = (ccg.y + ccg.height == cg.y + cg.height);
-               break;
+               return (ccg.y + ccg.height == cg.y + cg.height);
           case Right:
           default:
-               ret = (ccg.x + ccg.width == cg.x + cg.width);
-               break;
+               return (ccg.x + ccg.width == cg.x + cg.width);
      }
 
-     return ret;
+     return False;
 }
 
 /** Get c parents of row and resize

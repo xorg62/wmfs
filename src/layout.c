@@ -173,7 +173,7 @@ uicb_layout_prev(uicb_t cmd)
 Client*
 tiled_client(int screen, Client *c)
 {
-     for(;c && ((c->flags & (MaxFlag | FreeFlag | FSSFlag | AboveFlag))
+     for(;c && (c->flags & (MaxFlag | FreeFlag | FSSFlag | AboveFlag)
                     || c->screen != screen
                     || ishide(c, screen)); c = c->next);
 
