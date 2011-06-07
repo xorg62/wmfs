@@ -354,7 +354,7 @@ launcher_execute(Launcher *launcher)
                barwin_draw_text(bw, 1 + textw(launcher->prompt) + textw(" "), FHINFOBAR - 1, buf);
                barwin_refresh(bw);
           }
-          else if(ev.type < nevent)
+          else if(ev.type < nevent && ev.type > 0)
                HANDLE_EVENT(&ev);
 
           XNextEvent(dpy, &ev);

@@ -221,7 +221,7 @@ menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
           break;
 
      default:
-          if(ev->type < nevent)
+          if(ev->type < nevent && ev->type > 0)
                HANDLE_EVENT(ev);
           break;
      }
