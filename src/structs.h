@@ -71,6 +71,11 @@
 
 #define TagFlag(t) (1 << (t))
 
+/* BarWindow flags definition */
+#define MappedFlag   (1 << 1)
+#define StippleFlag  (1 << 2)
+#define BordFlag     (1 << 3)
+
 /* XEMBED messages */
 #define XEMBED_MAPPED                 (1 << 0)
 #define XEMBED_EMBEDDED_NOTIFY        0
@@ -196,7 +201,7 @@ typedef struct
      char *fg;
      uint stipple_color;
      Geo geo;
-     Bool mapped, stipple, bord;
+     uint flags;
 } BarWindow;
 
 /* Client Structure. */

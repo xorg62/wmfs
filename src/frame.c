@@ -209,7 +209,7 @@ frame_update_color(Client *c, Bool focused)
           c->colors.fg           = conf.titlebar.fg_normal;
           c->colors.resizecorner = conf.client.resizecorner_normal;
 
-          if(TBARH - BORDH && c->titlebar->stipple)
+          if(TBARH - BORDH)
                c->titlebar->stipple_color = conf.titlebar.stipple.colors.normal;
      }
      /* Focused */
@@ -219,7 +219,7 @@ frame_update_color(Client *c, Bool focused)
           c->colors.fg           = conf.titlebar.fg_focus;
           c->colors.resizecorner = conf.client.resizecorner_focus;
 
-          if(TBARH - BORDH && c->titlebar->stipple)
+          if(TBARH - BORDH)
                c->titlebar->stipple_color = conf.titlebar.stipple.colors.focus;
      }
 

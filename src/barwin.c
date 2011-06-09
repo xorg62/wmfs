@@ -80,7 +80,7 @@ barwin_create(Window parent,
      /* His border */
      if(border)
      {
-          bw->bord = True;
+          bw->flags |= BordFlag;
           bw->border.light = color_shade(bg, conf.colors.bar_light_shade);
           bw->border.dark = color_shade(bg, conf.colors.bar_dark_shade);
 
@@ -97,7 +97,7 @@ barwin_create(Window parent,
      bw->geo.height = h;
      bw->bg = bg;
      bw->fg = fg;
-     bw->stipple = stipple;
+     FLAGAPPLY(bw->flags, stipple, StippleFlag);
      bw->stipple_color = -1;
 
      return bw;
@@ -112,7 +112,7 @@ barwin_draw_text(BarWindow *bw, int x, int y, char *text)
           return;
 
      /* Background color of the text if there is stipple */
-     if(bw->stipple)
+     if(bw->flags & StippleFlag)
           draw_rectangle(bw->dr, x - 4, 0, textw(text) + 8, bw->geo.height, bw->bg);
 
      /* Draw text */
@@ -132,7 +132,7 @@ barwin_draw_image_ofset_text(BarWindow *bw, int x, int y, char *text, int x_imag
           return;
 
      /* Background color of the text if there is stipple */
-     if(bw->stipple)
+     if(bw->flags & StippleFlag)
           draw_rectangle(bw->dr, x - 4, 0, textw(text) + 8, bw->geo.height, bw->bg);
 
      /* Draw text */
@@ -151,7 +151,7 @@ barwin_color_set(BarWindow *bw, uint bg, char *fg)
      bw->bg = bg;
      bw->fg = fg;
 
-     if(bw->bord)
+     if(bw->flags & BordFlag)
      {
           bw->border.light = color_shade(bg, conf.colors.bar_light_shade);
           bw->border.dark = color_shade(bg, conf.colors.bar_dark_shade);
@@ -195,11 +195,11 @@ barwin_delete_subwin(BarWindow *bw)
 void
 barwin_map(BarWindow *bw)
 {
-     CHECK(!bw->mapped);
+     CHECK(!(bw->flags & MappedFlag));
 
      XMapWindow(dpy, bw->win);
 
-     bw->mapped = True;
+     bw->flags |= MappedFlag;
 
      return;
 }
@@ -225,11 +225,11 @@ barwin_map_subwin(BarWindow *bw)
 void
 barwin_unmap(BarWindow *bw)
 {
-     CHECK(bw->mapped);
+     CHECK(bw->flags & MappedFlag);
 
      XUnmapWindow(dpy, bw->win);
 
-     bw->mapped = False;
+     bw->flags &= ~MappedFlag;
 
      return;
 }
@@ -280,14 +280,14 @@ barwin_resize(BarWindow *bw, int w, int h)
 
      /* Frame */
      bw->dr = XCreatePixmap(dpy, ROOT,
-                            w - ((bw->bord) ? SHADH : 0),
-                            h - ((bw->bord) ? SHADH : 0),
+                            w - ((bw->flags & BordFlag) ? SHADH : 0),
+                            h - ((bw->flags & BordFlag) ? SHADH : 0),
                             DefaultDepth(dpy, SCREEN));
 
      XResizeWindow(dpy, bw->win, w, h);
 
      /* Border */
-     if(bw->bord)
+     if(bw->flags & BordFlag)
      {
           XResizeWindow(dpy, bw->border.left, SHADH, h);
           XResizeWindow(dpy, bw->border.top, w, SHADH);
@@ -308,13 +308,13 @@ barwin_refresh_color(BarWindow *bw)
 
      draw_rectangle(bw->dr, 0, 0, bw->geo.width, bw->geo.height, bw->bg);
 
-     if(bw->stipple)
+     if(bw->flags & StippleFlag)
      {
           XSetForeground(dpy, gc_stipple, ((bw->stipple_color != (uint)-1) ? (long)bw->stipple_color : getcolor(bw->fg)));
           XFillRectangle(dpy, bw->dr, gc_stipple, 3, 2, bw->geo.width - 6, bw->geo.height - 4);
      }
 
-     if(bw->bord)
+     if(bw->flags & BordFlag)
      {
           XSetWindowBackground(dpy, bw->border.left, bw->border.light);
           XSetWindowBackground(dpy, bw->border.top, bw->border.light);

@@ -201,7 +201,7 @@ infobar_draw_selbar(int sc)
 
           return;
      }
-     else if(sel && !infobar[sc].selbar->mapped)
+     else if(sel && !(infobar[sc].selbar->flags & MappedFlag))
           barwin_map(infobar[sc].selbar);
 
      if(conf.selbar.maxlength >= 0 && sel)
@@ -262,7 +262,7 @@ infobar_draw_taglist(int sc)
                     continue;
                }
 
-               if(!infobar[sc].tags[i]->mapped)
+               if(!(infobar[sc].tags[i]->flags & MappedFlag))
                     barwin_map(infobar[sc].tags[i]);
 
                barwin_move(infobar[sc].tags[i], x, 0);
@@ -458,7 +458,7 @@ uicb_toggle_tagautohide(uicb_t cmd)
      {
           for(i = 1, x = 0; i < conf.ntag[selscreen] + 1; ++i)
           {
-               if(!infobar[selscreen].tags[i]->mapped)
+               if(!(infobar[selscreen].tags[i]->flags & MappedFlag))
                     barwin_map(infobar[selscreen].tags[i]);
 
                barwin_move(infobar[selscreen].tags[i], x, 0);
