@@ -157,6 +157,9 @@ barwin_color_set(BarWindow *bw, uint bg, char *fg)
           bw->border.dark = color_shade(bg, conf.colors.bar_dark_shade);
      }
 
+     if(bw->flags & StippleFlag && bw->stipple_color == -1)
+          bw->stipple_color = getcolor(fg);
+
      return;
 }
 
@@ -274,15 +277,16 @@ barwin_resize(BarWindow *bw, int w, int h)
      if(!bw || (bw->geo.width == w && bw->geo.height == h))
           return;
 
-     bw->geo.width = w;
-     bw->geo.height = h;
+     /* Frame */
      XFreePixmap(dpy, bw->dr);
 
-     /* Frame */
      bw->dr = XCreatePixmap(dpy, ROOT,
-                            w - ((bw->flags & BordFlag) ? SHADH : 0),
-                            h - ((bw->flags & BordFlag) ? SHADH : 0),
-                            DefaultDepth(dpy, SCREEN));
+               w - ((bw->flags & BordFlag) ? SHADH : 0),
+               h - ((bw->flags & BordFlag) ? SHADH : 0),
+               DefaultDepth(dpy, SCREEN));
+
+     bw->geo.width = w;
+     bw->geo.height = h;
 
      XResizeWindow(dpy, bw->win, w, h);
 
@@ -306,20 +310,21 @@ barwin_refresh_color(BarWindow *bw)
 {
      CHECK(bw);
 
-     draw_rectangle(bw->dr, 0, 0, bw->geo.width, bw->geo.height, bw->bg);
+     XSetForeground(dpy, gc, bw->bg);
+     XFillRectangle(dpy, bw->dr, gc, 0, 0, bw->geo.width, bw->geo.height);
 
      if(bw->flags & StippleFlag)
      {
-          XSetForeground(dpy, gc_stipple, ((bw->stipple_color != (uint)-1) ? (long)bw->stipple_color : getcolor(bw->fg)));
+          XSetForeground(dpy, gc_stipple, bw->stipple_color);
           XFillRectangle(dpy, bw->dr, gc_stipple, 3, 2, bw->geo.width - 6, bw->geo.height - 4);
      }
 
      if(bw->flags & BordFlag)
      {
-          XSetWindowBackground(dpy, bw->border.left, bw->border.light);
-          XSetWindowBackground(dpy, bw->border.top, bw->border.light);
+          XSetWindowBackground(dpy, bw->border.left,   bw->border.light);
+          XSetWindowBackground(dpy, bw->border.top,    bw->border.light);
           XSetWindowBackground(dpy, bw->border.bottom, bw->border.dark);
-          XSetWindowBackground(dpy, bw->border.right, bw->border.dark);
+          XSetWindowBackground(dpy, bw->border.right,  bw->border.dark);
 
           XClearWindow(dpy, bw->border.left);
           XClearWindow(dpy, bw->border.top);
@@ -336,8 +341,7 @@ barwin_refresh_color(BarWindow *bw)
 void
 barwin_refresh(BarWindow *bw)
 {
-     if(!bw || !bw->dr || !bw->win)
-          return;
+     CHECK(bw);
 
      XCopyArea(dpy, bw->dr, bw->win, gc, 0, 0, bw->geo.width, bw->geo.height, 0, 0);
 

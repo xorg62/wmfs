@@ -246,7 +246,7 @@ client_above(Client *c)
 void
 client_focus(Client *c)
 {
-     Bool prevwasmax;
+     Bool prevwasmax = False;
      Client *cc;
 
      if(sel && sel != c)
