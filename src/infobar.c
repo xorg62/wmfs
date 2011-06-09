@@ -148,9 +148,9 @@ infobar_draw_layout(int sc)
      if(!conf.layout_placement)
           barwin_move(infobar[sc].layout_button, infobar[sc].tags_board->geo.width + (PAD >> 1), 0);
 
-     w = ((conf.layout_button_width > 0)
-               ? (uint)conf.layout_button_width
-               : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD));
+     w = (conf.layout_button_width > 0)
+          ? conf.layout_button_width
+          : textw(tags[sc][seltag[sc]].layout.symbol) + PAD;
 
      barwin_resize(infobar[sc].layout_button, w, infobar[sc].geo.height);
      barwin_refresh_color(infobar[sc].layout_button);
@@ -199,7 +199,6 @@ infobar_draw_selbar(int sc)
      if(!sel || (sel && sel->screen != sc))
      {
           barwin_unmap(infobar[sc].selbar);
-
           return;
      }
      else if(sel)
@@ -241,17 +240,16 @@ infobar_draw_taglist(int sc)
 {
      int i, x;
      Client *c = NULL;
-     Bool is_occupied[MAXTAG + 1];
+     Bool is_occupied[MAXTAG + 1] = { 0 };
 
      if(conf.layout_placement)
-          barwin_move(infobar[sc].tags_board, ((conf.layout_button_width > 0) ? (uint)conf.layout_button_width : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)) + (PAD >> 1), 0);
-
-     for(i = 0; i < MAXTAG; i++)
-          is_occupied[i] = False;
+          barwin_move(infobar[sc].tags_board,
+                    ((conf.layout_button_width > 0)
+                     ? (uint)conf.layout_button_width
+                     : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)) + (PAD >> 1), 0);
 
      for(c = clients; c; c = c->next)
-          if(c->screen == sc && c->tag != MAXTAG + 1)
-               is_occupied[c->tag] = True;
+          is_occupied[c->tag] = (c->screen == sc && c->tag != MAXTAG + 1);
 
      for(i = 1, x = 0; i < conf.ntag[sc] + 1; ++i)
      {
@@ -261,34 +259,29 @@ infobar_draw_taglist(int sc)
                if(!is_occupied[i] && i != seltag[sc])
                {
                     barwin_unmap(infobar[sc].tags[i]);
-
                     continue;
                }
 
                barwin_map(infobar[sc].tags[i]);
-
                barwin_move(infobar[sc].tags[i], x, 0);
-
-               x += infobar[sc].tags[i]->geo.width;
-
-               barwin_resize(infobar[sc].tags_board, x, infobar[sc].geo.height);
+               barwin_resize(infobar[sc].tags_board, (x += infobar[sc].tags[i]->geo.width), infobar[sc].geo.height);
           }
 
-          infobar[sc].tags[i]->bg = (tags[sc][i].flags & TagUrgentFlag)
-               ? conf.colors.tagurbg
-               : ((i == seltag[sc] || tags[sc][seltag[sc]].tagad & TagFlag(i))
-                    ? conf.colors.tagselbg
-                    : (is_occupied[i]
-                         ? conf.colors.tag_occupied_bg
-                         : conf.colors.bar));
-
-          infobar[sc].tags[i]->fg = (tags[sc][i].flags & TagUrgentFlag)
-               ? conf.colors.tagurfg
-               : ((i == seltag[sc] || tags[sc][seltag[sc]].tagad & TagFlag(i))
-                    ? conf.colors.tagselfg
-                    : (is_occupied[i]
-                         ? conf.colors.tag_occupied_fg
-                         : conf.colors.text));
+          if(tags[sc][i].flags & TagUrgentFlag)
+          {
+               infobar[sc].tags[i]->bg = conf.colors.tagurbg;
+               infobar[sc].tags[i]->fg = conf.colors.tagurfg;
+          }
+          else if(i == seltag[sc] || tags[sc][seltag[sc]].tagad & TagFlag(i))
+          {
+               infobar[sc].tags[i]->bg = conf.colors.tagselbg;
+               infobar[sc].tags[i]->fg = conf.colors.tagselfg;
+          }
+          else
+          {
+               infobar[sc].tags[i]->bg = (is_occupied[i] ? conf.colors.tag_occupied_bg : conf.colors.bar);
+               infobar[sc].tags[i]->fg = (is_occupied[i] ? conf.colors.tag_occupied_fg : conf.colors.text);
+          }
 
           barwin_color_set(infobar[sc].tags[i], infobar[sc].tags[i]->bg, infobar[sc].tags[i]->fg);
           barwin_refresh_color(infobar[sc].tags[i]);
@@ -320,18 +313,14 @@ infobar_update_taglist(int sc)
 
                barwin_map(infobar[sc].tags[i]);
                barwin_map_subwin(infobar[sc].tags[i]);
-
-               j += textw(tags[sc][i].name) + PAD;
-
-               barwin_resize(infobar[sc].tags_board, j, infobar[sc].geo.height);
+               barwin_resize(infobar[sc].tags_board, (j += textw(tags[sc][i].name) + PAD), infobar[sc].geo.height);
 
                continue;
           }
 
           barwin_move(infobar[sc].tags[i], j, 0);
-          j += textw(tags[sc][i].name) + PAD;
           barwin_resize(infobar[sc].tags[i], textw(tags[sc][i].name) + PAD, infobar[sc].geo.height);
-          barwin_resize(infobar[sc].tags_board, j, infobar[sc].geo.height);
+          barwin_resize(infobar[sc].tags_board, (j += textw(tags[sc][i].name) + PAD), infobar[sc].geo.height);
      }
 
      infobar[sc].need_update = False;
