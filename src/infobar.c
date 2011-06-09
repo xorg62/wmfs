@@ -191,6 +191,7 @@ void
 infobar_draw_selbar(int sc)
 {
      char *str = NULL;
+     int s;
 
      if(!conf.bars.selbar)
           return;
@@ -201,9 +202,10 @@ infobar_draw_selbar(int sc)
 
           return;
      }
-     else if(sel && !(infobar[sc].selbar->flags & MappedFlag))
+     else if(sel)
           barwin_map(infobar[sc].selbar);
 
+     /* Truncate string if too long */
      if(conf.selbar.maxlength >= 0 && sel)
      {
           str = xcalloc(conf.selbar.maxlength + 4, sizeof(char));
@@ -213,7 +215,8 @@ infobar_draw_selbar(int sc)
                strcat(str, "...");
      }
 
-     barwin_resize(infobar[sc].selbar, textw(str ? str : sel->title) + PAD, infobar[sc].geo.height - 2);
+     if((s = (textw(str ? str : sel->title) + PAD)) > infobar[sc].selbar->geo.width)
+          barwin_resize(infobar[sc].selbar, s, infobar[sc].geo.height - 2);
 
      barwin_move(infobar[sc].selbar,
                ((conf.layout_placement)
@@ -262,8 +265,7 @@ infobar_draw_taglist(int sc)
                     continue;
                }
 
-               if(!(infobar[sc].tags[i]->flags & MappedFlag))
-                    barwin_map(infobar[sc].tags[i]);
+               barwin_map(infobar[sc].tags[i]);
 
                barwin_move(infobar[sc].tags[i], x, 0);
 
@@ -458,9 +460,7 @@ uicb_toggle_tagautohide(uicb_t cmd)
      {
           for(i = 1, x = 0; i < conf.ntag[selscreen] + 1; ++i)
           {
-               if(!(infobar[selscreen].tags[i]->flags & MappedFlag))
-                    barwin_map(infobar[selscreen].tags[i]);
-
+               barwin_map(infobar[selscreen].tags[i]);
                barwin_move(infobar[selscreen].tags[i], x, 0);
                x += infobar[selscreen].tags[i]->geo.width;
           }
