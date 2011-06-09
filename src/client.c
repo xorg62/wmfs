@@ -246,12 +246,16 @@ client_above(Client *c)
 void
 client_focus(Client *c)
 {
+     Bool prevwasmax;
      Client *cc;
 
      if(sel && sel != c)
      {
           if(sel->flags & AboveFlag)
                sel->flags &= ~AboveFlag;
+
+          if(sel->flags & MaxFlag)
+               prevwasmax = True;
 
           XChangeProperty(dpy, sel->frame, net_atom[net_wm_window_opacity], XA_CARDINAL,
                           32, PropModeReplace, (uchar *)&conf.opacity, 1);
@@ -277,7 +281,7 @@ client_focus(Client *c)
           frame_update(c);
           mouse_grabbuttons(c, True);
 
-          if(conf.raisefocus || c->flags & MaxFlag)
+          if(conf.raisefocus || c->flags & MaxFlag || prevwasmax)
           {
                client_raise(c);
                tags[c->screen][c->tag].flags |= IgnoreEnterFlag;
