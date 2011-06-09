@@ -43,7 +43,7 @@ void
 ewmh_init_hints(void)
 {
      int i = 1, s, j, showing_desk = 0;
-     char root_name[] = WMFS_VERSION;
+     char rootn[] = "wmfs-"WMFS_VERSION;
      char class[] = "wmfs", st[64];
      long pid = (long)getpid();
      char systray_atom[48];
@@ -126,7 +126,7 @@ ewmh_init_hints(void)
                      PropModeReplace, (uchar*)&ROOT, 1);
 
      XChangeProperty(dpy, ROOT, net_atom[net_wm_name], net_atom[utf8_string], 8,
-                     PropModeReplace, (uchar*)&root_name, strlen(root_name));
+                     PropModeReplace, (uchar*)&rootn, strlen(rootn));
 
      XChangeProperty(dpy, ROOT, ATOM("WM_CLASS"), XA_STRING, 8,
                      PropModeReplace, (uchar*)&class, strlen(class));
