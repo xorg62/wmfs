@@ -240,7 +240,7 @@ infobar_draw_taglist(int sc)
 {
      int i, x;
      Client *c = NULL;
-     Bool is_occupied[MAXTAG + 1] = { 0 };
+     uint occupied = 0;
 
      if(conf.layout_placement)
           barwin_move(infobar[sc].tags_board,
@@ -249,14 +249,14 @@ infobar_draw_taglist(int sc)
                      : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)) + (PAD >> 1), 0);
 
      for(c = clients; c; c = c->next)
-          is_occupied[c->tag] = (c->screen == sc && c->tag != MAXTAG + 1);
+          occupied |= TagFlag(c->tag);
 
      for(i = 1, x = 0; i < conf.ntag[sc] + 1; ++i)
      {
           /* Autohide tag feature */
           if(conf.tagautohide)
           {
-               if(!is_occupied[i] && i != seltag[sc])
+               if(!(occupied & TagFlag(i)) && i != seltag[sc])
                {
                     barwin_unmap(infobar[sc].tags[i]);
                     continue;
@@ -279,8 +279,8 @@ infobar_draw_taglist(int sc)
           }
           else
           {
-               infobar[sc].tags[i]->bg = (is_occupied[i] ? conf.colors.tag_occupied_bg : conf.colors.bar);
-               infobar[sc].tags[i]->fg = (is_occupied[i] ? conf.colors.tag_occupied_fg : conf.colors.text);
+               infobar[sc].tags[i]->bg = ((occupied & TagFlag(i)) ? conf.colors.tag_occupied_bg : conf.colors.bar);
+               infobar[sc].tags[i]->fg = ((occupied & TagFlag(i)) ? conf.colors.tag_occupied_fg : conf.colors.text);
           }
 
           barwin_color_set(infobar[sc].tags[i], infobar[sc].tags[i]->bg, infobar[sc].tags[i]->fg);

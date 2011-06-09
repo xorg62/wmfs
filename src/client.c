@@ -486,9 +486,10 @@ client_hide(Client *c)
 Bool
 ishide(Client *c, int screen)
 {
-     if(((c->tag == (uint)seltag[screen] || c->tag == MAXTAG + 1) && c->screen == screen)
-               || tags[screen][seltag[screen]].tagad & TagFlag(c->tag))
-          return False;
+     if(c->screen == screen)
+          if(c->tag == seltag[screen] || c->tag == MAXTAG + 1
+                    || tags[screen][seltag[screen]].tagad & TagFlag(c->tag))
+               return False;
 
      return True;
 }

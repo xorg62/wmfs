@@ -43,13 +43,10 @@ arrange(int screen, Bool update_layout)
           screen = screen_get_sel();
 
      for(c = clients; c; c = c->next)
-          if(c->screen == screen)
-          {
-               if(!ishide(c, screen))
-                    client_unhide(c);
-               else
-                    client_hide(c);
-          }
+          if(!ishide(c, screen))
+               client_unhide(c);
+          else
+               client_hide(c);
 
      if(tags[screen][seltag[screen]].layout.func)
      {
