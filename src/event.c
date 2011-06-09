@@ -372,9 +372,9 @@ enternotify(XEvent *e)
                && ev->window != ROOT)
           return;
 
-     if(tags[selscreen][seltag[selscreen]].flags & IgnoreNextExpose)
+     if(tags[selscreen][seltag[selscreen]].flags & IgnoreEnterFlag)
      {
-          tags[selscreen][seltag[selscreen]].flags &= ~IgnoreNextExpose;
+          tags[selscreen][seltag[selscreen]].flags &= ~IgnoreEnterFlag;
           return;
      }
 

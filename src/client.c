@@ -280,7 +280,7 @@ client_focus(Client *c)
           if(conf.raisefocus || c->flags & MaxFlag)
           {
                client_raise(c);
-               tags[c->screen][c->tag].flags |= IgnoreNextExpose;
+               tags[c->screen][c->tag].flags |= IgnoreEnterFlag;
           }
 
           if((tags[sel->screen][sel->tag].flags & AboveFCFlag)

@@ -67,7 +67,7 @@
 #define StayLastFlag      (1 << 6)
 #define SplitFlag         (1 << 7)
 #define FirstArrangeFlag  (1 << 8)
-#define IgnoreNextExpose  (1 << 9)
+#define IgnoreEnterFlag   (1 << 9)
 
 #define TagFlag(t) (1 << (t))
 
