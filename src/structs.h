@@ -67,6 +67,7 @@
 #define StayLastFlag      (1 << 6)
 #define SplitFlag         (1 << 7)
 #define FirstArrangeFlag  (1 << 8)
+#define IgnoreNextExpose  (1 << 9)
 
 #define TagFlag(t) (1 << (t))
 
@@ -529,27 +530,27 @@ typedef struct
 
 typedef struct
 {
-     uint x, y, w, h;
+     int x, y, w, h;
      uint color;
 } StatusRec;
 
 typedef struct
 {
-     uint x, y, w, h;
+     int x, y, w, h;
      uint color;
      char data[512];
 } StatusGraph;
 
 typedef struct
 {
-     uint x, y;
+     int x, y;
      char color[8];
      char text[512];
 } StatusText;
 
 typedef struct
 {
-     uint x, y, w, h;
+     int x, y, w, h;
      char name[512];
 } ImageAttr;
 

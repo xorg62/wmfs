@@ -247,8 +247,6 @@ void
 client_focus(Client *c)
 {
      Client *cc;
-     Window w;
-     int d;
 
      if(sel && sel != c)
      {
@@ -279,14 +277,10 @@ client_focus(Client *c)
           frame_update(c);
           mouse_grabbuttons(c, True);
 
-          if(conf.raisefocus)
+          if(conf.raisefocus || c->flags & MaxFlag)
           {
-               XQueryPointer(dpy, ROOT, &w, &w, &d, &d, &d, &d, (uint *)&d);
-
-               if(c == client_gb_win(w)
-                  || c == client_gb_frame(w)
-                  || c == client_gb_titlebar(w))
-                    client_raise(c);
+               client_raise(c);
+               tags[c->screen][c->tag].flags |= IgnoreNextExpose;
           }
 
           if((tags[sel->screen][sel->tag].flags & AboveFCFlag)
@@ -1094,8 +1088,8 @@ client_update_attributes(Client *c)
 void
 client_raise(Client *c)
 {
-     if((!c || ((c->flags & TileFlag) && !(c->flags & AboveFlag)))
-          && !conf.client_tile_raise)
+     if((!c || ((c->flags & TileFlag) && !(c->flags & (AboveFlag | MaxFlag))))
+               && !conf.client_tile_raise)
           return;
 
      XRaiseWindow(dpy, c->frame);

@@ -368,10 +368,15 @@ enternotify(XEvent *e)
      Client *c;
      int n;
 
-     if((ev->mode != NotifyNormal
-         || ev->detail == NotifyInferior)
-        && ev->window != ROOT)
+     if((ev->mode != NotifyNormal || ev->detail == NotifyInferior)
+               && ev->window != ROOT)
           return;
+
+     if(tags[selscreen][seltag[selscreen]].flags & IgnoreNextExpose)
+     {
+          tags[selscreen][seltag[selscreen]].flags &= ~IgnoreNextExpose;
+          return;
+     }
 
      /* Don't handle EnterNotify event if it's about systray */
      if(systray_find(ev->window) || ev->window == traywin)

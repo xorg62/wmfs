@@ -89,8 +89,8 @@ freelayout(int screen)
 
      for(c = clients; c; c = c->next)
           if(!ishide(c, selscreen)
-             && c->screen == screen_get_sel()
-             && !(c->flags & MaxFlag))
+                    && c->screen == screen
+                    && !(c->flags & MaxFlag))
           {
                client_moveresize(c, c->free_geo, True);
                c->flags &= ~(TileFlag | LMaxFlag);
