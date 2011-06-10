@@ -40,9 +40,9 @@ string_to_opt(char *s)
 
      if (!strcmp(s, "true") || !strcmp(s, "True") ||
                !strcmp(s, "TRUE") || !strcmp(s, "1"))
-          ret.bool = True;
+          ret.boolean = True;
      else
-          ret.bool = False;
+          ret.boolean = False;
 
      ret.str = s;
 

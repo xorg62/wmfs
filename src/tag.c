@@ -39,7 +39,7 @@ void
 tag_set(int tag)
 {
      Client *c;
-     Bool al = False;
+     bool al = False;
      int i;
 
      if(tag < 0 || tag > MAXTAG)
@@ -226,7 +226,7 @@ uicb_tag_next_visible(uicb_t cmd)
 {
      int i, tag;
      Client *c;
-     Bool is_occupied[MAXTAG];
+     bool is_occupied[MAXTAG];
      (void)cmd;
 
      screen_get_sel();
@@ -270,7 +270,7 @@ uicb_tag_prev_visible(uicb_t cmd)
 {
      int i, tag;
      Client *c;
-     Bool is_occupied[MAXTAG];
+     bool is_occupied[MAXTAG];
      (void)cmd;
 
      screen_get_sel();

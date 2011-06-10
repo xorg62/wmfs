@@ -39,6 +39,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <signal.h>
 #include <unistd.h>
 #include <ctype.h>
@@ -119,9 +120,9 @@ BarWindow *barwin_create(Window parent,
                          int x, int y,
                          int w, int h,
                          uint bg, char*fg,
-                         Bool entermask,
-                         Bool stipple,
-                         Bool border);
+                         bool entermask,
+                         bool stipple,
+                         bool border);
 void barwin_draw_text(BarWindow *bw, int x, int y, char *text);
 void barwin_draw_image_ofset_text(BarWindow *bw, int x, int y, char *text, int x_image_ofset, int y_image_ofset);
 void barwin_color_set(BarWindow *bw, uint bg, char *fg);
@@ -160,8 +161,8 @@ void uicb_toggle_tagautohide(uicb_t);
 /* cfactor.c */
 void cfactor_clean(Client *c);
 Geo cfactor_geo(Geo geo, int fact[4], int *err);
-Bool cfactor_check_2pc(Geo g1, Geo g2, Position p);
-Bool cfactor_parentrow(Geo cg, Geo ccg, Position p);
+bool cfactor_check_2pc(Geo g1, Geo g2, Position p);
+bool cfactor_parentrow(Geo cg, Geo ccg, Position p);
 void cfactor_set(Client *c, Position p, int fac);
 void cfactor_multi_set(Client *c, int fac[4]);
 /* Generated with macro {{{ */
@@ -189,11 +190,11 @@ Client* client_gb_pos(Client *c, int x, int y);
 void client_get_name(Client *c);
 void client_hide(Client *c);
 void client_kill(Client *c);
-Bool ishide(Client *c, int screen);
+bool ishide(Client *c, int screen);
 void client_map(Client *c);
-Client* client_manage(Window w, XWindowAttributes *wa, Bool ar);
+Client* client_manage(Window w, XWindowAttributes *wa, bool ar);
 void client_geo_hints(Geo *geo, Client *c);
-void client_moveresize(Client *c, Geo geo, Bool r);
+void client_moveresize(Client *c, Geo geo, bool r);
 void client_maximize(Client *c);
 void client_size_hints(Client *c);
 void client_swap(Client *c1, Client *c2);
@@ -203,7 +204,7 @@ void client_focus_next(Client *c);
 void client_unmanage(Client *c);
 void client_unmap(Client *c);
 void client_update_attributes(Client *c);
-void client_urgent(Client *c, Bool u);
+void client_urgent(Client *c, bool u);
 Client* client_get_next_with_direction(Client *bc, Position pos);
 void uicb_client_raise(uicb_t);
 /* Generated with macro {{{ */
@@ -228,7 +229,7 @@ void uicb_client_move(uicb_t cmd);
 void uicb_client_resize(uicb_t cmd);
 void uicb_ignore_next_client_rules(uicb_t cmd);
 void uicb_clientlist(uicb_t cmd);
-Bool uicb_checkclist(uicb_t);
+bool uicb_checkclist(uicb_t);
 void uicb_client_ignore_tag(uicb_t);
 void uicb_client_set_master(uicb_t);
 
@@ -248,7 +249,7 @@ void ewmh_manage_window_type(Client *c);
 void frame_create(Client *c);
 void frame_delete(Client *c);
 void frame_moveresize(Client *c, Geo geo);
-void frame_update_color(Client *c, Bool focused);
+void frame_update_color(Client *c, bool focused);
 void frame_update(Client *c);
 
 /* config.c */
@@ -277,7 +278,7 @@ void uicb_launcher(uicb_t);
 
 /* mouse.c */
 void mouse_resize(Client *c);
-void mouse_grabbuttons(Client *c, Bool focused);
+void mouse_grabbuttons(Client *c, bool focused);
 void uicb_mouse_move(uicb_t);
 void uicb_mouse_resize(uicb_t);
 
@@ -352,7 +353,7 @@ void uicb_screen_prev_sel(uicb_t);
 void statustext_handle(int sc, char *str);
 
 /* systray.c */
-Bool systray_acquire(void);
+bool systray_acquire(void);
 void systray_add(Window win);
 void systray_del(Systray *s);
 void systray_state(Systray *s);
@@ -362,11 +363,11 @@ int systray_get_width(void);
 void systray_update(void);
 
 /* layout.c */
-void arrange(int screen, Bool update_layout);
+void arrange(int screen, bool update_layout);
 void layout_func(int screen, int tag);
 Client *tiled_client(int screen, Client *c);
 void freelayout(int screen);
-void layoutswitch(Bool b);
+void layoutswitch(bool b);
 void maxlayout(int screen);
 /* tile {{{ */
  void tile(int screen);
@@ -388,14 +389,14 @@ void uicb_set_layout(uicb_t);
 void uicb_toggle_resizehint(uicb_t);
 void uicb_toggle_abovefc(uicb_t cmd);
 void layout_set_client_master(Client *c);
-void layout_split_client(Client *c, Bool p);
+void layout_split_client(Client *c, bool p);
 void layout_split_apply(Client *c);
 void layout_split_arrange_closed(int screen);
 void uicb_split_client_vertical(uicb_t);
 void uicb_split_client_horizontal(uicb_t);
-Bool uicb_checkmax(uicb_t);
-Bool uicb_checkfree(uicb_t);
-Bool uicb_checklayout(uicb_t);
+bool uicb_checkmax(uicb_t);
+bool uicb_checkfree(uicb_t);
+bool uicb_checklayout(uicb_t);
 
 /* init.c */
 void init(void);
@@ -405,7 +406,7 @@ void split_store_geo(int screen, int tag);
 void split_set_current(Client *nc, Client *ghost);
 void split_apply_current(int screen, int tag);
 void split_arrange_closed(Client *ghost);
-Geo split_client(Client *c, Bool p);
+Geo split_client(Client *c, bool p);
 void split_client_fill(Client *c, Geo geo);
 void split_client_integrate(Client *c, Client *sc, int screen, int tag);
 void split_move_dir(Client *c, Position p);
@@ -426,7 +427,7 @@ int errorhandler(Display *d, XErrorEvent *event);
 int errorhandlerdummy(Display *d, XErrorEvent *event);
 void quit(void);
 void *thread_process(void *arg);
-Bool check_wmfs_running(void);
+bool check_wmfs_running(void);
 void exec_uicb_function(char *func, char *cmd);
 void handle_signal(int signum);
 void uicb_quit(uicb_t);
@@ -441,7 +442,7 @@ int selscreen;
 int prevselscreen;
 Conf conf;
 Key *keys;
-Bool estatus;
+bool estatus;
 Geo *sgeo;
 Geo *spgeo;
 Cursor cursor[CurLast];

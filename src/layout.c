@@ -35,7 +35,7 @@
 /** Arrange All
 */
 void
-arrange(int screen, Bool update_layout)
+arrange(int screen, bool update_layout)
 {
      Client *c;
 
@@ -102,10 +102,10 @@ freelayout(int screen)
 }
 
 /** Layout switching function
- * \param b Bool True : next False : previous
+ * \param b bool True : next False : previous
 */
 void
-layoutswitch(Bool b)
+layoutswitch(bool b)
 {
      int i;
      Client *c;
@@ -256,7 +256,7 @@ uicb_set_nmaster(uicb_t cmd)
 /** Grid layout function
 */
 static void
-grid(int screen, Bool horizontal)
+grid(int screen, bool horizontal)
 {
      Client *c;
      Geo sg = sgeo[screen];
@@ -428,7 +428,7 @@ multi_tile(int screen, Position type)
           }
 
           /* REMAINDER */
-          if(i + 1 == n  || i + 1 == (n < nmaster ? n : nmaster))
+          if(i + 1 == n || i + 1 == (n < nmaster ? n : nmaster))
           {
                if(LDIR(type))
                     cgeo.height = (sg.y + sg.height) - cgeo.y - BORDH;
@@ -457,7 +457,7 @@ multi_tile(int screen, Position type)
  * \param horizont To specify the mirror mode (vertical/horizontal)
  */
 static void
-mirror(int screen, Bool horizontal)
+mirror(int screen, bool horizontal)
 {
      Client *c;
      Geo sg = sgeo[screen];
@@ -467,7 +467,7 @@ mirror(int screen, Bool horizontal)
      uint i, n, tilesize = 0, mwfact;
      uint nmaster = tags[screen][seltag[screen]].nmaster;
      int pa, imp;
-     Bool isp = False;
+     bool isp = False;
 
      memset(nextg, 0, sizeof(nextg));
 
@@ -892,7 +892,7 @@ layout_set_client_master(Client *c)
 /** Check the selected client is max
  * \param cmd uicb_t type unused
 */
-Bool
+bool
 uicb_checkmax(uicb_t cmd)
 {
      (void)cmd;
@@ -909,7 +909,7 @@ uicb_checkmax(uicb_t cmd)
 /** Check the selected client is free
  * \param cmd uicb_t type unused
 */
-Bool
+bool
 uicb_checkfree(uicb_t cmd)
 {
      (void)cmd;
@@ -926,7 +926,7 @@ uicb_checkfree(uicb_t cmd)
 /** Check layout type
  * \param cmd uicb_t type layout type
 */
-Bool
+bool
 uicb_checklayout(uicb_t cmd)
 {
      screen_get_sel();

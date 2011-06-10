@@ -87,7 +87,7 @@ viwmfs(int argc, char **argv)
 {
      size_t i;
      char *cmd, str[256] = { 0 };
-     Bool e;
+     bool e;
 
      if(!argc)
           return;

@@ -246,7 +246,7 @@ client_above(Client *c)
 void
 client_focus(Client *c)
 {
-     Bool prevwasmax = False;
+     bool prevwasmax = False;
      Client *cc;
 
      if(sel && sel != c)
@@ -311,10 +311,10 @@ client_focus(Client *c)
 
 /** Set urgency flag of the client
  * \param c Client pointer
- * \param u Bool
+ * \param u bool
 */
 void
-client_urgent(Client *c, Bool u)
+client_urgent(Client *c, bool u)
 {
      FLAGAPPLY(c->flags, u, UrgentFlag);
      FLAGAPPLY(tags[c->screen][c->tag].flags, u, TagUrgentFlag);
@@ -483,7 +483,7 @@ client_hide(Client *c)
  * \param c Client pointer
  * \return True if the client is hide; False if not
 */
-Bool
+bool
 ishide(Client *c, int screen)
 {
      if(c->screen == screen)
@@ -588,8 +588,8 @@ client_set_rules(Client *c)
      ulong n, il;
      uchar *data = NULL;
      char wwrole[256] = { 0 };
-     Bool applied_tag_rule = False;
-     Bool applied_screen_rule = False;
+     bool applied_tag_rule = False;
+     bool applied_screen_rule = False;
 
      memset(&xch, 0, sizeof(xch));
 
@@ -679,11 +679,11 @@ client_set_rules(Client *c)
 /** Manage a client with a window and his attributes
  * \param w Cient's futur Window
  * \param wa XWindowAttributes pointer, Window w attributes
- * \param ar Do arrange() or not (Bool)
+ * \param ar Do arrange() or not (bool)
  * \return The managed client
 */
 Client*
-client_manage(Window w, XWindowAttributes *wa, Bool ar)
+client_manage(Window w, XWindowAttributes *wa, bool ar)
 {
      Client *c, *t = NULL;
      Window trans, dw;
@@ -862,10 +862,10 @@ client_geo_hints(Geo *geo, Client *c)
  * \param c Client pointer
  * \param geo Coordinate info for the future size
  * of the client
- * \param r Bool for resize hint or not
+ * \param r bool for resize hint or not
 */
 void
-client_moveresize(Client *c, Geo geo, Bool r)
+client_moveresize(Client *c, Geo geo, bool r)
 {
      int os, e;
      int rhx = 0;
@@ -1158,7 +1158,7 @@ client_focus_next(Client *c)
 void
 client_unmanage(Client *c)
 {
-     Bool b = False;
+     bool b = False;
      int i;
 
      XGrabServer(dpy);
@@ -1436,7 +1436,7 @@ uicb_clientlist(uicb_t cmd)
 {
      int i, d, u, x, y;
      int n = 0;
-     Bool all = False;
+     bool all = False;
      Window w;
      Client *c = NULL;
 
@@ -1490,7 +1490,7 @@ uicb_clientlist(uicb_t cmd)
 /** Check clientlist menu fake function
  * \param cmd uicb_t type unused
 */
-Bool
+bool
 uicb_checkclist(uicb_t cmd)
 {
      (void)cmd;

@@ -182,9 +182,9 @@ static void
 launcher_execute(Launcher *launcher)
 {
      BarWindow *bw;
-     Bool found;
-     Bool lastwastab = False;
-     Bool my_guitar_gently_wheeps = True;
+     bool found;
+     bool lastwastab = False;
+     bool my_guitar_gently_wheeps = True;
      char tmp[32] = { 0 };
      char buf[512] = { 0 };
      char tmpbuf[512] = { 0 };

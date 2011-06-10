@@ -23,17 +23,11 @@
 #define INCLUDE_CMD "@include"
 #define PARSE_MAX_LIST 32
 
-#if defined(Bool)
-#define bool_t Bool
-#else
-typedef enum { False, True } bool_t;
-#endif /* Bool */
-
 struct conf_opt {
      char *name;
      char *val[PARSE_MAX_LIST];
      size_t nval;
-     bool_t used;
+     bool used;
      int line;
      char *filename;
      SLIST_ENTRY(conf_opt) entry;
@@ -51,7 +45,7 @@ struct conf_sec {
 struct opt_type {
      long int num;
      float fnum;
-     bool_t bool;
+     bool boolean;
      char *str;
 };
 

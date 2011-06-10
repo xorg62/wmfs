@@ -278,7 +278,7 @@ typedef struct
      Geo geo;
      int position;
      char *statustext;
-     Bool need_update;
+     bool need_update;
 } InfoBar;
 
 /* Layout Structure */
@@ -324,7 +324,7 @@ typedef struct
      char *name;
      void (*func)(uicb_t);
      uicb_t cmd;
-     Bool (*check)(uicb_t);
+     bool (*check)(uicb_t);
      char *submenu;
 } MenuItem;
 
@@ -337,7 +337,7 @@ typedef struct
       */
      char *name;
      /* Placement */
-     Bool place_at_mouse;
+     bool place_at_mouse;
      int align;
      int x, y;
      /* Color */
@@ -388,10 +388,10 @@ typedef struct
      char *role;
      int screen;
      int tag;
-     Bool free;
-     Bool max;
-     Bool ignoretags;
-     Bool follow_client;
+     bool free;
+     bool max;
+     bool ignoretags;
+     bool follow_client;
 } Rule;
 
 /* Configuration structure */
@@ -403,13 +403,13 @@ typedef struct
      /* Misc option */
      char *font;
      uint opacity;
-     Bool raisefocus;
-     Bool focus_fmouse;
-     Bool focus_fmov;
-     Bool focus_pclick;
-     Bool ignore_next_client_rules;
-     Bool tagautohide;
-     Bool tagnamecount;
+     bool raisefocus;
+     bool focus_fmouse;
+     bool focus_fmov;
+     bool focus_pclick;
+     bool ignore_next_client_rules;
+     bool tagautohide;
+     bool tagnamecount;
      Tag default_tag;
      uint pad;
      int status_timing;
@@ -444,7 +444,7 @@ typedef struct
           int height;
           MouseBinding *mouse;
           int nmouse;
-          Bool selbar;
+          bool selbar;
      } bars;
      struct
      {
@@ -462,10 +462,10 @@ typedef struct
      } root;
      struct
      {
-          Bool set_new_win_master;
-          Bool place_at_mouse;
-          Bool border_shadow;
-          Bool new_client_get_mouse;
+          bool set_new_win_master;
+          bool place_at_mouse;
+          bool border_shadow;
+          bool new_client_get_mouse;
           int borderheight;
           char *autofree, *automax;
           uint bordernormal;
@@ -486,7 +486,7 @@ typedef struct
           char *fg_focus;
           struct
           {
-               Bool active;
+               bool active;
                struct { uint normal, focus; } colors;
           } stipple;
           MouseBinding *mouse;
@@ -496,13 +496,13 @@ typedef struct
      } titlebar;
      struct
      {
-          Bool bar;
-          Bool tag;
-          Bool layout;
+          bool bar;
+          bool tag;
+          bool layout;
      } border;
      struct
      {
-          Bool active;
+          bool active;
           int screen;
           int spacing;
      } systray;
@@ -514,14 +514,14 @@ typedef struct
      Launcher *launcher;
      Rule *rule;
      int *ntag;
-     Bool tag_round;
-     Bool tag_auto_prev;
-     Bool client_round;
-     Bool client_auto_center;
-     Bool client_tile_raise;
-     Bool layout_system; /* Switch: False, Menu: True. */
-     Bool layout_placement; /* Right (normal): False, Left: True. */
-     Bool keep_layout_geo;
+     bool tag_round;
+     bool tag_auto_prev;
+     bool client_round;
+     bool client_auto_center;
+     bool client_tile_raise;
+     bool layout_system; /* Switch: False, Menu: True. */
+     bool layout_placement; /* Right (normal): False, Left: True. */
+     bool keep_layout_geo;
      char *tag_expose_name;
      char *expose_layout;
      char *selected_layout_symbol;

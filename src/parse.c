@@ -70,8 +70,8 @@ struct keyword {
 };
 
 struct state {
-     bool_t quote;
-     bool_t comment;
+     bool quote;
+     bool comment;
      char quote_char;
 };
 
@@ -162,7 +162,7 @@ parse_keywords(const char *filename)
      char path[PATH_MAX];
      size_t i, j;
      int line;
-     bool_t error = False;
+     bool error = False;
 
 
      if ((fd = open(filename, O_RDONLY)) == -1 || stat(filename, &st) == -1) {

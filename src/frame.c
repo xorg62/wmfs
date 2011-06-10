@@ -198,7 +198,7 @@ frame_moveresize(Client *c, Geo geo)
   *\param c Client pointer
 */
 void
-frame_update_color(Client *c, Bool focused)
+frame_update_color(Client *c, bool focused)
 {
      CHECK(c);
 

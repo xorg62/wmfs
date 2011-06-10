@@ -32,7 +32,7 @@
 
 #include "wmfs.h"
 
-static volatile Bool exiting = False, sig_chld = False;
+static volatile bool exiting = False, sig_chld = False;
 static pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
 
 int
@@ -320,7 +320,7 @@ uicb_reload(uicb_t cmd)
     execute when wmfs will be already running).
     \return False if wmfs is not running
 */
-Bool
+bool
 check_wmfs_running(void)
 {
       Atom rt;

@@ -34,7 +34,7 @@
 
 #define TRAY_DWIDTH   (infobar[conf.systray.screen].bar->geo.height + conf.systray.spacing)
 
-Bool
+bool
 systray_acquire(void)
 {
      XSetWindowAttributes wattr;

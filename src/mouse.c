@@ -190,7 +190,7 @@ mouse_move(Client *c)
      while(ev.type != ButtonRelease);
 
      /* One time again to delete all the trace on the window */
-     if(!(c->flags & TileFlag) && !(c->flags & LMaxFlag))
+     if(!(c->flags & (TileFlag | LMaxFlag)))
      {
           mouse_dragborder(geo, gci);
           client_moveresize(c, geo, False);
@@ -330,7 +330,7 @@ mouse_resize(Client *c)
  * \param focused For know if c is or not focused
 */
 void
-mouse_grabbuttons(Client *c, Bool focused)
+mouse_grabbuttons(Client *c, bool focused)
 {
      size_t i;
      uint but[] = {Button1, Button2, Button3, Button4, Button5};

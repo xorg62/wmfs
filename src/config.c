@@ -173,10 +173,10 @@ conf_misc_section(void)
      sec = fetch_section_first(NULL, "misc");
 
      conf.font              = fetch_opt_first(sec, "sans-9", "font").str;
-     conf.raisefocus        = fetch_opt_first(sec, "false", "raisefocus").bool;
-     conf.focus_fmouse      = fetch_opt_first(sec, "true", "focus_follow_mouse").bool;
-     conf.focus_fmov        = fetch_opt_first(sec, "false", "focus_follow_movement").bool;
-     conf.focus_pclick      = fetch_opt_first(sec, "true", "focus_pointer_click").bool;
+     conf.raisefocus        = fetch_opt_first(sec, "false", "raisefocus").boolean;
+     conf.focus_fmouse      = fetch_opt_first(sec, "true", "focus_follow_mouse").boolean;
+     conf.focus_fmov        = fetch_opt_first(sec, "false", "focus_follow_movement").boolean;
+     conf.focus_pclick      = fetch_opt_first(sec, "true", "focus_pointer_click").boolean;
      conf.status_timing     = fetch_opt_first(sec, "1", "status_timing").num;
      conf.status_path       = fetch_opt_first(sec, "", "status_path").str;
      conf.autostart_path    = fetch_opt_first(sec, "", "autostart_path").str;
@@ -216,7 +216,7 @@ conf_bar_section(void)
 
      bar = fetch_section_first(NULL, "bar");
 
-     conf.border.bar  = fetch_opt_first(bar, "false", "border").bool;
+     conf.border.bar  = fetch_opt_first(bar, "false", "border").boolean;
      conf.bars.height = fetch_opt_first(bar, "-1", "height").num;
      conf.colors.bar  = getcolor((barbg = fetch_opt_first(bar, "#000000", "bg").str));
      conf.colors.text = fetch_opt_first(bar, "#ffffff", "fg").str;
@@ -236,7 +236,7 @@ conf_bar_section(void)
 
      if((systray = fetch_section_first(bar, "systray")))
      {
-          conf.systray.active = fetch_opt_first(systray, "true", "active").bool;
+          conf.systray.active = fetch_opt_first(systray, "true", "active").boolean;
 
           if((conf.systray.screen = fetch_opt_first(systray, "0", "screen").num) < 0
                     || conf.systray.screen >= sc)
@@ -300,27 +300,27 @@ conf_client_section(void)
 
      sec = fetch_section_first(NULL, "client");
 
-     conf.client_round               = fetch_opt_first(sec, "true", "client_round").bool;
-     conf.client_auto_center         = fetch_opt_first(sec, "false", "client_auto_center").bool;
-     conf.client_tile_raise          = fetch_opt_first(sec, "false", "client_tile_raise").bool;
+     conf.client_round               = fetch_opt_first(sec, "true", "client_round").boolean;
+     conf.client_auto_center         = fetch_opt_first(sec, "false", "client_auto_center").boolean;
+     conf.client_tile_raise          = fetch_opt_first(sec, "false", "client_tile_raise").boolean;
 
      if ((conf.client.borderheight = fetch_opt_first(sec, "1", "border_height").num) < 1)
           conf.client.borderheight = 1;
 
-     conf.client.border_shadow        = fetch_opt_first(sec, "false", "border_shadow").bool;
-     conf.client.place_at_mouse       = fetch_opt_first(sec, "false", "place_at_mouse").bool;
+     conf.client.border_shadow        = fetch_opt_first(sec, "false", "border_shadow").boolean;
+     conf.client.place_at_mouse       = fetch_opt_first(sec, "false", "place_at_mouse").boolean;
      conf.client.bordernormal         = getcolor(fetch_opt_first(sec, "#000000", "border_normal").str);
      conf.client.borderfocus          = getcolor(fetch_opt_first(sec, "#ffffff", "border_focus").str);
      conf.client.resizecorner_normal  = getcolor(fetch_opt_first(sec, "#222222", "resize_corner_normal").str);
      conf.client.resizecorner_focus   = getcolor(fetch_opt_first(sec, "#DDDDDD", "resize_corner_focus").str);
      conf.client.mod                  |= char_to_modkey(fetch_opt_first(sec, "Alt", "modifier").str, key_list);
-     conf.client.set_new_win_master   = fetch_opt_first(sec, "true", "set_new_win_master").bool;
+     conf.client.set_new_win_master   = fetch_opt_first(sec, "true", "set_new_win_master").boolean;
      conf.client.padding              = fetch_opt_first(sec, "0", "padding").num;
      conf.client.autofree             = fetch_opt_first(sec, "", "autofree").str;
      conf.client.automax              = fetch_opt_first(sec, "", "automax").str;
      conf.client.default_open_tag     = fetch_opt_first(sec, "0", "default_open_tag").num;
      conf.client.default_open_screen  = fetch_opt_first(sec, "-1", "default_open_screen").num;
-     conf.client.new_client_get_mouse = fetch_opt_first(sec, "false", "new_client_get_mouse").bool;
+     conf.client.new_client_get_mouse = fetch_opt_first(sec, "false", "new_client_get_mouse").boolean;
 
      conf.colors.client_light_shade = fetch_opt_first(sec, "0.25", "light_shade").fnum;
      conf.colors.client_dark_shade  = fetch_opt_first(sec, "-0.25", "dark_shade").fnum;
@@ -341,7 +341,7 @@ conf_client_section(void)
      conf.titlebar.fg_normal = fetch_opt_first(titlebar, "#ffffff", "fg_normal").str;
      conf.titlebar.fg_focus  = fetch_opt_first(titlebar, "#000000", "fg_focus").str;
 
-     conf.titlebar.stipple.active = fetch_opt_first(titlebar, "false", "stipple").bool;
+     conf.titlebar.stipple.active = fetch_opt_first(titlebar, "false", "stipple").boolean;
 
      if(!strcmp((p = fetch_opt_first(titlebar, "-1", "stipple_normal").str), "-1"))
           conf.titlebar.stipple.colors.normal = getcolor(conf.titlebar.fg_normal);
@@ -435,10 +435,10 @@ conf_layout_section(void)
      layouts = fetch_section_first(NULL, "layouts");
 
      conf.layout_button_width    = fetch_opt_first(layouts, "O", "layout_button_width").num;
-     conf.border.layout          = fetch_opt_first(layouts, "false", "border").bool;
+     conf.border.layout          = fetch_opt_first(layouts, "false", "border").boolean;
      conf.colors.layout_fg       = fetch_opt_first(layouts, "#ffffff", "fg").str;
      conf.colors.layout_bg       = getcolor((fetch_opt_first(layouts, "#000000", "bg").str));
-     conf.keep_layout_geo        = fetch_opt_first(layouts, "false", "keep_layout_geo").bool;
+     conf.keep_layout_geo        = fetch_opt_first(layouts, "false", "keep_layout_geo").boolean;
      conf.selected_layout_symbol = fetch_opt_first(layouts, "*", "selected_layout_symbol").str;
 
      if((tmp = fetch_opt_first(layouts, "menu", "system").str) && !strcmp(tmp, "menu"))
@@ -506,17 +506,17 @@ conf_tag_section(void)
 
      sec = fetch_section_first(NULL, "tags");
 
-     conf.tag_round               = fetch_opt_first(sec, "false", "tag_round").bool;
-     conf.tag_auto_prev           = fetch_opt_first(sec, "true", "tag_auto_prev").bool;
+     conf.tag_round               = fetch_opt_first(sec, "false", "tag_round").boolean;
+     conf.tag_auto_prev           = fetch_opt_first(sec, "true", "tag_auto_prev").boolean;
      conf.colors.tagselfg         = fetch_opt_first(sec, "#ffffff", "sel_fg").str;
      conf.colors.tagselbg         = getcolor(fetch_opt_first(sec, "#000000", "sel_bg").str);
      conf.colors.tagurfg          = fetch_opt_first(sec, "#000000", "urgent_fg").str;
      conf.colors.tagurbg          = getcolor(fetch_opt_first(sec, "#DD1111", "urgent_bg").str);
      conf.colors.tag_occupied_bg  = getcolor(fetch_opt_first(sec, "#222222", "occupied_bg").str);
      conf.colors.tag_occupied_fg  = fetch_opt_first(sec, conf.colors.text, "occupied_fg").str;
-     conf.border.tag              = fetch_opt_first(sec, "false", "border").bool;
-     conf.tagautohide             = fetch_opt_first(sec, "false", "autohide").bool;
-     conf.tagnamecount            = fetch_opt_first(sec, "false", "name_count").bool;
+     conf.border.tag              = fetch_opt_first(sec, "false", "border").boolean;
+     conf.tagautohide             = fetch_opt_first(sec, "false", "autohide").boolean;
+     conf.tagnamecount            = fetch_opt_first(sec, "false", "name_count").boolean;
      conf.tag_expose_name         = fetch_opt_first(sec, "EXPOSE", "expose_name").str;
      conf.expose_layout           = fetch_opt_first(sec, "tile_grid_vertical", "expose_layout").str;
 
@@ -553,11 +553,11 @@ conf_tag_section(void)
      };
 
      FLAGAPPLY(default_tag.flags,
-               fetch_opt_first(def_tag, "false", "resizehint").bool,
+               fetch_opt_first(def_tag, "false", "resizehint").boolean,
                ResizeHintFlag);
 
      FLAGAPPLY(default_tag.flags,
-               fetch_opt_first(def_tag, "false", "split").bool,
+               fetch_opt_first(def_tag, "false", "split").boolean,
                (SplitFlag | FirstArrangeFlag));
 
      conf.default_tag = default_tag;
@@ -608,15 +608,15 @@ conf_tag_section(void)
                tags[k][conf.ntag[k]].mwfact     = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "0.65", "mwfact").str, "mwfact").fnum;
                tags[k][conf.ntag[k]].nmaster    = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "1", "nmaster").str, "nmaster").num;
                FLAGAPPLY(tags[k][conf.ntag[k]].flags,
-                         fetch_opt_first(tag[i], fetch_opt_first(def_tag, "false", "resizehint").str, "resizehint").bool,
+                         fetch_opt_first(tag[i], fetch_opt_first(def_tag, "false", "resizehint").str, "resizehint").boolean,
                          ResizeHintFlag);
 
                FLAGAPPLY(tags[k][conf.ntag[k]].flags,
-                         fetch_opt_first(tag[i], "false", "abovefc").bool,
+                         fetch_opt_first(tag[i], "false", "abovefc").boolean,
                          AboveFCFlag);
 
                FLAGAPPLY(tags[k][conf.ntag[k]].flags,
-                         fetch_opt_first(tag[i], "false", "split").bool,
+                         fetch_opt_first(tag[i], "false", "split").boolean,
                          (SplitFlag | FirstArrangeFlag));
 
                tmp = fetch_opt_first(tag[i], fetch_opt_first(def_tag, "top", "infobar_position").str, "infobar_position").str;
@@ -682,10 +682,10 @@ conf_rule_section(void)
           conf.rule[i].role          = fetch_opt_first(rule[i], "", "role").str;
           conf.rule[i].screen        = fetch_opt_first(rule[i], "-1", "screen").num;
           conf.rule[i].tag           = fetch_opt_first(rule[i], "-1", "tag").num;
-          conf.rule[i].free          = fetch_opt_first(rule[i], "false", "free").bool;
-          conf.rule[i].max           = fetch_opt_first(rule[i], "false", "max").bool;
-          conf.rule[i].ignoretags    = fetch_opt_first(rule[i], "false", "ignoretags").bool;
-          conf.rule[i].follow_client = fetch_opt_first(rule[i], "false", "follow_client").bool;
+          conf.rule[i].free          = fetch_opt_first(rule[i], "false", "free").boolean;
+          conf.rule[i].max           = fetch_opt_first(rule[i], "false", "max").boolean;
+          conf.rule[i].ignoretags    = fetch_opt_first(rule[i], "false", "ignoretags").boolean;
+          conf.rule[i].follow_client = fetch_opt_first(rule[i], "false", "follow_client").boolean;
      }
 
      free(rule);
@@ -713,7 +713,7 @@ conf_menu_section(void)
 
           conf.menu[i].name = fetch_opt_first(set_menu[i], "menu_wname", "name").str;
 
-          if(!(conf.menu[i].place_at_mouse = fetch_opt_first(set_menu[i], "true", "place_at_mouse").bool))
+          if(!(conf.menu[i].place_at_mouse = fetch_opt_first(set_menu[i], "true", "place_at_mouse").boolean))
           {
                conf.menu[i].x = fetch_opt_first(set_menu[i], "0", "x").num;
                conf.menu[i].y = fetch_opt_first(set_menu[i], "0", "y").num;

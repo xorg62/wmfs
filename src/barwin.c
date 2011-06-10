@@ -39,7 +39,7 @@
  * \param w BarWindow Width
  * \param h BarWindow Height
  * \param color BarWindow color
- * \param entermask Bool for know if the EnterMask mask is needed
+ * \param entermask bool for know if the EnterMask mask is needed
  * \return The BarWindow pointer
 */
 BarWindow*
@@ -50,9 +50,9 @@ barwin_create(Window parent,
               int h,
               uint bg,
               char *fg,
-              Bool entermask,
-              Bool stipple,
-              Bool border)
+              bool entermask,
+              bool stipple,
+              bool border)
 {
      XSetWindowAttributes at;
      BarWindow *bw;

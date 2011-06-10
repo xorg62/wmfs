@@ -67,7 +67,7 @@ _split_arrange_size(Geo g, Geo *cg, Position p)
 
 /** Check if parent client of last closed client is OK for row resize
 */
-static Bool
+static bool
 _split_check_row(Geo g1, Geo g2, Position p)
 {
      if(LDIR(p))
@@ -124,7 +124,7 @@ split_apply_current(int screen, int tag)
   *\param p Position
   *\return True if available
 */
-static Bool
+static bool
 _split_check_row_dir(Client *c, Client *g, Position p)
 {
      int s, cs;
@@ -156,7 +156,7 @@ void
 split_arrange_closed(Client *ghost)
 {
      Position p;
-     Bool b = False;
+     bool b = False;
      Geo cgeo;
      Client *c, *cc;
      int screen = ghost->screen;
@@ -224,7 +224,7 @@ split_arrange_closed(Client *ghost)
   *\return sgeo Geo of future integrated client
 */
 Geo
-split_client(Client *c, Bool p)
+split_client(Client *c, bool p)
 {
      Geo geo, sgeo;
 
@@ -291,7 +291,7 @@ split_client_fill(Client *c, Geo geo)
 void
 split_client_integrate(Client *c, Client *sc, int screen, int tag)
 {
-     Bool b = True;
+     bool b = True;
      Geo g;
 
      if(!c || c->flags & FreeFlag || !(tags[screen][tag].flags & SplitFlag))

@@ -104,7 +104,7 @@ cfactor_geo(Geo geo, int fact[4], int *err)
   *\param ccg Second geo
   *\param p Direction of resizing
 */
-Bool
+bool
 cfactor_parentrow(Geo cg, Geo ccg, Position p)
 {
      switch(p)
@@ -151,7 +151,7 @@ _cfactor_arrange_row(Client *c, Position p, int fac)
   *\param fac Factor of resizing
   *\return False in case of error
 */
-static Bool
+static bool
 _cfactor_check_geo_row(Client *c, Position p, int fac)
 {
      Geo cgeo = c->frame_geo;
@@ -204,7 +204,7 @@ cfactor_arrange_two(Client *c1, Client *c2, Position p, int fac)
    *\param p Direction of resizing
    *\returm 1/0
 */
-Bool
+bool
 cfactor_check_2pc(Geo g1, Geo g2, Position p)
 {
      if(LDIR(p))
@@ -239,7 +239,7 @@ cfactor_arrange_row(Client *c, Client *gc, Position p, int fac)
   *\param p Direction of resizing
   *\param fac Factor of resizing
  */
-static Bool
+static bool
 cfactor_check_geo(Client *c, Client *g, Position p, int fac)
 {
      int e, ee;

@@ -44,7 +44,7 @@ menu_get_longer_string(MenuItem *mi, int nitem)
      return l;
 }
 
-static Bool
+static bool
 menu_get_checkstring_needed(MenuItem *mi, int nitem)
 {
      (void)mi;
@@ -83,7 +83,7 @@ menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[], int chcklen)
      return;
 }
 
-static Bool
+static bool
 menu_activate_item(Menu *menu, int i)
 {
      int j, x, y;
@@ -143,12 +143,12 @@ menu_focus_item(Menu *menu, int item, BarWindow *winitem[])
      return;
 }
 
-static Bool
+static bool
 menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
 {
      int i, c = 0;
      KeySym ks;
-     Bool quit = False;
+     bool quit = False;
      char acc = 0;
 
      switch(ev->type)
