@@ -224,9 +224,9 @@ uicb_tag_prev(uicb_t cmd)
 void
 uicb_tag_next_visible(uicb_t cmd)
 {
-     int i, tag;
+     int tag;
      Client *c;
-     bool is_occupied[MAXTAG];
+     uint occupied = 0;
      (void)cmd;
 
      screen_get_sel();
@@ -237,15 +237,11 @@ uicb_tag_next_visible(uicb_t cmd)
           return;
      }
 
-     for(i = 0; i < MAXTAG; i++)
-          is_occupied[i] = False;
-
      for(c = clients; c; c = c->next)
-          if(c->screen == selscreen)
-               is_occupied[c->tag] = True;
+          occupied |= TagFlag(c->tag);
 
      for(tag = seltag[selscreen] + 1; tag < conf.ntag[selscreen] + 1; ++tag)
-          if(is_occupied[tag])
+          if(occupied & TagFlag(tag))
           {
                tag_set(tag);
                return;
@@ -253,7 +249,7 @@ uicb_tag_next_visible(uicb_t cmd)
 
      if(conf.tag_round)
           for(tag = 0; tag < seltag[selscreen]; ++tag)
-               if(is_occupied[tag])
+               if(occupied & TagFlag(tag))
                {
                     tag_set(tag);
                     return;
@@ -268,9 +264,9 @@ uicb_tag_next_visible(uicb_t cmd)
 void
 uicb_tag_prev_visible(uicb_t cmd)
 {
-     int i, tag;
+     int tag;
      Client *c;
-     bool is_occupied[MAXTAG];
+     uint occupied;
      (void)cmd;
 
      screen_get_sel();
@@ -281,15 +277,11 @@ uicb_tag_prev_visible(uicb_t cmd)
           return;
      }
 
-     for(i = 0; i < MAXTAG; i++)
-          is_occupied[i] = False;
-
      for(c = clients; c; c = c->next)
-          if(c->screen == selscreen)
-               is_occupied[c->tag] = True;
+          occupied |= TagFlag(c->tag);
 
      for(tag = seltag[selscreen] - 1; tag >= 0; --tag)
-          if(is_occupied[tag])
+          if(occupied & TagFlag(tag))
           {
                tag_set(tag);
                return;
@@ -297,7 +289,7 @@ uicb_tag_prev_visible(uicb_t cmd)
 
      if(conf.tag_round)
           for(tag = conf.ntag[selscreen]; tag > seltag[selscreen]; --tag)
-               if(is_occupied[tag])
+               if(occupied & TagFlag(tag))
                {
                     tag_set(tag);
                     return;

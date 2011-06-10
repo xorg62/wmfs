@@ -115,6 +115,13 @@
 #define LDIR(x)            (x < Top)
 #define FLAGAPPLY(v, b, f) ((b) ? (v |= (f)) : (v &= ~(f)))
 
+/* Cfactor define */
+#define CFACTOR_CHECK2(g1, g2, p) (LDIR(p) ? (g1.height == g2.height) : (g1.width == g2.width))
+#define CFACTOR_PARENTROW(g1, g2, p)                                           \
+     (LDIR(p)                                                                  \
+      ? (p == Left ? (g1.x == g2.x) : (g1.x + g1.width  == g2.x + g2.width))   \
+      : (p == Top  ? (g1.y == g2.y) : (g1.y + g1.height == g2.y + g2.height))) \
+
 /* barwin.c */
 BarWindow *barwin_create(Window parent,
                          int x, int y,
@@ -161,8 +168,6 @@ void uicb_toggle_tagautohide(uicb_t);
 /* cfactor.c */
 void cfactor_clean(Client *c);
 Geo cfactor_geo(Geo geo, int fact[4], int *err);
-bool cfactor_check_2pc(Geo g1, Geo g2, Position p);
-bool cfactor_parentrow(Geo cg, Geo ccg, Position p);
 void cfactor_set(Client *c, Position p, int fac);
 void cfactor_multi_set(Client *c, int fac[4]);
 /* Generated with macro {{{ */

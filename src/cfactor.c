@@ -99,30 +99,6 @@ cfactor_geo(Geo geo, int fact[4], int *err)
      return cgeo;
 }
 
-/** Return test of parent compatibility between cg & ccg client geometry
-  *\param cg First geo
-  *\param ccg Second geo
-  *\param p Direction of resizing
-*/
-bool
-cfactor_parentrow(Geo cg, Geo ccg, Position p)
-{
-     switch(p)
-     {
-          case Left:
-               return (ccg.x == cg.x);
-          case Top:
-               return (ccg.y == cg.y);
-          case Bottom:
-               return (ccg.y + ccg.height == cg.y + cg.height);
-          case Right:
-          default:
-               return (ccg.x + ccg.width == cg.x + cg.width);
-     }
-
-     return False;
-}
-
 /** Get c parents of row and resize
   *\param c Client pointer
   *\param p Direction of resizing
@@ -136,7 +112,7 @@ _cfactor_arrange_row(Client *c, Position p, int fac)
 
      /* Travel clients to search parents of row and apply fact */
      for(cc = tiled_client(c->screen, clients); cc; cc = tiled_client(c->screen, cc->next))
-          if(cfactor_parentrow(cgeo, cc->frame_geo, p))
+          if(CFACTOR_PARENTROW(cgeo, cc->frame_geo, p))
           {
                cc->tilefact[p] += fac;
                client_moveresize(cc, cc->geo, (tags[cc->screen][cc->tag].flags & ResizeHintFlag));
@@ -162,7 +138,7 @@ _cfactor_check_geo_row(Client *c, Position p, int fac)
 
      /* Travel clients to search parents of row and check geos */
      for(cc = tiled_client(c->screen, clients); cc; cc = tiled_client(c->screen, cc->next))
-          if(cfactor_parentrow(cgeo, cc->frame_geo, p))
+          if(CFACTOR_PARENTROW(cgeo, cc->frame_geo, p))
           {
                (Geo)cfactor_geo(cc->wrgeo, f, &e);
                if(e)
@@ -198,21 +174,6 @@ cfactor_arrange_two(Client *c1, Client *c2, Position p, int fac)
 
 }
 
-/* Check 2 clients parenting compatibility
-   *\param g1 client1 geo
-   *\param g2 client2 geo
-   *\param p Direction of resizing
-   *\returm 1/0
-*/
-bool
-cfactor_check_2pc(Geo g1, Geo g2, Position p)
-{
-     if(LDIR(p))
-          return (g1.height == g2.height);
-     else
-          return (g1.width == g2.width);
-}
-
 /** Get c parents of row and resize, exception checking same size before arranging row
   *\param c Client pointer
   *\param gc Client pointer
@@ -222,7 +183,7 @@ cfactor_check_2pc(Geo g1, Geo g2, Position p)
 static void
 cfactor_arrange_row(Client *c, Client *gc, Position p, int fac)
 {
-     if(cfactor_check_2pc(c->frame_geo, gc->frame_geo, p))
+     if(CFACTOR_CHECK2(c->frame_geo, gc->frame_geo, p))
           cfactor_arrange_two(c, gc, p, fac);
      else
      {

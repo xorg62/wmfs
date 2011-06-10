@@ -32,6 +32,11 @@
 
 #include "wmfs.h"
 
+#define SPLIT_CHECK_ROW(g1, g2, p)                                 \
+     (LDIR(p)                                                      \
+      ? (g1.y >= g2.y && (g1.y + g1.height) <= (g2.y + g2.height)) \
+      : (g1.x >= g2.x && (g1.x + g1.width) <= (g2.x + g2.width)))  \
+
 #define SPLIT_MOVE_DIR(d)       \
 void                            \
 uicb_split_move_##d(uicb_t cmd) \
@@ -63,17 +68,6 @@ _split_arrange_size(Geo g, Geo *cg, Position p)
           cg->y -= FRAMEH(g.height);
 
      return;
-}
-
-/** Check if parent client of last closed client is OK for row resize
-*/
-static bool
-_split_check_row(Geo g1, Geo g2, Position p)
-{
-     if(LDIR(p))
-          return (g1.y >= g2.y && (g1.y + g1.height) <= (g2.y + g2.height));
-     else
-          return (g1.x >= g2.x && (g1.x + g1.width) <= (g2.x + g2.width));
 }
 
 /** Set layout current clients to split/unsplit
@@ -135,8 +129,8 @@ _split_check_row_dir(Client *c, Client *g, Position p)
 
      for(s = 0, cgeo = c->frame_geo, cc = tiled_client(c->screen, clients);
                cc; cc = tiled_client(c->screen, cc->next))
-          if(cfactor_parentrow(cgeo, cc->frame_geo, RPOS(p))
-                    &&  _split_check_row(cc->frame_geo, g->frame_geo, p))
+          if(CFACTOR_PARENTROW(cgeo, cc->frame_geo, RPOS(p))
+                    && SPLIT_CHECK_ROW(cc->frame_geo, g->frame_geo, p))
           {
                s += (LDIR(p) ? cc->frame_geo.height : cc->frame_geo.width);
 
@@ -181,9 +175,9 @@ split_arrange_closed(Client *ghost)
       * |     |  C  | ->   C   -> |     |v v v|
       * |_____|_____| ->       -> |_____|_____|
       */
-     for(p = Right; p < Bottom + 1; ++p)
+     for(p = Right; p < Bottom; ++p)
           if((c = client_get_next_with_direction(ghost, p)))
-               if(cfactor_check_2pc(ghost->frame_geo, c->frame_geo, p))
+               if(CFACTOR_CHECK2(ghost->frame_geo, c->frame_geo, p))
                {
                     _split_arrange_size(ghost->wrgeo, &c->wrgeo, p);
                     cfactor_clean(c);
@@ -200,13 +194,13 @@ split_arrange_closed(Client *ghost)
       * |     |  C  | ->   A   -> | <<  C     |
       * |_____|_____| ->       -> |___________|
       */
-     for(p = Right; p < Bottom + 1 && !b; ++p)
+     for(p = Right; p < Bottom && !b; ++p)
           if((c = client_get_next_with_direction(ghost, p)) && _split_check_row_dir(c, ghost, p))
           {
                for(cgeo = c->frame_geo, cc = tiled_client(c->screen, clients);
                          cc; cc = tiled_client(c->screen, cc->next))
-                    if(cfactor_parentrow(cgeo, cc->frame_geo, RPOS(p)) &&
-                              _split_check_row(cc->frame_geo, ghost->frame_geo, p))
+                    if(CFACTOR_PARENTROW(cgeo, cc->frame_geo, RPOS(p))
+                              && SPLIT_CHECK_ROW(cc->frame_geo, ghost->frame_geo, p))
                     {
                          _split_arrange_size(ghost->wrgeo, &cc->wrgeo, p);
                          cfactor_clean(cc);
