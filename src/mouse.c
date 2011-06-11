@@ -75,7 +75,7 @@ mouse_move_tile_client(Client **c)
      XQueryPointer(dpy, ROOT, &w, &w, &d, &d, &d, &d, (uint*)&d);
 
      if(((sc = client_gb_win(w)) || (sc = client_gb_frame(w)) || (sc = client_gb_titlebar(w)))
-        && (*c)->win != sc->win && !((*c)->flags & HideFlag) && !(sc->flags & HideFlag))
+               && (*c)->win != sc->win && !((*c)->flags & HideFlag) && !(sc->flags & HideFlag) && (sc->flags & TileFlag))
      {
           client_swap(sc, *c);
           client_focus(sc);

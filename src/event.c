@@ -32,6 +32,8 @@
 
 #include "wmfs.h"
 
+#define EVDPY (e->xany.display)
+
 /** ButtonPress handle event
 */
 static void
@@ -204,7 +206,7 @@ clientmessageevent(XEvent *e)
                if((c = client_gb_win(ev->window)))
                     client_focus(c);
                else if((sy = systray_find(ev->data.l[0])))
-                    XSetInputFocus(dpy, sy->win, RevertToNone, CurrentTime);
+                    XSetInputFocus(EVDPY, sy->win, RevertToNone, CurrentTime);
           }
      }
      else if(ev->window == traywin)
@@ -242,7 +244,7 @@ clientmessageevent(XEvent *e)
      /* Manage _WMFS_STATUSTEXT_x */
      if(mess_t >= wmfs_statustext && ev->data.l[4] == True)
      {
-          if(XGetWindowProperty(dpy, ROOT, net_atom[mess_t], 0, 4096,
+          if(XGetWindowProperty(EVDPY, ROOT, net_atom[mess_t], 0, 4096,
                                 False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret) == Success)
           {
                statustext_handle(mess_t - wmfs_statustext, (char*)ret);
@@ -254,10 +256,10 @@ clientmessageevent(XEvent *e)
      if((mess_t == wmfs_function && ev->data.l[4] == True)
         || (mess_t == wmfs_cmd && ev->data.l[4] == True))
      {
-          XGetWindowProperty(dpy, ROOT, net_atom[wmfs_function], 0, 4096,
+          XGetWindowProperty(EVDPY, ROOT, net_atom[wmfs_function], 0, 4096,
                     False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret);
 
-          XGetWindowProperty(dpy, ROOT, net_atom[wmfs_cmd], 0, 4096,
+          XGetWindowProperty(EVDPY, ROOT, net_atom[wmfs_cmd], 0, 4096,
                     False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret_cmd);
 
           if((func = name_to_func((char*)ret, func_list)))
@@ -296,9 +298,9 @@ configureevent(XEvent *e)
      Client *c;
 
      /* Check part */
-     if((c = client_gb_win(ev->window))
-        || (c = client_gb_win(ev->window)))
-          CHECK(!(c->flags & (LMaxFlag | MaxFlag | FSSFlag)));
+     if(((c = client_gb_win(ev->window)) || (c = client_gb_win(ev->window)))
+               && (c->flags & (LMaxFlag | MaxFlag | FSSFlag)))
+          return;
 
      if((c = client_gb_win(ev->window)))
      {
@@ -311,7 +313,7 @@ configureevent(XEvent *e)
           if(ev->value_mask & CWHeight)
                c->geo.height = ev->height;
 
-          if(c->flags & FreeFlag || !(c->flags & (TileFlag | LMaxFlag)))
+          if(c->flags & FreeFlag || !(c->flags & TileFlag))
                client_moveresize(c, c->geo, False);
           else
           {
@@ -329,7 +331,7 @@ configureevent(XEvent *e)
           wc.sibling      = ev->above;
           wc.stack_mode   = ev->detail;
 
-          XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
+          XConfigureWindow(EVDPY, ev->window, ev->value_mask, &wc);
      }
 
      return;
@@ -447,7 +449,7 @@ keypress(XEvent *e)
      KeySym keysym;
      int i;
 
-     keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
+     keysym = XKeycodeToKeysym(EVDPY, (KeyCode)ev->keycode, 0);
      for(i = 0; i < conf.nkeybind; ++i)
           if(keysym == keys[i].keysym
              && (keys[i].mod & ~(numlockmask | LockMask))
@@ -504,7 +506,7 @@ maprequest(XEvent *e)
      XWindowAttributes at;
      Systray *s;
 
-     CHECK(XGetWindowAttributes(dpy, ev->window, &at));
+     CHECK(XGetWindowAttributes(EVDPY, ev->window, &at));
      CHECK(!at.override_redirect);
 
      if((s = systray_find(ev->window)))
@@ -543,17 +545,15 @@ propertynotify(XEvent *e)
           switch(ev->atom)
           {
           case XA_WM_TRANSIENT_FOR:
-               XGetTransientForHint(dpy, c->win, &trans);
-               if((c->flags & TileFlag || c->flags & MaxFlag))
-                    if(((c->flags & HintFlag && (client_gb_win(trans) != NULL)))
-                              || (!(c->flags & HintFlag && (client_gb_win(trans) != NULL))))
-                         arrange(c->screen, True);
+               XGetTransientForHint(EVDPY, c->win, &trans);
+               if((c->flags & (TileFlag | MaxFlag)) && client_gb_win(trans))
+                    arrange(c->screen, True);
                break;
           case XA_WM_NORMAL_HINTS:
                client_size_hints(c);
                break;
           case XA_WM_HINTS:
-               if((h = XGetWMHints(dpy, c->win)) && (h->flags & XUrgencyHint) && c != sel)
+               if((h = XGetWMHints(EVDPY, c->win)) && (h->flags & XUrgencyHint) && c != sel)
                {
                     client_urgent(c, True);
                     XFree(h);
