@@ -276,7 +276,7 @@ typedef struct
      BarWindow *layout_button;
      BarWindow *tags_board, *tags[MAXTAG];
      Geo geo;
-     int position;
+     int screen, position;
      char *statustext;
      bool need_update;
 } InfoBar;

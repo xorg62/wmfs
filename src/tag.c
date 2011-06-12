@@ -359,7 +359,7 @@ tag_swap(int s, int t1, int t2)
                c->tag = t1;
      }
 
-     infobar_update_taglist(s);
+     infobar_update_taglist(&infobar[s]);
      tag_set(t2);
 
      return;
@@ -626,8 +626,8 @@ tag_new(int s, char *name)
      else
           goToTag = conf.ntag[s];
 
-     infobar_update_taglist(s);
-     infobar_draw(s);
+     infobar_update_taglist(&infobar[s]);
+     infobar_draw(&infobar[s]);
      tag_set(goToTag);
 
      return;
@@ -687,8 +687,8 @@ tag_delete(int s, int tag)
      }
 
      infobar[s].need_update = True;
-     infobar_update_taglist(s);
-     infobar_draw(s);
+     infobar_update_taglist(&infobar[s]);
+     infobar_draw(&infobar[s]);
 
      if(tag == seltag[s])
           tag_set(tag <= conf.ntag[s] ? tag : conf.ntag[s]);
@@ -737,8 +737,8 @@ uicb_tag_rename(uicb_t cmd)
       */
      strncpy(str, cmd, len);
 
-     infobar_update_taglist(selscreen);
-     infobar_draw(selscreen);
+     infobar_update_taglist(&infobar[selscreen]);
+     infobar_draw(&infobar[selscreen]);
 
      return;
 }

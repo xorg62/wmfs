@@ -362,7 +362,7 @@ launcher_execute(Launcher *launcher)
 
      barwin_unmap(bw);
      barwin_delete(bw);
-     infobar_draw(selscreen);
+     infobar_draw(&infobar[selscreen]);
 
      XUngrabKeyboard(dpy, CurrentTime);
 

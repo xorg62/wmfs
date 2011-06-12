@@ -154,11 +154,11 @@ ushort textw(char *text);
 
 /* infobar.c */
 void infobar_init(void);
-void infobar_draw_layout(int sc);
-void infobar_draw(int sc);
-void infobar_draw_selbar(int sc);
-void infobar_draw_taglist(int sc);
-void infobar_update_taglist(int sc);
+void infobar_draw_layout(InfoBar *i);
+void infobar_draw(InfoBar *i);
+void infobar_draw_selbar(InfoBar *i);
+void infobar_draw_taglist(InfoBar *i);
+void infobar_update_taglist(InfoBar *i);
 void infobar_destroy(void);
 void infobar_set_position(int pos);
 void uicb_infobar_togglepos(uicb_t);

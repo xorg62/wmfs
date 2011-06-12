@@ -56,7 +56,7 @@ arrange(int screen, bool update_layout)
           if(update_layout)
                layout_func(screen, seltag[screen]);
 
-          infobar_draw(screen);
+          infobar_draw(&infobar[screen]);
      }
 
      return;
@@ -136,7 +136,7 @@ layoutswitch(bool b)
      tags[selscreen][seltag[selscreen]].flags |= CleanFactFlag;
      tags[selscreen][seltag[selscreen]].flags &= ~SplitFlag;
      layout_func(selscreen, seltag[selscreen]);
-     infobar_draw(selscreen);
+     infobar_draw(&infobar[selscreen]);
 
      return;
 }

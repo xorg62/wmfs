@@ -302,13 +302,13 @@ client_focus(Client *c)
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 
           if(conf.bars.selbar)
-               infobar_draw_selbar(sel->screen);
+               infobar_draw_selbar(&infobar[sel->screen]);
      }
      else
      {
           XSetInputFocus(dpy, ROOT, RevertToPointerRoot, CurrentTime);
           if(conf.bars.selbar)
-               infobar_draw_selbar(selscreen);
+               infobar_draw_selbar(&infobar[selscreen]);
      }
 
      return;
@@ -324,7 +324,7 @@ client_urgent(Client *c, bool u)
      FLAGAPPLY(c->flags, u, UrgentFlag);
      FLAGAPPLY(tags[c->screen][c->tag].flags, u, TagUrgentFlag);
 
-     infobar_draw_taglist(c->screen);
+     infobar_draw_taglist(&infobar[c->screen]);
 }
 
 /* The following functions have the same point :
@@ -464,7 +464,7 @@ client_get_name(Client *c)
      frame_update(c);
 
      if(conf.bars.selbar && c == sel)
-          infobar_draw_selbar(c->screen);
+          infobar_draw_selbar(&infobar[c->screen]);
 
      return;
 }
@@ -1216,7 +1216,7 @@ client_unmanage(Client *c)
           else
           {
                tags[c->screen][c->tag].flags |= RequestUpdateFlag;
-               infobar_draw(c->screen);
+               infobar_draw(&infobar[c->screen]);
           }
      }
 
