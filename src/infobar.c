@@ -249,7 +249,8 @@ infobar_draw_taglist(int sc)
                      : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)) + (PAD >> 1), 0);
 
      for(c = clients; c; c = c->next)
-          occupied |= TagFlag(c->tag);
+          if(c->screen == sc)
+               occupied |= TagFlag(c->tag);
 
      for(i = 1, x = 0; i < conf.ntag[sc] + 1; ++i)
      {

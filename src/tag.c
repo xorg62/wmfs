@@ -238,7 +238,8 @@ uicb_tag_next_visible(uicb_t cmd)
      }
 
      for(c = clients; c; c = c->next)
-          occupied |= TagFlag(c->tag);
+          if(c->screen == selscreen)
+               occupied |= TagFlag(c->tag);
 
      for(tag = seltag[selscreen] + 1; tag < conf.ntag[selscreen] + 1; ++tag)
           if(occupied & TagFlag(tag))
@@ -266,7 +267,7 @@ uicb_tag_prev_visible(uicb_t cmd)
 {
      int tag;
      Client *c;
-     uint occupied;
+     uint occupied = 0;
      (void)cmd;
 
      screen_get_sel();
@@ -278,7 +279,8 @@ uicb_tag_prev_visible(uicb_t cmd)
      }
 
      for(c = clients; c; c = c->next)
-          occupied |= TagFlag(c->tag);
+          if(c->screen == selscreen)
+               occupied |= TagFlag(c->tag);
 
      for(tag = seltag[selscreen] - 1; tag >= 0; --tag)
           if(occupied & TagFlag(tag))
