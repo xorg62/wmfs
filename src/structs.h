@@ -402,6 +402,7 @@ typedef struct
 
      /* Misc option */
      char *font;
+     bool use_xft;
      uint opacity;
      bool raisefocus;
      bool focus_fmouse;
@@ -533,6 +534,12 @@ typedef struct
      int nrule;
 } Conf;
 
+typedef struct
+{
+     int as, de, width, height;
+     XftFont *font;
+     XFontSet fontset;
+} FontStruct;
 typedef struct
 {
      int x, y, w, h;

@@ -60,12 +60,46 @@ const func_name_list_t layout_list[] =
 static void
 init_font(void)
 {
-     font = XftFontOpenName(dpy, SCREEN, conf.font);
-
-     if(!font)
+#ifdef HAVE_XFT
+     if(conf.use_xft)
      {
-          warnx("WMFS Error: Cannot initialize font");
-          font = XftFontOpenName(dpy, SCREEN, "sans-10");
+          if(!(font.font = XftFontOpenName(dpy, SCREEN, conf.font)))
+          {
+               warnx("WMFS Error: Cannot initialize Xft font");
+               font.font = XftFontOpenName(dpy, SCREEN, "sans-10");
+          }
+
+          font.de     = font.font->descent;
+          font.as     = font.font->ascent;
+          font.height = font.font->height;
+     }
+     else
+#endif /* HAVE_XFT */
+     {
+          char **misschar, **names, *defstring;
+          int d;
+          XFontStruct **xfs = NULL;
+
+          if(!conf.font)
+               conf.font = xstrdup("fixed");
+
+          /* Using Font Set */
+          if(!(font.fontset = XCreateFontSet(dpy, conf.font, &misschar, &d, &defstring)))
+          {
+               warnx("Can't load font '%s'", conf.font);
+               font.fontset = XCreateFontSet(dpy, "fixed", &misschar, &d, &defstring);
+          }
+
+          XFontsOfFontSet(font.fontset, &xfs, &names);
+
+          font.as    = xfs[0]->max_bounds.ascent;
+          font.de    = xfs[0]->max_bounds.descent;
+          font.width = xfs[0]->max_bounds.width;
+
+          font.height = font.as + font.de;
+
+          if(misschar)
+               XFreeStringList(misschar);
      }
 
      /* Set font in _WMFS_FONT for eventual status tools */

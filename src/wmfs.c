@@ -98,7 +98,13 @@ quit(void)
 
      systray_freeicons();
 
-     XftFontClose(dpy, font);
+#ifdef HAVE_XFT
+     if(conf.use_xft)
+          XftFontClose(dpy, font.font);
+     else
+#endif /* HAVE_XFT */
+          XFreeFontSet(dpy, font.fontset);
+
      for(i = 0; i < CurLast; ++i)
           XFreeCursor(dpy, cursor[i]);
      XFreeGC(dpy, gc_stipple);

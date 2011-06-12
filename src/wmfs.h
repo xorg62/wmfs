@@ -84,8 +84,8 @@
 #define ROOT         RootWindow(dpy, SCREEN)
 #define MAXH         DisplayHeight(dpy, DefaultScreen(dpy))
 #define MAXW         DisplayWidth(dpy, DefaultScreen(dpy))
-#define INFOBARH     ((conf.bars.height > 0) ? conf.bars.height : (font->height * 1.5))
-#define FHINFOBAR    ((font->height - font->descent) + (((int)INFOBARH - font->height) >> 1))
+#define INFOBARH     ((conf.bars.height > 0) ? conf.bars.height : (font.height * 1.5))
+#define FHINFOBAR    ((font.height - font.de) + (((int)INFOBARH - font.height) >> 1))
 #define SHADH        (1)
 #define BORDH        conf.client.borderheight
 #define TBARH        ((conf.titlebar.height < BORDH) ? BORDH : conf.titlebar.height)
@@ -457,7 +457,7 @@ int xrandr_event;
 uint timing;
 
 /* Fonts */
-XftFont *font;
+FontStruct font;
 
 /* Atoms list */
 Atom *net_atom;

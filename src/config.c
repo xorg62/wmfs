@@ -166,13 +166,19 @@ mouse_section(MouseBinding mb[], struct conf_sec **sec)
 static void
 conf_misc_section(void)
 {
+     bool xft = False;
      int pad = 12;
      uint opacity = 255;
      struct conf_sec *sec;
 
      sec = fetch_section_first(NULL, "misc");
 
+#ifdef HAVE_XFT
+     xft = True;
+#endif /* HAVE_XFT */
+
      conf.font              = fetch_opt_first(sec, "sans-9", "font").str;
+     conf.use_xft           = fetch_opt_first(sec, (xft ? "true" : "false"), "use_xft").boolean;
      conf.raisefocus        = fetch_opt_first(sec, "false", "raisefocus").boolean;
      conf.focus_fmouse      = fetch_opt_first(sec, "true", "focus_follow_mouse").boolean;
      conf.focus_fmov        = fetch_opt_first(sec, "false", "focus_follow_movement").boolean;
@@ -192,7 +198,6 @@ conf_misc_section(void)
      if(pad > 24 || pad < 1)
      {
           warnx("configuration : pad value (%d) incorrect.", pad);
-
           pad = 12;
      }
 

@@ -90,8 +90,6 @@ draw_text(Drawable d, int x, int y, char* fg, char *str)
 void
 draw_image_ofset_text(Drawable d, int x, int y, char* fg, char *str, int x_image_ofset, int y_image_ofset)
 {
-     XftColor xftcolor;
-     XftDraw *xftd;
 #ifdef HAVE_IMLIB
      char *ostr = NULL;
      int i, ni, sw = 0;
@@ -107,7 +105,6 @@ draw_image_ofset_text(Drawable d, int x, int y, char* fg, char *str, int x_image
 
      /* To draw image everywhere we can draw text */
 #ifdef HAVE_IMLIB
-
      ostr = xstrdup(str);
      textlen = strlen(ostr);
 
@@ -123,19 +120,34 @@ draw_image_ofset_text(Drawable d, int x, int y, char* fg, char *str, int x_image
      }
 #endif /* HAVE_IMLIB */
 
-     /* Transform X Drawable -> Xft Drawable */
-     xftd = XftDrawCreate(dpy, d, DefaultVisual(dpy, SCREEN), DefaultColormap(dpy, SCREEN));
+#ifdef HAVE_XFT
+     if(conf.use_xft)
+     {
+          XftColor xftcolor;
+          XftDraw *xftd;
 
-     /* Alloc text color */
-     XftColorAllocName(dpy, DefaultVisual(dpy, SCREEN),
-                       DefaultColormap(dpy, SCREEN), fg, &xftcolor);
+          /* Transform X Drawable -> Xft Drawable */
+          xftd = XftDrawCreate(dpy, d, DefaultVisual(dpy, SCREEN), DefaultColormap(dpy, SCREEN));
 
-     XftDrawStringUtf8(xftd, &xftcolor, font, x, y, (FcChar8 *)str, strlen(str));
+          /* Alloc text color */
+          XftColorAllocName(dpy, DefaultVisual(dpy, SCREEN),
+                    DefaultColormap(dpy, SCREEN), fg, &xftcolor);
 
-     /* Free the text color and XftDraw */
-     XftColorFree(dpy, DefaultVisual(dpy, SCREEN), DefaultColormap(dpy, SCREEN), &xftcolor);
+          XftDrawStringUtf8(xftd, &xftcolor, font.font, x, y, (FcChar8 *)str, strlen(str));
 
-     XftDrawDestroy(xftd);
+          /* Free the text color and XftDraw */
+          XftColorFree(dpy, DefaultVisual(dpy, SCREEN), DefaultColormap(dpy, SCREEN), &xftcolor);
+
+          XftDrawDestroy(xftd);
+     }
+     else
+#endif /* HAVE_XFT */
+     {
+          /* Use font set */
+          XSetForeground(dpy, gc, getcolor(fg));
+          XmbDrawString(dpy, d, font.fontset, gc, x, y, str, strlen(str));
+     }
+
 
 #ifdef HAVE_IMLIB
      if(strstr(ostr, "i["))
@@ -199,7 +211,7 @@ draw_graph(Drawable dr, int x, int y, int w, int h, uint color, char *data)
 ushort
 textw(char *text)
 {
-     XGlyphInfo gl;
+     ushort ret = 0;
 #ifdef HAVE_IMLIB
      char *ostr = NULL;
      ImageAttr im[128];
@@ -209,9 +221,7 @@ textw(char *text)
      if(!text)
           return 0;
 
-
 #ifdef HAVE_IMLIB
-
      ostr = xstrdup(text);
      textlen = strlen(ostr);
 
@@ -219,7 +229,22 @@ textw(char *text)
           parse_image_block(im, text);
 #endif /* HAVE_IMLIB */
 
-     XftTextExtentsUtf8(dpy, font, (FcChar8 *)text, strlen(text), &gl);
+#ifdef HAVE_XFT
+     if(conf.use_xft)
+     {
+          XGlyphInfo gl;
+
+          XftTextExtentsUtf8(dpy, font.font, (FcChar8 *)text, strlen(text), &gl);
+          ret = gl.width + font.de;
+     }
+     else
+#endif /* HAVE_XFT */
+     {
+          XRectangle r;
+
+          XmbTextExtents(font.fontset, text, strlen(text), NULL, &r);
+          ret = r.width;
+     }
 
 #ifdef HAVE_IMLIB
      if(strstr(ostr, "i["))
@@ -228,5 +253,5 @@ textw(char *text)
      free(ostr);
 #endif /* HAVE_IMLIB */
 
-     return gl.width + font->descent;
+     return ret;
 }
