@@ -169,7 +169,7 @@ clientmessageevent(XEvent *e)
      XClientMessageEvent *ev = &e->xclient;
      Client *c;
      Systray *sy;
-     int s, i, mess_t = 0;
+     int s, mess_t = 0;
      Atom rt;
      int rf;
      ulong ir, il;
@@ -182,9 +182,8 @@ clientmessageevent(XEvent *e)
 
      s = screen_count();
 
-     for(i = 0; i < net_last + s; ++i)
-          if(net_atom[i] == ev->message_type)
-               mess_t = i;
+     while(mess_t < net_last + s && net_atom[mess_t] != ev->message_type)
+          ++mess_t;
 
      if(ev->window == ROOT)
      {
@@ -241,32 +240,33 @@ clientmessageevent(XEvent *e)
           if((c = client_gb_win(ev->window)) && ev->data.l[0] != (long)0xFFFFFFFF)
                tag_transfert(c, ev->data.l[0]);
 
-     /* Manage _WMFS_STATUSTEXT_x */
-     if(mess_t >= wmfs_statustext && ev->data.l[4] == True)
+     if(ev->data.l[4])
      {
-          if(XGetWindowProperty(EVDPY, ROOT, net_atom[mess_t], 0, 4096,
-                                False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret) == Success)
+          /* Manage _WMFS_STATUSTEXT_x */
+          if(mess_t >= wmfs_statustext)
           {
-               statustext_handle(mess_t - wmfs_statustext, (char*)ret);
+               if(XGetWindowProperty(EVDPY, ROOT, net_atom[mess_t], 0, 4096,
+                              False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret) == Success)
+               {
+                    statustext_handle(mess_t - wmfs_statustext, (char*)ret);
+                    XFree(ret);
+               }
+          }
+
+          /* Manage _WMFS_FUNCTION && _WMFS_CMD */
+          if(mess_t == wmfs_function || mess_t == wmfs_cmd)
+          {
+               XGetWindowProperty(EVDPY, ROOT, net_atom[wmfs_function], 0, 4096,
+                         False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret);
+               XGetWindowProperty(EVDPY, ROOT, net_atom[wmfs_cmd], 0, 4096,
+                         False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret_cmd);
+
+               if((func = name_to_func((char*)ret, func_list)))
+                    func((uicb_t)ret_cmd);
+
+               XFree(ret_cmd);
                XFree(ret);
           }
-     }
-
-     /* Manage _WMFS_FUNCTION && _WMFS_CMD */
-     if((mess_t == wmfs_function && ev->data.l[4] == True)
-        || (mess_t == wmfs_cmd && ev->data.l[4] == True))
-     {
-          XGetWindowProperty(EVDPY, ROOT, net_atom[wmfs_function], 0, 4096,
-                    False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret);
-
-          XGetWindowProperty(EVDPY, ROOT, net_atom[wmfs_cmd], 0, 4096,
-                    False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret_cmd);
-
-          if((func = name_to_func((char*)ret, func_list)))
-               func((uicb_t)ret_cmd);
-
-          XFree(ret_cmd);
-          XFree(ret);
      }
 
      /* Manage _WMFS_UPDATE_HINTS */
@@ -281,8 +281,8 @@ clientmessageevent(XEvent *e)
           screen_get_sel();
      }
 
-     if(mess_t == wmfs_update_status
-               && estatus)
+     /* Manage _WMFS_UPDATE_STATUS */
+     if(mess_t == wmfs_update_status && estatus)
           spawn(conf.status_path);
 
      return;

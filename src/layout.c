@@ -136,7 +136,7 @@ layoutswitch(bool b)
      tags[selscreen][seltag[selscreen]].flags |= CleanFactFlag;
      tags[selscreen][seltag[selscreen]].flags &= ~SplitFlag;
      layout_func(selscreen, seltag[selscreen]);
-     infobar_draw(&infobar[selscreen]);
+     infobar_draw_layout(&infobar[selscreen]);
 
      return;
 }

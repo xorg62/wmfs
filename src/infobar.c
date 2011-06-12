@@ -305,7 +305,7 @@ infobar_update_taglist(InfoBar *i)
 
      for(t = 1, j = 0; t < conf.ntag[sc] + 1; ++t)
      {
-          /* If the tag i does not exist yet (graphically) or need full update */
+          /* If the tag t does not exist yet (graphically) or need full update */
           if(!i->tags[t] || i->need_update)
           {
                i->tags[t] = barwin_create(i->tags_board->win, j, 0,

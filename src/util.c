@@ -166,7 +166,7 @@ name_to_func(char *name, const func_name_list_t *l)
      int i;
 
      if(name)
-          for(i = 0; l[i].name ; ++i)
+          for(i = 0; l[i].name; ++i)
                if(!strcmp(name, l[i].name))
                     return l[i].func;
 
