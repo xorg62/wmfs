@@ -80,6 +80,9 @@ init_font(void)
           int d;
           XFontStruct **xfs = NULL;
 
+          /* locale support */
+          setlocale(LC_CTYPE, "");
+
           if(!conf.font)
                conf.font = xstrdup("fixed");
 

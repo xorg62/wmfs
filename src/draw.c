@@ -39,7 +39,8 @@
   * \param y Y position
   * \param name Path of the image
 */
-static void draw_image(Drawable dr, int x, int y, int w, int h, char *name)
+static void
+draw_image(Drawable dr, int x, int y, int w, int h, char *name)
 {
      Imlib_Image image;
 

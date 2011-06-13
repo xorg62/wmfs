@@ -50,6 +50,7 @@
 #include <dirent.h>
 #include <err.h>
 #include <pthread.h>
+#include <locale.h>
 #include <sys/select.h>
 #include <sys/types.h>
 #include <sys/wait.h>
