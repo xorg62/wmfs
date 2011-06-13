@@ -6,3 +6,6 @@ wmfs
 wmfs.1.gz
 tags
 *.patch
+*.diff
+Makefile
+build/

@@ -1,3 +1,4 @@
+
 /*
 *      wmfs.h
 *      Copyright © 2008, 2009 Martin Duquesnoy <xorg62@gmail.com>
@@ -57,13 +58,12 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/cursorfont.h>
-#include <X11/Xft/Xft.h>
-
-/* Local headers */
-#include "parse.h"
-#include "structs.h"
 
 /* Optional dependencies */
+#ifdef HAVE_XFT
+#include <X11/Xft/Xft.h>
+#endif /* HAVE_XFT */
+
 #ifdef HAVE_XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif /* HAVE_XINERAMA */
@@ -75,6 +75,10 @@
 #ifdef HAVE_IMLIB
 #include <Imlib2.h>
 #endif /* HAVE_IMLIB */
+
+/* Local headers */
+#include "parse.h"
+#include "structs.h"
 
 /* MACRO */
 #define ButtonMask   (ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)

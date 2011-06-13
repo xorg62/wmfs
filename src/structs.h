@@ -537,7 +537,9 @@ typedef struct
 typedef struct
 {
      int as, de, width, height;
+#ifdef HAVE_XFT
      XftFont *font;
+#endif /* HAVE_XFT */
      XFontSet fontset;
 } FontStruct;
 typedef struct

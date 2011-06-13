@@ -90,6 +90,7 @@ init_font(void)
                font.fontset = XCreateFontSet(dpy, "fixed", &misschar, &d, &defstring);
           }
 
+          XExtentsOfFontSet(font.fontset);
           XFontsOfFontSet(font.fontset, &xfs, &names);
 
           font.as    = xfs[0]->max_bounds.ascent;
