@@ -178,10 +178,8 @@ draw_text(Drawable d, int x, int y, char* fg, char *str)
 void
 draw_rectangle(Drawable dr, int x, int y, int w, int h, uint color)
 {
-     XRectangle r = { x, y, w, h };
-
      XSetForeground(dpy, gc, color);
-     XFillRectangles(dpy, dr, gc, &r, 1);
+     XFillRectangle(dpy, dr, gc, x, y, (uint)w, (uint)h);
 
      return;
 }
@@ -198,16 +196,10 @@ draw_rectangle(Drawable dr, int x, int y, int w, int h, uint color)
 void
 draw_graph(Drawable dr, int x, int y, int w, int h, uint color, char *data)
 {
-     uint i;
-
-     XSetForeground(dpy, gc, color);
+     int i;
 
      for(i = 0; i < w; ++i)
-     {
-          XRectangle r = { (x + i), (y + h - data[i]), 1, data[i] };
-
-          XFillRectangles(dpy, dr, gc, &r, 1);
-     }
+          draw_rectangle(dr, x + i, y + h - data[i], 1, data[i], color);
 
      return;
 }
