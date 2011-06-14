@@ -136,7 +136,6 @@ BarWindow *barwin_create(Window parent,
                          bool stipple,
                          bool border);
 void barwin_draw_text(BarWindow *bw, int x, int y, char *text);
-void barwin_draw_image_ofset_text(BarWindow *bw, int x, int y, char *text, int x_image_ofset, int y_image_ofset);
 void barwin_color_set(BarWindow *bw, uint bg, char *fg);
 void barwin_delete(BarWindow *bw);
 void barwin_delete_subwin(BarWindow *bw);
@@ -151,7 +150,6 @@ void barwin_refresh(BarWindow *bw);
 
 /* draw.c */
 void draw_text(Drawable d, int x, int y, char* fg, char *str);
-void draw_image_ofset_text(Drawable d, int x, int y, char* fg, char *str, int x_image_ofset, int y_image_ofset);
 void draw_rectangle(Drawable dr, int x, int y, int w, int h, uint color);
 void draw_graph(Drawable dr, int x, int y, int w, int h, uint color, char *data);
 
@@ -317,10 +315,6 @@ void uicb_spawn(uicb_t);
 char *clean_value(char *str);
 char* patht(char *path);
 int qsort_string_compare (const void * a, const void * b);
-
-#ifdef HAVE_IMLIB
-int parse_image_block(ImageAttr *im, char *str);
-#endif /* HAVE_IMLIB */
 
 /* tag.c */
 void tag_set(int tag);

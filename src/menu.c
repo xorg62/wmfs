@@ -71,11 +71,11 @@ menu_draw_item_name(Menu *menu, int item, BarWindow *winitem[], int chcklen)
           x = (width - (chcklen + PAD / 3)) / 2 - textw(menu->item[item].name) / 2 + chcklen + PAD / 3;
           break;
      }
-     barwin_draw_image_ofset_text(winitem[item], x, FHINFOBAR, menu->item[item].name, chcklen + PAD / 2, 0);
+     barwin_draw_text(winitem[item], x, FHINFOBAR, menu->item[item].name);
 
      if(menu->item[item].check)
           if(menu->item[item].check(menu->item[item].cmd))
-               barwin_draw_image_ofset_text(winitem[item], PAD / 3, FHINFOBAR, conf.selected_layout_symbol, PAD / 3, 0);
+               barwin_draw_text(winitem[item], PAD / 3, FHINFOBAR, conf.selected_layout_symbol);
 
      if(menu->item[item].submenu)
           barwin_draw_text(winitem[item], width + PAD * 2, FHINFOBAR, ">");
@@ -147,7 +147,7 @@ static bool
 menu_manage_event(XEvent *ev, Menu *menu, BarWindow *winitem[])
 {
      int i, c = 0;
-     KeySym ks;
+     KeySym ks = 0;
      bool quit = False;
      char acc = 0;
 
@@ -348,6 +348,8 @@ menu_draw(Menu menu, int x, int y)
      menu_focus_item(&menu, 0, item);
 
      XGrabKeyboard(dpy, ROOT, True, GrabModeAsync, GrabModeAsync, CurrentTime);
+
+     XNextEvent(dpy, &ev);
 
      while(!menu_manage_event(&ev, &menu, item));
 

@@ -123,26 +123,6 @@ barwin_draw_text(BarWindow *bw, int x, int y, char *text)
      return;
 }
 
-/** Draw text in a Barwindow
-*/
-void
-barwin_draw_image_ofset_text(BarWindow *bw, int x, int y, char *text, int x_image_ofset, int y_image_ofset)
-{
-     if(!text)
-          return;
-
-     /* Background color of the text if there is stipple */
-     if(bw->flags & StippleFlag)
-          draw_rectangle(bw->dr, x - 4, 0, textw(text) + 8, bw->geo.height, bw->bg);
-
-     /* Draw text */
-     draw_image_ofset_text(bw->dr, x, y, bw->fg, text, x_image_ofset, y_image_ofset);
-
-     barwin_refresh(bw);
-
-     return;
-}
-
 void
 barwin_color_set(BarWindow *bw, uint bg, char *fg)
 {

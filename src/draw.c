@@ -44,10 +44,9 @@ draw_image(Drawable dr, int x, int y, int w, int h, char *name)
 {
      Imlib_Image image;
 
-     if(!name)
+     if(!name || !dr)
           return;
 
-     imlib_set_cache_size(2048 << 10);
      imlib_context_set_display(dpy);
      imlib_context_set_visual(DefaultVisual(dpy, DefaultScreen(dpy)));
      imlib_context_set_colormap(DefaultColormap(dpy, DefaultScreen(dpy)));
@@ -63,22 +62,44 @@ draw_image(Drawable dr, int x, int y, int w, int h, char *name)
           h = imlib_image_get_height();
 
      if(image)
-     {
           imlib_render_image_on_drawable_at_size(x, y, w, h);
-          imlib_free_image();
-     }
      else
           warnx("Can't draw image: '%s'", name);
+
+     imlib_free_image();
+
+     return;
+}
+
+/** Check images blocks in str and return properties
+  * --> \i[x;y;w;h;name]\
+  *\param im ImageAttr pointer, image properties
+  *\param str String
+  *\return n Lenght of i
+  */
+static int
+parse_image_block(Drawable dr, char *str)
+{
+     ImageAttr im;
+     char as;
+     int i, j, k, sw = systray_get_width();
+
+     for(i = j = 0; i < (int)strlen(str); ++i, ++j)
+          if(sscanf(&str[i], "\\i[%d;%d;%d;%d;%512[^]]]%c", &im.x, &im.y, &im.w, &im.h, im.name, &as) == 6
+                    && as == '\\')
+          {
+               draw_image(dr, im.x - sw, im.y, im.w, im.h, im.name);
+
+               for(++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
+          }
+          else if(j != i)
+               str[j] = str[i];
+
+     for(k = j; k < i; str[k++] = 0);
 
      return;
 }
 #endif /* HAVE_IMLIB */
-
-void
-draw_text(Drawable d, int x, int y, char* fg, char *str)
-{
-     draw_image_ofset_text(d, x, y, fg, str, 0, 0);
-}
 
 /** Draw a string in a Drawable
  * \param d Drawable
@@ -89,13 +110,13 @@ draw_text(Drawable d, int x, int y, char* fg, char *str)
  * \param str String that will be draw
 */
 void
-draw_image_ofset_text(Drawable d, int x, int y, char* fg, char *str, int x_image_ofset, int y_image_ofset)
+draw_text(Drawable d, int x, int y, char* fg, char *str)
 {
 #ifdef HAVE_IMLIB
      char *ostr = NULL;
      int i, ni, sw = 0;
-     ImageAttr im[128];
      size_t textlen;
+     bool ii = False;
 #else
      (void)x_image_ofset;
      (void)y_image_ofset;
@@ -111,13 +132,8 @@ draw_image_ofset_text(Drawable d, int x, int y, char* fg, char *str, int x_image
 
      if(strstr(str, "i["))
      {
-          ni = parse_image_block(im, str);
-
-          if(infobar[conf.systray.screen].bar && d == infobar[conf.systray.screen].bar->dr)
-               sw = systray_get_width();
-
-          for(i = 0; i < ni; ++i)
-               draw_image(d, x_image_ofset + im[i].x - sw, y_image_ofset + im[i].y, im[i].w, im[i].h, im[i].name);
+          parse_image_block(d, str);
+          ii = True;
      }
 #endif /* HAVE_IMLIB */
 
@@ -151,7 +167,7 @@ draw_image_ofset_text(Drawable d, int x, int y, char* fg, char *str, int x_image
 
 
 #ifdef HAVE_IMLIB
-     if(strstr(ostr, "i["))
+     if(ii)
           strncpy(str, ostr, textlen);
 
      free(ostr);
@@ -212,11 +228,12 @@ draw_graph(Drawable dr, int x, int y, int w, int h, uint color, char *data)
 ushort
 textw(char *text)
 {
+     Drawable d = 0;
      ushort ret = 0;
 #ifdef HAVE_IMLIB
      char *ostr = NULL;
-     ImageAttr im[128];
      size_t textlen;
+     bool ii = False;
 #endif /* HAVE_IMLIB */
 
      if(!text)
@@ -227,7 +244,10 @@ textw(char *text)
      textlen = strlen(ostr);
 
      if(strstr(text, "i["))
-          parse_image_block(im, text);
+     {
+          parse_image_block(d, text);
+          ii = True;
+     }
 #endif /* HAVE_IMLIB */
 
 #ifdef HAVE_XFT
@@ -248,7 +268,7 @@ textw(char *text)
      }
 
 #ifdef HAVE_IMLIB
-     if(strstr(ostr, "i["))
+     if(ii)
           strncpy(text, ostr, textlen);
 
      free(ostr);

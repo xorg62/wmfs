@@ -32,102 +32,112 @@
 
 #include "wmfs.h"
 
-/** Check rectangles blocks in str and return properties
-  * --> \b[x;y;width;height;#color]\
-  *\param r StatusRec pointer, rectangles properties
-  *\param str String
-  *\return n Length of r
-  */
-static int
-statustext_rectangle(StatusRec *r, char *str)
-{
-     char as;
-     int n, i, j, k;
+/* Systray width */
+int sw = 0;
 
-     for(i = j = n = 0; i < (int)strlen(str); ++i, ++j)
-          if(sscanf(&str[i], "\\b[%d;%d;%d;%d;#%x]%c", &r[n].x, &r[n].y, &r[n].w, &r[n].h, &r[n].color, &as) == 6
+/** Check rectangles blocks in str and draw it
+  * --> \b[x;y;width;height;#color]\
+  *\param ib Infobar pointer
+  *\param str String
+  */
+static void
+statustext_rectangle(InfoBar *ib, char *str)
+{
+     StatusRec r;
+     char as;
+     int i, j, k;
+
+     for(i = j = 0; i < (int)strlen(str); ++i, ++j)
+          if(sscanf(&str[i], "\\b[%d;%d;%d;%d;#%x]%c", &r.x, &r.y, &r.w, &r.h, &r.color, &as) == 6
                     && as == '\\')
-               for(++n, ++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
+          {
+               draw_rectangle(ib->bar->dr, r.x - sw, r.y, r.w, r.h, r.color);
+
+               for(++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
+          }
           else if(j != i)
                str[j] = str[i];
 
-     for(k = j; k < i; str[k++] = 0);
+     for(k = j; k < i; str[k++] = '\0');
 
-     return n;
+     return;
 }
 
-/** Check graphs blocks in str and return properties
+/** Check graphs blocks in str and draw it
   * --> \g[x;y;width;height;#color;data]\
-  *\param g StatusGraph pointer, graphs properties
+  *\param ib Infobar pointer
   *\param str String
-  *\return n Length of g
   */
-static int
-statustext_graph(StatusGraph *g, char *str)
+static void
+statustext_graph(InfoBar *ib, char *str)
 {
+     StatusGraph g;
      char as, c, *p;
-     int n, i, j, k, m, w;
+     int i, j, k, m, w;
 
-     for(i = j = n = 0; i < (int)strlen(str); ++i, ++j)
+     for(i = j = 0; i < (int)strlen(str); ++i, ++j)
           if(sscanf(&str[i], "\\g[%d;%d;%d;%d;#%x;%512[^]]]%c",
-                    &g[n].x, &g[n].y, &g[n].w, &g[n].h, &g[n].color, g[n].data, &as) == 7
+                    &g.x, &g.y, &g.w, &g.h, &g.color, g.data, &as) == 7
                     && as == '\\')
           {
                /* data is a list of numbers separated by ';' */
-               w = g[n].w;
-               p = strtok(g[n].data, ";");
+               w = g.w;
+               p = strtok(g.data, ";");
                m = 0;
 
-               while(p && m < w)
+               for(c = atoi(p); p && m < w; ++m)
                {
-                    c = atoi(p);
                     /* height limits */
                     if(c < 0)
                          c = 0;
-                    if(c > (char)g[n].h)
-                         c = g[n].h;
-                    g[n].data[m] = c;
+                    if(c > (char)g.h)
+                         c = g.h;
+                    g.data[m] = c;
                     p = strtok(NULL, ";");
-                    ++m;
                }
 
                /* width limits */
-               for(; m < w; ++m)
-                    g[n].data[m] = 0;
-               /* data is a array[w] of bytes now */
+               for(; m < w; g.data[m++] = 0);
 
-               for(++n, ++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
+               /* data is a array[w] of bytes now */
+               draw_graph(ib->bar->dr, g.x - sw, g.y, g.w, g.h, g.color, g.data);
+
+               for(++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
           }
           else if(j != i)
                str[j] = str[i];
 
      for(k = j; k < i; str[k++] = 0);
 
-     return n;
+     return;
 }
 
-/** Check text blocks in str and return properties
+/** Check text blocks in str and draw it
   * --> \s[x;y;#color;text]\
-  *\param s StatusText pointer, text properties
+  *\param ib Infobar pointer
   *\param str String
-  *\return n Length of s
   */
-static int
-statustext_text(StatusText *s, char *str)
+static void
+statustext_text(InfoBar *ib, char *str)
 {
+     StatusText s;
      char as;
-     int n, i, j, k;
+     int i, j, k;
 
-     for(i = j = n = 0; i < (int)strlen(str); ++i, ++j)
-          if(sscanf(&str[i], "\\s[%d;%d;%7[^;];%512[^]]]%c", &s[n].x, &s[n].y, s[n].color, s[n].text, &as) == 5
+     for(i = j = 0; i < (int)strlen(str); ++i, ++j)
+          if(sscanf(&str[i], "\\s[%d;%d;%7[^;];%512[^]]]%c", &s.x, &s.y, s.color, s.text, &as) == 5
                     && as == '\\')
-               for(++n, ++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
+          {
+               draw_text(ib->bar->dr, s.x - sw, s.y, s.color, s.text);
+
+               for(++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
+          }
           else if(j != i)
                str[j] = str[i];
 
      for(k = j; k < i; str[k++] = 0);
 
-     return n;
+     return;
 }
 
 /** Draw normal text and colored normal text
@@ -141,10 +151,7 @@ statustext_normal(int sc, char *str)
      char strwc[MAXSTATUS] = { 0 };
      char buf[MAXSTATUS] = { 0 };
      char col[8] = { 0 };
-     int n, i, j, k, sw = 0;
-
-     if(sc == conf.systray.screen)
-          sw = systray_get_width();
+     int n, i, j, k;
 
      for(i = j = n = 0; i < (int)strlen(str); ++i, ++j)
           if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
@@ -195,10 +202,7 @@ void
 statustext_handle(int sc, char *str)
 {
      char *lastst;
-     int i, nr, ng, ns, sw = 0;
-     StatusRec r[128];
-     StatusGraph g[128];
-     StatusText s[128];
+     int i;
 
      /* If the str == the current statustext, return (not needed) */
      if(!str)
@@ -215,24 +219,12 @@ statustext_handle(int sc, char *str)
      infobar[sc].statustext = xstrdup(str);
 
      /* Store rectangles, located text & images properties. */
-     nr = statustext_rectangle(r, str);
-     ng = statustext_graph(g, str);
-     ns = statustext_text(s, str);
+     statustext_rectangle(&infobar[sc], str);
+     statustext_graph(&infobar[sc], str);
+     statustext_text(&infobar[sc], str);
 
      /* Draw normal text (and possibly colored with \#color\ blocks) */
      statustext_normal(sc, str);
-
-     /* Draw rectangles with stored properties. */
-     for(i = 0; i < nr; ++i)
-          draw_rectangle(infobar[sc].bar->dr, r[i].x - sw, r[i].y, r[i].w, r[i].h, r[i].color);
-
-     /* Draw graphs with stored properties. */
-     for(i = 0; i < ng; ++i)
-          draw_graph(infobar[sc].bar->dr, g[i].x - sw, g[i].y, g[i].w, g[i].h, g[i].color, g[i].data);
-
-     /* Draw located text with stored properties. */
-     for(i = 0; i < ns; ++i)
-          draw_text(infobar[sc].bar->dr, s[i].x - sw, s[i].y, s[i].color, s[i].text);
 
      barwin_refresh(infobar[sc].bar);
 
