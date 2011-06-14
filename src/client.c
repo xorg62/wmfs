@@ -338,9 +338,10 @@ client_urgent(Client *c, bool u)
 */
      Client* client_gb_win(Window w)
      {
-          Client *c;
+          Client *c = clients;
 
-          for(c = clients; c && c->win != w; c = c->next);
+          while(c && c->win != w)
+               c = c->next;
 
           return c;
      }
@@ -351,9 +352,10 @@ client_urgent(Client *c, bool u)
 */
      Client* client_gb_frame(Window w)
      {
-          Client *c;
+          Client *c = clients;
 
-          for(c = clients; c && c->frame != w; c = c->next);
+          while(c && c->frame != w)
+               c = c->next;
 
           return c;
      }
@@ -364,12 +366,13 @@ client_urgent(Client *c, bool u)
 */
      Client* client_gb_titlebar(Window w)
      {
-          Client *c;
+          Client *c = clients;
 
           if(!(TBARH - BORDH))
                return NULL;
 
-          for(c = clients; c && c->titlebar->win != w; c = c->next);
+          while(c && c->titlebar->win != w)
+               c = c->next;
 
           return c;
      }
@@ -380,9 +383,10 @@ client_urgent(Client *c, bool u)
 */
      Client* client_gb_resize(Window w)
      {
-          Client *c;
+          Client *c = clients;
 
-          for(c = clients; (c && c->resize[Right] != w) && (c && c->resize[Left] != w); c = c->next);
+          while((c && c->resize[Right] != w) && (c && c->resize[Left] != w))
+               c = c->next;
 
           return c;
      }
@@ -394,13 +398,13 @@ client_urgent(Client *c, bool u)
 */
      Client* client_gb_button(Window w, int *n)
      {
-          Client *c;
+          Client *c = clients;
           int i;
 
           if(!BUTTONWH || !(TBARH - BORDH))
                return NULL;
 
-          for(c = clients; c; c = c->next)
+          for(; c; c = c->next)
                for(i = 0; i < conf.titlebar.nbutton; ++i)
                     if(c->button[i] == w)
                     {
@@ -418,13 +422,13 @@ client_urgent(Client *c, bool u)
 */
      Client* client_gb_pos(Client *c, int x, int y)
      {
-          Client *cc;
+          Client *cc = clients;
 
           if((x | y) < 0 || x > spgeo[c->screen].x + spgeo[c->screen].width
                     || y > spgeo[c->screen].y + spgeo[c->screen].height)
                return NULL;
 
-          for(cc = clients; cc; cc = cc->next)
+          for(; cc; cc = cc->next)
                if(cc != c && cc->screen == c->screen && cc->tag == c->tag
                          && (cc->flags & TileFlag))
                     if(cc->frame_geo.x < x && cc->frame_geo.x + cc->frame_geo.width > x
