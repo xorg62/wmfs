@@ -107,7 +107,7 @@ statustext_graph(InfoBar *ib, char *str)
           else if(j != i)
                str[j] = str[i];
 
-     for(k = j; k < i; str[k++] = 0);
+     for(k = j; k < i; str[k++] = '\0');
 
      return;
 }
@@ -135,7 +135,7 @@ statustext_text(InfoBar *ib, char *str)
           else if(j != i)
                str[j] = str[i];
 
-     for(k = j; k < i; str[k++] = 0);
+     for(k = j; k < i; str[k++] = '\0');
 
      return;
 }

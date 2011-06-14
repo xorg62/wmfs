@@ -112,23 +112,13 @@ parse_image_block(Drawable dr, char *str)
 void
 draw_text(Drawable d, int x, int y, char* fg, char *str)
 {
-#ifdef HAVE_IMLIB
-     char *ostr = NULL;
-     int i, ni, sw = 0;
-     size_t textlen;
-     bool ii = False;
-#else
-     (void)x_image_ofset;
-     (void)y_image_ofset;
-#endif /* HAVE_IMLIB */
-
-     if(!str)
-          return;
+     CHECK(str);
 
      /* To draw image everywhere we can draw text */
 #ifdef HAVE_IMLIB
-     ostr = xstrdup(str);
-     textlen = strlen(ostr);
+     char *ostr = xstrdup(str);
+     bool ii = False;
+     size_t textlen = strlen(ostr);
 
      if(strstr(str, "i["))
      {
@@ -230,18 +220,14 @@ textw(char *text)
 {
      Drawable d = 0;
      ushort ret = 0;
-#ifdef HAVE_IMLIB
-     char *ostr = NULL;
-     size_t textlen;
-     bool ii = False;
-#endif /* HAVE_IMLIB */
 
      if(!text)
           return 0;
 
 #ifdef HAVE_IMLIB
-     ostr = xstrdup(text);
-     textlen = strlen(ostr);
+     char *ostr = xstrdup(text);
+     size_t textlen = strlen(ostr);
+     bool ii = False;
 
      if(strstr(text, "i["))
      {
