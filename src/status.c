@@ -33,7 +33,7 @@
 #include "wmfs.h"
 
 /* Systray width */
-int sw = 0;
+static int sw = 0;
 
 /** Check rectangles blocks in str and draw it
   * --> \b[x;y;width;height;#color]\
@@ -142,16 +142,17 @@ statustext_text(InfoBar *ib, char *str)
 
 /** Draw normal text and colored normal text
   * --> \#color\ text in color
-  *\param sc Screen
+  *\param sc Screen id
+  *\param ib Infobar pointer
   *\param str String
   */
 static void
-statustext_normal(int sc, char *str)
+statustext_normal(int sc, InfoBar *ib, char *str)
 {
      char strwc[MAXSTATUS] = { 0 };
      char buf[MAXSTATUS] = { 0 };
      char col[8] = { 0 };
-     int n, i, j, k;
+     int n, i, j, k, tw;
 
      for(i = j = n = 0; i < (int)strlen(str); ++i, ++j)
           if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
@@ -164,8 +165,7 @@ statustext_normal(int sc, char *str)
                strwc[j] = str[i];
 
      /* Draw normal text without any blocks */
-     draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - (textw(strwc) + sw),
-               FHINFOBAR, infobar[sc].bar->fg, strwc);
+     draw_text(ib->bar->dr, (sgeo[sc].width - SHADH) - (textw(strwc) + sw), FHINFOBAR, ib->bar->fg, strwc);
 
      if(n)
      {
@@ -174,17 +174,18 @@ statustext_normal(int sc, char *str)
           for(i = k = 0; i < (int)strlen(str); ++i, ++k)
                if(str[i] == '\\' && str[i + 1] == '#' && str[i + 8] == '\\')
                {
+                    tw = textw(&buf[k]);
+
                     /* Store current color in col[] */
                     for(j = 0, ++i; str[i] != '\\'; col[j++] = str[i++]);
 
                     /* Draw a rectangle with the bar color to draw the text properly */
-                    draw_rectangle(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - (textw(&buf[k]) + sw),
-                                   0, INFOBARH - (sgeo[sc].width - SHADH) - textw(&buf[k]),
-                                   INFOBARH, conf.colors.bar);
+                    draw_rectangle(ib->bar->dr, (sgeo[sc].width - SHADH) - (tw + sw),
+                              0, INFOBARH - (sgeo[sc].width - SHADH) - tw,
+                              INFOBARH, conf.colors.bar);
 
                     /* Draw text with its color */
-                    draw_text(infobar[sc].bar->dr, (sgeo[sc].width - SHADH) - (textw(&buf[k]) + sw),
-                              FHINFOBAR,  col, &buf[k]);
+                    draw_text(ib->bar->dr, (sgeo[sc].width - SHADH) - (tw + sw), FHINFOBAR,  col, &buf[k]);
 
                     strncpy(buf, strwc, sizeof(buf));
                     ++i;
@@ -195,12 +196,13 @@ statustext_normal(int sc, char *str)
 }
 
 /** Handle statustext and draw all things in infobar of specified screen
-  *\param sc Screen number
+  *\param sc Screen id
   *\param str String
   */
 void
 statustext_handle(int sc, char *str)
 {
+     InfoBar *ib = &infobar[sc];
      char *lastst;
      int i;
 
@@ -211,22 +213,22 @@ statustext_handle(int sc, char *str)
      if(sc == conf.systray.screen)
           sw = systray_get_width();
 
-     barwin_refresh_color(infobar[sc].bar);
+     barwin_refresh_color(ib->bar);
 
      /* save last status text address (for free at the end) */
-     lastst = infobar[sc].statustext;
+     lastst = ib->statustext;
 
-     infobar[sc].statustext = xstrdup(str);
+     ib->statustext = xstrdup(str);
 
      /* Store rectangles, located text & images properties. */
-     statustext_rectangle(&infobar[sc], str);
-     statustext_graph(&infobar[sc], str);
-     statustext_text(&infobar[sc], str);
+     statustext_rectangle(ib, str);
+     statustext_graph(ib, str);
+     statustext_text(ib, str);
 
      /* Draw normal text (and possibly colored with \#color\ blocks) */
-     statustext_normal(sc, str);
+     statustext_normal(sc, ib, str);
 
-     barwin_refresh(infobar[sc].bar);
+     barwin_refresh(ib->bar);
 
      free(lastst);
 
