@@ -285,8 +285,6 @@ frame_update(Client *c)
                          XSetWindowBorder(dpy, c->button[i], c->colors.frame);
                }
           }
-
-          barwin_refresh(c->titlebar);
      }
 
      XSetWindowBackground(dpy, c->frame, c->colors.frame);

@@ -247,7 +247,7 @@ void
 client_focus(Client *c)
 {
      bool prevwasmax = False;
-     int prevscreen;
+     int prevscreen = 0;
      Client *cc;
 
      if(sel && sel != c)
