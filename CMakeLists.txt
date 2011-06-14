@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 2.8)
 project(wmfs)
 
 set(CMAKE_C_FLAGS_RELEASE "-Wall")
-set(CMAKE_C_FLAGS_DEBUG "-Wall -g")
+set(CMAKE_C_FLAGS_DEBUG "-Wall -g -ansi -pendantic -O3 -funroll-loops")
 
 # General option
 option(WITH_XINERAMA "Build with X.Org xinerama support" ON)

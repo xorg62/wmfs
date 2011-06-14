@@ -498,7 +498,7 @@ uicb_tag_urgent(uicb_t cmd)
 void
 tag_additional(int sc, int tag, int adtag)
 {
-     if(tag < 0 || (tag | adtag) > conf.ntag[sc]
+     if(tag < 0 || (tag | adtag) > conf.ntag[sc] + 1
                || adtag < 1 || adtag == seltag[sc])
           return;
 

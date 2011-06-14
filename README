@@ -4,34 +4,36 @@ WMFS Window Manager.
 
 A highly configurable and manageable tiling Window Manager created from scratch
 
-AUTHORS : (in order of commits and > 5 commits)
+AUTHOR :
  - Martin Duquesnoy <xorg62@gmail.com>
+
+CONTRIBUTORS :
  - Philippe Pepiot <phil@philpep.org>
  - Marc Lagrange <markocpc@gmail.com>
  - OldMan <tele-post@mail.ru>
  - Raphael Khaiat <raphael@khaiat.org>
  - Tomáš Chvátal <scarabeus@gentoo.org>
  - David Delassus <linkdd@ydb.me>
+ - David Demelier <markand@malikania.fr>
 
-
-LICENSE : BSD
+LICENSE : BSD, see COPYING.
 
 REQUIREMENT :
-  - freetype2
-  - libxft
   - libx11
+  - libxft      (optional)
+    \- freetype
   - libxinerama (optional)
   - libxrandr   (optional)
   - imlib2      (optional)
+  - cmake>=2.8  (build system)
 
 OS :
   - GNU/Linux : Supported.
   - FreeBSD/OpenBSD/NetBSD : Supported.
 
 INSTALL :
-./configure [--without-imlib2|--without-xrandr|--without-xinerama] (./configure -h)
-make
-sudo make install
+mkdir build/ && cd build/
+cmake ..
 
 DISTROS :
   - wmfs port for FreeBSD at x11-wm/wmfs
