@@ -175,7 +175,7 @@ split_arrange_closed(Client *ghost)
       * |     |  C  | ->   C   -> |     |v v v|
       * |_____|_____| ->       -> |_____|_____|
       */
-     for(p = Right; p < Bottom; ++p)
+     for(p = Right; p < Center; ++p)
           if((c = client_get_next_with_direction(ghost, p)))
                if(CFACTOR_CHECK2(ghost->frame_geo, c->frame_geo, p))
                {
@@ -194,7 +194,7 @@ split_arrange_closed(Client *ghost)
       * |     |  C  | ->   A   -> | <<  C     |
       * |_____|_____| ->       -> |___________|
       */
-     for(p = Right; p < Bottom && !b; ++p)
+     for(p = Right; p < Center && !b; ++p)
           if((c = client_get_next_with_direction(ghost, p)) && _split_check_row_dir(c, ghost, p))
           {
                for(cgeo = c->frame_geo, cc = tiled_client(c->screen, clients);
