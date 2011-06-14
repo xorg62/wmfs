@@ -116,14 +116,14 @@ draw_text(Drawable d, int x, int y, char* fg, char *str)
 
      /* To draw image everywhere we can draw text */
 #ifdef HAVE_IMLIB
-     char *ostr = xstrdup(str);
-     bool ii = False;
-     size_t textlen = strlen(ostr);
+     char *ostr;
+     size_t textlen = 0;
 
      if(strstr(str, "i["))
      {
+          ostr = xstrdup(str);
+          textlen = strlen(ostr);
           parse_image_block(d, str);
-          ii = True;
      }
 #endif /* HAVE_IMLIB */
 
@@ -157,10 +157,11 @@ draw_text(Drawable d, int x, int y, char* fg, char *str)
 
 
 #ifdef HAVE_IMLIB
-     if(ii)
+     if(textlen)
+     {
           strncpy(str, ostr, textlen);
-
-     free(ostr);
+          free(ostr);
+     }
 #endif /* HAVE_IMLIB */
 
      return;
@@ -225,14 +226,14 @@ textw(char *text)
           return 0;
 
 #ifdef HAVE_IMLIB
-     char *ostr = xstrdup(text);
-     size_t textlen = strlen(ostr);
-     bool ii = False;
+     char *ostr;
+     size_t textlen = 0;
 
      if(strstr(text, "i["))
      {
+          ostr = xstrdup(text);
+          textlen = strlen(ostr);
           parse_image_block(d, text);
-          ii = True;
      }
 #endif /* HAVE_IMLIB */
 
@@ -254,10 +255,11 @@ textw(char *text)
      }
 
 #ifdef HAVE_IMLIB
-     if(ii)
+     if(textlen)
+     {
           strncpy(text, ostr, textlen);
-
-     free(ostr);
+          free(ostr);
+     }
 #endif /* HAVE_IMLIB */
 
      return ret;
