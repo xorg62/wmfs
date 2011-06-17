@@ -228,6 +228,7 @@ statustext_handle(int sc, char *str)
      /* Draw normal text (and possibly colored with \#color\ blocks) */
      statustext_normal(sc, ib, str);
 
+     sw = 0;
      barwin_refresh(ib->bar);
 
      free(lastst);

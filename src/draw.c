@@ -33,6 +33,8 @@
 #include "wmfs.h"
 
 #ifdef HAVE_IMLIB
+static int sw = 0;
+
 /** Draw an image in a drawable
   * \param dr Drawable
   * \param x X position
@@ -44,7 +46,7 @@ draw_image(Drawable dr, int x, int y, int w, int h, char *name)
 {
      Imlib_Image image;
 
-     if(!name || !dr)
+     if(!dr)
           return;
 
      imlib_context_set_display(dpy);
@@ -82,7 +84,7 @@ parse_image_block(Drawable dr, char *str)
 {
      ImageAttr im;
      char as;
-     int i, j, k, sw = systray_get_width();
+     int i, j, k;
 
      for(i = j = 0; i < (int)strlen(str); ++i, ++j)
           if(sscanf(&str[i], "\\i[%d;%d;%d;%d;%512[^]]]%c", &im.x, &im.y, &im.w, &im.h, im.name, &as) == 6
@@ -95,7 +97,7 @@ parse_image_block(Drawable dr, char *str)
           else if(j != i)
                str[j] = str[i];
 
-     for(k = j; k < i; str[k++] = 0);
+     for(sw = 0, k = j; k < i; str[k++] = 0);
 
      return;
 }
@@ -121,6 +123,9 @@ draw_text(Drawable d, int x, int y, char* fg, char *str)
 
      if(strstr(str, "i["))
      {
+          if(d == infobar[conf.systray.screen].bar->dr)
+               sw = systray_get_width();
+
           ostr = xstrdup(str);
           textlen = strlen(ostr);
           parse_image_block(d, str);

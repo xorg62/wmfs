@@ -385,7 +385,7 @@ client_urgent(Client *c, bool u)
      {
           Client *c = clients;
 
-          while((c && c->resize[Right] != w) && (c && c->resize[Left] != w))
+          while(c && (c->resize[Right] != w) && (c->resize[Left] != w))
                c = c->next;
 
           return c;
@@ -909,7 +909,7 @@ client_moveresize(Client *c, Geo geo, bool r)
           client_geo_hints(&geo, c);
 
           /* To balance position of window in frame */
-          rhx = (((c->wrgeo.width) - geo.width) >> 1);
+          rhx = (c->wrgeo.width - geo.width) >> 1;
       }
 
      c->geo = geo;
