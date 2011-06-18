@@ -372,7 +372,7 @@ uicb_tag_stay_last(uicb_t cmd)
      {
           int i;
           remove_old_last_tag(selscreen);
-          
+
           for(i = seltag[selscreen]; i <= conf.ntag[selscreen]; i++)
           {
                tag_swap(selscreen, seltag[selscreen], seltag[selscreen] + 1);
@@ -601,7 +601,7 @@ tag_new(int s, char *name)
          displayedName = xstrdup(name);
 
 
-     Tag t = { displayedName, NULL, 0, 0,
+     Tag t = { displayedName, NULL, 0, NULL, 0,
                conf.default_tag.mwfact, conf.default_tag.nmaster,
                False, conf.default_tag.resizehint, False, False,
                conf.default_tag.barpos, conf.default_tag.barpos, conf.default_tag.layout,
@@ -760,7 +760,7 @@ uicb_tag_toggle_expose(uicb_t cmd)
                return;
           }
      }
-     
+
      tag_new(selscreen, conf.tag_expose_name);
 
      for(i = 0; i < conf.nlayout; ++i)
@@ -775,7 +775,7 @@ uicb_tag_toggle_expose(uicb_t cmd)
      {
           tags[selscreen][conf.ntag[selscreen]].tagad ^= TagFlag(i);
      }
-     
+
      tags[selscreen][conf.ntag[selscreen]].request_update = True;
      arrange(selscreen, True);
 

@@ -37,6 +37,7 @@ const func_name_list_t func_list[] =
      {"spawn",                    uicb_spawn },
      {"client_kill",              uicb_client_kill },
      {"client_prev",              uicb_client_prev },
+     {"client_prev_sel",          uicb_client_prev_sel },
      {"client_next",              uicb_client_next },
      {"client_swap_next",         uicb_client_swap_next },
      {"client_swap_prev",         uicb_client_swap_prev },
@@ -522,7 +523,7 @@ conf_tag_section(void)
      /* If there is no tag in the conf or more than
       * MAXTAG (36) print an error and create only one.
       */
-     Tag default_tag = { fetch_opt_first(def_tag, "new tag", "name").str, NULL, 0, 1,
+     Tag default_tag = { fetch_opt_first(def_tag, "new tag", "name").str, NULL, 0, NULL, 1,
                          fetch_opt_first(def_tag, "0.6", "mwfact").fnum,
                          fetch_opt_first(def_tag, "1", "nmaster").num,
                          False, fetch_opt_first(def_tag, "False", "resizehint").bool,

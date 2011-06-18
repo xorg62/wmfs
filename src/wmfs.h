@@ -185,6 +185,7 @@ void client_urgent(Client *c, Bool u);
 void uicb_client_raise(uicb_t);
 void uicb_client_next(uicb_t);
 void uicb_client_prev(uicb_t);
+void uicb_client_prev_sel(uicb_t);
 void uicb_client_swap_next(uicb_t);
 void uicb_client_swap_prev(uicb_t);
 void uicb_client_focus_right(uicb_t cmd);

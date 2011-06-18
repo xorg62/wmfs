@@ -131,6 +131,26 @@ client_get_prev(void)
      return c;
 }
 
+/** Get the previously selected client
+ *\return The previously selected client or NULL
+ */
+static Client*
+client_get_prev_sel(void)
+{
+     Client *prevsel = NULL;
+
+     screen_get_sel();
+
+     if(!sel || ishide(sel, selscreen))
+          return NULL;
+
+     prevsel = tags[selscreen][sel->tag].prevsel;
+     if (!prevsel || ishide(prevsel, selscreen))
+          return NULL;
+
+     return prevsel;
+}
+
 /** Get client left/right/top/bottom of selected client
   *\param pos Position (Left/Right/Top/Bottom
   *\return Client found
@@ -202,6 +222,24 @@ uicb_client_next(uicb_t cmd)
      (void)cmd;
 
      if((c = client_get_next()))
+     {
+          client_focus(c);
+          client_raise(c);
+     }
+
+     return;
+}
+
+/** Switch to the previously selected client
+ * \param cmd uicb_t type unused
+ */
+void
+uicb_client_prev_sel(uicb_t cmd)
+{
+     Client *c;
+     (void)cmd;
+
+     if((c = client_get_prev_sel()))
      {
           client_focus(c);
           client_raise(c);
@@ -370,6 +408,10 @@ client_focus(Client *c)
           frame_update(sel);
 
           mouse_grabbuttons(sel, !conf.focus_pclick);
+
+          /* Only record previously selected client in case we are not switching tags */
+          if (c && c->tag == sel->tag)
+               tags[sel->screen][sel->tag].prevsel = sel;
      }
 
      if((sel = c))
