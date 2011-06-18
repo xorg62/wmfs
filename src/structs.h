@@ -279,6 +279,7 @@ typedef struct
      char *name;
      char **clients;
      int nclients;
+     Client *prevsel;
      int layers;
      float mwfact;
      int nmaster;

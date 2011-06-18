@@ -53,6 +53,7 @@ static vicmd_to_uicb vicmd[] =
      {"ctp",     "tag_transfert_prev"},
      {"cn",      "client_next"},
      {"cp",      "client_prev"},
+     {"cps",     "client_prev_sel"},
      {"csn",     "client_swap_next"},
      {"csp",     "client_swap_prev"},
      {"mwf",     "set_mwfact"},
