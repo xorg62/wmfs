@@ -32,12 +32,12 @@
           printf("( \e[1m%s\e[0m ) ", s); \
      } while(/* CONSTCOND */ 0);
 
-#define DISP_PAYLOAD(p, l)               \
-     do {                                \
-          int i = 0;                     \
-          for(; i < (l) && (p)++; ++i)   \
-               if(isprint(*(p)))         \
-                    putchar((char)*(p)); \
+#define DISP_PAYLOAD(p, l)                \
+     do {                                 \
+          int i = 0;                      \
+          for(; i < (l) && (p); ++i, ++p) \
+               if(isprint(*(p)))          \
+                    putchar((char)*(p));  \
      } while(/* CONSTCOND */ 0);
 
 #define BYE(s, er)                           \
