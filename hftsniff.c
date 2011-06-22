@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <limits.h>
+#include <ctype.h>
 
 #include <pcap.h>
 #include <sys/socket.h>
@@ -29,6 +30,14 @@
 #define DISP_PROTO(s)                     \
      do {                                 \
           printf("( \e[1m%s\e[0m ) ", s); \
+     } while(/* CONSTCOND */ 0);
+
+#define DISP_PAYLOAD(p, l)               \
+     do {                                \
+          int i = 0;                     \
+          for(; i < (l) && (p)++; ++i)   \
+               if(isprint(*(p)))         \
+                    putchar((char)*(p)); \
      } while(/* CONSTCOND */ 0);
 
 #define BYE(s, er)                           \
@@ -165,7 +174,8 @@ pkt_handle(unsigned char *args, const struct pcap_pkthdr *header, const unsigned
 {
      struct ethernet_header *eth;
      struct ip_header       *ip;
-     int                     len, plen, i = 0;
+     const unsigned char    *payload;
+     int                     len, plen, paylen, i = 0;
      bool                    pfound = false;
 
      /* Translate ethernet pkt */
@@ -198,7 +208,16 @@ pkt_handle(unsigned char *args, const struct pcap_pkthdr *header, const unsigned
           IP_SRCDEST(inet_ntoa(ip->ip_src), -1,  /* src  */
                      inet_ntoa(ip->ip_dst), -1); /* dest */
 
+
+          puts("\n");
+          return;
      }
+
+     /* Get / Display payload */
+     payload = (unsigned char*)(packet + ETHERNET_SIZE + len + plen);
+
+     if((paylen = ntohs(ip->ip_len) - (len + plen)) > 0)
+          DISP_PAYLOAD(payload, paylen);
 
      puts("\n");
 
