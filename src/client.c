@@ -38,6 +38,19 @@
 void
 client_attach(Client *c)
 {
+     if(sel) {
+          if (sel->next) {
+               c->next = sel->next;
+               sel->next->prev = c;
+          } else {
+               c->next = NULL;
+          }
+          sel->next = c;
+          c->prev = sel;
+
+          return;
+     } 
+
      if(clients)
           clients->prev = c;
 
