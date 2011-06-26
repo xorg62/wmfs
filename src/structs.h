@@ -41,40 +41,40 @@
 #define HISTOLEN       128
 
 /* Clients flags definition */
-#define FreeFlag   (1 << 1)
-#define MaxFlag    (1 << 2)
-#define TileFlag   (1 << 3)
-#define HideFlag   (1 << 4)
-#define LMaxFlag   (1 << 5)
-#define UnmapFlag  (1 << 6)
-#define HintFlag   (1 << 7)
-#define FSSFlag    (1 << 8)
-#define AboveFlag  (1 << 9)
-#define UrgentFlag (1 << 10)
-#define FLayFlag   (1 << 11)
-#define DockFlag   (1 << 12)
+#define FreeFlag   0x01
+#define MaxFlag    0x02
+#define TileFlag   0x04
+#define HideFlag   0x08
+#define LMaxFlag   0x10
+#define UnmapFlag  0x20
+#define HintFlag   0x40
+#define FSSFlag    0x80
+#define AboveFlag  0x100
+#define UrgentFlag 0x200
+#define FLayFlag   0x400
+#define DockFlag   0x800
 
 /* Layout flags definition */
-#define IntegrationFlag  (1 << 1)
-#define ArrangeFlag      (1 << 2)
+#define IntegrationFlag 0x01
+#define ArrangeFlag     0x02
 
 /* Tag flags definition */
-#define TagUrgentFlag     (1 << 1)
-#define ResizeHintFlag    (1 << 2)
-#define RequestUpdateFlag (1 << 3)
-#define AboveFCFlag       (1 << 4)
-#define CleanFactFlag     (1 << 5)
-#define StayLastFlag      (1 << 6)
-#define SplitFlag         (1 << 7)
-#define FirstArrangeFlag  (1 << 8)
-#define IgnoreEnterFlag   (1 << 9)
+#define TagUrgentFlag     0x01
+#define ResizeHintFlag    0x02
+#define RequestUpdateFlag 0x04
+#define AboveFCFlag       0x08
+#define CleanFactFlag     0x10
+#define StayLastFlag      0x20
+#define SplitFlag         0x40
+#define FirstArrangeFlag  0x80
+#define IgnoreEnterFlag   0x100
 
 #define TagFlag(t) (1 << (t))
 
 /* BarWindow flags definition */
-#define MappedFlag   (1 << 1)
-#define StippleFlag  (1 << 2)
-#define BordFlag     (1 << 3)
+#define MappedFlag   0x01
+#define StippleFlag  0x02
+#define BordFlag     0x04
 
 /* XEMBED messages */
 #define XEMBED_MAPPED                 (1 << 0)
@@ -523,6 +523,7 @@ typedef struct
      bool layout_system; /* Switch: False, Menu: True. */
      bool layout_placement; /* Right (normal): False, Left: True. */
      bool keep_layout_geo;
+     bool cfactor_enable_split;
      char *tag_expose_name;
      char *expose_layout;
      char *selected_layout_symbol;

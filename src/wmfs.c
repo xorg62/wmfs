@@ -456,7 +456,7 @@ int
 main(int argc, char **argv)
 {
      int i;
-     char *ol = "csVS";
+     char *ol = "csS";
      extern char *optarg;
      extern int optind;
      struct sigaction sa;
@@ -465,7 +465,7 @@ main(int argc, char **argv)
      all_argv = argv;
      sprintf(conf.confpath, "%s/"DEF_CONF, getenv("HOME"));
 
-     while((i = getopt(argc, argv, "hviSc:s:C:V:")) != -1)
+     while((i = getopt(argc, argv, "hviSc:s:C:")) != -1)
      {
 
           /* For options who need WMFS running */
@@ -480,7 +480,6 @@ main(int argc, char **argv)
                       "   -C <file>                 Load a configuration file\n"
                       "   -c <uicb_function> <cmd>  Execute an uicb function to control WMFS\n"
                       "   -s <screen_num> <string>  Set the bar(s) statustext\n"
-                      "   -V <viwmfs cmd>           Manage WMFS with vi-like command\n"
                       "   -S                        Update status script\n"
                       "   -h                        Show this page\n"
                       "   -i                        Show informations\n"
@@ -519,12 +518,6 @@ main(int argc, char **argv)
                     set_statustext(atoi(optarg), argv[3]);
                else
                     set_statustext(-1, optarg);
-               XCloseDisplay(dpy);
-               exit(EXIT_SUCCESS);
-               break;
-
-          case 'V':
-               viwmfs(argc, argv);
                XCloseDisplay(dpy);
                exit(EXIT_SUCCESS);
                break;

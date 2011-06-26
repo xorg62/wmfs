@@ -422,10 +422,6 @@ void uicb_split_move_Top(uicb_t);
 void uicb_split_move_Bottom(uicb_t);
 /* }}} */
 
-
-/* viwmfs.c */
-void viwmfs(int argc, char **argv);
-
 /* wmfs.c */
 int errorhandler(Display *d, XErrorEvent *event);
 int errorhandlerdummy(Display *d, XErrorEvent *event);

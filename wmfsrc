@@ -73,6 +73,9 @@
         # Keep layout geo for free layout
         keep_layout_geo = false
 
+        # Enable split mode with client_resize_<direction>
+        cfactor_enable_split = true
+
         # Symbol displayed for the selected layout in the list
         selected_layout_symbol = "*"
 
@@ -308,15 +311,6 @@
                 prompt = "Exec: "
                 command = "exec"
         [/set_launcher]
-
-        #ViWMFS : manage wmfs with vi-based command.
-        [set_launcher]
-                name = "viwmfs"
-                prompt = "> "
-                command = "wmfs -V"
-        [/set_launcher]
-[/launcher]
-
 [keys]
          # Reload the configuration of wmfs.
         [key] mod = {"Alt", "Control"} key = "r" func = "reload" [/key]
@@ -387,9 +381,6 @@
 
         #Launcher.
         [key] mod = {"Alt"} key = "p" func = "launcher" cmd = "launcher_exec" [/key]
-
-        #ViWMFS
-        [key] mod = {"Alt"} key = "Escape" func = "launcher" cmd = "viwmfs" [/key]
 
         # Set the tag x.
         [key] mod = {"Alt"} key = "F1" func = "tag" cmd = "1" [/key]

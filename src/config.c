@@ -445,6 +445,7 @@ conf_layout_section(void)
      conf.colors.layout_bg       = getcolor((fetch_opt_first(layouts, "#000000", "bg").str));
      conf.keep_layout_geo        = fetch_opt_first(layouts, "false", "keep_layout_geo").boolean;
      conf.selected_layout_symbol = fetch_opt_first(layouts, "*", "selected_layout_symbol").str;
+     conf.cfactor_enable_split   = fetch_opt_first(layouts, "false", "cfactor_enable_split").boolean;
 
      if((tmp = fetch_opt_first(layouts, "menu", "system").str) && !strcmp(tmp, "menu"))
           conf.layout_system = True;

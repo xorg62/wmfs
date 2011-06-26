@@ -247,6 +247,14 @@ cfactor_set(Client *c, Position p, int fac)
      /* Arrange client and row parents */
      cfactor_arrange_row(c, gc, p, fac);
 
+     /* Enable split with cfactor_enable_split option */
+     if(conf.cfactor_enable_split
+               && !(tags[c->screen][c->tag].flags & SplitFlag))
+     {
+          tags[c->screen][c->tag].flags |= SplitFlag;
+          infobar_draw_layout(&infobar[c->screen]);
+     }
+
      return;
 }
 
