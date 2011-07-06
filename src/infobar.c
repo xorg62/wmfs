@@ -188,7 +188,7 @@ infobar_draw_selbar(int sc)
      else if(sel && !infobar[sc].selbar->mapped)
           barwin_map(infobar[sc].selbar);
 
-     if(conf.selbar.maxlength >= 0 && sel)
+     if(conf.selbar.maxlength >= 0 && sel && sel->title)
      {
           str = xcalloc(conf.selbar.maxlength + 4, sizeof(char));
           strncpy(str, sel->title, conf.selbar.maxlength);
