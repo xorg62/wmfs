@@ -543,6 +543,8 @@ typedef struct
 #endif /* HAVE_XFT */
      XFontSet fontset;
 } FontStruct;
+
+/* status.c util struct */
 typedef struct
 {
      int x, y, w, h;

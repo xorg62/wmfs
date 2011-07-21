@@ -502,16 +502,12 @@ tag_additional(int sc, int tag, int adtag)
                || adtag < 1 || adtag == seltag[sc])
           return;
 
-     if(tags[sc][tag].flags & SplitFlag)
-          tags[sc][tag].flags &= ~SplitFlag;
-
-     tags[sc][tag].tagad ^= TagFlag(adtag);
-     tags[sc][adtag].flags |= RequestUpdateFlag;
-     tags[sc][tag].flags |= CleanFactFlag;
-     tags[sc][adtag].flags |= CleanFactFlag;
-
-     if(tags[sc][adtag].flags & SplitFlag)
-          tags[sc][adtag].flags &= ~SplitFlag;
+     tags[sc][tag].flags    &= ~SplitFlag;
+     tags[sc][tag].tagad    ^=  TagFlag(adtag);
+     tags[sc][adtag].flags  |=  RequestUpdateFlag;
+     tags[sc][tag].flags    |=  CleanFactFlag;
+     tags[sc][adtag].flags  |=  CleanFactFlag;
+     tags[sc][adtag].flags  &= ~SplitFlag;
 
      arrange(sc, True);
 

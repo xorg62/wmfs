@@ -206,7 +206,7 @@ infobar_draw_selbar(InfoBar *i)
           barwin_map(i->selbar);
 
      /* Truncate string if too long */
-     if(conf.selbar.maxlength >= 0 && sel)
+     if(conf.selbar.maxlength >= 0 && sel && sel->title)
      {
           str = xcalloc(conf.selbar.maxlength + 4, sizeof(char));
           strncpy(str, sel->title, conf.selbar.maxlength);
@@ -424,8 +424,7 @@ uicb_infobar_toggledisplay(uicb_t cmd)
 
      new_pos = (tags[selscreen][seltag[selscreen]].barpos
                ? 0 : (tags[selscreen][seltag[selscreen]].prev_barpos
-               ? tags[selscreen][seltag[selscreen]].prev_barpos : 2
-               ));
+                    ? tags[selscreen][seltag[selscreen]].prev_barpos : 2));
 
      tags[selscreen][seltag[selscreen]].prev_barpos = tags[selscreen][seltag[selscreen]].barpos;
      tags[selscreen][seltag[selscreen]].barpos = new_pos;
