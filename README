@@ -25,7 +25,7 @@ REQUIREMENT :
   - libxinerama (optional)
   - libxrandr   (optional)
   - imlib2      (optional)
-  - cmake>=2.8  (build system)
+  - cmake>=2.8  (build system, optional)
 
 OS :
   - GNU/Linux : Supported.
