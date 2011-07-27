@@ -183,8 +183,6 @@ conf_misc_section(void)
      conf.focus_fmouse      = fetch_opt_first(sec, "true", "focus_follow_mouse").boolean;
      conf.focus_fmov        = fetch_opt_first(sec, "false", "focus_follow_movement").boolean;
      conf.focus_pclick      = fetch_opt_first(sec, "true", "focus_pointer_click").boolean;
-     conf.status_timing     = fetch_opt_first(sec, "1", "status_timing").num;
-     conf.status_path       = fetch_opt_first(sec, "", "status_path").str;
      conf.autostart_path    = fetch_opt_first(sec, "", "autostart_path").str;
      conf.autostart_command = fetch_opt_first(sec, "", "autostart_command").str;
      pad                    = fetch_opt_first(sec, "12", "pad").num;
@@ -202,12 +200,6 @@ conf_misc_section(void)
      }
 
      conf.pad = pad;
-
-     if(conf.status_timing < 0)
-     {
-          warnx("configuration : status_timing value (%d) incorrect.", conf.status_timing);
-          conf.status_timing = 1;
-     }
 
      return;
 }

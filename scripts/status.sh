@@ -8,4 +8,4 @@ statustext()
      wmfs -s "`date`"
 }
 
-statustext
+while true; do statustext; sleep 10; done

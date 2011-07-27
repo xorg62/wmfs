@@ -158,7 +158,6 @@ enum
      /* WMFS HINTS */
      wmfs_running,
      wmfs_update_hints,
-     wmfs_update_status,
      wmfs_current_tag,
      wmfs_current_screen,
      wmfs_current_layout,
@@ -413,9 +412,6 @@ typedef struct
      bool tagnamecount;
      Tag default_tag;
      uint pad;
-     int status_timing;
-     char *status_path;
-     pid_t status_pid;
      char *autostart_path;
      char *autostart_command;
      struct

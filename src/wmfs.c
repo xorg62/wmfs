@@ -143,51 +143,7 @@ quit(void)
 
      free(event_handle);
 
-     /* kill status script */
-     if (conf.status_pid != (pid_t)-1)
-         kill(conf.status_pid, SIGTERM);
-
      return;
-}
-
-static void
-wait_childs_and_status(void)
-{
-     int pid;
-
-     pthread_mutex_lock(&mtx);
-     if (sig_chld) {
-          while ((pid = waitpid(-1, NULL, WNOHANG)) > 0)
-               if (pid == conf.status_pid)
-                    conf.status_pid = -1;
-          sig_chld = False;
-     }
-     pthread_mutex_unlock(&mtx);
-}
-
-static void *
-thread_status(void *arg)
-{
-     (void)arg;
-     int left = conf.status_timing;
-
-     pthread_detach(pthread_self());
-
-     do
-     {
-          wait_childs_and_status();
-
-          pthread_mutex_lock(&mtx);
-          if (conf.status_pid == -1)
-               conf.status_pid = spawn(conf.status_path);
-          pthread_mutex_unlock(&mtx);
-
-          while ((left = sleep(left)) > 0);
-          left = conf.status_timing;
-
-     } while (!exiting);
-
-     pthread_exit(NULL);
 }
 
 /** WMFS main loop.
@@ -196,24 +152,9 @@ static void
 mainloop(void)
 {
      XEvent ev;
-     pthread_t th_status;
-
-     if(estatus && !conf.status_timing)
-          conf.status_pid = spawn(conf.status_path);
-     else if(estatus && pthread_create(&th_status, NULL, thread_status, NULL) != 0)
-     {
-          warnx("pthread_create");
-          estatus = False;
-     }
 
      while(!exiting && !XNextEvent(dpy, &ev))
-     {
           HANDLE_EVENT(&ev);
-          wait_childs_and_status();
-     }
-
-     if(estatus)
-          pthread_join(th_status, NULL);
 
      return;
 }

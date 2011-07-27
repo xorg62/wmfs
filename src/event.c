@@ -281,10 +281,6 @@ clientmessageevent(XEvent *e)
           screen_get_sel();
      }
 
-     /* Manage _WMFS_UPDATE_STATUS */
-     if(mess_t == wmfs_update_status && estatus)
-          spawn(conf.status_path);
-
      return;
 }
 

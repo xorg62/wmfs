@@ -196,43 +196,6 @@ init_root(void)
      return;
 }
 
-/** Init statustext shell script
-  */
-static void
-init_status(void)
-{
-     struct stat st;
-     char *home;
-
-     conf.status_pid = -1;
-     estatus = False;
-
-     if(!conf.status_path)
-     {
-          if(!(home = getenv("HOME")))
-          {
-               warnx("HOME not set, can't launch status.sh");
-               return;
-          }
-
-          conf.status_path = zmalloc(strlen(home) + strlen(DEF_STATUS) + 2);
-          sprintf(conf.status_path, "%s/"DEF_STATUS, home);
-     }
-
-     if (stat(patht(conf.status_path), &st) == -1)
-     {
-          warn("%s", patht(conf.status_path));
-          return;
-     }
-
-     if(st.st_size && st.st_mode & S_IXUSR)
-          estatus = True;
-     else
-          warnx("status file specified in configuratin (status_path) or present in wmfs directory can't be executed, try 'chmod +x %s'.", patht(conf.status_path));
-
-     return;
-}
-
 /** Init WMFS
 */
 void
@@ -250,7 +213,6 @@ init(void)
      event_make_array();
      infobar_init();
      systray_acquire();
-     init_status();
      ewmh_update_current_tag_prop();
      grabkeys();
 

@@ -442,7 +442,6 @@ int selscreen;
 int prevselscreen;
 Conf conf;
 Key *keys;
-bool estatus;
 Geo *sgeo;
 Geo *spgeo;
 Cursor cursor[CurLast];
