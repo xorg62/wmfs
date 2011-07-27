@@ -21,7 +21,7 @@ LICENSE : BSD, see COPYING.
 REQUIREMENT :
   - libx11
   - libxft      (optional)
-    \- freetype
+  - freetype
   - libxinerama (optional)
   - libxrandr   (optional)
   - imlib2      (optional)
@@ -34,6 +34,9 @@ OS :
 INSTALL :
 mkdir build/ && cd build/
 cmake ..
+
+You can also use old build system if you don't want^Whave cmake
+./configure && make
 
 DISTROS :
   - wmfs port for FreeBSD at x11-wm/wmfs

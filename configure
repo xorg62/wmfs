@@ -1,0 +1,105 @@
+#!/bin/sh
+
+LIBS="x11 xft freetype2"
+USE_XINERAMA="xinerama"
+USE_XRANDR="xrandr"
+USE_IMLIB2="imlib2"
+OS=`uname -s`
+PREFIX=/usr/local
+MANPREFIX="$PREFIX/man"
+XDG_CONFIG_DIR="$PREFIX/etc/xdg"
+
+while true; do
+	case "$1" in
+		--without-xinerama)
+			USE_XINERAMA="";  shift;;
+		--without-xrandr)
+			USE_XRANDR="";  shift;;
+		--without-imlib2)
+			USE_IMLIB2="";  shift;;
+		--prefix)
+			[ -z "$2" ] && echo "Missing argument" && exit 1
+			PREFIX=$2; shift 2;;
+		--xdg-config-dir)
+			[ -z "$2" ] && echo "Missing argument" && exit 1
+			XDG_CONFIG_DIR=$2; shift 2;;
+		--man-prefix)
+			[ -z "$2" ] && echo "Missing argument" && exit 1
+			MANPREFIX=$2; shift 2;;
+		--help|-h)
+			echo "Usage: ./configure [options]
+	--without-imlib2		: compile without imlib2 support
+	--without-xrandr		: compile without xrandr support
+	--without-xinerama		: compile without xinerama support
+	--prefix DIRECTORY		: install binary with specified prefix (default $PREFIX)
+	--xdg-config-dir DIRECTORY	: install configuration to specified directory (default $XDG_CONFIG_DIR)
+	--man-prefix DIRECTORY		: install man page to specified prefix (default $MANPREFIX)"
+			exit 0;;
+		*) break;;
+	esac
+done
+
+LIBS="$LIBS $USE_XINERAMA $USE_XRANDR $USE_IMLIB2"
+
+which pkg-config >/dev/null 2>&1
+
+if [ $? -eq 0 ];
+then
+	CFLAGS=`pkg-config --cflags-only-I $LIBS`
+	LDFLAGS=`pkg-config --libs $LIBS`
+else
+	# Try to use some known paths
+	case $OS in
+		FreeBSD)
+			CFLAGS="-I/usr/local/include -I/usr/local/include/freetype2"
+			LDFLAGS="-L/usr/local/lib";;
+		OpenBSD)
+			CFLAGS="-I/usr/X11R6/include -I/usr/X11R6/include/freetype2 -I/usr/local/include"
+			LDFLAGS="-L/usr/X11R6/lib -L/usr/local/lib";;
+		NetBSD)
+			CFLAGS="-I/usr/X11R7/include -I/usr/X11R7/include/freetype2 -I/usr/local/include"
+			LDFLAGS="-L/usr/X11R7/lib -L/usr/local/lib";;
+		Linux)
+			CFLAGS="-I/usr/include/freetype2"
+			LDFLAGS=""
+			;;
+		*)
+			echo "No default CFLAGS and LDFLAGS found for your OS, feel free to contribute or install pkg-config :)"
+			exit 1;;
+	esac
+
+	LDFLAGS="$LDFLAGS -lX11 -lXft -lfreetype"
+
+	[ -n "$USE_XINERAMA" ] && LDFLAGS="$LDFLAGS -lXinerama"
+	[ -n "$USE_XRANDR" ] && LDFLAGS="$LDFLAGS -lXrandr"
+	[ -n "$USE_IMLIB2" ] && LDFLAGS="$LDFLAGS -lImlib2"
+fi
+
+[ -n "$USE_XINERAMA" ] && CFLAGS="$CFLAGS -DHAVE_XINERAMA"
+[ -n "$USE_XRANDR" ] && CFLAGS="$CFLAGS -DHAVE_XRANDR"
+[ -n "$USE_IMLIB2" ] && CFLAGS="$CFLAGS -DHAVE_IMLIB"
+
+LDFLAGS="$LDFLAGS -lpthread"
+
+cat > Makefile << EOF
+PREFIX=$PREFIX
+XDG_CONFIG_DIR=$XDG_CONFIG_DIR
+MANPREFIX=$MANPREFIX
+
+CFLAGS+=$CFLAGS
+LDFLAGS+=$LDFLAGS
+
+EOF
+
+cat Makefile.in >> Makefile
+
+echo "Compilation resume:
+OS=$OS
+CFLAGS=$CFLAGS
+LDFLAGS=$LDFLAGS
+PREFIX=$PREFIX
+MANPREFIX=$MANPREFIX
+XDG_CONFIG_DIR=$XDG_CONFIG_DIR
+
+You can run 'make' now :-)
+"
