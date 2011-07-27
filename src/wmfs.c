@@ -356,19 +356,6 @@ set_statustext(int s, char *str)
      return;
 }
 
-/** Update status script by ewmh hint
-  */
-static void
-update_status(void)
-{
-     if(!check_wmfs_running())
-          return;
-
-     ewmh_send_message(ROOT, ROOT, "_WMFS_UPDATE_STATUS", 0, 0, 0, 0, True);
-
-     return;
-}
-
 /** Signal handle function
 */
 static void
@@ -406,7 +393,7 @@ main(int argc, char **argv)
      all_argv = argv;
      sprintf(conf.confpath, "%s/"DEF_CONF, getenv("HOME"));
 
-     while((i = getopt(argc, argv, "hviSc:s:C:")) != -1)
+     while((i = getopt(argc, argv, "hvic:s:C:")) != -1)
      {
 
           /* For options who need WMFS running */
@@ -421,7 +408,6 @@ main(int argc, char **argv)
                       "   -C <file>                 Load a configuration file\n"
                       "   -c <uicb_function> <cmd>  Execute an uicb function to control WMFS\n"
                       "   -s <screen_num> <string>  Set the bar(s) statustext\n"
-                      "   -S                        Update status script\n"
                       "   -h                        Show this page\n"
                       "   -i                        Show informations\n"
                       "   -v                        Show WMFS version\n", argv[0]);
@@ -435,12 +421,6 @@ main(int argc, char **argv)
 
           case 'v':
                printf("wmfs"WMFS_VERSION"\n");
-               exit(EXIT_SUCCESS);
-               break;
-
-          case 'S':
-               update_status();
-               XCloseDisplay(dpy);
                exit(EXIT_SUCCESS);
                break;
 
