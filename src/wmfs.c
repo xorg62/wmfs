@@ -33,7 +33,6 @@
 #include "wmfs.h"
 
 static volatile bool exiting = False, sig_chld = False;
-static pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
 
 int
 errorhandler(Display *d, XErrorEvent *event)
