@@ -383,7 +383,7 @@ int
 main(int argc, char **argv)
 {
      int i;
-     char *ol = "csS";
+     char *ol = "cs";
      extern char *optarg;
      extern int optind;
      struct sigaction sa;

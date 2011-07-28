@@ -123,8 +123,6 @@ barwin_draw_text(BarWindow *bw, int x, int y, char *text)
 void
 barwin_color_set(BarWindow *bw, uint bg, char *fg)
 {
-     CHECK(bw);
-
      bw->bg = bg;
      bw->fg = fg;
 
@@ -146,8 +144,6 @@ barwin_color_set(BarWindow *bw, uint bg, char *fg)
 void
 barwin_delete(BarWindow *bw)
 {
-     CHECK(bw);
-
      XSelectInput(dpy, bw->win, NoEventMask);
      XDestroyWindow(dpy, bw->win);
      XFreePixmap(dpy, bw->dr);
@@ -162,8 +158,6 @@ barwin_delete(BarWindow *bw)
 void
 barwin_delete_subwin(BarWindow *bw)
 {
-     CHECK(bw);
-
      XDestroySubwindows(dpy, bw->win);
 
      return;
@@ -175,8 +169,6 @@ barwin_delete_subwin(BarWindow *bw)
 void
 barwin_map(BarWindow *bw)
 {
-     CHECK(!(bw->flags & MappedFlag));
-
      XMapWindow(dpy, bw->win);
 
      bw->flags |= MappedFlag;
@@ -192,8 +184,6 @@ barwin_map(BarWindow *bw)
 void
 barwin_map_subwin(BarWindow *bw)
 {
-     CHECK(bw);
-
      XMapSubwindows(dpy, bw->win);
 
      return;
@@ -205,8 +195,6 @@ barwin_map_subwin(BarWindow *bw)
 void
 barwin_unmap(BarWindow *bw)
 {
-     CHECK(bw->flags & MappedFlag);
-
      XUnmapWindow(dpy, bw->win);
 
      bw->flags &= ~MappedFlag;
@@ -220,8 +208,6 @@ barwin_unmap(BarWindow *bw)
 void
 barwin_unmap_subwin(BarWindow *bw)
 {
-     CHECK(bw);
-
      XUnmapSubwindows(dpy, bw->win);
 
      return;
@@ -235,7 +221,7 @@ barwin_unmap_subwin(BarWindow *bw)
 void
 barwin_move(BarWindow *bw, int x, int y)
 {
-     if(!bw || (bw->geo.x == x && bw->geo.y == y))
+     if(bw->geo.x == x && bw->geo.y == y)
           return;
 
      XMoveWindow(dpy, bw->win, (bw->geo.x = x), (bw->geo.y = y));
@@ -251,7 +237,7 @@ barwin_move(BarWindow *bw, int x, int y)
 void
 barwin_resize(BarWindow *bw, int w, int h)
 {
-     if(!bw || (bw->geo.width == w && bw->geo.height == h))
+     if(bw->geo.width == w && bw->geo.height == h)
           return;
 
      /* Frame */
@@ -285,8 +271,6 @@ barwin_resize(BarWindow *bw, int w, int h)
 void
 barwin_refresh_color(BarWindow *bw)
 {
-     CHECK(bw);
-
      XSetForeground(dpy, gc, bw->bg);
      XFillRectangle(dpy, bw->dr, gc, 0, 0, bw->geo.width, bw->geo.height);
 
@@ -318,8 +302,6 @@ barwin_refresh_color(BarWindow *bw)
 void
 barwin_refresh(BarWindow *bw)
 {
-     CHECK(bw);
-
      XCopyArea(dpy, bw->dr, bw->win, gc, 0, 0, bw->geo.width, bw->geo.height, 0, 0);
 
      return;
