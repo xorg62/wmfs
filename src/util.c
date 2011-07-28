@@ -279,29 +279,6 @@ uicb_spawn(uicb_t cmd)
      return;
 }
 
-char*
-clean_value(char *str)
-{
-     int i;
-     char c, *p;
-
-     if(!str || !(p = xstrdup(str)))
-          return NULL;
-
-     /* Remove useless spaces */
-     for(; *p == ' '; ++p);
-     for(; *(p + strlen(p) - 1) == ' '; *(p + strlen(p) - 1) = '\0');
-
-     /* For string delimiter (" or ') */
-     if(((c = *p) == '"' || (c = *p) == '\'') && strchr(p + 1, c))
-     {
-          for(++p, i = 0; p[i] && p[i] != c; ++i);
-          p[i] = '\0';
-     }
-
-     return p;
-}
-
 /* To use ~/ shortcut.. */
 char*
 patht(char *path)
