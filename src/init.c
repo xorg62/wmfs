@@ -218,6 +218,7 @@ init(void)
 
      /* Init lists heads */
      SLIST_INIT(&clients);
+     SLIST_INIT(&trayicons);
 
      return;
 }
