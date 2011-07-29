@@ -184,7 +184,7 @@ typedef struct
  *  BarWindow Structure
  * (titlebar, infobar..)
  */
-typedef struct
+typedef struct BarWindow
 {
      Window win;
      Drawable dr;
@@ -201,11 +201,11 @@ typedef struct
      uint stipple_color;
      Geo geo;
      uint flags;
+     SLIST_ENTRY(BarWindow) next;
 } BarWindow;
 
 /* Client Structure. */
-typedef struct Client Client;
-struct Client
+typedef struct Client
 {
      /* Client title */
      char *title;
@@ -246,7 +246,7 @@ struct Client
      uint flags;
      /* Simply-linked list */
      SLIST_ENTRY(Client) next;
-};
+} Client;
 
 /* Keybind Structure */
 typedef struct

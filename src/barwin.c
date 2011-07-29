@@ -100,6 +100,9 @@ barwin_create(Window parent,
      FLAGAPPLY(bw->flags, stipple, StippleFlag);
      bw->stipple_color = -1;
 
+     /* Attach */
+     SLIST_INSERT_HEAD(&bwhead, bw, next);
+
      return bw;
 }
 
@@ -144,6 +147,7 @@ barwin_color_set(BarWindow *bw, uint bg, char *fg)
 void
 barwin_delete(BarWindow *bw)
 {
+     SLIST_REMOVE(&bwhead, bw, BarWindow, next);
      XSelectInput(dpy, bw->win, NoEventMask);
      XDestroyWindow(dpy, bw->win);
      XFreePixmap(dpy, bw->dr);

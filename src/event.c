@@ -402,21 +402,15 @@ expose(XEvent *e)
 {
      XExposeEvent *ev = &e->xexpose;
      Client *c;
-     int i, sc;
+     BarWindow *bw;
 
-     /* InfoBar member */
-     for(sc = 0; sc < screen_count(); ++sc)
-     {
-          if(ev->window == infobar[sc].bar->win)
-               barwin_refresh(infobar[sc].bar);
-          if(ev->window == infobar[sc].layout_button->win)
-               barwin_refresh(infobar[sc].layout_button);
-          if(conf.bars.selbar && ev->window == infobar[sc].selbar->win)
-               barwin_refresh(infobar[sc].selbar);
-          for(i = 1; i < conf.ntag[sc] + 1; ++i)
-               if(ev->window == infobar[sc].tags[i]->win)
-                    barwin_refresh(infobar[sc].tags[i]);
-     }
+     /* BarWindows */
+     SLIST_FOREACH(bw, &bwhead, next)
+          if(ev->window == bw->win)
+          {
+               barwin_refresh(bw);
+               break;
+          }
 
      /* Client frame */
      if((c = client_gb_titlebar(ev->window)))

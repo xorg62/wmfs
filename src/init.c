@@ -201,6 +201,11 @@ init_root(void)
 void
 init(void)
 {
+     /* Init lists heads */
+     SLIST_INIT(&bwhead);
+     SLIST_INIT(&clients);
+     SLIST_INIT(&trayicons);
+
      /* First init */
      ewmh_init_hints();
      init_conf();
@@ -215,10 +220,6 @@ init(void)
      systray_acquire();
      ewmh_update_current_tag_prop();
      grabkeys();
-
-     /* Init lists heads */
-     SLIST_INIT(&clients);
-     SLIST_INIT(&trayicons);
 
      return;
 }

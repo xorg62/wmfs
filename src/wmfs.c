@@ -80,6 +80,7 @@ void
 quit(void)
 {
      Client *c;
+     BarWindow *bw;
      size_t i, len;
 
      /* Set the silent error handler */
@@ -111,6 +112,13 @@ quit(void)
           XFreeCursor(dpy, cursor[i]);
      XFreeGC(dpy, gc_stipple);
      infobar_destroy();
+
+     /* BarWindows */
+     while(!SLIST_EMPTY(&bwhead))
+     {
+          bw = SLIST_FIRST(&bwhead);
+          SLIST_REMOVE_HEAD(&bwhead, next);
+     }
 
      free(sgeo);
      free(spgeo);

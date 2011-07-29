@@ -436,7 +436,7 @@ void uicb_reload(uicb_t);
 
 /* Variables */
 
-/* Principal */
+/* Main */
 Display *dpy;
 GC gc, gc_stipple;
 int selscreen;
@@ -472,19 +472,24 @@ struct clndx {
      Client *client;
 } clist_index[MAXCLIST];
 
-/* Important Client */
+/* Client */
 SLIST_HEAD(, Client) clients;
 Client *sel;
 
-/* Other */
+/* Event */
 int nevent;
 void (**event_handle)(XEvent*);
 extern const func_name_list_t func_list[];
 extern const func_name_list_t layout_list[];
 uint numlockmask;
+
+/* Systray */
 SLIST_HEAD(, Systray) trayicons;
 Window traywin;
 int tray_width;
+
+/* BarWindow */
+SLIST_HEAD(, BarWindow) bwhead;
 
 #endif /* WMFS_H */
 
