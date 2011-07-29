@@ -79,7 +79,7 @@ draw_image(Drawable dr, int x, int y, int w, int h, char *name)
   *\param str String
   *\return n Lenght of i
   */
-static int
+static void
 parse_image_block(Drawable dr, char *str)
 {
      ImageAttr im;

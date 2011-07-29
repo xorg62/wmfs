@@ -627,11 +627,10 @@ client_set_rules(Client *c)
           if((xch.res_class && conf.rule[i].class && !strcmp(xch.res_class, conf.rule[i].class))
                     || (xch.res_name && conf.rule[i].instance && !strcmp(xch.res_name, conf.rule[i].instance)))
           {
-               if( ((strlen(wwrole) && conf.rule[i].role && !strcmp(wwrole, conf.rule[i].role))
-                         || (!strlen(wwrole) || !conf.rule[i].role))
-		     &&
-		    ((strlen(netwmname) && conf.rule[i].name && !strcmp(netwmname, conf.rule[i].name))
-			 || (!strlen(netwmname) || !conf.rule[i].name)) )
+               if(((strlen(wwrole) && conf.rule[i].role && !strcmp(wwrole, conf.rule[i].role))
+                              || (!strlen(wwrole) || !conf.rule[i].role))
+                         && ((strlen(netwmname) && conf.rule[i].name && !strcmp(netwmname, conf.rule[i].name))
+                              || (!strlen(netwmname) || !conf.rule[i].name)))
                {
                     if(conf.rule[i].screen != -1)
                          c->screen = conf.rule[i].screen;
