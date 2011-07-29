@@ -590,6 +590,7 @@ client_set_rules(Client *c)
      ulong n, il;
      uchar *data = NULL;
      char wwrole[256] = { 0 };
+     char netwmname[256] = { 0 };
      bool applied_tag_rule = False;
      bool applied_screen_rule = False;
 
@@ -612,14 +613,25 @@ client_set_rules(Client *c)
           XFree(data);
      }
 
-     /* Apply Rule if class || instance || role match */
+     /* Get _NET_WM_NAME */
+     if(XGetWindowProperty(dpy, c->win, ATOM("_NET_WM_NAME"), 0, 0x77777777, False,
+                    ATOM("UTF8_STRING"), &rf, &f, &n, &il, &data) == Success && data)
+     {
+          strncpy(netwmname, (char*)data, sizeof(netwmname));
+          XFree(data);
+     }
+
+     /* Apply Rule if class || instance || role || name match */
      for(i = 0; i < conf.nrule; ++i)
      {
           if((xch.res_class && conf.rule[i].class && !strcmp(xch.res_class, conf.rule[i].class))
                     || (xch.res_name && conf.rule[i].instance && !strcmp(xch.res_name, conf.rule[i].instance)))
           {
-               if((strlen(wwrole) && conf.rule[i].role && !strcmp(wwrole, conf.rule[i].role))
+               if( ((strlen(wwrole) && conf.rule[i].role && !strcmp(wwrole, conf.rule[i].role))
                          || (!strlen(wwrole) || !conf.rule[i].role))
+		     &&
+		    ((strlen(netwmname) && conf.rule[i].name && !strcmp(netwmname, conf.rule[i].name))
+			 || (!strlen(netwmname) || !conf.rule[i].name)) )
                {
                     if(conf.rule[i].screen != -1)
                          c->screen = conf.rule[i].screen;
