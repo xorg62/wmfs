@@ -51,6 +51,7 @@
 #include <err.h>
 #include <pthread.h>
 #include <locale.h>
+#include <sys/queue.h>
 #include <sys/select.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -472,7 +473,7 @@ struct clndx {
 } clist_index[MAXCLIST];
 
 /* Important Client */
-Client *clients;
+SLIST_HEAD(, Client) clients;
 Client *sel;
 
 /* Other */
@@ -481,7 +482,7 @@ void (**event_handle)(XEvent*);
 extern const func_name_list_t func_list[];
 extern const func_name_list_t layout_list[];
 uint numlockmask;
-Systray *trayicons;
+SLIST_HEAD(, Systray) trayicons;
 Window traywin;
 int tray_width;
 

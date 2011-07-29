@@ -244,9 +244,8 @@ struct Client
      } colors;
      /* Client Information by flags */
      uint flags;
-     /* Struct in chains */
-     Client *next;
-     Client *prev;
+     /* Simply-linked list */
+     SLIST_ENTRY(Client) next;
 };
 
 /* Keybind Structure */
@@ -297,7 +296,7 @@ struct Systray
 {
      Window win;
      Geo geo;
-     Systray *next, *prev;
+     SLIST_ENTRY(Systray) next;
 };
 
 /* Tag Structure */

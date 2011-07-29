@@ -98,11 +98,7 @@ systray_add(Window win)
      ewmh_send_message(s->win, s->win, "_XEMBED", CurrentTime, XEMBED_EMBEDDED_NOTIFY, 0, traywin, 0);
 
      /* Attach */
-     if(trayicons)
-          trayicons->prev = s;
-
-     s->next = trayicons;
-     trayicons = s;
+     SLIST_INSERT_HEAD(&trayicons, s, next);
 
      return;
 }
@@ -115,9 +111,7 @@ systray_del(Systray *s)
      if(!conf.systray.active)
           return;
 
-     for(ss = &trayicons; *ss && *ss != s; ss = &(*ss)->next);
-     *ss = s->next;
-
+     SLIST_REMOVE(&trayicons, s, Systray, next);
      free(s);
 
      return;
@@ -158,10 +152,13 @@ systray_freeicons(void)
      if(!conf.systray.active)
           return;
 
-     for(i = trayicons; i; i = i->next)
+     while(!SLIST_EMPTY(&trayicons))
      {
+          i = SLIST_FIRST(&trayicons);
+          SLIST_REMOVE_HEAD(&trayicons, next);
+
           XUnmapWindow(dpy, i->win);
-		XReparentWindow(dpy, i->win, ROOT, 0, 0);
+          XReparentWindow(dpy, i->win, ROOT, 0, 0);
           free(i);
      }
 
@@ -181,7 +178,7 @@ systray_find(Window win)
      if(!conf.systray.active)
           return NULL;
 
-     for(i = trayicons; i; i = i->next)
+     SLIST_FOREACH(i, &trayicons, next)
           if(i->win == win)
                return i;
 
@@ -197,7 +194,7 @@ systray_get_width(void)
      if(!conf.systray.active)
           return 0;
 
-     for(i = trayicons; i; i = i->next)
+     SLIST_FOREACH(i, &trayicons, next)
           w += i->geo.width + conf.systray.spacing + 1;
 
      return w;
@@ -212,13 +209,13 @@ systray_update(void)
      if(!conf.systray.active)
           return;
 
-     if(!trayicons)
+     if(!SLIST_FIRST(&trayicons))
      {
           XMoveResizeWindow(dpy, traywin, infobar[conf.systray.screen].bar->geo.width - 1, 0, 1, 1);
           return;
      }
 
-     for(i = trayicons; i; i = i->next)
+     SLIST_FOREACH(i, &trayicons, next)
      {
           XMapWindow(dpy, i->win);
 

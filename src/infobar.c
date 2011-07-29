@@ -240,7 +240,7 @@ void
 infobar_draw_taglist(InfoBar *i)
 {
      int j, x, sc = i->screen;
-     Client *c = NULL;
+     Client *c = SLIST_FIRST(&clients);
      uint occupied = 0;
 
      if(conf.layout_placement)
@@ -249,7 +249,7 @@ infobar_draw_taglist(InfoBar *i)
                      ? (uint)conf.layout_button_width
                      : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)) + (PAD >> 1), 0);
 
-     for(c = clients; c; c = c->next)
+     SLIST_FOREACH(c, &clients, next)
           if(c->screen == sc)
                occupied |= TagFlag(c->tag);
 

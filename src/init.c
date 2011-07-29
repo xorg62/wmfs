@@ -216,6 +216,9 @@ init(void)
      ewmh_update_current_tag_prop();
      grabkeys();
 
+     /* Init lists heads */
+     SLIST_INIT(&clients);
+
      return;
 }
 

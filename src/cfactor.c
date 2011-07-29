@@ -108,10 +108,10 @@ static void
 _cfactor_arrange_row(Client *c, Position p, int fac)
 {
      Geo cgeo = c->frame_geo;
-     Client *cc;
+     Client *cc = tiled_client(c->screen, SLIST_FIRST(&clients));
 
      /* Travel clients to search parents of row and apply fact */
-     for(cc = tiled_client(c->screen, clients); cc; cc = tiled_client(c->screen, cc->next))
+     for(; cc; cc = tiled_client(c->screen, SLIST_NEXT(cc, next)))
           if(CFACTOR_PARENTROW(cgeo, cc->frame_geo, p))
           {
                cc->tilefact[p] += fac;
@@ -131,13 +131,13 @@ static bool
 _cfactor_check_geo_row(Client *c, Position p, int fac)
 {
      Geo cgeo = c->frame_geo;
-     Client *cc;
+     Client *cc = tiled_client(c->screen, SLIST_FIRST(&clients));
      int e, f[4] = { 0 };
 
      f[p] += fac;
 
      /* Travel clients to search parents of row and check geos */
-     for(cc = tiled_client(c->screen, clients); cc; cc = tiled_client(c->screen, cc->next))
+     for(; cc; cc = tiled_client(c->screen, SLIST_NEXT(cc, next)))
           if(CFACTOR_PARENTROW(cgeo, cc->frame_geo, p))
           {
                (Geo)cfactor_geo(cc->wrgeo, f, &e);

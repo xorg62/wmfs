@@ -250,13 +250,16 @@ ewmh_get_client_list(void)
 {
      Window *list;
      Client *c;
-     int win_n;
+     int win_n = 0;
 
-     for(win_n = 0, c = clients; c; c = c->next, ++win_n);
+     SLIST_FOREACH(c, &clients, next)
+          ++win_n;
+
      list = xcalloc(win_n, sizeof(Window));
 
-     for(win_n = 0, c = clients; c; c = c->next, ++win_n)
-          list[win_n] = c->win;
+     win_n = 0;
+     SLIST_FOREACH(c, &clients, next)
+          list[win_n++] = c->win;
 
      XChangeProperty(dpy, ROOT, net_atom[net_client_list], XA_WINDOW, 32,
                      PropModeReplace, (uchar *)list, win_n);

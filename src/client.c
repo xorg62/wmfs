@@ -87,11 +87,7 @@ CLIENT_ACTION_DIR(swapsel, Bottom);
 void
 client_attach(Client *c)
 {
-     if(clients)
-          clients->prev = c;
-
-     c->next = clients;
-     clients = c;
+     SLIST_INSERT_HEAD(&clients, c, next);
 
      return;
 }
@@ -126,10 +122,7 @@ client_configure(Client *c)
 void
 client_detach(Client *c)
 {
-     Client **cc;
-
-     for(cc = &clients; *cc && *cc != c; cc = &(*cc)->next);
-     *cc = c->next;
+     SLIST_REMOVE(&clients, c, Client, next);
 
      return;
 }
@@ -147,10 +140,10 @@ client_get_next(void)
      if(!sel || ishide(sel, selscreen))
           return NULL;
 
-     for(c = sel->next; c && ishide(c, selscreen); c = c->next);
+     for(c = SLIST_NEXT(sel, next); c && ishide(c, selscreen); c = SLIST_NEXT(c, next));
 
      if(!c && conf.client_round)
-          for(c = clients; c && ishide(c, selscreen); c = c->next);
+          for(c = SLIST_FIRST(&clients); c && ishide(c, selscreen); c = SLIST_NEXT(c, next));
 
      return c;
 }
@@ -161,19 +154,19 @@ client_get_next(void)
 Client*
 client_get_prev(void)
 {
-     Client *c = NULL, *d;
+     Client *c = NULL, *d = SLIST_FIRST(&clients);
 
      screen_get_sel();
 
      if(!sel || ishide(sel, selscreen))
           return NULL;
 
-     for(d = clients; d != sel; d = d->next)
+     for(; d != sel; d = SLIST_NEXT(d, next))
           if(!ishide(d, selscreen))
                c = d;
 
      if(!c && conf.client_round)
-          for(; d; d = d->next)
+          for(; d; d = SLIST_NEXT(d, next))
                if(!ishide(d, selscreen))
                     c = d;
 
@@ -273,7 +266,7 @@ client_focus(Client *c)
      if((sel = c))
      {
           /* Set focusontag option */
-          for(cc = clients; cc; cc = cc->next)
+          SLIST_FOREACH(cc, &clients, next)
                if(cc->focusontag == (int)c->tag)
                     cc->focusontag = -1;
 
@@ -338,10 +331,10 @@ client_urgent(Client *c, bool u)
 */
      Client* client_gb_win(Window w)
      {
-          Client *c = clients;
+          Client *c = SLIST_FIRST(&clients);
 
           while(c && c->win != w)
-               c = c->next;
+               c = SLIST_NEXT(c, next);
 
           return c;
      }
@@ -352,10 +345,10 @@ client_urgent(Client *c, bool u)
 */
      Client* client_gb_frame(Window w)
      {
-          Client *c = clients;
+          Client *c = SLIST_FIRST(&clients);
 
           while(c && c->frame != w)
-               c = c->next;
+               c = SLIST_NEXT(c, next);
 
           return c;
      }
@@ -366,13 +359,13 @@ client_urgent(Client *c, bool u)
 */
      Client* client_gb_titlebar(Window w)
      {
-          Client *c = clients;
+          Client *c = SLIST_FIRST(&clients);
 
           if(!(TBARH - BORDH))
                return NULL;
 
           while(c && c->titlebar->win != w)
-               c = c->next;
+               c = SLIST_NEXT(c, next);
 
           return c;
      }
@@ -383,10 +376,10 @@ client_urgent(Client *c, bool u)
 */
      Client* client_gb_resize(Window w)
      {
-          Client *c = clients;
+          Client *c = SLIST_FIRST(&clients);
 
           while(c && (c->resize[Right] != w) && (c->resize[Left] != w))
-               c = c->next;
+               c = SLIST_NEXT(c, next);
 
           return c;
      }
@@ -398,13 +391,13 @@ client_urgent(Client *c, bool u)
 */
      Client* client_gb_button(Window w, int *n)
      {
-          Client *c = clients;
+          Client *c;
           int i;
 
           if(!BUTTONWH || !(TBARH - BORDH))
                return NULL;
 
-          for(; c; c = c->next)
+          SLIST_FOREACH(c, &clients, next)
                for(i = 0; i < conf.titlebar.nbutton; ++i)
                     if(c->button[i] == w)
                     {
@@ -422,13 +415,13 @@ client_urgent(Client *c, bool u)
 */
      Client* client_gb_pos(Client *c, int x, int y)
      {
-          Client *cc = clients;
+          Client *cc;
 
           if((x | y) < 0 || x > spgeo[c->screen].x + spgeo[c->screen].width
                     || y > spgeo[c->screen].y + spgeo[c->screen].height)
                return NULL;
 
-          for(; cc; cc = cc->next)
+          SLIST_FOREACH(cc, &clients, next)
                if(cc != c && cc->screen == c->screen && cc->tag == c->tag
                          && (cc->flags & TileFlag))
                     if(cc->frame_geo.x < x && cc->frame_geo.x + cc->frame_geo.width > x
@@ -767,7 +760,7 @@ client_manage(Window w, XWindowAttributes *wa, bool ar)
 
      /* Transient for tag setting */
      if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
-          for(t = clients; t && t->win != trans; t = t->next);
+          for(t = SLIST_FIRST(&clients); t && t->win != trans; t = SLIST_NEXT(t, next));
 
      if(t)
      {
@@ -1146,16 +1139,13 @@ client_unhide(Client *c)
 void
 client_focus_next(Client *c)
 {
-     Client *c_next = NULL;
+     Client *c_next = SLIST_FIRST(&clients);
 
-     for(c_next = clients;
-         c_next && c_next != c->prev
-              && c_next->tag != c->tag
-              && c_next->screen != c->screen;
-         c_next = c_next->next);
+     for(; c_next && c_next->tag != c->tag && c_next->screen != c->screen;
+               c_next = SLIST_NEXT(c_next, next));
 
      if(c_next && c_next->tag == (uint)seltag[selscreen]
-        && c_next->screen == selscreen)
+               && c_next->screen == selscreen)
           client_focus(c_next);
 
      return;
@@ -1443,8 +1433,8 @@ uicb_client_select(uicb_t cmd)
 void
 uicb_clientlist(uicb_t cmd)
 {
-     int i, d, u, x, y;
-     int n = 0;
+     int d, u, x, y;
+     int n = 0, i = 0;
      bool all = False;
      Window w;
      Client *c = NULL;
@@ -1454,7 +1444,7 @@ uicb_clientlist(uicb_t cmd)
      if(cmd && !strcmp(cmd, "all"))
           all = True;
 
-     for(c = clients; c; c = c->next)
+     SLIST_FOREACH(c, &clients, next)
           if(!ishide(c, selscreen) || all)
                ++n;
 
@@ -1472,7 +1462,7 @@ uicb_clientlist(uicb_t cmd)
 
           clientlist.align = MA_Left;
 
-          for(i = 0, c = clients; c; c = c->next)
+          SLIST_FOREACH(c, &clients, next)
                if(!ishide(c, selscreen) || all)
                {
                     sprintf(clist_index[i].key, "%d", i);
@@ -1530,7 +1520,7 @@ uicb_client_ignore_tag(uicb_t cmd)
 void
 uicb_client_set_master(uicb_t cmd)
 {
-     Client *c;
+     Client *c = SLIST_FIRST(&clients);
      (void)cmd;
 
      /* get the first client */
@@ -1538,7 +1528,7 @@ uicb_client_set_master(uicb_t cmd)
      if(!sel || ishide(sel, selscreen))
           return;
 
-     for(c = clients; c && ishide(c, selscreen); c = c->next);
+     for(; c && ishide(c, selscreen); c = SLIST_NEXT(c, next));
 
      if (c && c != sel)
      {

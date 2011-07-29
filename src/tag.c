@@ -95,7 +95,7 @@ tag_set(int tag)
           }
 
      /* Check for ignore_tag clients */
-     for(c = clients; c; c = c->next)
+     SLIST_FOREACH(c, &clients, next)
           if(c->tag == MAXTAG + 1 && c->screen == selscreen)
           {
                al = True;
@@ -111,13 +111,13 @@ tag_set(int tag)
      }
 
      /* To focus selected client of the via focusontag option */
-     for(c = clients; c; c = c->next)
+     SLIST_FOREACH(c, &clients, next)
           if(c->focusontag == tag && c->screen == selscreen)
                break;
 
      /* No focusontag option found on any client, try to find the first of the tag */
      if(!c)
-          for(c = clients; c; c = c->next)
+          SLIST_FOREACH(c, &clients, next)
                if(c->tag == (uint)seltag[selscreen] && c->screen == selscreen)
                     break;
 
@@ -237,7 +237,7 @@ uicb_tag_next_visible(uicb_t cmd)
           return;
      }
 
-     for(c = clients; c; c = c->next)
+     SLIST_FOREACH(c, &clients, next)
           if(c->screen == selscreen)
                occupied |= TagFlag(c->tag);
 
@@ -278,7 +278,7 @@ uicb_tag_prev_visible(uicb_t cmd)
           return;
      }
 
-     for(c = clients; c; c = c->next)
+     SLIST_FOREACH(c, &clients, next)
           if(c->screen == selscreen)
                occupied |= TagFlag(c->tag);
 
@@ -351,7 +351,7 @@ tag_swap(int s, int t1, int t2)
      tags[s][t1] = tags[s][t2];
      tags[s][t2] = t;
 
-     for(c = clients; c; c = c->next)
+     SLIST_FOREACH(c, &clients, next)
      {
           if(c->screen == s && c->tag == (uint)t1)
                c->tag = t2;
@@ -477,7 +477,7 @@ uicb_tag_urgent(uicb_t cmd)
      (void)cmd;
 
      /* Check if there is a urgent client */
-     for(c = clients; c; c = c->next)
+     SLIST_FOREACH(c, &clients, next)
           if(c->flags & UrgentFlag)
           {
                screen_set_sel(c->screen);
@@ -658,7 +658,7 @@ tag_delete(int s, int tag)
      if(tag < 0 || tag > conf.ntag[s] || conf.ntag[s] == 1)
           return;
 
-     for(c = clients; c; c = c->next)
+     SLIST_FOREACH(c, &clients, next)
           if(c->screen == s && c->tag == (uint)tag)
           {
                warnx("Client(s) present in this tag, can't delete it");
@@ -674,7 +674,7 @@ tag_delete(int s, int tag)
      for(i = tag; i < (size_t)conf.ntag[s] + 1; ++i)
      {
           /* Set clients tag because of shift */
-          for(c = clients; c; c = c->next)
+          SLIST_FOREACH(c, &clients, next)
                if(c->screen == s && c->tag == i + 1)
                     c->tag = i;
 
@@ -751,7 +751,7 @@ uicb_tag_toggle_expose(uicb_t cmd)
      {
           if(strcmp(tags[selscreen][i].name, conf.tag_expose_name) == 0)
           {
-               if(clients && sel->tag)
+               if(SLIST_FIRST(&clients) && sel->tag)
                     tag_set(sel->tag);
 
                tag_delete(selscreen, i);

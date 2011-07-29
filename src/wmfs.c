@@ -86,10 +86,13 @@ quit(void)
      XSetErrorHandler(errorhandlerdummy);
 
      /* Unmanage all clients */
-     for(c = clients; c; c = c->next)
+     while(!SLIST_EMPTY(&clients))
      {
+          c = SLIST_FIRST(&clients);
           client_unhide(c);
           XReparentWindow(dpy, c->win, ROOT, c->geo.x, c->geo.y);
+          free(c);
+          SLIST_REMOVE_HEAD(&clients, next);
      }
 
      free(tags);
@@ -230,7 +233,7 @@ scan(void)
           }
 
      /* Set update layout request */
-     for(c = clients; c; c = c->next)
+     SLIST_FOREACH(c, &clients, next)
      {
           if(c->tag > (uint)conf.ntag[c->screen])
                c->tag = conf.ntag[c->screen];

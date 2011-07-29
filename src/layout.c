@@ -42,7 +42,7 @@ arrange(int screen, bool update_layout)
      if(screen < 0 || screen > screen_count() - 1)
           screen = screen_get_sel();
 
-     for(c = clients; c; c = c->next)
+     SLIST_FOREACH(c, &clients, next)
           if(c->screen == screen)
           {
                if(!ishide(c, screen))
@@ -87,7 +87,7 @@ freelayout(int screen)
      Client *c;
      (void)screen;
 
-     for(c = clients; c; c = c->next)
+     SLIST_FOREACH(c, &clients, next)
           if(!ishide(c, selscreen)
                     && c->screen == screen
                     && !(c->flags & MaxFlag))
@@ -108,12 +108,12 @@ void
 layoutswitch(bool b)
 {
      int i;
-     Client *c;
+     Client *c = SLIST_FIRST(&clients);
 
      screen_get_sel();
 
      if(tags[selscreen][seltag[selscreen]].layout.func == freelayout)
-          for(c = clients; c && (c->tag != (uint)seltag[selscreen] && c->screen != selscreen); c = c->next)
+          for(; c && (c->tag != (uint)seltag[selscreen] && c->screen != selscreen); c = SLIST_NEXT(c, next))
           {
                c->ogeo = c->geo;
                c->free_geo = c->geo;
@@ -173,9 +173,9 @@ uicb_layout_prev(uicb_t cmd)
 Client*
 tiled_client(int screen, Client *c)
 {
-     for(;c && (c->flags & (MaxFlag | FreeFlag | FSSFlag | AboveFlag)
+     for(; c && (c->flags & (MaxFlag | FreeFlag | FSSFlag | AboveFlag)
                     || c->screen != screen
-                    || ishide(c, screen)); c = c->next);
+                    || ishide(c, screen)); c = SLIST_NEXT(c, next));
 
      if(c)
           c->flags |= FLayFlag;
@@ -188,10 +188,10 @@ tiled_client(int screen, Client *c)
 void
 maxlayout(int screen)
 {
-     Client *c;
-     int i;
+     Client *c = tiled_client(screen, SLIST_FIRST(&clients));
+     int i = 0;
 
-     for(i = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
+     for(; c; c = tiled_client(screen, SLIST_NEXT(c, next)), ++i)
      {
           c->flags &= ~TileFlag;
           c->flags |= LMaxFlag;
@@ -233,12 +233,12 @@ uicb_set_mwfact(uicb_t cmd)
 void
 uicb_set_nmaster(uicb_t cmd)
 {
-     int nc, n = atoi(cmd);
-     Client *c;
+     int nc = 0, n = atoi(cmd);
+     Client *c = tiled_client(selscreen, SLIST_FIRST(&clients));
 
      screen_get_sel();
 
-     for(nc = 0, c = tiled_client(selscreen, clients); c; c = tiled_client(selscreen, c->next), ++nc);
+     for(; c; c = tiled_client(selscreen, SLIST_NEXT(c, next)), ++nc);
 
      if(!nc || tags[selscreen][seltag[selscreen]].nmaster + n == 0
                || tags[selscreen][seltag[selscreen]].nmaster + n > nc)
@@ -258,12 +258,12 @@ uicb_set_nmaster(uicb_t cmd)
 static void
 grid(int screen, bool horizontal)
 {
-     Client *c;
+     Client *c = tiled_client(screen, SLIST_FIRST(&clients));
      Geo sg = sgeo[screen];
      Geo cgeo = {sg.x, sg.y, 0, 0};
-     unsigned int i, n, temp, cols, rows, cpcols = 0;
+     unsigned int i = 0, n = 0, temp, cols, rows, cpcols = 0;
 
-     for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
+     for(; c; c = tiled_client(screen, SLIST_NEXT(c, next)), ++n);
      CHECK((tags[screen][seltag[screen]].nclients = n));
 
      for(rows = 0; rows <= (n >> 1); ++rows)
@@ -281,7 +281,7 @@ grid(int screen, bool horizontal)
          rows = temp;
      }
 
-     for(i = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
+     for(c = tiled_client(screen, SLIST_FIRST(&clients)); c; c = tiled_client(screen, SLIST_NEXT(c, next)), ++i)
      {
           /* Set client property */
           c->flags &= ~(MaxFlag | LMaxFlag);
@@ -327,13 +327,13 @@ grid(int screen, bool horizontal)
 static void
 multi_tile(int screen, Position type)
 {
-     Client *c;
+     Client *c = tiled_client(screen, SLIST_FIRST(&clients));
      Geo sg = sgeo[screen];
      Geo mastergeo = {sg.x, sg.y, 0, 0};
      Geo cgeo = {sg.x, sg.y, 0, 0};
-     uint i, n, tilesize = 0, mwfact, nmaster = tags[screen][seltag[screen]].nmaster;
+     int i = 0, n = 0, tilesize = 0, mwfact, nmaster = tags[screen][seltag[screen]].nmaster;
 
-     for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
+     for(; c; c = tiled_client(screen, SLIST_NEXT(c, next)), ++n);
      CHECK((tags[screen][seltag[screen]].nclients = n));
 
      /* FIX NMASTER */
@@ -369,7 +369,7 @@ multi_tile(int screen, Position type)
      }
 
 
-     for(i = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
+     for(c = tiled_client(screen, SLIST_FIRST(&clients)); c; c = tiled_client(screen, SLIST_NEXT(c, next)), ++i)
      {
           /* Set client property */
           c->flags &= ~(MaxFlag | LMaxFlag);
@@ -459,19 +459,19 @@ multi_tile(int screen, Position type)
 static void
 mirror(int screen, bool horizontal)
 {
-     Client *c;
+     Client *c = tiled_client(screen, SLIST_FIRST(&clients));
      Geo sg = sgeo[screen];
      Geo mastergeo = {sg.x, sg.y, sg.width, sg.height};
      Geo cgeo = {sg.x, sg.y , sg.width, sg.height};
      Geo nextg[2];
-     uint i, n, tilesize = 0, mwfact;
-     uint nmaster = tags[screen][seltag[screen]].nmaster;
+     int i = 0, n = 0, tilesize = 0, mwfact;
+     int nmaster = tags[screen][seltag[screen]].nmaster;
      int pa, imp;
      bool isp = False;
 
      memset(nextg, 0, sizeof(nextg));
 
-     for(n = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++n);
+     for(; c; c = tiled_client(screen, SLIST_NEXT(c, next)), ++n);
      CHECK((tags[screen][seltag[screen]].nclients = n));
 
      /* Fix nmaster */
@@ -527,7 +527,7 @@ mirror(int screen, bool horizontal)
           }
      }
 
-     for(i = 0, c = tiled_client(screen, clients); c; c = tiled_client(screen, c->next), ++i)
+     for(c = tiled_client(screen, SLIST_FIRST(&clients)); c; c = tiled_client(screen, SLIST_NEXT(c, next)), ++i)
      {
           /* Set client property */
           c->flags &= ~(MaxFlag | LMaxFlag);
@@ -794,14 +794,14 @@ uicb_togglemax(uicb_t cmd)
 void
 uicb_toggle_resizehint(uicb_t cmd)
 {
-     Client *c;
+     Client *c = tiled_client(selscreen, SLIST_FIRST(&clients));
 
      screen_get_sel();
      (void)cmd;
 
      tags[selscreen][seltag[selscreen]].flags ^= ResizeHintFlag;
 
-     for(c = tiled_client(selscreen, clients); c; c = tiled_client(selscreen, c->next))
+     for(; c; c = tiled_client(selscreen, SLIST_NEXT(c, next)))
           client_moveresize(c, c->geo, (tags[selscreen][seltag[selscreen]].flags & ResizeHintFlag));
 
      return;
@@ -822,7 +822,7 @@ uicb_toggle_abovefc(uicb_t cmd)
 
      if(!(tags[selscreen][seltag[selscreen]].flags & AboveFCFlag))
      {
-          for(c = clients; c; c = c->next)
+          SLIST_FOREACH(c, &clients, next)
                if(c->flags & AboveFlag
                          && c->screen == selscreen
                          && c->tag == (uint)seltag[selscreen])
@@ -877,8 +877,8 @@ layout_set_client_master(Client *c)
      if(!c || (c->flags & (HintFlag | FSSFlag)) || !(c->flags & TileFlag))
           return;
 
-     if(c == tiled_client(selscreen, clients))
-          CHECK((c = tiled_client(selscreen, c->next)));
+     if(c == tiled_client(selscreen, SLIST_FIRST(&clients)))
+          CHECK((c = tiled_client(selscreen, SLIST_NEXT(c, next))));
 
      client_detach(c);
      client_attach(c);

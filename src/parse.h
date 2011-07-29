@@ -18,7 +18,6 @@
 #define PARSE_H
 
 #include "wmfs.h"
-#include <sys/queue.h>
 
 #define INCLUDE_CMD "@include"
 #define PARSE_MAX_LIST 32

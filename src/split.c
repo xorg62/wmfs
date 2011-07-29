@@ -121,14 +121,13 @@ split_apply_current(int screen, int tag)
 static bool
 _split_check_row_dir(Client *c, Client *g, Position p)
 {
-     int s, cs;
-     Geo cgeo;
-     Client *cc;
+     int s = 0, cs;
+     Geo cgeo = c->frame_geo;
+     Client *cc = tiled_client(c->screen, SLIST_FIRST(&clients));
 
      cs = (LDIR(p) ? g->frame_geo.height : g->frame_geo.width);
 
-     for(s = 0, cgeo = c->frame_geo, cc = tiled_client(c->screen, clients);
-               cc; cc = tiled_client(c->screen, cc->next))
+     for(; cc; cc = tiled_client(c->screen, SLIST_NEXT(cc, next)))
           if(CFACTOR_PARENTROW(cgeo, cc->frame_geo, RPOS(p))
                     && SPLIT_CHECK_ROW(cc->frame_geo, g->frame_geo, p))
           {
@@ -197,8 +196,8 @@ split_arrange_closed(Client *ghost)
      for(p = Right; p < Center && !b; ++p)
           if((c = client_get_next_with_direction(ghost, p)) && _split_check_row_dir(c, ghost, p))
           {
-               for(cgeo = c->frame_geo, cc = tiled_client(c->screen, clients);
-                         cc; cc = tiled_client(c->screen, cc->next))
+               for(cgeo = c->frame_geo, cc = tiled_client(c->screen, SLIST_FIRST(&clients));
+                         cc; cc = tiled_client(c->screen, SLIST_NEXT(cc, next)))
                     if(CFACTOR_PARENTROW(cgeo, cc->frame_geo, RPOS(p))
                               && SPLIT_CHECK_ROW(cc->frame_geo, ghost->frame_geo, p))
                     {
@@ -296,7 +295,8 @@ split_client_integrate(Client *c, Client *sc, int screen, int tag)
                || sc->screen != screen || sc->tag != tag)
      {
           /* Looking for first client on wanted tag */
-          for(b = False, sc = clients; sc; sc = sc->next)
+          b = False;
+          SLIST_FOREACH(sc, &clients, next)
                if(sc != c && sc->screen == screen && sc->tag == tag
                          && (sc->flags & TileFlag))
                {
