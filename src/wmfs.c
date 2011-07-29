@@ -414,7 +414,7 @@ main(int argc, char **argv)
           {
           case 'h':
           default:
-               printf("usage: %s [-ihvS] [-C <file>] [-c <uicb function> <cmd> ] [-g <argument>] [-s <screen_num> <string>] [-V <viwmfs cmd]\n"
+               printf("usage: %s [-ihv] [-C <file>] [-c <uicb function> <cmd> ] [-g <argument>] [-s <screen_num> <string>]\n"
                       "   -C <file>                 Load a configuration file\n"
                       "   -c <uicb_function> <cmd>  Execute an uicb function to control WMFS\n"
                       "   -s <screen_num> <string>  Set the bar(s) statustext\n"
