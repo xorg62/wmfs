@@ -678,6 +678,7 @@ conf_rule_section(void)
           conf.rule[i].class         = fetch_opt_first(rule[i], "", "class").str;
           conf.rule[i].instance      = fetch_opt_first(rule[i], "", "instance").str;
           conf.rule[i].role          = fetch_opt_first(rule[i], "", "role").str;
+	  conf.rule[i].name          = fetch_opt_first(rule[i], "", "name").str;
           conf.rule[i].screen        = fetch_opt_first(rule[i], "-1", "screen").num;
           conf.rule[i].tag           = fetch_opt_first(rule[i], "-1", "tag").num;
           conf.rule[i].free          = fetch_opt_first(rule[i], "false", "free").boolean;

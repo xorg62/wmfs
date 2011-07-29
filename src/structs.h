@@ -384,6 +384,7 @@ typedef struct
      char *class;
      char *instance;
      char *role;
+     char *name;
      int screen;
      int tag;
      bool free;
