@@ -156,67 +156,6 @@ barwin_delete(BarWindow *bw)
      return;
 }
 
-/** Delete the BarWindow sub windows
- * \param bw BarWindow pointer
-*/
-void
-barwin_delete_subwin(BarWindow *bw)
-{
-     XDestroySubwindows(dpy, bw->win);
-
-     return;
-}
-
-/** Map a BarWindow
- * \param bw BarWindow pointer
-*/
-void
-barwin_map(BarWindow *bw)
-{
-     XMapWindow(dpy, bw->win);
-
-     bw->flags |= MappedFlag;
-
-     return;
-}
-
-
-/** Map the subwindows of a BarWindow
- *  Use for the BarWindow special border...
- * \param bw BarWindow pointer
- */
-void
-barwin_map_subwin(BarWindow *bw)
-{
-     XMapSubwindows(dpy, bw->win);
-
-     return;
-}
-
-/** Unmap a BarWindow
- * \param bw BarWindow pointer
-*/
-void
-barwin_unmap(BarWindow *bw)
-{
-     XUnmapWindow(dpy, bw->win);
-
-     bw->flags &= ~MappedFlag;
-
-     return;
-}
-
-/** Unmap the BarWindow sub windows
- * \param bw BarWindow pointer
-*/
-void
-barwin_unmap_subwin(BarWindow *bw)
-{
-     XUnmapSubwindows(dpy, bw->win);
-
-     return;
-}
-
 /** Move a BarWindow
  * \param bw BarWindow pointer
  * \param x X position
@@ -300,13 +239,3 @@ barwin_refresh_color(BarWindow *bw)
      return;
 }
 
-/** Refresh the BarWindow
- * \param bw BarWindow pointer
-*/
-void
-barwin_refresh(BarWindow *bw)
-{
-     XCopyArea(dpy, bw->dr, bw->win, gc, 0, 0, bw->geo.width, bw->geo.height, 0, 0);
-
-     return;
-}

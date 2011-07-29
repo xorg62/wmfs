@@ -113,7 +113,6 @@
 #define ATOM(a)            XInternAtom(dpy, (a), False)
 #define FRAMEW(w)          ((w) + (BORDH << 1))
 #define FRAMEH(h)          ((h) + (BORDH  + TBARH))
-#define ROUND(x)           (float)((x > 0) ? x + (float)0.5 : x - (float)0.5)
 #define CHECK(x)           if(!(x)) return
 #define LEN(x)             (sizeof(x) / sizeof((x)[0]))
 #define MAXCLIST           (64)
@@ -128,6 +127,22 @@
       ? (p == Left ? (g1.x == g2.x) : (g1.x + g1.width  == g2.x + g2.width))   \
       : (p == Top  ? (g1.y == g2.y) : (g1.y + g1.height == g2.y + g2.height))) \
 
+/* Barwin define, wrappers for simple function */
+#define barwin_delete_subwin(bw) XDestroySubwindows(dpy, bw->win)
+#define barwin_map_subwin(bw)    XMapSubwindows(dpy, bw->win)
+#define barwin_unmap_subwin(bw)  XUnmapSubwindows(dpy, bw->win)
+#define barwin_refresh(bw)       XCopyArea(dpy, bw->dr, bw->win, gc, 0, 0, bw->geo.width, bw->geo.height, 0, 0)
+#define barwin_map(bw)              \
+     do {                           \
+          XMapWindow(dpy, bw->win); \
+          bw->flags |= MappedFlag;  \
+     } while(/* CONSTCOND */ 0)
+#define barwin_unmap(bw)              \
+     do {                             \
+          XUnmapWindow(dpy, bw->win); \
+          bw->flags &= ~MappedFlag;   \
+     } while(/* CONSTCOND */ 0)
+
 /* barwin.c */
 BarWindow *barwin_create(Window parent,
                          int x, int y,
@@ -139,15 +154,9 @@ BarWindow *barwin_create(Window parent,
 void barwin_draw_text(BarWindow *bw, int x, int y, char *text);
 void barwin_color_set(BarWindow *bw, uint bg, char *fg);
 void barwin_delete(BarWindow *bw);
-void barwin_delete_subwin(BarWindow *bw);
-void barwin_map(BarWindow *bw);
-void barwin_map_subwin(BarWindow *bw);
-void barwin_unmap(BarWindow *bw);
-void barwin_unmap_subwin(BarWindow *bw);
 void barwin_move(BarWindow *bw, int x, int y);
 void barwin_resize(BarWindow *bw, int w, int h);
 void barwin_refresh_color(BarWindow *bw);
-void barwin_refresh(BarWindow *bw);
 
 /* draw.c */
 void draw_text(Drawable d, int x, int y, char* fg, char *str);

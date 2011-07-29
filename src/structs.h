@@ -291,13 +291,12 @@ typedef struct
 } Layout;
 
 /* Systray Structure */
-typedef struct Systray Systray;
-struct Systray
+typedef struct Systray
 {
      Window win;
      Geo geo;
      SLIST_ENTRY(Systray) next;
-};
+} Systray;
 
 /* Tag Structure */
 typedef struct
