@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ABOUT :
 WMFS Window Manager.
    * Window Manager From Scratch
@@ -41,3 +42,6 @@ You can also use old build system if you don't want^Whave cmake
 DISTROS :
   - wmfs port for FreeBSD at x11-wm/wmfs
   - wmfs is available with AUR in ArchLinux (wmfs or wmfs-git)
+=======
+All that's missing is the fork. Heh.
+>>>>>>> upstream/master
