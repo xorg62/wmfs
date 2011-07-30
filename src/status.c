@@ -42,16 +42,13 @@ static int sw = 0;
   *\param win  Window to click
   *\return sm StatusMouse pointer
  */
-static StatusMouse*
+static void
 statustext_mouse(char *str, Geo area, Window win)
 {
      StatusMouse *sm = NULL;
      int i = 0, button = 1;
      char cmd[256] = { 0 };
      char func[64] = { 0 };
-
-     if(!str)
-          return NULL;
 
      for(; i < strlen(str); ++i)
           if(sscanf(&str[i], "(%d;%64[^;];%256[^)])", &button, func, cmd) == 3)
@@ -68,7 +65,7 @@ statustext_mouse(char *str, Geo area, Window win)
                break;
           }
 
-     return sm;
+     return;
 }
 
 /** Check rectangles blocks in str and draw it
@@ -90,7 +87,7 @@ statustext_rectangle(InfoBar *ib, char *str)
           {
                draw_rectangle(ib->bar->dr, r.g.x - sw, r.g.y, r.g.width, r.g.height, r.color);
 
-               (StatusMouse*)statustext_mouse(mouse, r.g, ib->bar->win);
+               statustext_mouse(mouse, r.g, ib->bar->win);
 
                for(++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
           }
@@ -160,14 +157,23 @@ static void
 statustext_text(InfoBar *ib, char *str)
 {
      StatusText s;
-     char as;
-     int i, j, k;
+     Geo area;
+     char as, mouse[512] = { 0 };
+     int i = 0, j = 0, k, n;
 
-     for(i = j = 0; i < (int)strlen(str); ++i, ++j)
-          if(sscanf(&str[i], "\\s[%d;%d;%7[^;];%512[^]]]%c", &s.x, &s.y, s.color, s.text, &as) == 5
-                    && as == '\\')
+     for(; i < (int)strlen(str); ++i, ++j)
+          if((n = sscanf(&str[i], "%512[^\\]\\s[%d;%d;%7[^;];%512[^]]]%c", mouse, &s.x, &s.y, s.color, s.text, &as)) == 6
+                    || n == 5 && as == '\\')
           {
                draw_text(ib->bar->dr, s.x - sw, s.y, s.color, s.text);
+
+               /* Etablish clickable area on text */
+               area.height = font.height;
+               area.width = textw(s.text);
+               area.x = s.x - sw;
+               area.y = s.y - area.height;
+
+               statustext_mouse(mouse, area, ib->bar->win);
 
                for(++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
           }
