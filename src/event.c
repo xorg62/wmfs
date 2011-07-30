@@ -40,6 +40,7 @@ static void
 buttonpress(XEvent *e)
 {
      XButtonEvent *ev = &e->xbutton;
+     StatusMouse *sm;
      Client *c;
      int i, j, n;
 
@@ -157,6 +158,14 @@ buttonpress(XEvent *e)
                }
           }
      }
+
+     /* Status mouse bindings */
+     SLIST_FOREACH(sm, &smhead, next)
+          if(sm->win == ev->window && ev->button == sm->button)
+               if(ev->x >= sm->area.x && ev->x <= sm->area.x + sm->area.width
+                         && ev->y >= sm->area.y && ev->y <= sm->area.y + sm->area.height)
+                    if(sm->func)
+                         sm->func(sm->cmd);
 
      return;
 }

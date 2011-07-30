@@ -35,6 +35,42 @@
 /* Systray width */
 static int sw = 0;
 
+/** Parse dynamic mouse binds in str and insert it in linked list
+  * --> (button;func;cmd)\<block>[;;;;]\  add a mouse bind on the block object
+  *\param str String
+  *\param area Area of clicking
+  *\param win  Window to click
+  *\return sm StatusMouse pointer
+ */
+static StatusMouse*
+statustext_mouse(char *str, Geo area, Window win)
+{
+     StatusMouse *sm = NULL;
+     int i = 0, button = 1;
+     char cmd[256] = { 0 };
+     char func[64] = { 0 };
+
+     if(!str)
+          return NULL;
+
+     for(; i < strlen(str); ++i)
+          if(sscanf(&str[i], "(%d;%64[^;];%256[^)])", &button, func, cmd) == 3)
+          {
+               sm = zcalloc(sizeof(StatusMouse));
+               sm->button = button;
+               sm->func   = name_to_func((char*)func, func_list);
+               sm->cmd    = xstrdup(cmd);
+               sm->area   = area;
+               sm->win    = win;
+
+               SLIST_INSERT_HEAD(&smhead, sm, next);
+
+               break;
+          }
+
+     return sm;
+}
+
 /** Check rectangles blocks in str and draw it
   * --> \b[x;y;width;height;#color]\
   *\param ib Infobar pointer
@@ -44,14 +80,17 @@ static void
 statustext_rectangle(InfoBar *ib, char *str)
 {
      StatusRec r;
-     char as;
-     int i, j, k;
+     char as, mouse[512] = { 0 };
+     int i, j, k, n;
 
      for(i = j = 0; i < (int)strlen(str); ++i, ++j)
-          if(sscanf(&str[i], "\\b[%d;%d;%d;%d;#%x]%c", &r.x, &r.y, &r.w, &r.h, &r.color, &as) == 6
-                    && as == '\\')
+          if((n = sscanf(&str[i], "%512[^\\]\\b[%d;%d;%d;%d;#%x]%c",
+                              mouse, &r.g.x, &r.g.y, &r.g.width, &r.g.height, &r.color, &as)) == 7
+                    || n == 6 && as == '\\')
           {
-               draw_rectangle(ib->bar->dr, r.x - sw, r.y, r.w, r.h, r.color);
+               draw_rectangle(ib->bar->dr, r.g.x - sw, r.g.y, r.g.width, r.g.height, r.color);
+
+               (StatusMouse*)statustext_mouse(mouse, r.g, ib->bar->win);
 
                for(++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
           }
@@ -203,12 +242,22 @@ void
 statustext_handle(int sc, char *str)
 {
      InfoBar *ib = &infobar[sc];
+     StatusMouse *sm;
      char *lastst;
      int i;
 
      /* If the str == the current statustext, return (not needed) */
      if(!str)
           return;
+
+     /* Free linked list of mouse bind */
+     while(!SLIST_EMPTY(&smhead))
+     {
+          sm = SLIST_FIRST(&smhead);
+          SLIST_REMOVE_HEAD(&smhead, next);
+          free((void*)sm->cmd);
+          free(sm);
+     }
 
      if(sc == conf.systray.screen)
           sw = systray_get_width();

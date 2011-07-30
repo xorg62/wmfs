@@ -203,6 +203,7 @@ init(void)
 {
      /* Init lists heads */
      SLIST_INIT(&bwhead);
+     SLIST_INIT(&smhead);
      SLIST_INIT(&clients);
      SLIST_INIT(&trayicons);
 

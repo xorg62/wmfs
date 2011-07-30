@@ -542,7 +542,7 @@ typedef struct
 /* status.c util struct */
 typedef struct
 {
-     int x, y, w, h;
+     Geo g;
      uint color;
 } StatusRec;
 
@@ -559,6 +559,16 @@ typedef struct
      char color[8];
      char text[512];
 } StatusText;
+
+typedef struct StatusMouse
+{
+     Geo area;
+     Window win;
+     int button;
+     void (*func)(uicb_t);
+     uicb_t cmd;
+     SLIST_ENTRY(StatusMouse) next;
+} StatusMouse;
 
 typedef struct
 {

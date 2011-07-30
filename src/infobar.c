@@ -368,22 +368,22 @@ infobar_set_position(int pos)
 
      switch(pos)
      {
-     case IB_Hide:
-          sgeo[selscreen].y = spgeo[selscreen].y + TBARH;
-          sgeo[selscreen].height = spgeo[selscreen].height - TBARH;
-          infobar[selscreen].geo.y = (-(infobar[selscreen].geo.height) << 1);
-          break;
-     case IB_Bottom:
-          sgeo[selscreen].y = spgeo[selscreen].y + TBARH;
-          sgeo[selscreen].height = spgeo[selscreen].height - INFOBARH - TBARH;
-          infobar[selscreen].geo.y = spgeo[selscreen].y + sgeo[selscreen].height + TBARH;
-          break;
-     default:
-     case IB_Top:
-          sgeo[selscreen].y = spgeo[selscreen].y + INFOBARH + TBARH;
-          sgeo[selscreen].height = spgeo[selscreen].height - INFOBARH - TBARH;
-          infobar[selscreen].geo.y = spgeo[selscreen].y;
-          break;
+          case IB_Hide:
+               sgeo[selscreen].y = spgeo[selscreen].y + TBARH;
+               sgeo[selscreen].height = spgeo[selscreen].height - TBARH;
+               infobar[selscreen].geo.y = (-(infobar[selscreen].geo.height) << 1);
+               break;
+          case IB_Bottom:
+               sgeo[selscreen].y = spgeo[selscreen].y + TBARH;
+               sgeo[selscreen].height = spgeo[selscreen].height - INFOBARH - TBARH;
+               infobar[selscreen].geo.y = spgeo[selscreen].y + sgeo[selscreen].height + TBARH;
+               break;
+          default:
+          case IB_Top:
+               sgeo[selscreen].y = spgeo[selscreen].y + INFOBARH + TBARH;
+               sgeo[selscreen].height = spgeo[selscreen].height - INFOBARH - TBARH;
+               infobar[selscreen].geo.y = spgeo[selscreen].y;
+               break;
      }
 
      tags[selscreen][seltag[selscreen]].barpos = pos;

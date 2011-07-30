@@ -322,7 +322,6 @@ char *char_to_str(const char c);
 pid_t spawn(const char *str, ...);
 void swap_ptr(void **x, void **y);
 void uicb_spawn(uicb_t);
-char *clean_value(char *str);
 char* patht(char *path);
 int qsort_string_compare (const void * a, const void * b);
 
@@ -499,6 +498,9 @@ int tray_width;
 
 /* BarWindow */
 SLIST_HEAD(, BarWindow) bwhead;
+
+/* Status */
+SLIST_HEAD(, StatusMouse) smhead;
 
 #endif /* WMFS_H */
 

@@ -332,21 +332,21 @@ mouse_resize(Client *c)
 void
 mouse_grabbuttons(Client *c, bool focused)
 {
-     size_t i;
+     size_t i = 0;
      uint but[] = {Button1, Button2, Button3, Button4, Button5};
 
      XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
      if(focused)
-          for(i = 0; i < LEN(but); ++i)
+          for(; i < LEN(but); ++i)
           {
                XGrabButton(dpy, but[i], conf.client.mod, c->win, False,
-                           ButtonMask, GrabModeAsync,GrabModeSync, None, None);
-               XGrabButton(dpy, but[i], conf.client.mod|LockMask, c->win, False,
-                           ButtonMask, GrabModeAsync,GrabModeSync, None, None);
-               XGrabButton(dpy, but[i], conf.client.mod|numlockmask, c->win, False,
-                           ButtonMask, GrabModeAsync,GrabModeSync, None, None);
-               XGrabButton(dpy, but[i], conf.client.mod|LockMask|numlockmask, c->win, False,
-                           ButtonMask, GrabModeAsync,GrabModeSync, None, None);
+                           ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, but[i], conf.client.mod | LockMask, c->win, False,
+                           ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, but[i], conf.client.mod | numlockmask, c->win, False,
+                         ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(dpy, but[i], conf.client.mod | LockMask | numlockmask, c->win, False,
+                           ButtonMask, GrabModeAsync, GrabModeSync, None, None);
           }
      else
           XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
