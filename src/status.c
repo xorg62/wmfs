@@ -50,7 +50,7 @@ statustext_mouse(char *str, Geo area, Window win)
      char func[64] = { 0 };
 
      for(; i < strlen(str); ++i)
-          if(sscanf(&str[i], "(%d;%64[^;];%256[^)])", &button, func, cmd) == 3)
+          if(sscanf(&str[i], "(%d;%64[^;];%256[^)])", &button, func, cmd) >= 2)
           {
                sm = zcalloc(sizeof(StatusMouse));
                sm->button = button;
@@ -60,7 +60,11 @@ statustext_mouse(char *str, Geo area, Window win)
                sm->win    = win;
 
                SLIST_INSERT_HEAD(&smhead, sm, next);
+
+               /* Jump to the end of the sequence */
+               while(str[++i + 1] != ')');
           }
+
 
      return;
 }
@@ -262,7 +266,7 @@ statustext_handle(int sc, char *str)
      if(!str)
           return;
 
-     /* Free linked list of mouse bind */
+     /* Free previous linked list of mouse bind */
      while(!SLIST_EMPTY(&smhead))
      {
           sm = SLIST_FIRST(&smhead);
