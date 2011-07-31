@@ -39,10 +39,9 @@ static int sw = 0;
   * --> (button;func;cmd)\<block>[;;;;]\  add a mouse bind on the block object
   *\param str String
   *\param area Area of clicking
-  *\param win  Window to click
-  *\return sm StatusMouse pointer
+  *\param win Win to click
  */
-static void
+void
 statustext_mouse(char *str, Geo area, Window win)
 {
      StatusMouse *sm = NULL;
@@ -78,16 +77,19 @@ statustext_rectangle(InfoBar *ib, char *str)
 {
      StatusRec r;
      char as, mouse[512] = { 0 };
-     int i, j, k, n;
+     int i = 0, j = 0, k, n;
 
-     for(i = j = 0; i < (int)strlen(str); ++i, ++j)
-          if((n = sscanf(&str[i], "%512[^\\]\\b[%d;%d;%d;%d;#%x]%c",
-                              mouse, &r.g.x, &r.g.y, &r.g.width, &r.g.height, &r.color, &as)) == 7
-                    || n == 6 && as == '\\')
+     for(; i < (int)strlen(str); ++i, ++j)
+          if((n = sscanf(&str[i], "\\b[%d;%d;%d;%d;#%x]%c",
+                              &r.g.x, &r.g.y, &r.g.width, &r.g.height, &r.color, &as)) == 6
+                    || (n = sscanf(&str[i], "\\b[%d;%d;%d;%d;#%x;%512[^]]]%c",
+                              &r.g.x, &r.g.y, &r.g.width, &r.g.height, &r.color, mouse, &as)) == 7
+                    && as == '\\')
           {
                draw_rectangle(ib->bar->dr, r.g.x - sw, r.g.y, r.g.width, r.g.height, r.color);
 
-               statustext_mouse(mouse, r.g, ib->bar->win);
+               if(n == 7)
+                    statustext_mouse(mouse, r.g, ib->bar->win);
 
                for(++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
           }
@@ -162,18 +164,24 @@ statustext_text(InfoBar *ib, char *str)
      int i = 0, j = 0, k, n;
 
      for(; i < (int)strlen(str); ++i, ++j)
-          if((n = sscanf(&str[i], "%512[^\\]\\s[%d;%d;%7[^;];%512[^]]]%c", mouse, &s.x, &s.y, s.color, s.text, &as)) == 6
-                    || n == 5 && as == '\\')
+          if((n = sscanf(&str[i], "\\s[%d;%d;%7[^;];%512[^];]]%c",
+                              &s.x, &s.y, s.color, s.text, &as)) == 5
+                    || (n = sscanf(&str[i], "\\s[%d;%d;%7[^;];%512[^;];%512[^]]]%c",
+                              &s.x, &s.y, s.color, s.text, mouse, &as)) == 6
+                    && as == '\\')
           {
                draw_text(ib->bar->dr, s.x - sw, s.y, s.color, s.text);
 
                /* Etablish clickable area on text */
-               area.height = font.height;
-               area.width = textw(s.text);
-               area.x = s.x - sw;
-               area.y = s.y - area.height;
+               if(n == 6)
+               {
+                    area.height = font.height;
+                    area.width  = textw(s.text);
+                    area.x = s.x - sw;
+                    area.y = s.y - area.height;
 
-               statustext_mouse(mouse, area, ib->bar->win);
+                    statustext_mouse(mouse, area, ib->bar->win);
+               }
 
                for(++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
           }

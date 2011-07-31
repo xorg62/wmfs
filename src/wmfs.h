@@ -363,6 +363,7 @@ void uicb_screen_prev(uicb_t);
 void uicb_screen_prev_sel(uicb_t);
 
 /* status.c */
+void statustext_mouse(char *str, Geo area, Drawable dr);
 void statustext_handle(int sc, char *str);
 
 /* systray.c */

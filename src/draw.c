@@ -83,14 +83,36 @@ static void
 parse_image_block(Drawable dr, char *str)
 {
      ImageAttr im;
-     char as;
-     int i, j, k;
+     BarWindow *bw;
+     Geo area;
+     char as, mouse[512] = { 0 };
+     int i = 0, j = 0, k, n;
 
-     for(i = j = 0; i < (int)strlen(str); ++i, ++j)
-          if(sscanf(&str[i], "\\i[%d;%d;%d;%d;%512[^]]]%c", &im.x, &im.y, &im.w, &im.h, im.name, &as) == 6
+     for(; i < (int)strlen(str); ++i, ++j)
+          if((n = sscanf(&str[i], "\\i[%d;%d;%d;%d;%512[^];]]%c",
+                              &im.x, &im.y, &im.w, &im.h, im.name, &as)) == 6
+                    || (n = sscanf(&str[i], "\\i[%d;%d;%d;%d;%512[^;];%512[^]]]%c",
+                              &im.x, &im.y, &im.w, &im.h, im.name, mouse, &as)) == 7
                     && as == '\\')
           {
                draw_image(dr, im.x - sw, im.y, im.w, im.h, im.name);
+
+               /* Etablish clickable area on image */
+               if(n == 7)
+               {
+                    area.x = im.x - sw;
+                    area.y = im.y;
+                    area.width  = im.w;
+                    area.height = im.h;
+
+                    /* Associate drawable with window; travel barwins */
+                    SLIST_FOREACH(bw, &bwhead, next)
+                         if(bw->dr == dr)
+                         {
+                              statustext_mouse(mouse, area, bw->win);
+                              break;
+                         }
+               }
 
                for(++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
           }
