@@ -45,12 +45,12 @@ void
 statustext_mouse(char *str, Geo area, Window win)
 {
      StatusMouse *sm = NULL;
-     int i = 0, button = 1;
+     int i = 0, button = 1, n;
      char cmd[256] = { 0 };
      char func[64] = { 0 };
 
      for(; i < strlen(str); ++i)
-          if(sscanf(&str[i], "(%d;%64[^;];%256[^)])", &button, func, cmd) >= 2)
+          if((n = sscanf(&str[i], "(%d;%64[^;];%256[^)])", &button, func, cmd) >= 2) && n <= 3)
           {
                sm = zcalloc(sizeof(StatusMouse));
                sm->button = button;
