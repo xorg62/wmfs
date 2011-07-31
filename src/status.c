@@ -36,7 +36,7 @@
 static int sw = 0;
 
 /** Parse dynamic mouse binds in str and insert it in linked list
-  * --> (button;func;cmd)\<block>[;;;;]\  add a mouse bind on the block object
+  * --> \<block>[;;;;(button;func;cmd)]\  add a mouse bind on the block object
   *\param str String
   *\param area Area of clicking
   *\param win Win to click
@@ -60,8 +60,6 @@ statustext_mouse(char *str, Geo area, Window win)
                sm->win    = win;
 
                SLIST_INSERT_HEAD(&smhead, sm, next);
-
-               break;
           }
 
      return;
