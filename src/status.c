@@ -49,7 +49,7 @@ statustext_mouse(char *str, Geo area, InfoBar *infobar)
      char cmd[256] = { 0 };
      char func[64] = { 0 };
 
-     for(; i < strlen(str); ++i)
+     for(; i < strlen(str); ++i, sm = NULL)
           if((n = sscanf(&str[i], "(%d;%64[^;];%256[^)])", &button, func, cmd) >= 2) && n < 4)
           {
                sm = zcalloc(sizeof(StatusMouse));

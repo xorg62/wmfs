@@ -77,10 +77,11 @@ draw_image(Drawable dr, int x, int y, int w, int h, char *name)
   * --> \i[x;y;w;h;name]\
   *\param im ImageAttr pointer, image properties
   *\param str String
+  *\param m Check dynamic mouse
   *\return n Lenght of i
   */
 static void
-parse_image_block(Drawable dr, char *str)
+parse_image_block(Drawable dr, char *str, bool m)
 {
      ImageAttr im;
      BarWindow *bw;
@@ -98,7 +99,7 @@ parse_image_block(Drawable dr, char *str)
                draw_image(dr, im.x - sw, im.y, im.w, im.h, im.name);
 
                /* Etablish clickable area on image (on infobar wins only (status mouse bind) */
-               if(n == 7)
+               if(n == 7 && m)
                {
                     area.x = im.x - sw;
                     area.y = im.y;
@@ -150,7 +151,7 @@ draw_text(Drawable d, int x, int y, char* fg, char *str)
 
           ostr = xstrdup(str);
           textlen = strlen(ostr);
-          parse_image_block(d, str);
+          parse_image_block(d, str, True);
      }
 #endif /* HAVE_IMLIB */
 
@@ -252,7 +253,7 @@ textw(char *text)
      {
           ostr = xstrdup(text);
           textlen = strlen(ostr);
-          parse_image_block(d, text);
+          parse_image_block(d, text, False);
      }
 #endif /* HAVE_IMLIB */
 
