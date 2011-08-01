@@ -4,6 +4,7 @@ LIBS="x11 xft freetype2"
 USE_XINERAMA="xinerama"
 USE_XRANDR="xrandr"
 USE_IMLIB2="imlib2"
+USE_XFT="xft"
 OS=`uname -s`
 PREFIX=/usr/local
 MANPREFIX="$PREFIX/man"
@@ -17,6 +18,8 @@ while true; do
 			USE_XRANDR="";  shift;;
 		--without-imlib2)
 			USE_IMLIB2="";  shift;;
+		--without-xft)
+			USE_XFT=""; shift;;
 		--prefix)
 			[ -z "$2" ] && echo "Missing argument" && exit 1
 			PREFIX=$2; shift 2;;
@@ -31,6 +34,7 @@ while true; do
 	--without-imlib2		: compile without imlib2 support
 	--without-xrandr		: compile without xrandr support
 	--without-xinerama		: compile without xinerama support
+	--without-xft			: compile without xft support
 	--prefix DIRECTORY		: install binary with specified prefix (default $PREFIX)
 	--xdg-config-dir DIRECTORY	: install configuration to specified directory (default $XDG_CONFIG_DIR)
 	--man-prefix DIRECTORY		: install man page to specified prefix (default $MANPREFIX)"
@@ -39,7 +43,7 @@ while true; do
 	esac
 done
 
-LIBS="$LIBS $USE_XINERAMA $USE_XRANDR $USE_IMLIB2"
+LIBS="$LIBS $USE_XINERAMA $USE_XRANDR $USE_IMLIB2 $USE_XFT"
 
 which pkg-config >/dev/null 2>&1
 
@@ -68,16 +72,18 @@ else
 			exit 1;;
 	esac
 
-	LDFLAGS="$LDFLAGS -lX11 -lXft -lfreetype"
+	LDFLAGS="$LDFLAGS -lX11 -lfreetype"
 
 	[ -n "$USE_XINERAMA" ] && LDFLAGS="$LDFLAGS -lXinerama"
 	[ -n "$USE_XRANDR" ] && LDFLAGS="$LDFLAGS -lXrandr"
 	[ -n "$USE_IMLIB2" ] && LDFLAGS="$LDFLAGS -lImlib2"
+	[ -n "$USE_XFT" ] && LDFLAGS="$LDFLAGS -lXft"
 fi
 
 [ -n "$USE_XINERAMA" ] && CFLAGS="$CFLAGS -DHAVE_XINERAMA"
 [ -n "$USE_XRANDR" ] && CFLAGS="$CFLAGS -DHAVE_XRANDR"
 [ -n "$USE_IMLIB2" ] && CFLAGS="$CFLAGS -DHAVE_IMLIB"
+[ -n "$USE_XFT" ] && CFLAGS="$CFLAGS -DHAVE_XFT"
 
 LDFLAGS="$LDFLAGS -lpthread"
 
