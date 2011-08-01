@@ -563,7 +563,7 @@ typedef struct
 typedef struct StatusMouse
 {
      Geo area;
-     Window win;
+     InfoBar *infobar;
      int button;
      void (*func)(uicb_t);
      uicb_t cmd;

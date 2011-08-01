@@ -86,7 +86,7 @@ parse_image_block(Drawable dr, char *str)
      BarWindow *bw;
      Geo area;
      char as, mouse[512] = { 0 };
-     int i = 0, j = 0, k, n;
+     int i = 0, j = 0, k = 0, n;
 
      for(; i < (int)strlen(str); ++i, ++j)
           if((n = sscanf(&str[i], "\\i[%d;%d;%d;%d;%512[^];]]%c",
@@ -97,7 +97,7 @@ parse_image_block(Drawable dr, char *str)
           {
                draw_image(dr, im.x - sw, im.y, im.w, im.h, im.name);
 
-               /* Etablish clickable area on image */
+               /* Etablish clickable area on image (on infobar wins only (status mouse bind) */
                if(n == 7)
                {
                     area.x = im.x - sw;
@@ -105,11 +105,11 @@ parse_image_block(Drawable dr, char *str)
                     area.width  = im.w;
                     area.height = im.h;
 
-                    /* Associate drawable with window; travel barwins */
-                    SLIST_FOREACH(bw, &bwhead, next)
-                         if(bw->dr == dr)
+                    /* Associate drawable with window; travel infobars */
+                    for(; k < screen_count(); ++k)
+                         if(infobar[k].bar->dr == dr)
                          {
-                              statustext_mouse(mouse, area, bw->win);
+                              statustext_mouse(mouse, area, &infobar[k]);
                               break;
                          }
                }

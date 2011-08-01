@@ -39,10 +39,10 @@ static int sw = 0;
   * --> \<block>[;;;;(button;func;cmd)]\  add a mouse bind on the block object
   *\param str String
   *\param area Area of clicking
-  *\param win Win to click
+  *\param infobar Infobar pointer
  */
 void
-statustext_mouse(char *str, Geo area, Window win)
+statustext_mouse(char *str, Geo area, InfoBar *infobar)
 {
      StatusMouse *sm = NULL;
      int i = 0, button = 1, n;
@@ -50,14 +50,14 @@ statustext_mouse(char *str, Geo area, Window win)
      char func[64] = { 0 };
 
      for(; i < strlen(str); ++i)
-          if((n = sscanf(&str[i], "(%d;%64[^;];%256[^)])", &button, func, cmd) >= 2) && n <= 3)
+          if((n = sscanf(&str[i], "(%d;%64[^;];%256[^)])", &button, func, cmd) >= 2) && n < 4)
           {
                sm = zcalloc(sizeof(StatusMouse));
-               sm->button = button;
-               sm->func   = name_to_func((char*)func, func_list);
-               sm->cmd    = xstrdup(cmd);
-               sm->area   = area;
-               sm->win    = win;
+               sm->button  = button;
+               sm->func    = name_to_func((char*)func, func_list);
+               sm->cmd     = xstrdup(cmd);
+               sm->area    = area;
+               sm->infobar = infobar;
 
                SLIST_INSERT_HEAD(&smhead, sm, next);
 
@@ -91,7 +91,7 @@ statustext_rectangle(InfoBar *ib, char *str)
                draw_rectangle(ib->bar->dr, r.g.x - sw, r.g.y, r.g.width, r.g.height, r.color);
 
                if(n == 7)
-                    statustext_mouse(mouse, r.g, ib->bar->win);
+                    statustext_mouse(mouse, r.g, ib);
 
                for(++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
           }
@@ -182,7 +182,7 @@ statustext_text(InfoBar *ib, char *str)
                     area.x = s.x - sw;
                     area.y = s.y - area.height;
 
-                    statustext_mouse(mouse, area, ib->bar->win);
+                    statustext_mouse(mouse, area, ib);
                }
 
                for(++i, --j; str[i] != as || str[i - 1] != ']'; ++i);
@@ -267,13 +267,14 @@ statustext_handle(int sc, char *str)
           return;
 
      /* Free previous linked list of mouse bind */
-     while(!SLIST_EMPTY(&smhead))
-     {
-          sm = SLIST_FIRST(&smhead);
-          SLIST_REMOVE_HEAD(&smhead, next);
-          free((void*)sm->cmd);
-          free(sm);
-     }
+     if(!sc)
+          while(!SLIST_EMPTY(&smhead))
+          {
+               sm = SLIST_FIRST(&smhead);
+               SLIST_REMOVE_HEAD(&smhead, next);
+               free((void*)sm->cmd);
+               free(sm);
+          }
 
      if(sc == conf.systray.screen)
           sw = systray_get_width();

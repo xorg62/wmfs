@@ -161,7 +161,7 @@ buttonpress(XEvent *e)
 
      /* Status mouse bindings */
      SLIST_FOREACH(sm, &smhead, next)
-          if(sm->win == ev->window && ev->button == sm->button)
+          if(sm->infobar->bar->win == ev->window && ev->button == sm->button)
                if(ev->x >= sm->area.x && ev->x <= sm->area.x + sm->area.width
                          && ev->y >= sm->area.y && ev->y <= sm->area.y + sm->area.height)
                     if(sm->func)
