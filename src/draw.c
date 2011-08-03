@@ -84,16 +84,15 @@ static void
 parse_image_block(Drawable dr, char *str, bool m)
 {
      ImageAttr im;
-     BarWindow *bw;
      Geo area;
      char as, mouse[512] = { 0 };
      int i = 0, j = 0, k = 0, n;
 
      for(; i < (int)strlen(str); ++i, ++j)
-          if((n = sscanf(&str[i], "\\i[%d;%d;%d;%d;%512[^];]]%c",
-                              &im.x, &im.y, &im.w, &im.h, im.name, &as)) == 6
-                    || (n = sscanf(&str[i], "\\i[%d;%d;%d;%d;%512[^;];%512[^]]]%c",
-                              &im.x, &im.y, &im.w, &im.h, im.name, mouse, &as)) == 7
+          if(((n = sscanf(&str[i], "\\i[%d;%d;%d;%d;%512[^];]]%c",
+                                   &im.x, &im.y, &im.w, &im.h, im.name, &as)) == 6
+                         || (n = sscanf(&str[i], "\\i[%d;%d;%d;%d;%512[^;];%512[^]]]%c",
+                                   &im.x, &im.y, &im.w, &im.h, im.name, mouse, &as)) == 7)
                     && as == '\\')
           {
                draw_image(dr, im.x - sw, im.y, im.w, im.h, im.name);

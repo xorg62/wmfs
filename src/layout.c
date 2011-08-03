@@ -113,7 +113,7 @@ layoutswitch(bool b)
      screen_get_sel();
 
      if(tags[selscreen][seltag[selscreen]].layout.func == freelayout)
-          for(; c && (c->tag != (uint)seltag[selscreen] && c->screen != selscreen); c = SLIST_NEXT(c, next))
+          for(; c && (c->tag != seltag[selscreen] && c->screen != selscreen); c = SLIST_NEXT(c, next))
           {
                c->ogeo = c->geo;
                c->free_geo = c->geo;
@@ -348,16 +348,16 @@ multi_tile(int screen, Position type)
      if(LDIR(type))
      {
           if(type == Left)
-               mastergeo.x = (n <= nmaster) ? (uint)sg.x : (sg.x + sg.width) - mwfact - (BORDH << 1);
-          mastergeo.width = (n <= nmaster) ? (uint)(sg.width - (BORDH << 1)) : mwfact;
+               mastergeo.x = (n <= nmaster) ? sg.x : (sg.x + sg.width) - mwfact - (BORDH << 1);
+          mastergeo.width = (n <= nmaster) ? (sg.width - (BORDH << 1)) : mwfact;
           mastergeo.height = (sg.height / nmaster) - BORDH;
      }
      else
      {
           if(type == Top)
-               mastergeo.y = (n <= nmaster) ? (uint)sg.y : sg.y + (sg.height - mwfact) - BORDH;
+               mastergeo.y = (n <= nmaster) ? sg.y : sg.y + (sg.height - mwfact) - BORDH;
           mastergeo.width = (sg.width / nmaster) - (BORDH << 2);
-          mastergeo.height = (n <= nmaster) ? (uint)(sg.height - BORDH) : mwfact;
+          mastergeo.height = (n <= nmaster) ? (sg.height - BORDH) : mwfact;
      }
      /* TILED SIZE */
      if(n > nmaster)
@@ -825,7 +825,7 @@ uicb_toggle_abovefc(uicb_t cmd)
           SLIST_FOREACH(c, &clients, next)
                if(c->flags & AboveFlag
                          && c->screen == selscreen
-                         && c->tag == (uint)seltag[selscreen])
+                         && c->tag == seltag[selscreen])
                {
                     c->flags &= ~AboveFlag;
                     break;

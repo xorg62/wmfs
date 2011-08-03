@@ -106,8 +106,6 @@ systray_add(Window win)
 void
 systray_del(Systray *s)
 {
-     Systray **ss;
-
      if(!conf.systray.active)
           return;
 

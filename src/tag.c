@@ -102,6 +102,11 @@ tag_set(int tag)
                break;
           }
 
+     /* To focus selected client of the via focusontag option */
+     SLIST_FOREACH(c, &clients, next)
+          if(c->focusontag == tag && c->screen == selscreen)
+               break;
+
      arrange(selscreen, al);
 
      if(tags[selscreen][tag].flags & RequestUpdateFlag)
@@ -110,15 +115,10 @@ tag_set(int tag)
           tags[selscreen][tag].flags &= ~RequestUpdateFlag;
      }
 
-     /* To focus selected client of the via focusontag option */
-     SLIST_FOREACH(c, &clients, next)
-          if(c->focusontag == tag && c->screen == selscreen)
-               break;
-
      /* No focusontag option found on any client, try to find the first of the tag */
      if(!c)
           SLIST_FOREACH(c, &clients, next)
-               if(c->tag == (uint)seltag[selscreen] && c->screen == selscreen)
+               if(c->tag == seltag[selscreen] && c->screen == selscreen)
                     break;
 
      client_focus((c) ? c : NULL);
@@ -353,9 +353,9 @@ tag_swap(int s, int t1, int t2)
 
      SLIST_FOREACH(c, &clients, next)
      {
-          if(c->screen == s && c->tag == (uint)t1)
+          if(c->screen == s && c->tag == t1)
                c->tag = t2;
-          else if(c->screen == s && c->tag == (uint)t2)
+          else if(c->screen == s && c->tag == t2)
                c->tag = t1;
      }
 
@@ -651,7 +651,7 @@ tag_delete(int s, int tag)
 {
      Tag t;
      Client *c;
-     size_t i;
+     int i;
 
      memset(&t, 0, sizeof(t));
 
@@ -659,7 +659,7 @@ tag_delete(int s, int tag)
           return;
 
      SLIST_FOREACH(c, &clients, next)
-          if(c->screen == s && c->tag == (uint)tag)
+          if(c->screen == s && c->tag ==tag)
           {
                warnx("Client(s) present in this tag, can't delete it");
 
@@ -671,7 +671,7 @@ tag_delete(int s, int tag)
      tags[s][tag] = t;
      infobar[s].tags[tag] = NULL;
 
-     for(i = tag; i < (size_t)conf.ntag[s] + 1; ++i)
+     for(i = tag; i < conf.ntag[s] + 1; ++i)
      {
           /* Set clients tag because of shift */
           SLIST_FOREACH(c, &clients, next)

@@ -41,6 +41,7 @@
 void                            \
 uicb_split_move_##d(uicb_t cmd) \
 {                               \
+     (void)cmd;                 \
      CHECK(sel);                \
      split_move_dir(sel, d);    \
 }

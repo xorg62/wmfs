@@ -79,8 +79,6 @@ errorhandlerdummy(Display *d, XErrorEvent *event)
 void
 quit(void)
 {
-     Client *c;
-     BarWindow *bw;
      size_t i, len;
 
      /* Set the silent error handler */
@@ -89,7 +87,7 @@ quit(void)
      /* Unmanage all clients */
      while(!SLIST_EMPTY(&clients))
      {
-          c = SLIST_FIRST(&clients);
+          Client *c = SLIST_FIRST(&clients);
           client_unhide(c);
           XReparentWindow(dpy, c->win, ROOT, c->geo.x, c->geo.y);
           free(c);
@@ -115,10 +113,7 @@ quit(void)
 
      /* BarWindows */
      while(!SLIST_EMPTY(&bwhead))
-     {
-          bw = SLIST_FIRST(&bwhead);
           SLIST_REMOVE_HEAD(&bwhead, next);
-     }
 
      free(sgeo);
      free(spgeo);
@@ -243,7 +238,7 @@ scan(void)
      /* Set update layout request */
      SLIST_FOREACH(c, &clients, next)
      {
-          if(c->tag > (uint)conf.ntag[c->screen])
+          if(c->tag > conf.ntag[c->screen])
                c->tag = conf.ntag[c->screen];
           tags[c->screen][c->tag].flags |= RequestUpdateFlag;
      }

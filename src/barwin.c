@@ -98,7 +98,7 @@ barwin_create(Window parent,
      bw->bg = bg;
      bw->fg = fg;
      FLAGAPPLY(bw->flags, stipple, StippleFlag);
-     bw->stipple_color = -1;
+     bw->stipple_color = 0xffffffff;
 
      /* Attach */
      SLIST_INSERT_HEAD(&bwhead, bw, next);
@@ -135,7 +135,7 @@ barwin_color_set(BarWindow *bw, uint bg, char *fg)
           bw->border.dark = color_shade(bg, conf.colors.bar_dark_shade);
      }
 
-     if(bw->flags & StippleFlag && bw->stipple_color == -1)
+     if(bw->flags & StippleFlag && bw->stipple_color == 0xffffffff)
           bw->stipple_color = getcolor(fg);
 
      return;

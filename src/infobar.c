@@ -149,9 +149,9 @@ infobar_draw_layout(InfoBar *i)
      if(!conf.layout_placement)
           barwin_move(i->layout_button, i->tags_board->geo.width + (PAD >> 1), 0);
 
-     w = (conf.layout_button_width > 0)
+     w = (conf.layout_button_width >= 1)
           ? conf.layout_button_width
-          : textw(tags[sc][seltag[sc]].layout.symbol) + PAD;
+          : (int)(textw(tags[sc][seltag[sc]].layout.symbol) + PAD);
 
      barwin_resize(i->layout_button, w, i->geo.height);
      barwin_refresh_color(i->layout_button);

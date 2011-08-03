@@ -653,7 +653,7 @@ client_set_rules(Client *c)
                          client_maximize(c);
                     }
 
-                    if(c->tag != (uint)seltag[selscreen])
+                    if(c->tag != seltag[selscreen])
                     {
                          tags[c->screen][c->tag].flags |= RequestUpdateFlag;
                          client_focus(NULL);
@@ -787,7 +787,7 @@ client_manage(Window w, XWindowAttributes *wa, bool ar)
      client_set_rules(c);
      client_get_name(c);
 
-     if(c->tag == (uint)seltag[selscreen])
+     if(c->tag == seltag[selscreen])
      {
           client_raise(c);
           client_map(c);
@@ -808,7 +808,7 @@ client_manage(Window w, XWindowAttributes *wa, bool ar)
      if(!conf.client.set_new_win_master)
           layout_set_client_master(c);
 
-     if(c->tag == (uint)seltag[selscreen])
+     if(c->tag == seltag[selscreen])
           client_focus(c);
 
      if(conf.client.new_client_get_mouse)
@@ -1155,7 +1155,7 @@ client_focus_next(Client *c)
      for(; c_next && c_next->tag != c->tag && c_next->screen != c->screen;
                c_next = SLIST_NEXT(c_next, next));
 
-     if(c_next && c_next->tag == (uint)seltag[selscreen]
+     if(c_next && c_next->tag == seltag[selscreen]
                && c_next->screen == selscreen)
           client_focus(c_next);
 
@@ -1205,7 +1205,7 @@ client_unmanage(Client *c)
      {
           /* Arrange */
           for(i = 0; i < screen_count() && !b; ++i)
-               if(c->tag == (uint)seltag[i])
+               if(c->tag == seltag[i])
                {
                     b = True;
                     break;
@@ -1422,7 +1422,7 @@ uicb_client_select(uicb_t cmd)
                if(clist_index[i].client->screen != selscreen)
                     screen_set_sel(clist_index[i].client->screen);
 
-               if(clist_index[i].client->tag != (uint)seltag[clist_index[i].client->screen])
+               if(clist_index[i].client->tag != seltag[clist_index[i].client->screen])
                     tag_set(clist_index[i].client->tag);
 
                client_focus(clist_index[i].client);

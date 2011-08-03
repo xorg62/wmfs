@@ -210,7 +210,7 @@ typedef struct Client
      /* Client title */
      char *title;
      /* Tag num */
-     uint tag;
+     int tag;
      int focusontag;
      /* Screen */
      int screen;
@@ -564,7 +564,7 @@ typedef struct StatusMouse
 {
      Geo area;
      InfoBar *infobar;
-     int button;
+     uint button;
      void (*func)(uicb_t);
      uicb_t cmd;
      SLIST_ENTRY(StatusMouse) next;

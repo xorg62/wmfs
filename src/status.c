@@ -49,7 +49,7 @@ statustext_mouse(char *str, Geo area, InfoBar *infobar)
      char cmd[256] = { 0 };
      char func[64] = { 0 };
 
-     for(; i < strlen(str); ++i, sm = NULL)
+     for(; i < (int)strlen(str); ++i, sm = NULL)
           if((n = sscanf(&str[i], "(%d;%64[^;];%256[^)])", &button, func, cmd) >= 2) && n < 4)
           {
                sm = zcalloc(sizeof(StatusMouse));
@@ -64,7 +64,6 @@ statustext_mouse(char *str, Geo area, InfoBar *infobar)
                /* Jump to the end of the sequence */
                while(str[++i + 1] != ')');
           }
-
 
      return;
 }
@@ -82,10 +81,10 @@ statustext_rectangle(InfoBar *ib, char *str)
      int i = 0, j = 0, k, n;
 
      for(; i < (int)strlen(str); ++i, ++j)
-          if((n = sscanf(&str[i], "\\b[%d;%d;%d;%d;#%x]%c",
-                              &r.g.x, &r.g.y, &r.g.width, &r.g.height, &r.color, &as)) == 6
-                    || (n = sscanf(&str[i], "\\b[%d;%d;%d;%d;#%x;%512[^]]]%c",
-                              &r.g.x, &r.g.y, &r.g.width, &r.g.height, &r.color, mouse, &as)) == 7
+          if(((n = sscanf(&str[i], "\\b[%d;%d;%d;%d;#%x]%c",
+                                   &r.g.x, &r.g.y, &r.g.width, &r.g.height, &r.color, &as)) == 6
+                         || (n = sscanf(&str[i], "\\b[%d;%d;%d;%d;#%x;%512[^]]]%c",
+                                   &r.g.x, &r.g.y, &r.g.width, &r.g.height, &r.color, mouse, &as)) == 7)
                     && as == '\\')
           {
                draw_rectangle(ib->bar->dr, r.g.x - sw, r.g.y, r.g.width, r.g.height, r.color);
@@ -166,10 +165,10 @@ statustext_text(InfoBar *ib, char *str)
      int i = 0, j = 0, k, n;
 
      for(; i < (int)strlen(str); ++i, ++j)
-          if((n = sscanf(&str[i], "\\s[%d;%d;%7[^;];%512[^];]]%c",
-                              &s.x, &s.y, s.color, s.text, &as)) == 5
-                    || (n = sscanf(&str[i], "\\s[%d;%d;%7[^;];%512[^;];%512[^]]]%c",
-                              &s.x, &s.y, s.color, s.text, mouse, &as)) == 6
+          if(((n = sscanf(&str[i], "\\s[%d;%d;%7[^;];%512[^];]]%c",
+                                   &s.x, &s.y, s.color, s.text, &as)) == 5
+                         || (n = sscanf(&str[i], "\\s[%d;%d;%7[^;];%512[^;];%512[^]]]%c",
+                                   &s.x, &s.y, s.color, s.text, mouse, &as)) == 6)
                     && as == '\\')
           {
                draw_text(ib->bar->dr, s.x - sw, s.y, s.color, s.text);
@@ -260,7 +259,6 @@ statustext_handle(int sc, char *str)
      InfoBar *ib = &infobar[sc];
      StatusMouse *sm;
      char *lastst;
-     int i;
 
      /* If the str == the current statustext, return (not needed) */
      if(!str)
