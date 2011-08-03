@@ -192,7 +192,7 @@ void
 infobar_draw_selbar(InfoBar *i)
 {
      char *str = NULL;
-     int s, sc = i->screen;
+     int sc = i->screen;
 
      if(!conf.bars.selbar)
           return;
@@ -215,9 +215,7 @@ infobar_draw_selbar(InfoBar *i)
                strcat(str, "...");
      }
 
-     if((s = (textw(str ? str : sel->title) + PAD)) > i->selbar->geo.width)
-          barwin_resize(i->selbar, s, i->geo.height - 2);
-
+     barwin_resize(i->selbar, textw(str ? str : sel->title) + PAD, i->geo.height - 2);
      barwin_move(i->selbar,
                ((conf.layout_placement)
                 ? (i->tags_board->geo.x + i->tags_board->geo.width + (PAD >> 1))
