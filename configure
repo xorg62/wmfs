@@ -1,10 +1,10 @@
 #!/bin/sh
 
-LIBS="x11 xft freetype2"
+LIBS="x11"
 USE_XINERAMA="xinerama"
 USE_XRANDR="xrandr"
 USE_IMLIB2="imlib2"
-USE_XFT="xft"
+USE_XFT="xft freetype2"
 OS=`uname -s`
 PREFIX=/usr/local
 MANPREFIX="$PREFIX/man"
@@ -72,12 +72,12 @@ else
 			exit 1;;
 	esac
 
-	LDFLAGS="$LDFLAGS -lX11 -lfreetype"
+	LDFLAGS="$LDFLAGS -lX11"
 
 	[ -n "$USE_XINERAMA" ] && LDFLAGS="$LDFLAGS -lXinerama"
 	[ -n "$USE_XRANDR" ] && LDFLAGS="$LDFLAGS -lXrandr"
 	[ -n "$USE_IMLIB2" ] && LDFLAGS="$LDFLAGS -lImlib2"
-	[ -n "$USE_XFT" ] && LDFLAGS="$LDFLAGS -lXft"
+	[ -n "$USE_XFT" ] && LDFLAGS="$LDFLAGS -lXft -lfreetype"
 fi
 
 [ -n "$USE_XINERAMA" ] && CFLAGS="$CFLAGS -DHAVE_XINERAMA"

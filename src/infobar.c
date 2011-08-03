@@ -350,7 +350,9 @@ infobar_destroy(void)
 
           barwin_delete_subwin(infobar[sc].tags_board);
           barwin_delete(infobar[sc].tags_board);
-          barwin_delete(infobar[sc].selbar);
+          if(conf.bars.selbar)
+               barwin_delete(infobar[sc].selbar);
+
           barwin_delete_subwin(infobar[sc].bar);
           barwin_delete(infobar[sc].bar);
      }
