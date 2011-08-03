@@ -39,6 +39,7 @@
 void
 infobar_init(void)
 {
+     InfoBar *ib;
      int s, sc, i, j = 0;
 
      s = screen_count();
@@ -49,90 +50,91 @@ infobar_init(void)
      for(sc = 0; sc < s; ++sc)
      {
           j = 0;
-          infobar[sc].geo.height = INFOBARH;
-          infobar[sc].screen = sc;
+          ib = &infobar[sc];
+          ib->geo.height = INFOBARH;
+          ib->screen = sc;
 
           switch(tags[sc][seltag[sc]].barpos)
           {
           case IB_Hide:
                sgeo[sc].y = spgeo[sc].y + TBARH;
                sgeo[sc].height += INFOBARH;
-               infobar[sc].geo.y = (-(infobar[sc].geo.height) << 2);
+               ib->geo.y = (-(ib->geo.height) << 2);
                break;
           case IB_Bottom:
                sgeo[sc].y = TBARH;
-               infobar[sc].geo.y = spgeo[sc].y + sgeo[sc].height + TBARH;
+               ib->geo.y = spgeo[sc].y + sgeo[sc].height + TBARH;
                break;
           default:
           case IB_Top:
                sgeo[sc].y = spgeo[sc].y + INFOBARH + TBARH;
-               infobar[sc].geo.y = spgeo[sc].y;
+               ib->geo.y = spgeo[sc].y;
                break;
           }
 
           /* Create infobar barwindow */
-          infobar[sc].bar = barwin_create(ROOT, sgeo[sc].x - BORDH, infobar[sc].geo.y,
-                                          sgeo[sc].width, infobar[sc].geo.height,
+          ib->bar = barwin_create(ROOT, sgeo[sc].x - BORDH, ib->geo.y,
+                                          sgeo[sc].width, ib->geo.height,
                                           conf.colors.bar, conf.colors.text, False, False, conf.border.bar);
 
-          infobar[sc].tags_board = barwin_create(infobar[sc].bar->win,
+          ib->tags_board = barwin_create(ib->bar->win,
                     ((conf.layout_placement) ? textw(tags[sc][seltag[sc]].layout.symbol) + PAD * 1.5: 0), 0,
                     textw(tags[sc][0].name) + PAD, /* Base size, will change */
-                    infobar[sc].geo.height,
+                    ib->geo.height,
                     conf.colors.bar, conf.colors.text, False, False, False);
 
           /* Create tags window */
           for(i = 1; i < conf.ntag[sc] + 1; ++i)
           {
-               infobar[sc].tags[i] = barwin_create(infobar[sc].tags_board->win, j, 0,
+               ib->tags[i] = barwin_create(ib->tags_board->win, j, 0,
                                                    textw(tags[sc][i].name) + PAD,
-                                                   infobar[sc].geo.height,
+                                                   ib->geo.height,
                                                    conf.colors.bar, conf.colors.text, False, False, conf.border.tag);
 
                j += textw(tags[sc][i].name) + PAD;
 
-               barwin_resize(infobar[sc].tags_board, j, infobar[sc].geo.height);
-               barwin_map_subwin(infobar[sc].tags[i]);
+               barwin_resize(ib->tags_board, j, ib->geo.height);
+               barwin_map_subwin(ib->tags[i]);
           }
 
           /* Create layout switch barwindow */
-          infobar[sc].layout_button = barwin_create(infobar[sc].bar->win,
+          ib->layout_button = barwin_create(ib->bar->win,
                     ((conf.layout_placement) ? 0 : (j + (PAD >> 1))), 0,
                     ((conf.layout_button_width > 0) ? (uint)conf.layout_button_width : (textw(tags[sc][seltag[sc]].layout.symbol) + PAD)),
-                    infobar[sc].geo.height,
+                    ib->geo.height,
                     conf.colors.layout_bg, conf.colors.layout_fg,
                     False, False, conf.border.layout);
 
           /* Selbar */
           if(conf.bars.selbar)
-               infobar[sc].selbar = barwin_create(infobar[sc].bar->win,
+               ib->selbar = barwin_create(ib->bar->win,
                          ((conf.layout_placement)
                           ? (j + (PAD >> 1))
-                          : infobar[sc].layout_button->geo.x + infobar[sc].layout_button->geo.width + (PAD >> 1)), 1,
+                          : ib->layout_button->geo.x + ib->layout_button->geo.width + (PAD >> 1)), 1,
                          (sel) ? textw(sel->title) + PAD : 1,
-                         infobar[sc].geo.height - 2,
+                         ib->geo.height - 2,
                          conf.selbar.bg, conf.selbar.fg, False, False, False);
 
           /* Map/Refresh all */
-          barwin_map(infobar[sc].bar);
-          barwin_map_subwin(infobar[sc].bar);
+          barwin_map(ib->bar);
+          barwin_map_subwin(ib->bar);
 
-          barwin_map(infobar[sc].tags_board);
-          barwin_map_subwin(infobar[sc].tags_board);
+          barwin_map(ib->tags_board);
+          barwin_map_subwin(ib->tags_board);
 
           if(conf.border.layout)
-               barwin_map_subwin(infobar[sc].layout_button);
+               barwin_map_subwin(ib->layout_button);
 
           if(conf.bars.selbar)
-               barwin_map(infobar[sc].selbar);
+               barwin_map(ib->selbar);
 
-          barwin_refresh_color(infobar[sc].bar);
-          barwin_refresh(infobar[sc].bar);
+          barwin_refresh_color(ib->bar);
+          barwin_refresh(ib->bar);
 
           /* Default statustext is set here */
-          infobar[sc].statustext = xstrdup("wmfs"WMFS_VERSION);
+          ib->statustext = xstrdup("wmfs"WMFS_VERSION);
 
-          infobar_draw(&infobar[sc]);
+          infobar_draw(ib);
      }
 
      return;
