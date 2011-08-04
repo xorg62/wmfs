@@ -29,6 +29,12 @@
         light_shade =  0.10
         dark_shade  = -0.10
 
+        # Order of infobar elements:
+        # t = Tag list
+        # l = Layout button
+        # s = Selbar
+        elements_order = "tls"
+
         [systray]
                 # Enable/disable systray
                 active = true
@@ -64,9 +70,6 @@
 
         # Value menu or switch.
         system = "menu"
-
-        # Value left or right.
-        placement = "right"
 
         # Keep layout geo for free layout
         keep_layout_geo = false

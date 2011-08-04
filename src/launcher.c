@@ -189,16 +189,17 @@ launcher_execute(Launcher *launcher)
      char buf[512] = { 0 };
      char tmpbuf[512] = { 0 };
      char *complete;
-     int i, pos = 0, histpos = 0, x, w;
+     int i, pos = 0, histpos = 0, w, x = 0;
      int tabhits = 0;
      KeySym ks;
      XEvent ev;
+     InfobarElem *e;
 
      screen_get_sel();
 
-     x = (conf.layout_placement)
-          ? (infobar[selscreen].tags_board->geo.x + infobar[selscreen].tags_board->geo.width)
-          : (infobar[selscreen].layout_button->geo.x + infobar[selscreen].layout_button->geo.width);
+     STAILQ_FOREACH(e, &infobar[selscreen].elemhead, next)
+          if(x < (e->geo.x + e->geo.width))
+               x = e->geo.x + e->geo.width + PAD;
 
      XGrabKeyboard(dpy, ROOT, True, GrabModeAsync, GrabModeAsync, CurrentTime);
 

@@ -112,10 +112,10 @@ enum { TagSel, TagTransfert, TagAdd, TagNext, TagPrev, TagActionLast };
 /* Menu align */
 enum { MA_Center = 0, MA_Left = 1, MA_Right = 2 };
 
-/* Infobar position */
+/* Infobar position / elements */
 enum { IB_Hide = 0, IB_Bottom = 1, IB_Top = 2 };
-
 typedef enum { Right = 0, Left, Top, Bottom, Center, PositionLast } Position;
+typedef enum { ElemTag, ElemLayout, ElemSelbar } IbElemType;
 
 /* Ewmh hints list */
 enum
@@ -267,12 +267,22 @@ typedef struct
      uicb_t cmd;
 } MouseBinding;
 
+/* InfoBar elements */
+typedef struct InfobarElem
+{
+     IbElemType type;
+     Geo geo;
+     STAILQ_ENTRY(InfobarElem) next;
+} InfobarElem;
+
 /* InfoBar Struct */
 typedef struct
 {
-     BarWindow *bar;
-     BarWindow *layout_button;
      BarWindow *tags_board, *tags[MAXTAG];
+     BarWindow *layout_button;
+     BarWindow *bar;
+     STAILQ_HEAD(, InfobarElem) elemhead;
+     char *elemorder;
      Geo geo, selbar_geo;
      int screen, position;
      char *statustext;
@@ -441,6 +451,7 @@ typedef struct
           MouseBinding *mouse;
           int nmouse;
           bool selbar;
+          char *element_order;
      } bars;
      struct
      {
@@ -516,7 +527,6 @@ typedef struct
      bool client_auto_center;
      bool client_tile_raise;
      bool layout_system; /* Switch: False, Menu: True. */
-     bool layout_placement; /* Right (normal): False, Left: True. */
      bool keep_layout_geo;
      bool cfactor_enable_split;
      char *tag_expose_name;

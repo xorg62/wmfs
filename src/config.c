@@ -217,9 +217,10 @@ conf_bar_section(void)
      conf.bars.height = fetch_opt_first(bar, "-1", "height").num;
      conf.colors.bar  = getcolor((barbg = fetch_opt_first(bar, "#000000", "bg").str));
      conf.colors.text = fetch_opt_first(bar, "#ffffff", "fg").str;
-
      conf.colors.bar_light_shade = fetch_opt_first(bar, "0.25", "light_shade").fnum;
      conf.colors.bar_dark_shade  = fetch_opt_first(bar, "-0.25", "dark_shade").fnum;
+
+     conf.bars.element_order = fetch_opt_first(bar, "tls", "elements_order").str;
 
      mouse = fetch_section(bar, "mouse");
 
@@ -441,9 +442,6 @@ conf_layout_section(void)
 
      if((tmp = fetch_opt_first(layouts, "menu", "system").str) && !strcmp(tmp, "menu"))
           conf.layout_system = True;
-
-     if((tmp = fetch_opt_first(layouts, "right", "placement").str) && !strcmp(tmp, "left"))
-          conf.layout_placement = True;
 
      layout = fetch_section(layouts, "layout");
      conf.nlayout = fetch_section_count(layout);

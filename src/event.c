@@ -115,26 +115,29 @@ buttonpress(XEvent *e)
                do_mousebind(selscreen, ev->button, conf.selbar.nmouse, conf.selbar.mouse);
 
      /* Tags */
-     for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
-          if(ev->window == ib->tags[i]->win)
-          {
-               do_mousebind(selscreen, ev->button, tags[selscreen][i].nmouse, tags[selscreen][i].mouse);
+     if(ib->tags_board)
+     {
+          for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
+               if(ev->window == ib->tags[i]->win)
+               {
+                    do_mousebind(selscreen, ev->button, tags[selscreen][i].nmouse, tags[selscreen][i].mouse);
 
-               /* Mouse button action on tag */
-               if(ev->button == conf.mouse_tag_action[TagSel])
-                    tag_set(i);
-               else if(ev->button == conf.mouse_tag_action[TagTransfert])
-                    tag_transfert(sel, i);
-               else if(ev->button == conf.mouse_tag_action[TagAdd])
-                    tag_additional(selscreen, seltag[selscreen], i);
-               else if(ev->button == conf.mouse_tag_action[TagNext])
-                    tag_set(seltag[selscreen] + 1);
-               else if(ev->button == conf.mouse_tag_action[TagPrev])
-                    tag_set(seltag[selscreen] - 1);
-          }
+                    /* Mouse button action on tag */
+                    if(ev->button == conf.mouse_tag_action[TagSel])
+                         tag_set(i);
+                    else if(ev->button == conf.mouse_tag_action[TagTransfert])
+                         tag_transfert(sel, i);
+                    else if(ev->button == conf.mouse_tag_action[TagAdd])
+                         tag_additional(selscreen, seltag[selscreen], i);
+                    else if(ev->button == conf.mouse_tag_action[TagNext])
+                         tag_set(seltag[selscreen] + 1);
+                    else if(ev->button == conf.mouse_tag_action[TagPrev])
+                         tag_set(seltag[selscreen] - 1);
+               }
+     }
 
      /* Layout button */
-     if(ev->window == ib->layout_button->win && conf.nlayout > 1)
+     if(ib->layout_button && ev->window == ib->layout_button->win && conf.nlayout > 1)
      {
           if(conf.layout_system && (ev->button == Button1 || ev->button == Button3)) /* True -> menu */
           {
