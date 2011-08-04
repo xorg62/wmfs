@@ -147,13 +147,7 @@ buttonpress(XEvent *e)
                uicb_menu("menulayout");
           }
           else
-          {
-               switch(ev->button)
-               {
-               case Button1: case Button4: layoutswitch(True);  break;
-               case Button3: case Button5: layoutswitch(False); break;
-               }
-          }
+               layoutswitch(ev->button == Button1 || ev->button == Button4);
      }
 
      /* Status mouse bindings */
