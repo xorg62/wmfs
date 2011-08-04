@@ -108,9 +108,6 @@ infobar_init(void)
           /* Selbar */
           if(conf.bars.selbar)
           {
-               ib->selbar_geo.x = (conf.layout_placement
-                         ? ib->tags_board->geo.x + ib->tags_board->geo.width + (PAD >> 1)
-                         : ib->layout_button->geo.x + ib->layout_button->geo.width + (PAD >> 1));
                ib->selbar_geo.y = 0;
                ib->selbar_geo.height = ib->geo.height;
           }
@@ -229,6 +226,10 @@ infobar_draw_selbar(InfoBar *i)
 
           f = True;
      }
+
+     i->selbar_geo.x = (conf.layout_placement
+               ? i->tags_board->geo.x + i->tags_board->geo.width + (PAD >> 1)
+               : i->layout_button->geo.x + i->layout_button->geo.width + (PAD >> 1));
 
      XSetForeground(dpy, gc, conf.selbar.bg);
      XFillRectangle(dpy, i->bar->dr, gc, i->selbar_geo.x, 0, (i->selbar_geo.width = textw(str) + PAD), i->geo.height);

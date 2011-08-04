@@ -133,10 +133,12 @@ layoutswitch(bool b)
      }
 
      ewmh_update_current_tag_prop();
+
      tags[selscreen][seltag[selscreen]].flags |= CleanFactFlag;
      tags[selscreen][seltag[selscreen]].flags &= ~SplitFlag;
+
      layout_func(selscreen, seltag[selscreen]);
-     infobar_draw_layout(&infobar[selscreen]);
+     infobar_draw(&infobar[selscreen]);
 
      return;
 }
