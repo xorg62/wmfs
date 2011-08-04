@@ -270,10 +270,10 @@ typedef struct
 /* InfoBar Struct */
 typedef struct
 {
-     BarWindow *bar, *selbar;
+     BarWindow *bar;
      BarWindow *layout_button;
      BarWindow *tags_board, *tags[MAXTAG];
-     Geo geo;
+     Geo geo, selbar_geo;
      int screen, position;
      char *statustext;
      bool need_update;

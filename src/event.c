@@ -41,10 +41,13 @@ buttonpress(XEvent *e)
 {
      XButtonEvent *ev = &e->xbutton;
      StatusMouse *sm;
+     InfoBar *ib;
      Client *c;
      int i, j, n;
 
      screen_get_sel();
+
+     ib = &infobar[selscreen];
 
      /* If the mouse is on a not selected client and you click on it. */
      if(((c = client_gb_win(ev->window)) || (c = client_gb_titlebar(ev->window))) && c != sel
@@ -106,17 +109,19 @@ buttonpress(XEvent *e)
                                         conf.bars.mouse[j].func(conf.bars.mouse[j].cmd);
 
      /* Selbar */
-     if(conf.bars.selbar && ev->window == infobar[selscreen].selbar->win)
+     if(conf.bars.selbar && ev->window == ib->bar->win)
           for(i = 0; i < conf.selbar.nmouse; ++i)
                if(conf.selbar.mouse[i].tag == seltag[conf.selbar.mouse[i].screen]
-                  || conf.selbar.mouse[i].tag < 0)
+                         || conf.selbar.mouse[i].tag < 0)
                     if(ev->button == conf.selbar.mouse[i].button)
-                         if(conf.selbar.mouse[i].func)
-                              conf.selbar.mouse[i].func(conf.selbar.mouse[i].cmd);
+                         if(ev->x >= ib->selbar_geo.x && ev->x <= ib->selbar_geo.x + ib->selbar_geo.width
+                                   && ev->y >= ib->selbar_geo.y && ev->y <= ib->selbar_geo.y + ib->selbar_geo.height)
+                              if(conf.selbar.mouse[i].func)
+                                   conf.selbar.mouse[i].func(conf.selbar.mouse[i].cmd);
 
      /* Tags */
      for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
-          if(ev->window == infobar[selscreen].tags[i]->win)
+          if(ev->window == ib->tags[i]->win)
           {
                for(j = 0; j < tags[selscreen][i].nmouse; ++j)
                     if(ev->button == tags[selscreen][i].mouse[j].button)
@@ -137,15 +142,15 @@ buttonpress(XEvent *e)
           }
 
      /* Layout button */
-     if(ev->window == infobar[selscreen].layout_button->win && conf.nlayout > 1)
+     if(ev->window == ib->layout_button->win && conf.nlayout > 1)
      {
           if(conf.layout_system && (ev->button == Button1 || ev->button == Button3)) /* True -> menu */
           {
-               menulayout.y = spgeo[selscreen].y + infobar[selscreen].layout_button->geo.y + INFOBARH;
-               menulayout.x = infobar[selscreen].layout_button->geo.x + (sgeo[selscreen].x - BORDH);
+               menulayout.y = spgeo[selscreen].y + ib->layout_button->geo.y + INFOBARH;
+               menulayout.x = ib->layout_button->geo.x + (sgeo[selscreen].x - BORDH);
 
-               if(infobar[selscreen].geo.y != spgeo[selscreen].y)
-                    menulayout.y = infobar[selscreen].geo.y - (INFOBARH * menulayout.nitem) - SHADH;
+               if(ib->geo.y != spgeo[selscreen].y)
+                    menulayout.y = ib->geo.y - (INFOBARH * menulayout.nitem) - SHADH;
 
                uicb_menu("menulayout");
           }
@@ -177,6 +182,7 @@ clientmessageevent(XEvent *e)
 {
      XClientMessageEvent *ev = &e->xclient;
      Client *c;
+     InfoBar *ib;
      Systray *sy;
      int s, mess_t = 0;
      Atom rt;
@@ -257,7 +263,10 @@ clientmessageevent(XEvent *e)
                if(XGetWindowProperty(EVDPY, ROOT, net_atom[mess_t], 0, 4096,
                               False, net_atom[utf8_string], &rt, &rf, &ir, &il, &ret) == Success)
                {
-                    statustext_handle(mess_t - wmfs_statustext, (char*)ret);
+                    ib = &infobar[mess_t - wmfs_statustext];
+                    free(ib->statustext);
+                    ib->statustext = xstrdup((char*)ret);
+                    _infobar_draw(ib);
                     XFree(ret);
                }
           }

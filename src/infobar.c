@@ -107,13 +107,13 @@ infobar_init(void)
 
           /* Selbar */
           if(conf.bars.selbar)
-               ib->selbar = barwin_create(ib->bar->win,
-                         ((conf.layout_placement)
-                          ? (j + (PAD >> 1))
-                          : ib->layout_button->geo.x + ib->layout_button->geo.width + (PAD >> 1)), 1,
-                         (sel) ? textw(sel->title) + PAD : 1,
-                         ib->geo.height - 2,
-                         conf.selbar.bg, conf.selbar.fg, False, False, False);
+          {
+               ib->selbar_geo.x = (conf.layout_placement
+                         ? ib->tags_board->geo.x + ib->tags_board->geo.width + (PAD >> 1)
+                         : ib->layout_button->geo.x + ib->layout_button->geo.width + (PAD >> 1));
+               ib->selbar_geo.y = 0;
+               ib->selbar_geo.height = ib->geo.height;
+          }
 
           /* Map/Refresh all */
           barwin_map(ib->bar);
@@ -124,9 +124,6 @@ infobar_init(void)
 
           if(conf.border.layout)
                barwin_map_subwin(ib->layout_button);
-
-          if(conf.bars.selbar)
-               barwin_map(ib->selbar);
 
           barwin_refresh_color(ib->bar);
           barwin_refresh(ib->bar);
@@ -172,6 +169,22 @@ infobar_draw_layout(InfoBar *i)
      return;
 }
 
+/** Draw Infobar barwin (selbar / statustext)
+  *\param i Infobar pointer
+ */
+void
+_infobar_draw(InfoBar *i)
+{
+     barwin_refresh_color(i->bar);
+
+     infobar_draw_selbar(i);
+     statustext_handle(i);
+
+     barwin_refresh(i->bar);
+
+     return;
+}
+
 /** Draw the InfoBar
  *\param i InfoBar pointer
 */
@@ -180,9 +193,8 @@ infobar_draw(InfoBar *i)
 {
      infobar_draw_taglist(i);
      infobar_draw_layout(i);
-     infobar_draw_selbar(i);
-     barwin_refresh_color(i->bar);
-     statustext_handle(i->screen, i->statustext);
+
+     _infobar_draw(i);
 
      return;
 }
@@ -195,40 +207,35 @@ infobar_draw_selbar(InfoBar *i)
 {
      char *str = NULL;
      int sc = i->screen;
+     bool f = False;
 
      if(!conf.bars.selbar)
           return;
 
      if(!sel || (sel && sel->screen != sc))
-     {
-          barwin_unmap(i->selbar);
           return;
-     }
-     else if(sel)
-          barwin_map(i->selbar);
+
+     str = sel->title;
 
      /* Truncate string if too long */
      if(conf.selbar.maxlength >= 0 && sel && sel->title)
      {
+          str = NULL;
           str = xcalloc(conf.selbar.maxlength + 4, sizeof(char));
           strncpy(str, sel->title, conf.selbar.maxlength);
 
           if(strlen(sel->title) > (size_t)conf.selbar.maxlength)
                strcat(str, "...");
+
+          f = True;
      }
 
-     barwin_resize(i->selbar, textw(str ? str : sel->title) + PAD, i->geo.height - 2);
-     barwin_move(i->selbar,
-               ((conf.layout_placement)
-                ? (i->tags_board->geo.x + i->tags_board->geo.width + (PAD >> 1))
-                : (i->layout_button->geo.x + i->layout_button->geo.width + (PAD >> 1))), 1);
+     XSetForeground(dpy, gc, conf.selbar.bg);
+     XFillRectangle(dpy, i->bar->dr, gc, i->selbar_geo.x, 0, (i->selbar_geo.width = textw(str) + PAD), i->geo.height);
+     draw_text(i->bar->dr, i->selbar_geo.x, FHINFOBAR - 1, conf.selbar.fg, str);
 
-     barwin_refresh_color(i->selbar);
-     barwin_draw_text(i->selbar, (PAD >> 1), FHINFOBAR - 1, ((str) ? str : sel->title));
-
-     barwin_refresh(i->selbar);
-
-     free(str);
+     if(f)
+          free(str);
 
      return;
 }
@@ -350,9 +357,6 @@ infobar_destroy(void)
 
           barwin_delete_subwin(infobar[sc].tags_board);
           barwin_delete(infobar[sc].tags_board);
-          if(conf.bars.selbar)
-               barwin_delete(infobar[sc].selbar);
-
           barwin_delete_subwin(infobar[sc].bar);
           barwin_delete(infobar[sc].bar);
      }
@@ -391,7 +395,6 @@ infobar_set_position(int pos)
      tags[selscreen][seltag[selscreen]].barpos = pos;
 
      barwin_move(infobar[selscreen].bar, sgeo[selscreen].x - BORDH, infobar[selscreen].geo.y);
-     infobar_draw(&infobar[selscreen]);
      arrange(selscreen, True);
 
      return;

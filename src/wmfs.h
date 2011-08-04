@@ -168,6 +168,7 @@ ushort textw(char *text);
 /* infobar.c */
 void infobar_init(void);
 void infobar_draw_layout(InfoBar *i);
+void _infobar_draw(InfoBar *i);
 void infobar_draw(InfoBar *i);
 void infobar_draw_selbar(InfoBar *i);
 void infobar_draw_taglist(InfoBar *i);
@@ -364,7 +365,7 @@ void uicb_screen_prev_sel(uicb_t);
 
 /* status.c */
 void statustext_mouse(char *str, Geo area, InfoBar *infobar);
-void statustext_handle(int sc, char *str);
+void statustext_handle(InfoBar *ib);
 
 /* systray.c */
 bool systray_acquire(void);

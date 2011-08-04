@@ -295,13 +295,13 @@ client_focus(Client *c)
           XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 
           if(conf.bars.selbar)
-               infobar_draw_selbar(&infobar[sel->screen]);
+               _infobar_draw(&infobar[sel->screen]);
      }
      else
      {
           XSetInputFocus(dpy, ROOT, RevertToPointerRoot, CurrentTime);
           if(conf.bars.selbar)
-               infobar_draw_selbar(&infobar[selscreen]);
+               _infobar_draw(&infobar[selscreen]);
      }
 
      return;
@@ -461,7 +461,7 @@ client_get_name(Client *c)
      frame_update(c);
 
      if(conf.bars.selbar && c == sel)
-          infobar_draw_selbar(&infobar[c->screen]);
+          _infobar_draw(&infobar[c->screen]);
 
      return;
 }

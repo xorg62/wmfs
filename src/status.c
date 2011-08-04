@@ -201,7 +201,7 @@ statustext_text(InfoBar *ib, char *str)
   *\param str String
   */
 static void
-statustext_normal(int sc, InfoBar *ib, char *str)
+statustext_normal(InfoBar *ib, char *str)
 {
      char strwc[MAXSTATUS] = { 0 };
      char buf[MAXSTATUS] = { 0 };
@@ -219,7 +219,7 @@ statustext_normal(int sc, InfoBar *ib, char *str)
                strwc[j] = str[i];
 
      /* Draw normal text without any blocks */
-     draw_text(ib->bar->dr, (sgeo[sc].width - SHADH) - (textw(strwc) + sw), FHINFOBAR, ib->bar->fg, strwc);
+     draw_text(ib->bar->dr, (sgeo[ib->screen].width - SHADH) - (textw(strwc) + sw), FHINFOBAR, ib->bar->fg, strwc);
 
      if(n)
      {
@@ -234,12 +234,12 @@ statustext_normal(int sc, InfoBar *ib, char *str)
                     for(j = 0, ++i; str[i] != '\\'; col[j++] = str[i++]);
 
                     /* Draw a rectangle with the bar color to draw the text properly */
-                    draw_rectangle(ib->bar->dr, (sgeo[sc].width - SHADH) - (tw + sw),
-                              0, INFOBARH - (sgeo[sc].width - SHADH) - tw,
+                    draw_rectangle(ib->bar->dr, (sgeo[ib->screen].width - SHADH) - (tw + sw),
+                              0, INFOBARH - (sgeo[ib->screen].width - SHADH) - tw,
                               INFOBARH, conf.colors.bar);
 
                     /* Draw text with its color */
-                    draw_text(ib->bar->dr, (sgeo[sc].width - SHADH) - (tw + sw), FHINFOBAR,  col, &buf[k]);
+                    draw_text(ib->bar->dr, (sgeo[ib->screen].width - SHADH) - (tw + sw), FHINFOBAR,  col, &buf[k]);
 
                     strncpy(buf, strwc, sizeof(buf));
                     ++i;
@@ -254,18 +254,13 @@ statustext_normal(int sc, InfoBar *ib, char *str)
   *\param str String
   */
 void
-statustext_handle(int sc, char *str)
+statustext_handle(InfoBar *ib)
 {
-     InfoBar *ib = &infobar[sc];
+     char *str;
      StatusMouse *sm;
-     char *lastst;
-
-     /* If the str == the current statustext, return (not needed) */
-     if(!str)
-          return;
 
      /* Free previous linked list of mouse bind */
-     if(!sc)
+     if(!ib->screen)
           while(!SLIST_EMPTY(&smhead))
           {
                sm = SLIST_FIRST(&smhead);
@@ -274,15 +269,10 @@ statustext_handle(int sc, char *str)
                free(sm);
           }
 
-     if(sc == conf.systray.screen)
+     if(ib->screen == conf.systray.screen)
           sw = systray_get_width();
 
-     barwin_refresh_color(ib->bar);
-
-     /* save last status text address (for free at the end) */
-     lastst = ib->statustext;
-
-     ib->statustext = xstrdup(str);
+     str = xstrdup(ib->statustext);
 
      /* Store rectangles, located text & images properties. */
      statustext_rectangle(ib, str);
@@ -290,12 +280,11 @@ statustext_handle(int sc, char *str)
      statustext_text(ib, str);
 
      /* Draw normal text (and possibly colored with \#color\ blocks) */
-     statustext_normal(sc, ib, str);
+     statustext_normal(ib, str);
 
      sw = 0;
-     barwin_refresh(ib->bar);
 
-     free(lastst);
+     free(str);
 
      return;
 }
