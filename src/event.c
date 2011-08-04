@@ -114,8 +114,7 @@ buttonpress(XEvent *e)
                if(conf.selbar.mouse[i].tag == seltag[conf.selbar.mouse[i].screen]
                          || conf.selbar.mouse[i].tag < 0)
                     if(ev->button == conf.selbar.mouse[i].button)
-                         if(ev->x >= ib->selbar_geo.x && ev->x <= ib->selbar_geo.x + ib->selbar_geo.width
-                                   && ev->y >= ib->selbar_geo.y && ev->y <= ib->selbar_geo.y + ib->selbar_geo.height)
+                         if(INAREA(ev->x, ev->y, ib->selbar_geo))
                               if(conf.selbar.mouse[i].func)
                                    conf.selbar.mouse[i].func(conf.selbar.mouse[i].cmd);
 
@@ -167,8 +166,7 @@ buttonpress(XEvent *e)
      /* Status mouse bindings */
      SLIST_FOREACH(sm, &smhead, next)
           if(sm->infobar->bar->win == ev->window && ev->button == sm->button)
-               if(ev->x >= sm->area.x && ev->x <= sm->area.x + sm->area.width
-                         && ev->y >= sm->area.y && ev->y <= sm->area.y + sm->area.height)
+               if(INAREA(ev->x, ev->y, sm->area))
                     if(sm->func)
                          sm->func(sm->cmd);
 

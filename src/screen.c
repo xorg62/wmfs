@@ -38,9 +38,7 @@
 int
 screen_count(void)
 {
-     int n = 0;
-
-     n = ScreenCount(dpy);
+     int n = ScreenCount(dpy);
 
 #ifdef HAVE_XINERAMA
      if(XineramaIsActive(dpy))
@@ -106,11 +104,10 @@ screen_get_geo(int s)
 int
 screen_get_with_geo(int x, int y)
 {
-     int i;
+     int i = 0;
 
-     for(i = 0; i < screen_count(); ++i)
-          if((x >= spgeo[i].x && x < spgeo[i].x + spgeo[i].width)
-             && y >= spgeo[i].y && y < spgeo[i].y + spgeo[i].height)
+     for(; i < screen_count(); ++i)
+          if(INAREA(x, y, spgeo[i]))
                return i;
 
      return 0;

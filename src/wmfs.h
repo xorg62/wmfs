@@ -119,6 +119,7 @@
 #define RPOS(x)            (x & 1 ? x - 1 : x + 1)
 #define LDIR(x)            (x < Top)
 #define FLAGAPPLY(v, b, f) ((b) ? (v |= (f)) : (v &= ~(f)))
+#define INAREA(i, j, a)    ((i) >= (a).x && (i) <= (a).x + (a).width && (j) >= (a).y && (j) <= (a).y + (a).height)
 
 /* Cfactor define */
 #define CFACTOR_CHECK2(g1, g2, p) (LDIR(p) ? (g1.height == g2.height) : (g1.width == g2.width))

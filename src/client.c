@@ -424,8 +424,7 @@ client_urgent(Client *c, bool u)
           SLIST_FOREACH(cc, &clients, next)
                if(cc != c && cc->screen == c->screen && cc->tag == c->tag
                          && (cc->flags & TileFlag))
-                    if(cc->frame_geo.x < x && cc->frame_geo.x + cc->frame_geo.width > x
-                              && cc->frame_geo.y < y && cc->frame_geo.y + cc->frame_geo.height > y)
+                    if(INAREA(x, y, cc->frame_geo))
                          return cc;
 
           return c;

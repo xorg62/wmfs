@@ -11,7 +11,7 @@
         font                  = "dejavu-10"
         raisefocus            = true
         focus_follow_mouse    = true
-        focus_follow_movement = false
+        focus_follow_movement = true
         opacity               = 255
 
         # focus_pointer_click: click on unfocused client area:
