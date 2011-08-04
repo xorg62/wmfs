@@ -34,6 +34,25 @@
 
 #define EVDPY (e->xany.display)
 
+/** Check mouse bind condition and execute associated function
+ */
+static void
+do_mousebind(int screen, uint button, int n, MouseBinding m[])
+{
+     int i = 0;
+
+     for(; i < n; ++i)
+     {
+          if(m[i].screen == screen || m[i].screen < 0)   /* Screen   */
+               if(m[i].tag == seltag[i] || m[i].tag < 0) /* Tag      */
+                    if(m[i].button == button)            /* Button   */
+                         if(m[i].func)                   /* Function */
+                              m[i].func(m[i].cmd);
+     }
+
+     return;
+}
+
 /** ButtonPress handle event
 */
 static void
@@ -43,15 +62,15 @@ buttonpress(XEvent *e)
      StatusMouse *sm;
      InfoBar *ib;
      Client *c;
-     int i, j, n;
+     int i, n;
 
      screen_get_sel();
 
      ib = &infobar[selscreen];
 
      /* If the mouse is on a not selected client and you click on it. */
-     if(((c = client_gb_win(ev->window)) || (c = client_gb_titlebar(ev->window))) && c != sel
-        && (ev->button == Button1 || ev->button == Button2 || ev->button == Button3))
+     if(((c = client_gb_win(ev->window)) || (c = client_gb_titlebar(ev->window)))
+               && c != sel && ev->button >= Button1 && ev->button <= Button3)
      {
           client_focus(c);
           client_raise(c);
@@ -61,10 +80,7 @@ buttonpress(XEvent *e)
 
      /* Titlebar */
      if((c = client_gb_titlebar(ev->window)) && c == sel)
-          for(i = 0; i < conf.titlebar.nmouse; ++i)
-                if(ev->button == conf.titlebar.mouse[i].button)
-                    if(conf.titlebar.mouse[i].func)
-                         conf.titlebar.mouse[i].func(conf.titlebar.mouse[i].cmd);
+          do_mousebind(selscreen, ev->button, conf.titlebar.nmouse, conf.titlebar.mouse);
 
      /* Titlebar buttons */
      if((c = client_gb_button(ev->window, &n)))
@@ -82,50 +98,27 @@ buttonpress(XEvent *e)
 
      /* Client */
      if((c = client_gb_win(ev->window)) && c == sel)
-          for(i = 0; i < conf.client.nmouse; ++i)
-               if(ev->button == conf.client.mouse[i].button)
-                    if(conf.client.mouse[i].func)
-                         conf.client.mouse[i].func(conf.client.mouse[i].cmd);
+          do_mousebind(selscreen, ev->button, conf.client.nmouse, conf.client.mouse);
 
      /* Root */
      if(ev->window == ROOT)
-          for(i = 0; i < conf.root.nmouse; ++i)
-               if(conf.root.mouse[i].tag == seltag[conf.root.mouse[i].screen]
-                  || conf.root.mouse[i].tag < 0)
-                    if(ev->button == conf.root.mouse[i].button)
-                         if(conf.root.mouse[i].func)
-                              conf.root.mouse[i].func(conf.root.mouse[i].cmd);
+          do_mousebind(selscreen, ev->button, conf.root.nmouse, conf.root.mouse);
 
      /* Infobars */
      for(i = 0; i < screen_count(); ++i)
           if(ev->window == infobar[i].bar->win)
-               for(j = 0; j < conf.bars.nmouse; ++j)
-                    if(conf.bars.mouse[j].screen == i
-                       || conf.bars.mouse[j].screen < 0)
-                         if(conf.bars.mouse[j].tag == seltag[i]
-                            || conf.bars.mouse[j].tag < 0)
-                              if(ev->button == conf.bars.mouse[j].button)
-                                   if(conf.bars.mouse[j].func)
-                                        conf.bars.mouse[j].func(conf.bars.mouse[j].cmd);
+               do_mousebind(i, ev->button, conf.bars.nmouse, conf.bars.mouse);
 
      /* Selbar */
      if(conf.bars.selbar && ev->window == ib->bar->win)
-          for(i = 0; i < conf.selbar.nmouse; ++i)
-               if(conf.selbar.mouse[i].tag == seltag[conf.selbar.mouse[i].screen]
-                         || conf.selbar.mouse[i].tag < 0)
-                    if(ev->button == conf.selbar.mouse[i].button)
-                         if(INAREA(ev->x, ev->y, ib->selbar_geo))
-                              if(conf.selbar.mouse[i].func)
-                                   conf.selbar.mouse[i].func(conf.selbar.mouse[i].cmd);
+          if(INAREA(ev->x, ev->y, ib->selbar_geo))
+               do_mousebind(selscreen, ev->button, conf.selbar.nmouse, conf.selbar.mouse);
 
      /* Tags */
      for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
           if(ev->window == ib->tags[i]->win)
           {
-               for(j = 0; j < tags[selscreen][i].nmouse; ++j)
-                    if(ev->button == tags[selscreen][i].mouse[j].button)
-                         if(tags[selscreen][i].mouse[j].func)
-                              tags[selscreen][i].mouse[j].func(tags[selscreen][i].mouse[j].cmd);
+               do_mousebind(selscreen, ev->button, tags[selscreen][i].nmouse, tags[selscreen][i].mouse);
 
                /* Mouse button action on tag */
                if(ev->button == conf.mouse_tag_action[TagSel])
