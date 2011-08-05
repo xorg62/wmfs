@@ -158,8 +158,13 @@ mainloop(void)
 {
      XEvent ev;
 
-     while(!exiting && !XNextEvent(dpy, &ev))
+     while(!exiting && !XNextEvent(dpy, &ev)) {
+          if (sig_chld) {
+               while(waitpid(-1, NULL, WNOHANG) > 0);
+               sig_chld = False;
+          }
           HANDLE_EVENT(&ev);
+     }
 
      return;
 }
