@@ -32,12 +32,12 @@
           printf("( \e[1m%s\e[0m ) ", s); \
      } while(/* CONSTCOND */ 0);
 
-#define DISP_PAYLOAD(p, l)                \
-     do {                                 \
-          int i = 0;                      \
-          for(; i < (l) && (p); ++i, ++p) \
-               if(isprint(*(p)))          \
-                    putchar((char)*(p));  \
+#define DISP_PAYLOAD(p, l)                  \
+     do {                                   \
+          int i = 0;                        \
+          for(; i < (l) && (p); ++i, ++(p)) \
+               if(isprint(*(p)))            \
+                    putchar((char)*(p));    \
      } while(/* CONSTCOND */ 0);
 
 #define BYE(s, er)                           \
@@ -233,21 +233,21 @@ main(int argc, char **argv)
      pcap_t             *descr;
      struct bpf_program  bpf;
 
-     /* Find device */
-       if(!(dev = pcap_lookupdev(errbuf)))
-          BYE("Can't find device", errbuf);
-
-     printf("Device ( %s )\n", dev);
+     if(argc < 2)
+     {
+          fprintf(stderr, "%s usage: %s <interface>\n", argv[0], argv[0]);
+          exit(EXIT_FAILURE);
+     }
 
      /* Find adress & mask */
-     if(pcap_lookupnet(dev, &netip, &mask, errbuf) < 0)
+     if(pcap_lookupnet(argv[1], &netip, &mask, errbuf) < 0)
      {
-          fprintf(stderr, "Can't find Adress or Mask: (%s)", errbuf);
+          fprintf(stderr, "Can't find Adress or Mask: (%s)\n", errbuf);
           netip = mask = 0;
      }
 
      /* Open device and reaaad */
-     if(!(descr = pcap_open_live(dev, SNAPLEN, true,  TIMEOUT, errbuf)))
+     if(!(descr = pcap_open_live(argv[1], SNAPLEN, true,  TIMEOUT, errbuf)))
           BYE("Fail at opening and reading device", errbuf);
 
      /* Check if packet is from ethernet device */
@@ -261,6 +261,7 @@ main(int argc, char **argv)
      if(pcap_setfilter(descr, &bpf) < 0)
           BYE("Can't use option", pcap_geterr(descr));
 
+     printf("%d\n", 1<<1);
      pcap_loop(descr, 10, pkt_handle, NULL);
 
      pcap_freecode(&bpf);
