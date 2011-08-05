@@ -24,10 +24,14 @@
 /* Local */
 #include "screen.h"
 #include "client.h"
+#include "config.h"
 
-#define ButtonMask   (ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
-#define MouseMask    (ButtonMask | PointerMotionMask)
-#define KeyMask      (KeyPressMask | KeyReleaseMask)
+#define ButtonMask (ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
+#define MouseMask  (ButtonMask | PointerMotionMask)
+#define KeyMask    (KeyPressMask | KeyReleaseMask)
+
+typedef unsigned int Flags;
+typedef const char* Uicb;
 
 typedef struct
 {
@@ -55,6 +59,7 @@ typedef struct
      {
           SLIST_HEAD(, Screen) screen;
           SLIST_HEAD(, Client) client;
+          SLIST_HEAD(, Keybind) keybind;
      } h;
 
      /*
@@ -65,9 +70,9 @@ typedef struct
 
 } Wmfs;
 
-
 int wmfs_error_handler(Display *d, XErrorEvent *event);
 int wmfs_error_handler_dummy(Display *d, XErrorEvent *event);
+void wmfs_grab_keys(void);
 void wmfs_quit(void);
 
 /* Single global variable */

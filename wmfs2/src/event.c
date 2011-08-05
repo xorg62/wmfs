@@ -7,6 +7,40 @@
 #include "util.h"
 #include "wmfs.h"
 
+#define EVDPY(e) (e)->xany.display
+
+static void
+event_enternotify(XEvent *e)
+{
+     XCrossingEvent *ev = &e->xcrossing;
+     Client *c;
+     int n;
+
+     if((ev->mode != NotifyNormal || ev->detail == NotifyInferior)
+               && ev->window != W->root)
+          return;
+
+     if((c = client_gb_win(ev->window)))
+          client_focus(c);
+}
+
+static void
+event_maprequest(XEvent *e)
+{
+     XMapRequestEvent *ev = &e->xmaprequest;
+     XWindowAttributes at;
+
+     /* Which windows to manage */
+     if(!XGetWindowAttributes(EVDPY(e), ev->window, &at)
+               || at.overried_redirect
+               || client_gb_win(ev->window))
+          return;
+
+     (Client*)client_new(ev->window, at);
+}
+
+
+
 static void
 event_dummy(XEvent *e)
 {

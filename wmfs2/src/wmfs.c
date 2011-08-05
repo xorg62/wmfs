@@ -108,6 +108,24 @@ wmfs_xinit(void)
 
 }
 
+void
+wmfs_grab_keys(void)
+{
+     KeyCode c;
+     Keybind *k;
+
+     XUngrabKey(W->dpy, AnyKey, AnyModifier, W->root);
+
+     FOREACH(k, &W->h.keybind, next)
+          if((c = XKeysymToKeycode(dpy, k->keysym)))
+          {
+               XGrabKey(W->dpy, c, k->mod, W->root, True, GrabModeAsync, GrabModeAsync);
+               XGrabKey(W->dpy, c, k->mod | LockMask, W->root, True, GrabModeAsync, GrabModeAsync);
+               XGrabKey(W->dpy, c, k->mod | numlockmask, W->root, True, GrabModeAsync, GrabModeAsync);
+               XGrabKey(W->dpy, c, k->mod | LockMask | numlockmask, W->root, True, GrabModeAsync, GrabModeAsync);
+          }
+}
+
 static void
 wmfs_loop(void)
 {

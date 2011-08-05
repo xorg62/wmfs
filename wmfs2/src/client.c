@@ -28,6 +28,17 @@ client_configure(Client *c)
      XSendEvent(dpy, c->win, False, StructureNotifyMask, (XEvent *)&ev);
 }
 
+Client*
+client_gb_win(Window *w)
+{
+     Client *c = SLIST_FIRST(&W->h.client);
+
+     while(c && c->win != w)
+          c = SLIST_NEXT(c, next);
+
+     return c;
+}
+
 /** Map a client
  * \param c Client pointer
  */
@@ -44,6 +55,12 @@ void
 client_unmap(Client *c)
 {
      XUnmapWindow(W->dpy, c->win);
+}
+
+void
+client_focus(Client *c)
+{
+
 }
 
 /** Close a client
