@@ -147,6 +147,9 @@ wmfs_init(void)
      /* X init */
      wmfs_xinit();
 
+     /* Event init */
+     event_init();
+
      /* Screen init */
      screen_init();
 
@@ -182,6 +185,7 @@ main(int argc, char **argv)
 
      /* Opt */
 
+     /* Core */
      wmfs_init();
 
      wmfs_loop();
