@@ -3,19 +3,10 @@
  *  For license, see COPYING.
  */
 
-#include "wmfs.h"
-#include "tag.h"
-
 #ifndef SCREEN_H
 #define SCREEN_H
 
-typedef struct Screen
-{
-     Geo geo;
-     Tag *seltag;
-     SLIST_HEAD(, Tag) tags;
-     SLIST_ENTRY(Screen) next;
-} Screen;
+#include "wmfs.h"
 
 void screen_init(void);
 void screen_free(void);

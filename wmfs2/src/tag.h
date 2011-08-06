@@ -7,16 +7,10 @@
 #define TAG_H
 
 #include "wmfs.h"
-#include "screen.h"
-#include "client.h"
 
-typedef struct Tag
-{
-     char *name;
-     Screen *screen;
-     Flags flags;
-     Client *sel;
-     SLIST_ENTRY(Tag) next;
-} Tag;
+Tag *tag_new(Scr33n *s, char *name);
+void tag_screen(Scr33n *s, Tag *t);
+void tag_free(Scr33n *s);
+
 
 #endif /* TAG_H */

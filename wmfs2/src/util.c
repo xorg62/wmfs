@@ -3,7 +3,8 @@
  *  For license, see COPYING.
  */
 
-#include "wmfs.h"
+#include <stdint.h>
+
 #include "util.h"
 
 /** malloc with error support and size_t overflow protection

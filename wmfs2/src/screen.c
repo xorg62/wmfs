@@ -6,17 +6,17 @@
 #include "screen.h"
 #include "util.h"
 
-static Screen*
-screen_new(Geo g)
+static Scr33n*
+screen_new(Geo *g)
 {
-     Screen *s = xcalloc(1, sizeof(Screen));
+     Scr33n *s = xcalloc(1, sizeof(Scr33n));
 
-     s->geo = g;
+     s->geo = *g;
      s->seltag = NULL;
 
      SLIST_INIT(&s->tags);
 
-     SLIST_INSERT_HEAD(s, &W->h.screen, Screen, next);
+     SLIST_INSERT_HEAD(&W->h.screen, s, next);
 
      W->screen = s;
 
@@ -35,11 +35,11 @@ screen_init(void)
 
      SLIST_INIT(&W->h.screen);
 
-     screen_new(g);
+     screen_new(&g);
 }
 
 void
 screen_free(void)
 {
-     FREE_LIST(Screen, W->h.screen);
+     FREE_LIST(Scr33n, W->h.screen);
 }

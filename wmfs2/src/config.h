@@ -9,13 +9,4 @@
 
 #include "wmfs.h"
 
-typedef struct Keybind
-{
-     unsigned int mod;
-     KeySym keysym;
-     void (*func)(Uicb);
-     Uicb cmd;
-     SLIST_ENTRY(Keybind) next;
-} Keybind;
-
 #endif /* CONFIG_H */

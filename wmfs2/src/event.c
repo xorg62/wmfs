@@ -6,6 +6,7 @@
 #include "event.h"
 #include "util.h"
 #include "wmfs.h"
+#include "client.h"
 
 #define EVDPY(e) (e)->xany.display
 
@@ -25,13 +26,47 @@ event_enternotify(XEvent *e)
 }
 
 static void
+event_configureevent(XEvent *e)
+{
+     XConfigureRequestEvent *ev = &e->xconfigurerequest;
+     XWindowChanges wc;
+     Client *c;
+
+     if((c = client_gb_win(ev->window)))
+     {
+          if(ev->value_mask & CWX)
+               c->geo.x = ev->x;
+          if(ev->value_mask & CWY)
+               c->geo.y = ev->y;
+          if(ev->value_mask & CWWidth)
+               c->geo.w = ev->width;
+          if(ev->value_mask & CWHeight)
+               c->geo.h = ev->height;
+
+          client_configure(c);
+     }
+     else
+     {
+          wc.x            = ev->x;
+          wc.y            = ev->y;
+          wc.width        = ev->width;
+          wc.height       = ev->height;
+          wc.border_width = ev->border_width;
+          wc.sibling      = ev->above;
+          wc.stack_mode   = ev->detail;
+
+          XConfigureWindow(EVDPY(e), ev->window, ev->value_mask, &wc);
+     }
+}
+
+static void
 event_destroynotify(XEvent *e)
 {
      XDestroyWindowEvent *ev = &e->xdestroywindow;
      Client *c;
 
      if((c = client_gb_win(ev->window)))
-          client_unmanage(c);
+          client_remove(c);
 }
 
 static void
@@ -51,11 +86,11 @@ event_maprequest(XEvent *e)
 
      /* Which windows to manage */
      if(!XGetWindowAttributes(EVDPY(e), ev->window, &at)
-               || at.overried_redirect
-               || client_gb_win(ev->window))
+               || at.override_redirect)
           return;
 
-     (Client*)client_new(ev->window, at);
+     if(!client_gb_win(ev->window))
+          (Client*)client_new(ev->window, &at);
 }
 
 static void
@@ -137,9 +172,9 @@ event_keypress(XEvent *e)
      Keybind *k;
      Flags m = ~(W->numlockmask | LockMask);
 
-     keysym = XKeycodeToKeysym(EVDPY, (KeyCode)ev->keycode, 0);
+     keysym = XKeycodeToKeysym(EVDPY(e), (KeyCode)ev->keycode, 0);
 
-     SLIST_FOREACH(k, W->h.keybind, next)
+     SLIST_FOREACH(k, &W->h.keybind, next)
           if(k->keysym == keysym && (k->mod & m) == (ev->state & m))
                if(k->func)
                     k->func(k->cmd);
@@ -157,6 +192,7 @@ event_expose(XEvent *e)
 static void
 event_dummy(XEvent *e)
 {
+     printf("%d\n", e->type);
      (void)e;
 }
 
@@ -168,9 +204,9 @@ event_init(void)
      while(i--)
           event_handle[i] = event_dummy;
 
-     event_handle[ButtonPress]      = event_buttonpress;
+     /*event_handle[ButtonPress]      = event_buttonpress;*/
      /*event_handle[ClientMessage]    = event_clientmessageevent;*/
-     /*event_handle[ConfigureRequest] = event_configureevent;*/
+     event_handle[ConfigureRequest] = event_configureevent;
      event_handle[DestroyNotify]    = event_destroynotify;
      event_handle[EnterNotify]      = event_enternotify;
      event_handle[Expose]           = event_expose;

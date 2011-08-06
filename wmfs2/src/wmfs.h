@@ -22,9 +22,6 @@
 #include <X11/Xatom.h>
 
 /* Local */
-#include "screen.h"
-#include "client.h"
-#include "config.h"
 
 #define ButtonMask (ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
 #define MouseMask  (ButtonMask | PointerMotionMask)
@@ -33,12 +30,63 @@
 typedef unsigned int Flags;
 typedef const char* Uicb;
 
-typedef struct
+/*
+ * Structures
+ */
+typedef struct Geo Geo;
+typedef struct Scr33n Scr33n;
+typedef struct Tag Tag;
+typedef struct Client Client;
+typedef struct Keybind Keybind;
+
+struct Geo
 {
      int x, y, w, h;
-} Geo;
+};
 
-typedef struct
+/* Screen */
+struct Scr33n
+{
+     Geo geo;
+     Tag *seltag;
+     SLIST_HEAD(, Tag) tags;
+     SLIST_ENTRY(Scr33n) next;
+};
+
+/* Tag */
+struct Tag
+{
+     char *name;
+     Scr33n *screen;
+     Flags flags;
+     Client *sel;
+     SLIST_ENTRY(Tag) next;
+};
+
+/* Client */
+struct Client
+{
+     Tag *tag;
+     Scr33n *screen;
+     Geo geo;
+     Flags flags;
+     char *title;
+     Window win;
+     SLIST_ENTRY(Client) next;
+};
+
+/* Config */
+struct Keybind
+{
+     unsigned int mod;
+     KeySym keysym;
+     void (*func)(Uicb);
+     Uicb cmd;
+     SLIST_ENTRY(Keybind) next;
+};
+
+/* Global struct */
+struct Wmfs
 {
      /* X11 stuffs */
      bool running;
@@ -47,6 +95,7 @@ typedef struct
      int xscreen;
      Flags numlockmask;
      GC gc;
+     Atom *net_atom;
 
      struct
      {
@@ -57,7 +106,7 @@ typedef struct
      /* Lists heads */
      struct
      {
-          SLIST_HEAD(, Screen) screen;
+          SLIST_HEAD(, Scr33n) screen;
           SLIST_HEAD(, Client) client;
           SLIST_HEAD(, Keybind) keybind;
      } h;
@@ -66,9 +115,9 @@ typedef struct
       * Selected screen, from what you go everywhere; selected tag,
       * and then selected client.
       */
-     Screen *screen;
+     Scr33n *screen;
 
-} Wmfs;
+};
 
 int wmfs_error_handler(Display *d, XErrorEvent *event);
 int wmfs_error_handler_dummy(Display *d, XErrorEvent *event);
@@ -76,6 +125,6 @@ void wmfs_grab_keys(void);
 void wmfs_quit(void);
 
 /* Single global variable */
-Wmfs *W;
+struct Wmfs *W;
 
 #endif /* WMFS_H */

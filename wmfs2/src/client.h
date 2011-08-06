@@ -7,21 +7,9 @@
 #define CLIENT_H
 
 #include "wmfs.h"
-#include "tag.h"
-#include "screen.h"
-
-typedef struct Client
-{
-     Tag *tag;
-     Screen *screen;
-     Geo *geo;
-     Flags flags;
-     Window win;
-     SLIST_ENTRY(Client) next;
-} Client;
 
 void client_configure(Client *c);
-Client *client_gb_win(Window *w);
+Client *client_gb_win(Window w);
 void client_map(Client *c);
 void client_unmap(Client *c);
 void client_focus(Client *c);

@@ -6,6 +6,8 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include "wmfs.h"
+
 /* Todo FREE_LIST(type, head, function_remove) */
 #define FREE_LIST(type, head)                   \
      do {                                       \
@@ -16,6 +18,8 @@
                free(t); /* function_remove(t)*/ \
           }                                     \
      } while(/* CONSTCOND */ 0);
+
+#define ATOM(a)  XInternAtom(W->dpy, (a), False)
 
 void *xmalloc(size_t nmemb, size_t size);
 void *xcalloc(size_t nmemb, size_t size);

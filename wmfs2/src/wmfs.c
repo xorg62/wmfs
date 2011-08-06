@@ -3,6 +3,9 @@
  *  For license, see COPYING.
  */
 
+#include <X11/keysym.h>
+#include <X11/cursorfont.h>
+
 #include "wmfs.h"
 #include "event.h"
 
@@ -68,11 +71,14 @@ wmfs_xinit(void)
      W->gc = DefaultGC(W->dpy, W->xscreen);
 
      /*
-      * Root window
+      * Root window/cursor
       */
-     W->root = RootWindow(dpy, W->xscreen);
+     W->root = RootWindow(W->dpy, W->xscreen);
+
      at.event_mask = KeyMask | ButtonMask | MouseMask | PropertyChangeMask
           | SubstructureRedirectMask | SubstructureNotifyMask | StructureNotifyMask;
+     at.cursor = XCreateFontCursor(W->dpy, XC_left_ptr);
+
      XChangeWindowAttributes(W->dpy, W->root, CWEventMask | CWCursor, &at);
 
      /*
@@ -85,9 +91,9 @@ wmfs_xinit(void)
      XExtentsOfFontSet(W->font.fontset);
      XFontsOfFontSet(W->font.fontset, &xfs, &names);
 
-     font.as    = xfs[0]->max_bounds.ascent;
-     font.de    = xfs[0]->max_bounds.descent;
-     font.width = xfs[0]->max_bounds.width;
+     W->font.as    = xfs[0]->max_bounds.ascent;
+     W->font.de    = xfs[0]->max_bounds.descent;
+     W->font.width = xfs[0]->max_bounds.width;
 
      W->font.height = W->font.as + W->font.de;
 
@@ -116,14 +122,78 @@ wmfs_grab_keys(void)
 
      XUngrabKey(W->dpy, AnyKey, AnyModifier, W->root);
 
-     FOREACH(k, &W->h.keybind, next)
-          if((c = XKeysymToKeycode(dpy, k->keysym)))
+     SLIST_FOREACH(k, &W->h.keybind, next)
+          if((c = XKeysymToKeycode(W->dpy, k->keysym)))
           {
                XGrabKey(W->dpy, c, k->mod, W->root, True, GrabModeAsync, GrabModeAsync);
                XGrabKey(W->dpy, c, k->mod | LockMask, W->root, True, GrabModeAsync, GrabModeAsync);
-               XGrabKey(W->dpy, c, k->mod | numlockmask, W->root, True, GrabModeAsync, GrabModeAsync);
-               XGrabKey(W->dpy, c, k->mod | LockMask | numlockmask, W->root, True, GrabModeAsync, GrabModeAsync);
+               XGrabKey(W->dpy, c, k->mod | W->numlockmask, W->root, True, GrabModeAsync, GrabModeAsync);
+               XGrabKey(W->dpy, c, k->mod | LockMask | W->numlockmask, W->root, True, GrabModeAsync, GrabModeAsync);
           }
+}
+
+/** Scan if there are windows on X
+ *  for manage it
+*/
+static void
+wmfs_scan(void)
+{
+     int i, n;
+     XWindowAttributes wa;
+     Window usl, usl2, *w = NULL;
+     Client *c;
+
+     /*
+        Atom rt;
+        int s, rf, tag = -1, screen = -1, flags = -1, i;
+        ulong ir, il;
+        uchar *ret;
+      */
+
+     if(XQueryTree(W->dpy, W->root, &usl, &usl2, &w, &n))
+          for(i = n - 1; i != -1; --i)
+          {
+               XGetWindowAttributes(W->dpy, w[i], &wa);
+
+               if(!wa.override_redirect && wa.map_state == IsViewable)
+               {/*
+                    if(XGetWindowProperty(dpy, w[i], ATOM("_WMFS_TAG"), 0, 32,
+                                   False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
+                    {
+                         tag = *ret;
+                         XFree(ret);
+                    }
+
+                    if(XGetWindowProperty(dpy, w[i], ATOM("_WMFS_SCREEN"), 0, 32,
+                                   False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
+                    {
+                         screen = *ret;
+                         XFree(ret);
+                    }
+
+                    if(XGetWindowProperty(dpy, w[i], ATOM("_WMFS_FLAGS"), 0, 32,
+                                   False, XA_CARDINAL, &rt, &rf, &ir, &il, &ret) == Success && ret)
+                    {
+                         flags = *ret;
+                         XFree(ret);
+                     }
+                 */
+                    /*c = */ client_new(w[i], &wa);
+
+                    /*
+                    if(tag != -1)
+                         c->tag = tag;
+                    if(screen != -1)
+                         c->screen = screen;
+                    if(flags != -1)
+                         c->flags = flags;
+                    */
+               }
+          }
+
+     XFree(w);
+
+     return;
 }
 
 static void
@@ -134,11 +204,10 @@ wmfs_loop(void)
      W->running = true;
 
      while(W->running)
-          while(XPending(W->dpy))
-          {
-               XNextEvent(W->dpy, &ev);
-               HANDLE_EVENT(&e);
-          }
+     {
+          XNextEvent(W->dpy, &ev);
+          HANDLE_EVENT(&ev);
+     }
 }
 
 static void
@@ -146,6 +215,9 @@ wmfs_init(void)
 {
      /* X init */
      wmfs_xinit();
+
+     /* EWMH init */
+     ewmh_init();
 
      /* Event init */
      event_init();
@@ -161,12 +233,14 @@ wmfs_quit(void)
      W->running = false;
 
      /* X stuffs */
-     XCloseDisplay(W->dpy);
-     XFreeGC(W->gc);
-     XFreeFontSet(dpy, W->font.fontset);
+     XFreeGC(W->dpy, W->gc);
+     XFreeFontSet(W->dpy, W->font.fontset);
 
      screen_free();
 
+     XCloseDisplay(W->dpy);
+
+     free(W->net_atom);
      free(W);
 }
 
@@ -174,7 +248,7 @@ wmfs_quit(void)
 int
 main(int argc, char **argv)
 {
-     W = xcalloc(1, sizeof(Wmfs));
+     W = (struct Wmfs*)xcalloc(1, sizeof(struct Wmfs));
 
      /* Get X display */
      if(!(W->dpy = XOpenDisplay(NULL)))
@@ -187,6 +261,7 @@ main(int argc, char **argv)
 
      /* Core */
      wmfs_init();
+     wmfs_scan();
 
      wmfs_loop();
 

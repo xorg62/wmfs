@@ -6,12 +6,14 @@
 #ifndef EVENT_H
 #define EVENT_H
 
+#include "wmfs.h"
+
 #define MAX_EV 256
 
 #define HANDLE_EVENT(e) event_handle[(e)->type](e);
 
 void event_init(void);
 
-void (*event_handle)(XEvent*)[MAX_EV];
+void (*event_handle[MAX_EV])(XEvent*);
 
 #endif /* EVENT_H */

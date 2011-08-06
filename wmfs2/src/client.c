@@ -25,11 +25,12 @@ client_configure(Client *c)
      ev.border_width      = 0;
      ev.override_redirect = 0;
 
-     XSendEvent(dpy, c->win, False, StructureNotifyMask, (XEvent *)&ev);
+     XSendEvent(W->dpy, c->win, False, StructureNotifyMask, (XEvent *)&ev);
+     XSync(W->dpy, False);
 }
 
 Client*
-client_gb_win(Window *w)
+client_gb_win(Window w)
 {
      Client *c = SLIST_FIRST(&W->h.client);
 
@@ -61,6 +62,27 @@ void
 client_focus(Client *c)
 {
 
+}
+
+/** Get a client name
+ * \param c Client pointer
+*/
+void
+client_get_name(Client *c)
+{
+     Atom rt;
+     int rf;
+     unsigned long ir, il;
+
+     /* This one instead XFetchName for utf8 name support */
+     if(XGetWindowProperty(W->dpy, c->win, ATOM("_NET_WM_NAME"), 0, 4096,
+                    False, ATOM("UTF8_STRING"), &rt, &rf, &ir, &il, (unsigned char**)&c->title) != Success)
+          XGetWindowProperty(W->dpy, c->win, ATOM("WM_NAME"), 0, 4096,
+                             False, ATOM("UTF8_STRING"), &rt, &rf, &ir, &il, (unsigned char**)&c->title);
+
+     /* Still no title... */
+     if(!c->title)
+          XFetchName(W->dpy, c->win, &(c->title));
 }
 
 /** Close a client
@@ -124,10 +146,17 @@ client_new(Window w, XWindowAttributes *wa)
 
      /* X window attributes */
      at.event_mask = PropertyChangeMask;
-     XChangeWindowAttributes(dpy, w, CWEventMask, &at);
+     XChangeWindowAttributes(W->dpy, c->win, CWEventMask, &at);
 
      /* Attach */
-     SLIST_INSERT(&W->h.client, c, Client, next);
+     SLIST_INSERT_HEAD(&W->h.client, c, next);
+
+     client_map(c);
+
+     XMoveResizeWindow(W->dpy, c->win, c->geo.x, c->geo.y, c->geo.w, c->geo.h);
+     XRaiseWindow(W->dpy, w);
+
+     client_configure(c);
 
      return c;
 }
@@ -151,5 +180,5 @@ client_remove(Client *c)
 void
 client_free(void)
 {
-     FREE_LIST(W->client);
+     FREE_LIST(Client, W->h.client);
 }

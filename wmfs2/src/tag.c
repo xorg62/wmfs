@@ -7,7 +7,7 @@
 #include "util.h"
 
 Tag*
-tag_new(Screen *s, const char *name)
+tag_new(Scr33n *s, char *name)
 {
      Tag *t;
 
@@ -18,13 +18,13 @@ tag_new(Screen *s, const char *name)
      t->flags  = 0;
      t->sel    = NULL;
 
-     SLIST_INSERT_HEAD(t, &s->tags, Tag, next);
+     SLIST_INSERT_HEAD(&s->tags, t, next);
 
      return t;
 }
 
 void
-tag_screen(Screen *s, Tag *t)
+tag_screen(Scr33n *s, Tag *t)
 {
      s->seltag = t;
 
@@ -32,7 +32,7 @@ tag_screen(Screen *s, Tag *t)
 
 
 void
-tag_free(Screen *s)
+tag_free(Scr33n *s)
 {
-     LIST_FREE(s->tags);
+     FREE_LIST(Tag, s->tags);
 }
