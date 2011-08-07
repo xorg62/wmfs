@@ -18,6 +18,7 @@ screen_new(Geo *g)
 
      SLIST_INSERT_HEAD(&W->h.screen, s, next);
 
+     /* Set as selected screen */
      W->screen = s;
 
      return s;
@@ -26,6 +27,7 @@ screen_new(Geo *g)
 void
 screen_init(void)
 {
+     Scr33n *s;
      Geo g;
 
      g.x = 0;
@@ -35,7 +37,8 @@ screen_init(void)
 
      SLIST_INIT(&W->h.screen);
 
-     screen_new(&g);
+     s = screen_new(&g);
+     tag_screen(s, tag_new(s, "tag"));
 }
 
 void

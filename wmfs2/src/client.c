@@ -61,6 +61,26 @@ client_unmap(Client *c)
 void
 client_focus(Client *c)
 {
+     puts("foc");
+
+     /* Unfocus selected */
+     if(c->tag->sel && c->tag->sel != c)
+     {
+          XSetWindowBorder(W->dpy, c->win, 0xf0f0f0);
+     }
+
+     /* Focus c */
+     if((c->tag->sel = c))
+     {
+          XSetWindowBorder(W->dpy, c->win, 0xffffff);
+
+          XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
+
+          XRaiseWindow(W->dpy, c->win);
+     }
+     /* Else, set input focus to root window */
+     else
+          XSetInputFocus(W->dpy, W->root, RevertToPointerRoot, CurrentTime);
 
 }
 
@@ -128,7 +148,6 @@ Client*
 client_new(Window w, XWindowAttributes *wa)
 {
      Client *c;
-     XSetWindowAttributes at;
 
      c = xcalloc(1, sizeof(Client));
 
@@ -145,17 +164,20 @@ client_new(Window w, XWindowAttributes *wa)
      c->geo.h = wa->height;
 
      /* X window attributes */
-     at.event_mask = PropertyChangeMask;
-     XChangeWindowAttributes(W->dpy, c->win, CWEventMask, &at);
+     XSelectInput(W->dpy, w, EnterWindowMask | FocusChangeMask | PropertyChangeMask | StructureNotifyMask);
+
+     XSetWindowBorder(W->dpy, w, 0xffffff);
+     XSetWindowBorderWidth(W->dpy, w, 1);
 
      /* Attach */
      SLIST_INSERT_HEAD(&W->h.client, c, next);
 
      client_map(c);
 
-     XMoveResizeWindow(W->dpy, c->win, c->geo.x, c->geo.y, c->geo.w, c->geo.h);
+     XMoveResizeWindow(W->dpy, w, c->geo.x, c->geo.y, c->geo.w, c->geo.h);
      XRaiseWindow(W->dpy, w);
 
+     client_focus(c);
      client_configure(c);
 
      return c;
@@ -166,8 +188,6 @@ client_remove(Client *c)
 {
      XGrabServer(W->dpy);
      XSetErrorHandler(wmfs_error_handler_dummy);
-
-     XReparentWindow(W->dpy, c->win, W->root, c->geo.x, c->geo.y);
 
      SLIST_REMOVE(&W->h.client, c, Client, next);
 

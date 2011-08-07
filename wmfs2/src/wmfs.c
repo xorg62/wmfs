@@ -203,7 +203,7 @@ wmfs_loop(void)
 
      W->running = true;
 
-     while(W->running)
+     while(W->running || XPending(W->dpy))
      {
           XNextEvent(W->dpy, &ev);
           HANDLE_EVENT(&ev);

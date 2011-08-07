@@ -11,11 +11,17 @@
 #define EVDPY(e) (e)->xany.display
 
 static void
+event_buttonpress(XEvent *e)
+{
+     XButtonEvent *ev = &e->xbutton;
+
+}
+
+static void
 event_enternotify(XEvent *e)
 {
      XCrossingEvent *ev = &e->xcrossing;
      Client *c;
-     int n;
 
      if((ev->mode != NotifyNormal || ev->detail == NotifyInferior)
                && ev->window != W->root)
@@ -23,6 +29,12 @@ event_enternotify(XEvent *e)
 
      if((c = client_gb_win(ev->window)))
           client_focus(c);
+}
+
+static void
+event_clientmessageevent(XEvent *e)
+{
+       XClientMessageEvent *ev = &e->xclient;
 }
 
 static void
@@ -44,6 +56,8 @@ event_configureevent(XEvent *e)
                c->geo.h = ev->height;
 
           client_configure(c);
+
+          XMoveResizeWindow(EVDPY(e), c->win, c->geo.x, c->geo.y, c->geo.w, c->geo.h);
      }
      else
      {
@@ -204,8 +218,8 @@ event_init(void)
      while(i--)
           event_handle[i] = event_dummy;
 
-     /*event_handle[ButtonPress]      = event_buttonpress;*/
-     /*event_handle[ClientMessage]    = event_clientmessageevent;*/
+     event_handle[ButtonPress]      = event_buttonpress;
+     event_handle[ClientMessage]    = event_clientmessageevent;
      event_handle[ConfigureRequest] = event_configureevent;
      event_handle[DestroyNotify]    = event_destroynotify;
      event_handle[EnterNotify]      = event_enternotify;
