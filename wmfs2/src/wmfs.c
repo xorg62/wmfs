@@ -8,6 +8,7 @@
 
 #include "wmfs.h"
 #include "event.h"
+#include "util.h"
 
 int
 wmfs_error_handler(Display *d, XErrorEvent *event)
@@ -68,6 +69,7 @@ wmfs_xinit(void)
       * X var
       */
      W->xscreen = DefaultScreen(W->dpy);
+     W->xdepth = DefaultDepth(W->dpy, W->xscreen);
      W->gc = DefaultGC(W->dpy, W->xscreen);
 
      /*

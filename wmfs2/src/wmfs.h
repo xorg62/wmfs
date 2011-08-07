@@ -28,12 +28,14 @@
 #define KeyMask    (KeyPressMask | KeyReleaseMask)
 
 typedef unsigned int Flags;
+typedef unsigned int Color;
 typedef const char* Uicb;
 
 /*
  * Structures
  */
 typedef struct Geo Geo;
+typedef struct Barwin Barwin;
 typedef struct Scr33n Scr33n;
 typedef struct Tag Tag;
 typedef struct Client Client;
@@ -42,6 +44,17 @@ typedef struct Keybind Keybind;
 struct Geo
 {
      int x, y, w, h;
+};
+
+/* Barwin */
+struct Barwin
+{
+     Window win;
+     Drawable dr;
+     Color fg, bg;
+     Geo geo;
+     Flags flags;
+     SLIST_ENTRY(Barwin) next;
 };
 
 /* Screen */
@@ -92,7 +105,7 @@ struct Wmfs
      bool running;
      Display *dpy;
      Window root;
-     int xscreen;
+     int xscreen, xdepth;
      Flags numlockmask;
      GC gc;
      Atom *net_atom;
@@ -109,6 +122,7 @@ struct Wmfs
           SLIST_HEAD(, Scr33n) screen;
           SLIST_HEAD(, Client) client;
           SLIST_HEAD(, Keybind) keybind;
+          SLIST_HEAD(, Barwin) barwin;
      } h;
 
      /*

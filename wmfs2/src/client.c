@@ -61,8 +61,6 @@ client_unmap(Client *c)
 void
 client_focus(Client *c)
 {
-     puts("foc");
-
      /* Unfocus selected */
      if(c->tag->sel && c->tag->sel != c)
      {
