@@ -43,6 +43,27 @@ xcalloc(size_t nmemb, size_t size)
      return ret;
 }
 
+/** asprintf wrapper
+ * \param strp target string
+ * \param fmt format
+ * \return non zero integer
+ */
+int
+xasprintf(char **strp, const char *fmt, ...)
+{
+     int ret;
+     va_list args;
+
+     va_start(args, fmt);
+     ret = vasprintf(strp, fmt, args);
+     va_end(args);
+
+     if (ret == -1)
+          err(EXIT_FAILURE, "asprintf(%s)", fmt);
+
+     return ret;
+}
+
 /** Execute a system command
  * \param cmd Command
  * \return child pid

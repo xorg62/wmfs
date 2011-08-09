@@ -40,6 +40,7 @@ typedef struct Scr33n Scr33n;
 typedef struct Tag Tag;
 typedef struct Client Client;
 typedef struct Keybind Keybind;
+typedef struct Mousebind Mousebind;
 
 struct Geo
 {
@@ -96,6 +97,28 @@ struct Keybind
      void (*func)(Uicb);
      Uicb cmd;
      SLIST_ENTRY(Keybind) next;
+};
+
+struct Mousebind
+{
+     unsigned int button;
+     Geo area;
+     bool use_area;
+     void (*func)(Uicb);
+     Uicb cmd;
+     SLIST_ENTRY(Keybind) next;
+};
+
+struct Config
+{
+     /* Misc section */
+     struct
+     {
+          char *font;
+          bool focus_follow_mouse;
+          bool focus_follow_movement;
+          bool focus_pointer_click;
+     } misc;
 };
 
 /* Global struct */

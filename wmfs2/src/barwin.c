@@ -20,15 +20,13 @@
 Barwin*
 barwin_new(Window parent, int x, int y, int w, int h, Color fg, Color bg, bool entermask)
 {
-     Barwin *b;
+     Barwin *b = (Barwin*)xcalloc(1, sizeof(Barwin));
      XSetWindowAttributes at =
      {
           .override_redirect = True,
           .background_pixmap = ParentRelative,
           .event_mask = BARWIN_MASK
      };
-
-     b = (Barwin*)xcalloc(1, sizeof(Barwin));
 
      if(entermask)
           at.event_mask |= BARWIN_ENTERMASK;
@@ -76,9 +74,6 @@ barwin_remove(Barwin *b)
 void
 barwin_resize(Barwin *b, int w, int h)
 {
-     if(b->geo.w == w && b->geo.h == h)
-          return;
-
      /* Frame */
      XFreePixmap(W->dpy, b->dr);
 
