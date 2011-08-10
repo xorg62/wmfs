@@ -203,9 +203,7 @@ wmfs_loop(void)
 {
      XEvent ev;
 
-     W->running = true;
-
-     while(W->running || XPending(W->dpy))
+     while(XPending(W->dpy))
      {
           XNextEvent(W->dpy, &ev);
           HANDLE_EVENT(&ev);
@@ -232,8 +230,6 @@ wmfs_init(void)
 void
 wmfs_quit(void)
 {
-     W->running = false;
-
      /* X stuffs */
      XFreeGC(W->dpy, W->gc);
      XFreeFontSet(W->dpy, W->font.fontset);
@@ -266,8 +262,6 @@ main(int argc, char **argv)
      wmfs_scan();
 
      wmfs_loop();
-
-     wmfs_quit();
 
      return 1;
 }

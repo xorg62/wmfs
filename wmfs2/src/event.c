@@ -1,4 +1,4 @@
-/*
+  /*
  *  wmfs2 by Martin Duquesnoy <xorg62@gmail.com> { for(i = 2011; i < 2111; ++i) ©(i); }
  *  For license, see COPYING.
  */
@@ -7,6 +7,7 @@
 #include "util.h"
 #include "wmfs.h"
 #include "client.h"
+#include "barwin.h"
 
 #define EVDPY(e) (e)->xany.display
 
@@ -35,6 +36,7 @@ static void
 event_clientmessageevent(XEvent *e)
 {
        XClientMessageEvent *ev = &e->xclient;
+       Client *c;
 }
 
 static void
@@ -197,10 +199,15 @@ event_keypress(XEvent *e)
 static void
 event_expose(XEvent *e)
 {
-     /*
-      *  XExposeEvent *ev = &e->xexpose;
-      */
+     XExposeEvent *ev = &e->xexpose;
+     Barwin *b;
 
+     SLIST_FOREACH(b, &W->h.barwin, next)
+          if(b->win == ev->window)
+          {
+               barwin_refresh(b);
+               return;
+          }
 }
 
 static void

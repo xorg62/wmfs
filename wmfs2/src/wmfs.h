@@ -58,6 +58,12 @@ struct Barwin
      SLIST_ENTRY(Barwin) next;
 };
 
+/* Infobar */
+struct Infobar
+{
+     Barwin *bar;
+};
+
 /* Screen */
 struct Scr33n
 {
@@ -125,7 +131,6 @@ struct Config
 struct Wmfs
 {
      /* X11 stuffs */
-     bool running;
      Display *dpy;
      Window root;
      int xscreen, xdepth;
