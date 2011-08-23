@@ -114,6 +114,7 @@ wmfs_xinit(void)
                     W->numlockmask = (1 << i);
      XFreeModifiermap(mm);
 
+     W->running = true;
 }
 
 void
@@ -194,8 +195,6 @@ wmfs_scan(void)
           }
 
      XFree(w);
-
-     return;
 }
 
 static void
@@ -204,10 +203,8 @@ wmfs_loop(void)
      XEvent ev;
 
      while(XPending(W->dpy))
-     {
-          XNextEvent(W->dpy, &ev);
-          HANDLE_EVENT(&ev);
-     }
+          while(W->running && !XNextEvent(W->dpy, &ev))
+               HANDLE_EVENT(&ev);
 }
 
 static void
@@ -240,6 +237,8 @@ wmfs_quit(void)
 
      free(W->net_atom);
      free(W);
+
+     W->running = false;
 }
 
 

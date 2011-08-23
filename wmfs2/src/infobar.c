@@ -4,4 +4,7 @@
  */
 
 #include "wmfs.h"
+#include "infobar.h"
+
+
 

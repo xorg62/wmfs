@@ -3,6 +3,12 @@
  *  For license, see COPYING.
  */
 
+#define HAVE_XINERAMA
+
+#ifdef HAVE_XINERAMA
+#include <X11/extensions/Xinerama.h>
+#endif /* HAVE_XINERAMA */
+
 #include "screen.h"
 #include "util.h"
 
@@ -30,15 +36,48 @@ screen_init(void)
      Scr33n *s;
      Geo g;
 
-     g.x = 0;
-     g.y = 0;
-     g.w = DisplayWidth(W->dpy, W->xscreen);
-     g.h = DisplayHeight(W->dpy, W->xscreen);
-
      SLIST_INIT(&W->h.screen);
 
-     s = screen_new(&g);
-     tag_screen(s, tag_new(s, "tag"));
+#ifdef HAVE_XINERAMA
+     XineramaScreenInfo *xsi;
+     int i = 0, n;
+
+     if(XineramaIsActive(W->dpy))
+     {
+          xsi = XineramaQueryScreens(W->dpy, &n);
+
+          for(; i < n; ++i)
+          {
+               s = NULL;
+               g.x = xsi[i].x_org;
+               g.y = xsi[i].y_org;
+               g.w = xsi[i].width;
+               g.h = xsi[i].height;
+
+               s = screen_new(&g);
+               tag_screen(s, tag_new(s, "tag")); /* tmp */
+
+               SLIST_INSERT_HEAD(&W->h.screen, s, next);
+
+               printf("%d: %d %d %d %d\n", i, s->geo.x, s->geo.y, s->geo.w, s->geo.h);
+          }
+
+          XFree(xsi);
+     }
+     else
+#endif /* HAVE_XINERAMA */
+     {
+          g.x = g.y = 0;
+          g.w = DisplayWidth(W->dpy, W->xscreen);
+          g.h = DisplayHeight(W->dpy, W->xscreen);
+
+          s = screen_new(&g);
+          tag_screen(s, tag_new(s, "tag"));
+
+          SLIST_INSERT_HEAD(&W->h.screen, s, next);
+          printf("%d: %d %d %d %d\n", i, s->geo.x, s->geo.y, s->geo.w, s->geo.h);
+     }
+
 }
 
 void

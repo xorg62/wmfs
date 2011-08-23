@@ -35,6 +35,8 @@ typedef const char* Uicb;
  * Structures
  */
 typedef struct Geo Geo;
+typedef struct Element Element;
+typedef struct Infobar Infobar;
 typedef struct Barwin Barwin;
 typedef struct Scr33n Scr33n;
 typedef struct Tag Tag;
@@ -55,13 +57,29 @@ struct Barwin
      Color fg, bg;
      Geo geo;
      Flags flags;
+     SLIST_HEAD(, MouseBind) mousebinds;
      SLIST_ENTRY(Barwin) next;
+};
+
+/* Infobar's element */
+struct Element
+{
+     SLIST_ENTRY(Barwin) bars;
+     Geo geo;
+     int type;
+     void (*func_init)(Infobar *i);
+     void (*func_update)(Element *e);
+     STAILQ_ENTRY(Element) next;
 };
 
 /* Infobar */
 struct Infobar
 {
      Barwin *bar;
+     Geo geo;
+     Scr33n *screen;
+     STAILQ_HEAD(, Element) elements;
+     SLIST_ENTRY(Infobar) next;
 };
 
 /* Screen */
@@ -137,6 +155,7 @@ struct Wmfs
      Flags numlockmask;
      GC gc;
      Atom *net_atom;
+     bool running;
 
      struct
      {
@@ -149,6 +168,7 @@ struct Wmfs
      {
           SLIST_HEAD(, Scr33n) screen;
           SLIST_HEAD(, Client) client;
+          SLIST_HEAD(, Infobar) infobar;
           SLIST_HEAD(, Keybind) keybind;
           SLIST_HEAD(, Barwin) barwin;
      } h;
