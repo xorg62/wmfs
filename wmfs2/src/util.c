@@ -118,3 +118,9 @@ spawn(const char *format, ...)
 
      return pid;
 }
+
+void
+uicb_spawn(Uicb cmd)
+{
+     spawn("%s", cmd);
+}

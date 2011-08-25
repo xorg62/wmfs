@@ -187,6 +187,8 @@ int wmfs_error_handler(Display *d, XErrorEvent *event);
 int wmfs_error_handler_dummy(Display *d, XErrorEvent *event);
 void wmfs_grab_keys(void);
 void wmfs_quit(void);
+void uicb_quit(Uicb cmd);
+
 
 /* Single global variable */
 struct Wmfs *W;

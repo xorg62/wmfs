@@ -169,7 +169,7 @@ event_unmapnotify(XEvent *e)
 static void
 event_motionnotify(XEvent *e)
 {
-     /*
+    /*
         XMotionEvent *ev = &e->xmotion;
         Client *c;
 
@@ -184,14 +184,12 @@ static void
 event_keypress(XEvent *e)
 {
      XKeyPressedEvent *ev = &e->xkey;
-     KeySym keysym;
-     Keybind *k;
+     KeySym keysym = XKeycodeToKeysym(EVDPY(e), (KeyCode)ev->keycode, 0);
      Flags m = ~(W->numlockmask | LockMask);
-
-     keysym = XKeycodeToKeysym(EVDPY(e), (KeyCode)ev->keycode, 0);
+     Keybind *k;
 
      SLIST_FOREACH(k, &W->h.keybind, next)
-          if(k->keysym == keysym && (k->mod & m) == (ev->state & m))
+          if(k->keysym == keysym && KEYPRESS_MASK(k->mod) == KEYPRESS_MASK(ev->state))
                if(k->func)
                     k->func(k->cmd);
 }
@@ -201,13 +199,13 @@ event_expose(XEvent *e)
 {
      XExposeEvent *ev = &e->xexpose;
      Barwin *b;
-/*
+
      SLIST_FOREACH(b, &W->h.barwin, next)
           if(b->win == ev->window)
           {
                barwin_refresh(b);
                return;
-          }*/
+          }
 }
 
 static void

@@ -3,13 +3,14 @@
  *  For license, see COPYING.
  */
 
+#include <getopt.h>
 #include <X11/keysym.h>
 #include <X11/cursorfont.h>
 
 #include "wmfs.h"
 #include "event.h"
 #include "util.h"
-/*#include "infobar.h" */
+#include "config.h"
 
 int
 wmfs_error_handler(Display *d, XErrorEvent *event)
@@ -56,7 +57,7 @@ static void
 wmfs_xinit(void)
 {
      char **misschar, **names, *defstring;
-     int d, i = 0, j = 0;
+     int d, i, j;
      XModifierKeymap *mm;
      XFontStruct **xfs = NULL;
      XSetWindowAttributes at;
@@ -108,8 +109,8 @@ wmfs_xinit(void)
       */
      mm = XGetModifierMapping(W->dpy);
 
-     for(; i < 8; i++)
-          for(; j < mm->max_keypermod; ++j)
+     for(i = 0; i < 8; i++)
+          for(j = 0; j < mm->max_keypermod; ++j)
                if(mm->modifiermap[i * mm->max_keypermod + j]
                          == XKeysymToKeycode(W->dpy, XK_Num_Lock))
                     W->numlockmask = (1 << i);
@@ -217,6 +218,8 @@ wmfs_init(void)
      /* EWMH init */
      ewmh_init();
 
+     config_init();
+
      /* Event init */
      event_init();
 
@@ -232,7 +235,6 @@ void
 wmfs_quit(void)
 {
      /* X stuffs */
-     XFreeGC(W->dpy, W->gc);
      XFreeFontSet(W->dpy, W->font.fontset);
 
      screen_free();
@@ -242,9 +244,18 @@ wmfs_quit(void)
      free(W->net_atom);
      free(W);
 
+     /* Conf stuffs */
+     FREE_LIST(Keybind, W->h.keybind);
+
      W->running = false;
 }
 
+void
+uicb_quit(Uicb cmd)
+{
+     (void)cmd;
+     W->running = false;
+}
 
 int
 main(int argc, char **argv)
@@ -259,6 +270,21 @@ main(int argc, char **argv)
      }
 
      /* Opt */
+     /*
+     int i;
+     while((i = getopt(argc, argv, "hviC:")) != -1)
+     {
+          switch(i)
+          {
+               case 'h':
+                    break;
+               case 'v':
+                    break;
+               case 'C':
+                    break;
+          }
+     }
+     */
 
      /* Core */
      wmfs_init();

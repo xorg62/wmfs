@@ -11,7 +11,7 @@
 /* Todo FREE_LIST(type, head, function_remove) */
 #define FREE_LIST(type, head)                   \
      do {                                       \
-          type *t;                              \
+          struct type *t;                       \
           while(!SLIST_EMPTY(&head)) {          \
                t = SLIST_FIRST(&head);          \
                SLIST_REMOVE_HEAD(&head, next);  \
@@ -26,5 +26,6 @@ void *xcalloc(size_t nmemb, size_t size);
 int xasprintf(char **strp, const char *fmt, ...);
 char *xstrdup(const char *str);
 pid_t spawn(const char *format, ...);
+void uicb_spawn(Uicb cmd);
 
 #endif /* UTIL_H */

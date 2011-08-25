@@ -10,6 +10,7 @@
 
 #define MAX_EV 256
 
+#define KEYPRESS_MASK(m) (m & ~(W->numlockmask | LockMask))
 #define HANDLE_EVENT(e) event_handle[(e)->type](e);
 
 void event_init(void);
