@@ -4,6 +4,7 @@
  */
 
 #include "event.h"
+#include "ewmh.h"
 #include "util.h"
 #include "wmfs.h"
 #include "client.h"
@@ -149,7 +150,7 @@ event_propertynotify(XEvent *e)
                      */
                     break;
                default:
-                    if(ev->atom == XA_WM_NAME /* || ev->atom == _NET_WM_NAME */)
+                    if(ev->atom == XA_WM_NAME || ev->atom == W->net_atom[net_wm_name])
                          client_get_name(c);
                     break;
           }

@@ -4,6 +4,7 @@
  */
 
 #include "wmfs.h"
+#include "draw.h"
 #include "infobar.h"
 #include "barwin.h"
 #include "util.h"
@@ -49,6 +50,8 @@ infobar_init(void)
 void
 infobar_refresh(Infobar *i)
 {
+     draw_text(i->bar->dr, 1, TEXTY(INFOBAR_DEF_W), 0x005500, "WMFS2");
+
      barwin_refresh(i->bar);
 }
 

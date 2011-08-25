@@ -73,9 +73,6 @@ screen_init(void)
           s = screen_new(&g, 0);
           tag_screen(s, tag_new(s, "tag"));
      }
-
-     SLIST_FOREACH(s, &W->h.screen, next)
-          printf("%d: %d %d %d %d\n", s->id, s->geo.x, s->geo.y, s->geo.w, s->geo.h);
 }
 
 void
