@@ -9,6 +9,7 @@
 #include "wmfs.h"
 #include "event.h"
 #include "util.h"
+/*#include "infobar.h" */
 
 int
 wmfs_error_handler(Display *d, XErrorEvent *event)
@@ -222,6 +223,9 @@ wmfs_init(void)
      /* Screen init */
      screen_init();
 
+     /* Infobar init */
+     infobar_init();
+
 }
 
 void
@@ -261,6 +265,8 @@ main(int argc, char **argv)
      wmfs_scan();
 
      wmfs_loop();
+
+     wmfs_quit();
 
      return 1;
 }

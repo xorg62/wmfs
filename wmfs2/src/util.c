@@ -4,6 +4,7 @@
  */
 
 #include <stdint.h>
+#include <string.h>
 
 #include "util.h"
 
@@ -60,6 +61,21 @@ xasprintf(char **strp, const char *fmt, ...)
 
      if (ret == -1)
           err(EXIT_FAILURE, "asprintf(%s)", fmt);
+
+     return ret;
+}
+
+/** strdup with error support
+ * \param str char pointer
+ * \retun non null void pointer
+ */
+char *
+xstrdup(const char *str)
+{
+     char *ret;
+
+     if (str == NULL || (ret = strdup(str)) == NULL)
+          err(EXIT_FAILURE, "strdup(%s)", str);
 
      return ret;
 }

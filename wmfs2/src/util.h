@@ -24,6 +24,7 @@
 void *xmalloc(size_t nmemb, size_t size);
 void *xcalloc(size_t nmemb, size_t size);
 int xasprintf(char **strp, const char *fmt, ...);
+char *xstrdup(const char *str);
 pid_t spawn(const char *format, ...);
 
 #endif /* UTIL_H */

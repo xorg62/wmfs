@@ -201,13 +201,13 @@ event_expose(XEvent *e)
 {
      XExposeEvent *ev = &e->xexpose;
      Barwin *b;
-
+/*
      SLIST_FOREACH(b, &W->h.barwin, next)
           if(b->win == ev->window)
           {
                barwin_refresh(b);
                return;
-          }
+          }*/
 }
 
 static void

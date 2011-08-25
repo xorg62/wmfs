@@ -78,6 +78,7 @@ struct Infobar
      Barwin *bar;
      Geo geo;
      Scr33n *screen;
+     char *elemorder;
      STAILQ_HEAD(, Element) elements;
      SLIST_ENTRY(Infobar) next;
 };
@@ -87,7 +88,9 @@ struct Scr33n
 {
      Geo geo;
      Tag *seltag;
+     int id;
      SLIST_HEAD(, Tag) tags;
+     SLIST_HEAD(, Infobar) infobars;
      SLIST_ENTRY(Scr33n) next;
 };
 
@@ -168,7 +171,6 @@ struct Wmfs
      {
           SLIST_HEAD(, Scr33n) screen;
           SLIST_HEAD(, Client) client;
-          SLIST_HEAD(, Infobar) infobar;
           SLIST_HEAD(, Keybind) keybind;
           SLIST_HEAD(, Barwin) barwin;
      } h;

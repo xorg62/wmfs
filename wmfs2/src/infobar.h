@@ -19,5 +19,10 @@ const struct elem_funcs { char c; void (*func_init)(Infobar *i); void (*func_upd
      { '\0', NULL, NULL }
 };*/
 
+void infobar_init(void);
+Infobar *infobar_new(Scr33n *s);
+void infobar_refresh(Infobar *i);
+void infobar_remove(Infobar *i);
+void infobar_free(Scr33n *s);
 
 #endif /* INFOBAR_H */
