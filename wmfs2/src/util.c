@@ -3,6 +3,8 @@
  *  For license, see COPYING.
  */
 
+#define _GNU_SOURCE /* vasprintf() */
+
 #include <stdint.h>
 #include <string.h>
 

@@ -12,6 +12,7 @@ enum { ElemTag = 0, ElemLayout, ElemSelbar, ElemStatus, ElemCustom };
 
 void infobar_init(void);
 Infobar *infobar_new(Scr33n *s);
+void infobar_elem_update(Infobar *i);
 void infobar_refresh(Infobar *i);
 void infobar_remove(Infobar *i);
 void infobar_free(Scr33n *s);

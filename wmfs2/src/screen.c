@@ -12,6 +12,7 @@
 #include "screen.h"
 #include "util.h"
 #include "tag.h"
+#include "infobar.h"
 
 static Scr33n*
 screen_new(Geo *g, int id)

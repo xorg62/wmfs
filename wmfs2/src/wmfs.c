@@ -9,8 +9,12 @@
 
 #include "wmfs.h"
 #include "event.h"
+#include "ewmh.h"
+#include "screen.h"
+#include "infobar.h"
 #include "util.h"
 #include "config.h"
+#include "client.h"
 
 int
 wmfs_error_handler(Display *d, XErrorEvent *event)
@@ -146,7 +150,6 @@ wmfs_scan(void)
      int i, n;
      XWindowAttributes wa;
      Window usl, usl2, *w = NULL;
-     Client *c;
 
      /*
         Atom rt;
@@ -155,7 +158,7 @@ wmfs_scan(void)
         uchar *ret;
       */
 
-     if(XQueryTree(W->dpy, W->root, &usl, &usl2, &w, &n))
+     if(XQueryTree(W->dpy, W->root, &usl, &usl2, &w, (unsigned int*)&n))
           for(i = n - 1; i != -1; --i)
           {
                XGetWindowAttributes(W->dpy, w[i], &wa);

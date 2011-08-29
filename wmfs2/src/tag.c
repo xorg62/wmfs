@@ -55,6 +55,7 @@ uicb_tag_set(Uicb cmd)
 void
 uicb_tag_next(Uicb cmd)
 {
+     (void)cmd;
      Tag *t;
 
      if((t = TAILQ_NEXT(W->screen->seltag, next)))
@@ -66,6 +67,7 @@ uicb_tag_next(Uicb cmd)
 void
 uicb_tag_prev(Uicb cmd)
 {
+     (void)cmd;
      Tag *t;
 
      if((t = TAILQ_PREV(W->screen->seltag, tsub, next)))

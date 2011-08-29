@@ -15,7 +15,7 @@
 static void
 event_buttonpress(XEvent *e)
 {
-     XButtonEvent *ev = &e->xbutton;
+     /*XButtonEvent *ev = &e->xbutton;*/
 
 }
 
@@ -36,8 +36,8 @@ event_enternotify(XEvent *e)
 static void
 event_clientmessageevent(XEvent *e)
 {
-       XClientMessageEvent *ev = &e->xclient;
-       Client *c;
+     /*  XClientMessageEvent *ev = &e->xclient;
+       Client *c;*/
 }
 
 static void
@@ -186,7 +186,6 @@ event_keypress(XEvent *e)
 {
      XKeyPressedEvent *ev = &e->xkey;
      KeySym keysym = XKeycodeToKeysym(EVDPY(e), (KeyCode)ev->keycode, 0);
-     Flags m = ~(W->numlockmask | LockMask);
      Keybind *k;
 
      SLIST_FOREACH(k, &W->h.keybind, next)

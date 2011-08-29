@@ -13,6 +13,7 @@ Client *client_gb_win(Window w);
 void client_map(Client *c);
 void client_unmap(Client *c);
 void client_focus(Client *c);
+void client_get_name(Client *c);
 void client_close(Client *c);
 Client *client_new(Window w, XWindowAttributes *wa);
 void client_remove(Client *c);
