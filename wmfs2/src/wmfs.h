@@ -58,7 +58,7 @@ struct Barwin
      Geo geo;
      Flags flags;
      void *ptr; /* Special cases */
-     SLIST_HEAD(, MouseBind) mousebinds;
+     SLIST_HEAD(, Mousebind) mousebinds;
      SLIST_ENTRY(Barwin) next;
 };
 
@@ -161,6 +161,7 @@ struct Wmfs
      Flags numlockmask;
      GC gc;
      Atom *net_atom;
+     char **argv;
      bool running;
 
      struct
@@ -190,6 +191,7 @@ int wmfs_error_handler(Display *d, XErrorEvent *event);
 int wmfs_error_handler_dummy(Display *d, XErrorEvent *event);
 void wmfs_grab_keys(void);
 void wmfs_quit(void);
+void uicb_reload(Uicb cmd);
 void uicb_quit(Uicb cmd);
 
 

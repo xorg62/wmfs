@@ -245,12 +245,29 @@ wmfs_quit(void)
      XCloseDisplay(W->dpy);
 
      free(W->net_atom);
+     free(W->argv);
      free(W);
 
      /* Conf stuffs */
      FREE_LIST(Keybind, W->h.keybind);
 
      W->running = false;
+}
+
+/** Reload WMFS binary
+*/
+void
+uicb_reload(Uicb cmd)
+{
+     (void)cmd;
+     char *command = xstrdup(W->argv[0]);
+     char **argv = W->argv;
+
+     wmfs_quit();
+
+     for(; command[0] && command[0] == ' '; ++command[0]);
+
+     execvp(command, argv);
 }
 
 void
@@ -264,6 +281,8 @@ int
 main(int argc, char **argv)
 {
      W = (struct Wmfs*)xcalloc(1, sizeof(struct Wmfs));
+
+     W->argv = argv;
 
      /* Get X display */
      if(!(W->dpy = XOpenDisplay(NULL)))

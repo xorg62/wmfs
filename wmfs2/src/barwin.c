@@ -45,6 +45,8 @@ barwin_new(Window parent, int x, int y, int w, int h, Color fg, Color bg, bool e
      b->bg = bg;
      b->fg = fg;
 
+     SLIST_INIT(&b->mousebinds);
+
      /* Attach */
      SLIST_INSERT_HEAD(&W->h.barwin, b, next);
 
@@ -62,6 +64,9 @@ barwin_remove(Barwin *b)
      XSelectInput(W->dpy, b->win, NoEventMask);
      XDestroyWindow(W->dpy, b->win);
      XFreePixmap(W->dpy, b->dr);
+
+     /* Free mousebinds */
+     FREE_LIST(b->mousebinds, Mousebind);
 
      free(b);
 }
@@ -85,6 +90,21 @@ barwin_resize(Barwin *b, int w, int h)
      XResizeWindow(W->dpy, b->win, w, h);
 }
 
+void
+barwin_mousebind_new(Barwin *b, unsigned int button, bool u, Geo a, void (*func)(Uicb), Uicb cmd)
+{
+     Mousebind *m;
+
+     m = xcalloc(1, sizeof(Mousebind));
+
+     m->button = button;
+     m->use_area = u;
+     m->area = a;
+     m->func = func;
+     m->cmd = cmd;
+
+     SLIST_INSERT_HEAD(&b->mousebinds, m, next):
+}
 
 /** Refresh the Barwin Color
  * \param bw Barwin pointer

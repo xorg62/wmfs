@@ -17,8 +17,9 @@
 static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
 {
      /* Sys */
-     { "spawn", uicb_spawn },
-     { "quit",  uicb_quit },
+     { "spawn",  uicb_spawn },
+     { "quit",   uicb_quit },
+     { "reload", uicb_reload },
 
      /* Tag */
      { "tag_set",  uicb_tag_set },

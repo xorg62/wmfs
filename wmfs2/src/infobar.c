@@ -110,6 +110,8 @@ infobar_elem_init(Infobar *i)
      Element *e;
      int n, j;
 
+     TAILQ_INIT(&i->elements);
+
      for(n = 0; n < strlen(i->elemorder); ++n)
      {
           for(j = 0; j < LEN(elem_funcs); ++j)
@@ -170,7 +172,6 @@ infobar_init(void)
 
           i->screen = s;
           i->elemorder = xstrdup(ELEM_DEFAULT_ORDER);
-          TAILQ_INIT(&i->elements);
 
           /* Positions TODO: geo = infobar_position(Position {Top,Bottom,Hidden}) */
           i->geo = s->geo;
@@ -184,7 +185,9 @@ infobar_init(void)
           barwin_map_subwin(i->bar);
           barwin_refresh_color(i->bar);
 
+          /* Elements */
           infobar_elem_init(i);
+
           infobar_refresh(i);
 
           SLIST_INSERT_HEAD(&s->infobars, i, next);
@@ -194,10 +197,6 @@ infobar_init(void)
 void
 infobar_refresh(Infobar *i)
 {
-     draw_text(i->bar->dr, 0, TEXTY(INFOBAR_DEF_W), 0x005500, "|");
-
-     i->elemupdate |= FLAGINT(ElemTag);
-
      infobar_elem_update(i);
 
      barwin_refresh(i->bar);
