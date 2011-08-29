@@ -12,11 +12,18 @@
 
 #include "wmfs.h"
 #include "util.h"
+#include "tag.h"
 
 static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
 {
+     /* Sys */
      { "spawn", uicb_spawn },
      { "quit",  uicb_quit },
+
+     /* Tag */
+     { "tag_set",  uicb_tag_set },
+     { "tag_next", uicb_tag_next },
+     { "tag_prev", uicb_tag_prev },
      { NULL, NULL }
 };
 

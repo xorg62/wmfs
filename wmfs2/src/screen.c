@@ -11,6 +11,7 @@
 
 #include "screen.h"
 #include "util.h"
+#include "tag.h"
 
 static Scr33n*
 screen_new(Geo *g, int id)
@@ -21,7 +22,7 @@ screen_new(Geo *g, int id)
      s->seltag = NULL;
      s->id = id;
 
-     SLIST_INIT(&s->tags);
+     TAILQ_INIT(&s->tags);
      SLIST_INIT(&s->infobars);
 
      SLIST_INSERT_HEAD(&W->h.screen, s, next);
@@ -57,6 +58,12 @@ screen_init(void)
 
                s = screen_new(&g, i);
                tag_screen(s, tag_new(s, "tag")); /* tmp */
+
+               {
+                    tag_new(s, "tag2");
+                    tag_new(s, "tag3");
+               }
+
                s = NULL;
           }
 
@@ -85,7 +92,7 @@ screen_free(void)
           s = SLIST_FIRST(&W->h.screen);
           SLIST_REMOVE_HEAD(&W->h.screen, next);
           infobar_free(s);
-          /*tag_free(s);*/
+          tag_free(s);
           free(s);
      }
 }

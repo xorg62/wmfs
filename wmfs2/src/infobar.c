@@ -9,9 +9,154 @@
 #include "barwin.h"
 #include "util.h"
 
-
 #define ELEM_DEFAULT_ORDER "tlsS"
 #define INFOBAR_DEF_W (12)
+
+#define ELEMX(e, head) TAILQ_PREV(e, head, next)->geo.
+
+static void infobar_elem_tag_init(Element *e);
+static void infobar_elem_tag_update(Element *e);
+
+const struct elem_funcs
+{
+     char c;
+     void (*func_init)(Element *e);
+     void (*func_update)(Element *e);
+} elem_funcs[] =
+{
+     { 't', infobar_elem_tag_init, infobar_elem_tag_update },
+
+     /* { 'l',  infobar_elem_layout_init, infobar_elem_layout_update },
+        { 's',  infobar_elem_selbar_init, infobar_elem_selbar_update },
+        { 'S',  infobar_elem_status_init, infobar_elem_status_update },*/
+
+     { '\0', NULL, NULL }
+};
+
+static inline void
+infobar_elem_placement(Element *e)
+{
+     Element *p = TAILQ_PREV(e, esub, next);
+
+     e->geo.y = 0;
+     e->geo.w = 0;
+     e->geo.h = e->infobar->geo.h;
+     e->geo.x = (p ? p->geo.x + p->geo.w + PAD : 0);
+}
+
+static void
+infobar_elem_tag_init(Element *e)
+{
+     Tag *t;
+     Barwin *b, *prev;
+     int tmp, j;
+
+     infobar_elem_placement(e);
+
+     j = e->geo.x;
+
+     TAILQ_FOREACH(t, &e->infobar->screen->tags, next)
+     {
+          tmp = draw_textw(t->name) + PAD;
+
+          b = barwin_new(e->infobar->bar->win, j, 0, tmp, e->geo.h, 0x009900, 0x777777, false);
+          b->ptr = (void*)t;
+          barwin_map(b);
+
+          if(SLIST_EMPTY(&e->bars))
+               SLIST_INSERT_HEAD(&e->bars, b, next);
+          else
+               SLIST_INSERT_AFTER(prev, b, next);
+
+          prev = b;
+          b = NULL;
+          j += tmp;
+     }
+}
+
+static void
+infobar_elem_tag_update(Element *e)
+{
+     Tag *t, *sel = e->infobar->screen->seltag;
+     Barwin *b;
+
+     SLIST_FOREACH(b, &e->bars, next)
+     {
+          t = (Tag*)b->ptr;
+
+          /* Selected */
+          if(t == sel)
+          {
+               b->fg = 0x000000;
+               b->bg = 0x3D5700;
+          }
+          else
+          {
+               b->fg = 0x3D5700;
+               b->bg = 0x000000;
+          }
+
+          barwin_refresh_color(b);
+
+          draw_text(b->dr, (PAD >> 1), TEXTY(e->geo.h), b->fg, t->name);
+
+          barwin_refresh(b);
+     }
+}
+
+void
+infobar_elem_init(Infobar *i)
+{
+     Element *e;
+     int n, j;
+
+     for(n = 0; n < strlen(i->elemorder); ++n)
+     {
+          for(j = 0; j < LEN(elem_funcs); ++j)
+               if(elem_funcs[j].c == i->elemorder[n])
+               {
+                    e = xcalloc(1, sizeof(Element));
+
+                    SLIST_INIT(&e->bars);
+
+                    e->infobar = i;
+                    e->type = j;
+                    e->func_init = elem_funcs[j].func_init;
+                    e->func_update = elem_funcs[j].func_update;
+
+                    TAILQ_INSERT_TAIL(&i->elements, e, next);
+
+                    e->func_init(e);
+
+                    break;
+               }
+     }
+}
+
+void
+infobar_elem_update(Infobar *i)
+{
+     Element *e;
+
+     TAILQ_FOREACH(e, &i->elements, next)
+          if(i->elemupdate & FLAGINT(e->type))
+               e->func_update(e);
+}
+
+void
+infobar_elem_remove(Element *e)
+{
+     Barwin *b;
+
+     TAILQ_REMOVE(&e->infobar->elements, e, next);
+
+     while(!SLIST_EMPTY(&e->bars))
+     {
+          b = SLIST_FIRST(&e->bars);
+          SLIST_REMOVE_HEAD(&e->bars, next);
+          barwin_remove(b);
+     }
+}
 
 void
 infobar_init(void)
@@ -25,7 +170,7 @@ infobar_init(void)
 
           i->screen = s;
           i->elemorder = xstrdup(ELEM_DEFAULT_ORDER);
-          STAILQ_INIT(&i->elements);
+          TAILQ_INIT(&i->elements);
 
           /* Positions TODO: geo = infobar_position(Position {Top,Bottom,Hidden}) */
           i->geo = s->geo;
@@ -39,18 +184,21 @@ infobar_init(void)
           barwin_map_subwin(i->bar);
           barwin_refresh_color(i->bar);
 
-          /* TODO: infobar_elem_init(i) */
+          infobar_elem_init(i);
           infobar_refresh(i);
 
           SLIST_INSERT_HEAD(&s->infobars, i, next);
-          i = NULL;
      }
 }
 
 void
 infobar_refresh(Infobar *i)
 {
-     draw_text(i->bar->dr, 1, TEXTY(INFOBAR_DEF_W), 0x005500, "WMFS2");
+     draw_text(i->bar->dr, 0, TEXTY(INFOBAR_DEF_W), 0x005500, "|");
+
+     i->elemupdate |= FLAGINT(ElemTag);
+
+     infobar_elem_update(i);
 
      barwin_refresh(i->bar);
 }
@@ -58,9 +206,13 @@ infobar_refresh(Infobar *i)
 void
 infobar_remove(Infobar *i)
 {
+     Element *e;
+
      free(i->elemorder);
 
-     /* TODO: infobar_elem_free */
+     TAILQ_FOREACH(e, &i->elements, next)
+          infobar_elem_remove(e);
+
      barwin_remove(i->bar);
 
      SLIST_REMOVE(&i->screen->infobars, i, Infobar, next);

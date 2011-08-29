@@ -57,6 +57,7 @@ struct Barwin
      Color fg, bg;
      Geo geo;
      Flags flags;
+     void *ptr; /* Special cases */
      SLIST_HEAD(, MouseBind) mousebinds;
      SLIST_ENTRY(Barwin) next;
 };
@@ -64,12 +65,13 @@ struct Barwin
 /* Infobar's element */
 struct Element
 {
-     SLIST_ENTRY(Barwin) bars;
+     SLIST_HEAD(, Barwin) bars;
      Geo geo;
+     Infobar *infobar;
      int type;
-     void (*func_init)(Infobar *i);
+     void (*func_init)(Element *e);
      void (*func_update)(Element *e);
-     STAILQ_ENTRY(Element) next;
+     TAILQ_ENTRY(Element) next;
 };
 
 /* Infobar */
@@ -79,7 +81,8 @@ struct Infobar
      Geo geo;
      Scr33n *screen;
      char *elemorder;
-     STAILQ_HEAD(, Element) elements;
+     Flags elemupdate;
+     TAILQ_HEAD(esub, Element) elements;
      SLIST_ENTRY(Infobar) next;
 };
 
@@ -89,7 +92,7 @@ struct Scr33n
      Geo geo;
      Tag *seltag;
      int id;
-     SLIST_HEAD(, Tag) tags;
+     TAILQ_HEAD(tsub, Tag) tags;
      SLIST_HEAD(, Infobar) infobars;
      SLIST_ENTRY(Scr33n) next;
 };
@@ -101,7 +104,7 @@ struct Tag
      Scr33n *screen;
      Flags flags;
      Client *sel;
-     SLIST_ENTRY(Tag) next;
+     TAILQ_ENTRY(Tag) next;
 };
 
 /* Client */

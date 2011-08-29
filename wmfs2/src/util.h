@@ -6,6 +6,8 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <string.h>
+
 #include "wmfs.h"
 
 /* Todo FREE_LIST(type, head, function_remove) */
@@ -19,7 +21,10 @@
           }                                     \
      } while(/* CONSTCOND */ 0);
 
-#define ATOM(a)  XInternAtom(W->dpy, (a), False)
+#define ATOM(a)      XInternAtom(W->dpy, (a), False)
+#define LEN(x)       (sizeof(x) / sizeof(*x))
+#define FLAGINT(i)   (1 << i)
+#define ATOI(s)      strtol(s, NULL, 10)
 
 void *xmalloc(size_t nmemb, size_t size);
 void *xcalloc(size_t nmemb, size_t size);
