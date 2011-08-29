@@ -12,6 +12,7 @@ Tag *tag_new(Scr33n *s, char *name);
 void tag_screen(Scr33n *s, Tag *t);
 void tag_free(Scr33n *s);
 void uicb_tag_set(Uicb cmd);
+void uicb_tag_set_with_name(Uicb cmd);
 void uicb_tag_next(Uicb cmd);
 void uicb_tag_prev(Uicb cmd);
 

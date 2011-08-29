@@ -59,7 +59,8 @@ struct Barwin
      Flags flags;
      void *ptr; /* Special cases */
      SLIST_HEAD(, Mousebind) mousebinds;
-     SLIST_ENTRY(Barwin) next;
+     SLIST_ENTRY(Barwin) next;  /* global barwin */
+     SLIST_ENTRY(Barwin) enext; /* element barwin */
 };
 
 /* Infobar's element */
@@ -136,7 +137,7 @@ struct Mousebind
      bool use_area;
      void (*func)(Uicb);
      Uicb cmd;
-     SLIST_ENTRY(Keybind) next;
+     SLIST_ENTRY(Mousebind) next;
 };
 
 struct Config
@@ -161,7 +162,6 @@ struct Wmfs
      Flags numlockmask;
      GC gc;
      Atom *net_atom;
-     char **argv;
      bool running;
 
      struct

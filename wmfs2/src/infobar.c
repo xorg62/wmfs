@@ -8,11 +8,10 @@
 #include "infobar.h"
 #include "barwin.h"
 #include "util.h"
+#include "tag.h"
 
 #define ELEM_DEFAULT_ORDER "tlsS"
 #define INFOBAR_DEF_W (12)
-
-#define ELEMX(e, head) TAILQ_PREV(e, head, next)->geo.
 
 static void infobar_elem_tag_init(Element *e);
 static void infobar_elem_tag_update(Element *e);
@@ -49,7 +48,8 @@ infobar_elem_tag_init(Element *e)
 {
      Tag *t;
      Barwin *b, *prev;
-     int tmp, j;
+     Geo g = { 0, 0, 0, 0 };
+     int s, j;
 
      infobar_elem_placement(e);
 
@@ -57,20 +57,26 @@ infobar_elem_tag_init(Element *e)
 
      TAILQ_FOREACH(t, &e->infobar->screen->tags, next)
      {
-          tmp = draw_textw(t->name) + PAD;
+          s = draw_textw(t->name) + PAD;
 
-          b = barwin_new(e->infobar->bar->win, j, 0, tmp, e->geo.h, 0x009900, 0x777777, false);
+          /* Init barwin */
+          b = barwin_new(e->infobar->bar->win, s, 0, tmp, e->geo.h, 0x009900, 0x777777, false);
           b->ptr = (void*)t;
           barwin_map(b);
 
+          /* TODO: refer to tag element configuration */
+          barwin_mousebind_new(b, Button1, false, g, uicb_tag_set_with_name, (Uicb)t->name);
+          barwin_mousebind_new(b, Button4, false, g, uicb_tag_next, NULL);
+          barwin_mousebind_new(b, Button5, false, g, uicb_tag_prev, NULL);
+
+          /* insert_tail with SLIST */
           if(SLIST_EMPTY(&e->bars))
-               SLIST_INSERT_HEAD(&e->bars, b, next);
+               SLIST_INSERT_HEAD(&e->bars, b, enext);
           else
-               SLIST_INSERT_AFTER(prev, b, next);
+               SLIST_INSERT_AFTER(prev, b, enext);
 
           prev = b;
-          b = NULL;
-          j += tmp;
+          j += s;
      }
 }
 
@@ -80,11 +86,12 @@ infobar_elem_tag_update(Element *e)
      Tag *t, *sel = e->infobar->screen->seltag;
      Barwin *b;
 
-     SLIST_FOREACH(b, &e->bars, next)
+     SLIST_FOREACH(b, &e->bars, enext)
      {
           t = (Tag*)b->ptr;
 
           /* Selected */
+          /* TODO: color from conf */
           if(t == sel)
           {
                b->fg = 0x000000;
@@ -104,7 +111,7 @@ infobar_elem_tag_update(Element *e)
      }
 }
 
-void
+static void
 infobar_elem_init(Infobar *i)
 {
      Element *e;
@@ -155,7 +162,7 @@ infobar_elem_remove(Element *e)
      while(!SLIST_EMPTY(&e->bars))
      {
           b = SLIST_FIRST(&e->bars);
-          SLIST_REMOVE_HEAD(&e->bars, next);
+          SLIST_REMOVE_HEAD(&e->bars, enext);
           barwin_remove(b);
      }
 }
@@ -197,6 +204,7 @@ infobar_init(void)
 void
 infobar_refresh(Infobar *i)
 {
+     i->elemupdate |= FLAGINT(ElemTag);
      infobar_elem_update(i);
 
      barwin_refresh(i->bar);

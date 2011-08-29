@@ -120,6 +120,11 @@ wmfs_xinit(void)
                     W->numlockmask = (1 << i);
      XFreeModifiermap(mm);
 
+     /*
+      * Barwin linked list
+      */
+     SLIST_INIT(&W->h.barwin);
+
      W->running = true;
 }
 
@@ -245,7 +250,6 @@ wmfs_quit(void)
      XCloseDisplay(W->dpy);
 
      free(W->net_atom);
-     free(W->argv);
      free(W);
 
      /* Conf stuffs */
@@ -260,14 +264,7 @@ void
 uicb_reload(Uicb cmd)
 {
      (void)cmd;
-     char *command = xstrdup(W->argv[0]);
-     char **argv = W->argv;
 
-     wmfs_quit();
-
-     for(; command[0] && command[0] == ' '; ++command[0]);
-
-     execvp(command, argv);
 }
 
 void
@@ -282,7 +279,6 @@ main(int argc, char **argv)
 {
      W = (struct Wmfs*)xcalloc(1, sizeof(struct Wmfs));
 
-     W->argv = argv;
 
      /* Get X display */
      if(!(W->dpy = XOpenDisplay(NULL)))

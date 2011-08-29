@@ -26,7 +26,7 @@
 Barwin* barwin_new(Window parent, int x, int y, int w, int h, Color fg, Color bg, bool entermask);
 void barwin_remove(Barwin *b);
 void barwin_resize(Barwin *b, int w, int h);
-void barwin_mousebind_new(Barwin *b, unsigned int button, bool u, Geo a, void (*func)(Uicb), Uicb cmd)
+void barwin_mousebind_new(Barwin *b, unsigned int button, bool u, Geo a, void (*func)(Uicb), Uicb cmd);
 void barwin_refresh_color(Barwin *b);
 
 #endif /* BARWIN_H */

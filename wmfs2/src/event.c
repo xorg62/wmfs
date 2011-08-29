@@ -15,8 +15,21 @@
 static void
 event_buttonpress(XEvent *e)
 {
-     /*XButtonEvent *ev = &e->xbutton;*/
+     XButtonEvent *ev = &e->xbutton;
+     Mousebind *m;
+     Barwin *b;
 
+     SLIST_FOREACH(b, &W->h.barwin, next)
+          if(b->win == ev->window)
+          {
+               SLIST_FOREACH(m, &b->mousebinds, next)
+                    if(m->button == ev->button)
+                         if(!m->use_area || (m->use_area && INAREA(ev->x, ev->y, m->area)))
+                              if(m->func)
+                                   m->func(m->cmd);
+
+               break;
+          }
 }
 
 static void

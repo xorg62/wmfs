@@ -6,8 +6,6 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include <string.h>
-
 #include "wmfs.h"
 
 /* Todo FREE_LIST(type, head, function_remove) */
@@ -25,6 +23,7 @@
 #define LEN(x)       (sizeof(x) / sizeof(*x))
 #define FLAGINT(i)   (1 << i)
 #define ATOI(s)      strtol(s, NULL, 10)
+#define INAREA(i, j, a)    ((i) >= (a).x && (i) <= (a).x + (a).w && (j) >= (a).y && (j) <= (a).y + (a).h)
 
 void *xmalloc(size_t nmemb, size_t size);
 void *xcalloc(size_t nmemb, size_t size);

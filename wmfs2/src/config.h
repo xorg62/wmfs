@@ -23,6 +23,7 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
 
      /* Tag */
      { "tag_set",  uicb_tag_set },
+     { "tag",      uicb_tag_set_with_name },
      { "tag_next", uicb_tag_next },
      { "tag_prev", uicb_tag_prev },
      { NULL, NULL }

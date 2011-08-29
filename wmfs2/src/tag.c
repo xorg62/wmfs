@@ -53,6 +53,19 @@ uicb_tag_set(Uicb cmd)
 }
 
 void
+uicb_tag_set_with_name(Uicb cmd)
+{
+     Tag *t;
+
+     TAILQ_FOREACH(t, &W->screen->tags, next)
+          if(!strcmp(cmd, t->name))
+          {
+               tag_screen(W->screen, t);
+               return;
+          }
+}
+
+void
 uicb_tag_next(Uicb cmd)
 {
      (void)cmd;

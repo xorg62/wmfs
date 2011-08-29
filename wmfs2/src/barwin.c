@@ -66,7 +66,7 @@ barwin_remove(Barwin *b)
      XFreePixmap(W->dpy, b->dr);
 
      /* Free mousebinds */
-     FREE_LIST(b->mousebinds, Mousebind);
+     FREE_LIST(Mousebind, b->mousebinds);
 
      free(b);
 }
@@ -101,9 +101,10 @@ barwin_mousebind_new(Barwin *b, unsigned int button, bool u, Geo a, void (*func)
      m->use_area = u;
      m->area = a;
      m->func = func;
-     m->cmd = cmd;
 
-     SLIST_INSERT_HEAD(&b->mousebinds, m, next):
+     m->cmd = (cmd ? xstrdup(cmd) : NULL);
+
+     SLIST_INSERT_HEAD(&b->mousebinds, m, next);
 }
 
 /** Refresh the Barwin Color
