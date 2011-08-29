@@ -10,7 +10,7 @@
 #include "util.h"
 #include "tag.h"
 
-#define ELEM_DEFAULT_ORDER "tlsS"
+#define ELEM_DEFAULT_ORDER "ttlsS"
 #define INFOBAR_DEF_W (12)
 
 static void infobar_elem_tag_init(Element *e);
@@ -78,6 +78,8 @@ infobar_elem_tag_init(Element *e)
           prev = b;
           j += s;
      }
+
+     e->geo.w = j;
 }
 
 static void
