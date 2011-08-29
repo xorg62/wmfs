@@ -60,7 +60,7 @@ infobar_elem_tag_init(Element *e)
           s = draw_textw(t->name) + PAD;
 
           /* Init barwin */
-          b = barwin_new(e->infobar->bar->win, s, 0, tmp, e->geo.h, 0x009900, 0x777777, false);
+          b = barwin_new(e->infobar->bar->win, j, 0, s, e->geo.h, 0x009900, 0x777777, false);
           b->ptr = (void*)t;
           barwin_map(b);
 
