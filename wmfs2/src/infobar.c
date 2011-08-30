@@ -42,20 +42,20 @@ infobar_elem_tag_init(Element *e)
      infobar_elem_placement(e);
 
      j = e->geo.x;
-     e->geo.h -= (ELEM_TAG_BORDER << 1);
+     e->geo.h -= (W->conf.theme.tags_border_width << 1);
 
      TAILQ_FOREACH(t, &e->infobar->screen->tags, next)
      {
           s = draw_textw(t->name) + PAD;
 
           /* Init barwin */
-          b = barwin_new(e->infobar->bar->win, j, 0, s, e->geo.h, 0x009900, 0x777777, false);
+          b = barwin_new(e->infobar->bar->win, j, 0, s, e->geo.h, 0, 0, false);
 
           /* Set border */
-          if(ELEM_TAG_BORDER)
+          if(W->conf.theme.tags_border_width)
           {
-               XSetWindowBorder(W->dpy, b->win, 0x1B3500);
-               XSetWindowBorderWidth(W->dpy, b->win, ELEM_TAG_BORDER);
+               XSetWindowBorder(W->dpy, b->win, W->conf.theme.tags_border_col);
+               XSetWindowBorderWidth(W->dpy, b->win, W->conf.theme.tags_border_width);
           }
 
           b->ptr = (void*)t;
@@ -93,13 +93,13 @@ infobar_elem_tag_update(Element *e)
           /* TODO: color from conf */
           if(t == sel)
           {
-               b->fg = 0x000000;
-               b->bg = 0x3D5700;
+               b->fg = W->conf.theme.tags_s.fg;
+               b->bg = W->conf.theme.tags_s.bg;
           }
           else
           {
-               b->fg = 0x3D5700;
-               b->bg = 0x000000;
+               b->fg = W->conf.theme.tags_n.fg;
+               b->bg = W->conf.theme.tags_n.bg;
           }
 
           barwin_refresh_color(b);
@@ -184,7 +184,8 @@ infobar_new(Scr33n *s, const char *elem)
      infobar_placement(i);
 
      /* Barwin create */
-     i->bar = barwin_new(W->root, i->geo.x, i->geo.y, i->geo.w, i->geo.h, 0x222222, 0xCCCCCC, false);
+     i->bar = barwin_new(W->root, i->geo.x, i->geo.y, i->geo.w, i->geo.h,
+               W->conf.theme.bars.fg, W->conf.theme.bars.bg, false);
 
      /* Render */
      barwin_map(i->bar);

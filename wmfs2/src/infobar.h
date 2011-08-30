@@ -11,7 +11,6 @@
 #include "draw.h"
 
 #define INFOBAR_DEF_W (14)
-#define ELEM_TAG_BORDER (1)
 
 enum { ElemTag = 0, ElemLayout, ElemSelbar, ElemStatus, ElemCustom, ElemLast };
 
@@ -38,7 +37,7 @@ infobar_placement(Infobar *i)
      Infobar *h = SLIST_FIRST(&i->screen->infobars);
 
      i->geo = i->screen->geo;
-     i->geo.h = INFOBAR_DEF_W;
+     i->geo.h =  W->conf.theme.bars_width;
      i->geo.y += (h ? h->geo.y + h->geo.h : i->screen->geo.y);
 }
 

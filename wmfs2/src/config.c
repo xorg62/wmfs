@@ -9,8 +9,34 @@
 #include "tag.h"
 #include "screen.h"
 #include "infobar.h"
+#include "util.h"
 
 #define CONFIG_DEFAULT_PATH ".config/wmfs/wmfsrc2" /* tmp */
+
+static void
+config_theme(void)
+{
+     size_t i, n;
+     struct conf_sec *sec;
+
+     /* [theme] */
+     sec = fetch_section_first(NULL, "theme");
+
+     /* bars */
+     W->conf.theme.bars.fg = color_atoh(fetch_opt_first(sec, "#CCCCCC", "bars_fg").str);
+     W->conf.theme.bars.bg = color_atoh(fetch_opt_first(sec, "#222222", "bars_bg").str);
+     W->conf.theme.bars_width = fetch_opt_first(sec, "12", "bars_width").num;
+
+     /*
+      * Elements
+      */
+     W->conf.theme.tags_n.fg = color_atoh(fetch_opt_first(sec, "#CCCCCC", "tags_normal_fg").str);
+     W->conf.theme.tags_n.bg = color_atoh(fetch_opt_first(sec, "#222222", "tags_normal_bg").str);
+     W->conf.theme.tags_s.fg = color_atoh(fetch_opt_first(sec, "#222222", "tags_sel_fg").str);
+     W->conf.theme.tags_s.bg = color_atoh(fetch_opt_first(sec, "#CCCCCC", "tags_sel_bg").str);
+     W->conf.theme.tags_border_col = color_atoh(fetch_opt_first(sec, "#888888", "tags_border_color").str);
+     W->conf.theme.tags_border_width = fetch_opt_first(sec, "0", "tags_border_width").num;
+}
 
 static void
 config_bars(void)
@@ -131,6 +157,7 @@ config_init(void)
      if(get_conf(path) == -1)
           errx(1, "parsing configuration file (%s) failed.", path);
 
+     config_theme();
      config_keybind();
      config_tag();
      config_bars();

@@ -140,6 +140,11 @@ struct Mousebind
      SLIST_ENTRY(Mousebind) next;
 };
 
+struct Colpair
+{
+     Color fg, bg;
+};
+
 struct Config
 {
      /* Misc section */
@@ -150,6 +155,20 @@ struct Config
           bool focus_follow_movement;
           bool focus_pointer_click;
      } misc;
+
+     /* Theme section */
+     struct
+     {
+          struct Colpair bars;
+          int bars_width;
+
+          /* Elements */
+          struct Colpair tags_n; /* normal */
+          struct Colpair tags_s; /* selected */
+          int tags_border_width;
+          Color tags_border_col;
+
+     } theme;
 };
 
 /* Global struct */
@@ -178,6 +197,9 @@ struct Wmfs
           SLIST_HEAD(, Keybind) keybind;
           SLIST_HEAD(, Barwin) barwin;
      } h;
+
+     /* Config options */
+     struct Config conf;
 
      /*
       * Selected screen, from what you go everywhere; selected tag,

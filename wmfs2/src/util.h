@@ -25,6 +25,17 @@
 #define ATOI(s)      strtol(s, NULL, 10)
 #define INAREA(i, j, a)    ((i) >= (a).x && (i) <= (a).x + (a).w && (j) >= (a).y && (j) <= (a).y + (a).h)
 
+/*
+ * "#RRGGBB" -> 0xRRGGBB
+ */
+static inline Color
+color_atoh(const char *col)
+{
+     int shift = (col[0] == '#');
+
+     return (Color)strtol(col + shift, NULL, 16);
+}
+
 void *xmalloc(size_t nmemb, size_t size);
 void *xcalloc(size_t nmemb, size_t size);
 int xasprintf(char **strp, const char *fmt, ...);
