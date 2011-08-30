@@ -2,6 +2,23 @@
 # WMFS2 configuration file
 #
 
+[theme]
+
+  # Bars
+  bars_width = 14
+  bars_fg = "#CCCCCC"
+  bars_bg = "#222222"
+
+  # Element tags
+  tags_normal_fg = "#CCCCCC"
+  tags_normal_bg = "#222222"
+  tags_sel_fg    = "#222222"
+  tags_sel_bg    = "#CCCCCC"
+  tags_border_color = "#888888"
+  tags_border_width = 1
+
+[/theme]
+
 [bars]
 
   # element type:
