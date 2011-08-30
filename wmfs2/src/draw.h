@@ -13,7 +13,7 @@
 #include "wmfs.h"
 
 #define TEXTY(w) ((W->font.height - W->font.de) + ((w - W->font.height) >> 1))
-#define PAD (4)
+#define PAD (8)
 
 static inline void
 draw_text(Drawable d, int x, int y, Color fg, const char *str)

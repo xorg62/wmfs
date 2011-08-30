@@ -6,8 +6,83 @@
 #include "config.h"
 #include "wmfs.h"
 #include "parse.h"
+#include "tag.h"
+#include "screen.h"
+#include "infobar.h"
 
 #define CONFIG_DEFAULT_PATH ".config/wmfs/wmfsrc2" /* tmp */
+
+static void
+config_bars(void)
+{
+     Scr33n *s;
+     size_t i, n, j, m;
+     struct conf_sec *sec, **ks, **es;
+     int screenid;
+
+     /* [bars] */
+     sec = fetch_section_first(NULL, "bars");
+     ks = fetch_section(sec, "bar");
+     n = fetch_section_count(ks);
+
+     /* [bar] */
+     for(i = 0; i < n; ++i)
+     {
+          char elem[128] = { 0 };
+
+          /* [element] */
+          es = fetch_section(ks[i], "element");
+          m = fetch_section_count(es);
+          for(j = 0; j < m; ++j)
+               elem[j] = fetch_opt_first(es[j], "t", "type").str[0];
+
+          screenid = fetch_opt_first(ks[i], "-1", "screen").num;
+
+          SLIST_FOREACH(s, &W->h.screen, next)
+               if(screenid == s->id || screenid == -1)
+                    (Infobar*)infobar_new(s, elem);
+
+          free(es);
+     }
+
+     free(ks);
+}
+
+
+static void
+config_tag(void)
+{
+     Scr33n *s;
+     Tag *t;
+     size_t i, n;
+     struct conf_sec *sec, **ks;
+     char *name;
+     int screenid;
+
+     /* [tags] */
+     sec = fetch_section_first(NULL, "tags");
+     ks = fetch_section(sec, "tag");
+     n = fetch_section_count(ks);
+
+     /* [tag] */
+     for(i = 0; i < n; ++i)
+     {
+          name = fetch_opt_first(ks[i], "tag", "name").str;
+          screenid = fetch_opt_first(ks[i], "-1", "screen").num;
+
+          SLIST_FOREACH(s, &W->h.screen, next)
+               if(screenid == s->id || screenid == -1)
+               {
+                    t = tag_new(s, name);
+
+                    /* Set first tag as seltag */
+                    if(t == TAILQ_FIRST(&s->tags))
+                         s->seltag = t;
+               }
+     }
+
+     free(ks);
+}
 
 static void
 config_keybind(void)
@@ -18,17 +93,19 @@ config_keybind(void)
      struct opt_type *opt;
      Keybind *k;
 
+     /* [keys] */
      sec = fetch_section_first(NULL, "keys");
      ks = fetch_section(sec, "key");
      n = fetch_section_count(ks);
 
      SLIST_INIT(&W->h.keybind);
 
+     /* [key] */
      for(i = 0; i < n; ++i)
      {
           opt = fetch_opt(ks[i], "", "mod");
 
-          k = xcalloc(1, sizeof(Keybind));
+          k = (Keybind*)xcalloc(1, sizeof(Keybind));
 
           for(j = 0; j < fetch_opt_count(opt); ++j)
                k->mod |= modkey_keysym(opt[j].str);
@@ -39,15 +116,14 @@ config_keybind(void)
 
           if(!(k->func = uicb_name_func(fetch_opt_first(ks[i], "", "func").str)))
           {
-               warnx("configuration : Unknown Function \"%s\".", fetch_opt_first(ks[i], "", "func").str);
+               warnx("configuration: Unknown Function \"%s\".",
+                         fetch_opt_first(ks[i], "", "func").str);
                k->func = uicb_spawn;
           }
 
           k->cmd = fetch_opt_first(ks[i], "", "cmd").str;
 
           SLIST_INSERT_HEAD(&W->h.keybind, k, next);
-
-          k = NULL;
      }
 
      free(ks);
@@ -64,6 +140,8 @@ config_init(void)
           errx(1, "parsing configuration file (%s) failed.", path);
 
      config_keybind();
+     config_tag();
+     config_bars();
 
      free(path);
 }

@@ -10,8 +10,8 @@
 #include "util.h"
 #include "tag.h"
 
-#define ELEM_DEFAULT_ORDER "ttlsS"
-#define INFOBAR_DEF_W (12)
+#define INFOBAR_DEF_W (14)
+#define ELEM_TAG_BORDER (1)
 
 static void infobar_elem_tag_init(Element *e);
 static void infobar_elem_tag_update(Element *e);
@@ -32,13 +32,13 @@ const struct elem_funcs
      { '\0', NULL, NULL }
 };
 
+/* Basic placement of elements */
 static inline void
 infobar_elem_placement(Element *e)
 {
      Element *p = TAILQ_PREV(e, esub, next);
 
-     e->geo.y = 0;
-     e->geo.w = 0;
+     e->geo.y = e->geo.w = 0;
      e->geo.h = e->infobar->geo.h;
      e->geo.x = (p ? p->geo.x + p->geo.w + PAD : 0);
 }
@@ -54,6 +54,7 @@ infobar_elem_tag_init(Element *e)
      infobar_elem_placement(e);
 
      j = e->geo.x;
+     e->geo.h -= (ELEM_TAG_BORDER << 1);
 
      TAILQ_FOREACH(t, &e->infobar->screen->tags, next)
      {
@@ -61,6 +62,14 @@ infobar_elem_tag_init(Element *e)
 
           /* Init barwin */
           b = barwin_new(e->infobar->bar->win, j, 0, s, e->geo.h, 0x009900, 0x777777, false);
+
+          /* Set border */
+          if(ELEM_TAG_BORDER)
+          {
+               XSetWindowBorder(W->dpy, b->win, 0x1B3500);
+               XSetWindowBorderWidth(W->dpy, b->win, ELEM_TAG_BORDER);
+          }
+
           b->ptr = (void*)t;
           barwin_map(b);
 
@@ -111,6 +120,7 @@ infobar_elem_tag_update(Element *e)
 
           barwin_refresh(b);
      }
+
 }
 
 static void
@@ -152,6 +162,8 @@ infobar_elem_update(Infobar *i)
      TAILQ_FOREACH(e, &i->elements, next)
           if(i->elemupdate & FLAGINT(e->type))
                e->func_update(e);
+
+     i->elemupdate = 0;
 }
 
 void
@@ -169,44 +181,54 @@ infobar_elem_remove(Element *e)
      }
 }
 
-void
-infobar_init(void)
+static inline void
+infobar_placement(Infobar *i)
 {
-     Infobar *i;
-     Scr33n *s;
+     Infobar *h = SLIST_FIRST(&i->screen->infobars);
 
-     SLIST_FOREACH(s, &W->h.screen, next)
-     {
-          i = (Infobar*)xcalloc(1, sizeof(Infobar));
+     i->geo = i->screen->geo;
+     i->geo.h = INFOBAR_DEF_W;
+     i->geo.y += (h ? h->geo.y + h->geo.h : i->screen->geo.y);
+}
 
-          i->screen = s;
-          i->elemorder = xstrdup(ELEM_DEFAULT_ORDER);
+Infobar*
+infobar_new(Scr33n *s, const char *elem)
+{
+     int n;
 
-          /* Positions TODO: geo = infobar_position(Position {Top,Bottom,Hidden}) */
-          i->geo = s->geo;
-          i->geo.h = INFOBAR_DEF_W;
+     Infobar *i = (Infobar*)xcalloc(1, sizeof(Infobar));
 
-          /* Barwin create */
-          i->bar = barwin_new(W->root, i->geo.x, i->geo.y, i->geo.w, i->geo.h, 0x222222, 0xCCCCCC, false);
+     i->screen = s;
+     i->elemorder = xstrdup(elem);
 
-          /* Render */
-          barwin_map(i->bar);
-          barwin_map_subwin(i->bar);
-          barwin_refresh_color(i->bar);
+     /* Active all flag for first refresh */
+     /* TODO: Find something else */
+     for(n = 0; n < ElemLast; i->elemupdate |= FLAGINT(n++));
 
-          /* Elements */
-          infobar_elem_init(i);
+     /* TODO: Position top/bottom */
+     infobar_placement(i);
 
-          infobar_refresh(i);
+     /* Barwin create */
+     i->bar = barwin_new(W->root, i->geo.x, i->geo.y, i->geo.w, i->geo.h, 0x222222, 0xCCCCCC, false);
 
-          SLIST_INSERT_HEAD(&s->infobars, i, next);
-     }
+     /* Render */
+     barwin_map(i->bar);
+     barwin_map_subwin(i->bar);
+     barwin_refresh_color(i->bar);
+
+     /* Elements */
+     infobar_elem_init(i);
+
+     infobar_refresh(i);
+
+     SLIST_INSERT_HEAD(&s->infobars, i, next);
+
+     return i;
 }
 
 void
 infobar_refresh(Infobar *i)
 {
-     i->elemupdate |= FLAGINT(ElemTag);
      infobar_elem_update(i);
 
      barwin_refresh(i->bar);

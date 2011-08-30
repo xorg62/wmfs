@@ -17,7 +17,7 @@
 static Scr33n*
 screen_new(Geo *g, int id)
 {
-     Scr33n *s = xcalloc(1, sizeof(Scr33n));
+     Scr33n *s = (Scr33n*)xcalloc(1, sizeof(Scr33n));
 
      s->geo = *g;
      s->seltag = NULL;
@@ -58,14 +58,6 @@ screen_init(void)
                g.h = xsi[i].height;
 
                s = screen_new(&g, i);
-               tag_screen(s, tag_new(s, "tag")); /* tmp */
-
-               {
-                    tag_new(s, "tag2");
-                    tag_new(s, "tag3");
-               }
-
-               s = NULL;
           }
 
           XFree(xsi);
@@ -73,14 +65,36 @@ screen_init(void)
      else
 #endif /* HAVE_XINERAMA */
      {
-
           g.x = g.y = 0;
           g.w = DisplayWidth(W->dpy, W->xscreen);
           g.h = DisplayHeight(W->dpy, W->xscreen);
 
           s = screen_new(&g, 0);
-          tag_screen(s, tag_new(s, "tag"));
      }
+}
+
+/*
+ * Update selected screen with mouse location
+ */
+Scr33n*
+screen_update_sel(void)
+{
+#ifdef HAVE_XINERAMA
+     if(XineramaIsActive(W->dpy))
+     {
+          Scr33n *s;
+          Window w;
+          int d, x, y;
+
+          XQueryPointer(W->dpy, W->root, &w, &w, &x, &y, &d, &d, (unsigned int *)&d);
+
+          SLIST_FOREACH(s, &W->h.screen, next)
+               if(INAREA(x, y, s->geo))
+                    break;
+
+          W->screen = s;
+     }
+#endif /* HAVE_XINERAMA */
 }
 
 void

@@ -217,26 +217,14 @@ wmfs_loop(void)
                HANDLE_EVENT(&ev);
 }
 
-static void
+static inline void
 wmfs_init(void)
 {
-     /* X init */
      wmfs_xinit();
-
-     /* EWMH init */
      ewmh_init();
-
-     config_init();
-
-     /* Event init */
-     event_init();
-
-     /* Screen init */
      screen_init();
-
-     /* Infobar init */
-     infobar_init();
-
+     event_init();
+     config_init();
 }
 
 void

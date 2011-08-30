@@ -19,6 +19,8 @@ event_buttonpress(XEvent *e)
      Mousebind *m;
      Barwin *b;
 
+     screen_update_sel();
+
      SLIST_FOREACH(b, &W->h.barwin, next)
           if(b->win == ev->window)
           {
@@ -200,6 +202,8 @@ event_keypress(XEvent *e)
      XKeyPressedEvent *ev = &e->xkey;
      KeySym keysym = XKeycodeToKeysym(EVDPY(e), (KeyCode)ev->keycode, 0);
      Keybind *k;
+
+     screen_update_sel();
 
      SLIST_FOREACH(k, &W->h.keybind, next)
           if(k->keysym == keysym && KEYPRESS_MASK(k->mod) == KEYPRESS_MASK(ev->state))
