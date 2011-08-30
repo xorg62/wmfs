@@ -16,9 +16,10 @@ static void
 config_bars(void)
 {
      Scr33n *s;
-     size_t i, n, j, m;
-     struct conf_sec *sec, **ks, **es;
+     size_t i, n;
+     struct conf_sec *sec, **ks;
      int screenid;
+     char *elem;
 
      /* [bars] */
      sec = fetch_section_first(NULL, "bars");
@@ -28,21 +29,12 @@ config_bars(void)
      /* [bar] */
      for(i = 0; i < n; ++i)
      {
-          char elem[128] = { 0 };
-
-          /* [element] */
-          es = fetch_section(ks[i], "element");
-          m = fetch_section_count(es);
-          for(j = 0; j < m; ++j)
-               elem[j] = fetch_opt_first(es[j], "t", "type").str[0];
-
+          elem = fetch_opt_first(ks[i], "", "elements").str;
           screenid = fetch_opt_first(ks[i], "-1", "screen").num;
 
           SLIST_FOREACH(s, &W->h.screen, next)
                if(screenid == s->id || screenid == -1)
                     (Infobar*)infobar_new(s, elem);
-
-          free(es);
      }
 
      free(ks);

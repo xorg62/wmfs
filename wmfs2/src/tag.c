@@ -27,8 +27,6 @@ tag_new(Scr33n *s, char *name)
 void
 tag_screen(Scr33n *s, Tag *t)
 {
-     Infobar *i;
-
      s->seltag = t;
 
      infobar_elem_screen_update(s, ElemTag);

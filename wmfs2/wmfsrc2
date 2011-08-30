@@ -5,17 +5,17 @@
 [bars]
 
   # element type:
-  #   t Tag list
-  #   S statustext
+  #   t Tags
+  #   S Statustext
 
   [bar]
      screen = 0
-     [element] type = "t" [/element]
+     elements = "tt"
   [/bar]
 
   [bar]
      screen = 1
-     [element] type = "t" [/element]
+     elements = "t"
   [/bar]
 
 [/bars]
