@@ -3,15 +3,14 @@
  *  For license, see COPYING.
  */
 
+#include <math.h>
+
 #include "wmfs.h"
 #include "draw.h"
 #include "infobar.h"
 #include "barwin.h"
 #include "util.h"
 #include "tag.h"
-
-#define INFOBAR_DEF_W (14)
-#define ELEM_TAG_BORDER (1)
 
 static void infobar_elem_tag_init(Element *e);
 static void infobar_elem_tag_update(Element *e);
@@ -31,17 +30,6 @@ const struct elem_funcs
 
      { '\0', NULL, NULL }
 };
-
-/* Basic placement of elements */
-static inline void
-infobar_elem_placement(Element *e)
-{
-     Element *p = TAILQ_PREV(e, esub, next);
-
-     e->geo.y = e->geo.w = 0;
-     e->geo.h = e->infobar->geo.h;
-     e->geo.x = (p ? p->geo.x + p->geo.w + PAD : 0);
-}
 
 static void
 infobar_elem_tag_init(Element *e)
@@ -160,10 +148,8 @@ infobar_elem_update(Infobar *i)
      Element *e;
 
      TAILQ_FOREACH(e, &i->elements, next)
-          if(i->elemupdate & FLAGINT(e->type))
+          if(i->screen->elemupdate & FLAGINT(e->type))
                e->func_update(e);
-
-     i->elemupdate = 0;
 }
 
 void
@@ -181,16 +167,6 @@ infobar_elem_remove(Element *e)
      }
 }
 
-static inline void
-infobar_placement(Infobar *i)
-{
-     Infobar *h = SLIST_FIRST(&i->screen->infobars);
-
-     i->geo = i->screen->geo;
-     i->geo.h = INFOBAR_DEF_W;
-     i->geo.y += (h ? h->geo.y + h->geo.h : i->screen->geo.y);
-}
-
 Infobar*
 infobar_new(Scr33n *s, const char *elem)
 {
@@ -201,9 +177,8 @@ infobar_new(Scr33n *s, const char *elem)
      i->screen = s;
      i->elemorder = xstrdup(elem);
 
-     /* Active all flag for first refresh */
-     /* TODO: Find something else */
-     for(n = 0; n < ElemLast; i->elemupdate |= FLAGINT(n++));
+     /* Active all flags for first refresh */
+     s->elemupdate |= (1<<0) | (1<<1) /*pow(ElemLast, 2) - 1*/;
 
      /* TODO: Position top/bottom */
      infobar_placement(i);

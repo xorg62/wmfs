@@ -31,12 +31,9 @@ tag_screen(Scr33n *s, Tag *t)
 
      s->seltag = t;
 
-     SLIST_FOREACH(i, &s->infobars, next)
-     {
-          i->elemupdate |= FLAGINT(ElemTag);
-          infobar_elem_update(i);
-     }
+     infobar_elem_screen_update(s, ElemTag);
 }
+
 
 void
 uicb_tag_set(Uicb cmd)

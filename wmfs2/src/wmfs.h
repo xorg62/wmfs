@@ -82,7 +82,6 @@ struct Infobar
      Geo geo;
      Scr33n *screen;
      char *elemorder;
-     Flags elemupdate;
      TAILQ_HEAD(esub, Element) elements;
      SLIST_ENTRY(Infobar) next;
 };
@@ -93,6 +92,7 @@ struct Scr33n
      Geo geo;
      Tag *seltag;
      int id;
+     Flags elemupdate;
      TAILQ_HEAD(tsub, Tag) tags;
      SLIST_HEAD(, Infobar) infobars;
      SLIST_ENTRY(Scr33n) next;
