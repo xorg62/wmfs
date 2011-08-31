@@ -207,6 +207,13 @@ struct Wmfs
       */
      Scr33n *screen;
 
+     /* FIFO */
+     struct
+     {
+          FILE *fp;
+          char *path;
+     } fifo;
+
 };
 
 int wmfs_error_handler(Display *d, XErrorEvent *event);

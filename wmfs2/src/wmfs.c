@@ -15,6 +15,7 @@
 #include "util.h"
 #include "config.h"
 #include "client.h"
+#include "fifo.h"
 
 int
 wmfs_error_handler(Display *d, XErrorEvent *event)
@@ -213,8 +214,13 @@ wmfs_loop(void)
      XEvent ev;
 
      while(XPending(W->dpy))
+     {
           while(W->running && !XNextEvent(W->dpy, &ev))
+          {
                HANDLE_EVENT(&ev);
+               fifo_read();
+          }
+     }
 }
 
 static inline void
@@ -225,6 +231,7 @@ wmfs_init(void)
      screen_init();
      event_init();
      config_init();
+     fifo_init();
 }
 
 void
@@ -242,6 +249,10 @@ wmfs_quit(void)
 
      /* Conf stuffs */
      FREE_LIST(Keybind, W->h.keybind);
+
+     /* FIFO stuffs */
+     fclose(W->fifo.fp);
+     free(W->fifo.path);
 
      W->running = false;
 }
