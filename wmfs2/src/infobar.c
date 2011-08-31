@@ -42,7 +42,7 @@ infobar_elem_tag_init(Element *e)
      infobar_elem_placement(e);
 
      j = e->geo.x;
-     e->geo.h -= (W->conf.theme.tags_border_width << 1);
+     e->geo.h -= (e->infobar->theme->tags_border_width << 1);
 
      TAILQ_FOREACH(t, &e->infobar->screen->tags, next)
      {
@@ -52,10 +52,10 @@ infobar_elem_tag_init(Element *e)
           b = barwin_new(e->infobar->bar->win, j, 0, s, e->geo.h, 0, 0, false);
 
           /* Set border */
-          if(W->conf.theme.tags_border_width)
+          if(e->infobar->theme->tags_border_width)
           {
-               XSetWindowBorder(W->dpy, b->win, W->conf.theme.tags_border_col);
-               XSetWindowBorderWidth(W->dpy, b->win, W->conf.theme.tags_border_width);
+               XSetWindowBorder(W->dpy, b->win, e->infobar->theme->tags_border_col);
+               XSetWindowBorderWidth(W->dpy, b->win, e->infobar->theme->tags_border_width);
           }
 
           b->ptr = (void*)t;
@@ -76,6 +76,8 @@ infobar_elem_tag_init(Element *e)
           j += s;
      }
 
+     e->infobar->screen->elemupdate |= FLAGINT(ElemTag);
+
      e->geo.w = j;
 }
 
@@ -93,13 +95,13 @@ infobar_elem_tag_update(Element *e)
           /* TODO: color from conf */
           if(t == sel)
           {
-               b->fg = W->conf.theme.tags_s.fg;
-               b->bg = W->conf.theme.tags_s.bg;
+               b->fg = e->infobar->theme->tags_s.fg;
+               b->bg = e->infobar->theme->tags_s.bg;
           }
           else
           {
-               b->fg = W->conf.theme.tags_n.fg;
-               b->bg = W->conf.theme.tags_n.bg;
+               b->fg = e->infobar->theme->tags_n.fg;
+               b->bg = e->infobar->theme->tags_n.bg;
           }
 
           barwin_refresh_color(b);
@@ -168,24 +170,22 @@ infobar_elem_remove(Element *e)
 }
 
 Infobar*
-infobar_new(Scr33n *s, const char *elem)
+infobar_new(Scr33n *s, Theme *theme, const char *elem)
 {
      int n;
 
      Infobar *i = (Infobar*)xcalloc(1, sizeof(Infobar));
 
      i->screen = s;
+     i->theme = theme;
      i->elemorder = xstrdup(elem);
-
-     /* Active all flags for first refresh */
-     s->elemupdate |= (1<<0) | (1<<1) /*pow(ElemLast, 2) - 1*/;
 
      /* TODO: Position top/bottom */
      infobar_placement(i);
 
      /* Barwin create */
      i->bar = barwin_new(W->root, i->geo.x, i->geo.y, i->geo.w, i->geo.h,
-               W->conf.theme.bars.fg, W->conf.theme.bars.bg, false);
+               theme->bars.fg, theme->bars.bg, false);
 
      /* Render */
      barwin_map(i->bar);

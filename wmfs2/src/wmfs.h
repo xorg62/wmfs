@@ -43,6 +43,7 @@ typedef struct Tag Tag;
 typedef struct Client Client;
 typedef struct Keybind Keybind;
 typedef struct Mousebind Mousebind;
+typedef struct Theme Theme;
 
 struct Geo
 {
@@ -81,6 +82,7 @@ struct Infobar
      Barwin *bar;
      Geo geo;
      Scr33n *screen;
+     Theme *theme;
      char *elemorder;
      TAILQ_HEAD(esub, Element) elements;
      SLIST_ENTRY(Infobar) next;
@@ -145,6 +147,23 @@ struct Colpair
      Color fg, bg;
 };
 
+struct Theme
+{
+     char *name;
+
+     /* Bars */
+     struct Colpair bars;
+     int bars_width;
+
+     /* Elements */
+     struct Colpair tags_n; /* normal */
+     struct Colpair tags_s; /* selected */
+     int tags_border_width;
+     Color tags_border_col;
+
+     SLIST_ENTRY(Theme) next;
+};
+
 struct Config
 {
      /* Misc section */
@@ -155,20 +174,6 @@ struct Config
           bool focus_follow_movement;
           bool focus_pointer_click;
      } misc;
-
-     /* Theme section */
-     struct
-     {
-          struct Colpair bars;
-          int bars_width;
-
-          /* Elements */
-          struct Colpair tags_n; /* normal */
-          struct Colpair tags_s; /* selected */
-          int tags_border_width;
-          Color tags_border_col;
-
-     } theme;
 };
 
 /* Global struct */
@@ -196,6 +201,7 @@ struct Wmfs
           SLIST_HEAD(, Client) client;
           SLIST_HEAD(, Keybind) keybind;
           SLIST_HEAD(, Barwin) barwin;
+          SLIST_HEAD(, Theme) theme;
      } h;
 
      /* Config options */

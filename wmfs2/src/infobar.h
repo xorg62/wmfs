@@ -10,11 +10,9 @@
 #include "util.h"
 #include "draw.h"
 
-#define INFOBAR_DEF_W (14)
-
 enum { ElemTag = 0, ElemLayout, ElemSelbar, ElemStatus, ElemCustom, ElemLast };
 
-Infobar *infobar_new(Scr33n *s, const char *elem);
+Infobar *infobar_new(Scr33n *s, Theme *theme, const char *elem);
 void infobar_elem_update(Infobar *i);
 void infobar_refresh(Infobar *i);
 void infobar_remove(Infobar *i);
@@ -37,7 +35,7 @@ infobar_placement(Infobar *i)
      Infobar *h = SLIST_FIRST(&i->screen->infobars);
 
      i->geo = i->screen->geo;
-     i->geo.h =  W->conf.theme.bars_width;
+     i->geo.h = i->theme->bars_width;
      i->geo.y += (h ? h->geo.y + h->geo.h : i->screen->geo.y);
 }
 

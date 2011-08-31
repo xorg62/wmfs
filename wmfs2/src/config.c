@@ -16,32 +16,51 @@
 static void
 config_theme(void)
 {
+     Theme *t;
      size_t i, n;
-     struct conf_sec *sec;
+     struct conf_sec *sec, **ks;
+     char *name;
 
-     /* [theme] */
-     sec = fetch_section_first(NULL, "theme");
+     /* [themes] */
+     sec = fetch_section_first(NULL, "themes");
+     ks = fetch_section(sec, "theme");
 
-     /* bars */
-     W->conf.theme.bars.fg = color_atoh(fetch_opt_first(sec, "#CCCCCC", "bars_fg").str);
-     W->conf.theme.bars.bg = color_atoh(fetch_opt_first(sec, "#222222", "bars_bg").str);
-     W->conf.theme.bars_width = fetch_opt_first(sec, "12", "bars_width").num;
+     if(!(n = fetch_section_count(ks)))
+          ++n;
 
-     /*
-      * Elements
-      */
-     W->conf.theme.tags_n.fg = color_atoh(fetch_opt_first(sec, "#CCCCCC", "tags_normal_fg").str);
-     W->conf.theme.tags_n.bg = color_atoh(fetch_opt_first(sec, "#222222", "tags_normal_bg").str);
-     W->conf.theme.tags_s.fg = color_atoh(fetch_opt_first(sec, "#222222", "tags_sel_fg").str);
-     W->conf.theme.tags_s.bg = color_atoh(fetch_opt_first(sec, "#CCCCCC", "tags_sel_bg").str);
-     W->conf.theme.tags_border_col = color_atoh(fetch_opt_first(sec, "#888888", "tags_border_color").str);
-     W->conf.theme.tags_border_width = fetch_opt_first(sec, "0", "tags_border_width").num;
+     /* [theme]*/
+     for(i = 0; i < n; ++i)
+     {
+          t = (Theme*)xcalloc(1, sizeof(Theme));
+
+          t->name = fetch_opt_first(ks[i], "default", "name").str;
+
+          /* bars */
+          t->bars.fg = color_atoh(fetch_opt_first(ks[i], "#CCCCCC", "bars_fg").str);
+          t->bars.bg = color_atoh(fetch_opt_first(ks[i], "#222222", "bars_bg").str);
+          t->bars_width = fetch_opt_first(ks[i], "12", "bars_width").num;
+
+          /*
+           * Elements
+           */
+          t->tags_n.fg = color_atoh(fetch_opt_first(ks[i], "#CCCCCC", "tags_normal_fg").str);
+          t->tags_n.bg = color_atoh(fetch_opt_first(ks[i], "#222222", "tags_normal_bg").str);
+          t->tags_s.fg = color_atoh(fetch_opt_first(ks[i], "#222222", "tags_sel_fg").str);
+          t->tags_s.bg = color_atoh(fetch_opt_first(ks[i], "#CCCCCC", "tags_sel_bg").str);
+          t->tags_border_col = color_atoh(fetch_opt_first(ks[i], "#888888", "tags_border_color").str);
+          t->tags_border_width = fetch_opt_first(ks[i], "0", "tags_border_width").num;
+
+          SLIST_INSERT_HEAD(&W->h.theme, t, next);
+     }
+
+     free(ks);
 }
 
 static void
 config_bars(void)
 {
      Scr33n *s;
+     Theme *t;
      size_t i, n;
      struct conf_sec *sec, **ks;
      int screenid;
@@ -57,10 +76,11 @@ config_bars(void)
      {
           elem = fetch_opt_first(ks[i], "", "elements").str;
           screenid = fetch_opt_first(ks[i], "-1", "screen").num;
+          t = name_to_theme(fetch_opt_first(ks[i], "default", "theme").str);
 
           SLIST_FOREACH(s, &W->h.screen, next)
                if(screenid == s->id || screenid == -1)
-                    (Infobar*)infobar_new(s, elem);
+                    (Infobar*)infobar_new(s, t, elem);
      }
 
      free(ks);

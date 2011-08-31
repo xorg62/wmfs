@@ -242,6 +242,7 @@ wmfs_quit(void)
 
      /* Conf stuffs */
      FREE_LIST(Keybind, W->h.keybind);
+     FREE_LIST(Theme, W->h.theme);
 
      W->running = false;
 }

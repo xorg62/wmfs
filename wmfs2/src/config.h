@@ -69,6 +69,19 @@ modkey_keysym(const char *name)
      return NoSymbol;
 }
 
+static inline Theme*
+name_to_theme(const char *name)
+{
+     Theme *t;
+
+     SLIST_FOREACH(t, &W->h.theme, next)
+          if(!strcmp(t->name, name))
+               return t;
+
+     return SLIST_FIRST(&W->h.theme);
+}
+
+
 void config_init(void);
 
 #endif /* CONFIG_H */
