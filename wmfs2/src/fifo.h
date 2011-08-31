@@ -1,7 +1,8 @@
 /*
-*  wmfs2 by Martin Duquesnoy <xorg62@gmail.com> { for(i = 2011; i < 2111; ++i) ©(i); }
-*  For license, see COPYING.
-*/
+ *  wmfs2 by Martin Duquesnoy <xorg62@gmail.com> { for(i = 2011; i < 2111; ++i) ©(i); }
+ *  File created by David Delassus.
+ *  For license, see COPYING.
+ */
 
 #ifndef FIFO_H
 #define FIFO_H

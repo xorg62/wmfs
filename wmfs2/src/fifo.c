@@ -1,5 +1,6 @@
 /*
  *  wmfs2 by Martin Duquesnoy <xorg62@gmail.com> { for(i = 2011; i < 2111; ++i) ©(i); }
+ *  File created by David Delassus.
  *  For license, see COPYING.
  */
 
@@ -14,13 +15,12 @@ fifo_init(void)
 {
      W->fifo.path = FIFO_DEFAULT_PATH;
 
-     if(mkfifo(W->fifo.path, 0644) < 0 || !(W->fifo.fp = fopen(W->fifo.path, "w+")))
+     if(mkfifo(W->fifo.path, 0644) < 0
+               || !(W->fifo.fd = open(W->fifo.path, O_NONBLOCK, 0)))
      {
           warnx("Can't create FIFO: %s\n", strerror(errno));
           return;
      }
-
-     fcntl(fileno(W->fifo.fp), F_SETFL, O_NONBLOCK);
 }
 
 static void
@@ -30,11 +30,13 @@ fifo_parse(char *cmd)
      char *uicb = strtok(cmd, " ");
      char *arg  = strtok(NULL, "\n");
 
-     printf ("%s %s\n", uicb, arg);
+     printf("%s %s\n", uicb, arg);
 
      func = uicb_name_func(uicb);
      if(func)
           func(arg);
+
+     XSync(W->dpy, false);
 }
 
 void
@@ -43,11 +45,12 @@ fifo_read(void)
      char buf[256] = {0};
 
      /* Don't read it if not open */
-     if(!(W->fifo.fp)) return;
+     if(!(W->fifo.fd))
+          return;
 
-     fread(buf, sizeof(buf) - 1, 1, W->fifo.fp);
+     read(W->fifo.fd, buf, sizeof(buf) - 1);
 
-     if (buf[0])
+     if(buf[0])
           fifo_parse(buf);
 }
 

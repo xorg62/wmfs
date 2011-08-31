@@ -216,7 +216,7 @@ struct Wmfs
      /* FIFO */
      struct
      {
-          FILE *fp;
+          int fd;
           char *path;
      } fifo;
 

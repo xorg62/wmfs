@@ -212,13 +212,27 @@ static void
 wmfs_loop(void)
 {
      XEvent ev;
+     int fd = ConnectionNumber(W->dpy);
+     fd_set iset;
 
-     while(XPending(W->dpy))
+     while(W->running)
      {
-          while(W->running && !XNextEvent(W->dpy, &ev))
+          FD_ZERO(&iset);
+          FD_SET(fd, &iset);
+          FD_SET(W->fifo.fd, &iset);
+
+          if(select(fd + W->fifo.fd + 1, &iset, NULL, NULL, NULL) > 0)
           {
-               HANDLE_EVENT(&ev);
-               fifo_read();
+               if(FD_ISSET(fd, &iset))
+               {
+                    while(XPending(W->dpy))
+                    {
+                         XNextEvent(W->dpy, &ev);
+                         HANDLE_EVENT(&ev);
+                    }
+               }
+               else if(FD_ISSET(W->fifo.fd, &iset))
+                    fifo_read();
           }
      }
 }
@@ -252,7 +266,7 @@ wmfs_quit(void)
      FREE_LIST(Theme, W->h.theme);
 
      /* FIFO stuffs */
-     fclose(W->fifo.fp);
+     close(W->fifo.fd);
      free(W->fifo.path);
 
      W->running = false;
