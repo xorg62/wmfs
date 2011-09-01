@@ -211,26 +211,10 @@ static void
 wmfs_loop(void)
 {
      XEvent ev;
-     int fd = ConnectionNumber(W->dpy);
-     fd_set iset;
 
-     while(W->running)
-     {
-          FD_ZERO(&iset);
-          FD_SET(fd, &iset);
-
-          if(select(fd + 1, &iset, NULL, NULL, NULL) > 0)
-          {
-               if(FD_ISSET(fd, &iset))
-               {
-                    while(XPending(W->dpy))
-                    {
-                         XNextEvent(W->dpy, &ev);
-                         HANDLE_EVENT(&ev);
-                    }
-               }
-          }
-     }
+     while(XPending(W->dpy))
+          while(W->running && !XNextEvent(W->dpy, &ev))
+               HANDLE_EVENT(&ev);
 }
 
 static inline void
