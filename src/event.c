@@ -33,6 +33,7 @@
 #include "wmfs.h"
 
 #define EVDPY (e->xany.display)
+#define MAX_EV 256
 
 /** Check mouse bind condition and execute associated function
  */
@@ -680,13 +681,9 @@ grabkeys(void)
 void
 event_make_array(void)
 {
-     int i = LASTEvent;
+     int i = MAX_EV;
 
-#ifdef HAVE_XRANDR
-     i = xrandr_event + RRScreenChangeNotify;
-#endif /* HAVE_XRANDR */
-
-     event_handle = xcalloc((nevent = i + 1), sizeof(event_handle));
+     event_handle = xcalloc(MAX_EV, sizeof(event_handle));
 
      /* Fill array with non-used function (do nothing) */
      while(i--)
