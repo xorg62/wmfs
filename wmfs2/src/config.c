@@ -28,12 +28,16 @@ config_theme(void)
      if(!(n = fetch_section_count(ks)))
           ++n;
 
+     SLIST_INIT(&W->h.theme);
+
      /* [theme]*/
      for(i = 0; i < n; ++i)
      {
           t = (Theme*)xcalloc(1, sizeof(Theme));
 
           t->name = fetch_opt_first(ks[i], "default", "name").str;
+
+          wmfs_init_font(fetch_opt_first(ks[i], "fixed", "font").str, t);
 
           /* bars */
           t->bars.fg = color_atoh(fetch_opt_first(ks[i], "#CCCCCC", "bars_fg").str);

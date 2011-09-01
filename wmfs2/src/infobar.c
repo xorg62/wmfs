@@ -46,7 +46,7 @@ infobar_elem_tag_init(Element *e)
 
      TAILQ_FOREACH(t, &e->infobar->screen->tags, next)
      {
-          s = draw_textw(t->name) + PAD;
+          s = draw_textw(e->infobar->theme, t->name) + PAD;
 
           /* Init barwin */
           b = barwin_new(e->infobar->bar->win, j, 0, s, e->geo.h, 0, 0, false);
@@ -106,7 +106,8 @@ infobar_elem_tag_update(Element *e)
 
           barwin_refresh_color(b);
 
-          draw_text(b->dr, (PAD >> 1), TEXTY(e->geo.h), b->fg, t->name);
+          draw_text(b->dr, e->infobar->theme, (PAD >> 1),
+                    TEXTY(e->infobar->theme, e->geo.h), b->fg, t->name);
 
           barwin_refresh(b);
      }

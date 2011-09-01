@@ -12,22 +12,22 @@
 
 #include "wmfs.h"
 
-#define TEXTY(w) ((W->font.height - W->font.de) + ((w - W->font.height) >> 1))
+#define TEXTY(t, w) ((t->font.height - t->font.de) + ((w - t->font.height) >> 1))
 #define PAD (8)
 
 static inline void
-draw_text(Drawable d, int x, int y, Color fg, const char *str)
+draw_text(Drawable d, Theme *t, int x, int y, Color fg, const char *str)
 {
      XSetForeground(W->dpy, W->gc, fg);
-     XmbDrawString(W->dpy, d, W->font.fontset, W->gc, x, y, str, strlen(str));
+     XmbDrawString(W->dpy, d, t->font.fontset, W->gc, x, y, str, strlen(str));
 }
 
 static inline unsigned short
-draw_textw(const char *str)
+draw_textw(Theme *t, const char *str)
 {
      XRectangle r;
 
-     XmbTextExtents(W->font.fontset, str, strlen(str), NULL, &r);
+     XmbTextExtents(t->font.fontset, str, strlen(str), NULL, &r);
 
      return r.width;
 }

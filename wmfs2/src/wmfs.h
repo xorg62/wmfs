@@ -151,6 +151,13 @@ struct Theme
 {
      char *name;
 
+     /* Font */
+     struct
+     {
+          int as, de, width, height;
+          XFontSet fontset;
+     } font;
+
      /* Bars */
      struct Colpair bars;
      int bars_width;
@@ -188,12 +195,6 @@ struct Wmfs
      Atom *net_atom;
      bool running;
 
-     struct
-     {
-          int as, de, width, height;
-          XFontSet fontset;
-     } font;
-
      /* Lists heads */
      struct
      {
@@ -217,6 +218,7 @@ struct Wmfs
 int wmfs_error_handler(Display *d, XErrorEvent *event);
 int wmfs_error_handler_dummy(Display *d, XErrorEvent *event);
 void wmfs_grab_keys(void);
+void wmfs_init_font(char *font, Theme *t);
 void wmfs_quit(void);
 void uicb_reload(Uicb cmd);
 void uicb_quit(Uicb cmd);

@@ -57,13 +57,37 @@ wmfs_error_handler_dummy(Display *d, XErrorEvent *event)
      return 0;
 }
 
+void
+wmfs_init_font(char *font, Theme *t)
+{
+     XFontStruct **xfs = NULL;
+     char **misschar, **names, *defstring;
+     int d;
+
+     if(!(t->font.fontset = XCreateFontSet(W->dpy, font, &misschar, &d, &defstring)))
+     {
+          warnx("Can't load font '%s'", font);
+          t->font.fontset = XCreateFontSet(W->dpy, "fixed", &misschar, &d, &defstring);
+     }
+
+     XExtentsOfFontSet(t->font.fontset);
+     XFontsOfFontSet(t->font.fontset, &xfs, &names);
+
+     t->font.as    = xfs[0]->max_bounds.ascent;
+     t->font.de    = xfs[0]->max_bounds.descent;
+     t->font.width = xfs[0]->max_bounds.width;
+
+     t->font.height = t->font.as + t->font.de;
+
+     if(misschar)
+          XFreeStringList(misschar);
+}
+
 static void
 wmfs_xinit(void)
 {
-     char **misschar, **names, *defstring;
-     int d, i, j;
+     int i, j;
      XModifierKeymap *mm;
-     XFontStruct **xfs = NULL;
      XSetWindowAttributes at;
 
      /*
@@ -90,23 +114,9 @@ wmfs_xinit(void)
      XChangeWindowAttributes(W->dpy, W->root, CWEventMask | CWCursor, &at);
 
      /*
-      * Font
+      * Locale (font encode)
       */
      setlocale(LC_CTYPE, "");
-
-     W->font.fontset = XCreateFontSet(W->dpy, "fixed", &misschar, &d, &defstring);
-
-     XExtentsOfFontSet(W->font.fontset);
-     XFontsOfFontSet(W->font.fontset, &xfs, &names);
-
-     W->font.as    = xfs[0]->max_bounds.ascent;
-     W->font.de    = xfs[0]->max_bounds.descent;
-     W->font.width = xfs[0]->max_bounds.width;
-
-     W->font.height = W->font.as + W->font.de;
-
-     if(misschar)
-          XFreeStringList(misschar);
 
      /*
       * Keys
@@ -230,19 +240,30 @@ wmfs_init(void)
 void
 wmfs_quit(void)
 {
-     /* X stuffs */
-     XFreeFontSet(W->dpy, W->font.fontset);
+     Theme *t;
 
+     /* Will free:
+      *
+      * Screens -> Tags
+      *         -> Infobars -> Elements
+      */
      screen_free();
 
      XCloseDisplay(W->dpy);
 
-     free(W->net_atom);
-     free(W);
-
      /* Conf stuffs */
      FREE_LIST(Keybind, W->h.keybind);
-     FREE_LIST(Theme, W->h.theme);
+
+     while(!SLIST_EMPTY(&W->h.theme))
+     {
+          t = SLIST_FIRST(&W->h.theme);
+          SLIST_REMOVE_HEAD(&W->h.theme, next);
+          XFreeFontSet(W->dpy, t->font.fontset);
+          free(t);
+     }
+
+     free(W->net_atom);
+     free(W);
 
      W->running = false;
 }

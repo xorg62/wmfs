@@ -228,7 +228,7 @@ event_expose(XEvent *e)
 static void
 event_dummy(XEvent *e)
 {
-     printf("%d\n", e->type);
+   /*  printf("%d\n", e->type);*/
      (void)e;
 }
 

@@ -7,6 +7,8 @@
   [theme]
      # name = "default"
 
+     font = "fixed"
+
      # Bars
      bars_width = 14
      bars_fg = "#CCCCCC"
@@ -24,6 +26,8 @@
 
    [theme]
       name = "perso"
+
+      font = "courier"
 
       bars_width = 20
       bars_fg = "#222222"
