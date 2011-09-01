@@ -15,7 +15,6 @@
 #include "util.h"
 #include "config.h"
 #include "client.h"
-#include "fifo.h"
 
 int
 wmfs_error_handler(Display *d, XErrorEvent *event)
@@ -219,9 +218,8 @@ wmfs_loop(void)
      {
           FD_ZERO(&iset);
           FD_SET(fd, &iset);
-          FD_SET(W->fifo.fd, &iset);
 
-          if(select(fd + W->fifo.fd + 1, &iset, NULL, NULL, NULL) > 0)
+          if(select(fd + 1, &iset, NULL, NULL, NULL) > 0)
           {
                if(FD_ISSET(fd, &iset))
                {
@@ -231,8 +229,6 @@ wmfs_loop(void)
                          HANDLE_EVENT(&ev);
                     }
                }
-               else if(FD_ISSET(W->fifo.fd, &iset))
-                    fifo_read();
           }
      }
 }
@@ -245,7 +241,6 @@ wmfs_init(void)
      screen_init();
      event_init();
      config_init();
-     fifo_init();
 }
 
 void
@@ -264,10 +259,6 @@ wmfs_quit(void)
      /* Conf stuffs */
      FREE_LIST(Keybind, W->h.keybind);
      FREE_LIST(Theme, W->h.theme);
-
-     /* FIFO stuffs */
-     close(W->fifo.fd);
-     free(W->fifo.path);
 
      W->running = false;
 }

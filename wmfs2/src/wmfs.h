@@ -212,14 +212,6 @@ struct Wmfs
       * and then selected client.
       */
      Scr33n *screen;
-
-     /* FIFO */
-     struct
-     {
-          int fd;
-          char *path;
-     } fifo;
-
 };
 
 int wmfs_error_handler(Display *d, XErrorEvent *event);
