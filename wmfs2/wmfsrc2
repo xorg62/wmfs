@@ -27,7 +27,7 @@
    [theme]
       name = "perso"
 
-      font = "courier"
+      font = "-*-fixed-bold"
 
       bars_width = 20
       bars_fg = "#222222"
