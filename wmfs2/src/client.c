@@ -65,7 +65,7 @@ client_grabbuttons(Client *c, bool focused)
 {
      int i, but[] = {Button1, Button2, Button3, Button4, Button5};
 
-    /* wmfs_numlockmask();*/
+     wmfs_numlockmask();
 
      XUngrabButton(W->dpy, AnyButton, AnyModifier, c->win);
 
