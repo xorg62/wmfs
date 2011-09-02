@@ -12,7 +12,7 @@
 
 enum { ElemTag = 0, ElemLayout, ElemSelbar, ElemStatus, ElemCustom, ElemLast };
 
-Infobar *infobar_new(Scr33n *s, Theme *theme, const char *elem);
+Infobar *infobar_new(Scr33n *s, Theme *theme, Barpos pos, const char *elem);
 void infobar_elem_update(Infobar *i);
 void infobar_refresh(Infobar *i);
 void infobar_remove(Infobar *i);
@@ -29,14 +29,30 @@ infobar_elem_placement(Element *e)
      e->geo.x = (p ? p->geo.x + p->geo.w + PAD : 0);
 }
 
-static inline void
-infobar_placement(Infobar *i)
+/* Bars placement management and usable space management */
+static inline bool
+infobar_placement(Infobar *i, Barpos p)
 {
-     Infobar *h = SLIST_FIRST(&i->screen->infobars);
-
-     i->geo = i->screen->geo;
+     i->geo = i->screen->ugeo;
      i->geo.h = i->theme->bars_width;
-     i->geo.y += (h ? h->geo.y + h->geo.h : i->screen->geo.y);
+
+     /* Top */
+     switch(p)
+     {
+          case BarTop:
+               i->screen->ugeo.y += i->geo.h;
+               i->screen->ugeo.h -= i->geo.h;
+               break;
+          case BarBottom:
+               i->geo.y = (i->screen->ugeo.y + i->screen->ugeo.h) - i->geo.h;
+               i->screen->ugeo.h -= i->geo.h;
+               break;
+          default:
+          case BarHide:
+               return false;
+     }
+
+     return true;
 }
 
 static inline void

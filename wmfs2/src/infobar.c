@@ -3,8 +3,6 @@
  *  For license, see COPYING.
  */
 
-#include <math.h>
-
 #include "wmfs.h"
 #include "draw.h"
 #include "infobar.h"
@@ -171,8 +169,9 @@ infobar_elem_remove(Element *e)
 }
 
 Infobar*
-infobar_new(Scr33n *s, Theme *theme, const char *elem)
+infobar_new(Scr33n *s, Theme *theme, Barpos pos, const char *elem)
 {
+     bool map;
      int n;
 
      Infobar *i = (Infobar*)xcalloc(1, sizeof(Infobar));
@@ -181,24 +180,25 @@ infobar_new(Scr33n *s, Theme *theme, const char *elem)
      i->theme = theme;
      i->elemorder = xstrdup(elem);
 
-     /* TODO: Position top/bottom */
-     infobar_placement(i);
+     map = infobar_placement(i, (i->pos = pos));
 
      /* Barwin create */
      i->bar = barwin_new(W->root, i->geo.x, i->geo.y, i->geo.w, i->geo.h,
                theme->bars.fg, theme->bars.bg, false);
 
-     /* Render */
-     barwin_map(i->bar);
-     barwin_map_subwin(i->bar);
-     barwin_refresh_color(i->bar);
+     SLIST_INSERT_HEAD(&s->infobars, i, next);
 
      /* Elements */
      infobar_elem_init(i);
 
-     infobar_refresh(i);
+     /* Render, only if pos is Top or Bottom */
+     if(!map)
+          return i;
 
-     SLIST_INSERT_HEAD(&s->infobars, i, next);
+     barwin_map(i->bar);
+     barwin_map_subwin(i->bar);
+     barwin_refresh_color(i->bar);
+     infobar_refresh(i);
 
      return i;
 }

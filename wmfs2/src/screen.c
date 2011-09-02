@@ -19,7 +19,7 @@ screen_new(Geo *g, int id)
 {
      Scr33n *s = (Scr33n*)xcalloc(1, sizeof(Scr33n));
 
-     s->geo = *g;
+     s->geo = s->ugeo = *g;
      s->seltag = NULL;
      s->id = id;
 

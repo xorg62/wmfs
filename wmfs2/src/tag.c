@@ -15,7 +15,7 @@ tag_new(Scr33n *s, char *name)
      t = xcalloc(1, sizeof(Tag));
 
      t->screen = s;
-     t->name   = name;
+     t->name   = xstrdup(name);
      t->flags  = 0;
      t->sel    = NULL;
 
@@ -93,6 +93,7 @@ tag_free(Scr33n *s)
      TAILQ_FOREACH(t, &s->tags, next)
      {
           TAILQ_REMOVE(&s->tags, t, next);
+          free(t->name);
           free(t);
      }
 }

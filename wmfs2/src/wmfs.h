@@ -30,6 +30,8 @@
 typedef unsigned int Flags;
 typedef unsigned int Color;
 typedef const char* Uicb;
+typedef enum { BarTop = 0, BarBottom, BarHide, BarLast } Barpos;
+typedef enum { Right = 0, Left, Top, Bottom, Center, PositionLast } Position;
 
 /*
  * Structures
@@ -81,6 +83,7 @@ struct Infobar
 {
      Barwin *bar;
      Geo geo;
+     Barpos pos;
      Scr33n *screen;
      Theme *theme;
      char *elemorder;
@@ -91,7 +94,7 @@ struct Infobar
 /* Screen */
 struct Scr33n
 {
-     Geo geo;
+     Geo geo, ugeo;
      Tag *seltag;
      int id;
      Flags elemupdate;
@@ -171,18 +174,6 @@ struct Theme
      SLIST_ENTRY(Theme) next;
 };
 
-struct Config
-{
-     /* Misc section */
-     struct
-     {
-          char *font;
-          bool focus_follow_mouse;
-          bool focus_follow_movement;
-          bool focus_pointer_click;
-     } misc;
-};
-
 /* Global struct */
 struct Wmfs
 {
@@ -204,9 +195,6 @@ struct Wmfs
           SLIST_HEAD(, Barwin) barwin;
           SLIST_HEAD(, Theme) theme;
      } h;
-
-     /* Config options */
-     struct Config conf;
 
      /*
       * Selected screen, from what you go everywhere; selected tag,

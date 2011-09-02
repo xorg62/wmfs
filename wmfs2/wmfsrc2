@@ -25,16 +25,16 @@
    [/theme]
 
    [theme]
-      name = "perso"
+     name = "perso"
 
-      font = "-*-fixed-bold"
+     font = "-*-fixed-bold"
 
-      bars_width = 20
-      bars_fg = "#222222"
-      bars_bg = "#CCCCCC"
+     bars_width = 20
+     bars_fg = "#222222"
+     bars_bg = "#CCCCCC"
 
-      tags_sel_bg = "#33AA33"
-      tags_normal_fg = "#AA3333"
+     tags_sel_bg = "#33AA33"
+     tags_normal_fg = "#AA3333"
 
    [/theme]
 
@@ -42,11 +42,24 @@
 
 [bars]
 
-  # element type:
+  # Position:
+  #   0 Top
+  #   1 Bottom
+  #   2 Hide
+
+  # Element type:
   #   t Tags
   #   S Statustext
 
   [bar]
+     position = 1
+     screen = 0
+     elements = "t"
+     theme = "perso"
+  [/bar]
+
+  [bar]
+     position = 1
      screen = 0
      elements = "t"
      theme = "default"
@@ -57,6 +70,12 @@
      elements = "t"
      theme = "perso"
   [/bar]
+    [bar]
+     screen = 1
+     elements = "t"
+     theme = "default"
+  [/bar]
+
 
 [/bars]
 

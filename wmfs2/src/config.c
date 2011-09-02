@@ -69,6 +69,7 @@ config_bars(void)
      struct conf_sec *sec, **ks;
      int screenid;
      char *elem;
+     Barpos pos = BarTop;
 
      /* [bars] */
      sec = fetch_section_first(NULL, "bars");
@@ -81,10 +82,11 @@ config_bars(void)
           elem = fetch_opt_first(ks[i], "", "elements").str;
           screenid = fetch_opt_first(ks[i], "-1", "screen").num;
           t = name_to_theme(fetch_opt_first(ks[i], "default", "theme").str);
+          pos = fetch_opt_first(ks[i], "0", "position").num;
 
           SLIST_FOREACH(s, &W->h.screen, next)
                if(screenid == s->id || screenid == -1)
-                    (Infobar*)infobar_new(s, t, elem);
+                    (Infobar*)infobar_new(s, t, pos, elem);
      }
 
      free(ks);
@@ -133,6 +135,7 @@ config_keybind(void)
      size_t j, n;
      struct conf_sec *sec, **ks;
      struct opt_type *opt;
+     char *cmd;
      Keybind *k;
 
      /* [keys] */
@@ -145,17 +148,20 @@ config_keybind(void)
      /* [key] */
      for(i = 0; i < n; ++i)
      {
-          opt = fetch_opt(ks[i], "", "mod");
-
           k = (Keybind*)xcalloc(1, sizeof(Keybind));
+
+          /* mod = {} */
+          opt = fetch_opt(ks[i], "", "mod");
 
           for(j = 0; j < fetch_opt_count(opt); ++j)
                k->mod |= modkey_keysym(opt[j].str);
 
           free(opt);
 
+          /* key = */
           k->keysym = XStringToKeysym(fetch_opt_first(ks[i], "None", "key").str);
 
+          /* func = */
           if(!(k->func = uicb_name_func(fetch_opt_first(ks[i], "", "func").str)))
           {
                warnx("configuration: Unknown Function \"%s\".",
@@ -163,7 +169,9 @@ config_keybind(void)
                k->func = uicb_spawn;
           }
 
-          k->cmd = fetch_opt_first(ks[i], "", "cmd").str;
+          /* cmd = */
+          if((cmd = fetch_opt_first(ks[i], "", "cmd").str))
+               k->cmd = xstrdup(cmd);
 
           SLIST_INSERT_HEAD(&W->h.keybind, k, next);
      }
@@ -187,4 +195,5 @@ config_init(void)
      config_bars();
 
      free(path);
+     free_conf();
 }

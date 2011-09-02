@@ -240,6 +240,7 @@ wmfs_init(void)
 void
 wmfs_quit(void)
 {
+     Keybind *k;
      Theme *t;
 
      /* Will free:
@@ -252,7 +253,13 @@ wmfs_quit(void)
      XCloseDisplay(W->dpy);
 
      /* Conf stuffs */
-     FREE_LIST(Keybind, W->h.keybind);
+     while(!SLIST_EMPTY(&W->h.keybind))
+     {
+          k = SLIST_FIRST(&W->h.keybind);
+          SLIST_REMOVE_HEAD(&W->h.keybind, next);
+          free((void*)k->cmd);
+          free(k);
+     }
 
      while(!SLIST_EMPTY(&W->h.theme))
      {
