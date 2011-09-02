@@ -6,6 +6,8 @@
 #include "client.h"
 #include "util.h"
 
+#define CLIENT_MOUSE_MOD Mod1Mask
+
 /** Send a ConfigureRequest event to the Client
  * \param c Client pointer
 */
@@ -58,25 +60,59 @@ client_unmap(Client *c)
      XUnmapWindow(W->dpy, c->win);
 }
 
+static void
+client_grabbuttons(Client *c, bool focused)
+{
+     int i, but[] = {Button1, Button2, Button3, Button4, Button5};
+
+    /* wmfs_numlockmask();*/
+
+     XUngrabButton(W->dpy, AnyButton, AnyModifier, c->win);
+
+     if(focused)
+     {
+          for(i = 0; i < LEN(but); ++i)
+          {
+               XGrabButton(W->dpy, but[i], CLIENT_MOUSE_MOD, c->win, False,
+                         ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(W->dpy, but[i], CLIENT_MOUSE_MOD | LockMask, c->win, False,
+                         ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(W->dpy, but[i], CLIENT_MOUSE_MOD | W->numlockmask, c->win, False,
+                         ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+               XGrabButton(W->dpy, but[i], CLIENT_MOUSE_MOD | LockMask | W->numlockmask, c->win, False,
+                         ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+          }
+
+          return;
+     }
+
+     XGrabButton(W->dpy, AnyButton, AnyModifier, c->win, False,
+               ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+
+}
+
 void
 client_focus(Client *c)
 {
      /* Unfocus selected */
-     if(c->tag->sel && c->tag->sel != c)
+     if(W->client && W->client != c)
      {
-          XSetWindowBorder(W->dpy, c->win, 0xf0f0f0);
+          XSetWindowBorder(W->dpy, W->client->win, 0xfF0000);
+
+          client_grabbuttons(W->client, false);
      }
 
      /* Focus c */
-     if((c->tag->sel = c))
+     if((W->client = c))
      {
+          c->tag->sel = c;
+
           XSetWindowBorder(W->dpy, c->win, 0xffffff);
 
-          XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
+          client_grabbuttons(c, true);
 
-          XRaiseWindow(W->dpy, c->win);
+          XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
      }
-     /* Else, set input focus to root window */
      else
           XSetInputFocus(W->dpy, W->root, RevertToPointerRoot, CurrentTime);
 
@@ -152,8 +188,10 @@ client_new(Window w, XWindowAttributes *wa)
      /* C attributes */
      c->win    = w;
      c->screen = W->screen;
-     c->tag    = W->screen->seltag;
      c->flags  = 0;
+
+     /* Set tag */
+     tag_client(W->screen->seltag, c);
 
      /* Geometry */
      c->geo.x = wa->x;
@@ -166,16 +204,22 @@ client_new(Window w, XWindowAttributes *wa)
 
      XSetWindowBorder(W->dpy, w, 0xffffff);
      XSetWindowBorderWidth(W->dpy, w, 1);
+     client_grabbuttons(c, false);
 
      /* Attach */
      SLIST_INSERT_HEAD(&W->h.client, c, next);
 
+     XMoveResizeWindow(W->dpy, w,
+               c->screen->ugeo.x,
+               c->screen->ugeo.y,
+               c->screen->ugeo.w,
+               c->screen->ugeo.h);
+
+
      client_map(c);
 
-     XMoveResizeWindow(W->dpy, w, c->geo.x, c->geo.y, c->geo.w, c->geo.h);
      XRaiseWindow(W->dpy, w);
 
-     client_focus(c);
      client_configure(c);
 
      return c;
@@ -184,11 +228,22 @@ client_new(Window w, XWindowAttributes *wa)
 void
 client_remove(Client *c)
 {
+     Client *cc;
+
      XGrabServer(W->dpy);
      XSetErrorHandler(wmfs_error_handler_dummy);
 
+     if(W->client == c)
+          client_focus(NULL);
+
      SLIST_REMOVE(&W->h.client, c, Client, next);
 
+     if(c->tag->sel == c)
+          c->tag->sel = SLIST_FIRST(&c->tag->clients);
+
+     tag_client(NULL, c);
+
+     XSync(W->dpy, False);
      XUngrabServer(W->dpy);
      XSetErrorHandler(wmfs_error_handler);
 

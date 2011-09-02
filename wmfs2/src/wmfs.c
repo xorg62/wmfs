@@ -58,6 +58,21 @@ wmfs_error_handler_dummy(Display *d, XErrorEvent *event)
 }
 
 void
+wmfs_numlockmask(void)
+{
+     int i, j;
+     XModifierKeymap *mm = XGetModifierMapping(W->dpy);
+
+     for(i = 0; i < 8; i++)
+          for(j = 0; j < mm->max_keypermod; ++j)
+               if(mm->modifiermap[i * mm->max_keypermod + j]
+                         == XKeysymToKeycode(W->dpy, XK_Num_Lock))
+                    W->numlockmask = (1 << i);
+
+     XFreeModifiermap(mm);
+}
+
+void
 wmfs_init_font(char *font, Theme *t)
 {
      XFontStruct **xfs = NULL;
@@ -121,14 +136,7 @@ wmfs_xinit(void)
      /*
       * Keys
       */
-     mm = XGetModifierMapping(W->dpy);
-
-     for(i = 0; i < 8; i++)
-          for(j = 0; j < mm->max_keypermod; ++j)
-               if(mm->modifiermap[i * mm->max_keypermod + j]
-                         == XKeysymToKeycode(W->dpy, XK_Num_Lock))
-                    W->numlockmask = (1 << i);
-     XFreeModifiermap(mm);
+     wmfs_numlockmask();
 
      /*
       * Barwin linked list
@@ -143,6 +151,8 @@ wmfs_grab_keys(void)
 {
      KeyCode c;
      Keybind *k;
+
+     wmfs_numlockmask();
 
      XUngrabKey(W->dpy, AnyKey, AnyModifier, W->root);
 
@@ -165,6 +175,8 @@ wmfs_scan(void)
      int i, n;
      XWindowAttributes wa;
      Window usl, usl2, *w = NULL;
+
+     SLIST_INIT(&W->h.client);
 
      /*
         Atom rt;

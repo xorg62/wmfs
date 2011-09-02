@@ -36,7 +36,6 @@ infobar_placement(Infobar *i, Barpos p)
      i->geo = i->screen->ugeo;
      i->geo.h = i->theme->bars_width;
 
-     /* Top */
      switch(p)
      {
           case BarTop:

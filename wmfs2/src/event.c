@@ -106,8 +106,8 @@ event_focusin(XEvent *e)
 {
      Client *c;
 
-     if((c = W->screen->seltag->sel) && e->xfocus.window != c->win)
-          client_focus(c);
+     if(W->client && e->xfocus.window != W->client->win)
+          client_focus(W->client);
 }
 
 static void

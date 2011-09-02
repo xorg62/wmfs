@@ -110,6 +110,7 @@ struct Tag
      Scr33n *screen;
      Flags flags;
      Client *sel;
+     SLIST_HEAD(, Client) clients;
      TAILQ_ENTRY(Tag) next;
 };
 
@@ -122,7 +123,8 @@ struct Client
      Flags flags;
      char *title;
      Window win;
-     SLIST_ENTRY(Client) next;
+     SLIST_ENTRY(Client) next;  /* Global list */
+     SLIST_ENTRY(Client) tnext; /* Tag list */
 };
 
 /* Config */
@@ -197,15 +199,17 @@ struct Wmfs
      } h;
 
      /*
-      * Selected screen, from what you go everywhere; selected tag,
-      * and then selected client.
+      * Selected screen, client
       */
      Scr33n *screen;
+     Client *client;
+
 };
 
 int wmfs_error_handler(Display *d, XErrorEvent *event);
 int wmfs_error_handler_dummy(Display *d, XErrorEvent *event);
 void wmfs_grab_keys(void);
+void wmfs_numlockmask(void);
 void wmfs_init_font(char *font, Theme *t);
 void wmfs_quit(void);
 void uicb_reload(Uicb cmd);
