@@ -110,6 +110,7 @@ infobar_elem_tag_update(Element *e)
           barwin_refresh(b);
      }
 
+     e->infobar->screen->elemupdate &= ~FLAGINT(ElemTag);
 }
 
 static void
@@ -180,7 +181,7 @@ infobar_new(Scr33n *s, Theme *theme, Barpos pos, const char *elem)
      i->theme = theme;
      i->elemorder = xstrdup(elem);
 
-     map = infobar_placement(i, (i->pos = pos));
+     map = infobar_placement(i, pos);
 
      /* Barwin create */
      i->bar = barwin_new(W->root, i->geo.x, i->geo.y, i->geo.w, i->geo.h,

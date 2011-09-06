@@ -33,6 +33,7 @@ infobar_elem_placement(Element *e)
 static inline bool
 infobar_placement(Infobar *i, Barpos p)
 {
+     i->pos = p;
      i->geo = i->screen->ugeo;
      i->geo.h = i->theme->bars_width;
 
@@ -63,8 +64,6 @@ infobar_elem_screen_update(Scr33n *s, int addf)
 
      SLIST_FOREACH(i, &s->infobars, next)
           infobar_elem_update(i);
-
-     s->elemupdate &= ~FLAGINT(addf);
 }
 
 #endif /* INFOBAR_H */

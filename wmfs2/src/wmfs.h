@@ -43,6 +43,7 @@ typedef struct Barwin Barwin;
 typedef struct Scr33n Scr33n;
 typedef struct Tag Tag;
 typedef struct Client Client;
+typedef struct Frame Frame;
 typedef struct Keybind Keybind;
 typedef struct Mousebind Mousebind;
 typedef struct Theme Theme;
@@ -110,6 +111,8 @@ struct Tag
      Scr33n *screen;
      Flags flags;
      Client *sel;
+     Frame *frame;
+     SLIST_HEAD(, Frame) frames;
      SLIST_HEAD(, Client) clients;
      TAILQ_ENTRY(Tag) next;
 };
@@ -119,12 +122,26 @@ struct Client
 {
      Tag *tag;
      Scr33n *screen;
+     Frame *frame;
+     Barwin *titlebar;
      Geo geo;
      Flags flags;
      char *title;
      Window win;
      SLIST_ENTRY(Client) next;  /* Global list */
      SLIST_ENTRY(Client) tnext; /* Tag list */
+     SLIST_ENTRY(Client) fnext; /* Frame list */
+};
+
+/* Frame */
+struct Frame
+{
+     Tag *tag;
+     Geo geo;
+     Window win;
+     Color fg, bg;
+     SLIST_HEAD(, Client) clients;
+     SLIST_ENTRY(Frame) next;
 };
 
 /* Config */

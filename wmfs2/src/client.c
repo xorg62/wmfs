@@ -63,23 +63,23 @@ client_unmap(Client *c)
 static void
 client_grabbuttons(Client *c, bool focused)
 {
-     int i, but[] = {Button1, Button2, Button3, Button4, Button5};
-
      wmfs_numlockmask();
 
      XUngrabButton(W->dpy, AnyButton, AnyModifier, c->win);
 
      if(focused)
      {
-          for(i = 0; i < LEN(but); ++i)
+          int i = 0;
+
+          while(i++ != Button5)
           {
-               XGrabButton(W->dpy, but[i], CLIENT_MOUSE_MOD, c->win, False,
+               XGrabButton(W->dpy, i, CLIENT_MOUSE_MOD, c->win, False,
                          ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-               XGrabButton(W->dpy, but[i], CLIENT_MOUSE_MOD | LockMask, c->win, False,
+               XGrabButton(W->dpy, i, CLIENT_MOUSE_MOD | LockMask, c->win, False,
                          ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-               XGrabButton(W->dpy, but[i], CLIENT_MOUSE_MOD | W->numlockmask, c->win, False,
+               XGrabButton(W->dpy, i, CLIENT_MOUSE_MOD | W->numlockmask, c->win, False,
                          ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-               XGrabButton(W->dpy, but[i], CLIENT_MOUSE_MOD | LockMask | W->numlockmask, c->win, False,
+               XGrabButton(W->dpy, i, CLIENT_MOUSE_MOD | LockMask | W->numlockmask, c->win, False,
                          ButtonMask, GrabModeAsync, GrabModeSync, None, None);
           }
 
@@ -236,10 +236,10 @@ client_remove(Client *c)
      if(W->client == c)
           client_focus(NULL);
 
-     SLIST_REMOVE(&W->h.client, c, Client, next);
-
      if(c->tag->sel == c)
           c->tag->sel = SLIST_FIRST(&c->tag->clients);
+
+     SLIST_REMOVE(&W->h.client, c, Client, next);
 
      tag_client(NULL, c);
 

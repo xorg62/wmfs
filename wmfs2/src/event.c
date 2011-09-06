@@ -246,7 +246,7 @@ event_init(void)
      event_handle[DestroyNotify]    = event_destroynotify;
      event_handle[EnterNotify]      = event_enternotify;
      event_handle[Expose]           = event_expose;
-     event_handle[FocusIn]          = event_focusin;
+     /*event_handle[FocusIn]          = event_focusin;*/
      event_handle[KeyPress]         = event_keypress;
      /*event_handle[MapNotify]        = event_mapnotify;*/
      event_handle[MapRequest]       = event_maprequest;

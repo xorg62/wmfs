@@ -7,6 +7,7 @@
 #include "util.h"
 #include "infobar.h"
 #include "client.h"
+#include "frame.h"
 
 Tag*
 tag_new(Scr33n *s, char *name)
@@ -20,6 +21,14 @@ tag_new(Scr33n *s, char *name)
      t->flags  = 0;
      t->sel    = NULL;
 
+     SLIST_INIT(&t->clients);
+     SLIST_INIT(&t->frames);
+
+     /*
+      * tmp
+      */
+     t->frame = frame_new(t);
+
      TAILQ_INSERT_TAIL(&s->tags, t, next);
 
      return t;
@@ -28,11 +37,26 @@ tag_new(Scr33n *s, char *name)
 void
 tag_screen(Scr33n *s, Tag *t)
 {
+     Frame *f;
+     Client *c;
+
+     /* Hide previous tag's clients */
+     if(s->seltag)
+          SLIST_FOREACH(c, &s->seltag->clients, tnext)
+               client_unmap(c);
+
      s->seltag = t;
+
+     /* Unhide selected tag's clients */
+     SLIST_FOREACH(c, &t->clients, tnext)
+          client_map(c);
 
      client_focus(t->sel);
 
      infobar_elem_screen_update(s, ElemTag);
+
+     SLIST_FOREACH(f, &t->frames, next)
+          frame_update(f);
 }
 
 void
@@ -107,6 +131,18 @@ uicb_tag_prev(Uicb cmd)
           tag_screen(W->screen, TAILQ_LAST(&W->screen->tags, tsub));
 }
 
+static void
+tag_remove(Tag *t)
+{
+     Frame *f;
+
+     free(t->name);
+
+     frame_free(t);
+
+     free(t);
+}
+
 
 void
 tag_free(Scr33n *s)
@@ -116,7 +152,6 @@ tag_free(Scr33n *s)
      TAILQ_FOREACH(t, &s->tags, next)
      {
           TAILQ_REMOVE(&s->tags, t, next);
-          free(t->name);
-          free(t);
+          tag_remove(t);
      }
 }
