@@ -64,6 +64,8 @@ infobar_elem_screen_update(Scr33n *s, int addf)
 
      SLIST_FOREACH(i, &s->infobars, next)
           infobar_elem_update(i);
+
+     s->elemupdate &= ~FLAGINT(ElemTag);
 }
 
 #endif /* INFOBAR_H */

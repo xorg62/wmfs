@@ -4,7 +4,9 @@
  */
 
 #include "client.h"
+#include "config.h"
 #include "util.h"
+#include "barwin.h"
 
 #define CLIENT_MOUSE_MOD Mod1Mask
 
@@ -97,7 +99,7 @@ client_focus(Client *c)
      /* Unfocus selected */
      if(W->client && W->client != c)
      {
-          XSetWindowBorder(W->dpy, W->client->win, 0xfF0000);
+          XSetWindowBorder(W->dpy, W->client->win, THEME_DEFAULT->client_n.bg);
 
           client_grabbuttons(W->client, false);
      }
@@ -107,7 +109,7 @@ client_focus(Client *c)
      {
           c->tag->sel = c;
 
-          XSetWindowBorder(W->dpy, c->win, 0xffffff);
+          XSetWindowBorder(W->dpy, c->win, THEME_DEFAULT->client_s.bg);
 
           client_grabbuttons(c, true);
 
@@ -202,8 +204,8 @@ client_new(Window w, XWindowAttributes *wa)
      /* X window attributes */
      XSelectInput(W->dpy, w, EnterWindowMask | FocusChangeMask | PropertyChangeMask | StructureNotifyMask);
 
-     XSetWindowBorder(W->dpy, w, 0xffffff);
-     XSetWindowBorderWidth(W->dpy, w, 1);
+     XSetWindowBorder(W->dpy, w, THEME_DEFAULT->client_n.bg);
+     XSetWindowBorderWidth(W->dpy, w, THEME_DEFAULT->client_border_width);
      client_grabbuttons(c, false);
 
      /* Attach */

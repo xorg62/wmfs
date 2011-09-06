@@ -185,10 +185,15 @@ struct Theme
      int bars_width;
 
      /* Elements */
-     struct Colpair tags_n; /* normal */
-     struct Colpair tags_s; /* selected */
+     struct Colpair tags_n, tags_s; /* normal / selected */
      int tags_border_width;
      Color tags_border_col;
+
+     /* Client / Frame */
+     struct Colpair client_n, client_s;
+     Color frame_bg;
+     int client_titlebar_width;
+     int client_border_width;
 
      SLIST_ENTRY(Theme) next;
 };

@@ -109,8 +109,6 @@ infobar_elem_tag_update(Element *e)
 
           barwin_refresh(b);
      }
-
-     e->infobar->screen->elemupdate &= ~FLAGINT(ElemTag);
 }
 
 static void

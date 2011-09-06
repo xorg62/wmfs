@@ -14,6 +14,8 @@
 #include "util.h"
 #include "tag.h"
 
+#define THEME_DEFAULT (SLIST_FIRST(&W->h.theme))
+
 static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
 {
      /* Sys */
@@ -78,7 +80,7 @@ name_to_theme(const char *name)
           if(!strcmp(t->name, name))
                return t;
 
-     return SLIST_FIRST(&W->h.theme);
+     return THEME_DEFAULT;
 }
 
 
