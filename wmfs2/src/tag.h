@@ -8,16 +8,13 @@
 
 #include "wmfs.h"
 
-Tag *tag_new(Scr33n *s, char *name);
-void tag_screen(Scr33n *s, Tag *t);
-void tag_client(Tag *t, Client *c);
-void tag_free(Scr33n *s);
+struct Tag *tag_new(struct Scr33n *s, char *name);
+void tag_screen(struct Scr33n *s, struct Tag *t);
+void tag_client(struct Tag *t, struct Client *c);
+void tag_free(struct Scr33n *s);
 void uicb_tag_set(Uicb cmd);
 void uicb_tag_set_with_name(Uicb cmd);
 void uicb_tag_next(Uicb cmd);
 void uicb_tag_prev(Uicb cmd);
-
-
-
 
 #endif /* TAG_H */

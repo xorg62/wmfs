@@ -17,10 +17,10 @@
  * \param entermask bool for know if the EnterMask mask is needed
  * \return The BarWindow pointer
 */
-Barwin*
+struct Barwin*
 barwin_new(Window parent, int x, int y, int w, int h, Color fg, Color bg, bool entermask)
 {
-     Barwin *b = (Barwin*)xcalloc(1, sizeof(Barwin));
+     struct Barwin *b = (struct Barwin*)xcalloc(1, sizeof(struct Barwin));
      XSetWindowAttributes at =
      {
           .override_redirect = True,
@@ -57,7 +57,7 @@ barwin_new(Window parent, int x, int y, int w, int h, Color fg, Color bg, bool e
  * \param bw Barwin pointer
 */
 void
-barwin_remove(Barwin *b)
+barwin_remove(struct Barwin *b)
 {
      SLIST_REMOVE(&W->h.barwin, b, Barwin, next);
 
@@ -77,7 +77,7 @@ barwin_remove(Barwin *b)
  * \param h Height
 */
 void
-barwin_resize(Barwin *b, int w, int h)
+barwin_resize(struct Barwin *b, int w, int h)
 {
      /* Frame */
      XFreePixmap(W->dpy, b->dr);
@@ -91,11 +91,11 @@ barwin_resize(Barwin *b, int w, int h)
 }
 
 void
-barwin_mousebind_new(Barwin *b, unsigned int button, bool u, Geo a, void (*func)(Uicb), Uicb cmd)
+barwin_mousebind_new(struct Barwin *b, unsigned int button, bool u, struct Geo a, void (*func)(Uicb), Uicb cmd)
 {
-     Mousebind *m;
+     struct Mousebind *m;
 
-     m = xcalloc(1, sizeof(Mousebind));
+     m = xcalloc(1, sizeof(struct Mousebind));
 
      m->button = button;
      m->use_area = u;
@@ -111,7 +111,7 @@ barwin_mousebind_new(Barwin *b, unsigned int button, bool u, Geo a, void (*func)
  * \param bw Barwin pointer
 */
 void
-barwin_refresh_color(Barwin *b)
+barwin_refresh_color(struct Barwin *b)
 {
      XSetForeground(W->dpy, W->gc, b->bg);
      XFillRectangle(W->dpy, b->dr, W->gc, 0, 0, b->geo.w, b->geo.h);

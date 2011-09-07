@@ -8,8 +8,8 @@
 
 #include "wmfs.h"
 
-Frame *frame_new(Tag *t);
-void frame_free(Tag *t);
-void frame_update(Frame *f);
+struct Frame *frame_new(struct Tag *t);
+void frame_free(struct Tag *t);
+void frame_update(struct Frame *f);
 
 #endif /* FRAME_H */

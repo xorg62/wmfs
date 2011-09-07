@@ -16,8 +16,8 @@ static void
 event_buttonpress(XEvent *e)
 {
      XButtonEvent *ev = &e->xbutton;
-     Mousebind *m;
-     Barwin *b;
+     struct Mousebind *m;
+     struct Barwin *b;
 
      screen_update_sel();
 
@@ -38,7 +38,7 @@ static void
 event_enternotify(XEvent *e)
 {
      XCrossingEvent *ev = &e->xcrossing;
-     Client *c;
+     struct Client *c;
 
      if((ev->mode != NotifyNormal || ev->detail == NotifyInferior)
                && ev->window != W->root)
@@ -60,7 +60,7 @@ event_configureevent(XEvent *e)
 {
      XConfigureRequestEvent *ev = &e->xconfigurerequest;
      XWindowChanges wc;
-     Client *c;
+     struct Client *c;
 
      if((c = client_gb_win(ev->window)))
      {
@@ -95,7 +95,7 @@ static void
 event_destroynotify(XEvent *e)
 {
      XDestroyWindowEvent *ev = &e->xdestroywindow;
-     Client *c;
+     struct Client *c;
 
      if((c = client_gb_win(ev->window)))
           client_remove(c);
@@ -104,7 +104,7 @@ event_destroynotify(XEvent *e)
 static void
 event_focusin(XEvent *e)
 {
-     Client *c;
+     struct Client *c;
 
      if(W->client && e->xfocus.window != W->client->win)
           client_focus(W->client);
@@ -122,7 +122,7 @@ event_maprequest(XEvent *e)
           return;
 
      if(!client_gb_win(ev->window))
-          (Client*)client_new(ev->window, &at);
+          (struct Client*)client_new(ev->window, &at);
 }
 
 static void
@@ -139,7 +139,7 @@ static void
 event_propertynotify(XEvent *e)
 {
      XPropertyEvent *ev = &e->xproperty;
-     Client *c;
+     struct Client *c;
 
      if(ev->state == PropertyDelete)
           return;
@@ -176,7 +176,7 @@ static void
 event_unmapnotify(XEvent *e)
 {
      XUnmapEvent *ev = &e->xunmap;
-     Client *c;
+     struct Client *c;
 
      if((c = client_gb_win(ev->window)) && ev->send_event)
           client_remove(c);
@@ -201,7 +201,7 @@ event_keypress(XEvent *e)
 {
      XKeyPressedEvent *ev = &e->xkey;
      KeySym keysym = XKeycodeToKeysym(EVDPY(e), (KeyCode)ev->keycode, 0);
-     Keybind *k;
+     struct Keybind *k;
 
      screen_update_sel();
 
@@ -215,7 +215,7 @@ static void
 event_expose(XEvent *e)
 {
      XExposeEvent *ev = &e->xexpose;
-     Barwin *b;
+     struct Barwin *b;
 
      SLIST_FOREACH(b, &W->h.barwin, next)
           if(b->win == ev->window)

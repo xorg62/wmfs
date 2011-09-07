@@ -16,14 +16,14 @@
 #define PAD (8)
 
 static inline void
-draw_text(Drawable d, Theme *t, int x, int y, Color fg, const char *str)
+draw_text(Drawable d, struct Theme *t, int x, int y, Color fg, const char *str)
 {
      XSetForeground(W->dpy, W->gc, fg);
      XmbDrawString(W->dpy, d, t->font.fontset, W->gc, x, y, str, strlen(str));
 }
 
 static inline unsigned short
-draw_textw(Theme *t, const char *str)
+draw_textw(struct Theme *t, const char *str)
 {
      XRectangle r;
 

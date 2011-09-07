@@ -73,7 +73,7 @@ wmfs_numlockmask(void)
 }
 
 void
-wmfs_init_font(char *font, Theme *t)
+wmfs_init_font(char *font, struct Theme *t)
 {
      XFontStruct **xfs = NULL;
      char **misschar, **names, *defstring;
@@ -150,7 +150,7 @@ void
 wmfs_grab_keys(void)
 {
      KeyCode c;
-     Keybind *k;
+     struct Keybind *k;
 
      wmfs_numlockmask();
 
@@ -252,8 +252,8 @@ wmfs_init(void)
 void
 wmfs_quit(void)
 {
-     Keybind *k;
-     Theme *t;
+     struct Keybind *k;
+     struct Theme *t;
 
      /* Will free:
       *

@@ -12,17 +12,17 @@
 
 enum { ElemTag = 0, ElemLayout, ElemSelbar, ElemStatus, ElemCustom, ElemLast };
 
-Infobar *infobar_new(Scr33n *s, Theme *theme, Barpos pos, const char *elem);
-void infobar_elem_update(Infobar *i);
-void infobar_refresh(Infobar *i);
-void infobar_remove(Infobar *i);
-void infobar_free(Scr33n *s);
+struct Infobar *infobar_new(struct Scr33n *s, struct Theme *theme, Barpos pos, const char *elem);
+void infobar_elem_update(struct Infobar *i);
+void infobar_refresh(struct Infobar *i);
+void infobar_remove(struct Infobar *i);
+void infobar_free(struct Scr33n *s);
 
 /* Basic placement of elements */
 static inline void
-infobar_elem_placement(Element *e)
+infobar_elem_placement(struct Element *e)
 {
-     Element *p = TAILQ_PREV(e, esub, next);
+     struct Element *p = TAILQ_PREV(e, esub, next);
 
      e->geo.y = e->geo.w = 0;
      e->geo.h = e->infobar->geo.h;
@@ -31,7 +31,7 @@ infobar_elem_placement(Element *e)
 
 /* Bars placement management and usable space management */
 static inline bool
-infobar_placement(Infobar *i, Barpos p)
+infobar_placement(struct Infobar *i, Barpos p)
 {
      i->pos = p;
      i->geo = i->screen->ugeo;
@@ -56,9 +56,9 @@ infobar_placement(Infobar *i, Barpos p)
 }
 
 static inline void
-infobar_elem_screen_update(Scr33n *s, int addf)
+infobar_elem_screen_update(struct Scr33n *s, int addf)
 {
-     Infobar *i;
+     struct Infobar *i;
 
      s->elemupdate |= FLAGINT(addf);
 

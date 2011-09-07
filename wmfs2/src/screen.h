@@ -8,10 +8,10 @@
 
 #include "wmfs.h"
 
-static inline Scr33n*
+static inline struct Scr33n*
 screen_gb_id(int id)
 {
-     Scr33n *s;
+     struct Scr33n *s;
 
      SLIST_FOREACH(s, &W->h.screen, next)
           if(s->id == id)
@@ -21,7 +21,7 @@ screen_gb_id(int id)
 }
 
 void screen_init(void);
-Scr33n* screen_update_sel(void);
+struct Scr33n* screen_update_sel(void);
 void screen_free(void);
 
 #endif /* SCREEN_H */

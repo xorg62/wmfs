@@ -36,58 +36,47 @@ typedef enum { Right = 0, Left, Top, Bottom, Center, PositionLast } Position;
 /*
  * Structures
  */
-typedef struct Geo Geo;
-typedef struct Element Element;
-typedef struct Infobar Infobar;
-typedef struct Barwin Barwin;
-typedef struct Scr33n Scr33n;
-typedef struct Tag Tag;
-typedef struct Client Client;
-typedef struct Frame Frame;
-typedef struct Keybind Keybind;
-typedef struct Mousebind Mousebind;
-typedef struct Theme Theme;
 
 struct Geo
 {
      int x, y, w, h;
 };
 
-/* Barwin */
+/* struct Barwin */
 struct Barwin
 {
+     struct Geo geo;
      Window win;
      Drawable dr;
      Color fg, bg;
-     Geo geo;
-     Flags flags;
+      Flags flags;
      void *ptr; /* Special cases */
      SLIST_HEAD(, Mousebind) mousebinds;
      SLIST_ENTRY(Barwin) next;  /* global barwin */
      SLIST_ENTRY(Barwin) enext; /* element barwin */
 };
 
-/* Infobar's element */
+/* struct Infobar's element */
 struct Element
 {
-     SLIST_HEAD(, Barwin) bars;
-     Geo geo;
-     Infobar *infobar;
+     struct Geo geo;
+     struct Infobar *infobar;
      int type;
-     void (*func_init)(Element *e);
-     void (*func_update)(Element *e);
+     void (*func_init)(struct Element *e);
+     void (*func_update)(struct Element *e);
+     SLIST_HEAD(, Barwin) bars;
      TAILQ_ENTRY(Element) next;
 };
 
-/* Infobar */
+/* struct Infobar */
 struct Infobar
 {
-     Barwin *bar;
-     Geo geo;
-     Barpos pos;
-     Scr33n *screen;
-     Theme *theme;
+     struct Barwin *bar;
+     struct Geo geo;
+     struct Scr33n *screen;
+     struct Theme *theme;
      char *elemorder;
+     Barpos pos;
      TAILQ_HEAD(esub, Element) elements;
      SLIST_ENTRY(Infobar) next;
 };
@@ -95,8 +84,8 @@ struct Infobar
 /* Screen */
 struct Scr33n
 {
-     Geo geo, ugeo;
-     Tag *seltag;
+     struct Geo geo, ugeo;
+     struct Tag *seltag;
      int id;
      Flags elemupdate;
      TAILQ_HEAD(tsub, Tag) tags;
@@ -104,40 +93,40 @@ struct Scr33n
      SLIST_ENTRY(Scr33n) next;
 };
 
-/* Tag */
+/* struct Tag */
 struct Tag
 {
+     struct Scr33n *screen;
+     struct Client *sel;
+     struct Frame *frame;
      char *name;
-     Scr33n *screen;
      Flags flags;
-     Client *sel;
-     Frame *frame;
      SLIST_HEAD(, Frame) frames;
      SLIST_HEAD(, Client) clients;
      TAILQ_ENTRY(Tag) next;
 };
 
-/* Client */
+/* struct Client */
 struct Client
 {
-     Tag *tag;
-     Scr33n *screen;
-     Frame *frame;
-     Barwin *titlebar;
-     Geo geo;
-     Flags flags;
+     struct Tag *tag;
+     struct Scr33n *screen;
+     struct Frame *frame;
+     struct Barwin *titlebar;
+     struct Geo geo;
      char *title;
+     Flags flags;
      Window win;
      SLIST_ENTRY(Client) next;  /* Global list */
-     SLIST_ENTRY(Client) tnext; /* Tag list */
-     SLIST_ENTRY(Client) fnext; /* Frame list */
+     SLIST_ENTRY(Client) tnext; /* struct Tag list */
+     SLIST_ENTRY(Client) fnext; /* struct struct Frame list */
 };
 
-/* Frame */
+/* struct struct Frame */
 struct Frame
 {
-     Tag *tag;
-     Geo geo;
+     struct Tag *tag;
+     struct Geo geo;
      Window win;
      Color fg, bg;
      SLIST_HEAD(, Client) clients;
@@ -148,16 +137,16 @@ struct Frame
 struct Keybind
 {
      unsigned int mod;
-     KeySym keysym;
      void (*func)(Uicb);
      Uicb cmd;
+     KeySym keysym;
      SLIST_ENTRY(Keybind) next;
 };
 
 struct Mousebind
 {
+     struct Geo area;
      unsigned int button;
-     Geo area;
      bool use_area;
      void (*func)(Uicb);
      Uicb cmd;
@@ -184,12 +173,12 @@ struct Theme
      struct Colpair bars;
      int bars_width;
 
-     /* Elements */
+     /* struct Elements */
      struct Colpair tags_n, tags_s; /* normal / selected */
      int tags_border_width;
      Color tags_border_col;
 
-     /* Client / Frame */
+     /* struct Client / struct struct Frame */
      struct Colpair client_n, client_s;
      Color frame_bg;
      int client_titlebar_width;
@@ -223,8 +212,8 @@ struct Wmfs
      /*
       * Selected screen, client
       */
-     Scr33n *screen;
-     Client *client;
+     struct Scr33n *screen;
+     struct Client *client;
 
 };
 
@@ -232,7 +221,7 @@ int wmfs_error_handler(Display *d, XErrorEvent *event);
 int wmfs_error_handler_dummy(Display *d, XErrorEvent *event);
 void wmfs_grab_keys(void);
 void wmfs_numlockmask(void);
-void wmfs_init_font(char *font, Theme *t);
+void wmfs_init_font(char *font, struct Theme *t);
 void wmfs_quit(void);
 void uicb_reload(Uicb cmd);
 void uicb_quit(Uicb cmd);

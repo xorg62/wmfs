@@ -9,11 +9,11 @@
 #include "tag.h"
 #include "util.h"
 
-Frame*
-frame_new(Tag *t)
+struct Frame*
+frame_new(struct Tag *t)
 {
-     Geo g = t->screen->ugeo;
-     Frame *f = xcalloc(1, sizeof(Frame));
+     struct Geo g = t->screen->ugeo;
+     struct Frame *f = xcalloc(1, sizeof(struct Frame));
      XSetWindowAttributes at =
      {
           .override_redirect = True,
@@ -34,7 +34,7 @@ frame_new(Tag *t)
 }
 
 static void
-frame_remove(Frame *f)
+frame_remove(struct Frame *f)
 {
      SLIST_REMOVE(&f->tag->frames, f, Frame, next);
      XDestroyWindow(W->dpy, f->win);
@@ -44,16 +44,16 @@ frame_remove(Frame *f)
 }
 
 void
-frame_free(Tag *t)
+frame_free(struct Tag *t)
 {
-     Frame *f;
+     struct Frame *f;
 
      SLIST_FOREACH(f, &t->frames, next)
           frame_remove(f);
 }
 
 void
-frame_client(Frame *f, Client *c)
+frame_client(struct Frame *f, struct Client *c)
 {
      /* Remove client from its previous frame */
      if(c->frame)
@@ -71,7 +71,7 @@ frame_client(Frame *f, Client *c)
 }
 
 void
-frame_update(Frame *f)
+frame_update(struct Frame *f)
 {
 
 }

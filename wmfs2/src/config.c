@@ -16,7 +16,7 @@
 static void
 config_theme(void)
 {
-     Theme *t;
+     struct Theme *t;
      size_t i, n;
      struct conf_sec *sec, **ks;
      char *name;
@@ -34,7 +34,7 @@ config_theme(void)
      /* [theme]*/
      for(i = 0; i < n; ++i)
      {
-          t = (Theme*)xcalloc(1, sizeof(Theme));
+          t = (struct Theme*)xcalloc(1, sizeof(struct Theme));
 
           t->name = fetch_opt_first(ks[i], "default", "name").str;
 
@@ -73,8 +73,8 @@ config_theme(void)
 static void
 config_bars(void)
 {
-     Scr33n *s;
-     Theme *t;
+     struct Scr33n *s;
+     struct Theme *t;
      size_t i, n;
      struct conf_sec *sec, **ks;
      int screenid;
@@ -96,7 +96,7 @@ config_bars(void)
 
           SLIST_FOREACH(s, &W->h.screen, next)
                if(screenid == s->id || screenid == -1)
-                    (Infobar*)infobar_new(s, t, pos, elem);
+                    (struct Infobar*)infobar_new(s, t, pos, elem);
      }
 
      free(ks);
@@ -106,8 +106,8 @@ config_bars(void)
 static void
 config_tag(void)
 {
-     Scr33n *s;
-     Tag *t;
+     struct Scr33n *s;
+     struct Tag *t;
      size_t i, n;
      struct conf_sec *sec, **ks;
      char *name;
@@ -146,7 +146,7 @@ config_keybind(void)
      struct conf_sec *sec, **ks;
      struct opt_type *opt;
      char *cmd;
-     Keybind *k;
+     struct Keybind *k;
 
      /* [keys] */
      sec = fetch_section_first(NULL, "keys");
@@ -158,7 +158,7 @@ config_keybind(void)
      /* [key] */
      for(i = 0; i < n; ++i)
      {
-          k = (Keybind*)xcalloc(1, sizeof(Keybind));
+          k = (struct Keybind*)xcalloc(1, sizeof(struct Keybind));
 
           /* mod = {} */
           opt = fetch_opt(ks[i], "", "mod");
