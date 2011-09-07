@@ -235,6 +235,8 @@ infobar_free(Scr33n *s)
      while(!SLIST_EMPTY(&s->infobars))
      {
           i = SLIST_FIRST(&s->infobars);
+
+          /* SLIST_REMOVE is done by infobar_remove */
           infobar_remove(i);
      }
 }

@@ -22,6 +22,15 @@
      tags_border_color = "#888888"
      tags_border_width = 1
 
+     # Frame / Client
+     client_normal_fg = "#CCCCCC"
+     client_normal_bg = "#222222"
+     client_sel_fg = "#222222"
+     client_sel_bg = "#CCCCCC"
+     frame_bg = "#555555"
+     client_titlebar_width = 12 #useless for now
+     client_border_width = 1
+
    [/theme]
 
    [theme]
