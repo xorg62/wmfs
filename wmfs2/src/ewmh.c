@@ -4,6 +4,7 @@
  */
 
 #include <X11/Xatom.h>
+#include <X11/Xutil.h>
 
 #include "ewmh.h"
 #include "util.h"
@@ -16,6 +17,7 @@ ewmh_init(void)
      W->net_atom = xcalloc(net_last, sizeof(Atom));
 
      /* EWMH hints */
+     W->net_atom[wm_state]                       = ATOM("WM_STATE");
      W->net_atom[net_supported]                  = ATOM("_NET_SUPPORTED");
      W->net_atom[net_client_list]                = ATOM("_NET_CLIENT_LIST");
      W->net_atom[net_frame_extents]              = ATOM("_NET_FRAME_EXTENTS");
@@ -92,3 +94,13 @@ ewmh_init(void)
       */
 
 }
+
+void
+ewmh_set_wm_state(Window w, int state)
+{
+     unsigned char d[] = { state, None };
+
+     XChangeProperty(W->dpy, w, W->net_atom[wm_state],
+                     W->net_atom[wm_state], 32, PropModeReplace, d, 2);
+}
+

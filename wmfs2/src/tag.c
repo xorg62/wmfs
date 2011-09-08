@@ -9,12 +9,12 @@
 #include "client.h"
 #include "frame.h"
 
-struct Tag*
-tag_new(struct Scr33n *s, char *name)
+struct tag*
+tag_new(struct screen *s, char *name)
 {
-     struct Tag *t;
+     struct tag *t;
 
-     t = xcalloc(1, sizeof(struct Tag));
+     t = xcalloc(1, sizeof(struct tag));
 
      t->screen = s;
      t->name   = xstrdup(name);
@@ -24,10 +24,8 @@ tag_new(struct Scr33n *s, char *name)
      SLIST_INIT(&t->clients);
      SLIST_INIT(&t->frames);
 
-     /*
-      * tmp
-      */
-     t->frame = frame_new(t);
+     /* only one frame for now, *tmp* */
+     frame_new(t); /* t->frame */
 
      TAILQ_INSERT_TAIL(&s->tags, t, next);
 
@@ -35,56 +33,56 @@ tag_new(struct Scr33n *s, char *name)
 }
 
 void
-tag_screen(struct Scr33n *s, struct Tag *t)
+tag_screen(struct screen *s, struct tag *t)
 {
-     struct Frame *f;
-     struct Client *c;
+     struct frame *f;
+     struct client *c;
 
-     /* Hide previous tag's clients */
-     if(s->seltag)
-          SLIST_FOREACH(c, &s->seltag->clients, tnext)
-               client_unmap(c);
-
-     s->seltag = t;
+     /* Hide previous tag's frame */
+     SLIST_FOREACH(f, &s->seltag->frames, next)
+          frame_unmap(f);
 
      /* Unhide selected tag's clients */
-     SLIST_FOREACH(c, &t->clients, tnext)
-          client_map(c);
+     SLIST_FOREACH(f, &t->frames, next)
+          frame_update(f);
+
+     s->seltag = t;
 
      client_focus(t->sel);
 
      infobar_elem_screen_update(s, ElemTag);
-
-     SLIST_FOREACH(f, &t->frames, next)
-          frame_update(f);
 }
 
 void
-tag_client(struct Tag *t, struct Client *c)
+tag_client(struct tag *t, struct client *c)
 {
      /* Remove client from its previous tag */
      if(c->tag)
      {
-          SLIST_REMOVE(&c->tag->clients, c, Client, tnext);
+          if(c->tag == t)
+               return;
+
+          SLIST_REMOVE(&c->tag->clients, c, client, tnext);
 
           if(c->tag->sel == c)
                c->tag->sel = NULL;
      }
 
-     /* Case of client remove, t = NULL */
-     if(!(c->tag = t))
+     /* Case of client remove */
+     if(!t)
           return;
+
+     c->tag = t;
 
      /* Insert in new tag list */
      SLIST_INSERT_HEAD(&t->clients, c, tnext);
 }
 
-
 void
 uicb_tag_set(Uicb cmd)
 {
      int i = 0, n = ATOI(cmd);
-     struct Tag *t;
+     struct tag *t;
 
      TAILQ_FOREACH(t, &W->screen->tags, next)
           if(++i == n)
@@ -97,7 +95,7 @@ uicb_tag_set(Uicb cmd)
 void
 uicb_tag_set_with_name(Uicb cmd)
 {
-     struct Tag *t;
+     struct tag *t;
 
      TAILQ_FOREACH(t, &W->screen->tags, next)
           if(!strcmp(cmd, t->name))
@@ -111,7 +109,7 @@ void
 uicb_tag_next(Uicb cmd)
 {
      (void)cmd;
-     struct Tag *t;
+     struct tag *t;
 
      if((t = TAILQ_NEXT(W->screen->seltag, next)))
           tag_screen(W->screen, t);
@@ -123,7 +121,7 @@ void
 uicb_tag_prev(Uicb cmd)
 {
      (void)cmd;
-     struct Tag *t;
+     struct tag *t;
 
      if((t = TAILQ_PREV(W->screen->seltag, tsub, next)))
           tag_screen(W->screen, t);
@@ -132,9 +130,9 @@ uicb_tag_prev(Uicb cmd)
 }
 
 static void
-tag_remove(struct Tag *t)
+tag_remove(struct tag *t)
 {
-     struct Frame *f;
+     struct frame *f;
 
      free(t->name);
 
@@ -143,11 +141,10 @@ tag_remove(struct Tag *t)
      free(t);
 }
 
-
 void
-tag_free(struct Scr33n *s)
+tag_free(struct screen *s)
 {
-     struct Tag *t;
+     struct tag *t;
 
      TAILQ_FOREACH(t, &s->tags, next)
      {

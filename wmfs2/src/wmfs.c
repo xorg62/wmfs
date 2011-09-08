@@ -73,7 +73,7 @@ wmfs_numlockmask(void)
 }
 
 void
-wmfs_init_font(char *font, struct Theme *t)
+wmfs_init_font(char *font, struct theme *t)
 {
      XFontStruct **xfs = NULL;
      char **misschar, **names, *defstring;
@@ -150,7 +150,7 @@ void
 wmfs_grab_keys(void)
 {
      KeyCode c;
-     struct Keybind *k;
+     struct keybind *k;
 
      wmfs_numlockmask();
 
@@ -252,12 +252,12 @@ wmfs_init(void)
 void
 wmfs_quit(void)
 {
-     struct Keybind *k;
-     struct Theme *t;
+     struct keybind *k;
+     struct theme *t;
 
      /* Will free:
       *
-      * Screens -> Tags
+      * Screens -> tags
       *         -> Infobars -> Elements
       */
      screen_free();
@@ -306,7 +306,7 @@ uicb_quit(Uicb cmd)
 int
 main(int argc, char **argv)
 {
-     W = (struct Wmfs*)xcalloc(1, sizeof(struct Wmfs));
+     W = (struct wmfs*)xcalloc(1, sizeof(struct wmfs));
 
 
      /* Get X display */

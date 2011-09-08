@@ -19,11 +19,20 @@
           }                                     \
      } while(/* CONSTCOND */ 0);
 
-#define ATOM(a)      XInternAtom(W->dpy, (a), False)
-#define LEN(x)       (sizeof(x) / sizeof(*x))
-#define FLAGINT(i)   (1 << i)
-#define ATOI(s)      strtol(s, NULL, 10)
-#define INAREA(i, j, a)    ((i) >= (a).x && (i) <= (a).x + (a).w && (j) >= (a).y && (j) <= (a).y + (a).h)
+/* t is Map or Unmap */
+#define WIN_STATE(w, t) do {      \
+     X##t##Subwindows(W->dpy, w); \
+     X##t##Window(W->dpy, w);     \
+} while( /* CONSTCOND */ 0);
+
+
+#define ATOM(a)          XInternAtom(W->dpy, (a), False)
+#define LEN(x)           (sizeof(x) / sizeof(*x))
+#define FLAGINT(i)       (1 << i)
+#define ATOI(s)          strtol(s, NULL, 10)
+#define ABS(j)           (j < 0 ? -j : j)
+#define INAREA(i, j, a)  ((i) >= (a).x && (i) <= (a).x + (a).w && (j) >= (a).y && (j) <= (a).y + (a).h)
+
 
 /*
  * "#RRGGBB" -> 0xRRGGBB

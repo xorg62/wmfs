@@ -3,40 +3,48 @@
  *  For license, see COPYING.
  */
 
+#include <X11/Xutil.h>
+
 #include "wmfs.h"
 #include "frame.h"
 #include "barwin.h"
 #include "tag.h"
 #include "util.h"
+#include "config.h"
 
-struct Frame*
-frame_new(struct Tag *t)
+struct frame*
+frame_new(struct tag *t)
 {
-     struct Geo g = t->screen->ugeo;
-     struct Frame *f = xcalloc(1, sizeof(struct Frame));
+     struct frame *f = xcalloc(1, sizeof(struct frame));
      XSetWindowAttributes at =
      {
-          .override_redirect = True,
+          .background_pixel  = THEME_DEFAULT->frame_bg,
+          .override_redirect = true,
           .background_pixmap = ParentRelative,
-          .event_mask = (BARWIN_MASK | BARWIN_ENTERMASK)
+          .event_mask        = BARWIN_MASK
      };
 
      f->tag = t;
-     f->geo = g;
+     f->geo = t->screen->ugeo;
+     t->frame = f;
 
-     f->win = XCreateWindow(W->dpy, W->root, g.x, g.y, g.w, g.h, 0, W->xdepth,
-               CopyFromParent, DefaultVisual(W->dpy, W->xscreen),
-               (CWOverrideRedirect | CWEventMask), &at);
+     f->win = XCreateWindow(W->dpy, W->root,
+                            f->geo.x, f->geo.y,
+                            f->geo.w, f->geo.h,
+                            0, CopyFromParent,
+                            InputOutput,
+                            CopyFromParent,
+                            (CWOverrideRedirect | CWBackPixmap | CWBackPixel | CWEventMask),
+                            &at);
 
      SLIST_INIT(&f->clients);
-
      SLIST_INSERT_HEAD(&t->frames, f, next);
 }
 
 static void
-frame_remove(struct Frame *f)
+frame_remove(struct frame *f)
 {
-     SLIST_REMOVE(&f->tag->frames, f, Frame, next);
+     SLIST_REMOVE(&f->tag->frames, f, frame, next);
      XDestroyWindow(W->dpy, f->win);
 
      /* frame_arrange(f->tag); */
@@ -44,36 +52,93 @@ frame_remove(struct Frame *f)
 }
 
 void
-frame_free(struct Tag *t)
+frame_free(struct tag *t)
 {
-     struct Frame *f;
+     struct frame *f;
 
      SLIST_FOREACH(f, &t->frames, next)
           frame_remove(f);
 }
 
 void
-frame_client(struct Frame *f, struct Client *c)
+frame_client(struct frame *f, struct client *c)
 {
      /* Remove client from its previous frame */
      if(c->frame)
-          SLIST_REMOVE(&c->frame->clients, c, Client, fnext);
+     {
+          if(c->frame == f)
+               return;
 
-     /* Adjust tag with frame's one */
-     if(f->tag != c->tag)
-          tag_client(f->tag, c);
+          SLIST_REMOVE(&c->frame->clients, c, client, fnext);
+     }
 
-     XReparentWindow(W->dpy, c->win, f->win, 1, 1);
+     /* Case of client remove, f = NULL */
+     if(!f)
+     {
+          if(c->frame && FRAME_EMPTY(c->frame))
+               frame_unmap(c->frame);
+
+          XReparentWindow(W->dpy, c->win, W->root, c->geo.x, c->geo.y);
+
+          return;
+     }
+
+     XReparentWindow(W->dpy, c->win, f->win,
+                     THEME_DEFAULT->client_border_width,
+                     THEME_DEFAULT->client_titlebar_width);
+
+     XResizeWindow(W->dpy, c->win,
+                   f->geo.w - (THEME_DEFAULT->client_border_width << 1) - 1,
+                   f->geo.h - (THEME_DEFAULT->client_titlebar_width
+                        + THEME_DEFAULT->client_border_width >> 1));
 
      /* XReparentWindow(W->dpy, c->win, c->titlebar->win, 1, 1); */
 
-     SLIST_INSERT_HEAD(&f->clients, c, next);
+     /*split_integrate(f, c) */
+
+     SLIST_INSERT_HEAD(&f->clients, c, fnext);
+
+     frame_update(f);
 }
 
 void
-frame_update(struct Frame *f)
+frame_map(struct frame *f)
 {
+     struct client *c;
 
+     WIN_STATE(f->win, Map);
+
+     SLIST_FOREACH(c, &f->clients, fnext)
+          ewmh_set_wm_state(c->win, NormalState);
+}
+
+void
+frame_unmap(struct frame *f)
+{
+     struct client *c;
+
+     WIN_STATE(f->win, Unmap);
+
+     SLIST_FOREACH(c, &f->clients, fnext)
+          ewmh_set_wm_state(c->win, IconicState);
+}
+
+void
+frame_update(struct frame *f)
+{
+     if(FRAME_EMPTY(f))
+          return;
+
+     /* Resize frame */
+     /* TODO: frame_arrange or something */
+     XMoveResizeWindow(W->dpy,
+               f->win,
+               f->geo.x,
+               f->geo.y,
+               f->geo.w,
+               f->geo.h);
+
+     frame_map(f);
 }
 
 

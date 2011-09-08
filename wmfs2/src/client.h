@@ -8,15 +8,13 @@
 
 #include "wmfs.h"
 
-void client_configure(struct Client *c);
-struct Client *client_gb_win(Window w);
-void client_map(struct Client *c);
-void client_unmap(struct Client *c);
-void client_focus(struct Client *c);
-void client_get_name(struct Client *c);
-void client_close(struct Client *c);
-struct Client *client_new(Window w, XWindowAttributes *wa);
-void client_remove(struct Client *c);
+void client_configure(struct client *c);
+struct client *client_gb_win(Window w);
+void client_focus(struct client *c);
+void client_get_name(struct client *c);
+void client_close(struct client *c);
+struct client *client_new(Window w, XWindowAttributes *wa);
+void client_remove(struct client *c);
 void client_free(void);
 
 #endif /* CLIENT_H */

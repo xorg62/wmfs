@@ -10,14 +10,14 @@
 #include "util.h"
 #include "tag.h"
 
-static void infobar_elem_tag_init(struct Element *e);
-static void infobar_elem_tag_update(struct Element *e);
+static void infobar_elem_tag_init(struct element *e);
+static void infobar_elem_tag_update(struct element *e);
 
 const struct elem_funcs
 {
      char c;
-     void (*func_init)(struct Element *e);
-     void (*func_update)(struct Element *e);
+     void (*func_init)(struct element *e);
+     void (*func_update)(struct element *e);
 } elem_funcs[] =
 {
      { 't', infobar_elem_tag_init, infobar_elem_tag_update },
@@ -30,11 +30,11 @@ const struct elem_funcs
 };
 
 static void
-infobar_elem_tag_init(struct Element *e)
+infobar_elem_tag_init(struct element *e)
 {
-     struct Tag *t;
-     struct Barwin *b, *prev;
-     struct Geo g = { 0, 0, 0, 0 };
+     struct tag *t;
+     struct barwin *b, *prev;
+     struct geo g = { 0, 0, 0, 0 };
      int s, j;
 
      infobar_elem_placement(e);
@@ -80,14 +80,14 @@ infobar_elem_tag_init(struct Element *e)
 }
 
 static void
-infobar_elem_tag_update(struct Element *e)
+infobar_elem_tag_update(struct element *e)
 {
-     struct Tag *t, *sel = e->infobar->screen->seltag;
-     struct Barwin *b;
+     struct tag *t, *sel = e->infobar->screen->seltag;
+     struct barwin *b;
 
      SLIST_FOREACH(b, &e->bars, enext)
      {
-          t = (struct Tag*)b->ptr;
+          t = (struct tag*)b->ptr;
 
           /* Selected */
           /* TODO: color from conf */
@@ -112,9 +112,9 @@ infobar_elem_tag_update(struct Element *e)
 }
 
 static void
-infobar_elem_init(struct Infobar *i)
+infobar_elem_init(struct infobar *i)
 {
-     struct Element *e;
+     struct element *e;
      int n, j;
 
      TAILQ_INIT(&i->elements);
@@ -124,7 +124,7 @@ infobar_elem_init(struct Infobar *i)
           for(j = 0; j < LEN(elem_funcs); ++j)
                if(elem_funcs[j].c == i->elemorder[n])
                {
-                    e = xcalloc(1, sizeof(struct Element));
+                    e = xcalloc(1, sizeof(struct element));
 
                     SLIST_INIT(&e->bars);
 
@@ -143,9 +143,9 @@ infobar_elem_init(struct Infobar *i)
 }
 
 void
-infobar_elem_update(struct Infobar *i)
+infobar_elem_update(struct infobar *i)
 {
-     struct Element *e;
+     struct element *e;
 
      TAILQ_FOREACH(e, &i->elements, next)
           if(i->screen->elemupdate & FLAGINT(e->type))
@@ -153,9 +153,9 @@ infobar_elem_update(struct Infobar *i)
 }
 
 void
-infobar_elem_remove(struct Element *e)
+infobar_elem_remove(struct element *e)
 {
-     struct Barwin *b;
+     struct barwin *b;
 
      TAILQ_REMOVE(&e->infobar->elements, e, next);
 
@@ -167,13 +167,13 @@ infobar_elem_remove(struct Element *e)
      }
 }
 
-struct Infobar*
-infobar_new(struct Scr33n *s, struct Theme *theme, Barpos pos, const char *elem)
+struct infobar*
+infobar_new(struct screen *s, struct theme *theme, Barpos pos, const char *elem)
 {
      bool map;
      int n;
 
-     struct Infobar *i = (struct Infobar*)xcalloc(1, sizeof(struct Infobar));
+     struct infobar *i = (struct infobar*)xcalloc(1, sizeof(struct infobar));
 
      i->screen = s;
      i->theme = theme;
@@ -181,13 +181,13 @@ infobar_new(struct Scr33n *s, struct Theme *theme, Barpos pos, const char *elem)
 
      map = infobar_placement(i, pos);
 
-     /* struct Barwin create */
+     /* struct barwin create */
      i->bar = barwin_new(W->root, i->geo.x, i->geo.y, i->geo.w, i->geo.h,
                theme->bars.fg, theme->bars.bg, false);
 
      SLIST_INSERT_HEAD(&s->infobars, i, next);
 
-     /* struct Elements */
+     /* struct elements */
      infobar_elem_init(i);
 
      /* Render, only if pos is Top or Bottom */
@@ -203,7 +203,7 @@ infobar_new(struct Scr33n *s, struct Theme *theme, Barpos pos, const char *elem)
 }
 
 void
-infobar_refresh(struct Infobar *i)
+infobar_refresh(struct infobar *i)
 {
      infobar_elem_update(i);
 
@@ -211,9 +211,9 @@ infobar_refresh(struct Infobar *i)
 }
 
 void
-infobar_remove(struct Infobar *i)
+infobar_remove(struct infobar *i)
 {
-     struct Element *e;
+     struct element *e;
 
      free(i->elemorder);
 
@@ -222,15 +222,15 @@ infobar_remove(struct Infobar *i)
 
      barwin_remove(i->bar);
 
-     SLIST_REMOVE(&i->screen->infobars, i, Infobar, next);
+     SLIST_REMOVE(&i->screen->infobars, i, infobar, next);
 
      free(i);
 }
 
 void
-infobar_free(struct Scr33n *s)
+infobar_free(struct screen *s)
 {
-     struct Infobar *i;
+     struct infobar *i;
 
      while(!SLIST_EMPTY(&s->infobars))
      {

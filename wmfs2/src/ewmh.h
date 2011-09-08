@@ -12,6 +12,9 @@
 /* Ewmh hints list */
 enum
 {
+     /* ICCCM */
+     wm_state,
+     /* EWMH */
      net_supported,
      net_wm_name,
      net_client_list,
@@ -66,5 +69,6 @@ enum
 };
 
 void ewmh_init(void);
+void ewmh_set_wm_state(Window w, int state);
 
 #endif /* EWMH_H */

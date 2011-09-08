@@ -14,10 +14,10 @@
 #include "tag.h"
 #include "infobar.h"
 
-static struct Scr33n*
-screen_new(struct Geo *g, int id)
+static struct screen*
+screen_new(struct geo *g, int id)
 {
-     struct Scr33n *s = (struct Scr33n*)xcalloc(1, sizeof(struct Scr33n));
+     struct screen *s = (struct screen*)xcalloc(1, sizeof(struct screen));
 
      s->geo = s->ugeo = *g;
      s->seltag = NULL;
@@ -37,8 +37,8 @@ screen_new(struct Geo *g, int id)
 void
 screen_init(void)
 {
-     struct Scr33n *s;
-     struct Geo g;
+     struct screen *s;
+     struct geo g;
 
      SLIST_INIT(&W->h.screen);
 
@@ -76,13 +76,13 @@ screen_init(void)
 /*
  * Update selected screen with mouse location
  */
-struct Scr33n*
+struct screen*
 screen_update_sel(void)
 {
 #ifdef HAVE_XINERAMA
      if(XineramaIsActive(W->dpy))
      {
-          struct Scr33n *s;
+          struct screen *s;
           Window w;
           int d, x, y;
 
@@ -100,7 +100,7 @@ screen_update_sel(void)
 void
 screen_free(void)
 {
-     struct Scr33n *s;
+     struct screen *s;
 
      while(!SLIST_EMPTY(&W->h.screen))
      {

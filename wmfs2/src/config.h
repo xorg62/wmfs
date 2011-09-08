@@ -71,10 +71,10 @@ modkey_keysym(const char *name)
      return NoSymbol;
 }
 
-static inline struct Theme*
+static inline struct theme*
 name_to_theme(const char *name)
 {
-     struct Theme *t;
+     struct theme *t;
 
      SLIST_FOREACH(t, &W->h.theme, next)
           if(!strcmp(t->name, name))

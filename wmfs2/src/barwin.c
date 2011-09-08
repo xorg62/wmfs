@@ -7,20 +7,20 @@
 #include "barwin.h"
 #include "util.h"
 
-/** Create a Barwin
+/** Create a barwin
  * \param parent Parent window of the BarWindow
  * \param x X position
  * \param y Y position
- * \param w Barwin Width
- * \param h Barwin Height
- * \param color Barwin color
+ * \param w barwin Width
+ * \param h barwin Height
+ * \param color barwin color
  * \param entermask bool for know if the EnterMask mask is needed
  * \return The BarWindow pointer
 */
-struct Barwin*
+struct barwin*
 barwin_new(Window parent, int x, int y, int w, int h, Color fg, Color bg, bool entermask)
 {
-     struct Barwin *b = (struct Barwin*)xcalloc(1, sizeof(struct Barwin));
+     struct barwin *b = (struct barwin*)xcalloc(1, sizeof(struct barwin));
      XSetWindowAttributes at =
      {
           .override_redirect = True,
@@ -32,8 +32,13 @@ barwin_new(Window parent, int x, int y, int w, int h, Color fg, Color bg, bool e
           at.event_mask |= BARWIN_ENTERMASK;
 
      /* Create window */
-     b->win = XCreateWindow(W->dpy, parent, x, y, w, h, 0, W->xdepth, CopyFromParent,
-               DefaultVisual(W->dpy, W->xscreen), BARWIN_WINCW, &at);
+     b->win = XCreateWindow(W->dpy, parent,
+                            x, y, w, h,
+                            0, W->xdepth,
+                            CopyFromParent,
+                            DefaultVisual(W->dpy, W->xscreen),
+                            BARWIN_WINCW,
+                            &at);
 
      b->dr = XCreatePixmap(W->dpy, parent, w, h, W->xdepth);
 
@@ -53,31 +58,31 @@ barwin_new(Window parent, int x, int y, int w, int h, Color fg, Color bg, bool e
      return b;
 }
 
-/** Delete a Barwin
- * \param bw Barwin pointer
+/** Delete a barwin
+ * \param bw barwin pointer
 */
 void
-barwin_remove(struct Barwin *b)
+barwin_remove(struct barwin *b)
 {
-     SLIST_REMOVE(&W->h.barwin, b, Barwin, next);
+     SLIST_REMOVE(&W->h.barwin, b, barwin, next);
 
      XSelectInput(W->dpy, b->win, NoEventMask);
      XDestroyWindow(W->dpy, b->win);
      XFreePixmap(W->dpy, b->dr);
 
      /* Free mousebinds */
-     FREE_LIST(Mousebind, b->mousebinds);
+     FREE_LIST(mousebind, b->mousebinds);
 
      free(b);
 }
 
-/** Resize a Barwin
- * \param bw Barwin pointer
+/** Resize a barwin
+ * \param bw barwin pointer
  * \param w Width
  * \param h Height
 */
 void
-barwin_resize(struct Barwin *b, int w, int h)
+barwin_resize(struct barwin *b, int w, int h)
 {
      /* Frame */
      XFreePixmap(W->dpy, b->dr);
@@ -91,11 +96,11 @@ barwin_resize(struct Barwin *b, int w, int h)
 }
 
 void
-barwin_mousebind_new(struct Barwin *b, unsigned int button, bool u, struct Geo a, void (*func)(Uicb), Uicb cmd)
+barwin_mousebind_new(struct barwin *b, unsigned int button, bool u, struct geo a, void (*func)(Uicb), Uicb cmd)
 {
-     struct Mousebind *m;
+     struct mousebind *m;
 
-     m = xcalloc(1, sizeof(struct Mousebind));
+     m = xcalloc(1, sizeof(struct mousebind));
 
      m->button = button;
      m->use_area = u;
@@ -107,11 +112,11 @@ barwin_mousebind_new(struct Barwin *b, unsigned int button, bool u, struct Geo a
      SLIST_INSERT_HEAD(&b->mousebinds, m, next);
 }
 
-/** Refresh the Barwin Color
- * \param bw Barwin pointer
+/** Refresh the barwin Color
+ * \param bw barwin pointer
 */
 void
-barwin_refresh_color(struct Barwin *b)
+barwin_refresh_color(struct barwin *b)
 {
      XSetForeground(W->dpy, W->gc, b->bg);
      XFillRectangle(W->dpy, b->dr, W->gc, 0, 0, b->geo.w, b->geo.h);

@@ -3,6 +3,8 @@
  *  For license, see COPYING.
  */
 
+#include <X11/Xutil.h>
+
 #include "client.h"
 #include "config.h"
 #include "util.h"
@@ -10,11 +12,11 @@
 
 #define CLIENT_MOUSE_MOD Mod1Mask
 
-/** Send a ConfigureRequest event to the struct Client
- * \param c struct Client pointer
+/** Send a ConfigureRequest event to the struct client
+ * \param c struct client pointer
 */
 void
-client_configure(struct Client *c)
+client_configure(struct client *c)
 {
      XConfigureEvent ev;
 
@@ -33,10 +35,10 @@ client_configure(struct Client *c)
      XSync(W->dpy, False);
 }
 
-struct Client*
+struct client*
 client_gb_win(Window w)
 {
-     struct Client *c = SLIST_FIRST(&W->h.client);
+     struct client *c = SLIST_FIRST(&W->h.client);
 
      while(c && c->win != w)
           c = SLIST_NEXT(c, next);
@@ -45,25 +47,25 @@ client_gb_win(Window w)
 }
 
 /** Map a client
- * \param c struct Client pointer
+ * \param c struct client pointer
  */
 void
-client_map(struct Client *c)
+client_map(struct client *c)
 {
      XMapWindow(W->dpy, c->win);
 }
 
 /** Unmap a client
- * \param c struct Client pointer
+ * \param c struct client pointer
  */
 void
-client_unmap(struct Client *c)
+client_unmap(struct client *c)
 {
      XUnmapWindow(W->dpy, c->win);
 }
 
 static void
-client_grabbuttons(struct Client *c, bool focused)
+client_grabbuttons(struct client *c, bool focused)
 {
      wmfs_numlockmask();
 
@@ -94,7 +96,7 @@ client_grabbuttons(struct Client *c, bool focused)
 }
 
 void
-client_focus(struct Client *c)
+client_focus(struct client *c)
 {
      /* Unfocus selected */
      if(W->client && W->client != c)
@@ -121,10 +123,10 @@ client_focus(struct Client *c)
 }
 
 /** Get a client name
- * \param c struct Client pointer
+ * \param c struct client pointer
 */
 void
-client_get_name(struct Client *c)
+client_get_name(struct client *c)
 {
      Atom rt;
      int rf;
@@ -142,10 +144,10 @@ client_get_name(struct Client *c)
 }
 
 /** Close a client
- * \param c struct Client pointer
+ * \param c struct client pointer
 */
 void
-client_close(struct Client *c)
+client_close(struct client *c)
 {
      XEvent ev;
      Atom *atom = NULL;
@@ -180,30 +182,29 @@ client_close(struct Client *c)
           XKillClient(W->dpy, c->win);
 }
 
-struct Client*
+struct client*
 client_new(Window w, XWindowAttributes *wa)
 {
-     struct Client *c;
-
-     c = xcalloc(1, sizeof(struct Client));
+     struct client *c = xcalloc(1, sizeof(struct client));
 
      /* C attributes */
      c->win    = w;
      c->screen = W->screen;
      c->flags  = 0;
+     c->tag    = NULL;
 
      /* Set tag */
      tag_client(W->screen->seltag, c);
 
-     /* struct Geometry */
+     /* struct geometry */
      c->geo.x = wa->x;
      c->geo.y = wa->y;
      c->geo.w = wa->width;
      c->geo.h = wa->height;
 
      /* X window attributes */
-     XSelectInput(W->dpy, w, EnterWindowMask | FocusChangeMask | PropertyChangeMask | StructureNotifyMask);
-
+     XSelectInput(W->dpy, w, EnterWindowMask | FocusChangeMask
+                             | PropertyChangeMask | StructureNotifyMask);
      XSetWindowBorder(W->dpy, w, THEME_DEFAULT->client_n.bg);
      XSetWindowBorderWidth(W->dpy, w, THEME_DEFAULT->client_border_width);
      client_grabbuttons(c, false);
@@ -211,14 +212,10 @@ client_new(Window w, XWindowAttributes *wa)
      /* Attach */
      SLIST_INSERT_HEAD(&W->h.client, c, next);
 
-     XMoveResizeWindow(W->dpy, w,
-               c->screen->ugeo.x,
-               c->screen->ugeo.y,
-               c->screen->ugeo.w,
-               c->screen->ugeo.h);
+     /* Insert in frame */
+     frame_client(c->tag->frame, c);
 
-
-     client_map(c);
+     WIN_STATE(c->win, Map);
 
      XRaiseWindow(W->dpy, w);
 
@@ -228,9 +225,9 @@ client_new(Window w, XWindowAttributes *wa)
 }
 
 void
-client_remove(struct Client *c)
+client_remove(struct client *c)
 {
-     struct Client *cc;
+     struct client *cc;
 
      XGrabServer(W->dpy);
      XSetErrorHandler(wmfs_error_handler_dummy);
@@ -241,9 +238,12 @@ client_remove(struct Client *c)
      if(c->tag->sel == c)
           c->tag->sel = SLIST_FIRST(&c->tag->clients);
 
-     SLIST_REMOVE(&W->h.client, c, Client, next);
+     SLIST_REMOVE(&W->h.client, c, client, next);
 
      tag_client(NULL, c);
+     frame_client(NULL, c);
+
+     ewmh_set_wm_state(c->win, WithdrawnState);
 
      XSync(W->dpy, False);
      XUngrabServer(W->dpy);
@@ -255,5 +255,5 @@ client_remove(struct Client *c)
 void
 client_free(void)
 {
-     FREE_LIST(Client, W->h.client);
+     FREE_LIST(client, W->h.client);
 }

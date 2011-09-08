@@ -16,7 +16,7 @@
 static void
 config_theme(void)
 {
-     struct Theme *t;
+     struct theme *t;
      size_t i, n;
      struct conf_sec *sec, **ks;
      char *name;
@@ -34,7 +34,7 @@ config_theme(void)
      /* [theme]*/
      for(i = 0; i < n; ++i)
      {
-          t = (struct Theme*)xcalloc(1, sizeof(struct Theme));
+          t = (struct theme*)xcalloc(1, sizeof(struct theme));
 
           t->name = fetch_opt_first(ks[i], "default", "name").str;
 
@@ -55,7 +55,7 @@ config_theme(void)
           t->tags_border_col   = color_atoh(fetch_opt_first(ks[i], "#888888", "tags_border_color").str);
           t->tags_border_width = fetch_opt_first(ks[i], "0", "tags_border_width").num;
 
-          /* Client / Frame */
+          /* Client / frame */
           t->client_n.fg = color_atoh(fetch_opt_first(ks[i], "#CCCCCC", "client_normal_fg").str);
           t->client_n.bg = color_atoh(fetch_opt_first(ks[i], "#222222", "client_normal_bg").str);
           t->client_s.fg = color_atoh(fetch_opt_first(ks[i], "#222222", "client_sel_fg").str);
@@ -73,8 +73,8 @@ config_theme(void)
 static void
 config_bars(void)
 {
-     struct Scr33n *s;
-     struct Theme *t;
+     struct screen *s;
+     struct theme *t;
      size_t i, n;
      struct conf_sec *sec, **ks;
      int screenid;
@@ -106,8 +106,8 @@ config_bars(void)
 static void
 config_tag(void)
 {
-     struct Scr33n *s;
-     struct Tag *t;
+     struct screen *s;
+     struct tag *t;
      size_t i, n;
      struct conf_sec *sec, **ks;
      char *name;
@@ -146,7 +146,7 @@ config_keybind(void)
      struct conf_sec *sec, **ks;
      struct opt_type *opt;
      char *cmd;
-     struct Keybind *k;
+     struct keybind *k;
 
      /* [keys] */
      sec = fetch_section_first(NULL, "keys");
@@ -158,7 +158,7 @@ config_keybind(void)
      /* [key] */
      for(i = 0; i < n; ++i)
      {
-          k = (struct Keybind*)xcalloc(1, sizeof(struct Keybind));
+          k = (struct keybind*)xcalloc(1, sizeof(struct keybind));
 
           /* mod = {} */
           opt = fetch_opt(ks[i], "", "mod");

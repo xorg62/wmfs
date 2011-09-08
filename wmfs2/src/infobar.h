@@ -9,20 +9,21 @@
 #include "wmfs.h"
 #include "util.h"
 #include "draw.h"
+#include "frame.h"
 
 enum { ElemTag = 0, ElemLayout, ElemSelbar, ElemStatus, ElemCustom, ElemLast };
 
-struct Infobar *infobar_new(struct Scr33n *s, struct Theme *theme, Barpos pos, const char *elem);
-void infobar_elem_update(struct Infobar *i);
-void infobar_refresh(struct Infobar *i);
-void infobar_remove(struct Infobar *i);
-void infobar_free(struct Scr33n *s);
+struct infobar *infobar_new(struct screen *s, struct theme *theme, Barpos pos, const char *elem);
+void infobar_elem_update(struct infobar *i);
+void infobar_refresh(struct infobar *i);
+void infobar_remove(struct infobar *i);
+void infobar_free(struct screen *s);
 
 /* Basic placement of elements */
 static inline void
-infobar_elem_placement(struct Element *e)
+infobar_elem_placement(struct element *e)
 {
-     struct Element *p = TAILQ_PREV(e, esub, next);
+     struct element *p = TAILQ_PREV(e, esub, next);
 
      e->geo.y = e->geo.w = 0;
      e->geo.h = e->infobar->geo.h;
@@ -31,7 +32,7 @@ infobar_elem_placement(struct Element *e)
 
 /* Bars placement management and usable space management */
 static inline bool
-infobar_placement(struct Infobar *i, Barpos p)
+infobar_placement(struct infobar *i, Barpos p)
 {
      i->pos = p;
      i->geo = i->screen->ugeo;
@@ -52,13 +53,15 @@ infobar_placement(struct Infobar *i, Barpos p)
                return false;
      }
 
+     frame_update_geo(i->screen);
+
      return true;
 }
 
 static inline void
-infobar_elem_screen_update(struct Scr33n *s, int addf)
+infobar_elem_screen_update(struct screen *s, int addf)
 {
-     struct Infobar *i;
+     struct infobar *i;
 
      s->elemupdate |= FLAGINT(addf);
 
