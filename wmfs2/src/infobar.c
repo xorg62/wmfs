@@ -171,8 +171,6 @@ struct infobar*
 infobar_new(struct screen *s, struct theme *theme, Barpos pos, const char *elem)
 {
      bool map;
-     int n;
-
      struct infobar *i = (struct infobar*)xcalloc(1, sizeof(struct infobar));
 
      i->screen = s;

@@ -19,7 +19,6 @@ config_theme(void)
      struct theme *t;
      size_t i, n;
      struct conf_sec *sec, **ks;
-     char *name;
 
      /* [themes] */
      sec = fetch_section_first(NULL, "themes");
@@ -96,7 +95,7 @@ config_bars(void)
 
           SLIST_FOREACH(s, &W->h.screen, next)
                if(screenid == s->id || screenid == -1)
-                    (struct Infobar*)infobar_new(s, t, pos, elem);
+                    infobar_new(s, t, pos, elem);
      }
 
      free(ks);

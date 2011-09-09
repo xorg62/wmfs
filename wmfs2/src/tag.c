@@ -11,6 +11,7 @@
 #include "client.h"
 #include "config.h"
 #include "barwin.h"
+#include "ewmh.h"
 
 struct tag*
 tag_new(struct screen *s, char *name)
@@ -32,15 +33,15 @@ tag_new(struct screen *s, char *name)
      t->sel    = NULL;
 
      /* Frame window */
-     t->frame  = XCreateWindow(W->dpy, W->root,
-                               s->ugeo.x, s->ugeo.y,
-                               s->ugeo.w, s->ugeo.h,
-                               0, CopyFromParent,
-                               InputOutput,
-                               CopyFromParent,
-                               (CWOverrideRedirect | CWBackPixmap
-                                | CWBackPixel | CWEventMask),
-                               &at);
+     t->frame = XCreateWindow(W->dpy, W->root,
+                              s->ugeo.x, s->ugeo.y,
+                              s->ugeo.w, s->ugeo.h,
+                              0, CopyFromParent,
+                              InputOutput,
+                              CopyFromParent,
+                              (CWOverrideRedirect | CWBackPixmap
+                               | CWBackPixel | CWEventMask),
+                              &at);
 
      SLIST_INIT(&t->clients);
 
@@ -94,7 +95,10 @@ tag_client(struct tag *t, struct client *c)
                c->tag->sel = NULL;
      }
 
-     /* Case of client remove */
+     /*
+      * Case of client removing: umap frame if empty
+      * TODO: arrange layout
+      */
      if(!t)
      {
           /* Unmap frame if tag is now empty */
@@ -112,6 +116,8 @@ tag_client(struct tag *t, struct client *c)
 
      /* Reparent client win in frame win */
      XReparentWindow(W->dpy, c->win, t->frame, 0, 0);
+
+     /* tag_frame_client */
 
      /* Insert in new tag list */
      SLIST_INSERT_HEAD(&t->clients, c, tnext);

@@ -101,9 +101,13 @@ wmfs_init_font(char *font, struct theme *t)
 static void
 wmfs_xinit(void)
 {
-     int i, j;
-     XModifierKeymap *mm;
-     XSetWindowAttributes at;
+     XSetWindowAttributes at =
+     {
+          .event_mask = (KeyMask | ButtonMask | MouseMask
+                    | PropertyChangeMask | SubstructureRedirectMask
+                    | SubstructureNotifyMask | StructureNotifyMask),
+          .cursor = XCreateFontCursor(W->dpy, XC_left_ptr)
+     };
 
      /*
       * X Error handler
@@ -121,11 +125,6 @@ wmfs_xinit(void)
       * Root window/cursor
       */
      W->root = RootWindow(W->dpy, W->xscreen);
-
-     at.event_mask = KeyMask | ButtonMask | MouseMask | PropertyChangeMask
-          | SubstructureRedirectMask | SubstructureNotifyMask | StructureNotifyMask;
-     at.cursor = XCreateFontCursor(W->dpy, XC_left_ptr);
-
      XChangeWindowAttributes(W->dpy, W->root, CWEventMask | CWCursor, &at);
 
      /*
@@ -236,7 +235,7 @@ wmfs_loop(void)
 
      while(XPending(W->dpy))
           while(W->running && !XNextEvent(W->dpy, &ev))
-               HANDLE_EVENT(&ev);
+               EVENT_HANDLE(&ev);
 }
 
 static inline void

@@ -9,6 +9,7 @@
 #include "wmfs.h"
 #include "client.h"
 #include "barwin.h"
+#include "screen.h"
 
 #define EVDPY(e) (e)->xany.display
 
@@ -104,8 +105,6 @@ event_destroynotify(XEvent *e)
 static void
 event_focusin(XEvent *e)
 {
-     struct client *c;
-
      if(W->client && e->xfocus.window != W->client->win)
           client_focus(W->client);
 }
@@ -246,7 +245,7 @@ event_init(void)
      event_handle[DestroyNotify]    = event_destroynotify;
      event_handle[EnterNotify]      = event_enternotify;
      event_handle[Expose]           = event_expose;
-     /*event_handle[FocusIn]          = event_focusin;*/
+     event_handle[FocusIn]          = event_focusin;
      event_handle[KeyPress]         = event_keypress;
      /*event_handle[MapNotify]        = event_mapnotify;*/
      event_handle[MapRequest]       = event_maprequest;

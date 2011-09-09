@@ -9,6 +9,7 @@
 #include "config.h"
 #include "util.h"
 #include "barwin.h"
+#include "ewmh.h"
 
 #define CLIENT_MOUSE_MOD Mod1Mask
 
@@ -221,8 +222,6 @@ client_new(Window w, XWindowAttributes *wa)
 void
 client_remove(struct client *c)
 {
-     struct client *cc;
-
      XGrabServer(W->dpy);
      XSetErrorHandler(wmfs_error_handler_dummy);
      XReparentWindow(W->dpy, c->win, W->root, c->geo.x, c->geo.y);

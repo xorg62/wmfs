@@ -37,7 +37,6 @@ screen_new(struct geo *g, int id)
 void
 screen_init(void)
 {
-     struct screen *s;
      struct geo g;
 
      SLIST_INIT(&W->h.screen);
@@ -57,7 +56,7 @@ screen_init(void)
                g.w = xsi[i].width;
                g.h = xsi[i].height;
 
-               s = screen_new(&g, i);
+               screen_new(&g, i);
           }
 
           XFree(xsi);
@@ -69,7 +68,7 @@ screen_init(void)
           g.w = DisplayWidth(W->dpy, W->xscreen);
           g.h = DisplayHeight(W->dpy, W->xscreen);
 
-          s = screen_new(&g, 0);
+          screen_new(&g, 0);
      }
 }
 
@@ -92,9 +91,11 @@ screen_update_sel(void)
                if(INAREA(x, y, s->geo))
                     break;
 
-          W->screen = s;
+          return (W->screen = s);
      }
 #endif /* HAVE_XINERAMA */
+
+     return W->screen;
 }
 
 void
