@@ -3,16 +3,26 @@
  *  For license, see COPYING.
  */
 
+#include <X11/Xutil.h> /* IconicState / NormalState */
+
 #include "tag.h"
 #include "util.h"
 #include "infobar.h"
 #include "client.h"
-#include "frame.h"
+#include "config.h"
+#include "barwin.h"
 
 struct tag*
 tag_new(struct screen *s, char *name)
 {
      struct tag *t;
+     XSetWindowAttributes at =
+     {
+          .background_pixel  = THEME_DEFAULT->frame_bg,
+          .override_redirect = true,
+          .background_pixmap = ParentRelative,
+          .event_mask        = BARWIN_MASK
+     };
 
      t = xcalloc(1, sizeof(struct tag));
 
@@ -21,11 +31,18 @@ tag_new(struct screen *s, char *name)
      t->flags  = 0;
      t->sel    = NULL;
 
-     SLIST_INIT(&t->clients);
-     SLIST_INIT(&t->frames);
+     /* Frame window */
+     t->frame  = XCreateWindow(W->dpy, W->root,
+                               s->ugeo.x, s->ugeo.y,
+                               s->ugeo.w, s->ugeo.h,
+                               0, CopyFromParent,
+                               InputOutput,
+                               CopyFromParent,
+                               (CWOverrideRedirect | CWBackPixmap
+                                | CWBackPixel | CWEventMask),
+                               &at);
 
-     /* only one frame for now, *tmp* */
-     frame_new(t); /* t->frame */
+     SLIST_INIT(&t->clients);
 
      TAILQ_INSERT_TAIL(&s->tags, t, next);
 
@@ -35,16 +52,23 @@ tag_new(struct screen *s, char *name)
 void
 tag_screen(struct screen *s, struct tag *t)
 {
-     struct frame *f;
      struct client *c;
 
-     /* Hide previous tag's frame */
-     SLIST_FOREACH(f, &s->seltag->frames, next)
-          frame_unmap(f);
+     /* Unmap previous tag's frame */
+     WIN_STATE(s->seltag->frame, Unmap);
+     SLIST_FOREACH(c, &s->seltag->clients, tnext)
+          ewmh_set_wm_state(c->win, IconicState);
 
-     /* Unhide selected tag's clients */
-     SLIST_FOREACH(f, &t->frames, next)
-          frame_update(f);
+     /*
+      * Map selected tag's frame, only if there is
+      * clients in t
+      */
+     if(!SLIST_EMPTY(&t->clients))
+     {
+          WIN_STATE(t->frame, Map);
+          SLIST_FOREACH(c, &t->clients, tnext)
+               ewmh_set_wm_state(c->win, NormalState);
+     }
 
      s->seltag = t;
 
@@ -53,6 +77,7 @@ tag_screen(struct screen *s, struct tag *t)
      infobar_elem_screen_update(s, ElemTag);
 }
 
+/* Set t to NULL to untag c from c->tag */
 void
 tag_client(struct tag *t, struct client *c)
 {
@@ -64,15 +89,29 @@ tag_client(struct tag *t, struct client *c)
 
           SLIST_REMOVE(&c->tag->clients, c, client, tnext);
 
+          /* TODO: Focus next client */
           if(c->tag->sel == c)
                c->tag->sel = NULL;
      }
 
      /* Case of client remove */
      if(!t)
+     {
+          /* Unmap frame if tag is now empty */
+          if(SLIST_EMPTY(&c->tag->clients))
+               WIN_STATE(c->tag->frame, Unmap);
+
           return;
+     }
+
+     /* Map frame if tag was empty */
+     if(SLIST_EMPTY(&t->clients))
+          WIN_STATE(t->frame, Map);
 
      c->tag = t;
+
+     /* Reparent client win in frame win */
+     XReparentWindow(W->dpy, c->win, t->frame, 0, 0);
 
      /* Insert in new tag list */
      SLIST_INSERT_HEAD(&t->clients, c, tnext);
@@ -132,12 +171,8 @@ uicb_tag_prev(Uicb cmd)
 static void
 tag_remove(struct tag *t)
 {
-     struct frame *f;
-
      free(t->name);
-
-     frame_free(t);
-
+     XDestroyWindow(W->dpy, t->frame);
      free(t);
 }
 

@@ -48,7 +48,6 @@ struct barwin
      Window win;
      Drawable dr;
      Color fg, bg;
-      Flags flags;
      void *ptr; /* Special cases */
      SLIST_HEAD(, mousebind) mousebinds;
      SLIST_ENTRY(barwin) next;  /* global barwin */
@@ -93,10 +92,9 @@ struct tag
 {
      struct screen *screen;
      struct client *sel;
-     struct frame *frame;
      char *name;
      Flags flags;
-     SLIST_HEAD(, frame) frames;
+     Window frame;
      SLIST_HEAD(, client) clients;
      TAILQ_ENTRY(tag) next;
 };
@@ -105,7 +103,6 @@ struct client
 {
      struct tag *tag;
      struct screen *screen;
-     struct frame *frame;
      struct barwin *titlebar;
      struct geo geo;
      char *title;
@@ -113,17 +110,6 @@ struct client
      Window win;
      SLIST_ENTRY(client) next;  /* Global list */
      SLIST_ENTRY(client) tnext; /* struct tag list */
-     SLIST_ENTRY(client) fnext; /* struct struct frame list */
-};
-
-struct frame
-{
-     struct tag *tag;
-     struct geo geo;
-     Window win;
-     Color fg, bg;
-     SLIST_HEAD(, client) clients;
-     SLIST_ENTRY(frame) next;
 };
 
 struct keybind

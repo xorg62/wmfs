@@ -117,9 +117,6 @@ client_focus(struct client *c)
 
           XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
      }
-     else
-          XSetInputFocus(W->dpy, W->root, RevertToPointerRoot, CurrentTime);
-
 }
 
 /** Get a client name
@@ -212,12 +209,9 @@ client_new(Window w, XWindowAttributes *wa)
      /* Attach */
      SLIST_INSERT_HEAD(&W->h.client, c, next);
 
-     /* Insert in frame */
-     frame_client(c->tag->frame, c);
-
+     /* Map */
      WIN_STATE(c->win, Map);
-
-     XRaiseWindow(W->dpy, w);
+     ewmh_set_wm_state(c->win, NormalState);
 
      client_configure(c);
 
@@ -231,22 +225,24 @@ client_remove(struct client *c)
 
      XGrabServer(W->dpy);
      XSetErrorHandler(wmfs_error_handler_dummy);
+     XReparentWindow(W->dpy, c->win, W->root, c->geo.x, c->geo.y);
 
      if(W->client == c)
-          client_focus(NULL);
+     {
+          W->client = NULL;
+          XSetInputFocus(W->dpy, W->root, RevertToPointerRoot, CurrentTime);
+     }
 
-     if(c->tag->sel == c)
-          c->tag->sel = SLIST_FIRST(&c->tag->clients);
-
+     /* Remove from global client list */
      SLIST_REMOVE(&W->h.client, c, client, next);
 
      tag_client(NULL, c);
-     frame_client(NULL, c);
 
      ewmh_set_wm_state(c->win, WithdrawnState);
 
-     XSync(W->dpy, False);
+     XUngrabButton(W->dpy, AnyButton, AnyModifier, c->win);
      XUngrabServer(W->dpy);
+     XSync(W->dpy, False);
      XSetErrorHandler(wmfs_error_handler);
 
      free(c);

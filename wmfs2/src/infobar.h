@@ -9,7 +9,7 @@
 #include "wmfs.h"
 #include "util.h"
 #include "draw.h"
-#include "frame.h"
+#include "tag.h"
 
 enum { ElemTag = 0, ElemLayout, ElemSelbar, ElemStatus, ElemCustom, ElemLast };
 
@@ -53,7 +53,7 @@ infobar_placement(struct infobar *i, Barpos p)
                return false;
      }
 
-     frame_update_geo(i->screen);
+     tag_update_frame_geo(i->screen);
 
      return true;
 }

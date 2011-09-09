@@ -17,4 +17,22 @@ void uicb_tag_set_with_name(Uicb cmd);
 void uicb_tag_next(Uicb cmd);
 void uicb_tag_prev(Uicb cmd);
 
+/*
+ * Update frames size with screen usable geo
+ */
+static inline void
+tag_update_frame_geo(struct screen *s)
+{
+     struct tag *t;
+
+     TAILQ_FOREACH(t, &s->tags, next)
+          XMoveResizeWindow(W->dpy,
+                            t->frame,
+                            s->ugeo.x,
+                            s->ugeo.y,
+                            s->ugeo.w,
+                            s->ugeo.h);
+}
+
+
 #endif /* TAG_H */
