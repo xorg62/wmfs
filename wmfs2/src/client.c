@@ -10,6 +10,7 @@
 #include "util.h"
 #include "barwin.h"
 #include "ewmh.h"
+#include "layout.h"
 
 #define CLIENT_MOUSE_MOD Mod1Mask
 
@@ -43,6 +44,54 @@ client_gb_win(Window w)
 
      while(c && c->win != w)
           c = SLIST_NEXT(c, next);
+
+     return c;
+}
+
+static struct client*
+client_gb_pos(struct tag *t, int x, int y)
+{
+     struct client *c;
+
+     SLIST_FOREACH(c, &t->clients, tnext)
+          if(INAREA(x, y, c->geo))
+               return c;
+
+     return NULL;
+}
+
+/** Get client left/right/top/bottom of selected client
+  *\param bc Base client
+  *\param pos Position
+  *\return Client found or NULL
+*/
+struct client*
+client_next_with_pos(struct client *bc, Position p)
+{
+     struct client *c;
+     int x, y;
+     const static char scanfac[4][2] =
+     {
+          { 2,  0 }, { -2, 0 }, /* Right, Left   */
+          { 0, -2 }, {  0, 2 }  /* Top,   Bottom */
+     };
+
+     /*
+      * Set start place of pointer (edge of base client)
+      * for faster scanning
+      */
+     x = bc->geo.x + ((p == Right)  ? bc->geo.w : 0);
+     y = bc->geo.y + ((p == Bottom) ? bc->geo.h : 0);
+     y += ((LDIR(p))  ? (bc->geo.h >> 1) : 0);
+     x += ((p > Left) ? (bc->geo.w >> 1) : 0);
+
+     /* Scan in right direction to next(p) physical client */
+
+     while((c = client_gb_pos(bc->tag, x, y)) == bc)
+     {
+          x += scanfac[p][0];
+          y += scanfac[p][1];
+     }
 
      return c;
 }
@@ -191,14 +240,15 @@ client_new(Window w, XWindowAttributes *wa)
      c->flags  = 0;
      c->tag    = NULL;
 
-     /* Set tag */
-     tag_client(W->screen->seltag, c);
-
      /* struct geometry */
      c->geo.x = wa->x;
      c->geo.y = wa->y;
      c->geo.w = wa->width;
      c->geo.h = wa->height;
+     c->cgeo = c->geo;
+
+     /* Set tag */
+     tag_client(W->screen->seltag, c);
 
      /* X window attributes */
      XSelectInput(W->dpy, w, EnterWindowMask | FocusChangeMask
@@ -220,6 +270,29 @@ client_new(Window w, XWindowAttributes *wa)
 }
 
 void
+client_moveresize(struct client *c, struct geo g)
+{
+     c->geo = c->cgeo = g;
+
+     c->cgeo.w += THEME_DEFAULT->client_border_width << 1;
+     c->cgeo.h += THEME_DEFAULT->client_border_width << 1;
+
+     XMoveResizeWindow(W->dpy, c->win, g.x, g.y, g.w, g.h);
+}
+
+void
+client_maximize(struct client *c)
+{
+     c->geo = c->tag->screen->ugeo;
+
+     c->geo.x = c->geo.y = 0; /* Frame x/y, not screen geo */
+     c->geo.w = c->tag->screen->ugeo.w - (THEME_DEFAULT->client_border_width << 1);
+     c->geo.h = c->tag->screen->ugeo.h - (THEME_DEFAULT->client_border_width << 1);
+
+     client_moveresize(c, c->geo);
+}
+
+void
 client_remove(struct client *c)
 {
      XGrabServer(W->dpy);
@@ -231,6 +304,8 @@ client_remove(struct client *c)
           W->client = NULL;
           XSetInputFocus(W->dpy, W->root, RevertToPointerRoot, CurrentTime);
      }
+
+     layout_split_arrange_closed(c);
 
      /* Remove from global client list */
      SLIST_REMOVE(&W->h.client, c, client, next);

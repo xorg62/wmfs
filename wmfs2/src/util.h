@@ -11,11 +11,11 @@
 /* Todo FREE_LIST(type, head, function_remove) */
 #define FREE_LIST(type, head)                   \
      do {                                       \
-          struct type *t;                       \
+          struct type *Z;                       \
           while(!SLIST_EMPTY(&head)) {          \
-               t = SLIST_FIRST(&head);          \
+               Z = SLIST_FIRST(&head);          \
                SLIST_REMOVE_HEAD(&head, next);  \
-               free(t); /* function_remove(t)*/ \
+               free(Z); /* function_remove(t)*/ \
           }                                     \
      } while(/* CONSTCOND */ 0);
 
@@ -32,7 +32,6 @@
 #define ATOI(s)          strtol(s, NULL, 10)
 #define ABS(j)           (j < 0 ? -j : j)
 #define INAREA(i, j, a)  ((i) >= (a).x && (i) <= (a).x + (a).w && (j) >= (a).y && (j) <= (a).y + (a).h)
-
 
 /*
  * "#RRGGBB" -> 0xRRGGBB

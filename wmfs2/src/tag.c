@@ -12,6 +12,7 @@
 #include "config.h"
 #include "barwin.h"
 #include "ewmh.h"
+#include "layout.h"
 
 struct tag*
 tag_new(struct screen *s, char *name)
@@ -89,7 +90,6 @@ tag_client(struct tag *t, struct client *c)
                return;
 
           SLIST_REMOVE(&c->tag->clients, c, client, tnext);
-
           /* TODO: Focus next client */
           if(c->tag->sel == c)
                c->tag->sel = NULL;
@@ -117,7 +117,7 @@ tag_client(struct tag *t, struct client *c)
      /* Reparent client win in frame win */
      XReparentWindow(W->dpy, c->win, t->frame, 0, 0);
 
-     /* tag_frame_client */
+     layout_split_integrate(c, t->sel);
 
      /* Insert in new tag list */
      SLIST_INSERT_HEAD(&t->clients, c, tnext);
@@ -178,7 +178,9 @@ static void
 tag_remove(struct tag *t)
 {
      free(t->name);
+
      XDestroyWindow(W->dpy, t->frame);
+
      free(t);
 }
 

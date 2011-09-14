@@ -16,7 +16,7 @@
 static void
 config_theme(void)
 {
-     struct theme *t;
+     struct theme *t, *p;
      size_t i, n;
      struct conf_sec *sec, **ks;
 
@@ -63,7 +63,13 @@ config_theme(void)
           t->client_titlebar_width = fetch_opt_first(ks[i], "12", "client_titlebar_width").num;
           t->client_border_width   = fetch_opt_first(ks[i], "1", "client_border_width").num;
 
-          SLIST_INSERT_HEAD(&W->h.theme, t, next);
+          /* insert_tail with SLIST */
+          if(SLIST_EMPTY(&W->h.theme))
+               SLIST_INSERT_HEAD(&W->h.theme, t, next);
+          else
+               SLIST_INSERT_AFTER(p, t, next);
+
+          p = t;
      }
 
      free(ks);
@@ -162,7 +168,7 @@ config_keybind(void)
           /* mod = {} */
           opt = fetch_opt(ks[i], "", "mod");
 
-          for(j = 0; j < fetch_opt_count(opt); ++j)
+          for(j = k->mod = 0; j < fetch_opt_count(opt); ++j)
                k->mod |= modkey_keysym(opt[j].str);
 
           free(opt);

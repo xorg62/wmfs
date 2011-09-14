@@ -98,9 +98,7 @@ barwin_resize(struct barwin *b, int w, int h)
 void
 barwin_mousebind_new(struct barwin *b, unsigned int button, bool u, struct geo a, void (*func)(Uicb), Uicb cmd)
 {
-     struct mousebind *m;
-
-     m = xcalloc(1, sizeof(struct mousebind));
+     struct mousebind *m = (struct mousebind*)xcalloc(1, sizeof(struct mousebind));
 
      m->button = button;
      m->use_area = u;

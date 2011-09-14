@@ -104,7 +104,7 @@ struct client
      struct tag *tag;
      struct screen *screen;
      struct barwin *titlebar;
-     struct geo geo;
+     struct geo geo, cgeo; /* Complete geo: + border */
      char *title;
      Flags flags;
      Window win;
@@ -124,7 +124,7 @@ struct keybind
 struct mousebind
 {
      struct geo area;
-     unsigned int button;
+     int button;
      bool use_area;
      void (*func)(Uicb);
      Uicb cmd;

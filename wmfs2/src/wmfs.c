@@ -292,7 +292,7 @@ void
 uicb_reload(Uicb cmd)
 {
      (void)cmd;
-
+     /* TODO */
 }
 
 void
