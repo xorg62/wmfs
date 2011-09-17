@@ -13,6 +13,7 @@
 #include "wmfs.h"
 #include "util.h"
 #include "tag.h"
+#include "client.h"
 
 #define THEME_DEFAULT (SLIST_FIRST(&W->h.theme))
 
@@ -28,6 +29,13 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "tag",      uicb_tag_set_with_name },
      { "tag_next", uicb_tag_next },
      { "tag_prev", uicb_tag_prev },
+
+     /* Client */
+     { "client_resize_right",  uicb_client_resize_Right },
+     { "client_resize_left",   uicb_client_resize_Left },
+     { "client_resize_top",    uicb_client_resize_Top },
+     { "client_resize_bottom", uicb_client_resize_Bottom },
+
      { NULL, NULL }
 };
 

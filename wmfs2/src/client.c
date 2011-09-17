@@ -14,6 +14,19 @@
 
 #define CLIENT_MOUSE_MOD Mod1Mask
 
+#define CLIENT_RESIZE_DIR(d)                          \
+void uicb_client_resize_##d(Uicb cmd)                 \
+{                                                     \
+     if(W->client)                                    \
+          client_fac_resize(W->client, d, ATOI(cmd)); \
+}
+
+/* uicb_client_resize_dir() */
+CLIENT_RESIZE_DIR(Right)
+CLIENT_RESIZE_DIR(Left)
+CLIENT_RESIZE_DIR(Top)
+CLIENT_RESIZE_DIR(Bottom)
+
 /** Send a ConfigureRequest event to the struct client
  * \param c struct client pointer
 */
@@ -245,7 +258,7 @@ client_new(Window w, XWindowAttributes *wa)
      c->geo.y = wa->y;
      c->geo.w = wa->width;
      c->geo.h = wa->height;
-     c->cgeo = c->geo;
+     c->tgeo = c->geo;
 
      /* Set tag */
      tag_client(W->screen->seltag, c);
@@ -272,10 +285,7 @@ client_new(Window w, XWindowAttributes *wa)
 void
 client_moveresize(struct client *c, struct geo g)
 {
-     c->geo = c->cgeo = g;
-
-     c->cgeo.w += THEME_DEFAULT->client_border_width << 1;
-     c->cgeo.h += THEME_DEFAULT->client_border_width << 1;
+     c->geo = g;
 
      XMoveResizeWindow(W->dpy, c->win, g.x, g.y, g.w, g.h);
 }
@@ -293,6 +303,36 @@ client_maximize(struct client *c)
 }
 
 void
+client_fac_resize(struct client *c, Position p, int fac)
+{
+     struct client *gc = client_next_with_pos(c, p);
+
+     if(!gc || gc->screen != c->screen)
+          return;
+
+     /* Check futur size/pos */
+     if(!client_fac_geo(c, p, fac)
+         || !client_fac_geo(gc, RPOS(p), -fac)
+         || !client_fac_check_row(c, p, fac)
+         || !client_fac_check_row(gc, RPOS(p), -fac))
+          return;
+
+
+     /* Simple resize with only c & gc */
+     if(GEO_CHECK2(c->geo, gc->geo, p))
+     {
+          client_moveresize(c, c->tgeo);
+          client_moveresize(gc, gc->tgeo);
+     }
+     /* Resize with row parents */
+     else
+     {
+          client_fac_arrange_row(c, p, fac);
+          client_fac_arrange_row(gc, RPOS(p), -fac);
+     }
+}
+
+void
 client_remove(struct client *c)
 {
      XGrabServer(W->dpy);
@@ -304,8 +344,6 @@ client_remove(struct client *c)
           W->client = NULL;
           XSetInputFocus(W->dpy, W->root, RevertToPointerRoot, CurrentTime);
      }
-
-     layout_split_arrange_closed(c);
 
      /* Remove from global client list */
      SLIST_REMOVE(&W->h.client, c, client, next);

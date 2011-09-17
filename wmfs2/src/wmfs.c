@@ -151,7 +151,7 @@ wmfs_grab_keys(void)
      KeyCode c;
      struct keybind *k;
 
-     wmfs_numlockmask();
+     /*wmfs_numlockmask();*/
 
      XUngrabKey(W->dpy, AnyKey, AnyModifier, W->root);
 

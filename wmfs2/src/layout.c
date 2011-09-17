@@ -40,6 +40,54 @@ layout_split(struct client *c, bool vertical)
      return geo;
 }
 
+static inline void
+layout_split_arrange_size(struct geo g, struct client *c, Position p)
+{
+     if(LDIR(p))
+     {
+          c->geo.w += g.w + (THEME_DEFAULT->client_border_width << 1);
+
+          if(p == Right)
+               c->geo.x = g.x;
+     }
+     else
+     {
+          c->geo.h += g.h + (THEME_DEFAULT->client_border_width << 1);
+
+          if(p == Bottom)
+               c->geo.y = g.y;
+     }
+
+     client_moveresize(c, c->geo);
+}
+
+static inline bool
+layout_split_check_row_dir(struct client *c, struct client *g, Position p)
+{
+     struct geo cgeo = c->geo;
+     struct client *cc;
+     int bord = THEME_DEFAULT->client_border_width;
+     int i = 0, s = 0, cs = (LDIR(p) ? g->geo.h : g->geo.w );
+
+     SLIST_FOREACH(cc, &c->tag->clients, tnext)
+          if(GEO_PARENTROW(cgeo, cc->geo, RPOS(p))
+                    && GEO_CHECK_ROW(cc->geo, g->geo, p))
+          {
+               s += (LDIR(p)
+                         ? cc->geo.h + bord
+                         : cc->geo.w + bord) + (i > 1 ? bord : 0);
+
+               if(s == cs)
+                    return true;
+               if(s > cs)
+                    return false;
+
+               ++i;
+          }
+
+     return false;
+}
+
 /* Use ghost client properties to fix holes in tile
  *     .--.  ~   ~
  *    /xx  \   ~   ~
