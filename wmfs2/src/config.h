@@ -31,6 +31,7 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "tag_prev", uicb_tag_prev },
 
      /* Client */
+     { "client_close",         uicb_client_close },
      { "client_resize_right",  uicb_client_resize_Right },
      { "client_resize_left",   uicb_client_resize_Left },
      { "client_resize_top",    uicb_client_resize_Top },

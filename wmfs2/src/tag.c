@@ -92,6 +92,7 @@ tag_client(struct tag *t, struct client *c)
           layout_split_arrange_closed(c);
 
           SLIST_REMOVE(&c->tag->clients, c, client, tnext);
+
           /* TODO: Focus next client */
           if(c->tag->sel == c)
                c->tag->sel = NULL;
@@ -99,14 +100,12 @@ tag_client(struct tag *t, struct client *c)
 
      /*
       * Case of client removing: umap frame if empty
-      * TODO: arrange layout
       */
      if(!t)
      {
           /* Unmap frame if tag is now empty */
           if(SLIST_EMPTY(&c->tag->clients))
                WIN_STATE(c->tag->frame, Unmap);
-
 
           return;
      }

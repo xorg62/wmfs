@@ -33,18 +33,19 @@ CLIENT_RESIZE_DIR(Bottom)
 void
 client_configure(struct client *c)
 {
-     XConfigureEvent ev;
-
-     ev.type              = ConfigureNotify;
-     ev.event             = c->win;
-     ev.window            = c->win;
-     ev.x                 = c->geo.x;
-     ev.y                 = c->geo.y;
-     ev.width             = c->geo.w;
-     ev.height            = c->geo.h;
-     ev.above             = None;
-     ev.border_width      = 0;
-     ev.override_redirect = 0;
+     XConfigureEvent ev =
+     {
+          .type              = ConfigureNotify,
+          .event             = c->win,
+          .window            = c->win,
+          .x                 = c->geo.x,
+          .y                 = c->geo.y,
+          .width             = c->geo.w,
+          .height            = c->geo.h,
+          .above             = None,
+          .border_width      = 0,
+          .override_redirect = 0
+     };
 
      XSendEvent(W->dpy, c->win, False, StructureNotifyMask, (XEvent *)&ev);
      XSync(W->dpy, False);
@@ -109,24 +110,6 @@ client_next_with_pos(struct client *bc, Position p)
      return c;
 }
 
-/** Map a client
- * \param c struct client pointer
- */
-void
-client_map(struct client *c)
-{
-     XMapWindow(W->dpy, c->win);
-}
-
-/** Unmap a client
- * \param c struct client pointer
- */
-void
-client_unmap(struct client *c)
-{
-     XUnmapWindow(W->dpy, c->win);
-}
-
 static void
 client_grabbuttons(struct client *c, bool focused)
 {
@@ -176,9 +159,9 @@ client_focus(struct client *c)
 
           XSetWindowBorder(W->dpy, c->win, THEME_DEFAULT->client_s.bg);
 
-          client_grabbuttons(c, true);
-
           XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
+
+          client_grabbuttons(c, true);
      }
 }
 
@@ -209,9 +192,9 @@ client_get_name(struct client *c)
 void
 client_close(struct client *c)
 {
-     XEvent ev;
-     Atom *atom = NULL;
+     bool canbedel;
      int proto;
+     Atom *atom = NULL;
 
      /* Event will call client_remove */
      if(XGetWMProtocols(W->dpy, c->win, &atom, &proto) && atom)
@@ -219,27 +202,37 @@ client_close(struct client *c)
           while(proto--)
                if(atom[proto] == ATOM("WM_DELETE_WINDOW"))
                {
-                    ev.type = ClientMessage;
-                    ev.xclient.window = c->win;
-                    ev.xclient.message_type = ATOM("WM_PROTOCOLS");
-                    ev.xclient.format = 32;
-                    ev.xclient.data.l[0] = ATOM("WM_DELETE_WINDOW");
-                    ev.xclient.data.l[1] = CurrentTime;
-                    ev.xclient.data.l[2] = 0;
-                    ev.xclient.data.l[3] = 0;
-                    ev.xclient.data.l[4] = 0;
-
-                    XSendEvent(W->dpy, c->win, False, NoEventMask, &ev);
-
+                    canbedel = true;
                     XFree(atom);
-
-                    return;
+                    break;
                }
 
-          XKillClient(W->dpy, c->win);
+          if(canbedel)
+          {
+               XEvent ev =
+               {
+                    .type                 = ClientMessage,
+                    .xclient.window       = c->win,
+                    .xclient.message_type = ATOM("WM_PROTOCOLS"),
+                    .xclient.format       = 32,
+                    .xclient.data.l[0]    = ATOM("WM_DELETE_WINDOW"),
+                    .xclient.data.l[1]    = CurrentTime
+               };
+
+               XSendEvent(W->dpy, c->win, False, NoEventMask, &ev);
+           }
+          else
+               XKillClient(W->dpy, c->win);
      }
      else
           XKillClient(W->dpy, c->win);
+}
+
+void
+uicb_client_close(Uicb cmd)
+{
+     if(W->client)
+          client_close(W->client);
 }
 
 struct client*
@@ -264,8 +257,7 @@ client_new(Window w, XWindowAttributes *wa)
      tag_client(W->screen->seltag, c);
 
      /* X window attributes */
-     XSelectInput(W->dpy, w, EnterWindowMask | FocusChangeMask
-                             | PropertyChangeMask | StructureNotifyMask);
+     XSelectInput(W->dpy, w, EnterWindowMask | LeaveWindowMask | StructureNotifyMask | PropertyChangeMask);
      XSetWindowBorder(W->dpy, w, THEME_DEFAULT->client_n.bg);
      XSetWindowBorderWidth(W->dpy, w, THEME_DEFAULT->client_border_width);
      client_grabbuttons(c, false);
@@ -274,8 +266,8 @@ client_new(Window w, XWindowAttributes *wa)
      SLIST_INSERT_HEAD(&W->h.client, c, next);
 
      /* Map */
-     WIN_STATE(c->win, Map);
-     ewmh_set_wm_state(c->win, NormalState);
+     WIN_STATE(w, Map);
+     ewmh_set_wm_state(w, NormalState);
 
      client_configure(c);
 
@@ -312,9 +304,9 @@ client_fac_resize(struct client *c, Position p, int fac)
 
      /* Check futur size/pos */
      if(!client_fac_geo(c, p, fac)
-         || !client_fac_geo(gc, RPOS(p), -fac)
-         || !client_fac_check_row(c, p, fac)
-         || !client_fac_check_row(gc, RPOS(p), -fac))
+        || !client_fac_geo(gc, RPOS(p), -fac)
+        || !client_fac_check_row(c, p, fac)
+        || !client_fac_check_row(gc, RPOS(p), -fac))
           return;
 
 

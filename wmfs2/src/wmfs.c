@@ -122,6 +122,11 @@ wmfs_xinit(void)
      W->gc = DefaultGC(W->dpy, W->xscreen);
 
      /*
+      * Keys
+      */
+     wmfs_numlockmask();
+
+     /*
       * Root window/cursor
       */
      W->root = RootWindow(W->dpy, W->xscreen);
@@ -131,11 +136,6 @@ wmfs_xinit(void)
       * Locale (font encode)
       */
      setlocale(LC_CTYPE, "");
-
-     /*
-      * Keys
-      */
-     wmfs_numlockmask();
 
      /*
       * Barwin linked list
@@ -151,7 +151,7 @@ wmfs_grab_keys(void)
      KeyCode c;
      struct keybind *k;
 
-     /*wmfs_numlockmask();*/
+     wmfs_numlockmask();
 
      XUngrabKey(W->dpy, AnyKey, AnyModifier, W->root);
 

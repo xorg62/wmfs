@@ -115,13 +115,13 @@
 
   # Resize selected tiled client with direction
   [key] mod = {"Super"} key = "h" func = "client_resize_left"   cmd = "20" [/key]
-  [key] mod = {"Super"} key = "l" func = "client_resize_right"  cmd = "20" [/key]
+  [key] mod = {"Super"} key = "l" func = "client_resize_left"   cmd = "-20" [/key]
   [key] mod = {"Super"} key = "k" func = "client_resize_top"    cmd = "20" [/key]
-  [key] mod = {"Super"} key = "j" func = "client_resize_bottom" cmd = "20" [/key]
+  [key] mod = {"Super"} key = "j" func = "client_resize_top"    cmd = "-20" [/key]
   [key] mod = {"Super", "Control"} key = "h" func = "client_resize_right"  cmd = "-20" [/key]
-  [key] mod = {"Super", "Control"} key = "l" func = "client_resize_left"   cmd = "-20" [/key]
+  [key] mod = {"Super", "Control"} key = "l" func = "client_resize_right"  cmd = "20" [/key]
   [key] mod = {"Super", "Control"} key = "k" func = "client_resize_bottom" cmd = "-20" [/key]
-  [key] mod = {"Super", "Control"} key = "j" func = "client_resize_top"    cmd = "-20" [/key]
+  [key] mod = {"Super", "Control"} key = "j" func = "client_resize_bottom" cmd = "20" [/key]
 
 
 [/keys]

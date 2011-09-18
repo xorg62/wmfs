@@ -33,7 +33,7 @@ static void
 infobar_elem_tag_init(struct element *e)
 {
      struct tag *t;
-     struct barwin *b, *prev;
+     struct barwin *b, *prev = NULL;
      struct geo g = { 0, 0, 0, 0 };
      int s, j;
 

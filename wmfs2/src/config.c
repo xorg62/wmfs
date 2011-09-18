@@ -16,7 +16,7 @@
 static void
 config_theme(void)
 {
-     struct theme *t, *p;
+     struct theme *t, *p = NULL;
      size_t i, n;
      struct conf_sec *sec, **ks;
 
@@ -190,6 +190,8 @@ config_keybind(void)
 
           SLIST_INSERT_HEAD(&W->h.keybind, k, next);
      }
+
+     wmfs_grab_keys();
 
      free(ks);
 }
