@@ -12,14 +12,13 @@ static struct geo
 layout_split(struct client *c, bool vertical)
 {
      struct geo og, geo;
-     int bord = THEME_DEFAULT->client_border_width;
 
      geo = og = c->geo;
 
      if(vertical)
      {
           c->geo.w >>= 1;
-          geo.x = (c->geo.x + bord) + (c->geo.w + bord);
+          geo.x = c->geo.x + c->geo.w;
           geo.w >>= 1;
 
           /* Remainder */
@@ -28,7 +27,7 @@ layout_split(struct client *c, bool vertical)
      else
      {
           c->geo.h >>= 1;
-          geo.y = (c->geo.y + bord) + (c->geo.h + bord);
+          geo.y = c->geo.y + c->geo.h;
           geo.h >>= 1;
 
           /* Remainder */
@@ -45,14 +44,14 @@ layout_split_arrange_size(struct geo g, struct client *c, Position p)
 {
      if(LDIR(p))
      {
-          c->geo.w += g.w + (THEME_DEFAULT->client_border_width << 1);
+          c->geo.w += g.w;
 
           if(p == Right)
                c->geo.x = g.x;
      }
      else
      {
-          c->geo.h += g.h + (THEME_DEFAULT->client_border_width << 1);
+          c->geo.h += g.h;
 
           if(p == Bottom)
                c->geo.y = g.y;
@@ -66,23 +65,18 @@ layout_split_check_row_dir(struct client *c, struct client *g, Position p)
 {
      struct geo cgeo = c->geo;
      struct client *cc;
-     int bord = THEME_DEFAULT->client_border_width;
-     int i = 0, s = 0, cs = (LDIR(p) ? g->geo.h : g->geo.w );
+     int s = 0, cs = (LDIR(p) ? g->geo.h : g->geo.w);
 
      SLIST_FOREACH(cc, &c->tag->clients, tnext)
           if(GEO_PARENTROW(cgeo, cc->geo, RPOS(p))
                     && GEO_CHECK_ROW(cc->geo, g->geo, p))
           {
-               s += (LDIR(p)
-                         ? cc->geo.h + bord
-                         : cc->geo.w + bord) + (i > 1 ? bord : 0);
+               s += (LDIR(p) ? cc->geo.h : cc->geo.w);
 
                if(s == cs)
                     return true;
                if(s > cs)
                     return false;
-
-               ++i;
           }
 
      return false;
@@ -147,7 +141,6 @@ layout_split_arrange_closed(struct client *ghost)
                     }
           }
      }
-
 }
 
 /* Integrate a client in split layout: split sc and fill c in new geo */

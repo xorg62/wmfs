@@ -11,6 +11,7 @@
 
 void client_configure(struct client *c);
 struct client *client_gb_win(Window w);
+struct client* client_gb_pos(struct tag *t, int x, int y);
 struct client *client_next_with_pos(struct client *bc, Position p);
 void client_focus(struct client *c);
 void client_get_name(struct client *c);
@@ -53,7 +54,7 @@ client_fac_geo(struct client *c, Position p, int fac)
 
      /* Check for incompatible geo */
      if(cg.w > c->screen->ugeo.w || cg.h > c->screen->ugeo.h
-               || cg.w < 1 || cg.h < 1)
+               || cg.w < 3 || cg.h < 3)
           return false;
 
      /* Set transformed geo in tmp geo */

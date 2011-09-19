@@ -104,7 +104,7 @@ struct client
      struct tag *tag;
      struct screen *screen;
      struct barwin *titlebar;
-     struct geo geo, tgeo;
+     struct geo geo, tgeo, wgeo;
      char *title;
      Flags flags;
      Window win;

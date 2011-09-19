@@ -22,6 +22,13 @@ draw_text(Drawable d, struct theme *t, int x, int y, Color fg, const char *str)
      XmbDrawString(W->dpy, d, t->font.fontset, W->gc, x, y, str, strlen(str));
 }
 
+static inline void
+draw_rect(Drawable d, struct geo g, Color bg)
+{
+     XSetForeground(W->dpy, W->gc, bg);
+     XFillRectangle(W->dpy, d, W->gc, g.x, g.y, g.w, g.h);
+}
+
 static inline unsigned short
 draw_textw(struct theme *t, const char *str)
 {

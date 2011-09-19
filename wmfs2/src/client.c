@@ -11,6 +11,7 @@
 #include "barwin.h"
 #include "ewmh.h"
 #include "layout.h"
+#include "draw.h"
 
 #define CLIENT_MOUSE_MOD Mod1Mask
 
@@ -62,7 +63,7 @@ client_gb_win(Window w)
      return c;
 }
 
-static struct client*
+struct client*
 client_gb_pos(struct tag *t, int x, int y)
 {
      struct client *c;
@@ -141,25 +142,32 @@ client_grabbuttons(struct client *c, bool focused)
 
 }
 
+static inline void
+client_draw_bord(void)
+{
+     struct geo g = { 0, 0, W->screen->ugeo.w, W->screen->ugeo.h };
+
+     draw_rect(W->screen->seltag->frame, g, THEME_DEFAULT->client_n.bg);
+
+     /* Selected client's border */
+     if(W->client)
+          draw_rect(W->client->tag->frame, W->client->geo, THEME_DEFAULT->client_s.bg);
+}
+
+
 void
 client_focus(struct client *c)
 {
      /* Unfocus selected */
      if(W->client && W->client != c)
-     {
-          XSetWindowBorder(W->dpy, W->client->win, THEME_DEFAULT->client_n.bg);
-
           client_grabbuttons(W->client, false);
-     }
 
      /* Focus c */
      if((W->client = c))
      {
           c->tag->sel = c;
 
-          XSetWindowBorder(W->dpy, c->win, THEME_DEFAULT->client_s.bg);
-
-          XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
+          client_draw_bord();
 
           client_grabbuttons(c, true);
      }
@@ -251,15 +259,14 @@ client_new(Window w, XWindowAttributes *wa)
      c->geo.y = wa->y;
      c->geo.w = wa->width;
      c->geo.h = wa->height;
-     c->tgeo = c->geo;
+     c->tgeo = c->wgeo = c->geo;
 
      /* Set tag */
      tag_client(W->screen->seltag, c);
 
      /* X window attributes */
      XSelectInput(W->dpy, w, EnterWindowMask | LeaveWindowMask | StructureNotifyMask | PropertyChangeMask);
-     XSetWindowBorder(W->dpy, w, THEME_DEFAULT->client_n.bg);
-     XSetWindowBorderWidth(W->dpy, w, THEME_DEFAULT->client_border_width);
+     XSetWindowBorderWidth(W->dpy, w, 0);
      client_grabbuttons(c, false);
 
      /* Attach */
@@ -277,9 +284,21 @@ client_new(Window w, XWindowAttributes *wa)
 void
 client_moveresize(struct client *c, struct geo g)
 {
-     c->geo = g;
+     int bord = THEME_DEFAULT->client_border_width;
 
-     XMoveResizeWindow(W->dpy, c->win, g.x, g.y, g.w, g.h);
+     c->geo = c->wgeo = g;
+
+     /* Window geo */
+     c->wgeo.x += bord;
+     c->wgeo.y += bord ;
+     c->wgeo.w -= (bord << 1);
+     c->wgeo.h -= (bord << 1);
+
+     XMoveResizeWindow(W->dpy, c->win,
+                       c->wgeo.x, c->wgeo.y,
+                       c->wgeo.w, c->wgeo.h);
+
+     client_draw_bord();
 }
 
 void
@@ -288,8 +307,8 @@ client_maximize(struct client *c)
      c->geo = c->tag->screen->ugeo;
 
      c->geo.x = c->geo.y = 0; /* Frame x/y, not screen geo */
-     c->geo.w = c->tag->screen->ugeo.w - (THEME_DEFAULT->client_border_width << 1);
-     c->geo.h = c->tag->screen->ugeo.h - (THEME_DEFAULT->client_border_width << 1);
+     c->geo.w = c->tag->screen->ugeo.w;
+     c->geo.h = c->tag->screen->ugeo.h;
 
      client_moveresize(c, c->geo);
 }
@@ -298,15 +317,16 @@ void
 client_fac_resize(struct client *c, Position p, int fac)
 {
      struct client *gc = client_next_with_pos(c, p);
+     Position rp = RPOS(p);
 
      if(!gc || gc->screen != c->screen)
           return;
 
      /* Check futur size/pos */
      if(!client_fac_geo(c, p, fac)
-        || !client_fac_geo(gc, RPOS(p), -fac)
+        || !client_fac_geo(gc, rp, -fac)
         || !client_fac_check_row(c, p, fac)
-        || !client_fac_check_row(gc, RPOS(p), -fac))
+        || !client_fac_check_row(gc, rp, -fac))
           return;
 
 
@@ -320,7 +340,7 @@ client_fac_resize(struct client *c, Position p, int fac)
      else
      {
           client_fac_arrange_row(c, p, fac);
-          client_fac_arrange_row(gc, RPOS(p), -fac);
+          client_fac_arrange_row(gc, rp, -fac);
      }
 }
 
