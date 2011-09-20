@@ -104,7 +104,7 @@
 
 [keys]
 
-  [key] mod = {"Control"} key = "Return" func = "spawn" cmd = "xterm" [/key]
+  [key] mod = {"Super"} key = "Return" func = "spawn" cmd = "xterm" [/key]
   [key] mod = {"Control","Alt"} key = "q" func = "quit" [/key]
   [key] mod = {"Super"} key = "1" func = "tag_set" cmd = "1" [/key]
   [key] mod = {"Super"} key = "2" func = "tag_set" cmd = "2" [/key]
@@ -112,6 +112,24 @@
   [key] mod = {"Super"} key = "s" func = "tag_next" [/key]
   [key] mod = {"Super"} key = "a" func = "tag_prev" [/key]
   [key] mod = {"Super"} key = "z" func = "tag" cmd = "tag2" [/key]
+
+  [key] mod = {"Super"} key = "q" func = "client_close" [/key]
+
+  # Focus next / prev client
+  [key] mod = { "Alt" } key = "Tab" func = "client_focus_next" [/key]
+  [key] mod = { "Alt", "Shift" } key = "Tab" func = "client_focus_prev" [/key]
+
+  # Focus next client with direction
+  [key] mod = {"Alt"} key = "h" func = "client_focus_left"   [/key]
+  [key] mod = {"Alt"} key = "l" func = "client_focus_right"  [/key]
+  [key] mod = {"Alt"} key = "k" func = "client_focus_top"    [/key]
+  [key] mod = {"Alt"} key = "j" func = "client_focus_bottom" [/key]
+
+ # swap next client with direction:
+  [key] mod = {"Control", "Shift"} key = "h" func = "client_swap_left"   [/key]
+  [key] mod = {"Control", "Shift"} key = "l" func = "client_swap_right"  [/key]
+  [key] mod = {"Control", "Shift"} key = "k" func = "client_swap_top"    [/key]
+  [key] mod = {"Control", "Shift"} key = "j" func = "client_swap_bottom" [/key]
 
   # Resize selected tiled client with direction
   [key] mod = {"Super"} key = "h" func = "client_resize_left"   cmd = "20" [/key]

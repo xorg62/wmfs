@@ -36,7 +36,18 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "client_resize_left",   uicb_client_resize_Left },
      { "client_resize_top",    uicb_client_resize_Top },
      { "client_resize_bottom", uicb_client_resize_Bottom },
-
+     { "client_focus_right",   uicb_client_focus_Right },
+     { "client_focus_left",    uicb_client_focus_Left },
+     { "client_focus_top",     uicb_client_focus_Top },
+     { "client_focus_bottom",  uicb_client_focus_Bottom },
+     { "client_swap_right",    uicb_client_swapsel_Right },
+     { "client_swap_left",     uicb_client_swapsel_Left },
+     { "client_swap_top",      uicb_client_swapsel_Top },
+     { "client_swap_bottom",   uicb_client_swapsel_Bottom },
+     { "client_focus_next",    uicb_client_focus_next },
+     { "client_focus_prev",    uicb_client_focus_prev },
+     { "client_swap_next",     uicb_client_swapsel_next },
+     { "client_swap_prev",     uicb_client_swapsel_prev },
      { NULL, NULL }
 };
 

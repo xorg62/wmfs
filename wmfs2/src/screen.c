@@ -13,6 +13,7 @@
 #include "util.h"
 #include "tag.h"
 #include "infobar.h"
+#include "client.h"
 
 static struct screen*
 screen_new(struct geo *g, int id)
@@ -90,6 +91,8 @@ screen_update_sel(void)
           SLIST_FOREACH(s, &W->h.screen, next)
                if(INAREA(x, y, s->geo))
                     break;
+
+          client_focus(s->seltag->sel);
 
           return (W->screen = s);
      }

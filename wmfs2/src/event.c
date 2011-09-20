@@ -35,6 +35,7 @@ event_buttonpress(XEvent *e)
           }
 }
 
+/*
 static void
 event_enternotify(XEvent *e)
 {
@@ -48,12 +49,13 @@ event_enternotify(XEvent *e)
      if((c = client_gb_win(ev->window)))
           client_focus(c);
 }
+*/
 
 static void
 event_clientmessageevent(XEvent *e)
 {
-     /*  XclientMessageEvent *ev = &e->xclient;
-       client *c;*/
+     /*  XClientMessageEvent *ev = &e->xclient;
+         client *c;*/
 }
 
 static void
@@ -184,15 +186,12 @@ event_unmapnotify(XEvent *e)
 static void
 event_motionnotify(XEvent *e)
 {
-    /*
-        XMotionEvent *ev = &e->xmotion;
-        client *c;
+     XMotionEvent *ev = &e->xmotion;
+     struct client *c;
 
-
-      * Option follow mouvement
-        if((c = client_gb_win(ev->subwindow)) && c != c->tag->sel)
-             client_focus(c);
-      */
+     /* Option follow mouvement */
+     if((c = client_gb_win(ev->subwindow)) && c != c->tag->sel)
+          client_focus(c);
 }
 
 static void
@@ -243,7 +242,7 @@ event_init(void)
      event_handle[ClientMessage]    = event_clientmessageevent;
      event_handle[ConfigureRequest] = event_configureevent;
      event_handle[DestroyNotify]    = event_destroynotify;
-     event_handle[EnterNotify]      = event_enternotify;
+     /*event_handle[EnterNotify]      = event_enternotify; use motion instead */
      event_handle[Expose]           = event_expose;
      event_handle[FocusIn]          = event_focusin;
      event_handle[KeyPress]         = event_keypress;

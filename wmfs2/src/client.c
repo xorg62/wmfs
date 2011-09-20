@@ -15,11 +15,27 @@
 
 #define CLIENT_MOUSE_MOD Mod1Mask
 
-#define CLIENT_RESIZE_DIR(d)                          \
-void uicb_client_resize_##d(Uicb cmd)                 \
+#define CLIENT_RESIZE_DIR(D)                          \
+void uicb_client_resize_##D(Uicb cmd)                 \
 {                                                     \
      if(W->client)                                    \
-          client_fac_resize(W->client, d, ATOI(cmd)); \
+          client_fac_resize(W->client, D, ATOI(cmd)); \
+}
+
+#define CLIENT_ACTION_DIR(A, D)                           \
+void uicb_client_##A##_##D(Uicb cmd)                      \
+{                                                         \
+     (void)cmd;                                           \
+     if(W->client)                                        \
+          client_##A(client_next_with_pos(W->client, D)); \
+}
+
+#define CLIENT_ACTION_LIST(A, L)             \
+void uicb_client_##A##_##L(Uicb cmd)         \
+{                                            \
+     (void)cmd;                              \
+     if(W->client)                           \
+          client_##A(client_##L(W->client)); \
 }
 
 /* uicb_client_resize_dir() */
@@ -27,6 +43,27 @@ CLIENT_RESIZE_DIR(Right)
 CLIENT_RESIZE_DIR(Left)
 CLIENT_RESIZE_DIR(Top)
 CLIENT_RESIZE_DIR(Bottom)
+
+/* uicb_client_focus_dir() */
+CLIENT_ACTION_DIR(focus, Right)
+CLIENT_ACTION_DIR(focus, Left)
+CLIENT_ACTION_DIR(focus, Top)
+CLIENT_ACTION_DIR(focus, Bottom)
+
+/* uicb_client_swapsel_dir() */
+#define client_swapsel(c) client_swap(W->client, c)
+CLIENT_ACTION_DIR(swapsel, Right)
+CLIENT_ACTION_DIR(swapsel, Left)
+CLIENT_ACTION_DIR(swapsel, Top)
+CLIENT_ACTION_DIR(swapsel, Bottom)
+
+/* uicb_client_focus_next/prev() */
+CLIENT_ACTION_LIST(focus, next)
+CLIENT_ACTION_LIST(focus, prev)
+
+/* uicb_client_swapsel_next/prev() */
+CLIENT_ACTION_LIST(swapsel, next)
+CLIENT_ACTION_LIST(swapsel, prev)
 
 /** Send a ConfigureRequest event to the struct client
  * \param c struct client pointer
@@ -50,6 +87,29 @@ client_configure(struct client *c)
 
      XSendEvent(W->dpy, c->win, False, StructureNotifyMask, (XEvent *)&ev);
      XSync(W->dpy, False);
+}
+
+struct client*
+client_next(struct client *c)
+{
+     struct client *next;
+
+     if(!(next = SLIST_NEXT(c, tnext)))
+          next = SLIST_FIRST(&c->tag->clients);
+
+     return next;
+}
+
+struct client*
+client_prev(struct client *c)
+{
+     struct client *cc;
+
+     SLIST_FOREACH(cc, &c->tag->clients, tnext)
+          if(SLIST_NEXT(cc, tnext) == c || !SLIST_NEXT(cc, tnext))
+               return cc;
+
+     return SLIST_FIRST(&c->tag->clients);
 }
 
 struct client*
@@ -111,6 +171,27 @@ client_next_with_pos(struct client *bc, Position p)
      return c;
 }
 
+void
+client_swap(struct client *c1, struct client *c2)
+{
+     struct tag *t;
+     struct geo g;
+
+     if(c1 == c2 || !c1 || !c2)
+          return;
+
+     t = c1->tag;
+     g = c1->geo;
+
+     swap_ptr((void**)&c1->screen, (void**)&c2->screen);
+
+     tag_client(c2->tag, c1);
+     tag_client(t, c2);
+
+     client_moveresize(c1, c2->geo);
+     client_moveresize(c2, g);
+}
+
 static void
 client_grabbuttons(struct client *c, bool focused)
 {
@@ -143,15 +224,15 @@ client_grabbuttons(struct client *c, bool focused)
 }
 
 static inline void
-client_draw_bord(void)
+client_draw_bord(struct client *c)
 {
-     struct geo g = { 0, 0, W->screen->ugeo.w, W->screen->ugeo.h };
+     struct geo g = { 0, 0, c->screen->ugeo.w, c->screen->ugeo.h };
 
-     draw_rect(W->screen->seltag->frame, g, THEME_DEFAULT->client_n.bg);
+     draw_rect(c->tag->frame, g, THEME_DEFAULT->client_n.bg);
 
      /* Selected client's border */
      if(W->client)
-          draw_rect(W->client->tag->frame, W->client->geo, THEME_DEFAULT->client_s.bg);
+          draw_rect(c->tag->frame, c->tag->sel->geo, THEME_DEFAULT->client_s.bg);
 }
 
 
@@ -167,9 +248,10 @@ client_focus(struct client *c)
      {
           c->tag->sel = c;
 
-          client_draw_bord();
-
+          client_draw_bord(c);
           client_grabbuttons(c, true);
+
+          XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
      }
 }
 
@@ -286,19 +368,20 @@ client_moveresize(struct client *c, struct geo g)
 {
      int bord = THEME_DEFAULT->client_border_width;
 
-     c->geo = c->wgeo = g;
+     c->geo = g;
 
      /* Window geo */
-     c->wgeo.x += bord;
-     c->wgeo.y += bord ;
-     c->wgeo.w -= (bord << 1);
-     c->wgeo.h -= (bord << 1);
+     c->wgeo.x = g.x + bord;
+     c->wgeo.y = g.y + bord ;
+     c->wgeo.w = g.w - (bord << 1);
+     c->wgeo.h = g.h - (bord << 1);
 
      XMoveResizeWindow(W->dpy, c->win,
                        c->wgeo.x, c->wgeo.y,
                        c->wgeo.w, c->wgeo.h);
 
-     client_draw_bord();
+     client_draw_bord(c);
+     client_configure(c);
 }
 
 void

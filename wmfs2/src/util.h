@@ -44,6 +44,15 @@ color_atoh(const char *col)
      return (Color)strtol(col + shift, NULL, 16);
 }
 
+static inline void
+swap_ptr(void **x, void **y)
+{
+     void *t = *x;
+
+     *x = *y;
+     *y = t;
+}
+
 void *xmalloc(size_t nmemb, size_t size);
 void *xcalloc(size_t nmemb, size_t size);
 int xasprintf(char **strp, const char *fmt, ...);
