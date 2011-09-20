@@ -90,25 +90,6 @@ client_configure(struct client *c)
 }
 
 struct client*
-client_next(struct client *c)
-{
-     struct client *next = SLIST_NEXT(c, tnext);
-
-     return (next ? next : SLIST_FIRST(&c->tag->clients));
-}
-
-struct client*
-client_prev(struct client *c)
-{
-     struct client *nc, *cc = SLIST_FIRST(&c->tag->clients);
-
-     while((nc = SLIST_NEXT(cc, tnext)) && nc != c)
-          cc = nc;
-
-     return cc;
-}
-
-struct client*
 client_gb_win(Window w)
 {
      struct client *c = SLIST_FIRST(&W->h.client);

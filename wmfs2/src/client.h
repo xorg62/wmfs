@@ -10,9 +10,6 @@
 #include "layout.h"
 
 void client_configure(struct client *c);
-
-struct client *client_next(struct client *c);
-struct client *client_prev(struct client *c);
 struct client *client_gb_win(Window w);
 struct client *client_gb_pos(struct tag *t, int x, int y);
 struct client *client_next_with_pos(struct client *bc, Position p);
@@ -45,6 +42,25 @@ void uicb_client_focus_next(Uicb);
 void uicb_client_focus_prev(Uicb);
 void uicb_client_swapsel_next(Uicb);
 void uicb_client_swapsel_prev(Uicb);
+
+static inline struct client*
+client_next(struct client *c)
+{
+     return (SLIST_NEXT(c, tnext)
+               ? SLIST_NEXT(c, tnext)
+               : SLIST_FIRST(&c->tag->clients));
+}
+
+static inline struct client*
+client_prev(struct client *c)
+{
+     struct client *nc, *cc = SLIST_FIRST(&c->tag->clients);
+
+     while((nc = SLIST_NEXT(cc, tnext)) && nc != c)
+          cc = nc;
+
+     return cc;
+}
 
 static inline bool
 client_fac_geo(struct client *c, Position p, int fac)
