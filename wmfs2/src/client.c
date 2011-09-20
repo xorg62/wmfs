@@ -122,15 +122,11 @@ client_next_with_pos(struct client *bc, Position p)
 {
      struct client *c;
      int x, y;
-     const static char scanfac[4][2] =
-     {
-          { 2,  0 }, { -2, 0 }, /* Right, Left   */
-          { 0, -2 }, {  0, 2 }  /* Top,   Bottom */
-     };
+     const static char scanfac[PositionLast] = { +10, -10, 0, 0 };
 
      /*
-      * Set start place of pointer (edge of base client)
-      * for faster scanning
+      * Set start place of pointer (edge with position
+      * of base client) for faster scanning.
       */
      x = bc->geo.x + ((p == Right)  ? bc->geo.w : 0);
      y = bc->geo.y + ((p == Bottom) ? bc->geo.h : 0);
@@ -138,11 +134,10 @@ client_next_with_pos(struct client *bc, Position p)
      x += ((p > Left) ? (bc->geo.w >> 1) : 0);
 
      /* Scan in right direction to next(p) physical client */
-
      while((c = client_gb_pos(bc->tag, x, y)) == bc)
      {
-          x += scanfac[p][0];
-          y += scanfac[p][1];
+          x += scanfac[p];
+          y += scanfac[Bottom - p];
      }
 
      return c;
