@@ -92,24 +92,20 @@ client_configure(struct client *c)
 struct client*
 client_next(struct client *c)
 {
-     struct client *next;
+     struct client *next = SLIST_NEXT(c, tnext);
 
-     if(!(next = SLIST_NEXT(c, tnext)))
-          next = SLIST_FIRST(&c->tag->clients);
-
-     return next;
+     return (next ? next : SLIST_FIRST(&c->tag->clients));
 }
 
 struct client*
 client_prev(struct client *c)
 {
-     struct client *cc;
+     struct client *nc, *cc = SLIST_FIRST(&c->tag->clients);
 
-     SLIST_FOREACH(cc, &c->tag->clients, tnext)
-          if(SLIST_NEXT(cc, tnext) == c || !SLIST_NEXT(cc, tnext))
-               return cc;
+     while((nc = SLIST_NEXT(cc, tnext)) && nc != c)
+          cc = nc;
 
-     return SLIST_FIRST(&c->tag->clients);
+     return cc;
 }
 
 struct client*
