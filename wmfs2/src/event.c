@@ -35,21 +35,21 @@ event_buttonpress(XEvent *e)
           }
 }
 
-/*
 static void
 event_enternotify(XEvent *e)
 {
      XCrossingEvent *ev = &e->xcrossing;
      struct client *c;
 
-     if((ev->mode != NotifyNormal || ev->detail == NotifyInferior)
+     if((ev->mode != NotifyNormal
+        || ev->detail == NotifyInferior
+        || ev->detail ==  NotifyAncestor)
                && ev->window != W->root)
           return;
 
      if((c = client_gb_win(ev->window)))
           client_focus(c);
 }
-*/
 
 static void
 event_clientmessageevent(XEvent *e)
@@ -183,16 +183,17 @@ event_unmapnotify(XEvent *e)
           client_remove(c);
 }
 
+/*
 static void
 event_motionnotify(XEvent *e)
 {
      XMotionEvent *ev = &e->xmotion;
      struct client *c;
 
-     /* Option follow mouvement */
      if((c = client_gb_win(ev->subwindow)) && c != c->tag->sel)
           client_focus(c);
 }
+*/
 
 static void
 event_keypress(XEvent *e)
@@ -242,14 +243,14 @@ event_init(void)
      event_handle[ClientMessage]    = event_clientmessageevent;
      event_handle[ConfigureRequest] = event_configureevent;
      event_handle[DestroyNotify]    = event_destroynotify;
-     /*event_handle[EnterNotify]      = event_enternotify; use motion instead */
+     event_handle[EnterNotify]      = event_enternotify;
      event_handle[Expose]           = event_expose;
      event_handle[FocusIn]          = event_focusin;
      event_handle[KeyPress]         = event_keypress;
      /*event_handle[MapNotify]        = event_mapnotify;*/
      event_handle[MapRequest]       = event_maprequest;
      event_handle[MappingNotify]    = event_mappingnotify;
-     event_handle[MotionNotify]     = event_motionnotify;
+     /*event_handle[MotionNotify]     = event_motionnotify;*/
      event_handle[PropertyNotify]   = event_propertynotify;
      /*event_handle[ReparentNotify]   = event_reparentnotify;*/
      /*event_handle[SelectionClear]   = event_selectionclearevent;*/

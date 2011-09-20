@@ -93,9 +93,8 @@ tag_client(struct tag *t, struct client *c)
 
           SLIST_REMOVE(&c->tag->clients, c, client, tnext);
 
-          /* TODO: Focus next client */
           if(c->tag->sel == c)
-               c->tag->sel = NULL;
+               client_focus(client_next(c));
      }
 
      /*
