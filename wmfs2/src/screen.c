@@ -92,8 +92,6 @@ screen_update_sel(void)
                if(INAREA(x, y, s->geo))
                     break;
 
-          client_focus(s->seltag->sel);
-
           return (W->screen = s);
      }
 #endif /* HAVE_XINERAMA */

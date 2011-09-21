@@ -167,8 +167,6 @@ client_swap(struct client *c1, struct client *c2)
 static void
 client_grabbuttons(struct client *c, bool focused)
 {
-     wmfs_numlockmask();
-
      XUngrabButton(W->dpy, AnyButton, AnyModifier, c->win);
 
      if(focused)
@@ -204,7 +202,7 @@ client_draw_bord(struct client *c)
 
      /* Selected client's border */
      if(W->client)
-          draw_rect(c->tag->frame, c->tag->sel->geo, THEME_DEFAULT->client_s.bg);
+          draw_rect(W->client->tag->frame, W->client->tag->sel->geo, THEME_DEFAULT->client_s.bg);
 }
 
 
@@ -225,6 +223,8 @@ client_focus(struct client *c)
 
           XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
      }
+     else
+          XSetInputFocus(W->dpy, W->root, RevertToPointerRoot, CurrentTime);
 }
 
 /** Get a client name
@@ -330,6 +330,8 @@ client_new(Window w, XWindowAttributes *wa)
      WIN_STATE(w, Map);
      ewmh_set_wm_state(w, NormalState);
 
+     client_get_name(c);
+     client_focus(c);
      client_configure(c);
 
      return c;
@@ -419,7 +421,6 @@ client_remove(struct client *c)
 
      ewmh_set_wm_state(c->win, WithdrawnState);
 
-     XUngrabButton(W->dpy, AnyButton, AnyModifier, c->win);
      XUngrabServer(W->dpy);
      XSync(W->dpy, False);
      XSetErrorHandler(wmfs_error_handler);

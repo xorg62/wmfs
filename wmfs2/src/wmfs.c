@@ -37,13 +37,13 @@ wmfs_error_handler(Display *d, XErrorEvent *event)
                return 0;
 
 
-     XGetErrorText(d, event->error_code, mess, 128);
-     warnx("%s(%d) opcodes %d/%d\n  resource #%lx\n",
-               mess,
-               event->error_code,
-               event->request_code,
-               event->minor_code,
-               event->resourceid);
+     if(XGetErrorText(d, event->error_code, mess, 128))
+          warnx("%s(%d) opcodes %d/%d\n  resource #%lx\n",
+                    mess,
+                    event->error_code,
+                    event->request_code,
+                    event->minor_code,
+                    event->resourceid);
 
      return 1;
 }

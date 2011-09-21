@@ -73,6 +73,7 @@ layout_split_check_row_dir(struct client *c, struct client *g, Position p)
           {
                s += (LDIR(p) ? cc->geo.h : cc->geo.w);
 
+
                if(s == cs)
                     return true;
                if(s > cs)
@@ -97,7 +98,7 @@ layout_split_arrange_closed(struct client *ghost)
 {
      struct client *c, *cc;
      struct geo g;
-     bool b;
+     bool b = false;
      Position p;
 
      /* Search for single parent for easy resize
