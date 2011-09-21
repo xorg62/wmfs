@@ -124,7 +124,7 @@ client_next_with_pos(struct client *bc, Position p)
 {
      struct client *c;
      int x, y;
-     const static char scanfac[PositionLast] = { +1, -1, 0, 0 };
+     const static char scanfac[PositionLast] = { +10, -10, 0, 0 };
 
      /*
       * Set start place of pointer (edge with position
@@ -259,7 +259,6 @@ client_get_name(struct client *c)
 void
 client_close(struct client *c)
 {
-     bool canbedel;
      int proto;
      XEvent ev;
      Atom *atom = NULL;
@@ -270,27 +269,21 @@ client_close(struct client *c)
           while(proto--)
                if(atom[proto] == ATOM("WM_DELETE_WINDOW"))
                {
-                    canbedel = true;
+                    ev.type = ClientMessage;
+                    ev.xclient.window = c->win;
+                    ev.xclient.message_type = ATOM("WM_PROTOCOLS");
+                    ev.xclient.format = 32;
+                    ev.xclient.data.l[0] = ATOM("WM_DELETE_WINDOW");
+                    ev.xclient.data.l[1] = CurrentTime;
+
+                    XSendEvent(W->dpy, c->win, False, NoEventMask, &ev);
                     XFree(atom);
-                    break;
+
+                    return;
                }
-
-          if(canbedel)
-          {
-               ev.type = ClientMessage;
-               ev.xclient.window = c->win;
-               ev.xclient.message_type = ATOM("WM_PROTOCOLS");
-               ev.xclient.format = 32;
-               ev.xclient.data.l[0] = ATOM("WM_DELETE_WINDOW");
-               ev.xclient.data.l[1] = CurrentTime;
-
-               XSendEvent(W->dpy, c->win, False, NoEventMask, &ev);
-          }
-          else
-               XKillClient(W->dpy, c->win);
      }
-     else
-          XKillClient(W->dpy, c->win);
+
+     XKillClient(W->dpy, c->win);
 }
 
 void

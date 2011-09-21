@@ -109,14 +109,14 @@ tag_client(struct tag *t, struct client *c)
           return;
      }
 
+     /* Reparent client win in frame win */
+     XReparentWindow(W->dpy, c->win, t->frame, 0, 0);
+
      /* Map frame if tag was empty */
      if(SLIST_EMPTY(&t->clients))
           WIN_STATE(t->frame, Map);
 
      c->tag = t;
-
-     /* Reparent client win in frame win */
-     XReparentWindow(W->dpy, c->win, t->frame, 0, 0);
 
      layout_split_integrate(c, t->sel);
 

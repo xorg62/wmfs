@@ -89,7 +89,7 @@ client_fac_geo(struct client *c, Position p, int fac)
 
      /* Check for incompatible geo */
      if(cg.w > c->screen->ugeo.w || cg.h > c->screen->ugeo.h
-               || cg.w < 3 || cg.h < 3)
+               || cg.w < 5 || cg.h < 5)
           return false;
 
      /* Set transformed geo in tmp geo */
