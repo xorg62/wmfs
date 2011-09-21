@@ -54,10 +54,11 @@ client_next(struct client *c)
 static inline struct client*
 client_prev(struct client *c)
 {
-     struct client *nc, *cc = SLIST_FIRST(&c->tag->clients);
+     struct client *cc;
 
-     while((nc = SLIST_NEXT(cc, tnext)) && nc != c)
-          cc = nc;
+     for(cc = SLIST_FIRST(&c->tag->clients);
+         SLIST_NEXT(cc, tnext) && SLIST_NEXT(cc, tnext) != c;
+         cc = SLIST_NEXT(cc, tnext));
 
      return cc;
 }

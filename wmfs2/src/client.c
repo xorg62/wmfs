@@ -22,20 +22,22 @@ void uicb_client_resize_##D(Uicb cmd)                 \
           client_fac_resize(W->client, D, ATOI(cmd)); \
 }
 
-#define CLIENT_ACTION_DIR(A, D)                           \
-void uicb_client_##A##_##D(Uicb cmd)                      \
-{                                                         \
-     (void)cmd;                                           \
-     if(W->client)                                        \
-          client_##A(client_next_with_pos(W->client, D)); \
+#define CLIENT_ACTION_DIR(A, D)                                \
+void uicb_client_##A##_##D(Uicb cmd)                           \
+{                                                              \
+     (void)cmd;                                                \
+     struct client *c;                                         \
+     if(W->client && (c = client_next_with_pos(W->client, D))) \
+          client_##A(c);                                       \
 }
 
-#define CLIENT_ACTION_LIST(A, L)             \
-void uicb_client_##A##_##L(Uicb cmd)         \
-{                                            \
-     (void)cmd;                              \
-     if(W->client)                           \
-          client_##A(client_##L(W->client)); \
+#define CLIENT_ACTION_LIST(A, L)                  \
+void uicb_client_##A##_##L(Uicb cmd)              \
+{                                                 \
+     (void)cmd;                                   \
+     struct client *c;                            \
+     if(W->client && (c = client_##L(W->client))) \
+          client_##A(c);                          \
 }
 
 /* uicb_client_resize_dir() */
@@ -122,7 +124,7 @@ client_next_with_pos(struct client *bc, Position p)
 {
      struct client *c;
      int x, y;
-     const static char scanfac[PositionLast] = { +10, -10, 0, 0 };
+     const static char scanfac[PositionLast] = { +1, -1, 0, 0 };
 
      /*
       * Set start place of pointer (edge with position
@@ -421,7 +423,6 @@ client_remove(struct client *c)
      XSetErrorHandler(wmfs_error_handler);
 
      free(c);
-     c = NULL;
 }
 
 void

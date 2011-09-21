@@ -91,10 +91,10 @@ tag_client(struct tag *t, struct client *c)
 
           layout_split_arrange_closed(c);
 
+          SLIST_REMOVE(&c->tag->clients, c, client, tnext);
+
           if(c->tag->sel == c || W->client == c)
                client_focus(client_next(c));
-
-          SLIST_REMOVE(&c->tag->clients, c, client, tnext);
      }
 
      /*
