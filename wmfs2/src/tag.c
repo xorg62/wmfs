@@ -70,11 +70,11 @@ tag_screen(struct screen *s, struct tag *t)
           WIN_STATE(t->frame, Map);
           SLIST_FOREACH(c, &t->clients, tnext)
                ewmh_set_wm_state(c->win, NormalState);
+
+          client_focus(t->sel);
      }
 
      s->seltag = t;
-
-     client_focus(t->sel);
 
      infobar_elem_screen_update(s, ElemTag);
 }
@@ -91,13 +91,10 @@ tag_client(struct tag *t, struct client *c)
 
           layout_split_arrange_closed(c);
 
-          SLIST_REMOVE(&c->tag->clients, c, client, tnext);
-
-          if(c->tag->sel == c)
-          {
-               c->tag->sel = NULL;
+          if(c->tag->sel == c || W->client == c)
                client_focus(client_next(c));
-          }
+
+          SLIST_REMOVE(&c->tag->clients, c, client, tnext);
      }
 
      /*

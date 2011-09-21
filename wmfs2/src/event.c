@@ -123,7 +123,7 @@ event_maprequest(XEvent *e)
           return;
 
      if(!client_gb_win(ev->window))
-          (struct client*)client_new(ev->window, &at);
+          client_new(ev->window, &at);
 }
 
 static void

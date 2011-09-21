@@ -224,7 +224,10 @@ client_focus(struct client *c)
           XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
      }
      else
+     {
+          W->client = W->screen->seltag->sel = NULL;
           XSetInputFocus(W->dpy, W->root, RevertToPointerRoot, CurrentTime);
+     }
 }
 
 /** Get a client name
@@ -256,6 +259,7 @@ client_close(struct client *c)
 {
      bool canbedel;
      int proto;
+     XEvent ev;
      Atom *atom = NULL;
 
      /* Event will call client_remove */
@@ -271,18 +275,15 @@ client_close(struct client *c)
 
           if(canbedel)
           {
-               XEvent ev =
-               {
-                    .type                 = ClientMessage,
-                    .xclient.window       = c->win,
-                    .xclient.message_type = ATOM("WM_PROTOCOLS"),
-                    .xclient.format       = 32,
-                    .xclient.data.l[0]    = ATOM("WM_DELETE_WINDOW"),
-                    .xclient.data.l[1]    = CurrentTime
-               };
+               ev.type = ClientMessage;
+               ev.xclient.window = c->win;
+               ev.xclient.message_type = ATOM("WM_PROTOCOLS");
+               ev.xclient.format = 32;
+               ev.xclient.data.l[0] = ATOM("WM_DELETE_WINDOW");
+               ev.xclient.data.l[1] = CurrentTime;
 
                XSendEvent(W->dpy, c->win, False, NoEventMask, &ev);
-           }
+          }
           else
                XKillClient(W->dpy, c->win);
      }
@@ -408,12 +409,6 @@ client_remove(struct client *c)
      XSetErrorHandler(wmfs_error_handler_dummy);
      XReparentWindow(W->dpy, c->win, W->root, c->geo.x, c->geo.y);
 
-     if(W->client == c)
-     {
-          W->client = NULL;
-          XSetInputFocus(W->dpy, W->root, RevertToPointerRoot, CurrentTime);
-     }
-
      /* Remove from global client list */
      SLIST_REMOVE(&W->h.client, c, client, next);
 
@@ -426,6 +421,7 @@ client_remove(struct client *c)
      XSetErrorHandler(wmfs_error_handler);
 
      free(c);
+     c = NULL;
 }
 
 void
