@@ -168,3 +168,30 @@ layout_split_integrate(struct client *c, struct client *sc)
      client_moveresize(c, g);
 }
 
+/*
+ * Really simple functions, don't need static no-uicb backend
+ * so we evitate if(vertical) .. else
+ */
+void
+uicb_layout_split_vmirror(Uicb cmd)
+{
+     struct client *c;
+
+     SLIST_FOREACH(c, &W->screen->seltag->clients, tnext)
+     {
+          c->geo.x = W->screen->ugeo.w - (c->geo.x + c->geo.w);
+          client_moveresize(c, c->geo);
+     }
+}
+
+void
+uicb_layout_split_hmirror(Uicb cmd)
+{
+     struct client *c;
+
+     SLIST_FOREACH(c, &W->screen->seltag->clients, tnext)
+     {
+          c->geo.y = W->screen->ugeo.h - (c->geo.y + c->geo.h);
+          client_moveresize(c, c->geo);
+     }
+}
