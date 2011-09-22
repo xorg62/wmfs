@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2010 Philippe Pepiot <phil@philpep.org>
+ * Copyright (c) 2011 Martin Duquesnoy <xorg62@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,7 +23,8 @@
 #define INCLUDE_CMD "@include"
 #define PARSE_MAX_LIST 32
 
-struct conf_opt {
+struct conf_opt
+{
      char *name;
      char *val[PARSE_MAX_LIST];
      size_t nval;
@@ -32,16 +34,18 @@ struct conf_opt {
      SLIST_ENTRY(conf_opt) entry;
 };
 
-struct conf_sec {
+struct conf_sec
+{
      char *name;
      SLIST_HEAD(, conf_opt) optlist;
-     TAILQ_HEAD(, conf_sec) sub;
+     TAILQ_HEAD(cshead, conf_sec) sub;
      size_t nopt;
      size_t nsub;
      TAILQ_ENTRY(conf_sec) entry;
 };
 
-struct opt_type {
+struct opt_type
+{
      long int num;
      float fnum;
      bool boolean;

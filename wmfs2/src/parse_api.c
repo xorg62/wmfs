@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2010 Philippe Pepiot <phil@philpep.org>
+ * Copyright (c) 2011 Martin Duquesnoy <xorg62@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -27,24 +28,23 @@
 
 extern TAILQ_HEAD(, conf_sec) config;
 
-static const struct opt_type opt_type_null = { 0, 0, False, NULL };
+static const struct opt_type opt_type_null = { 0, 0, false, NULL };
 
 static struct opt_type
 string_to_opt(char *s)
 {
      struct opt_type ret = opt_type_null;
 
-     if (!s || !strlen(s))
+     if(!s || !strlen(s))
           return ret;
 
      ret.num = strtol(s, (char**)NULL, 10);
      ret.fnum = strtod(s, NULL);
 
-     if (!strcmp(s, "true") || !strcmp(s, "True") ||
-               !strcmp(s, "TRUE") || !strcmp(s, "1"))
-          ret.boolean = True;
-     else
-          ret.boolean = False;
+     ret.boolean = (!strcmp(s, "true")
+                   || !strcmp(s, "true")
+                   || !strcmp(s, "TRUE")
+                   || !strcmp(s, "1"));
 
      ret.str = s;
 
@@ -58,7 +58,7 @@ print_unused(struct conf_sec *sec)
      struct conf_sec *s;
      struct conf_opt *o;
 
-     if (!sec)
+     if(!sec)
      {
           TAILQ_FOREACH(s, &config, entry)
                print_unused(s);
@@ -66,12 +66,11 @@ print_unused(struct conf_sec *sec)
      }
 
      SLIST_FOREACH(o, &sec->optlist, entry)
-          if (o->used == False)
-               warnx("%s:%d, unused param %s",
-                         o->filename, o->line, o->name);
+          if(!o->used)
+               warnx("%s:%d, unused param %s", o->filename, o->line, o->name);
 
      TAILQ_FOREACH(s, &sec->sub, entry)
-          if (!TAILQ_EMPTY(&s->sub))
+          if(!TAILQ_EMPTY(&s->sub))
                print_unused(s);
 }
 
@@ -82,26 +81,32 @@ fetch_section(struct conf_sec *s, char *name)
      struct conf_sec *sec;
      size_t i = 0;
 
-     if (!name)
+     if(!name)
           return NULL;
 
-     if (!s) {
+     if(!s)
+     {
           ret = xcalloc(2, sizeof(struct conf_sec *));
+
           TAILQ_FOREACH(sec, &config, entry)
-               if (!strcmp(sec->name, name)) {
+               if(!strcmp(sec->name, name))
+               {
                     ret[0] = sec;
                     ret[1] = NULL;
                     break;
                }
      }
-     else {
-          ret = xcalloc(s->nsub+1, sizeof(struct conf_sec *));
-          TAILQ_FOREACH(sec, &s->sub, entry) {
-               if (!strcmp(sec->name, name) && i < s->nsub)
+     else
+     {
+          ret = xcalloc(s->nsub + 1, sizeof(struct conf_sec *));
+
+          TAILQ_FOREACH(sec, &s->sub, entry)
+               if(!strcmp(sec->name, name) && i < s->nsub)
                     ret[i++] = sec;
-          }
+
           ret[i] = NULL;
      }
+
      return ret;
 }
 
@@ -109,26 +114,20 @@ struct conf_sec *
 fetch_section_first(struct conf_sec *s, char *name)
 {
      struct conf_sec *sec, *ret = NULL;
+     TAILQ_HEAD(cshead, conf_sec) *head =
+          (s
+           ? (struct cshead*)&s->sub
+           : (struct cshead*)&config);
 
-     if (!name)
+     if(!name)
           return NULL;
 
-     if (!s)
-     {
-          TAILQ_FOREACH(sec, &config, entry)
-               if(sec->name && !strcmp(sec->name, name)) {
-                   ret = sec;
-                   break;
-               }
-     }
-     else
-     {
-         TAILQ_FOREACH(sec, &s->sub, entry)
-              if (sec->name && !strcmp(sec->name, name)) {
-                  ret = sec;
-                  break;
-              }
-     }
+     TAILQ_FOREACH(sec, head, entry)
+          if(sec->name && !strcmp(sec->name, name))
+          {
+               ret = sec;
+               break;
+          }
 
      return ret;
 }
@@ -136,8 +135,11 @@ fetch_section_first(struct conf_sec *s, char *name)
 size_t
 fetch_section_count(struct conf_sec **s)
 {
-     size_t ret;
-     for (ret = 0; s[ret]; ret++);
+     size_t ret = 0;
+
+     while(s[ret])
+          ++ret;
+
      return ret;
 }
 
@@ -148,20 +150,25 @@ fetch_opt(struct conf_sec *s, char *dfl, char *name)
      struct opt_type *ret;
      size_t i = 0;
 
-     if (!name)
+     if(!name)
           return NULL;
 
      ret = xcalloc(10, sizeof(struct opt_type));
 
-     if (s) {
+     if(s)
+     {
           SLIST_FOREACH(o, &s->optlist, entry)
-               if (!strcmp(o->name, name)) {
-                    while (o->val[i]) {
-                         o->used = True;
+               if(!strcmp(o->name, name))
+               {
+                    while(o->val[i])
+                    {
+                         o->used = true;
                          ret[i] = string_to_opt(o->val[i]);
-                         i++;
+                         ++i;
                     }
+
                     ret[i] = opt_type_null;
+
                     return ret;
                }
      }
@@ -177,22 +184,30 @@ fetch_opt_first(struct conf_sec *s, char *dfl, char *name)
 {
      struct conf_opt *o;
 
-     if (!name)
+     if(!name)
           return opt_type_null;
-     else if (s)
+     else if(s)
+     {
           SLIST_FOREACH(o, &s->optlist, entry)
-               if (!strcmp(o->name, name)) {
-                    o->used = True;
+               if(!strcmp(o->name, name))
+               {
+                    o->used = true;
+
                     return string_to_opt(o->val[0]);
                }
+     }
+
      return string_to_opt(dfl);
 }
 
 size_t
 fetch_opt_count(struct opt_type *o)
 {
-     size_t ret;
-     for(ret = 0; o[ret].str; ret++);
+     size_t ret = 0;
+
+     while(o[ret].str)
+          ++ret;
+
      return ret;
 }
 

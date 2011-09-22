@@ -172,17 +172,20 @@ void
 layout_rotate(struct tag *t, bool left)
 {
      struct client *c;
-     struct geo g;
+     struct geo g, ug = t->screen->ugeo;
 
      SLIST_FOREACH(c, &t->clients, tnext)
      {
-         /* g = c->geo;
-          c->geo.x = g.y;
-          c->geo.y = g.x;
-          c->geo.w = g.h;
-          c->geo.h = g.w;*/
+          /*
+          g = c->geo;
+          c->geo.x = (g.y * ug.h) / ug.w;
+          c->geo.y = (g.x * ug.w) / ug.h;
+
+          c->geo.w = (g.h * ug.w) / ug.h;
+          c->geo.h = (g.w * ug.h) / ug.w;
 
           client_moveresize(c, c->geo);
+          */
      }
 }
 
