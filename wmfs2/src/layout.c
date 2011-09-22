@@ -168,12 +168,36 @@ layout_split_integrate(struct client *c, struct client *sc)
      client_moveresize(c, g);
 }
 
+void
+layout_rotate(struct tag *t, bool left)
+{
+     struct client *c;
+     struct geo g;
+
+     SLIST_FOREACH(c, &t->clients, tnext)
+     {
+         /* g = c->geo;
+          c->geo.x = g.y;
+          c->geo.y = g.x;
+          c->geo.w = g.h;
+          c->geo.h = g.w;*/
+
+          client_moveresize(c, c->geo);
+     }
+}
+
+void
+uicb_layout_rotate(Uicb cmd)
+{
+     layout_rotate(W->screen->seltag, false);
+}
+
 /*
  * Really simple functions, don't need static no-uicb backend
- * so we evitate if(vertical) .. else
+ * so we avoid the use of if(vertical) .. else
  */
 void
-uicb_layout_split_vmirror(Uicb cmd)
+uicb_layout_vmirror(Uicb cmd)
 {
      struct client *c;
 
@@ -185,7 +209,7 @@ uicb_layout_split_vmirror(Uicb cmd)
 }
 
 void
-uicb_layout_split_hmirror(Uicb cmd)
+uicb_layout_hmirror(Uicb cmd)
 {
      struct client *c;
 

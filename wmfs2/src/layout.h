@@ -31,9 +31,9 @@
 
 void layout_split_integrate(struct client *c, struct client *sc);
 void layout_split_arrange_closed(struct client *ghost);
-void uicb_layout_split_vmirror(Uicb cmd);
-void uicb_layout_split_hmirror(Uicb cmd);
-
+void uicb_layout_vmirror(Uicb cmd);
+void uicb_layout_hmirror(Uicb cmd);
+void uicb_layout_rotate(Uicb cmd);
 
 #endif /* LAYOUT_H */
 
