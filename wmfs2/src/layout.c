@@ -83,14 +83,15 @@ layout_split_check_row_dir(struct client *c, struct client *g, Position p)
 }
 
 /* Use ghost client properties to fix holes in tile
- *     .--.  ~   ~
- *    /xx  \   ~   ~
- *  ~~\O _ (____     ~
- *  __.|    .--'-==~   ~
- * '---\    '.      ~  ,  ~
- *      '.    '-.___.-'/   ~
- *        '-.__     _.'  ~
- *             `````   ~
+ *
+ *     ~   .--.  ~   ~
+ *_____ ~ /xx  \   ~   ~
+ *  |>>| ~\O _ (____     ~
+ *  |  |__.|    .--'-==~   ~
+ *  |>>'---\    '.      ~  ,  ~
+ *__|__|    '.    '-.___.-'/   ~
+ *            '-.__     _.'  ~
+ *                 `````   ~
  */
 void
 layout_split_arrange_closed(struct client *ghost)
@@ -176,7 +177,6 @@ layout_rotate(struct tag *t, bool left)
 
      SLIST_FOREACH(c, &t->clients, tnext)
      {
-          /*
           g = c->geo;
           c->geo.x = (g.y * ug.h) / ug.w;
           c->geo.y = (g.x * ug.w) / ug.h;
@@ -185,7 +185,6 @@ layout_rotate(struct tag *t, bool left)
           c->geo.h = (g.w * ug.h) / ug.w;
 
           client_moveresize(c, c->geo);
-          */
      }
 }
 
@@ -198,6 +197,13 @@ uicb_layout_rotate(Uicb cmd)
 /*
  * Really simple functions, don't need static no-uicb backend
  * so we avoid the use of if(vertical) .. else
+ *
+ * Vertical mirror
+ *  ____________        ____________
+ * |    |   B   |  ->  |   B   |    |
+ * |  A |_______|  ->  |_______| A  |
+ * |    | C | D |  ->  | D | C |    |
+ * |____|___|___|  ->  |___|___|____|
  */
 void
 uicb_layout_vmirror(Uicb cmd)
@@ -211,6 +217,14 @@ uicb_layout_vmirror(Uicb cmd)
      }
 }
 
+/*
+ * Horinzontal mirror
+ *  ____________        ____________
+ * |    |   B   |  ->  |    | C | D |
+ * |  A |_______|  ->  |  A |___|___|
+ * |    | C | D |  ->  |    |   B   |
+ * |____|___|___|  ->  |____|_______|
+ */
 void
 uicb_layout_hmirror(Uicb cmd)
 {
