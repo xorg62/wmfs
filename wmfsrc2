@@ -1,0 +1,149 @@
+#
+# WMFS2 configuration file
+#
+
+[themes]
+
+
+  [theme]
+     # name = "default"
+
+     font = "fixed"
+
+     # Bars
+     bars_width = 14
+     bars_fg = "#CCCCCC"
+     bars_bg = "#222222"
+
+     # Element tags
+     tags_normal_fg = "#CCCCCC"
+     tags_normal_bg = "#222222"
+     tags_sel_fg    = "#222222"
+     tags_sel_bg    = "#CCCCCC"
+     tags_border_color = "#888888"
+     tags_border_width = 1
+
+     # Frame / Client
+     client_normal_fg = "#CCCCCC"
+     client_normal_bg = "#222222"
+     client_sel_fg = "#222222"
+     client_sel_bg = "#CCCCCC"
+     frame_bg = "#555555"
+     client_titlebar_width = 12 #useless for now
+     client_border_width = 1
+
+   [/theme]
+
+   [theme]
+     name = "perso"
+
+     font = "-*-fixed-bold"
+
+     bars_width = 20
+     bars_fg = "#222222"
+     bars_bg = "#CCCCCC"
+
+     tags_sel_bg = "#33AA33"
+     tags_normal_fg = "#AA3333"
+
+   [/theme]
+
+[/themes]
+
+[bars]
+
+  # Position:
+  #   0 Top
+  #   1 Bottom
+  #   2 Hide
+
+  # Element type:
+  #   t Tags
+  #   S Statustext
+
+  [bar]
+     position = 1
+     screen = 0
+     elements = "t"
+     theme = "perso"
+  [/bar]
+
+  [bar]
+     position = 1
+     screen = 0
+     elements = "t"
+     theme = "default"
+  [/bar]
+
+  [bar]
+     screen = 1
+     elements = "t"
+     theme = "perso"
+  [/bar]
+    [bar]
+     screen = 1
+     elements = "t"
+     theme = "default"
+  [/bar]
+
+
+[/bars]
+
+[tags]
+
+  [tag] screen = 0 name = "one" [/tag]
+  [tag] screen = 0 name = "two" [/tag]
+  [tag] screen = 0 name = "three" [/tag]
+
+  [tag] screen = 1 name = "four" [/tag]
+  [tag] screen = 1 name = "five" [/tag]
+
+  [tag] name = "universal tag" [/tag]
+
+[/tags]
+
+[keys]
+
+  [key] mod = {"Super"} key = "Return" func = "spawn" cmd = "xterm" [/key]
+  [key] mod = {"Control","Alt"} key = "q" func = "quit" [/key]
+  [key] mod = {"Super"} key = "1" func = "tag_set" cmd = "1" [/key]
+  [key] mod = {"Super"} key = "2" func = "tag_set" cmd = "2" [/key]
+  [key] mod = {"Super"} key = "3" func = "tag_set" cmd = "3" [/key]
+  [key] mod = {"Super"} key = "s" func = "tag_next" [/key]
+  [key] mod = {"Super"} key = "a" func = "tag_prev" [/key]
+  [key] mod = {"Super"} key = "z" func = "tag" cmd = "tag2" [/key]
+
+  [key] mod = {"Super"} key = "q" func = "client_close" [/key]
+
+  # Focus next / prev client
+  [key] mod = { "Alt" } key = "Tab" func = "client_focus_next" [/key][key] mod = { "Alt", "Shift" } key = "Tab" func = "client_focus_prev" [/key]
+
+  # Focus next client with direction
+  [key] mod = {"Alt"} key = "h" func = "client_focus_left"   [/key]
+  [key] mod = {"Alt"} key = "l" func = "client_focus_right"  [/key]
+  [key] mod = {"Alt"} key = "k" func = "client_focus_top"    [/key]
+  [key] mod = {"Alt"} key = "j" func = "client_focus_bottom" [/key]
+
+  # swap next client with direction:
+  [key] mod = {"Control", "Shift"} key = "h" func = "client_swap_left"   [/key]
+  [key] mod = {"Control", "Shift"} key = "l" func = "client_swap_right"  [/key]
+  [key] mod = {"Control", "Shift"} key = "k" func = "client_swap_top"    [/key]
+  [key] mod = {"Control", "Shift"} key = "j" func = "client_swap_bottom" [/key]
+
+  # Resize selected tiled client with direction
+  [key] mod = {"Super"} key = "h" func = "client_resize_left"   cmd = "20" [/key]
+  [key] mod = {"Super"} key = "l" func = "client_resize_left"   cmd = "-20" [/key]
+  [key] mod = {"Super"} key = "k" func = "client_resize_top"    cmd = "20" [/key]
+  [key] mod = {"Super"} key = "j" func = "client_resize_top"    cmd = "-20" [/key]
+  [key] mod = {"Super", "Control"} key = "h" func = "client_resize_right"  cmd = "-20" [/key]
+  [key] mod = {"Super", "Control"} key = "l" func = "client_resize_right"  cmd = "20" [/key]
+  [key] mod = {"Super", "Control"} key = "k" func = "client_resize_bottom" cmd = "-20" [/key]
+  [key] mod = {"Super", "Control"} key = "j" func = "client_resize_bottom" cmd = "20" [/key]
+
+  # Layout manipulation
+  [key] mod = {"Super"}          key = "m" func = "layout_vmirror" [/key]
+  [key] mod = {"Super", "Shift"} key = "m" func = "layout_hmirror" [/key]
+  [key] mod = {"Super"}          key = "r" func = "layout_rotate_right" [/key]
+  [key] mod = {"Super", "Shift"} key = "r" func = "layout_rotate_left" [/key]
+
+[/keys]
