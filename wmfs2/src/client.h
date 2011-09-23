@@ -11,7 +11,7 @@
 
 void client_configure(struct client *c);
 struct client *client_gb_win(Window w);
-struct client *client_gb_pos(struct tag *t, int x, int y);
+inline struct client *client_gb_pos(struct tag *t, int x, int y);
 struct client *client_next_with_pos(struct client *bc, Position p);
 void client_swap(struct client *c1, struct client *c2);
 void client_focus(struct client *c);

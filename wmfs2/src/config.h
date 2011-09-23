@@ -31,9 +31,10 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "tag_prev", uicb_tag_prev },
 
      /* Layout */
-     { "layout_vmirror", uicb_layout_vmirror },
-     { "layout_hmirror", uicb_layout_hmirror },
-     { "layout_rotate",  uicb_layout_rotate },
+     { "layout_vmirror",      uicb_layout_vmirror },
+     { "layout_hmirror",      uicb_layout_hmirror },
+     { "layout_rotate_left",  uicb_layout_rotate_left },
+     { "layout_rotate_right", uicb_layout_rotate_right },
 
      /* Client */
      { "client_close",         uicb_client_close },

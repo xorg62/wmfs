@@ -655,8 +655,9 @@ int
 get_conf(const char *filename)
 {
      struct conf_sec *s;
-     struct keyword *head = parse_keywords(filename);
-     struct keyword *kw   = parse_keywords(filename);
+     struct keyword *head, *kw;
+
+     head = kw = parse_keywords(filename);
 
      if(!head)
           return -1; /* TODO ERREUR */

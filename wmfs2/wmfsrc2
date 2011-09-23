@@ -116,8 +116,7 @@
   [key] mod = {"Super"} key = "q" func = "client_close" [/key]
 
   # Focus next / prev client
-  [key] mod = { "Alt" } key = "Tab" func = "client_focus_next" [/key]
-  [key] mod = { "Alt", "Shift" } key = "Tab" func = "client_focus_prev" [/key]
+  [key] mod = { "Alt" } key = "Tab" func = "client_focus_next" [/key][key] mod = { "Alt", "Shift" } key = "Tab" func = "client_focus_prev" [/key]
 
   # Focus next client with direction
   [key] mod = {"Alt"} key = "h" func = "client_focus_left"   [/key]
@@ -125,7 +124,7 @@
   [key] mod = {"Alt"} key = "k" func = "client_focus_top"    [/key]
   [key] mod = {"Alt"} key = "j" func = "client_focus_bottom" [/key]
 
- # swap next client with direction:
+  # swap next client with direction:
   [key] mod = {"Control", "Shift"} key = "h" func = "client_swap_left"   [/key]
   [key] mod = {"Control", "Shift"} key = "l" func = "client_swap_right"  [/key]
   [key] mod = {"Control", "Shift"} key = "k" func = "client_swap_top"    [/key]
@@ -141,5 +140,10 @@
   [key] mod = {"Super", "Control"} key = "k" func = "client_resize_bottom" cmd = "-20" [/key]
   [key] mod = {"Super", "Control"} key = "j" func = "client_resize_bottom" cmd = "20" [/key]
 
+  # Layout manipulation
+  [key] mod = {"Super"}          key = "m" func = "layout_vmirror" [/key]
+  [key] mod = {"Super", "Shift"} key = "m" func = "layout_hmirror" [/key]
+  [key] mod = {"Super"}          key = "r" func = "layout_rotate_right" [/key]
+  [key] mod = {"Super", "Shift"} key = "r" func = "layout_rotate_left" [/key]
 
 [/keys]

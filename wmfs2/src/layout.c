@@ -169,27 +169,104 @@ layout_split_integrate(struct client *c, struct client *sc)
      client_moveresize(c, g);
 }
 
-void
+/* Arrange inter-clients holes:
+ *  ___________      ___________
+ * |     ||    | -> |      |    |
+ * |  A  || B  | -> |  A  >| B  |
+ * |     ||    | -> |     >|    |
+ * |_____||____| -> |______|____|
+ *        ^ void
+ *
+ * and client-screen edge holes
+ *  ___________      ___________
+ * |     |    || -> |     |     |
+ * |  A  |  B || -> |  A  |  B >|
+ * |     |    || -> |     |    >|
+ * |_____|----'| -> |_____|__v__|
+ *          ^^^ void
+ */
+static inline void
+layout_fix_hole(struct client *c)
+{
+     struct client *cr = client_next_with_pos(c, Right);
+     struct client *cb = client_next_with_pos(c, Bottom);
+
+     c->geo.w += (cr ? cr->geo.x : c->screen->ugeo.w) - (c->geo.x + c->geo.w);
+     c->geo.h += (cb ? cb->geo.y : c->screen->ugeo.h) - (c->geo.y + c->geo.h);
+
+     client_moveresize(c, c->geo);
+}
+
+/* Layout rotation: Rotate 90° all client to right or left.
+ * Avoid if(left) condition in layout_rotate loop; use func ptr
+ *
+ * Left rotation
+ *  _____________        _____________
+ * |    |   B    |  ->  |     A       |
+ * |  A |________|  ->  |-------------|
+ * |    |    |   |  ->  |  C  |  B    |
+ * |    |  C | D |  ->  |_____|       |
+ * |____|____|___|  ->  |_____|_______|
+ *                       ^ D
+ * Right rotation
+ *  _____________        _____________
+ * |    |   B    |  ->  |   |_________|< D
+ * |  A |________|  ->  | B |   C     |
+ * |    |    |   |  ->  |___|_________|
+ * |    |  C | D |  ->  |     A       |
+ * |____|____|___|  ->  |_____________|
+ *
+ */
+
+static inline void
+_pos_rotate_left(struct geo *g, struct geo ug, struct geo og)
+{
+     g->x = (ug.h - (og.y + og.h));
+     g->y = og.x;
+}
+
+static inline void
+_pos_rotate_right(struct geo *g, struct geo ug, struct geo og)
+{
+     g->x = og.y;
+     g->y = (ug.w - (og.x + og.w));
+}
+
+static void
 layout_rotate(struct tag *t, bool left)
 {
      struct client *c;
-     struct geo g, ug = t->screen->ugeo;
+     struct geo g;
+     float f1 = (float)t->screen->ugeo.w / (float)t->screen->ugeo.h;
+     float f2 = 1 / f1;
+     void (*pos)(struct geo*, struct geo, struct geo) =
+          (left ? _pos_rotate_left : _pos_rotate_right);
 
      SLIST_FOREACH(c, &t->clients, tnext)
      {
-          g = c->geo;
-          c->geo.x = (g.y * ug.h) / ug.w;
-          c->geo.y = (g.x * ug.w) / ug.h;
+          pos(&g, t->screen->ugeo, c->geo);
 
-          c->geo.w = (g.h * ug.w) / ug.h;
-          c->geo.h = (g.w * ug.h) / ug.w;
+          g.x *= f1;
+          g.y *= f2;
+          g.w = c->geo.h * f1;
+          g.h = c->geo.w * f2;
 
-          client_moveresize(c, c->geo);
+          client_moveresize(c, g);
      }
+
+     /* Rotate sometimes do not set back perfect size.. */
+     SLIST_FOREACH(c, &t->clients, tnext)
+          layout_fix_hole(c);
 }
 
 void
-uicb_layout_rotate(Uicb cmd)
+uicb_layout_rotate_left(Uicb cmd)
+{
+     layout_rotate(W->screen->seltag, true);
+}
+
+void
+uicb_layout_rotate_right(Uicb cmd)
 {
      layout_rotate(W->screen->seltag, false);
 }
@@ -204,6 +281,13 @@ uicb_layout_rotate(Uicb cmd)
  * |  A |_______|  ->  |_______| A  |
  * |    | C | D |  ->  | D | C |    |
  * |____|___|___|  ->  |___|___|____|
+ *
+ * Horizontal mirror
+ *  ____________        ____________
+ * |    |   B   |  ->  |    | C | D |
+ * |  A |_______|  ->  |  A |___|___|
+ * |    | C | D |  ->  |    |   B   |
+ * |____|___|___|  ->  |____|_______|
  */
 void
 uicb_layout_vmirror(Uicb cmd)
@@ -217,14 +301,6 @@ uicb_layout_vmirror(Uicb cmd)
      }
 }
 
-/*
- * Horinzontal mirror
- *  ____________        ____________
- * |    |   B   |  ->  |    | C | D |
- * |  A |_______|  ->  |  A |___|___|
- * |    | C | D |  ->  |    |   B   |
- * |____|___|___|  ->  |____|_______|
- */
 void
 uicb_layout_hmirror(Uicb cmd)
 {

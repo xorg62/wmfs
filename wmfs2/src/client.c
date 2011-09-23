@@ -102,14 +102,18 @@ client_gb_win(Window w)
      return c;
 }
 
-struct client*
+inline struct client*
 client_gb_pos(struct tag *t, int x, int y)
 {
-     struct client *c;
+     struct client *c = SLIST_FIRST(&t->clients);
 
-     SLIST_FOREACH(c, &t->clients, tnext)
+     while(c)
+     {
           if(INAREA(x, y, c->geo))
                return c;
+
+          c = SLIST_NEXT(c, tnext);
+     }
 
      return NULL;
 }
@@ -125,6 +129,7 @@ client_next_with_pos(struct client *bc, Position p)
      struct client *c;
      int x, y;
      const static char scanfac[PositionLast] = { +10, -10, 0, 0 };
+     Position ip = Bottom - p;
 
      /*
       * Set start place of pointer (edge with position
@@ -139,7 +144,7 @@ client_next_with_pos(struct client *bc, Position p)
      while((c = client_gb_pos(bc->tag, x, y)) == bc)
      {
           x += scanfac[p];
-          y += scanfac[Bottom - p];
+          y += scanfac[ip];
      }
 
      return c;
