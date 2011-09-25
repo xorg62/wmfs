@@ -9,10 +9,10 @@
 #include "wmfs.h"
 #include "layout.h"
 
-void client_configure(struct client *c);
+inline void client_configure(struct client *c);
 struct client *client_gb_win(Window w);
 struct client *client_gb_pos(struct tag *t, int x, int y);
-struct client *client_next_with_pos(struct client *bc, Position p);
+struct client *client_next_with_pos(struct client *bc, enum position p);
 void client_swap(struct client *c1, struct client *c2);
 void client_focus(struct client *c);
 void client_get_name(struct client *c);
@@ -21,7 +21,7 @@ void uicb_client_close(Uicb cmd);
 struct client *client_new(Window w, XWindowAttributes *wa);
 void client_moveresize(struct client *c, struct geo g);
 void client_maximize(struct client *c);
-void client_fac_resize(struct client *c, Position p, int fac);
+void client_fac_resize(struct client *c, enum position p, int fac);
 void client_remove(struct client *c);
 void client_free(void);
 
@@ -54,17 +54,16 @@ client_next(struct client *c)
 static inline struct client*
 client_prev(struct client *c)
 {
-     struct client *cc;
+     struct client *cc = SLIST_FIRST(&c->tag->clients);
 
-     for(cc = SLIST_FIRST(&c->tag->clients);
-         SLIST_NEXT(cc, tnext) && SLIST_NEXT(cc, tnext) != c;
-         cc = SLIST_NEXT(cc, tnext));
+     while(SLIST_NEXT(cc, tnext) && SLIST_NEXT(cc, tnext) != c)
+          cc = SLIST_NEXT(cc, tnext);
 
      return cc;
 }
 
 static inline bool
-client_fac_geo(struct client *c, Position p, int fac)
+client_fac_geo(struct client *c, enum position p, int fac)
 {
      struct geo cg = c->geo;
 
@@ -99,7 +98,7 @@ client_fac_geo(struct client *c, Position p, int fac)
 }
 
 static inline bool
-client_fac_check_row(struct client *c, Position p, int fac)
+client_fac_check_row(struct client *c, enum position p, int fac)
 {
      struct geo g = c->geo;
      struct client *cc;
@@ -113,7 +112,7 @@ client_fac_check_row(struct client *c, Position p, int fac)
 }
 
 static inline void
-client_fac_arrange_row(struct client *c, Position p, int fac)
+client_fac_arrange_row(struct client *c, enum position p, int fac)
 {
      struct geo g = c->geo;
      struct client *cc;

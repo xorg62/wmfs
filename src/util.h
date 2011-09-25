@@ -1,4 +1,4 @@
-/*
+;/*
  *  wmfs2 by Martin Duquesnoy <xorg62@gmail.com> { for(i = 2011; i < 2111; ++i) ©(i); }
  *  For license, see COPYING.
  */
@@ -24,7 +24,6 @@
      X##t##Subwindows(W->dpy, w); \
      X##t##Window(W->dpy, w);     \
 } while( /* CONSTCOND */ 0);
-
 
 #define ATOM(a)          XInternAtom(W->dpy, (a), False)
 #define LEN(x)           (sizeof(x) / sizeof(*x))

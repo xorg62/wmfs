@@ -40,28 +40,28 @@ layout_split(struct client *c, bool vertical)
 }
 
 static inline void
-layout_split_arrange_size(struct geo g, struct client *c, Position p)
+layout_split_arrange_size(struct geo *g, struct client *c, enum position p)
 {
      if(LDIR(p))
      {
-          c->geo.w += g.w;
+          c->geo.w += g->w;
 
           if(p == Right)
-               c->geo.x = g.x;
+               c->geo.x = g->x;
      }
      else
      {
-          c->geo.h += g.h;
+          c->geo.h += g->h;
 
           if(p == Bottom)
-               c->geo.y = g.y;
+               c->geo.y = g->y;
      }
 
      client_moveresize(c, c->geo);
 }
 
 static inline bool
-layout_split_check_row_dir(struct client *c, struct client *g, Position p)
+layout_split_check_row_dir(struct client *c, struct client *g, enum position p)
 {
      struct geo cgeo = c->geo;
      struct client *cc;
@@ -99,7 +99,7 @@ layout_split_arrange_closed(struct client *ghost)
      struct client *c, *cc;
      struct geo g;
      bool b = false;
-     Position p;
+     enum position p;
 
 
      /* Search for single parent for easy resize
@@ -115,7 +115,7 @@ layout_split_arrange_closed(struct client *ghost)
           if((c = client_next_with_pos(ghost, p)))
                if(GEO_CHECK2(ghost->geo, c->geo, p))
                {
-                    layout_split_arrange_size(ghost->geo, c, p);
+                    layout_split_arrange_size(&ghost->geo, c, p);
                     return;
                }
      }
@@ -138,7 +138,7 @@ layout_split_arrange_closed(struct client *ghost)
                     if(GEO_PARENTROW(g, cc->geo, RPOS(p))
                               && GEO_CHECK_ROW(cc->geo, ghost->geo, p))
                     {
-                         layout_split_arrange_size(ghost->geo, cc, p);
+                         layout_split_arrange_size(&ghost->geo, cc, p);
                          b = true;
                     }
           }
@@ -200,14 +200,14 @@ layout_fix_hole(struct client *c)
 /* Layout rotation: Rotate 90° all client to right or left.
  * Avoid if(left) condition in layout_rotate loop; use func ptr
  *
- * Left rotation
+ * Right rotation
  *  ____________        ____________
  * |    |   B   |  ->  |  |   A     |
  * |  A |_______|  ->  |__|_________|
  * |____| C | D |  ->  |_____|   B  |
  * |____|___|___|  ->  |_____|______|
  *
- * Right rotation
+ * Left rotation
  *  ____________        ____________
  * |    |   B   |  ->  |   B  |_____|
  * |  A |_______|  ->  |______|_____|
@@ -217,17 +217,17 @@ layout_fix_hole(struct client *c)
  */
 
 static inline void
-_pos_rotate_left(struct geo *g, struct geo ug, struct geo og)
+_pos_rotate_left(struct geo *g, struct geo *ug, struct geo *og)
 {
-     g->x = (ug.h - (og.y + og.h));
-     g->y = og.x;
+     g->x = (ug->h - (og->y + og->h));
+     g->y = og->x;
 }
 
 static inline void
-_pos_rotate_right(struct geo *g, struct geo ug, struct geo og)
+_pos_rotate_right(struct geo *g, struct geo *ug, struct geo *og)
 {
-     g->x = og.y;
-     g->y = (ug.w - (og.x + og.w));
+     g->x = og->y;
+     g->y = (ug->w - (og->x + og->w));
 }
 
 static void
@@ -237,12 +237,12 @@ layout_rotate(struct tag *t, bool left)
      struct geo g;
      float f1 = (float)t->screen->ugeo.w / (float)t->screen->ugeo.h;
      float f2 = 1 / f1;
-     void (*pos)(struct geo*, struct geo, struct geo) =
+     void (*pos)(struct geo*, struct geo*, struct geo*) =
           (left ? _pos_rotate_left : _pos_rotate_right);
 
      SLIST_FOREACH(c, &t->clients, tnext)
      {
-          pos(&g, t->screen->ugeo, c->geo);
+          pos(&g, &t->screen->ugeo, &c->geo);
 
           g.x *= f1;
           g.y *= f2;

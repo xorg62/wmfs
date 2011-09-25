@@ -70,7 +70,7 @@ CLIENT_ACTION_LIST(swapsel, prev)
 /** Send a ConfigureRequest event to the struct client
  * \param c struct client pointer
 */
-void
+inline void
 client_configure(struct client *c)
 {
      XConfigureEvent ev =
@@ -118,27 +118,22 @@ client_gb_pos(struct tag *t, int x, int y)
      return NULL;
 }
 
-/** Get client left/right/top/bottom of selected client
-  *\param bc Base client
-  *\param pos Position
-  *\return Client found or NULL
-*/
+/*
+ * Get client left/right/top/bottom of selected client
+ */
 struct client*
-client_next_with_pos(struct client *bc, Position p)
+client_next_with_pos(struct client *bc, enum position p)
 {
      struct client *c;
-     int x, y;
      static const char scanfac[PositionLast] = { +10, -10, 0, 0 };
-     Position ip = Bottom - p;
+     enum position ip = Bottom - p;
+     int x = bc->geo.x + ((p == Right)  ? bc->geo.w : 0);
+     int y = bc->geo.y + ((p == Bottom) ? bc->geo.h : 0);
 
-     /*
-      * Set start place of pointer (edge with position
-      * of base client) for faster scanning.
-      */
-     x = bc->geo.x + ((p == Right)  ? bc->geo.w : 0);
-     y = bc->geo.y + ((p == Bottom) ? bc->geo.h : 0);
-     y += ((LDIR(p))  ? (bc->geo.h >> 1) : 0);
-     x += ((p > Left) ? (bc->geo.w >> 1) : 0);
+     if(p > Left)
+          x += bc->geo.w >> 1;
+     if(LDIR(p))
+          y += bc->geo.h >> 1;
 
      /* Scan in right direction to next(p) physical client */
      while((c = client_gb_pos(bc->tag, x, y)) == bc)
@@ -374,10 +369,10 @@ client_maximize(struct client *c)
 }
 
 void
-client_fac_resize(struct client *c, Position p, int fac)
+client_fac_resize(struct client *c, enum position p, int fac)
 {
      struct client *gc = client_next_with_pos(c, p);
-     Position rp = RPOS(p);
+     enum position rp = RPOS(p);
 
      if(!gc || gc->screen != c->screen)
           return;

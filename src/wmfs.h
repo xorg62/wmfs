@@ -30,8 +30,24 @@
 typedef unsigned int Flags;
 typedef unsigned int Color;
 typedef const char* Uicb;
-typedef enum { BarTop = 0, BarBottom, BarHide, BarLast } Barpos;
-typedef enum { Right = 0, Left, Top, Bottom, Center, PositionLast } Position;
+
+enum barpos
+{
+     BarTop = 0,
+     BarBottom,
+     BarHide,
+     BarLast
+};
+
+enum position
+{
+     Right = 0,
+     Left,
+     Top,
+     Bottom,
+     Center,
+     PositionLast
+};
 
 /*
  * Structures
@@ -71,8 +87,8 @@ struct infobar
      struct geo geo;
      struct screen *screen;
      struct theme *theme;
+     enum barpos pos;
      char *elemorder;
-     Barpos pos;
      TAILQ_HEAD(esub, element) elements;
      SLIST_ENTRY(infobar) next;
 };
