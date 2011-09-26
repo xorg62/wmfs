@@ -162,8 +162,8 @@ client_swap(struct client *c1, struct client *c2)
      tag_client(c2->tag, c1);
      tag_client(t, c2);
 
-     client_moveresize(c1, c2->geo);
-     client_moveresize(c2, g);
+     client_moveresize(c1, &c2->geo);
+     client_moveresize(c2, &g);
 }
 
 static void
@@ -198,9 +198,9 @@ client_grabbuttons(struct client *c, bool focused)
 static inline void
 client_draw_bord(struct client *c)
 {
-     struct geo g = { 0, 0, c->screen->ugeo.w, c->screen->ugeo.h };
+     struct geo ge = { 0, 0, c->screen->ugeo.w, c->screen->ugeo.h };
 
-     draw_rect(c->tag->frame, g, THEME_DEFAULT->client_n.bg);
+     draw_rect(c->tag->frame, ge, THEME_DEFAULT->client_n.bg);
 
      /* Selected client's border */
      if(W->client)
@@ -336,17 +336,17 @@ client_new(Window w, XWindowAttributes *wa)
 }
 
 void
-client_moveresize(struct client *c, struct geo g)
+client_moveresize(struct client *c, struct geo *g)
 {
      int bord = THEME_DEFAULT->client_border_width;
 
-     c->geo = g;
+     c->geo = *g;
 
      /* Window geo */
-     c->wgeo.x = g.x + bord;
-     c->wgeo.y = g.y + bord ;
-     c->wgeo.w = g.w - (bord << 1);
-     c->wgeo.h = g.h - (bord << 1);
+     c->wgeo.x = g->x + bord;
+     c->wgeo.y = g->y + bord ;
+     c->wgeo.w = g->w - (bord << 1);
+     c->wgeo.h = g->h - (bord << 1);
 
      XMoveResizeWindow(W->dpy, c->win,
                        c->wgeo.x, c->wgeo.y,
@@ -365,7 +365,7 @@ client_maximize(struct client *c)
      c->geo.w = c->tag->screen->ugeo.w;
      c->geo.h = c->tag->screen->ugeo.h;
 
-     client_moveresize(c, c->geo);
+     client_moveresize(c, &c->geo);
 }
 
 void
@@ -388,8 +388,8 @@ client_fac_resize(struct client *c, enum position p, int fac)
      /* Simple resize with only c & gc */
      if(GEO_CHECK2(c->geo, gc->geo, p))
      {
-          client_moveresize(c, c->tgeo);
-          client_moveresize(gc, gc->tgeo);
+          client_moveresize(c, &c->tgeo);
+          client_moveresize(gc, &gc->tgeo);
      }
      /* Resize with row parents */
      else

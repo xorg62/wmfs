@@ -108,6 +108,7 @@ struct tag
 {
      struct screen *screen;
      struct client *sel;
+     struct client *prevsel;
      char *name;
      Flags flags;
      Window frame;

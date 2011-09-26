@@ -34,7 +34,7 @@ layout_split(struct client *c, bool vertical)
           geo.h += (og.y + og.h) - (geo.y + geo.h);
      }
 
-     client_moveresize(c, c->geo);
+     client_moveresize(c, &c->geo);
 
      return geo;
 }
@@ -57,7 +57,7 @@ layout_split_arrange_size(struct geo *g, struct client *c, enum position p)
                c->geo.y = g->y;
      }
 
-     client_moveresize(c, c->geo);
+     client_moveresize(c, &c->geo);
 }
 
 static inline bool
@@ -166,7 +166,7 @@ layout_split_integrate(struct client *c, struct client *sc)
      }
 
      g = layout_split(sc, (sc->geo.h < sc->geo.w));
-     client_moveresize(c, g);
+     client_moveresize(c, &g);
 }
 
 /* Arrange inter-clients holes:
@@ -194,7 +194,7 @@ layout_fix_hole(struct client *c)
      c->geo.w += (cr ? cr->geo.x : c->screen->ugeo.w) - (c->geo.x + c->geo.w);
      c->geo.h += (cb ? cb->geo.y : c->screen->ugeo.h) - (c->geo.y + c->geo.h);
 
-     client_moveresize(c, c->geo);
+     client_moveresize(c, &c->geo);
 }
 
 /* Layout rotation: Rotate 90° all client to right or left.
@@ -249,7 +249,7 @@ layout_rotate(struct tag *t, bool left)
           g.w = c->geo.h * f1;
           g.h = c->geo.w * f2;
 
-          client_moveresize(c, g);
+          client_moveresize(c, &g);
      }
 
      /* Rotate sometimes do not set back perfect size.. */
@@ -298,7 +298,7 @@ uicb_layout_vmirror(Uicb cmd)
      SLIST_FOREACH(c, &W->screen->seltag->clients, tnext)
      {
           c->geo.x = W->screen->ugeo.w - (c->geo.x + c->geo.w);
-          client_moveresize(c, c->geo);
+          client_moveresize(c, &c->geo);
      }
 }
 
@@ -311,6 +311,6 @@ uicb_layout_hmirror(Uicb cmd)
      SLIST_FOREACH(c, &W->screen->seltag->clients, tnext)
      {
           c->geo.y = W->screen->ugeo.h - (c->geo.y + c->geo.h);
-          client_moveresize(c, c->geo);
+          client_moveresize(c, &c->geo);
      }
 }

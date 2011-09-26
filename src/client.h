@@ -19,7 +19,7 @@ void client_get_name(struct client *c);
 void client_close(struct client *c);
 void uicb_client_close(Uicb cmd);
 struct client *client_new(Window w, XWindowAttributes *wa);
-void client_moveresize(struct client *c, struct geo g);
+void client_moveresize(struct client *c, struct geo *g);
 void client_maximize(struct client *c);
 void client_fac_resize(struct client *c, enum position p, int fac);
 void client_remove(struct client *c);
@@ -122,7 +122,7 @@ client_fac_arrange_row(struct client *c, enum position p, int fac)
           if(GEO_PARENTROW(g, cc->geo, p))
           {
                client_fac_geo(cc, p, fac);
-               client_moveresize(cc, cc->tgeo);
+               client_moveresize(cc, &cc->tgeo);
           }
 }
 
