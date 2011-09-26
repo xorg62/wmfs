@@ -13,7 +13,7 @@
 
 enum { ElemTag = 0, ElemLayout, ElemSelbar, ElemStatus, ElemCustom, ElemLast };
 
-struct infobar *infobar_new(struct screen *s, struct theme *theme, Barpos pos, const char *elem);
+struct infobar *infobar_new(struct screen *s, struct theme *theme, enum barpos pos, const char *elem);
 void infobar_elem_update(struct infobar *i);
 void infobar_refresh(struct infobar *i);
 void infobar_remove(struct infobar *i);
@@ -32,7 +32,7 @@ infobar_elem_placement(struct element *e)
 
 /* Bars placement management and usable space management */
 static inline bool
-infobar_placement(struct infobar *i, Barpos p)
+infobar_placement(struct infobar *i, enum barpos p)
 {
      i->pos = p;
      i->geo = i->screen->ugeo;

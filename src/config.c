@@ -84,7 +84,7 @@ config_bars(void)
      struct conf_sec *sec, **ks;
      int screenid;
      char *elem;
-     Barpos pos = BarTop;
+     enum barpos pos = BarTop;
 
      /* [bars] */
      sec = fetch_section_first(NULL, "bars");

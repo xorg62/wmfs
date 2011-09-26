@@ -168,7 +168,7 @@ infobar_elem_remove(struct element *e)
 }
 
 struct infobar*
-infobar_new(struct screen *s, struct theme *theme, Barpos pos, const char *elem)
+infobar_new(struct screen *s, struct theme *theme, enum barpos pos, const char *elem)
 {
      bool map;
      struct infobar *i = (struct infobar*)xcalloc(1, sizeof(struct infobar));
