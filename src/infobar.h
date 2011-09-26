@@ -68,7 +68,7 @@ infobar_elem_screen_update(struct screen *s, int addf)
      SLIST_FOREACH(i, &s->infobars, next)
           infobar_elem_update(i);
 
-     s->elemupdate &= ~FLAGINT(ElemTag);
+     s->elemupdate &= ~FLAGINT(addf);
 }
 
 #endif /* INFOBAR_H */
