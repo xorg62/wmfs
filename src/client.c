@@ -435,7 +435,6 @@ client_geo_hints(struct geo *g, int *s)
           g->h = s[MAXH];
 }
 
-
 void
 client_moveresize(struct client *c, struct geo *g)
 {
