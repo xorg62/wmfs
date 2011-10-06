@@ -49,6 +49,17 @@ enum position
      PositionLast
 };
 
+enum size_hints
+{
+     BASEW, BASEH,
+     INCW,  INCH,
+     MAXW,  MAXH,
+     MINW,  MINH,
+     MINAX, MINAY,
+     MAXAX, MAXAY,
+     SHLAST
+};
+
 /*
  * Structures
  */
@@ -122,7 +133,9 @@ struct client
      struct screen *screen;
      struct barwin *titlebar;
      struct geo geo, tgeo, wgeo;
+     int sizeh[SHLAST];
      char *title;
+#define CLIENT_HINT_FLAG 0x01
      Flags flags;
      Window win;
      SLIST_ENTRY(client) next;  /* Global list */

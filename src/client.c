@@ -295,6 +295,69 @@ uicb_client_close(Uicb cmd)
           client_close(W->client);
 }
 
+static void
+client_get_sizeh(struct client *c)
+{
+     long msize;
+     XSizeHints size;
+
+     memset(c->sizeh, 0, SHLAST);
+
+     if(!XGetWMNormalHints(W->dpy, c->win, &size, &msize) || !size.flags)
+          size.flags = PSize;
+
+     /* base */
+     if(size.flags & PBaseSize)
+     {
+          c->sizeh[BASEW] = size.base_width;
+          c->sizeh[BASEH] = size.base_height;
+     }
+     else if(size.flags & PMinSize)
+     {
+          c->sizeh[BASEW] = size.min_width;
+          c->sizeh[BASEH] = size.min_height;
+     }
+
+     /* inc */
+     if(size.flags & PResizeInc)
+     {
+          c->sizeh[INCW] = size.width_inc;
+          c->sizeh[INCH] = size.height_inc;
+     }
+
+     /* max */
+     if(size.flags & PMaxSize)
+     {
+          c->sizeh[MAXW] = size.max_width;
+          c->sizeh[MAXH] = size.max_height;
+     }
+
+     /* min */
+     if(size.flags & PMinSize)
+     {
+          c->sizeh[MINW] = (size.min_width ? size.min_width : 1);
+          c->sizeh[MINH] = (size.min_height ? size.min_height: 1);
+     }
+     else if(size.flags & PBaseSize)
+     {
+          c->sizeh[MINW] = (size.base_width ? size.base_width : 1);
+          c->sizeh[MINH] = (size.base_height ? size.base_height : 1);
+     }
+
+     /* aspect */
+     if(size.flags & PAspect)
+     {
+          c->sizeh[MINAX] = size.min_aspect.x;
+          c->sizeh[MAXAX] = size.max_aspect.x;
+          c->sizeh[MINAY] = size.min_aspect.y;
+          c->sizeh[MAXAY] = size.max_aspect.y;
+     }
+
+     if(c->sizeh[MAXW] && c->sizeh[MINW] && c->sizeh[MAXH] && c->sizeh[MINH]
+        && c->sizeh[MAXW] == c->sizeh[MINW] && c->sizeh[MAXH] == c->sizeh[MINH])
+          c->flags |= CLIENT_HINT_FLAG;
+}
+
 struct client*
 client_new(Window w, XWindowAttributes *wa)
 {
@@ -314,6 +377,7 @@ client_new(Window w, XWindowAttributes *wa)
      c->tgeo = c->wgeo = c->geo;
 
      /* Set tag */
+     client_get_sizeh(c);
      tag_client(W->screen->seltag, c);
 
      /* X window attributes */
@@ -335,6 +399,43 @@ client_new(Window w, XWindowAttributes *wa)
      return c;
 }
 
+static void
+client_geo_hints(struct geo *g, int *s)
+{
+     /* base */
+     g->w -= s[BASEW];
+     g->h -= s[BASEH];
+
+     /* aspect */
+     if((s[MINAY] | s[MAXAY] | s[MINAX] | s[MAXAX]) > 0)
+     {
+          if(g->w * s[MAXAY] > g->h * s[MAXAX])
+               g->w = g->h * s[MAXAX] / s[MAXAY];
+          else if(g->w * s[MINAY] < g->h * s[MINAX])
+               g->h = g->w * s[MINAY] / s[MINAX];
+     }
+
+     /* incremental */
+     if(s[INCW])
+          g->w -= g->w % s[INCW];
+     if(s[INCH])
+          g->h -= g->h % s[INCH];
+
+     /* base dimension */
+     g->w += s[BASEW];
+     g->h += s[BASEH];
+
+     if(s[MINW] > 0 && g->w < s[MINW])
+          g->w = s[MINW];
+     if(s[MINH] > 0 && g->h < s[MINH])
+          g->h = s[MINH];
+     if(s[MAXW] > 0 && g->w > s[MAXW])
+          g->w = s[MAXW];
+     if(s[MAXH] > 0 && g->h > s[MAXH])
+          g->h = s[MAXH];
+}
+
+
 void
 client_moveresize(struct client *c, struct geo *g)
 {
@@ -347,6 +448,8 @@ client_moveresize(struct client *c, struct geo *g)
      c->wgeo.y = g->y + bord ;
      c->wgeo.w = g->w - (bord << 1);
      c->wgeo.h = g->h - (bord << 1);
+
+     client_geo_hints(&c->wgeo, (int*)c->sizeh);
 
      XMoveResizeWindow(W->dpy, c->win,
                        c->wgeo.x, c->wgeo.y,

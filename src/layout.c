@@ -93,6 +93,15 @@ layout_split_check_row_dir(struct client *c, struct client *g, enum position p)
  *            '-.__     _.'  ~
  *                 `````   ~
  */
+#define _ARRANGE_SINGLE_PARENT(p)                                 \
+     do {                                                         \
+          if((c = client_next_with_pos(ghost, p)))                \
+               if(GEO_CHECK2(ghost->geo, c->geo, p))              \
+               {                                                  \
+                    layout_split_arrange_size(&ghost->geo, c, p); \
+                    return;                                       \
+               }                                                  \
+     } while(/* CONSTCOND */ 0);
 void
 layout_split_arrange_closed(struct client *ghost)
 {
@@ -110,15 +119,11 @@ layout_split_arrange_closed(struct client *ghost)
       * |     |  C  | ->   C   -> |     |v v v|
       * |_____|_____| ->       -> |_____|_____|
       */
-     for(p = Right; p < Center; ++p)  /* Check every direction */
-     {
-          if((c = client_next_with_pos(ghost, p)))
-               if(GEO_CHECK2(ghost->geo, c->geo, p))
-               {
-                    layout_split_arrange_size(&ghost->geo, c, p);
-                    return;
-               }
-     }
+     _ARRANGE_SINGLE_PARENT(Right);
+     _ARRANGE_SINGLE_PARENT(Left);
+     _ARRANGE_SINGLE_PARENT(Top);
+     _ARRANGE_SINGLE_PARENT(Bottom);
+
 
      /* Check row parents for full resize
       * Example case:
