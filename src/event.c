@@ -35,7 +35,6 @@ event_buttonpress(XEvent *e)
           }
 }
 
-/*
 static void
 event_enternotify(XEvent *e)
 {
@@ -43,15 +42,18 @@ event_enternotify(XEvent *e)
      struct client *c;
 
      if((ev->mode != NotifyNormal
-        || ev->detail == NotifyInferior
-        || ev->detail ==  NotifyAncestor)
+         || ev->detail == NotifyInferior)
                && ev->window != W->root)
           return;
 
      if((c = client_gb_win(ev->window)))
-          client_focus(c);
+     {
+          if(c->flags & CLIENT_IGNORE_ENTER)
+               c->flags ^= CLIENT_IGNORE_ENTER;
+          else
+               client_focus(c);
+     }
 }
-*/
 
 static void
 event_clientmessageevent(XEvent *e)
@@ -191,14 +193,14 @@ event_motionnotify(XEvent *e)
 {
      XMotionEvent *ev = &e->xmotion;
      struct client *c;
+     struct tag *t = W->screen->seltag;
 
      /*
       * Check client window and tag frame to get focused
       * window with mouse motion
       */
      if(((c = client_gb_win(ev->subwindow)) && c != c->tag->sel)
-        || (ev->window == W->screen->seltag->frame
-          && ((c = client_gb_pos(W->screen->seltag, ev->x, ev->y)))))
+        || (ev->window == t->frame && ((c = client_gb_pos(t, ev->x, ev->y)))))
           client_focus(c);
 }
 
@@ -250,7 +252,7 @@ event_init(void)
      event_handle[ClientMessage]    = event_clientmessageevent;
      event_handle[ConfigureRequest] = event_configureevent;
      event_handle[DestroyNotify]    = event_destroynotify;
-     /*event_handle[EnterNotify]      = event_enternotify;*/
+     event_handle[EnterNotify]      = event_enternotify;
      event_handle[Expose]           = event_expose;
      event_handle[FocusIn]          = event_focusin;
      event_handle[KeyPress]         = event_keypress;

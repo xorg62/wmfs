@@ -135,7 +135,8 @@ struct client
      struct geo geo, tgeo, wgeo;
      int sizeh[SHLAST];
      char *title;
-#define CLIENT_HINT_FLAG 0x01
+#define CLIENT_HINT_FLAG    0x01
+#define CLIENT_IGNORE_ENTER 0x02
      Flags flags;
      Window win;
      SLIST_ENTRY(client) next;  /* Global list */

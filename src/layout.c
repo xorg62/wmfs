@@ -34,8 +34,6 @@ layout_split(struct client *c, bool vertical)
           geo.h += (og.y + og.h) - (geo.y + geo.h);
      }
 
-     client_moveresize(c, &c->geo);
-
      return geo;
 }
 
@@ -171,7 +169,9 @@ layout_split_integrate(struct client *c, struct client *sc)
      }
 
      g = layout_split(sc, (sc->geo.h < sc->geo.w));
+
      client_moveresize(c, &g);
+     client_moveresize(sc, &sc->geo);
 }
 
 /* Arrange inter-clients holes:

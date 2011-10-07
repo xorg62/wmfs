@@ -19,9 +19,11 @@ void client_get_name(struct client *c);
 void client_close(struct client *c);
 void uicb_client_close(Uicb cmd);
 struct client *client_new(Window w, XWindowAttributes *wa);
+bool client_winsize(struct client *c, struct geo *geo, struct geo *ret);
 void client_moveresize(struct client *c, struct geo *g);
 void client_maximize(struct client *c);
 void client_fac_resize(struct client *c, enum position p, int fac);
+void client_fac_adjust(struct client *c);
 void client_remove(struct client *c);
 void client_free(void);
 
@@ -91,7 +93,7 @@ client_fac_geo(struct client *c, enum position p, int fac)
                || cg.w < 5 || cg.h < 5)
           return false;
 
-     /* Set transformed geo in tmp geo */
+     /* Set transformed geo in tile geo */
      c->tgeo = cg;
 
      return true;
@@ -119,10 +121,10 @@ client_fac_arrange_row(struct client *c, enum position p, int fac)
 
      /* Travel clients to search row parents and apply fac */
      SLIST_FOREACH(cc, &c->tag->clients, tnext)
-          if(GEO_PARENTROW(g, cc->geo, p))
+          if(GEO_PARENTROW(g, cc->tgeo, p))
           {
                client_fac_geo(cc, p, fac);
-               client_moveresize(cc, &cc->tgeo);
+               c->flags |= CLIENT_IGNORE_ENTER;
           }
 }
 

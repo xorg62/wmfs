@@ -149,9 +149,15 @@ void
 client_swap(struct client *c1, struct client *c2)
 {
      struct tag *t;
-     struct geo g;
+     struct geo g, foo;
 
+     /* Conflict / errors */
      if(c1 == c2 || !c1 || !c2)
+          return;
+
+     /* are swapped geos compatible? */
+     if(client_winsize(c1, &c2->geo, &foo)
+        || client_winsize(c2, &c1->geo, &foo))
           return;
 
      t = c1->tag;
@@ -164,6 +170,9 @@ client_swap(struct client *c1, struct client *c2)
 
      client_moveresize(c1, &c2->geo);
      client_moveresize(c2, &g);
+
+     c1->flags |= CLIENT_IGNORE_ENTER;
+     c2->flags |= CLIENT_IGNORE_ENTER;
 }
 
 static void
@@ -435,20 +444,34 @@ client_geo_hints(struct geo *g, int *s)
           g->h = s[MAXH];
 }
 
+bool
+client_winsize(struct client *c, struct geo *g, struct geo *ret)
+{
+     int ow, bord = THEME_DEFAULT->client_border_width;
+
+     /* Window geo */
+     ret->x = g->x + bord;
+     ret->y = g->y + bord;
+     ret->h = g->h - (bord << 1);
+     ret->w = ow = g->w - (bord << 1);
+
+     client_geo_hints(ret, (int*)c->sizeh);
+
+     if(ret->h > g->h || ret->w > g->w)
+          return true;
+
+     /* Balance position with new size */
+     ret->x += (ow - c->wgeo.w) >> 1;
+
+     return false;
+}
+
 void
 client_moveresize(struct client *c, struct geo *g)
 {
-     int bord = THEME_DEFAULT->client_border_width;
+     c->tgeo = c->geo = *g;
 
-     c->geo = *g;
-
-     /* Window geo */
-     c->wgeo.x = g->x + bord;
-     c->wgeo.y = g->y + bord ;
-     c->wgeo.w = g->w - (bord << 1);
-     c->wgeo.h = g->h - (bord << 1);
-
-     client_geo_hints(&c->wgeo, (int*)c->sizeh);
+     client_winsize(c, g, &c->wgeo);
 
      XMoveResizeWindow(W->dpy, c->win,
                        c->wgeo.x, c->wgeo.y,
@@ -474,6 +497,7 @@ void
 client_fac_resize(struct client *c, enum position p, int fac)
 {
      struct client *gc = client_next_with_pos(c, p);
+     struct geo foo;
      enum position rp = RPOS(p);
 
      if(!gc || gc->screen != c->screen)
@@ -486,12 +510,11 @@ client_fac_resize(struct client *c, enum position p, int fac)
         || !client_fac_check_row(gc, rp, -fac))
           return;
 
-
      /* Simple resize with only c & gc */
      if(GEO_CHECK2(c->geo, gc->geo, p))
      {
-          client_moveresize(c, &c->tgeo);
-          client_moveresize(gc, &gc->tgeo);
+          c->flags |= CLIENT_IGNORE_ENTER;
+          gc->flags |= CLIENT_IGNORE_ENTER;
      }
      /* Resize with row parents */
      else
@@ -499,6 +522,20 @@ client_fac_resize(struct client *c, enum position p, int fac)
           client_fac_arrange_row(c, p, fac);
           client_fac_arrange_row(gc, rp, -fac);
      }
+
+     /*
+      * Check if every tag client are compatible with
+      * future globals geo. Problem here is that we must *not*
+      * resize client because of possible error with next
+      * clients in linked list.
+      */
+     SLIST_FOREACH(gc, &c->tag->clients, tnext)
+          if(client_winsize(gc, &gc->tgeo, &foo))
+               return;
+
+     /* It's ok, resize */
+     SLIST_FOREACH(gc, &c->tag->clients, tnext)
+          client_moveresize(gc, &gc->tgeo);
 }
 
 void
