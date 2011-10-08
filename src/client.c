@@ -457,6 +457,7 @@ client_winsize(struct client *c, struct geo *g, struct geo *ret)
 
      client_geo_hints(ret, (int*)c->sizeh);
 
+     /* Check possible problem for tile integration */
      if(ret->h > g->h || ret->w > g->w)
           return true;
 

@@ -199,7 +199,7 @@ event_motionnotify(XEvent *e)
       * Check client window and tag frame to get focused
       * window with mouse motion
       */
-     if(((c = client_gb_win(ev->subwindow)) && c != c->tag->sel)
+     if((c = client_gb_win(ev->subwindow))
         || (ev->window == t->frame && ((c = client_gb_pos(t, ev->x, ev->y)))))
           client_focus(c);
 }
