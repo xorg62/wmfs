@@ -132,15 +132,17 @@ struct client
      struct tag *tag;
      struct screen *screen;
      struct barwin *titlebar;
-     struct geo geo, tgeo, wgeo;
+     struct geo geo, tgeo, wgeo, owgeo;
      int sizeh[SHLAST];
      char *title;
 #define CLIENT_HINT_FLAG    0x01
 #define CLIENT_IGNORE_ENTER 0x02
+#define CLIENT_DID_WINSIZE  0x04
      Flags flags;
      Window win;
      SLIST_ENTRY(client) next;  /* Global list */
      SLIST_ENTRY(client) tnext; /* struct tag list */
+     SLIST_ENTRY(client) vnext; /* various list */
 };
 
 struct keybind

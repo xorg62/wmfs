@@ -383,7 +383,7 @@ client_new(Window w, XWindowAttributes *wa)
      c->geo.y = wa->y;
      c->geo.w = wa->width;
      c->geo.h = wa->height;
-     c->tgeo = c->wgeo = c->geo;
+     c->tgeo = c->wgeo = c->owgeo = c->geo;
 
      /* Set tag */
      client_get_sizeh(c);
@@ -449,6 +449,8 @@ client_winsize(struct client *c, struct geo *g, struct geo *ret)
 {
      int ow, bord = THEME_DEFAULT->client_border_width;
 
+     c->owgeo = c->wgeo;
+
      /* Window geo */
      ret->x = g->x + bord;
      ret->y = g->y + bord;
@@ -458,11 +460,19 @@ client_winsize(struct client *c, struct geo *g, struct geo *ret)
      client_geo_hints(ret, (int*)c->sizeh);
 
      /* Check possible problem for tile integration */
-     if(ret->h > g->h || ret->w > g->w)
+     if(g->w < c->sizeh[MINW] || g->h < c->sizeh[MINH]
+        || g->x < 0 || g->y < 0
+        || ret->x < g->x || ret->y < g->y
+        || ret->h > g->h || ret->w > g->w)
+     {
+          *ret = c->wgeo;
           return true;
+     }
 
      /* Balance position with new size */
-     ret->x += (ow - c->wgeo.w) >> 1;
+     ret->x += (ow - ret->w) >> 1;
+
+     c->flags |= CLIENT_DID_WINSIZE;
 
      return false;
 }
@@ -472,11 +482,15 @@ client_moveresize(struct client *c, struct geo *g)
 {
      c->tgeo = c->geo = *g;
 
-     client_winsize(c, g, &c->wgeo);
+     if(!(c->flags & CLIENT_DID_WINSIZE))
+          if(client_winsize(c, g, &c->wgeo))
+               return;
 
      XMoveResizeWindow(W->dpy, c->win,
                        c->wgeo.x, c->wgeo.y,
                        c->wgeo.w, c->wgeo.h);
+
+     c->flags &= ~CLIENT_DID_WINSIZE;
 
      client_draw_bord(c);
      client_configure(c);
@@ -494,45 +508,89 @@ client_maximize(struct client *c)
      client_moveresize(c, &c->geo);
 }
 
+
+/*
+ * Client factor resize: allow clients to be resized in
+ * manual tile layout.
+ */
+static inline void
+_fac_apply(struct client *c, enum position p, int fac)
+{
+     switch(p)
+     {
+          default:
+          case Right:
+               c->tgeo.w += fac;
+               break;
+          case Left:
+               c->tgeo.x -= fac;
+               c->tgeo.w += fac;
+               break;
+          case Top:
+               c->tgeo.y -= fac;
+               c->tgeo.h += fac;
+               break;
+          case Bottom:
+               c->tgeo.h += fac;
+               break;
+     }
+
+     c->flags |= CLIENT_IGNORE_ENTER;
+}
+
+static inline void
+_fac_arrange_row(struct client *c, enum position p, int fac)
+{
+     struct geo g = c->geo;
+     struct client *cc;
+
+     /* Travel clients to search row parents and apply fac */
+     SLIST_FOREACH(cc, &c->tag->clients, tnext)
+          if(GEO_PARENTROW(g, cc->tgeo, p))
+               _fac_apply(cc, p, fac);
+}
+
 void
 client_fac_resize(struct client *c, enum position p, int fac)
 {
-     struct client *gc = client_next_with_pos(c, p);
-     struct geo foo;
+     struct client *cc, *gc = client_next_with_pos(c, p);
      enum position rp = RPOS(p);
 
      if(!gc || gc->screen != c->screen)
           return;
 
-     /* Check futur size/pos */
-     if(!client_fac_geo(c, p, fac)
-        || !client_fac_geo(gc, rp, -fac)
-        || !client_fac_check_row(c, p, fac)
-        || !client_fac_check_row(gc, rp, -fac))
-          return;
-
-     /* Simple resize with only c & gc */
      if(GEO_CHECK2(c->geo, gc->geo, p))
      {
-          c->flags |= CLIENT_IGNORE_ENTER;
-          gc->flags |= CLIENT_IGNORE_ENTER;
+          _fac_apply(c, p, fac);
+          _fac_apply(gc, rp, -fac);
      }
-     /* Resize with row parents */
      else
      {
-          client_fac_arrange_row(c, p, fac);
-          client_fac_arrange_row(gc, rp, -fac);
+          _fac_arrange_row(c, p, fac);
+          _fac_arrange_row(gc, rp, -fac);
      }
 
      /*
-      * Check if every tag client are compatible with
+      * Check if every clients are compatible with
       * future globals geo. Problem here is that we must *not*
       * resize client because of possible error with next
       * clients in linked list.
       */
      SLIST_FOREACH(gc, &c->tag->clients, tnext)
-          if(client_winsize(gc, &gc->tgeo, &foo))
+          if(client_winsize(gc, &gc->tgeo, &gc->wgeo))
+          {
+               /*
+                * Reverse back the flag and the window geo
+                * in previous affected clients
+                */
+               SLIST_FOREACH(cc, &c->tag->clients, tnext)
+               {
+                    cc->tgeo = cc->geo;
+                    cc->flags &= ~CLIENT_DID_WINSIZE;
+               }
+
                return;
+          }
 
      /* It's ok, resize */
      SLIST_FOREACH(gc, &c->tag->clients, tnext)
