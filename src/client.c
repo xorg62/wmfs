@@ -518,20 +518,16 @@ _fac_apply(struct client *c, enum position p, int fac)
 {
      switch(p)
      {
-          default:
-          case Right:
-               c->tgeo.w += fac;
+          case Top:
+               c->tgeo.y -= fac;
+          case Bottom:
+               c->tgeo.h += fac;
                break;
           case Left:
                c->tgeo.x -= fac;
+          default:
+          case Right:
                c->tgeo.w += fac;
-               break;
-          case Top:
-               c->tgeo.y -= fac;
-               c->tgeo.h += fac;
-               break;
-          case Bottom:
-               c->tgeo.h += fac;
                break;
      }
 
