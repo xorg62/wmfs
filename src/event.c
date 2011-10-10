@@ -201,7 +201,8 @@ event_motionnotify(XEvent *e)
       */
      if((c = client_gb_win(ev->subwindow))
         || (ev->window == t->frame && ((c = client_gb_pos(t, ev->x, ev->y)))))
-          client_focus(c);
+          if(c != c->tag->sel)
+               client_focus(c);
 }
 
 static void
