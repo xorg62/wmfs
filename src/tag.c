@@ -45,6 +45,7 @@ tag_new(struct screen *s, char *name)
                               &at);
 
      SLIST_INIT(&t->clients);
+     SLIST_INIT(&t->sets);
 
      TAILQ_INSERT_TAIL(&s->tags, t, next);
 
@@ -181,6 +182,8 @@ tag_remove(struct tag *t)
      free(t->name);
 
      XDestroyWindow(W->dpy, t->frame);
+
+     layout_free_set(t);
 
      free(t);
 }

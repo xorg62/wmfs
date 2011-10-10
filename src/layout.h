@@ -29,6 +29,7 @@
 /* Debug */
 #define DGEO(G) printf(": %d %d %d %d\n", G.x, G.y, G.w, G.h)
 
+void layout_free_set(struct tag *t);
 void layout_split_integrate(struct client *c, struct client *sc);
 void layout_split_arrange_closed(struct client *ghost);
 void uicb_layout_vmirror(Uicb cmd);

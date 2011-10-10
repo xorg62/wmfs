@@ -11,6 +11,7 @@
 #include <X11/Xlib.h>
 
 #include "wmfs.h"
+#include "config.h"
 
 #define TEXTY(t, w) ((t->font.height - t->font.de) + ((w - t->font.height) >> 1))
 #define PAD (8)
@@ -27,6 +28,18 @@ draw_rect(Drawable d, struct geo g, Color bg)
 {
      XSetForeground(W->dpy, W->gc, bg);
      XFillRectangle(W->dpy, d, W->gc, g.x, g.y, g.w, g.h);
+}
+
+/*
+ * For client use
+ */
+static inline void
+draw_reversed_rect(Drawable dr, GC gc, struct geo g)
+{
+     int i = THEME_DEFAULT->client_border_width;
+
+     XDrawRectangle(W->dpy, dr, gc, g.x + i, g.y + i,
+                    g.w - (i << 1), g.h - (i << 1));
 }
 
 static inline unsigned short

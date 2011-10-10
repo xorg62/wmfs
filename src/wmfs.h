@@ -69,6 +69,12 @@ struct geo
      int x, y, w, h;
 };
 
+struct geo_list
+{
+     struct geo geo;
+     SLIST_ENTRY(geo_list) next;
+};
+
 struct barwin
 {
      struct geo geo;
@@ -124,6 +130,7 @@ struct tag
      Flags flags;
      Window frame;
      SLIST_HEAD(, client) clients;
+     SLIST_HEAD(, layout_set) sets;
      TAILQ_ENTRY(tag) next;
 };
 
@@ -142,7 +149,13 @@ struct client
      Window win;
      SLIST_ENTRY(client) next;  /* Global list */
      SLIST_ENTRY(client) tnext; /* struct tag list */
-     SLIST_ENTRY(client) vnext; /* various list */
+};
+
+struct layout_set
+{
+     int n;
+     SLIST_HEAD(, geo_list) geos;
+     SLIST_ENTRY(layout_set) next;
 };
 
 struct keybind

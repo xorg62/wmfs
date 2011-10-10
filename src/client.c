@@ -7,6 +7,7 @@
 
 #include "client.h"
 #include "config.h"
+#include "event.h"
 #include "util.h"
 #include "barwin.h"
 #include "ewmh.h"
@@ -537,7 +538,7 @@ _fac_apply(struct client *c, enum position p, int fac)
 static inline void
 _fac_arrange_row(struct client *c, enum position p, int fac)
 {
-     struct geo g = c->geo;
+     struct geo g = c->tgeo;
      struct client *cc;
 
      /* Travel clients to search row parents and apply fac */
@@ -546,8 +547,8 @@ _fac_arrange_row(struct client *c, enum position p, int fac)
                _fac_apply(cc, p, fac);
 }
 
-void
-client_fac_resize(struct client *c, enum position p, int fac)
+static void
+_fac_resize(struct client *c, enum position p, int fac)
 {
      struct client *cc, *gc = client_next_with_pos(c, p);
      enum position rp = RPOS(p);
@@ -587,10 +588,109 @@ client_fac_resize(struct client *c, enum position p, int fac)
 
                return;
           }
+}
 
-     /* It's ok, resize */
-     SLIST_FOREACH(gc, &c->tag->clients, tnext)
-          client_moveresize(gc, &gc->tgeo);
+#define _REV_BORDER()                           \
+     SLIST_FOREACH(gc, &c->tag->clients, tnext) \
+          draw_reversed_rect(c->tag->frame, rgc, gc->tgeo);
+void
+client_fac_resize(struct client *c, enum position p, int fac)
+{
+     struct keybind *k;
+     struct client *gc;
+     bool b = true;
+     XEvent ev;
+     KeySym keysym;
+     GC rgc;
+     XGCValues xgc =
+     {
+          .function       = GXinvert,
+          .subwindow_mode = IncludeInferiors,
+          .line_width     = THEME_DEFAULT->client_border_width
+     };
+
+     /* Do it once before */
+     _fac_resize(c, p, fac);
+
+     /* TODO
+     if(option_simple_manual_resize)
+          returnl
+     */
+
+     XGrabKeyboard(W->dpy, W->root, True, GrabModeAsync, GrabModeAsync, CurrentTime);
+
+     rgc = XCreateGC(W->dpy, c->tag->frame, GCFunction | GCSubwindowMode | GCLineWidth, &xgc);
+
+     _REV_BORDER();
+
+     do
+     {
+          XMaskEvent(W->dpy, KeyPressMask, &ev);
+
+          if(ev.type == KeyPress)
+          {
+               XKeyPressedEvent *ke = &ev.xkey;
+               keysym = XKeycodeToKeysym(W->dpy, (KeyCode)ke->keycode, 0);
+
+               _REV_BORDER();
+
+               SLIST_FOREACH(k, &W->h.keybind, next)
+                    if(k->keysym == keysym && KEYPRESS_MASK(k->mod) == KEYPRESS_MASK(ke->state)
+                              && k->func)
+                    {
+                         if(k->func == uicb_client_resize_Right)
+                              _fac_resize(c, Right, ATOI(k->cmd));
+                         else if(k->func == uicb_client_resize_Left)
+                              _fac_resize(c, Left, ATOI(k->cmd));
+                         else if(k->func == uicb_client_resize_Top)
+                              _fac_resize(c, Top, ATOI(k->cmd));
+                         else if(k->func == uicb_client_resize_Bottom)
+                              _fac_resize(c, Bottom, ATOI(k->cmd));
+                         else
+                         {
+                              k->func(k->cmd);
+                              keysym = XK_Escape;
+                         }
+                    }
+
+               _REV_BORDER();
+
+               /* Gtfo of this loop */
+               if(keysym == XK_Return)
+                    break;
+               else if(keysym == XK_Escape)
+               {
+                    b = false;
+                    break;
+               }
+
+               XSync(W->dpy, False);
+          }
+
+          XNextEvent(W->dpy, &ev);
+
+     } while(ev.type != KeyPress);
+
+     _REV_BORDER();
+
+     /* Success, resize clients */
+     if(b)
+     {
+          SLIST_FOREACH(gc, &c->tag->clients, tnext)
+               client_moveresize(gc, &gc->tgeo);
+     }
+     /* Aborted with escape, Set back original geos */
+     else
+     {
+          SLIST_FOREACH(gc, &c->tag->clients, tnext)
+          {
+               gc->tgeo = gc->geo;
+               gc->flags &= ~CLIENT_DID_WINSIZE;
+          }
+     }
+
+     XFreeGC(W->dpy, rgc);
+     XUngrabKeyboard(W->dpy, CurrentTime);
 }
 
 void

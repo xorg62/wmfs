@@ -8,6 +8,93 @@
 #include "client.h"
 #include "util.h"
 
+static void
+layout_save_set(struct tag *t)
+{
+     struct client *c;
+     struct layout_set *l;
+     struct geo_list *g;
+     int n = 0;
+
+     l = xcalloc(1, sizeof(struct layout_set));
+     SLIST_INIT(&l->geos);
+
+     SLIST_FOREACH(c, &t->clients, tnext)
+     {
+          g = xcalloc(1, sizeof(struct geo_list));
+          g->geo = c->geo;
+          SLIST_INSERT_HEAD(&l->geos, g, next);
+          ++n;
+     }
+
+     l->n = n;
+
+     SLIST_INSERT_HEAD(&t->sets, l, next);
+}
+
+static void
+layout_apply_set(struct tag *t, struct layout_set *l)
+{
+     struct geo_list *g;
+     struct client *c, cc;
+
+     for(g = SLIST_FIRST(&l->geos), c = SLIST_FIRST(&t->clients);
+         c;
+         c = SLIST_NEXT(c, tnext), g = SLIST_NEXT(g, next))
+     {
+          if(g)
+          {
+               if(!client_winsize(c, &g->geo, &c->wgeo))
+                    client_moveresize(c, &g->geo);
+
+          }
+          /*
+           * Not enough geos in the set;
+           * then integrate remains of client
+           */
+          else
+               layout_split_integrate(c, SLIST_FIRST(&t->clients));
+     }
+
+     /*
+      * Not enough clients for geos in set;
+      * arrange clients with not set geo.
+      */
+     if(g)
+     {
+          cc.tag = t;
+          while(g)
+          {
+               cc.geo = g->geo;
+               layout_split_arrange_closed(&cc);
+               g = SLIST_NEXT(g, next);
+          }
+     }
+
+     /* Re-insert set in historic */
+     SLIST_INSERT_HEAD(&t->sets, l, next);
+}
+
+
+void
+layout_free_set(struct tag *t)
+{
+     struct layout_set *l;
+
+     while(!SLIST_EMPTY(&t->sets))
+     {
+          l = SLIST_FIRST(&t->sets);
+          SLIST_REMOVE_HEAD(&t->sets, next);
+
+          /* Set can be several times in list */
+          if(l)
+          {
+               FREE_LIST(geo_list, l->geos);
+               free(l);
+          }
+     }
+}
+
 static struct geo
 layout_split(struct client *c, bool vertical)
 {
