@@ -32,6 +32,14 @@ void uicb_client_##A##_##D(Uicb cmd)                           \
           client_##A(c);                                       \
 }
 
+#define CLIENT_ACTION_IDIR(A, D)     \
+void uicb_client_##A##_##D(Uicb cmd) \
+{                                    \
+     (void)cmd;                      \
+     if(W->client)                   \
+          client_##A(W->client, D);  \
+}
+
 #define CLIENT_ACTION_LIST(A, L)                  \
 void uicb_client_##A##_##L(Uicb cmd)              \
 {                                                 \
@@ -53,18 +61,18 @@ CLIENT_ACTION_DIR(focus, Left)
 CLIENT_ACTION_DIR(focus, Top)
 CLIENT_ACTION_DIR(focus, Bottom)
 
-/* uicb_client_swapsel_dir() */
-#define client_swapsel(c) client_swap(W->client, c)
-CLIENT_ACTION_DIR(swapsel, Right)
-CLIENT_ACTION_DIR(swapsel, Left)
-CLIENT_ACTION_DIR(swapsel, Top)
-CLIENT_ACTION_DIR(swapsel, Bottom)
+/* uicb_client_swap_dir() */
+CLIENT_ACTION_IDIR(swap, Right)
+CLIENT_ACTION_IDIR(swap, Left)
+CLIENT_ACTION_IDIR(swap, Top)
+CLIENT_ACTION_IDIR(swap, Bottom)
 
 /* uicb_client_focus_next/prev() */
 CLIENT_ACTION_LIST(focus, next)
 CLIENT_ACTION_LIST(focus, prev)
 
 /* uicb_client_swapsel_next/prev() */
+#define client_swapsel(c) client_swap2(W->client, c)
 CLIENT_ACTION_LIST(swapsel, next)
 CLIENT_ACTION_LIST(swapsel, prev)
 
@@ -147,33 +155,136 @@ client_next_with_pos(struct client *bc, enum position p)
 }
 
 void
-client_swap(struct client *c1, struct client *c2)
+client_swap2(struct client *c1, struct client *c2)
 {
      struct tag *t;
-     struct geo g, foo;
 
      /* Conflict / errors */
      if(c1 == c2 || !c1 || !c2)
           return;
 
      /* are swapped geos compatible? */
-     if(client_winsize(c1, &c2->geo, &foo)
-        || client_winsize(c2, &c1->geo, &foo))
+     if(client_winsize(c1, &c2->geo, &c1->wgeo)
+        || client_winsize(c2, &c1->geo, &c2->wgeo))
           return;
 
-     t = c1->tag;
-     g = c1->geo;
+     if(c1->screen != c2->screen)
+          swap_ptr((void**)&c1->screen, (void**)&c2->screen);
 
-     swap_ptr((void**)&c1->screen, (void**)&c2->screen);
+     if(c1->tag != c2->tag)
+     {
+          t = c1->tag;
+          tag_client(c2->tag, c1);
+          tag_client(t, c2);
+     }
 
-     tag_client(c2->tag, c1);
-     tag_client(t, c2);
+     c1->tgeo = c2->geo;
+     c2->tgeo = c1->geo;
 
-     client_moveresize(c1, &c2->geo);
-     client_moveresize(c2, &g);
+     client_moveresize(c1, &c1->tgeo);
+     client_moveresize(c2, &c2->tgeo);
 
      c1->flags |= CLIENT_IGNORE_ENTER;
      c2->flags |= CLIENT_IGNORE_ENTER;
+}
+
+static inline struct client*
+_swap_get(struct client *c, enum position p)
+{
+     struct client *ret = client_next_with_pos(c, p);
+
+     if(!ret)
+          return c;
+
+     return ret;
+}
+
+void
+client_swap(struct client *c, enum position p)
+{
+     struct keybind *k;
+     struct client *c2;
+     bool b = true;
+     XEvent ev;
+     KeySym keysym;
+     GC rgc;
+     XGCValues xgc =
+     {
+          .function       = GXinvert,
+          .subwindow_mode = IncludeInferiors,
+          .line_width     = THEME_DEFAULT->client_border_width
+     };
+
+     c2 = _swap_get(c, p);
+
+     /* TODO
+     if(option_simple_manual_resize)
+     {
+        _swap(c, c2);
+        return;
+     }
+     */
+
+     XGrabKeyboard(W->dpy, W->root, True, GrabModeAsync, GrabModeAsync, CurrentTime);
+
+     rgc = XCreateGC(W->dpy, c->tag->frame, GCFunction | GCSubwindowMode | GCLineWidth, &xgc);
+
+     draw_reversed_rect(c->tag->frame, rgc, c2->geo);
+
+     do
+     {
+          XMaskEvent(W->dpy, KeyPressMask, &ev);
+
+          if(ev.type == KeyPress)
+          {
+               XKeyPressedEvent *ke = &ev.xkey;
+               keysym = XKeycodeToKeysym(W->dpy, (KeyCode)ke->keycode, 0);
+
+               draw_reversed_rect(c->tag->frame, rgc, c2->geo);
+
+               SLIST_FOREACH(k, &W->h.keybind, next)
+                    if(k->keysym == keysym && KEYPRESS_MASK(k->mod) == KEYPRESS_MASK(ke->state)
+                              && k->func)
+                    {
+                         if(k->func == uicb_client_swap_Right)
+                              c2 = _swap_get(c2, Right);
+                         else if(k->func == uicb_client_swap_Left)
+                              c2 = _swap_get(c2, Left);
+                         else if(k->func == uicb_client_swap_Top)
+                              c2 = _swap_get(c2, Top);
+                         else if(k->func == uicb_client_swap_Bottom)
+                              c2 = _swap_get(c2, Bottom);
+                         else
+                         {
+                              k->func(k->cmd);
+                              keysym = XK_Escape;
+                         }
+                    }
+
+               draw_reversed_rect(c->tag->frame, rgc, c2->geo);
+
+               /* Gtfo of this loop */
+               if(keysym == XK_Return)
+                    break;
+               else if(keysym == XK_Escape)
+               {
+                    b = false;
+                    break;
+               }
+
+               XSync(W->dpy, False);
+          }
+          XNextEvent(W->dpy, &ev);
+
+     } while(ev.type != KeyPress);
+
+     draw_reversed_rect(c->tag->frame, rgc, c2->geo);
+
+     if(b)
+         client_swap2(c, c2);
+
+     XFreeGC(W->dpy, rgc);
+     XUngrabKeyboard(W->dpy, CurrentTime);
 }
 
 static void
@@ -202,7 +313,6 @@ client_grabbuttons(struct client *c, bool focused)
 
      XGrabButton(W->dpy, AnyButton, AnyModifier, c->win, False,
                ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-
 }
 
 static inline void
@@ -614,7 +724,7 @@ client_fac_resize(struct client *c, enum position p, int fac)
 
      /* TODO
      if(option_simple_manual_resize)
-          returnl
+          return;
      */
 
      XGrabKeyboard(W->dpy, W->root, True, GrabModeAsync, GrabModeAsync, CurrentTime);
@@ -666,7 +776,6 @@ client_fac_resize(struct client *c, enum position p, int fac)
 
                XSync(W->dpy, False);
           }
-
           XNextEvent(W->dpy, &ev);
 
      } while(ev.type != KeyPress);
