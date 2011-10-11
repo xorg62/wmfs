@@ -619,7 +619,6 @@ client_maximize(struct client *c)
      client_moveresize(c, &c->geo);
 }
 
-
 /*
  * Client factor resize: allow clients to be resized in
  * manual tile layout.
@@ -727,6 +726,7 @@ client_fac_resize(struct client *c, enum position p, int fac)
           return;
      */
 
+     XGrabServer(W->dpy);
      XGrabKeyboard(W->dpy, W->root, True, GrabModeAsync, GrabModeAsync, CurrentTime);
 
      rgc = XCreateGC(W->dpy, c->tag->frame, GCFunction | GCSubwindowMode | GCLineWidth, &xgc);
@@ -787,6 +787,8 @@ client_fac_resize(struct client *c, enum position p, int fac)
      {
           SLIST_FOREACH(gc, &c->tag->clients, tnext)
                client_moveresize(gc, &gc->tgeo);
+
+          layout_save_set(c->tag);
      }
      /* Aborted with escape, Set back original geos */
      else
@@ -798,7 +800,9 @@ client_fac_resize(struct client *c, enum position p, int fac)
           }
      }
 
+
      XFreeGC(W->dpy, rgc);
+     XUngrabServer(W->dpy);
      XUngrabKeyboard(W->dpy, CurrentTime);
 }
 

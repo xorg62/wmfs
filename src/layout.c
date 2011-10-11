@@ -8,7 +8,7 @@
 #include "client.h"
 #include "util.h"
 
-static void
+void
 layout_save_set(struct tag *t)
 {
      struct client *c;
@@ -233,6 +233,8 @@ layout_split_arrange_closed(struct client *ghost)
                     }
           }
      }
+
+     layout_save_set(ghost->tag);
 }
 
 /* Integrate a client in split layout: split sc and fill c in new geo */
@@ -259,6 +261,8 @@ layout_split_integrate(struct client *c, struct client *sc)
 
      client_moveresize(c, &g);
      client_moveresize(sc, &sc->geo);
+
+     layout_save_set(c->tag);
 }
 
 /* Arrange inter-clients holes:
