@@ -130,7 +130,7 @@ struct tag
      Flags flags;
      Window frame;
      SLIST_HEAD(, client) clients;
-     SLIST_HEAD(, layout_set) sets;
+     TAILQ_HEAD(ssub, layout_set) sets;
      TAILQ_ENTRY(tag) next;
 };
 
@@ -155,7 +155,7 @@ struct layout_set
 {
      int n;
      SLIST_HEAD(, geo_list) geos;
-     SLIST_ENTRY(layout_set) next;
+     TAILQ_ENTRY(layout_set) next;
 };
 
 struct keybind

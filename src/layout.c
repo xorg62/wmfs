@@ -29,7 +29,7 @@ layout_save_set(struct tag *t)
 
      l->n = n;
 
-     SLIST_INSERT_HEAD(&t->sets, l, next);
+     TAILQ_INSERT_TAIL(&t->sets, l, next);
 }
 
 static void
@@ -39,14 +39,14 @@ layout_apply_set(struct tag *t, struct layout_set *l)
      struct client *c, cc;
 
      for(g = SLIST_FIRST(&l->geos), c = SLIST_FIRST(&t->clients);
-         c;
-         c = SLIST_NEXT(c, tnext), g = SLIST_NEXT(g, next))
+         c; c = SLIST_NEXT(c, tnext))
      {
           if(g)
           {
                if(!client_winsize(c, &g->geo, &c->wgeo))
                     client_moveresize(c, &g->geo);
 
+               g = SLIST_NEXT(g, next);
           }
           /*
            * Not enough geos in the set;
@@ -61,18 +61,14 @@ layout_apply_set(struct tag *t, struct layout_set *l)
       * arrange clients with not set geo.
       */
      if(g)
-     {
-          cc.tag = t;
-          while(g)
+          for(cc.tag = t; g; g = SLIST_NEXT(g, next))
           {
                cc.geo = g->geo;
                layout_split_arrange_closed(&cc);
-               g = SLIST_NEXT(g, next);
           }
-     }
 
      /* Re-insert set in historic */
-     SLIST_INSERT_HEAD(&t->sets, l, next);
+     TAILQ_INSERT_TAIL(&t->sets, l, next);
 }
 
 
@@ -81,10 +77,9 @@ layout_free_set(struct tag *t)
 {
      struct layout_set *l;
 
-     while(!SLIST_EMPTY(&t->sets))
+     TAILQ_FOREACH(l, &t->sets, next)
      {
-          l = SLIST_FIRST(&t->sets);
-          SLIST_REMOVE_HEAD(&t->sets, next);
+          TAILQ_REMOVE(&t->sets, l, next);
 
           /* Set can be several times in list */
           if(l)
@@ -93,6 +88,18 @@ layout_free_set(struct tag *t)
                free(l);
           }
      }
+}
+
+void
+uicb_layout_prev_set(Uicb cmd)
+{
+     struct layout_set *l;
+     struct tag *t = W->screen->seltag;
+     (void)cmd;
+
+     if(!TAILQ_EMPTY(&t->sets)
+               && (l = TAILQ_PREV(TAILQ_LAST(&t->sets, ssub), ssub, next)))
+          layout_apply_set(t, l);
 }
 
 static struct geo

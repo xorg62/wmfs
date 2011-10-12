@@ -35,6 +35,7 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "layout_hmirror",      uicb_layout_hmirror },
      { "layout_rotate_left",  uicb_layout_rotate_left },
      { "layout_rotate_right", uicb_layout_rotate_right },
+     { "layout_prev_set",     uicb_layout_prev_set },
 
      /* Client */
      { "client_close",         uicb_client_close },

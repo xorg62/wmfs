@@ -45,7 +45,7 @@ tag_new(struct screen *s, char *name)
                               &at);
 
      SLIST_INIT(&t->clients);
-     SLIST_INIT(&t->sets);
+     TAILQ_INIT(&t->sets);
 
      TAILQ_INSERT_TAIL(&s->tags, t, next);
 
