@@ -616,6 +616,8 @@ client_maximize(struct client *c)
      c->geo.h = c->tag->screen->ugeo.h;
 
      client_moveresize(c, &c->geo);
+
+     layout_save_set(c->tag);
 }
 
 /*
@@ -797,7 +799,6 @@ client_fac_resize(struct client *c, enum position p, int fac)
                gc->flags &= ~CLIENT_DID_WINSIZE;
           }
      }
-
 
      XFreeGC(W->dpy, rgc);
      XUngrabServer(W->dpy);

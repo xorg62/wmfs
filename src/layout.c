@@ -17,8 +17,8 @@ layout_save_set(struct tag *t)
 {
      struct client *c;
      struct layout_set *l;
-     struct geo_list *g;
-     int n = 0;
+     struct geo_list *g, *gp;
+     int n = 1;
 
      l = xcalloc(1, sizeof(struct layout_set));
      SLIST_INIT(&l->geos);
@@ -27,8 +27,14 @@ layout_save_set(struct tag *t)
      {
           g = xcalloc(1, sizeof(struct geo_list));
           g->geo = c->geo;
-          SLIST_INSERT_HEAD(&l->geos, g, next);
+
+          if(!SLIST_FIRST(&l->geos))
+               SLIST_INSERT_HEAD(&l->geos, g, next);
+          else
+               SLIST_INSERT_AFTER(gp, g, next);
+
           ++n;
+          gp = g;
      }
 
      l->n = n;
@@ -47,8 +53,7 @@ layout_apply_set(struct tag *t, struct layout_set *l)
      {
           if(g)
           {
-               if(!client_winsize(c, &g->geo, &c->wgeo))
-                    client_moveresize(c, &g->geo);
+               client_moveresize(c, &g->geo);
 
                g = SLIST_NEXT(g, next);
           }
@@ -72,7 +77,7 @@ layout_apply_set(struct tag *t, struct layout_set *l)
           }
 
      /* Re-insert set in historic */
-     TAILQ_INSERT_TAIL(&t->sets, l, next);
+     layout_save_set(t);
 }
 
 void
@@ -303,6 +308,7 @@ layout_split_check_row_dir(struct client *c, struct client *g, enum position p)
                if(GEO_CHECK2(ghost->geo, c->geo, p))              \
                {                                                  \
                     layout_split_arrange_size(&ghost->geo, c, p); \
+                    layout_save_set(ghost->tag);                  \
                     return;                                       \
                }                                                  \
      } while(/* CONSTCOND */ 0);
@@ -369,7 +375,7 @@ layout_split_integrate(struct client *c, struct client *sc)
            * Not even a first client in list, then
            * maximize the lonely client
            */
-          if(!(sc = SLIST_FIRST(&c->tag->clients)))
+          if(!(sc = SLIST_NEXT(SLIST_FIRST(&c->tag->clients), tnext)))
           {
                client_maximize(c);
                return;
@@ -470,6 +476,8 @@ layout_rotate(struct tag *t, bool left)
      /* Rotate sometimes do not set back perfect size.. */
      SLIST_FOREACH(c, &t->clients, tnext)
           layout_fix_hole(c);
+
+     layout_save_set(t);
 }
 
 void
@@ -515,6 +523,8 @@ uicb_layout_vmirror(Uicb cmd)
           c->geo.x = W->screen->ugeo.w - (c->geo.x + c->geo.w);
           client_moveresize(c, &c->geo);
      }
+
+     layout_save_set(W->screen->seltag);
 }
 
 void
@@ -528,4 +538,6 @@ uicb_layout_hmirror(Uicb cmd)
           c->geo.y = W->screen->ugeo.h - (c->geo.y + c->geo.h);
           client_moveresize(c, &c->geo);
      }
+
+     layout_save_set(W->screen->seltag);
 }

@@ -119,11 +119,14 @@ tag_client(struct tag *t, struct client *c)
 
      c->tag = t;
 
-     layout_split_integrate(c, t->sel);
-
-     /* Insert in new tag list */
+     /*
+      * Insert in new tag list before
+      * layout_split_integrate, because of set historic.
+      */
      SLIST_INSERT_HEAD(&t->clients, c, tnext);
-}
+
+     layout_split_integrate(c, t->sel);
+ }
 
 void
 uicb_tag_set(Uicb cmd)
