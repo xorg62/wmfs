@@ -226,7 +226,6 @@ client_swap(struct client *c, enum position p)
      */
 
      XGrabKeyboard(W->dpy, W->root, True, GrabModeAsync, GrabModeAsync, CurrentTime);
-
      rgc = XCreateGC(W->dpy, c->tag->frame, GCFunction | GCSubwindowMode | GCLineWidth, &xgc);
 
      draw_reversed_rect(c->tag->frame, rgc, c2->geo);
@@ -728,7 +727,6 @@ client_fac_resize(struct client *c, enum position p, int fac)
 
      XGrabServer(W->dpy);
      XGrabKeyboard(W->dpy, W->root, True, GrabModeAsync, GrabModeAsync, CurrentTime);
-
      rgc = XCreateGC(W->dpy, c->tag->frame, GCFunction | GCSubwindowMode | GCLineWidth, &xgc);
 
      _REV_BORDER();

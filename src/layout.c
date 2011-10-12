@@ -3,9 +3,13 @@
  *  For license, see COPYING.
  */
 
+#include <X11/Xutil.h>
+
 #include "layout.h"
 #include "config.h"
 #include "client.h"
+#include "draw.h"
+#include "event.h"
 #include "util.h"
 
 void
@@ -71,7 +75,6 @@ layout_apply_set(struct tag *t, struct layout_set *l)
      TAILQ_INSERT_TAIL(&t->sets, l, next);
 }
 
-
 void
 layout_free_set(struct tag *t)
 {
@@ -90,16 +93,125 @@ layout_free_set(struct tag *t)
      }
 }
 
+#define _REV_BORDER()                 \
+     SLIST_FOREACH(g, &l->geos, next) \
+          draw_reversed_rect(t->frame, rgc, g->geo);
+static void
+_historic_set(struct tag *t, bool prev)
+{
+     struct keybind *k;
+     struct layout_set *l;
+     struct geo_list *g;
+     bool b = true;
+     XEvent ev;
+     KeySym keysym;
+     GC rgc;
+     XGCValues xgc =
+     {
+          .function       = GXinvert,
+          .subwindow_mode = IncludeInferiors,
+          .line_width     = THEME_DEFAULT->client_border_width
+     };
+
+     if(TAILQ_EMPTY(&t->sets))
+          return;
+
+     l = TAILQ_LAST(&t->sets, ssub);
+
+     if(prev)
+          l = TAILQ_PREV(l, ssub, next);
+
+     if(!l)
+          return;
+
+     /* TODO
+     if(option_simple_manual_resize)
+     {
+          layout_set_apply(l);
+          return;
+     */
+
+     XGrabKeyboard(W->dpy, W->root, True, GrabModeAsync, GrabModeAsync, CurrentTime);
+     rgc = XCreateGC(W->dpy, t->frame, GCFunction | GCSubwindowMode | GCLineWidth, &xgc);
+
+     _REV_BORDER();
+
+     do
+     {
+          XMaskEvent(W->dpy, KeyPressMask, &ev);
+
+          if(ev.type == KeyPress)
+          {
+               XKeyPressedEvent *ke = &ev.xkey;
+               keysym = XKeycodeToKeysym(W->dpy, (KeyCode)ke->keycode, 0);
+
+               _REV_BORDER();
+
+               SLIST_FOREACH(k, &W->h.keybind, next)
+                    if(k->keysym == keysym && KEYPRESS_MASK(k->mod) == KEYPRESS_MASK(ke->state)
+                              && k->func)
+                    {
+                         if(k->func == uicb_layout_prev_set)
+                         {
+                              if(!(l = TAILQ_PREV(l, ssub, next)))
+                                   l = TAILQ_LAST(&t->sets, ssub);
+                         }
+                         else if(k->func == uicb_layout_next_set)
+                         {
+                              if(!(l = TAILQ_NEXT(l, next)))
+                                   l = TAILQ_FIRST(&t->sets);
+                         }
+                         else
+                         {
+                              k->func(k->cmd);
+                              keysym = XK_Escape;
+                         }
+                    }
+
+               if(!l)
+                    l = TAILQ_LAST(&t->sets, ssub);
+
+               _REV_BORDER();
+
+               /* Gtfo of this loop */
+               if(keysym == XK_Return)
+                    break;
+               else if(keysym == XK_Escape)
+               {
+                    b = false;
+                    break;
+               }
+
+               XSync(W->dpy, False);
+          }
+          XNextEvent(W->dpy, &ev);
+
+     } while(ev.type != KeyPress);
+
+     _REV_BORDER();
+
+     if(b)
+          layout_apply_set(t, l);
+
+     XFreeGC(W->dpy, rgc);
+     XUngrabServer(W->dpy);
+     XUngrabKeyboard(W->dpy, CurrentTime);
+}
+
 void
 uicb_layout_prev_set(Uicb cmd)
 {
-     struct layout_set *l;
-     struct tag *t = W->screen->seltag;
      (void)cmd;
 
-     if(!TAILQ_EMPTY(&t->sets)
-               && (l = TAILQ_PREV(TAILQ_LAST(&t->sets, ssub), ssub, next)))
-          layout_apply_set(t, l);
+     _historic_set(W->screen->seltag, true);
+}
+
+void
+uicb_layout_next_set(Uicb cmd)
+{
+     (void)cmd;
+
+     _historic_set(W->screen->seltag, false);
 }
 
 static struct geo

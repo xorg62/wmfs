@@ -146,4 +146,7 @@
   [key] mod = {"Super"}          key = "r" func = "layout_rotate_right" [/key]
   [key] mod = {"Super", "Shift"} key = "r" func = "layout_rotate_left" [/key]
 
+  [key] mod = {"Super"} key = "o" func = "layout_prev_set" [/key]
+  [key] mod = {"Super"} key = "p" func = "layout_next_set" [/key]
+
 [/keys]
