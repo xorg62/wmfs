@@ -47,6 +47,14 @@ layout_apply_set(struct tag *t, struct layout_set *l)
 {
      struct geo_list *g;
      struct client *c, cc;
+     int nc = 1;
+
+     SLIST_FOREACH(c, &t->clients, tnext)
+          ++nc;
+
+     /* TODO: Adapt different client number case */
+     if(l->n != nc)
+          return;
 
      for(g = SLIST_FIRST(&l->geos), c = SLIST_FIRST(&t->clients);
          c; c = SLIST_NEXT(c, tnext))
@@ -54,27 +62,29 @@ layout_apply_set(struct tag *t, struct layout_set *l)
           if(g)
           {
                client_moveresize(c, &g->geo);
-
                g = SLIST_NEXT(g, next);
           }
-          /*
+          /* TODO
            * Not enough geos in the set;
            * then integrate remains of client
-           */
+           *
+
           else
                layout_split_integrate(c, SLIST_FIRST(&t->clients));
+           */
      }
 
-     /*
+     /* TODO
       * Not enough clients for geos in set;
       * arrange clients with not set geo.
-      */
-     if(g)
+      *
+     if((g = SLIST_NEXT(g, next)))
           for(cc.tag = t; g; g = SLIST_NEXT(g, next))
           {
                cc.geo = g->geo;
                layout_split_arrange_closed(&cc);
           }
+     */
 
      /* Re-insert set in historic */
      layout_save_set(t);
@@ -88,13 +98,8 @@ layout_free_set(struct tag *t)
      TAILQ_FOREACH(l, &t->sets, next)
      {
           TAILQ_REMOVE(&t->sets, l, next);
-
-          /* Set can be several times in list */
-          if(l)
-          {
-               FREE_LIST(geo_list, l->geos);
-               free(l);
-          }
+          FREE_LIST(geo_list, l->geos);
+          free(l);
      }
 }
 
@@ -452,18 +457,16 @@ _pos_rotate_right(struct geo *g, struct geo *ug, struct geo *og)
 }
 
 static void
-layout_rotate(struct tag *t, bool left)
+layout_rotate(struct tag *t, void (*pfunc)(struct geo*, struct geo*, struct geo*))
 {
      struct client *c;
      struct geo g;
      float f1 = (float)t->screen->ugeo.w / (float)t->screen->ugeo.h;
      float f2 = 1 / f1;
-     void (*pos)(struct geo*, struct geo*, struct geo*) =
-          (left ? _pos_rotate_left : _pos_rotate_right);
 
      SLIST_FOREACH(c, &t->clients, tnext)
      {
-          pos(&g, &t->screen->ugeo, &c->geo);
+          pfunc(&g, &t->screen->ugeo, &c->geo);
 
           g.x *= f1;
           g.y *= f2;
@@ -484,14 +487,14 @@ void
 uicb_layout_rotate_left(Uicb cmd)
 {
      (void)cmd;
-     layout_rotate(W->screen->seltag, true);
+     layout_rotate(W->screen->seltag, _pos_rotate_left);
 }
 
 void
 uicb_layout_rotate_right(Uicb cmd)
 {
      (void)cmd;
-     layout_rotate(W->screen->seltag, false);
+     layout_rotate(W->screen->seltag, _pos_rotate_right);
 }
 
 /*
