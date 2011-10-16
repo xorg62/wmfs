@@ -15,7 +15,6 @@
 #include "barwin.h"
 #include "draw.h"
 
-#define CCOL(c) (c == c->tag->sel ? &c->scol : &c->ncol)
 #define CLIENT_MOUSE_MOD Mod1Mask
 
 #define CLIENT_RESIZE_DIR(D)                          \
@@ -319,6 +318,7 @@ client_grabbuttons(struct client *c, bool focused)
                ButtonMask, GrabModeAsync, GrabModeSync, None, None);
 }
 
+#define CCOL(c) (c == c->tag->sel ? &c->scol : &c->ncol)
 static void
 client_frame_update(struct client *c, struct colpair *cp)
 {
@@ -551,10 +551,8 @@ client_new(Window w, XWindowAttributes *wa)
      if(!(c->tbarw = THEME_DEFAULT->client_titlebar_width))
           c->tbarw = c->border;
 
-     c->ncol.fg = THEME_DEFAULT->client_n.fg;
-     c->ncol.bg = THEME_DEFAULT->client_n.bg;
-     c->scol.fg = THEME_DEFAULT->client_s.fg;
-     c->scol.bg = THEME_DEFAULT->client_s.bg;
+     c->ncol = THEME_DEFAULT->client_n;
+     c->scol = THEME_DEFAULT->client_s;
 
      client_frame_new(c);
 
