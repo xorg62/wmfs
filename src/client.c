@@ -877,6 +877,9 @@ client_remove(struct client *c)
      XReparentWindow(W->dpy, c->win, W->root, c->geo.x, c->geo.y);
      XDestroyWindow(W->dpy, c->frame);
 
+     if(c->titlebar)
+          barwin_remove(c->titlebar);
+
      /* Remove from global client list */
      SLIST_REMOVE(&W->h.client, c, client, next);
 
