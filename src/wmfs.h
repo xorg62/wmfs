@@ -75,6 +75,11 @@ struct geo_list
      SLIST_ENTRY(geo_list) next;
 };
 
+struct colpair
+{
+     Color fg, bg;
+};
+
 struct barwin
 {
      struct geo geo;
@@ -128,7 +133,6 @@ struct tag
      struct client *prevsel;
      char *name;
      Flags flags;
-     Window frame;
      SLIST_HEAD(, client) clients;
      TAILQ_HEAD(ssub, layout_set) sets;
      TAILQ_ENTRY(tag) next;
@@ -139,14 +143,16 @@ struct client
      struct tag *tag;
      struct screen *screen;
      struct barwin *titlebar;
-     struct geo geo, tgeo, wgeo, owgeo;
+     struct geo geo, wgeo, tgeo, rgeo;
+     struct colpair ncol, scol;
      int sizeh[SHLAST];
      char *title;
+     int border, tbarw;
 #define CLIENT_HINT_FLAG    0x01
 #define CLIENT_IGNORE_ENTER 0x02
 #define CLIENT_DID_WINSIZE  0x04
      Flags flags;
-     Window win;
+     Window win, frame;
      SLIST_ENTRY(client) next;  /* Global list */
      SLIST_ENTRY(client) tnext; /* struct tag list */
 };
@@ -175,11 +181,6 @@ struct mousebind
      void (*func)(Uicb);
      Uicb cmd;
      SLIST_ENTRY(mousebind) next;
-};
-
-struct colpair
-{
-     Color fg, bg;
 };
 
 struct theme
@@ -218,7 +219,7 @@ struct wmfs
      Window root;
      int xscreen, xdepth;
      Flags numlockmask;
-     GC gc;
+     GC gc, rgc;
      Atom *net_atom;
      bool running;
 

@@ -53,8 +53,6 @@ infobar_placement(struct infobar *i, enum barpos p)
                return false;
      }
 
-     tag_update_frame_geo(i->screen);
-
      return true;
 }
 

@@ -34,12 +34,16 @@ draw_rect(Drawable d, struct geo g, Color bg)
  * For client use
  */
 static inline void
-draw_reversed_rect(Drawable dr, GC gc, struct geo g)
+draw_reversed_rect(Drawable dr, GC gc, struct geo *g)
 {
+     struct geo *ug = &W->screen->ugeo;
      int i = THEME_DEFAULT->client_border_width;
 
-     XDrawRectangle(W->dpy, dr, gc, g.x + i, g.y + i,
-                    g.w - (i << 1), g.h - (i << 1));
+     XDrawRectangle(W->dpy, dr, gc,
+                    ug->x + g->x + i,
+                    ug->y + g->y + i,
+                    g->w - (i << 1),
+                    g->h - (i << 1));
 }
 
 static inline unsigned short

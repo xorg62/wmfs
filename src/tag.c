@@ -18,13 +18,6 @@ struct tag*
 tag_new(struct screen *s, char *name)
 {
      struct tag *t;
-     XSetWindowAttributes at =
-     {
-          .background_pixel  = THEME_DEFAULT->frame_bg,
-          .override_redirect = true,
-          .background_pixmap = ParentRelative,
-          .event_mask        = BARWIN_MASK
-     };
 
      t = xcalloc(1, sizeof(struct tag));
 
@@ -32,17 +25,6 @@ tag_new(struct screen *s, char *name)
      t->name   = xstrdup(name);
      t->flags  = 0;
      t->sel    = NULL;
-
-     /* Frame window */
-     t->frame = XCreateWindow(W->dpy, W->root,
-                              s->ugeo.x, s->ugeo.y,
-                              s->ugeo.w, s->ugeo.h,
-                              0, CopyFromParent,
-                              InputOutput,
-                              CopyFromParent,
-                              (CWOverrideRedirect | CWBackPixmap
-                               | CWBackPixel | CWEventMask),
-                              &at);
 
      SLIST_INIT(&t->clients);
      TAILQ_INIT(&t->sets);
@@ -58,9 +40,11 @@ tag_screen(struct screen *s, struct tag *t)
      struct client *c;
 
      /* Unmap previous tag's frame */
-     WIN_STATE(s->seltag->frame, Unmap);
      SLIST_FOREACH(c, &s->seltag->clients, tnext)
+     {
+          WIN_STATE(c->frame, Unmap);
           ewmh_set_wm_state(c->win, IconicState);
+     }
 
      /*
       * Map selected tag's frame, only if there is
@@ -68,9 +52,11 @@ tag_screen(struct screen *s, struct tag *t)
       */
      if(!SLIST_EMPTY(&t->clients))
      {
-          WIN_STATE(t->frame, Map);
           SLIST_FOREACH(c, &t->clients, tnext)
+          {
+               WIN_STATE(c->frame, Map);
                ewmh_set_wm_state(c->win, NormalState);
+          }
 
           client_focus(t->sel);
      }
@@ -98,24 +84,9 @@ tag_client(struct tag *t, struct client *c)
                client_focus(client_next(c));
      }
 
-     /*
-      * Case of client removing: umap frame if empty
-      */
+     /* Client remove */
      if(!t)
-     {
-          /* Unmap frame if tag is now empty */
-          if(SLIST_EMPTY(&c->tag->clients))
-               WIN_STATE(c->tag->frame, Unmap);
-
           return;
-     }
-
-     /* Reparent client win in frame win */
-     XReparentWindow(W->dpy, c->win, t->frame, 0, 0);
-
-     /* Map frame if tag was empty */
-     if(SLIST_EMPTY(&t->clients))
-          WIN_STATE(t->frame, Map);
 
      c->tag = t;
 
@@ -183,8 +154,6 @@ static void
 tag_remove(struct tag *t)
 {
      free(t->name);
-
-     XDestroyWindow(W->dpy, t->frame);
 
      layout_free_set(t);
 

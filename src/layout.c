@@ -46,7 +46,7 @@ static void
 layout_apply_set(struct tag *t, struct layout_set *l)
 {
      struct geo_list *g;
-     struct client *c, cc;
+     struct client *c;
      int nc = 1;
 
      SLIST_FOREACH(c, &t->clients, tnext)
@@ -105,7 +105,7 @@ layout_free_set(struct tag *t)
 
 #define _REV_BORDER()                 \
      SLIST_FOREACH(g, &l->geos, next) \
-          draw_reversed_rect(t->frame, rgc, g->geo);
+          draw_reversed_rect(W->root, W->rgc, &g->geo);
 static void
 _historic_set(struct tag *t, bool prev)
 {
@@ -115,13 +115,6 @@ _historic_set(struct tag *t, bool prev)
      bool b = true;
      XEvent ev;
      KeySym keysym;
-     GC rgc;
-     XGCValues xgc =
-     {
-          .function       = GXinvert,
-          .subwindow_mode = IncludeInferiors,
-          .line_width     = THEME_DEFAULT->client_border_width
-     };
 
      if(TAILQ_EMPTY(&t->sets))
           return;
@@ -142,7 +135,6 @@ _historic_set(struct tag *t, bool prev)
      */
 
      XGrabKeyboard(W->dpy, W->root, True, GrabModeAsync, GrabModeAsync, CurrentTime);
-     rgc = XCreateGC(W->dpy, t->frame, GCFunction | GCSubwindowMode | GCLineWidth, &xgc);
 
      _REV_BORDER();
 
@@ -203,7 +195,6 @@ _historic_set(struct tag *t, bool prev)
      if(b)
           layout_apply_set(t, l);
 
-     XFreeGC(W->dpy, rgc);
      XUngrabServer(W->dpy);
      XUngrabKeyboard(W->dpy, CurrentTime);
 }
@@ -339,7 +330,6 @@ layout_split_arrange_closed(struct client *ghost)
      _ARRANGE_SINGLE_PARENT(Top);
      _ARRANGE_SINGLE_PARENT(Bottom);
 
-
      /* Check row parents for full resize
       * Example case:
       *  ___________               ___________
@@ -460,16 +450,17 @@ static void
 layout_rotate(struct tag *t, void (*pfunc)(struct geo*, struct geo*, struct geo*))
 {
      struct client *c;
-     struct geo g;
+     struct geo g, *ug = &t->screen->ugeo;
      float f1 = (float)t->screen->ugeo.w / (float)t->screen->ugeo.h;
      float f2 = 1 / f1;
 
      SLIST_FOREACH(c, &t->clients, tnext)
      {
-          pfunc(&g, &t->screen->ugeo, &c->geo);
+          pfunc(&g, ug, &c->geo);
 
           g.x *= f1;
           g.y *= f2;
+
           g.w = c->geo.h * f1;
           g.h = c->geo.w * f2;
 

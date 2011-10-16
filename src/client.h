@@ -11,6 +11,7 @@
 
 inline void client_configure(struct client *c);
 struct client *client_gb_win(Window w);
+struct client *client_gb_frame(Window w);
 struct client *client_gb_pos(struct tag *t, int x, int y);
 struct client *client_next_with_pos(struct client *bc, enum position p);
 void client_swap2(struct client *c1, struct client *c2);
@@ -20,7 +21,7 @@ void client_get_name(struct client *c);
 void client_close(struct client *c);
 void uicb_client_close(Uicb cmd);
 struct client *client_new(Window w, XWindowAttributes *wa);
-bool client_winsize(struct client *c, struct geo *geo, struct geo *ret);
+bool client_winsize(struct client *c, struct geo *geo);
 void client_moveresize(struct client *c, struct geo *g);
 void client_maximize(struct client *c);
 void client_fac_resize(struct client *c, enum position p, int fac);

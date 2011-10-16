@@ -101,6 +101,13 @@ wmfs_init_font(char *font, struct theme *t)
 static void
 wmfs_xinit(void)
 {
+     XGCValues xgc =
+     {
+          .function       = GXinvert,
+          .subwindow_mode = IncludeInferiors,
+          .line_width     = 1
+     };
+
      XSetWindowAttributes at =
      {
           .event_mask = (KeyMask | ButtonMask | MouseMask
@@ -131,6 +138,8 @@ wmfs_xinit(void)
       */
      W->root = RootWindow(W->dpy, W->xscreen);
      XChangeWindowAttributes(W->dpy, W->root, CWEventMask | CWCursor, &at);
+     W->rgc = XCreateGC(W->dpy, W->root, GCFunction | GCSubwindowMode | GCLineWidth, &xgc);
+
 
      /*
       * Locale (font encode)
@@ -261,6 +270,7 @@ wmfs_quit(void)
       */
      screen_free();
 
+     XFreeGC(W->dpy, W->rgc);
      XCloseDisplay(W->dpy);
 
      /* Conf stuffs */

@@ -12,8 +12,10 @@
 #include "barwin.h"
 #include "ewmh.h"
 #include "layout.h"
+#include "barwin.h"
 #include "draw.h"
 
+#define CCOL(c) (c == c->tag->sel ? &c->scol : &c->ncol)
 #define CLIENT_MOUSE_MOD Mod1Mask
 
 #define CLIENT_RESIZE_DIR(D)                          \
@@ -87,10 +89,10 @@ client_configure(struct client *c)
           .type              = ConfigureNotify,
           .event             = c->win,
           .window            = c->win,
-          .x                 = c->geo.x,
-          .y                 = c->geo.y,
-          .width             = c->geo.w,
-          .height            = c->geo.h,
+          .x                 = c->rgeo.x + c->border,
+          .y                 = c->rgeo.y + c->tbarw,
+          .width             = c->wgeo.w,
+          .height            = c->wgeo.h,
           .above             = None,
           .border_width      = 0,
           .override_redirect = 0
@@ -106,6 +108,17 @@ client_gb_win(Window w)
      struct client *c = SLIST_FIRST(&W->h.client);
 
      while(c && c->win != w)
+          c = SLIST_NEXT(c, next);
+
+     return c;
+}
+
+struct client*
+client_gb_frame(Window w)
+{
+     struct client *c = SLIST_FIRST(&W->h.client);
+
+     while(c && c->frame != w)
           c = SLIST_NEXT(c, next);
 
      return c;
@@ -164,8 +177,8 @@ client_swap2(struct client *c1, struct client *c2)
           return;
 
      /* are swapped geos compatible? */
-     if(client_winsize(c1, &c2->geo, &c1->wgeo)
-        || client_winsize(c2, &c1->geo, &c2->wgeo))
+     if(client_winsize(c1, &c2->geo)
+        || client_winsize(c2, &c1->geo))
           return;
 
      if(c1->screen != c2->screen)
@@ -199,6 +212,8 @@ _swap_get(struct client *c, enum position p)
      return ret;
 }
 
+#define _REV_SBORDER() \
+          draw_reversed_rect(W->root, W->rgc, &c2->geo);
 void
 client_swap(struct client *c, enum position p)
 {
@@ -207,13 +222,6 @@ client_swap(struct client *c, enum position p)
      bool b = true;
      XEvent ev;
      KeySym keysym;
-     GC rgc;
-     XGCValues xgc =
-     {
-          .function       = GXinvert,
-          .subwindow_mode = IncludeInferiors,
-          .line_width     = THEME_DEFAULT->client_border_width
-     };
 
      c2 = _swap_get(c, p);
 
@@ -226,9 +234,7 @@ client_swap(struct client *c, enum position p)
      */
 
      XGrabKeyboard(W->dpy, W->root, True, GrabModeAsync, GrabModeAsync, CurrentTime);
-     rgc = XCreateGC(W->dpy, c->tag->frame, GCFunction | GCSubwindowMode | GCLineWidth, &xgc);
-
-     draw_reversed_rect(c->tag->frame, rgc, c2->geo);
+     _REV_SBORDER();
 
      do
      {
@@ -239,7 +245,7 @@ client_swap(struct client *c, enum position p)
                XKeyPressedEvent *ke = &ev.xkey;
                keysym = XKeycodeToKeysym(W->dpy, (KeyCode)ke->keycode, 0);
 
-               draw_reversed_rect(c->tag->frame, rgc, c2->geo);
+               _REV_SBORDER();
 
                SLIST_FOREACH(k, &W->h.keybind, next)
                     if(k->keysym == keysym && KEYPRESS_MASK(k->mod) == KEYPRESS_MASK(ke->state)
@@ -260,7 +266,7 @@ client_swap(struct client *c, enum position p)
                          }
                     }
 
-               draw_reversed_rect(c->tag->frame, rgc, c2->geo);
+               _REV_SBORDER();
 
                /* Gtfo of this loop */
                if(keysym == XK_Return)
@@ -277,12 +283,11 @@ client_swap(struct client *c, enum position p)
 
      } while(ev.type != KeyPress);
 
-     draw_reversed_rect(c->tag->frame, rgc, c2->geo);
+     _REV_SBORDER();
 
      if(b)
          client_swap2(c, c2);
 
-     XFreeGC(W->dpy, rgc);
      XUngrabKeyboard(W->dpy, CurrentTime);
 }
 
@@ -314,33 +319,47 @@ client_grabbuttons(struct client *c, bool focused)
                ButtonMask, GrabModeAsync, GrabModeSync, None, None);
 }
 
-static inline void
-client_draw_bord(struct client *c)
+static void
+client_frame_update(struct client *c, struct colpair *cp)
 {
-     struct geo ge = { 0, 0, c->screen->ugeo.w, c->screen->ugeo.h };
+     XSetWindowBackground(W->dpy, c->frame, cp->bg);
+     XClearWindow(W->dpy, c->frame);
 
-     draw_rect(c->tag->frame, ge, THEME_DEFAULT->client_n.bg);
+     if(c->titlebar && c->title)
+     {
+          int w = draw_textw(THEME_DEFAULT, c->title);
 
-     /* Selected client's border */
-     if(W->client)
-          draw_rect(W->client->tag->frame, W->client->tag->sel->geo, THEME_DEFAULT->client_s.bg);
+          c->titlebar->fg = cp->fg;
+          c->titlebar->bg = cp->bg;
+
+          barwin_move(c->titlebar, (c->geo.w >> 1) - (w >> 1) - PAD, 0);
+          barwin_resize(c->titlebar, w + (PAD << 1), c->tbarw);
+          barwin_refresh_color(c->titlebar);
+
+          draw_text(c->titlebar->dr, THEME_DEFAULT,
+                    PAD, TEXTY(THEME_DEFAULT, c->tbarw), cp->fg,
+                    c->title);
+
+          barwin_refresh(c->titlebar);
+     }
 }
-
 
 void
 client_focus(struct client *c)
 {
      /* Unfocus selected */
      if(W->client && W->client != c)
+     {
           client_grabbuttons(W->client, false);
+          client_frame_update(W->client, &W->client->ncol);
+     }
 
      /* Focus c */
      if((W->client = c))
      {
           c->tag->sel = c;
-
-          client_draw_bord(c);
           client_grabbuttons(c, true);
+          client_frame_update(c, &c->scol);
 
           XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
      }
@@ -370,6 +389,8 @@ client_get_name(struct client *c)
      /* Still no title... */
      if(!c->title)
           XFetchName(W->dpy, c->win, &(c->title));
+
+     client_frame_update(c, CCOL(c));
 }
 
 /** Close a client
@@ -477,6 +498,33 @@ client_get_sizeh(struct client *c)
           c->flags |= CLIENT_HINT_FLAG;
 }
 
+static void
+client_frame_new(struct client *c)
+{
+     XSetWindowAttributes at =
+     {
+          .background_pixel  = c->ncol.bg,
+          .override_redirect = true,
+          .background_pixmap = ParentRelative,
+          .event_mask        = BARWIN_MASK | BARWIN_ENTERMASK
+     };
+
+     c->frame = XCreateWindow(W->dpy, W->root,
+                              c->geo.x, c->geo.y,
+                              c->geo.w, c->geo.h,
+                              0, CopyFromParent,
+                              InputOutput,
+                              CopyFromParent,
+                              (CWOverrideRedirect | CWBackPixmap
+                               | CWBackPixel | CWEventMask), &at);
+
+     if(c->tbarw > c->border)
+          c->titlebar = barwin_new(c->frame, 0, 0, 1, c->tbarw,
+                                   c->ncol.fg, c->ncol.bg, true);
+
+     XReparentWindow(W->dpy, c->win, c->frame, c->border, c->tbarw);
+}
+
 struct client*
 client_new(Window w, XWindowAttributes *wa)
 {
@@ -493,7 +541,22 @@ client_new(Window w, XWindowAttributes *wa)
      c->geo.y = wa->y;
      c->geo.w = wa->width;
      c->geo.h = wa->height;
-     c->tgeo = c->wgeo = c->owgeo = c->geo;
+     c->tgeo = c->wgeo = c->rgeo = c->geo;
+
+     /*
+      * Conf option set per client, for possibility
+      * to config only one client
+      */
+     c->border = THEME_DEFAULT->client_border_width;
+     if(!(c->tbarw = THEME_DEFAULT->client_titlebar_width))
+          c->tbarw = c->border;
+
+     c->ncol.fg = THEME_DEFAULT->client_n.fg;
+     c->ncol.bg = THEME_DEFAULT->client_n.bg;
+     c->scol.fg = THEME_DEFAULT->client_s.fg;
+     c->scol.bg = THEME_DEFAULT->client_s.bg;
+
+     client_frame_new(c);
 
      /* Set tag */
      client_get_sizeh(c);
@@ -508,7 +571,10 @@ client_new(Window w, XWindowAttributes *wa)
      SLIST_INSERT_HEAD(&W->h.client, c, next);
 
      /* Map */
-     WIN_STATE(w, Map);
+     WIN_STATE(c->frame, Map);
+     if(c->titlebar)
+          barwin_map(c->titlebar);
+
      ewmh_set_wm_state(w, NormalState);
 
      client_get_name(c);
@@ -555,32 +621,29 @@ client_geo_hints(struct geo *g, int *s)
 }
 
 bool
-client_winsize(struct client *c, struct geo *g, struct geo *ret)
+client_winsize(struct client *c, struct geo *g)
 {
-     int ow, bord = THEME_DEFAULT->client_border_width;
-
-     c->owgeo = c->wgeo;
+     int ow;
+     struct geo og = c->wgeo;
 
      /* Window geo */
-     ret->x = g->x + bord;
-     ret->y = g->y + bord;
-     ret->h = g->h - (bord << 1);
-     ret->w = ow = g->w - (bord << 1);
+     c->wgeo.x = c->border;
+     c->wgeo.y = c->tbarw;
+     c->wgeo.h = g->h - (c->border + c->tbarw);
+     c->wgeo.w = ow = g->w - (c->border << 1);
 
-     client_geo_hints(ret, (int*)c->sizeh);
+     client_geo_hints(&c->wgeo, (int*)c->sizeh);
 
      /* Check possible problem for tile integration */
      if(g->w < c->sizeh[MINW] || g->h < c->sizeh[MINH]
-        || g->x < 0 || g->y < 0
-        || ret->x < g->x || ret->y < g->y
-        || ret->h > g->h || ret->w > g->w)
+        || c->wgeo.h > g->h || c->wgeo.w > g->w)
      {
-          *ret = c->wgeo;
+          c->wgeo = og;
           return true;
      }
 
      /* Balance position with new size */
-     ret->x += (ow - ret->w) >> 1;
+     c->wgeo.x += (ow - c->wgeo.w) >> 1;
 
      c->flags |= CLIENT_DID_WINSIZE;
 
@@ -590,11 +653,24 @@ client_winsize(struct client *c, struct geo *g, struct geo *ret)
 void
 client_moveresize(struct client *c, struct geo *g)
 {
-     c->tgeo = c->geo = *g;
+     c->tgeo = c->rgeo = c->geo = *g;
 
      if(!(c->flags & CLIENT_DID_WINSIZE))
-          if(client_winsize(c, g, &c->wgeo))
-               return;
+          if(client_winsize(c, g))
+          {
+               /* TODO
+                * Window required size not compatible
+                * with frame window size in tile mode
+                */
+          }
+
+     /* Real geo regarding full root size */
+     c->rgeo.x += c->screen->ugeo.x;
+     c->rgeo.y += c->screen->ugeo.y;
+
+     XMoveResizeWindow(W->dpy, c->frame,
+                       c->rgeo.x, c->rgeo.y,
+                       c->rgeo.w, c->rgeo.h);
 
      XMoveResizeWindow(W->dpy, c->win,
                        c->wgeo.x, c->wgeo.y,
@@ -602,18 +678,15 @@ client_moveresize(struct client *c, struct geo *g)
 
      c->flags &= ~CLIENT_DID_WINSIZE;
 
-     client_draw_bord(c);
+     client_frame_update(c, CCOL(c));
      client_configure(c);
 }
 
 void
 client_maximize(struct client *c)
 {
-     c->geo = c->tag->screen->ugeo;
-
-     c->geo.x = c->geo.y = 0; /* Frame x/y, not screen geo */
-     c->geo.w = c->tag->screen->ugeo.w;
-     c->geo.h = c->tag->screen->ugeo.h;
+     c->geo = c->screen->ugeo;
+     c->geo.x = c->geo.y = 0;
 
      client_moveresize(c, &c->geo);
 
@@ -684,7 +757,7 @@ _fac_resize(struct client *c, enum position p, int fac)
       * clients in linked list.
       */
      SLIST_FOREACH(gc, &c->tag->clients, tnext)
-          if(client_winsize(gc, &gc->tgeo, &gc->wgeo))
+          if(client_winsize(gc, &gc->tgeo))
           {
                /*
                 * Reverse back the flag and the window geo
@@ -702,7 +775,7 @@ _fac_resize(struct client *c, enum position p, int fac)
 
 #define _REV_BORDER()                           \
      SLIST_FOREACH(gc, &c->tag->clients, tnext) \
-          draw_reversed_rect(c->tag->frame, rgc, gc->tgeo);
+          draw_reversed_rect(W->root, W->rgc, &gc->tgeo);
 void
 client_fac_resize(struct client *c, enum position p, int fac)
 {
@@ -711,13 +784,6 @@ client_fac_resize(struct client *c, enum position p, int fac)
      bool b = true;
      XEvent ev;
      KeySym keysym;
-     GC rgc;
-     XGCValues xgc =
-     {
-          .function       = GXinvert,
-          .subwindow_mode = IncludeInferiors,
-          .line_width     = THEME_DEFAULT->client_border_width
-     };
 
      /* Do it once before */
      _fac_resize(c, p, fac);
@@ -729,7 +795,6 @@ client_fac_resize(struct client *c, enum position p, int fac)
 
      XGrabServer(W->dpy);
      XGrabKeyboard(W->dpy, W->root, True, GrabModeAsync, GrabModeAsync, CurrentTime);
-     rgc = XCreateGC(W->dpy, c->tag->frame, GCFunction | GCSubwindowMode | GCLineWidth, &xgc);
 
      _REV_BORDER();
 
@@ -800,7 +865,6 @@ client_fac_resize(struct client *c, enum position p, int fac)
           }
      }
 
-     XFreeGC(W->dpy, rgc);
      XUngrabServer(W->dpy);
      XUngrabKeyboard(W->dpy, CurrentTime);
 }
@@ -811,6 +875,7 @@ client_remove(struct client *c)
      XGrabServer(W->dpy);
      XSetErrorHandler(wmfs_error_handler_dummy);
      XReparentWindow(W->dpy, c->win, W->root, c->geo.x, c->geo.y);
+     XDestroyWindow(W->dpy, c->frame);
 
      /* Remove from global client list */
      SLIST_REMOVE(&W->h.client, c, client, next);

@@ -46,8 +46,9 @@ event_enternotify(XEvent *e)
                && ev->window != W->root)
           return;
 
-     if((c = client_gb_win(ev->window)))
-     {
+     if((c = client_gb_win(ev->window))
+        || (c = client_gb_frame(ev->window)))
+{
           if(c->flags & CLIENT_IGNORE_ENTER)
                c->flags ^= CLIENT_IGNORE_ENTER;
           else
@@ -193,14 +194,13 @@ event_motionnotify(XEvent *e)
 {
      XMotionEvent *ev = &e->xmotion;
      struct client *c;
-     struct tag *t = W->screen->seltag;
 
      /*
       * Check client window and tag frame to get focused
       * window with mouse motion
       */
      if((c = client_gb_win(ev->subwindow))
-        || (ev->window == t->frame && ((c = client_gb_pos(t, ev->x, ev->y)))))
+        || (c = client_gb_frame(ev->subwindow)))
           if(c != c->tag->sel)
                client_focus(c);
 }
