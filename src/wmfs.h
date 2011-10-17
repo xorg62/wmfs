@@ -223,6 +223,13 @@ struct wmfs
      Atom *net_atom;
      bool running;
 
+     /* FIFO stuffs */
+     struct
+     {
+          char *path;
+          int fd;
+     } fifo;
+
      /* Lists heads */
      struct
      {

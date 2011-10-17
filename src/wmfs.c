@@ -15,6 +15,7 @@
 #include "util.h"
 #include "config.h"
 #include "client.h"
+#include "fifo.h"
 
 int
 wmfs_error_handler(Display *d, XErrorEvent *event)
@@ -241,10 +242,35 @@ static void
 wmfs_loop(void)
 {
      XEvent ev;
+     int fd = ConnectionNumber(W->dpy);
+     int maxfd = fd + 1;
+     fd_set iset;
 
-     while(XPending(W->dpy))
-          while(W->running && !XNextEvent(W->dpy, &ev))
-               EVENT_HANDLE(&ev);
+     if(W->fifo.fd > 0)
+          maxfd += W->fifo.fd;
+
+     while(W->running)
+     {
+          FD_ZERO(&iset);
+          FD_SET(fd, &iset);
+
+          if(W->fifo.fd > 0)
+               FD_SET(W->fifo.fd, &iset);
+
+          if(select(maxfd, &iset, NULL, NULL, NULL) > 0)
+          {
+               if(FD_ISSET(fd, &iset))
+               {
+                    while(XPending(W->dpy))
+                    {
+                         XNextEvent(W->dpy, &ev);
+                         EVENT_HANDLE(&ev);
+                    }
+               }
+               else if(W->fifo.fd > 0 && FD_ISSET(W->fifo.fd, &iset))
+                    fifo_read();
+          }
+     }
 }
 
 static inline void
@@ -255,6 +281,7 @@ wmfs_init(void)
      screen_init();
      event_init();
      config_init();
+     fifo_init();
 }
 
 void
@@ -289,6 +316,14 @@ wmfs_quit(void)
           XFreeFontSet(W->dpy, t->font.fontset);
           free(t);
      }
+
+     /* FIFO stuffs */
+     if(W->fifo.fd > 0)
+     {
+          close(W->fifo.fd);
+          unlink(W->fifo.path);
+     }
+     free(W->fifo.path);
 
      free(W->net_atom);
      free(W);
