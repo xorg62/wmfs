@@ -48,7 +48,7 @@ event_enternotify(XEvent *e)
 
      if((c = client_gb_win(ev->window))
         || (c = client_gb_frame(ev->window)))
-{
+     {
           if(c->flags & CLIENT_IGNORE_ENTER)
                c->flags ^= CLIENT_IGNORE_ENTER;
           else

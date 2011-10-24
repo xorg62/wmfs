@@ -651,7 +651,7 @@ client_winsize(struct client *c, struct geo *g)
 void
 client_moveresize(struct client *c, struct geo *g)
 {
-     c->tgeo = c->rgeo = c->geo = *g;
+     c->ttgeo = c->tgeo = c->rgeo = c->geo = *g;
 
      if(!(c->flags & CLIENT_DID_WINSIZE))
           if(client_winsize(c, g))
@@ -683,8 +683,9 @@ client_moveresize(struct client *c, struct geo *g)
 void
 client_maximize(struct client *c)
 {
-     c->geo = c->screen->ugeo;
      c->geo.x = c->geo.y = 0;
+     c->geo.w = c->screen->ugeo.w;
+     c->geo.h = c->screen->ugeo.h;
 
      client_moveresize(c, &c->geo);
 
@@ -713,7 +714,7 @@ _fac_apply(struct client *c, enum position p, int fac)
                break;
      }
 
-     c->flags |= CLIENT_IGNORE_ENTER;
+     c->flags |= (CLIENT_IGNORE_ENTER | CLIENT_FAC_APPLIED);
 }
 
 static inline void
@@ -737,6 +738,9 @@ _fac_resize(struct client *c, enum position p, int fac)
      if(!gc || gc->screen != c->screen)
           return;
 
+     SLIST_FOREACH(cc, &c->tag->clients, tnext)
+          cc->ttgeo = cc->tgeo;
+
      if(GEO_CHECK2(c->geo, gc->geo, p))
      {
           _fac_apply(c, p, fac);
@@ -755,7 +759,8 @@ _fac_resize(struct client *c, enum position p, int fac)
       * clients in linked list.
       */
      SLIST_FOREACH(gc, &c->tag->clients, tnext)
-          if(client_winsize(gc, &gc->tgeo))
+          if(gc->flags & CLIENT_FAC_APPLIED
+             && client_winsize(gc, &gc->tgeo))
           {
                /*
                 * Reverse back the flag and the window geo
@@ -763,12 +768,13 @@ _fac_resize(struct client *c, enum position p, int fac)
                 */
                SLIST_FOREACH(cc, &c->tag->clients, tnext)
                {
-                    cc->tgeo = cc->geo;
+                    cc->tgeo = cc->ttgeo;
                     cc->flags &= ~CLIENT_DID_WINSIZE;
                }
 
                return;
           }
+
 }
 
 #define _REV_BORDER()                           \
@@ -849,7 +855,10 @@ client_fac_resize(struct client *c, enum position p, int fac)
      if(b)
      {
           SLIST_FOREACH(gc, &c->tag->clients, tnext)
+          {
                client_moveresize(gc, &gc->tgeo);
+               gc->flags &= ~CLIENT_FAC_APPLIED;
+          }
 
           layout_save_set(c->tag);
      }
