@@ -528,7 +528,9 @@ client_frame_new(struct client *c)
 struct client*
 client_new(Window w, XWindowAttributes *wa)
 {
-     struct client *c = xcalloc(1, sizeof(struct client));
+     struct client *c = NULL;
+
+     c = xcalloc(1, sizeof(struct client));
 
      /* C attributes */
      c->win    = w;

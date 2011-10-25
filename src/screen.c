@@ -90,6 +90,9 @@ screen_update_sel(void)
                if(INAREA(x, y, s->geo))
                     break;
 
+          if(!s)
+               s = SLIST_FIRST(&W->h.screen);
+
           return (W->screen = s);
      }
 #endif /* HAVE_XINERAMA */

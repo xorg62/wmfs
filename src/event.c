@@ -79,9 +79,9 @@ event_configureevent(XEvent *e)
                c->geo.y = ev->y; */
 
           if(ev->value_mask & CWWidth)
-               _fac_resize(c, Right, (ev->width - c->geo.w));
+               _fac_resize(c, Right, (ev->width - (c->geo.w - c->border - c->border)));
           if(ev->value_mask & CWHeight)
-               _fac_resize(c, Bottom, (ev->height - c->geo.h));
+               _fac_resize(c, Bottom, (ev->height - (c->geo.h - c->tbarw)));
 
           client_apply_tgeo(c->tag);
      }
