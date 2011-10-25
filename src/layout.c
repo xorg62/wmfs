@@ -105,7 +105,7 @@ layout_free_set(struct tag *t)
 
 #define _REV_BORDER()                 \
      SLIST_FOREACH(g, &l->geos, next) \
-          draw_reversed_rect(W->root, W->rgc, &g->geo);
+          draw_reversed_rect(W->root, &g->geo);
 static void
 _historic_set(struct tag *t, bool prev)
 {

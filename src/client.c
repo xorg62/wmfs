@@ -212,7 +212,7 @@ _swap_get(struct client *c, enum position p)
 }
 
 #define _REV_SBORDER() \
-          draw_reversed_rect(W->root, W->rgc, &c2->geo);
+          draw_reversed_rect(W->root, &c2->geo);
 void
 client_swap(struct client *c, enum position p)
 {
@@ -729,7 +729,7 @@ _fac_arrange_row(struct client *c, enum position p, int fac)
                _fac_apply(cc, p, fac);
 }
 
-static void
+void
 _fac_resize(struct client *c, enum position p, int fac)
 {
      struct client *cc, *gc = client_next_with_pos(c, p);
@@ -774,12 +774,26 @@ _fac_resize(struct client *c, enum position p, int fac)
 
                return;
           }
-
 }
 
-#define _REV_BORDER()                           \
-     SLIST_FOREACH(gc, &c->tag->clients, tnext) \
-          draw_reversed_rect(W->root, W->rgc, &gc->tgeo);
+void
+client_apply_tgeo(struct tag *t)
+{
+     struct client *c;
+
+     SLIST_FOREACH(c, &t->clients, tnext)
+     {
+          client_moveresize(c, &c->tgeo);
+          c->flags &= ~CLIENT_FAC_APPLIED;
+     }
+}
+
+#define _REV_BORDER()                                        \
+     do {                                                    \
+          SLIST_FOREACH(gc, &c->tag->clients, tnext)         \
+               draw_reversed_rect(W->root, &gc->tgeo);       \
+          draw_reversed_cross(W->root, &c->tag->sel->tgeo);  \
+     } while(/* CONSTCOND */ 0);
 void
 client_fac_resize(struct client *c, enum position p, int fac)
 {
@@ -864,13 +878,7 @@ client_fac_resize(struct client *c, enum position p, int fac)
      }
      /* Aborted with escape, Set back original geos */
      else
-     {
-          SLIST_FOREACH(gc, &c->tag->clients, tnext)
-          {
-               gc->tgeo = gc->geo;
-               gc->flags &= ~CLIENT_DID_WINSIZE;
-          }
-     }
+          client_apply_tgeo(c->tag);
 
      XUngrabServer(W->dpy);
      XUngrabKeyboard(W->dpy, CurrentTime);

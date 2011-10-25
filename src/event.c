@@ -73,18 +73,17 @@ event_configureevent(XEvent *e)
 
      if((c = client_gb_win(ev->window)))
      {
-          if(ev->value_mask & CWX)
+         /* if(ev->value_mask & CWX)
                c->geo.x = ev->x;
           if(ev->value_mask & CWY)
-               c->geo.y = ev->y;
+               c->geo.y = ev->y; */
+
           if(ev->value_mask & CWWidth)
-               c->geo.w = ev->width;
+               _fac_resize(c, Right, (ev->width - c->geo.w));
           if(ev->value_mask & CWHeight)
-               c->geo.h = ev->height;
+               _fac_resize(c, Bottom, (ev->height - c->geo.h));
 
-          client_configure(c);
-
-          XMoveResizeWindow(EVDPY(e), c->win, c->geo.x, c->geo.y, c->geo.w, c->geo.h);
+          client_apply_tgeo(c->tag);
      }
      else
      {
