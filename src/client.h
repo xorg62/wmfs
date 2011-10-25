@@ -30,6 +30,7 @@ void client_remove(struct client *c);
 void client_free(void);
 void _fac_resize(struct client *c, enum position p, int fac);
 void client_apply_tgeo(struct tag *t);
+inline void client_fac_hint(struct client *c);
 
 /* Generated */
 void uicb_client_resize_Right(Uicb);

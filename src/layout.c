@@ -382,6 +382,9 @@ layout_split_integrate(struct client *c, struct client *sc)
      client_moveresize(c, &g);
      client_moveresize(sc, &sc->geo);
 
+     client_fac_hint(c);
+     client_fac_hint(sc);
+
      layout_save_set(c->tag);
 }
 

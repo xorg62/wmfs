@@ -623,24 +623,24 @@ client_geo_hints(struct geo *g, int *s)
 bool
 client_winsize(struct client *c, struct geo *g)
 {
-     int ow;
+     int ow, oh;
      struct geo og = c->wgeo;
 
      /* Window geo */
      c->wgeo.x = c->border;
      c->wgeo.y = c->tbarw;
-     c->wgeo.h = g->h - (c->border + c->tbarw);
+     c->wgeo.h = oh = g->h - (c->border + c->tbarw);
      c->wgeo.w = ow = g->w - (c->border << 1);
 
      client_geo_hints(&c->wgeo, (int*)c->sizeh);
 
      /* Check possible problem for tile integration */
-     if(g->w < c->sizeh[MINW] || g->h < c->sizeh[MINH]
-        || c->wgeo.h > g->h || c->wgeo.w > g->w)
-     {
-          c->wgeo = og;
-          return true;
-     }
+     if(ow < c->sizeh[MINW] || oh < c->sizeh[MINH])
+          if(ow + oh < og.w + og.h)
+          {
+               c->wgeo = og;
+               return true;
+          }
 
      /* Balance position with new size */
      c->wgeo.x += (ow - c->wgeo.w) >> 1;
@@ -884,6 +884,25 @@ client_fac_resize(struct client *c, enum position p, int fac)
 
      XUngrabServer(W->dpy);
      XUngrabKeyboard(W->dpy, CurrentTime);
+}
+
+inline void
+client_fac_hint(struct client *c)
+{
+     int w = c->sizeh[MINW] + c->border + c->border;
+     int h = c->sizeh[MINH] + c->tbarw + c->border;
+
+     if(c->geo.w < w)
+          _fac_resize(c, Right, (w - c->geo.w));
+     if(c->tgeo.w < w)
+          _fac_resize(c, Left, (w - c->tgeo.w));
+
+     if(c->geo.h < h)
+          _fac_resize(c, Top, (h - c->geo.h));
+     if(c->tgeo.h < h)
+          _fac_resize(c, Bottom, (h - c->tgeo.h));
+
+     client_apply_tgeo(c->tag);
 }
 
 void
