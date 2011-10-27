@@ -528,9 +528,7 @@ client_frame_new(struct client *c)
 struct client*
 client_new(Window w, XWindowAttributes *wa)
 {
-     struct client *c = NULL;
-
-     c = xcalloc(1, sizeof(struct client));
+     struct client *c = xcalloc(1, sizeof(struct client));
 
      /* C attributes */
      c->win    = w;
@@ -794,7 +792,7 @@ client_apply_tgeo(struct tag *t)
      do {                                                    \
           SLIST_FOREACH(gc, &c->tag->clients, tnext)         \
                draw_reversed_rect(W->root, &gc->tgeo);       \
-          draw_reversed_cross(W->root, &c->tag->sel->tgeo);  \
+      /* draw_reversed_cross(W->root, &c->tag->sel->tgeo);*/ \
      } while(/* CONSTCOND */ 0);
 void
 client_fac_resize(struct client *c, enum position p, int fac)

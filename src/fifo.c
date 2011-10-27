@@ -14,38 +14,30 @@ fifo_init(void)
 {
      xasprintf(&(W->fifo.path), "%s/wmfs-%s.fifo", P_tmpdir, DisplayString(W->dpy));
 
-     if(mkfifo(W->fifo.path, 0644) < 0 || !(W->fifo.fd = open(W->fifo.path, O_NONBLOCK, 0)))
+     if(mkfifo(W->fifo.path, 0644) < 0)
           warnx("Can't create FIFO: %s\n", strerror(errno));
+
+     if(!(W->fifo.fd = open(W->fifo.path, O_NONBLOCK, 0)))
+          warnx("Can't open FIFO: %s\n", strerror(errno));
 }
 
 static void
 fifo_parse(char *cmd)
 {
      void (*func)(Uicb);
-     char *uicb = NULL;
-     char *arg  = NULL;
-     char *p    = NULL;
+     char *p = NULL;
 
      /* remove trailing newline */
      if((p = strchr(cmd, '\n')))
-          *p = 0;
+          *p = '\0';
 
-     /* Check if an argument is present */
+     /* If an argument is present, delimit function string */
      if((p = strchr(cmd, ' ')))
-     {
-          *p = 0;
-          arg = xstrdup(p + 1);
-     }
-     uicb = xstrdup(cmd);
+          *p = '\0';
 
-     /* call the UICB function */
-     func = uicb_name_func(uicb);
-     if(func)
-          func(arg);
-
-     if(arg)
-          free(arg);
-     free(uicb);
+     /* call the UICB function, p + 1 is command or NULL */
+     if((func = uicb_name_func(cmd)))
+          func(p + 1);
 
      XSync(W->dpy, false);
 }
@@ -53,14 +45,8 @@ fifo_parse(char *cmd)
 void
 fifo_read(void)
 {
-     char buf[256] = {0};
+     static char buf[256] = { 0 };
 
-     /* Don't read it if not open */
-     if(!(W->fifo.fd))
-          return;
-
-     read(W->fifo.fd, buf, sizeof(buf) - 1);
-
-     if(buf[0])
+     if(read(W->fifo.fd, buf, sizeof(buf) - 1) > 0)
           fifo_parse(buf);
 }
