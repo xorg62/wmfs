@@ -868,11 +868,7 @@ client_fac_resize(struct client *c, enum position p, int fac)
      /* Success, resize clients */
      if(b)
      {
-          SLIST_FOREACH(gc, &c->tag->clients, tnext)
-          {
-               client_moveresize(gc, &gc->tgeo);
-               gc->flags &= ~CLIENT_FAC_APPLIED;
-          }
+          client_apply_tgeo(c->tag);
 
           layout_save_set(c->tag);
      }
