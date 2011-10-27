@@ -758,7 +758,7 @@ client_manage(Window w, XWindowAttributes *wa, bool ar)
      tags[c->screen][c->tag].flags |= CleanFactFlag;
      cfactor_clean(c);
 
-     at.event_mask = PropertyChangeMask;
+     at.event_mask = EnterWindowMask | LeaveWindowMask | StructureNotifyMask | PropertyChangeMask;
 
      frame_create(c);
      client_size_hints(c);

@@ -119,7 +119,7 @@ buttonpress(XEvent *e)
      if(ib->tags_board)
      {
           for(i = 1; i < conf.ntag[selscreen] + 1; ++i)
-               if(ev->window == ib->tags[i]->win)
+               if(ib->tags[i] && ev->window == ib->tags[i]->win)
                {
                     do_mousebind(selscreen, ev->button, tags[selscreen][i].nmouse, tags[selscreen][i].mouse);
 
