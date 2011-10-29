@@ -222,7 +222,8 @@ struct wmfs
      Flags numlockmask;
      GC gc, rgc;
      Atom *net_atom;
-     bool running;
+     char **argv;
+     bool running, reload;
 
      /* FIFO stuffs */
      struct
@@ -257,7 +258,6 @@ void wmfs_init_font(char *font, struct theme *t);
 void wmfs_quit(void);
 void uicb_reload(Uicb cmd);
 void uicb_quit(Uicb cmd);
-
 
 /* Single global variable */
 struct wmfs *W;

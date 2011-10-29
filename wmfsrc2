@@ -105,7 +105,8 @@
 [keys]
 
   [key] mod = {"Super"} key = "Return" func = "spawn" cmd = "xterm" [/key]
-  [key] mod = {"Control","Alt"} key = "q" func = "quit" [/key]
+  [key] mod = {"Control", "Alt"} key = "q" func = "quit" [/key]
+  [key] mod = {"Control", "Alt"} key = "r" func = " reload" [/key]
   [key] mod = {"Super"} key = "1" func = "tag_set" cmd = "1" [/key]
   [key] mod = {"Super"} key = "2" func = "tag_set" cmd = "2" [/key]
   [key] mod = {"Super"} key = "3" func = "tag_set" cmd = "3" [/key]

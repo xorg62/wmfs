@@ -261,7 +261,7 @@ wmfs_loop(void)
           {
                if(FD_ISSET(fd, &iset))
                {
-                    while(XPending(W->dpy))
+                    while(W->running && XPending(W->dpy))
                     {
                          XNextEvent(W->dpy, &ev);
                          EVENT_HANDLE(&ev);
@@ -289,6 +289,7 @@ wmfs_quit(void)
 {
      struct keybind *k;
      struct theme *t;
+     struct client *c;
 
      /* Will free:
       *
@@ -298,17 +299,14 @@ wmfs_quit(void)
      screen_free();
 
      XFreeGC(W->dpy, W->rgc);
-     XCloseDisplay(W->dpy);
 
-     /* Conf stuffs */
-     while(!SLIST_EMPTY(&W->h.keybind))
+     while(!SLIST_EMPTY(&W->h.client))
      {
-          k = SLIST_FIRST(&W->h.keybind);
-          SLIST_REMOVE_HEAD(&W->h.keybind, next);
-          free((void*)k->cmd);
-          free(k);
+          c = SLIST_FIRST(&W->h.client);
+          client_remove(c);
      }
 
+     /* Conf stuffs */
      while(!SLIST_EMPTY(&W->h.theme))
      {
           t = SLIST_FIRST(&W->h.theme);
@@ -317,18 +315,24 @@ wmfs_quit(void)
           free(t);
      }
 
+     while(!SLIST_EMPTY(&W->h.keybind))
+     {
+          k = SLIST_FIRST(&W->h.keybind);
+          SLIST_REMOVE_HEAD(&W->h.keybind, next);
+          free((void*)k->cmd);
+          free(k);
+     }
+
      /* FIFO stuffs */
      if(W->fifo.fd > 0)
      {
           close(W->fifo.fd);
           unlink(W->fifo.path);
      }
-     free(W->fifo.path);
-
-     free(W->net_atom);
-     free(W);
 
      W->running = false;
+
+     XCloseDisplay(W->dpy);
 }
 
 /** Reload WMFS binary
@@ -337,21 +341,25 @@ void
 uicb_reload(Uicb cmd)
 {
      (void)cmd;
-     /* TODO */
+
+     W->running = false;
+     W->reload  = true;
 }
 
 void
 uicb_quit(Uicb cmd)
 {
      (void)cmd;
+
      W->running = false;
 }
 
 int
 main(int argc, char **argv)
 {
-     W = (struct wmfs*)xcalloc(1, sizeof(struct wmfs));
+     bool r;
 
+     W = (struct wmfs*)xcalloc(1, sizeof(struct wmfs));
 
      /* Get X display */
      if(!(W->dpy = XOpenDisplay(NULL)))
@@ -380,10 +388,14 @@ main(int argc, char **argv)
      /* Core */
      wmfs_init();
      wmfs_scan();
-
      wmfs_loop();
-
      wmfs_quit();
+
+     r = W->reload;
+     free(W);
+
+     if(r)
+          execvp(argv[0], argv);
 
      return 1;
 }

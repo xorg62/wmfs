@@ -904,7 +904,8 @@ client_remove(struct client *c)
 {
      XGrabServer(W->dpy);
      XSetErrorHandler(wmfs_error_handler_dummy);
-     XReparentWindow(W->dpy, c->win, W->root, c->geo.x, c->geo.y);
+     XReparentWindow(W->dpy, c->win, W->root, c->rgeo.x, c->rgeo.y);
+     WIN_STATE(c->win, Map);
      XDestroyWindow(W->dpy, c->frame);
 
      if(c->titlebar)
