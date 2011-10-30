@@ -17,14 +17,18 @@
 struct tag*
 tag_new(struct screen *s, char *name)
 {
-     struct tag *t;
+     struct tag *t, *l;
 
      t = xcalloc(1, sizeof(struct tag));
 
      t->screen = s;
      t->name   = xstrdup(name);
      t->flags  = 0;
+     t->id     = 0;
      t->sel    = NULL;
+
+     if((l = TAILQ_LAST(&s->tags, tsub)))
+          t->id = l->id + 1;
 
      SLIST_INIT(&t->clients);
      TAILQ_INIT(&t->sets);
@@ -90,13 +94,30 @@ tag_client(struct tag *t, struct client *c)
 
      c->tag = t;
 
+     /* Map / Unmap client */
+     if(t == W->screen->seltag)
+     {
+          WIN_STATE(c->frame, Map);
+          ewmh_set_wm_state(c->win, NormalState);
+     }
+     else
+     {
+          WIN_STATE(c->frame, Unmap);
+          ewmh_set_wm_state(c->win, IconicState);
+     }
+
+     client_update_props(c);
+
      /*
       * Insert in new tag list before
       * layout_split_integrate, because of set historic.
       */
      SLIST_INSERT_HEAD(&t->clients, c, tnext);
 
-     layout_split_integrate(c, t->sel);
+     if(c->flags & CLIENT_IGNORE_LAYOUT)
+          c->flags ^= CLIENT_IGNORE_LAYOUT;
+     else
+          layout_split_integrate(c, t->sel);
  }
 
 void

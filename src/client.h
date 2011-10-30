@@ -20,7 +20,7 @@ void client_focus(struct client *c);
 void client_get_name(struct client *c);
 void client_close(struct client *c);
 void uicb_client_close(Uicb cmd);
-struct client *client_new(Window w, XWindowAttributes *wa);
+struct client *client_new(Window w, XWindowAttributes *wa, bool scan);
 bool client_winsize(struct client *c, struct geo *geo);
 void client_moveresize(struct client *c, struct geo *g);
 void client_maximize(struct client *c);
@@ -30,6 +30,7 @@ void client_remove(struct client *c);
 void client_free(void);
 void _fac_resize(struct client *c, enum position p, int fac);
 void client_apply_tgeo(struct tag *t);
+void client_update_props(struct client *c);
 inline void client_fac_hint(struct client *c);
 
 /* Generated */

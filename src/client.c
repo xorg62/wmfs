@@ -526,7 +526,7 @@ client_frame_new(struct client *c)
 }
 
 struct client*
-client_new(Window w, XWindowAttributes *wa)
+client_new(Window w, XWindowAttributes *wa, bool scan)
 {
      struct client *c = xcalloc(1, sizeof(struct client));
 
@@ -558,7 +558,9 @@ client_new(Window w, XWindowAttributes *wa)
 
      /* Set tag */
      client_get_sizeh(c);
-     tag_client(W->screen->seltag, c);
+
+     if(!scan)
+          tag_client(W->screen->seltag, c);
 
      /* X window attributes */
      XSelectInput(W->dpy, w, EnterWindowMask | LeaveWindowMask | StructureNotifyMask | PropertyChangeMask);
@@ -568,18 +570,34 @@ client_new(Window w, XWindowAttributes *wa)
      /* Attach */
      SLIST_INSERT_HEAD(&W->h.client, c, next);
 
-     /* Map */
-     WIN_STATE(c->frame, Map);
-     if(c->titlebar)
-          barwin_map(c->titlebar);
-
      ewmh_set_wm_state(w, NormalState);
 
-     client_get_name(c);
-     client_focus(c);
-     client_configure(c);
+     if(!scan)
+     {
+          client_get_name(c);
+          client_focus(c);
+          client_configure(c);
+     }
 
      return c;
+}
+
+void
+client_update_props(struct client *c)
+{
+     long g[4] = { c->geo.x, c->geo.y, c->geo.w, c->geo.h };
+
+     XChangeProperty(W->dpy, c->win, ATOM("_WMFS_TAG"), XA_CARDINAL, 32,
+                     PropModeReplace, (unsigned char*)&(c->tag->id), 1);
+
+     XChangeProperty(W->dpy, c->win, ATOM("_WMFS_SCREEN"), XA_CARDINAL, 32,
+                     PropModeReplace, (unsigned char*)&(c->screen->id), 1);
+
+     XChangeProperty(W->dpy, c->win, ATOM("_WMFS_FLAGS"), XA_CARDINAL, 32,
+                     PropModeReplace, (unsigned char*)&(c->flags), 1);
+
+     XChangeProperty(W->dpy, c->win, ATOM("_WMFS_GEO"), XA_CARDINAL, 32,
+                     PropModeReplace, (unsigned char*)g, 4);
 }
 
 static void
@@ -677,6 +695,7 @@ client_moveresize(struct client *c, struct geo *g)
      c->flags &= ~CLIENT_DID_WINSIZE;
 
      client_frame_update(c, CCOL(c));
+     client_update_props(c);
      client_configure(c);
 }
 

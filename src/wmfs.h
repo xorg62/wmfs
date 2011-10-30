@@ -132,6 +132,7 @@ struct tag
      struct client *sel;
      struct client *prevsel;
      char *name;
+     int id;
      Flags flags;
      SLIST_HEAD(, client) clients;
      TAILQ_HEAD(ssub, layout_set) sets;
@@ -148,10 +149,11 @@ struct client
      int sizeh[SHLAST];
      char *title;
      int border, tbarw;
-#define CLIENT_HINT_FLAG    0x01
-#define CLIENT_IGNORE_ENTER 0x02
-#define CLIENT_DID_WINSIZE  0x04
-#define CLIENT_FAC_APPLIED  0x08
+#define CLIENT_HINT_FLAG     0x01
+#define CLIENT_IGNORE_ENTER  0x02
+#define CLIENT_DID_WINSIZE   0x04
+#define CLIENT_FAC_APPLIED   0x08
+#define CLIENT_IGNORE_LAYOUT 0x10
      Flags flags;
      Window win, frame;
      SLIST_ENTRY(client) next;  /* Global list */
