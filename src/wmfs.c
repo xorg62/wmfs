@@ -242,12 +242,12 @@ static void
 wmfs_loop(void)
 {
      XEvent ev;
-     int fd = ConnectionNumber(W->dpy);
+     int maxfd, fd = ConnectionNumber(W->dpy);
      fd_set iset;
 
      while(W->running)
      {
-          int maxfd = fd + 1;
+          maxfd = fd + 1;
 
           FD_ZERO(&iset);
           FD_SET(fd, &iset);
@@ -269,15 +269,7 @@ wmfs_loop(void)
                     }
                }
                else if(W->fifo.fd > 0 && FD_ISSET(W->fifo.fd, &iset))
-               {
-                    if(fifo_read() == 0)
-                    {
-                         close(W->fifo.fd);
-
-                         if(!(W->fifo.fd = open(W->fifo.path, O_RDONLY | O_NDELAY, 0)))
-                              warnx("Can't reopen FIFO: %s\n", strerror(errno));
-                    }
-               }
+                    fifo_read();
           }
      }
 }

@@ -14,6 +14,6 @@
 #include <string.h>
 
 void fifo_init(void);
-int fifo_read(void);
+void fifo_read(void);
 
 #endif /* __FIFO_H */

@@ -9,6 +9,16 @@
 #include "config.h"
 #include "fifo.h"
 
+static void
+fifo_open(void)
+{
+     if(W->fifo.fd)
+          close(W->fifo.fd);
+
+     if(!(W->fifo.fd = open(W->fifo.path, O_RDONLY | O_NDELAY, 0)))
+          warnx("Can't open FIFO: %s\n", strerror(errno));
+}
+
 void
 fifo_init(void)
 {
@@ -17,8 +27,7 @@ fifo_init(void)
      if(mkfifo(W->fifo.path, 0644) < 0)
           warnx("Can't create FIFO: %s\n", strerror(errno));
 
-     if(!(W->fifo.fd = open(W->fifo.path, O_RDONLY | O_NDELAY, 0)))
-          warnx("Can't open FIFO: %s\n", strerror(errno));
+     fifo_open();
 }
 
 static void
@@ -42,14 +51,14 @@ fifo_parse(char *cmd)
      XSync(W->dpy, false);
 }
 
-int
+void
 fifo_read(void)
 {
      char buf[256] = { 0 };
-     int ret = 0;
+     int ret;
 
      if((ret = read(W->fifo.fd, buf, sizeof(buf) - 1)) > 0)
           fifo_parse(buf);
-
-     return ret;
+     else if(!ret)
+          fifo_open();
 }
