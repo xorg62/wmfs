@@ -17,7 +17,7 @@ fifo_init(void)
      if(mkfifo(W->fifo.path, 0644) < 0)
           warnx("Can't create FIFO: %s\n", strerror(errno));
 
-     if(!(W->fifo.fd = open(W->fifo.path, O_NONBLOCK, 0)))
+     if(!(W->fifo.fd = open(W->fifo.path, O_RDONLY | O_NDELAY, 0)))
           warnx("Can't open FIFO: %s\n", strerror(errno));
 }
 
@@ -42,11 +42,14 @@ fifo_parse(char *cmd)
      XSync(W->dpy, false);
 }
 
-void
+int
 fifo_read(void)
 {
-     static char buf[256] = { 0 };
+     char buf[256] = { 0 };
+     int ret = 0;
 
-     if(read(W->fifo.fd, buf, sizeof(buf) - 1) > 0)
+     if((ret = read(W->fifo.fd, buf, sizeof(buf) - 1)) > 0)
           fifo_parse(buf);
+
+     return ret;
 }
