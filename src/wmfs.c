@@ -270,12 +270,12 @@ wmfs_loop(void)
                }
                else if(W->fifo.fd > 0 && FD_ISSET(W->fifo.fd, &iset))
                {
-                    if (fifo_read() == 0)
+                    if(fifo_read() == 0)
                     {
-                         close (W->fifo.fd);
+                         close(W->fifo.fd);
 
-                         if (!(W->fifo.fd = open (W->fifo.path, O_RDONLY | O_NDELAY, 0)))
-                              warnx ("Can't reopen FIFO: %s\n", strerror (errno));
+                         if(!(W->fifo.fd = open(W->fifo.path, O_RDONLY | O_NDELAY, 0)))
+                              warnx("Can't reopen FIFO: %s\n", strerror(errno));
                     }
                }
           }
