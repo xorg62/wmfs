@@ -583,21 +583,30 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
 }
 
 void
-client_update_props(struct client *c)
+client_update_props(struct client *c, Flags f)
 {
-     long g[4] = { c->geo.x, c->geo.y, c->geo.w, c->geo.h };
+     if(f & CPROP_LOC)
+     {
+          XChangeProperty(W->dpy, c->win, ATOM("_WMFS_TAG"), XA_CARDINAL, 32,
+                          PropModeReplace, (unsigned char*)&(c->tag->id), 1);
 
-     XChangeProperty(W->dpy, c->win, ATOM("_WMFS_TAG"), XA_CARDINAL, 32,
-                     PropModeReplace, (unsigned char*)&(c->tag->id), 1);
+          XChangeProperty(W->dpy, c->win, ATOM("_WMFS_SCREEN"), XA_CARDINAL, 32,
+                          PropModeReplace, (unsigned char*)&(c->screen->id), 1);
+     }
 
-     XChangeProperty(W->dpy, c->win, ATOM("_WMFS_SCREEN"), XA_CARDINAL, 32,
-                     PropModeReplace, (unsigned char*)&(c->screen->id), 1);
+     if(f & CPROP_FLAG)
+          XChangeProperty(W->dpy, c->win, ATOM("_WMFS_FLAGS"), XA_CARDINAL, 32,
+                          PropModeReplace, (unsigned char*)&(c->flags), 1);
 
-     XChangeProperty(W->dpy, c->win, ATOM("_WMFS_FLAGS"), XA_CARDINAL, 32,
-                     PropModeReplace, (unsigned char*)&(c->flags), 1);
+     if(f & CPROP_GEO)
+     {
+          long g[4] = { (long)c->geo.x, (long)c->geo.y, (long)c->geo.w, (long)c->geo.h };
 
-     XChangeProperty(W->dpy, c->win, ATOM("_WMFS_GEO"), XA_CARDINAL, 32,
-                     PropModeReplace, (unsigned char*)g, 4);
+          XChangeProperty(W->dpy, c->win, ATOM("_WMFS_GEO"), XA_CARDINAL, 32,
+                          PropModeReplace, (unsigned char*)g, 4);
+          putchar(' ');
+          DGEO(c->geo);
+     }
 }
 
 static void
@@ -695,7 +704,7 @@ client_moveresize(struct client *c, struct geo *g)
      c->flags &= ~CLIENT_DID_WINSIZE;
 
      client_frame_update(c, CCOL(c));
-     client_update_props(c);
+     client_update_props(c, CPROP_GEO);
      client_configure(c);
 }
 

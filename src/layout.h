@@ -33,6 +33,7 @@ void layout_save_set(struct tag *t);
 void layout_free_set(struct tag *t);
 void layout_split_integrate(struct client *c, struct client *sc);
 void layout_split_arrange_closed(struct client *ghost);
+inline void layout_fix_hole(struct client *c);
 void uicb_layout_vmirror(Uicb cmd);
 void uicb_layout_hmirror(Uicb cmd);
 void uicb_layout_rotate_left(Uicb cmd);

@@ -181,16 +181,17 @@ wmfs_grab_keys(void)
 static void
 wmfs_scan(void)
 {
-     XWindowAttributes wa;
-     Window usl, usl2, *w = NULL;
-     Atom rt;
      struct geo g;
      struct tag *t;
      struct client *c;
      struct screen *s;
-     int i, n, rf, tag = -1, screen = -1, flags = -1;
+     int i, n, rf;
+     int tag = -1, screen = -1, flags = -1;
      unsigned long ir, il;
      long *ret;
+     XWindowAttributes wa;
+     Window usl, usl2, *w = NULL;
+     Atom rt;
 
      SLIST_INIT(&W->h.client);
 
@@ -201,19 +202,6 @@ wmfs_scan(void)
 
                if(!wa.override_redirect && wa.map_state == IsViewable)
                {
-                    if(XGetWindowProperty(W->dpy, w[i], ATOM("_WMFS_GEO"), 0, 32,
-                                          False, XA_CARDINAL, &rt, &rf, &ir, &il,
-                                          (unsigned char**)&ret)
-                              == Success && ret)
-                    {
-                         g.x = ret[0];
-                         g.y = ret[1];
-                         g.w = ret[2];
-                         g.h = ret[3];
-
-                         XFree(ret);
-                     }
-
                     if(XGetWindowProperty(W->dpy, w[i], ATOM("_WMFS_TAG"), 0, 32,
                                           False, XA_CARDINAL, &rt, &rf, &ir, &il,
                                           (unsigned char**)&ret)
@@ -241,23 +229,36 @@ wmfs_scan(void)
                          XFree(ret);
                     }
 
+                    if(XGetWindowProperty(W->dpy, w[i], ATOM("_WMFS_GEO"), 0, 32,
+                                          False, XA_CARDINAL, &rt, &rf, &ir, &il,
+                                          (unsigned char**)&ret)
+                              == Success && ret)
+                    {
+                         g.x = ret[0];
+                         g.y = ret[1];
+                         g.w = ret[2];
+                         g.h = ret[3];
+
+                         DGEO(g);
+                         XFree(ret);
+                    }
+
                     c = client_new(w[i], &wa, true);
-
-                    c->tgeo = g;
-
                     if(flags != -1)
                          c->flags = flags;
 
                     if(tag != -1 && screen != -1)
                     {
                          c->screen = screen_gb_id(screen);
+
                          TAILQ_FOREACH(t, &c->screen->tags, next)
                               if(t->id == tag)
                               {
                                    c->flags |= CLIENT_IGNORE_LAYOUT;
                                    tag_client(t, c);
+                                   client_moveresize(c, &g);
                                    client_get_name(c);
-                                   client_focus(c);
+                                   /*client_focus(c);*/
                                    break;
                               }
                     }
@@ -265,7 +266,10 @@ wmfs_scan(void)
           }
 
      /*SLIST_FOREACH(c, &W->h.client, next)
-          client_moveresize(c, &c->tgeo);*/
+          client_moveresize(c, &c->tgeo);
+
+     SLIST_FOREACH(c, &W->h.client, next)
+          layout_fix_hole(c);*/
 
      XFree(w);
 }
@@ -336,6 +340,7 @@ wmfs_quit(void)
      while(!SLIST_EMPTY(&W->h.client))
      {
           c = SLIST_FIRST(&W->h.client);
+          client_update_props(c, CPROP_LOC | CPROP_FLAG | CPROP_GEO);
           client_remove(c);
      }
 

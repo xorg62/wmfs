@@ -404,7 +404,7 @@ layout_split_integrate(struct client *c, struct client *sc)
  * |_____|----'| -> |_____|__v__|
  *          ^^^ void
  */
-static inline void
+inline void
 layout_fix_hole(struct client *c)
 {
      struct client *cr = client_next_with_pos(c, Right);

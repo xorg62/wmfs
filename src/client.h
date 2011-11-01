@@ -30,7 +30,12 @@ void client_remove(struct client *c);
 void client_free(void);
 void _fac_resize(struct client *c, enum position p, int fac);
 void client_apply_tgeo(struct tag *t);
-void client_update_props(struct client *c);
+
+#define CPROP_LOC  0x01
+#define CPROP_FLAG 0x02
+#define CPROP_GEO  0x04
+void client_update_props(struct client *c, Flags f);
+
 inline void client_fac_hint(struct client *c);
 
 /* Generated */

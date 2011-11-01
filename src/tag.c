@@ -106,7 +106,7 @@ tag_client(struct tag *t, struct client *c)
           ewmh_set_wm_state(c->win, IconicState);
      }
 
-     client_update_props(c);
+     client_update_props(c, CPROP_LOC);
 
      /*
       * Insert in new tag list before
