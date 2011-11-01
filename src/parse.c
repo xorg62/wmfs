@@ -172,7 +172,7 @@ parse_keywords(const char *filename)
      bool error = false;
 
 
-     if((fd = open(filename, O_RDONLY)) == -1 || stat(filename, &st) == -1)
+     if(stat(filename, &st) == -1 || (fd = open(filename, O_RDONLY)) == -1)
      {
           warn("%s", filename);
           return NULL;
