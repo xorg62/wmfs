@@ -143,6 +143,11 @@ config_tag(void)
      free(ks);
 }
 
+#define ISTRDUP(t, s)             \
+     do {                         \
+          if((tmp = s))           \
+                t = xstrdup(tmp); \
+     } while(/* CONSTCOND */ 0);
 static void
 config_rule(void)
 {
@@ -150,7 +155,7 @@ config_rule(void)
      struct conf_sec *sec, **ks;
      struct rule *r;
      struct theme *t;
-     char *tn;
+     char *tn, *tmp;
 
      /* [rules] */
      sec = fetch_section_first(NULL, "rules");
@@ -164,10 +169,11 @@ config_rule(void)
      {
           r = (struct rule*)xcalloc(1, sizeof(struct rule));
 
-          r->class    = xstrdup(fetch_opt_first(ks[i], "", "class").str);
-          r->instance = xstrdup(fetch_opt_first(ks[i], "", "instance").str);
-          r->role     = xstrdup(fetch_opt_first(ks[i], "", "role").str);
-          r->name     = xstrdup(fetch_opt_first(ks[i], "", "name").str);
+          ISTRDUP(r->class,    fetch_opt_first(ks[i], "", "class").str);
+          ISTRDUP(r->instance, fetch_opt_first(ks[i], "", "instance").str);
+          ISTRDUP(r->role,     fetch_opt_first(ks[i], "", "role").str);
+          ISTRDUP(r->name ,    fetch_opt_first(ks[i], "", "name").str);
+
           r->screen   = fetch_opt_first(ks[i], "-1", "screen").num;
           r->tag      = fetch_opt_first(ks[i], "-1", "tag").num;
 
