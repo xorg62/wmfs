@@ -604,8 +604,7 @@ client_update_props(struct client *c, Flags f)
 
           XChangeProperty(W->dpy, c->win, ATOM("_WMFS_GEO"), XA_CARDINAL, 32,
                           PropModeReplace, (unsigned char*)g, 4);
-          putchar(' ');
-          DGEO(c->geo);
+
      }
 }
 

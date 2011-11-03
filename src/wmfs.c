@@ -239,7 +239,6 @@ wmfs_scan(void)
                          g.w = ret[2];
                          g.h = ret[3];
 
-                         DGEO(g);
                          XFree(ret);
                     }
 
@@ -258,18 +257,11 @@ wmfs_scan(void)
                                    tag_client(t, c);
                                    client_moveresize(c, &g);
                                    client_get_name(c);
-                                   /*client_focus(c);*/
                                    break;
                               }
                     }
                }
           }
-
-     /*SLIST_FOREACH(c, &W->h.client, next)
-          client_moveresize(c, &c->tgeo);
-
-     SLIST_FOREACH(c, &W->h.client, next)
-          layout_fix_hole(c);*/
 
      XFree(w);
 }
@@ -341,6 +333,7 @@ wmfs_quit(void)
      {
           c = SLIST_FIRST(&W->h.client);
           client_update_props(c, CPROP_LOC | CPROP_FLAG | CPROP_GEO);
+          c->flags |= CLIENT_IGNORE_LAYOUT;
           client_remove(c);
      }
 
