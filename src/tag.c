@@ -68,6 +68,8 @@ tag_screen(struct screen *s, struct tag *t)
      s->seltag = t;
 
      infobar_elem_screen_update(s, ElemTag);
+
+     ewmh_update_wmfs_props();
 }
 
 /* Set t to NULL to untag c from c->tag */

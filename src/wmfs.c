@@ -175,8 +175,8 @@ wmfs_grab_keys(void)
           }
 }
 
-/** Scan if there are windows on X
- *  for manage it
+/** Scan xprops of previous session to set it back
+  * Check if there are windows on X (previous sessions windows)
 */
 static void
 wmfs_scan(void)
@@ -184,7 +184,6 @@ wmfs_scan(void)
      struct geo g;
      struct tag *t;
      struct client *c;
-     struct screen *s;
      int i, n, rf;
      int tag = -1, screen = -1, flags = -1;
      unsigned long ir, il;
@@ -194,6 +193,21 @@ wmfs_scan(void)
      Atom rt;
 
      SLIST_INIT(&W->h.client);
+
+     /* Set back selected tag */
+     if(XGetWindowProperty(W->dpy, W->root, W->net_atom[wmfs_current_tag], 0, 32,
+                           False, XA_CARDINAL, &rt, &rf, &ir, &il,
+                           (unsigned char**)&ret)
+               == Success && ret)
+     {
+          struct screen *s;
+
+          for(i = 0; i < (int)ir; ++i)
+          {
+               s = screen_gb_id(i);
+               tag_screen(s, tag_gb_id(s, ret[i]));
+          }
+     }
 
      if(XQueryTree(W->dpy, W->root, &usl, &usl2, &w, (unsigned int*)&n))
           for(i = n - 1; i != -1; --i)
@@ -243,22 +257,17 @@ wmfs_scan(void)
                     }
 
                     c = client_new(w[i], &wa, true);
+
                     if(flags != -1)
                          c->flags = flags;
 
                     if(tag != -1 && screen != -1)
                     {
                          c->screen = screen_gb_id(screen);
-
-                         TAILQ_FOREACH(t, &c->screen->tags, next)
-                              if(t->id == tag)
-                              {
-                                   c->flags |= CLIENT_IGNORE_LAYOUT;
-                                   tag_client(t, c);
-                                   client_moveresize(c, &g);
-                                   client_get_name(c);
-                                   break;
-                              }
+                         c->flags |= CLIENT_IGNORE_LAYOUT;
+                         tag_client(tag_gb_id(c->screen, tag), c);
+                         client_moveresize(c, &g);
+                         client_get_name(c);
                     }
                }
           }
@@ -325,6 +334,8 @@ wmfs_quit(void)
       * Screens -> tags
       *         -> Infobars -> Elements
       */
+     ewmh_update_wmfs_props();
+
      screen_free();
 
      XFreeGC(W->dpy, W->rgc);

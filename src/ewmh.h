@@ -70,5 +70,6 @@ enum
 
 void ewmh_init(void);
 void ewmh_set_wm_state(Window w, int state);
+void ewmh_update_wmfs_props(void);
 
 #endif /* EWMH_H */

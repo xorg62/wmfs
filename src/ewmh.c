@@ -104,3 +104,26 @@ ewmh_set_wm_state(Window w, int state)
                      W->net_atom[wm_state], 32, PropModeReplace, d, 2);
 }
 
+void
+ewmh_update_wmfs_props(void)
+{
+     struct screen *s;
+     int n = 0;
+     unsigned char *cts = NULL;
+
+     SLIST_FOREACH(s, &W->h.screen, next)
+          ++n;
+
+     cts = xcalloc(n, sizeof(char));
+
+     n = 0;
+
+     SLIST_FOREACH(s, &W->h.screen, next)
+          cts[n++] = s->seltag->id;
+
+     XChangeProperty(W->dpy, W->root, W->net_atom[wmfs_current_tag], XA_CARDINAL, 32,
+                     PropModeReplace, (unsigned char*)cts, n);
+
+     free(cts);
+}
+

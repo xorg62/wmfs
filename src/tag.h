@@ -8,6 +8,19 @@
 
 #include "wmfs.h"
 
+
+static inline struct tag*
+tag_gb_id(struct screen *s, int id)
+{
+     struct tag *t;
+
+     TAILQ_FOREACH(t, &s->tags, next)
+          if(t->id == id)
+               return t;
+
+     return TAILQ_FIRST(&s->tags);
+}
+
 struct tag *tag_new(struct screen *s, char *name);
 void tag_screen(struct screen *s, struct tag *t);
 void tag_client(struct tag *t, struct client *c);
