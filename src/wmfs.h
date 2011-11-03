@@ -215,6 +215,21 @@ struct theme
      SLIST_ENTRY(theme) next;
 };
 
+#define RULE_FREE       0x01
+#define RULE_MAX        0x02
+#define RULE_IGNORE_TAG 0x04
+struct rule
+{
+     struct theme *theme;
+     char *class;
+     char *instance;
+     char *role;
+     char *name;
+     int tag, screen;
+     Flags flags;
+     SLIST_ENTRY(rule) next;
+};
+
 struct wmfs
 {
      /* X11 stuffs */
@@ -242,6 +257,7 @@ struct wmfs
           SLIST_HEAD(, keybind) keybind;
           SLIST_HEAD(, barwin) barwin;
           SLIST_HEAD(, theme) theme;
+          SLIST_HEAD(, rule) rule;
      } h;
 
      /*

@@ -182,7 +182,6 @@ static void
 wmfs_scan(void)
 {
      struct geo g;
-     struct tag *t;
      struct client *c;
      int i, n, rf;
      int tag = -1, screen = -1, flags = -1;
@@ -328,6 +327,7 @@ void
 wmfs_quit(void)
 {
      struct keybind *k;
+     struct rule *r;
      struct theme *t;
      struct client *c;
 
@@ -357,6 +357,17 @@ wmfs_quit(void)
           SLIST_REMOVE_HEAD(&W->h.theme, next);
           XFreeFontSet(W->dpy, t->font.fontset);
           free(t);
+     }
+
+     while(!SLIST_EMPTY(&W->h.rule))
+     {
+          r = SLIST_FIRST(&W->h.rule);
+          SLIST_REMOVE_HEAD(&W->h.rule, next);
+          free(r->class);
+          free(r->instance);
+          free(r->role);
+          free(r->name);
+          free(r);
      }
 
      while(!SLIST_EMPTY(&W->h.keybind))

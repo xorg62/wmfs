@@ -144,6 +144,50 @@ config_tag(void)
 }
 
 static void
+config_rule(void)
+{
+     int i, n;
+     struct conf_sec *sec, **ks;
+     struct rule *r;
+     struct theme *t;
+
+     /* [rules] */
+     sec = fetch_section_first(NULL, "rules");
+     ks = fetch_section(sec, "rule");
+     n = fetch_section_count(ks);
+
+     SLIST_INIT(&W->h.rule);
+
+     /* [rule] */
+     for(i = 0; i < n; ++i)
+     {
+          r = (struct rule*)xcalloc(1, sizeof(struct rule));
+
+          r->class    = xstrdup(fetch_opt_first(ks[i], "", "class").str);
+          r->instance = xstrdup(fetch_opt_first(ks[i], "", "instance").str);
+          r->role     = xstrdup(fetch_opt_first(ks[i], "", "role").str);
+          r->name     = xstrdup(fetch_opt_first(ks[i], "", "name").str);
+          r->screen   = fetch_opt_first(ks[i], "-1", "screen").num;
+          r->tag      = fetch_opt_first(ks[i], "-1", "tag").num;
+
+          FLAGAPPLY(r->flags, fetch_opt_first(ks[i], "false", "free").boolean,       RULE_FREE);
+          FLAGAPPLY(r->flags, fetch_opt_first(ks[i], "false", "max").boolean,        RULE_MAX);
+          FLAGAPPLY(r->flags, fetch_opt_first(ks[i], "false", "ignore_tag").boolean, RULE_IGNORE_TAG);
+
+          SLIST_FOREACH(t, &W->h.theme, next)
+               if(!strcmp(fetch_opt_first(ks[i], "", "theme").str, t->name))
+               {
+                    r->theme = t;
+                    break;
+               }
+
+          SLIST_INSERT_HEAD(&W->h.rule, r, next);
+     }
+
+     free(ks);
+}
+
+static void
 config_keybind(void)
 {
      int i, n;
@@ -210,6 +254,7 @@ config_init(void)
      config_keybind();
      config_tag();
      config_bars();
+     config_rule();
 
      free(path);
      free_conf();
