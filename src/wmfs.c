@@ -207,6 +207,8 @@ wmfs_scan(void)
                s = screen_gb_id(i);
                tag_screen(s, tag_gb_id(s, ret[i]));
           }
+
+          XFree(ret);
      }
 
      if(XQueryTree(W->dpy, W->root, &usl, &usl2, &w, (unsigned int*)&n))
