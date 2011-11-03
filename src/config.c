@@ -150,6 +150,7 @@ config_rule(void)
      struct conf_sec *sec, **ks;
      struct rule *r;
      struct theme *t;
+     char *tn;
 
      /* [rules] */
      sec = fetch_section_first(NULL, "rules");
@@ -174,8 +175,9 @@ config_rule(void)
           FLAGAPPLY(r->flags, fetch_opt_first(ks[i], "false", "max").boolean,        RULE_MAX);
           FLAGAPPLY(r->flags, fetch_opt_first(ks[i], "false", "ignore_tag").boolean, RULE_IGNORE_TAG);
 
+          tn = fetch_opt_first(ks[i], "", "theme").str;
           SLIST_FOREACH(t, &W->h.theme, next)
-               if(!strcmp(fetch_opt_first(ks[i], "", "theme").str, t->name))
+               if(!strcmp(tn, t->name))
                {
                     r->theme = t;
                     break;
