@@ -525,6 +525,65 @@ client_frame_new(struct client *c)
      XReparentWindow(W->dpy, c->win, c->frame, c->border, c->tbarw);
 }
 
+#define RINSTANCE 0x01
+#define RCLASS    0x02
+#define RROLE     0x04
+#define RNAME     0x08
+static void
+client_apply_rule(struct client *c)
+{
+     struct rule *r;
+     char *wmname = NULL;
+     char *role = NULL;
+     int f;
+     unsigned char *data = NULL;
+     unsigned long n, il;
+     Flags flags = 0;
+     Atom rf;
+     XClassHint xch;
+
+     XGetClassHint(W->dpy, c->win, &xch);
+
+     /* Get WM_WINDOW_ROLE */
+     if(XGetWindowProperty(W->dpy, c->win, ATOM("WM_WINDOW_ROLE"), 0L, 0x7FFFFFFFL, false,
+                           XA_STRING, &rf, &f, &n, &il, &data)
+               == Success && data)
+     {
+          role = xstrdup((char*)data);
+          XFree(data);
+     }
+
+     /* Get _NET_WM_NAME */
+     if(XGetWindowProperty(W->dpy, c->win, ATOM("_NET_WM_NAME"), 0, 0x77777777, false,
+                           ATOM("UTF8_STRING"), &rf, &f, &n, &il, &data)
+               == Success && data)
+     {
+          wmname = xstrdup((char*)data);
+          XFree(data);
+     }
+
+     SLIST_FOREACH(r, &W->h.rule, next)
+     {
+          FLAGAPPLY(flags, (xch.res_name && r->instance && !strcmp(xch.res_name, r->instance)),      RINSTANCE);
+          FLAGAPPLY(flags, (xch.res_class && r->class && !strcmp(xch.res_class, r->class)),          RCLASS);
+          FLAGAPPLY(flags, ((role && r->role && !strcmp(role, r->role)) || !role || !r->role),       RROLE);
+          FLAGAPPLY(flags, ((wmname && r->name && !strcmp(wmname, r->name)) || !wmname || !r->name), RNAME);
+
+          if(flags & RINSTANCE || flags & RCLASS)
+          {
+               if(flags & RROLE || flags & RNAME)
+               {
+               }
+          }
+     }
+
+     if(role)
+          free(role);
+
+     if(wmname)
+          free(wmname);
+}
+
 struct client*
 client_new(Window w, XWindowAttributes *wa, bool scan)
 {
