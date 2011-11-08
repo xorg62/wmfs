@@ -260,7 +260,7 @@ wmfs_scan(void)
                     c = client_new(w[i], &wa, true);
 
                     if(flags != -1)
-                         c->flags = flags;
+                         c->flags |= flags;
 
                     if(tag != -1 && screen != -1)
                     {

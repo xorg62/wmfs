@@ -575,9 +575,7 @@ client_apply_rule(struct client *c)
                if(flags & RROLE || flags & RNAME)
                {
                     c->screen = screen_gb_id(r->screen);
-
-                    c->tag = tag_gb_id(c->screen, r->tag);
-
+                    c->tag    = tag_gb_id(c->screen, r->tag);
                     c->theme  = r->theme;
 
                     if(r->flags & RULE_FREE)
@@ -640,6 +638,8 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
 
      if(!scan)
           tag_client((c->flags & CLIENT_RULED ? c->tag : c->screen->seltag), c);
+
+     printf("-> %d\n", c->flags & CLIENT_RULED);
 
      /* X window attributes */
      XSelectInput(W->dpy, w, EnterWindowMask | LeaveWindowMask | StructureNotifyMask | PropertyChangeMask);
