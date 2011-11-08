@@ -14,6 +14,7 @@
 #include "layout.h"
 #include "barwin.h"
 #include "draw.h"
+#include "screen.h"
 
 #define CLIENT_MOUSE_MOD Mod1Mask
 
@@ -327,7 +328,7 @@ client_frame_update(struct client *c, struct colpair *cp)
 
      if(c->titlebar && c->title)
      {
-          int w = draw_textw(THEME_DEFAULT, c->title);
+          int w = draw_textw(c->theme, c->title);
 
           c->titlebar->fg = cp->fg;
           c->titlebar->bg = cp->bg;
@@ -336,8 +337,8 @@ client_frame_update(struct client *c, struct colpair *cp)
           barwin_resize(c->titlebar, w + (PAD << 1), c->tbarw);
           barwin_refresh_color(c->titlebar);
 
-          draw_text(c->titlebar->dr, THEME_DEFAULT,
-                    PAD, TEXTY(THEME_DEFAULT, c->tbarw), cp->fg,
+          draw_text(c->titlebar->dr, c->theme,
+                    PAD, TEXTY(c->theme, c->tbarw), cp->fg,
                     c->title);
 
           barwin_refresh(c->titlebar);
@@ -573,6 +574,22 @@ client_apply_rule(struct client *c)
           {
                if(flags & RROLE || flags & RNAME)
                {
+                    c->screen = screen_gb_id(r->screen);
+
+                    c->tag = tag_gb_id(c->screen, r->tag);
+
+                    c->theme  = r->theme;
+
+                    if(r->flags & RULE_FREE)
+                    { /* TODO */ }
+
+                    if(r->flags & RULE_MAX)
+                    { /* TODO */ }
+
+                    if(r->flags & RULE_IGNORE_TAG)
+                    { /* TODO */ }
+
+                    c->flags  = r->flags | CLIENT_RULED;
                }
           }
      }
@@ -591,8 +608,9 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
 
      /* C attributes */
      c->win    = w;
-     c->screen = W->screen;
      c->flags  = 0;
+     c->screen = W->screen;
+     c->theme  = THEME_DEFAULT;
      c->tag    = NULL;
 
      /* struct geometry */
@@ -602,16 +620,18 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
      c->geo.h = wa->height;
      c->tgeo = c->wgeo = c->rgeo = c->geo;
 
+     client_apply_rule(c);
+
      /*
       * Conf option set per client, for possibility
       * to config only one client
       */
-     c->border = THEME_DEFAULT->client_border_width;
-     if(!(c->tbarw = THEME_DEFAULT->client_titlebar_width))
+     c->border = c->theme->client_border_width;
+     if(!(c->tbarw = c->theme->client_titlebar_width))
           c->tbarw = c->border;
 
-     c->ncol = THEME_DEFAULT->client_n;
-     c->scol = THEME_DEFAULT->client_s;
+     c->ncol = c->theme->client_n;
+     c->scol = c->theme->client_s;
 
      client_frame_new(c);
 
@@ -619,7 +639,7 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
      client_get_sizeh(c);
 
      if(!scan)
-          tag_client(W->screen->seltag, c);
+          tag_client((c->flags & CLIENT_RULED ? c->tag : c->screen->seltag), c);
 
      /* X window attributes */
      XSelectInput(W->dpy, w, EnterWindowMask | LeaveWindowMask | StructureNotifyMask | PropertyChangeMask);

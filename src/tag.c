@@ -77,7 +77,7 @@ void
 tag_client(struct tag *t, struct client *c)
 {
      /* Remove client from its previous tag */
-     if(c->tag)
+     if(c->tag && !(c->flags & CLIENT_RULED))
      {
           if(c->tag == t)
                return;
@@ -91,6 +91,8 @@ tag_client(struct tag *t, struct client *c)
                client_focus(client_next(c));
      }
 
+     c->flags &= ~CLIENT_RULED;
+
      /* Client remove */
      if(!t)
           return;
@@ -98,7 +100,7 @@ tag_client(struct tag *t, struct client *c)
      c->tag = t;
 
      /* Map / Unmap client */
-     if(t == W->screen->seltag)
+     if(t == c->screen->seltag)
      {
           WIN_STATE(c->frame, Map);
           ewmh_set_wm_state(c->win, NormalState);
