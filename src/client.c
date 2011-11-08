@@ -639,8 +639,6 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
      if(!scan)
           tag_client((c->flags & CLIENT_RULED ? c->tag : c->screen->seltag), c);
 
-     printf("-> %d\n", c->flags & CLIENT_RULED);
-
      /* X window attributes */
      XSelectInput(W->dpy, w, EnterWindowMask | LeaveWindowMask | StructureNotifyMask | PropertyChangeMask);
      XSetWindowBorderWidth(W->dpy, w, 0);
