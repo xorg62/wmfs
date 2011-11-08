@@ -37,7 +37,7 @@
    [theme]
      name = "perso"
 
-     font = "-*-fixed-bold"
+     font = "-*-fixed-bold-*-*-18"
 
      bars_width = 20
      bars_fg = "#222222"
@@ -45,6 +45,14 @@
 
      tags_sel_bg = "#33AA33"
      tags_normal_fg = "#AA3333"
+
+     client_normal_fg = "#CCCCCC"
+     client_normal_bg = "#222222"
+     client_sel_fg = "#222222"
+     client_sel_bg = "#33AA33"
+
+     client_titlebar_width = 16
+
 
    [/theme]
 
@@ -62,7 +70,7 @@
   #   S Statustext
 
   [bar]
-     position = 1
+     position = 0
      screen = 0
      elements = "t"
      theme = "perso"
@@ -74,18 +82,6 @@
      elements = "t"
      theme = "default"
   [/bar]
-
-  [bar]
-     screen = 1
-     elements = "t"
-     theme = "perso"
-  [/bar]
-    [bar]
-     screen = 1
-     elements = "t"
-     theme = "default"
-  [/bar]
-
 
 [/bars]
 
@@ -102,11 +98,31 @@
 
 [/tags]
 
+[rules]
+
+  [rule]
+      class    = "xterm"
+      instance = "xterm"
+#     role     = ""
+#     name     = ""
+      theme    = "perso"
+
+      tag = 0
+      screen = 0
+
+      free       = false
+      max        = false
+      ignore_tag = false
+  [/rule]
+
+[/rules]
+
 [keys]
 
   [key] mod = {"Super"} key = "Return" func = "spawn" cmd = "xterm" [/key]
-  [key] mod = {"Control", "Alt"} key = "q" func = "quit" [/key]
+  [key] mod = {"Control","Alt"} key = "q" func = "quit" [/key]
   [key] mod = {"Control", "Alt"} key = "r" func = "reload" [/key]
+
   [key] mod = {"Super"} key = "1" func = "tag_set" cmd = "1" [/key]
   [key] mod = {"Super"} key = "2" func = "tag_set" cmd = "2" [/key]
   [key] mod = {"Super"} key = "3" func = "tag_set" cmd = "3" [/key]
