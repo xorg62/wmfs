@@ -590,6 +590,8 @@ client_apply_rule(struct client *c)
                     c->flags  = r->flags | CLIENT_RULED;
                }
           }
+
+          flags = 0;
      }
 
      if(role)
