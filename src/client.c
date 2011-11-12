@@ -319,6 +319,31 @@ client_grabbuttons(struct client *c, bool focused)
                ButtonMask, GrabModeAsync, GrabModeSync, None, None);
 }
 
+static void
+client_tab_etablish(struct client *c)
+{
+     struct chead cs;
+     struct client *cc, *prev = c;
+
+     if(c->tabhead != NULL)
+          while(!SLIST_EMPTY(c->tabhead))
+               SLIST_REMOVE_HEAD(c->tabhead, tbnext);
+
+     SLIST_INIT(&cs);
+     SLIST_INSERT_HEAD(&cs, c, tbnext);
+
+     SLIST_FOREACH(cc, &c->tag->clients, tnext)
+     {
+          if(GEOCMP(c->geo, cc->geo))
+          {
+               SLIST_INSERT_AFTER(prev, cc, tbnext);
+               prev = cc;
+          }
+     }
+
+     c->tabhead = &cs;
+}
+
 #define CCOL(c) (c == c->tag->sel ? &c->scol : &c->ncol)
 static void
 client_frame_update(struct client *c, struct colpair *cp)
@@ -778,6 +803,9 @@ client_moveresize(struct client *c, struct geo *g)
                        c->wgeo.w, c->wgeo.h);
 
      c->flags &= ~CLIENT_DID_WINSIZE;
+
+     if(/* TABBING OPTION */ 1)
+     { /*   client_tab_etablish(c); */ }
 
      client_frame_update(c, CCOL(c));
      client_update_props(c, CPROP_GEO);

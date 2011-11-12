@@ -168,7 +168,7 @@ infobar_elem_remove(struct element *e)
 }
 
 struct infobar*
-infobar_new(struct screen *s, struct theme *theme, enum barpos pos, const char *elem)
+infobar_new(struct screen *s, char *name, struct theme *theme, enum barpos pos, const char *elem)
 {
      bool map;
      struct infobar *i = (struct infobar*)xcalloc(1, sizeof(struct infobar));
@@ -176,6 +176,7 @@ infobar_new(struct screen *s, struct theme *theme, enum barpos pos, const char *
      i->screen = s;
      i->theme = theme;
      i->elemorder = xstrdup(elem);
+     i->name = xstrdup(name);
 
      map = infobar_placement(i, pos);
 
@@ -214,6 +215,7 @@ infobar_remove(struct infobar *i)
      struct element *e;
 
      free(i->elemorder);
+     free(i->name);
 
      TAILQ_FOREACH(e, &i->elements, next)
           infobar_elem_remove(e);

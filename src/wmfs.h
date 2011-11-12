@@ -111,6 +111,7 @@ struct infobar
      struct theme *theme;
      enum barpos pos;
      char *elemorder;
+     char *name;
      TAILQ_HEAD(esub, element) elements;
      SLIST_ENTRY(infobar) next;
 };
@@ -139,6 +140,7 @@ struct tag
      TAILQ_ENTRY(tag) next;
 };
 
+SLIST_HEAD(chead, client);
 struct client
 {
      struct tag *tag;
@@ -147,6 +149,7 @@ struct client
      struct geo geo, wgeo, tgeo, ttgeo, rgeo;
      struct colpair ncol, scol;
      struct theme *theme;
+     struct chead *tabhead;
      int sizeh[SHLAST];
      char *title;
      int border, tbarw;
@@ -158,8 +161,9 @@ struct client
 #define CLIENT_RULED         0x20
      Flags flags;
      Window win, frame;
-     SLIST_ENTRY(client) next;  /* Global list */
-     SLIST_ENTRY(client) tnext; /* struct tag list */
+     SLIST_ENTRY(client) next;   /* Global list */
+     SLIST_ENTRY(client) tnext;  /* struct tag list */
+     SLIST_ENTRY(client) tbnext; /* Tabbed client list */
 };
 
 struct layout_set
@@ -217,9 +221,6 @@ struct theme
      SLIST_ENTRY(theme) next;
 };
 
-#define RULE_FREE       0x01
-#define RULE_MAX        0x02
-#define RULE_IGNORE_TAG 0x04
 struct rule
 {
      struct theme *theme;
@@ -228,6 +229,9 @@ struct rule
      char *role;
      char *name;
      int tag, screen;
+#define RULE_FREE       0x01
+#define RULE_MAX        0x02
+#define RULE_IGNORE_TAG 0x04
      Flags flags;
      SLIST_ENTRY(rule) next;
 };

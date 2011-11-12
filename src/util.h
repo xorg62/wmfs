@@ -32,6 +32,7 @@
 #define ATOI(s)             strtol(s, NULL, 10)
 #define ABS(j)              (j < 0 ? -j : j)
 #define INAREA(i, j, a)     ((i) >= (a).x && (i) <= (a).x + (a).w && (j) >= (a).y && (j) <= (a).y + (a).h)
+#define GEOCMP(g1, g2)      ((g1).x == (g2).x && (g1).y == (g2).y && (g1).w == (g2).w && (g1).h == (g2).h)
 
 /*
  * "#RRGGBB" -> 0xRRGGBB
