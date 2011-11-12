@@ -83,7 +83,7 @@ config_bars(void)
      size_t i, n;
      struct conf_sec *sec, **ks;
      int screenid;
-     char *elem;
+     char *name, *elem;
      enum barpos pos = BarTop;
 
      /* [bars] */
@@ -94,6 +94,7 @@ config_bars(void)
      /* [bar] */
      for(i = 0; i < n; ++i)
      {
+          name = fetch_opt_first(ks[i], "infobar", "name").str;
           elem = fetch_opt_first(ks[i], "", "elements").str;
           screenid = fetch_opt_first(ks[i], "-1", "screen").num;
           t = name_to_theme(fetch_opt_first(ks[i], "default", "theme").str);
@@ -101,7 +102,7 @@ config_bars(void)
 
           SLIST_FOREACH(s, &W->h.screen, next)
                if(screenid == s->id || screenid == -1)
-                    infobar_new(s, t, pos, elem);
+                    infobar_new(s, name, t, pos, elem);
      }
 
      free(ks);

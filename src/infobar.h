@@ -13,7 +13,7 @@
 
 enum { ElemTag = 0, ElemLayout, ElemSelbar, ElemStatus, ElemCustom, ElemLast };
 
-struct infobar *infobar_new(struct screen *s, struct theme *theme, enum barpos pos, const char *elem);
+struct infobar *infobar_new(struct screen *s, char *name, struct theme *theme, enum barpos pos, const char *elem);
 void infobar_elem_update(struct infobar *i);
 void infobar_refresh(struct infobar *i);
 void infobar_remove(struct infobar *i);
@@ -68,5 +68,22 @@ infobar_elem_screen_update(struct screen *s, int addf)
 
      s->elemupdate &= ~FLAGINT(addf);
 }
+
+static inline struct infobar*
+infobar_gb_name(const char *name)
+{
+     struct screen *s;
+     struct infobar *i;
+
+     SLIST_FOREACH(s, &W->h.screen, next)
+     {
+          SLIST_FOREACH(i, &s->infobars, next)
+               if(!strcmp(i->name, name))
+                    return i;
+     }
+
+     return SLIST_FIRST(&s->infobars);
+}
+
 
 #endif /* INFOBAR_H */
