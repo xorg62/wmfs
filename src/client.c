@@ -63,6 +63,13 @@ CLIENT_ACTION_DIR(focus, Left)
 CLIENT_ACTION_DIR(focus, Top)
 CLIENT_ACTION_DIR(focus, Bottom)
 
+/* uicb_client_tab_dir() */
+#define client_tab(c) client_moveresize(W->client, &c->geo)
+CLIENT_ACTION_DIR(tab, Right)
+CLIENT_ACTION_DIR(tab, Left)
+CLIENT_ACTION_DIR(tab, Top)
+CLIENT_ACTION_DIR(tab, Bottom)
+
 /* uicb_client_swap_dir() */
 CLIENT_ACTION_IDIR(swap, Right)
 CLIENT_ACTION_IDIR(swap, Left)
@@ -320,24 +327,30 @@ client_grabbuttons(struct client *c, bool focused)
 }
 
 static void
-client_tab_etablish(struct client *c)
+client_tab_etablish(struct client *c, struct geo *g)
 {
-     struct chead cs;
-     struct client *cc, *prev = c;
-
-     SLIST_INIT(&cs);
-     SLIST_INSERT_HEAD(&cs, c, tbnext);
+     struct client *cc;
 
      SLIST_FOREACH(cc, &c->tag->clients, tnext)
      {
-          if(c != cc && GEOCMP(c->geo, cc->geo))
+          if(c != cc)
           {
-               SLIST_INSERT_AFTER(prev, cc, tbnext);
-               prev = cc;
+               if(GEOCMP(c->geo, cc->geo))
+               {
+                    c->flags |= CLIENT_TABBED | CLIENT_TABMASTER;
+                    cc->flags |= CLIENT_TABBED;
+               }
+               else if(GEOCMP(*g, cc->geo) && cc->flags & CLIENT_TABBED)
+               {
+                    c->flags |= CLIENT_TABBED | CLIENT_TABMASTER;
+                    cc->flags |= CLIENT_TABBING;
+                    client_moveresize(cc, &c->geo);
+               }
           }
      }
 
-     c->tabhead = &cs;
+     if(c->flags & CLIENT_TABMASTER)
+          XRaiseWindow(W->dpy, c->frame);
 }
 
 #define CCOL(c) (c == c->tag->sel ? &c->scol : &c->ncol)
@@ -662,6 +675,13 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
      if(!scan)
           tag_client((c->flags & CLIENT_RULED ? c->tag : c->screen->seltag), c);
 
+     /* Map */
+     if(c->tag == c->screen->seltag)
+     {
+          WIN_STATE(c->frame, Map);
+          ewmh_set_wm_state(c->win, NormalState);
+     }
+
      /* X window attributes */
      XSelectInput(W->dpy, w, EnterWindowMask | LeaveWindowMask | StructureNotifyMask | PropertyChangeMask);
      XSetWindowBorderWidth(W->dpy, w, 0);
@@ -777,6 +797,8 @@ client_winsize(struct client *c, struct geo *g)
 void
 client_moveresize(struct client *c, struct geo *g)
 {
+     struct geo og = c->geo;
+
      c->ttgeo = c->tgeo = c->rgeo = c->geo = *g;
 
      if(!(c->flags & CLIENT_DID_WINSIZE))
@@ -802,8 +824,10 @@ client_moveresize(struct client *c, struct geo *g)
 
      c->flags &= ~CLIENT_DID_WINSIZE;
 
-     if(/* TABBING OPTION */ 1)
-          client_tab_etablish(c);
+     if(c->flags & CLIENT_TABBING)
+          c->flags ^= CLIENT_TABBING;
+     else
+          client_tab_etablish(c, &og);
 
      client_frame_update(c, CCOL(c));
      client_update_props(c, CPROP_GEO);

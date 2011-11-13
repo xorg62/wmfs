@@ -99,18 +99,6 @@ tag_client(struct tag *t, struct client *c)
 
      c->tag = t;
 
-     /* Map / Unmap client */
-     if(t == c->screen->seltag)
-     {
-          WIN_STATE(c->frame, Map);
-          ewmh_set_wm_state(c->win, NormalState);
-     }
-     else
-     {
-          WIN_STATE(c->frame, Unmap);
-          ewmh_set_wm_state(c->win, IconicState);
-     }
-
      client_update_props(c, CPROP_LOC);
 
      /*

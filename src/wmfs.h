@@ -27,7 +27,7 @@
 #define MouseMask  (ButtonMask | PointerMotionMask)
 #define KeyMask    (KeyPressMask | KeyReleaseMask)
 
-typedef unsigned int Flags;
+typedef unsigned long Flags;
 typedef unsigned int Color;
 typedef const char* Uicb;
 
@@ -150,7 +150,6 @@ struct client
      struct geo geo, wgeo, tgeo, ttgeo, rgeo;
      struct colpair ncol, scol;
      struct theme *theme;
-     struct chead *tabhead;
      int sizeh[SHLAST];
      char *title;
      int border, tbarw;
@@ -160,6 +159,9 @@ struct client
 #define CLIENT_FAC_APPLIED   0x08
 #define CLIENT_IGNORE_LAYOUT 0x10
 #define CLIENT_RULED         0x20
+#define CLIENT_TABBED        0x40
+#define CLIENT_TABMASTER     0x80
+#define CLIENT_TABBING       0x100
      Flags flags;
      Window win, frame;
      SLIST_ENTRY(client) next;   /* Global list */
