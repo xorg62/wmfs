@@ -127,6 +127,8 @@ struct screen
      SLIST_ENTRY(screen) next;
 };
 
+SLIST_HEAD(chead, client);
+
 struct tag
 {
      struct screen *screen;
@@ -140,7 +142,6 @@ struct tag
      TAILQ_ENTRY(tag) next;
 };
 
-SLIST_HEAD(chead, client);
 struct client
 {
      struct tag *tag;
