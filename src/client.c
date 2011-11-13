@@ -325,16 +325,12 @@ client_tab_etablish(struct client *c)
      struct chead cs;
      struct client *cc, *prev = c;
 
-     if(c->tabhead != NULL)
-          while(!SLIST_EMPTY(c->tabhead))
-               SLIST_REMOVE_HEAD(c->tabhead, tbnext);
-
      SLIST_INIT(&cs);
      SLIST_INSERT_HEAD(&cs, c, tbnext);
 
      SLIST_FOREACH(cc, &c->tag->clients, tnext)
      {
-          if(GEOCMP(c->geo, cc->geo))
+          if(c != cc && GEOCMP(c->geo, cc->geo))
           {
                SLIST_INSERT_AFTER(prev, cc, tbnext);
                prev = cc;
@@ -807,7 +803,7 @@ client_moveresize(struct client *c, struct geo *g)
      c->flags &= ~CLIENT_DID_WINSIZE;
 
      if(/* TABBING OPTION */ 1)
-     { /*   client_tab_etablish(c); */ }
+          client_tab_etablish(c);
 
      client_frame_update(c, CCOL(c));
      client_update_props(c, CPROP_GEO);
@@ -1003,12 +999,17 @@ client_fac_resize(struct client *c, enum position p, int fac)
      if(b)
      {
           client_apply_tgeo(c->tag);
-
           layout_save_set(c->tag);
      }
      /* Aborted with escape, Set back original geos */
      else
-          client_apply_tgeo(c->tag);
+     {
+          SLIST_FOREACH(gc, &c->tag->clients, tnext)
+          {
+               gc->tgeo = gc->geo;
+               gc->flags &= ~CLIENT_DID_WINSIZE;
+          }
+     }
 
      XUngrabServer(W->dpy);
      XUngrabKeyboard(W->dpy, CurrentTime);
