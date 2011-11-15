@@ -25,6 +25,8 @@
      X##t##Window(W->dpy, w);     \
 } while( /* CONSTCOND */ 0);
 
+#define DMAXH               DisplayHeight(W->dpy, W->xscreen)
+#define DMAXW               DisplayWidth(W->dpy, W->xscreen)
 #define ATOM(a)             XInternAtom(W->dpy, (a), False)
 #define LEN(x)              (sizeof(x) / sizeof(*x))
 #define FLAGINT(i)          (1 << i)
@@ -33,6 +35,10 @@
 #define ABS(j)              (j < 0 ? -j : j)
 #define INAREA(i, j, a)     ((i) >= (a).x && (i) <= (a).x + (a).w && (j) >= (a).y && (j) <= (a).y + (a).h)
 #define GEOCMP(g1, g2)      ((g1).x == (g2).x && (g1).y == (g2).y && (g1).w == (g2).w && (g1).h == (g2).h)
+#define XTABBED(x)          (-DMAXW - x)
+#define YTABBED(y)          (-DMAXH - y)
+#define GEOCMPTAB(g1, g2)   ((g1).x == XTABBED((g2).x) && (g1).y == YTABBED((g2).y) && (g1).w == (g2).w && (g1).h == -(g2).h)
+
 
 /*
  * "#RRGGBB" -> 0xRRGGBB

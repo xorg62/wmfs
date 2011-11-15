@@ -9,6 +9,8 @@
 #include "wmfs.h"
 #include "layout.h"
 
+#define TCLIENT_CHECK(C) (C->flags & CLIENT_TABBED && !(C->flags & CLIENT_TABMASTER))
+
 inline void client_configure(struct client *c);
 struct client *client_gb_win(Window w);
 struct client *client_gb_frame(Window w);

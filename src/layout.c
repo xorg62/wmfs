@@ -274,7 +274,7 @@ layout_split_check_row_dir(struct client *c, struct client *g, enum position p)
 
      SLIST_FOREACH(cc, &c->tag->clients, tnext)
           if(GEO_PARENTROW(cgeo, cc->geo, RPOS(p))
-                    && GEO_CHECK_ROW(cc->geo, g->geo, p))
+             && GEO_CHECK_ROW(cc->geo, g->geo, p))
           {
                s += (LDIR(p) ? cc->geo.h : cc->geo.w);
 
@@ -346,7 +346,7 @@ layout_split_arrange_closed(struct client *ghost)
                g = c->geo;
                SLIST_FOREACH(cc, &c->tag->clients, tnext)
                     if(GEO_PARENTROW(g, cc->geo, RPOS(p))
-                              && GEO_CHECK_ROW(cc->geo, ghost->geo, p))
+                       && GEO_CHECK_ROW(cc->geo, ghost->geo, p))
                     {
                          layout_split_arrange_size(&ghost->geo, cc, p);
                          b = true;
