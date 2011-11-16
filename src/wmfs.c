@@ -128,6 +128,8 @@ wmfs_xinit(void)
      W->xscreen = DefaultScreen(W->dpy);
      W->xdepth = DefaultDepth(W->dpy, W->xscreen);
      W->gc = DefaultGC(W->dpy, W->xscreen);
+     W->xmaxw = DisplayWidth(W->dpy, W->xscreen);
+     W->xmaxh = DisplayHeight(W->dpy, W->xscreen);
 
      /*
       * Keys

@@ -3,9 +3,6 @@
  *  For license, see COPYING.
  */
 
-#include <X11/Xatom.h>
-#include <X11/Xutil.h>
-
 #include "ewmh.h"
 #include "util.h"
 

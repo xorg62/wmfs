@@ -147,7 +147,7 @@ struct client
      struct tag *tag;
      struct screen *screen;
      struct barwin *titlebar;
-     struct geo geo, wgeo, tgeo, ttgeo, rgeo;
+     struct geo geo, wgeo, tgeo, ttgeo, rgeo, *tbgeo;
      struct colpair ncol, scol;
      struct theme *theme;
      struct client *tabmaster;
@@ -247,6 +247,7 @@ struct wmfs
      Display *dpy;
      Window root;
      int xscreen, xdepth;
+     int xmaxw, xmaxh;
      Flags numlockmask;
      GC gc, rgc;
      Atom *net_atom;

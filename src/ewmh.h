@@ -7,6 +7,9 @@
 #ifndef EWMH_H
 #define EWMH_H
 
+#include <X11/Xatom.h>
+#include <X11/Xutil.h>
+
 #include "wmfs.h"
 
 /* Ewmh hints list */

@@ -45,10 +45,7 @@ tag_screen(struct screen *s, struct tag *t)
 
      /* Unmap previous tag's frame */
      SLIST_FOREACH(c, &s->seltag->clients, tnext)
-     {
-          WIN_STATE(c->frame, Unmap);
-          ewmh_set_wm_state(c->win, IconicState);
-     }
+          client_unmap(c);
 
      /*
       * Map selected tag's frame, only if there is
@@ -56,12 +53,7 @@ tag_screen(struct screen *s, struct tag *t)
       */
      if(!SLIST_EMPTY(&t->clients))
      {
-          SLIST_FOREACH(c, &t->clients, tnext)
-          {
-               WIN_STATE(c->frame, Map);
-               ewmh_set_wm_state(c->win, NormalState);
-          }
-
+          client_map(c);
           client_focus(t->sel);
      }
 

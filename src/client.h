@@ -8,6 +8,8 @@
 
 #include "wmfs.h"
 #include "layout.h"
+#include "ewmh.h"
+#include "util.h"
 
 #define TCLIENT_CHECK(C) (C->flags & CLIENT_TABBED && !(C->flags & CLIENT_TABMASTER))
 
@@ -18,6 +20,8 @@ struct client *client_gb_pos(struct tag *t, int x, int y);
 struct client *client_next_with_pos(struct client *bc, enum position p);
 void client_swap2(struct client *c1, struct client *c2);
 void client_swap(struct client *c, enum position p);
+#define CCOL(c) (c == c->tag->sel ? &c->scol : &c->ncol)
+void client_frame_update(struct client *c, struct colpair *cp);
 void client_focus(struct client *c);
 void client_get_name(struct client *c);
 void client_close(struct client *c);
@@ -79,6 +83,36 @@ client_prev(struct client *c)
           cc = SLIST_NEXT(cc, tnext);
 
      return cc;
+}
+
+static inline void
+client_map(struct client *c)
+{
+     WIN_STATE(c->frame, Map);
+     ewmh_set_wm_state(c->win, NormalState);
+}
+
+static inline void
+client_unmap(struct client *c)
+{
+     WIN_STATE(c->frame, Unmap);
+     ewmh_set_wm_state(c->win, IconicState);
+}
+
+static inline void
+_client_tab(struct client *c, struct client *cc)
+{
+     layout_split_arrange_closed(cc);
+
+     /* Fake geo to don't act in layout functions */
+     struct geo g = { W->xmaxw + c->geo.x, W->xmaxh + c->geo.y, c->geo.w, c->geo.h };
+
+     cc->tbgeo = &c->geo;
+
+     cc->flags |= CLIENT_TABBED;
+
+     client_unmap(cc);
+     client_focus(c);
 }
 
 #endif /* CLIENT_H */
