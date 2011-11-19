@@ -53,7 +53,8 @@ tag_screen(struct screen *s, struct tag *t)
       */
      if(!SLIST_EMPTY(&t->clients))
      {
-          client_map(c);
+          SLIST_FOREACH(c, &t->clients, tnext)
+               client_map(c);
           client_focus(t->sel);
      }
 
@@ -76,6 +77,7 @@ tag_client(struct tag *t, struct client *c)
 
           if(!(c->flags & CLIENT_IGNORE_LAYOUT))
                layout_split_arrange_closed(c);
+
 
           SLIST_REMOVE(&c->tag->clients, c, client, tnext);
 

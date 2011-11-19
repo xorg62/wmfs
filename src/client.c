@@ -61,7 +61,7 @@ CLIENT_ACTION_DIR(focus, Top)
 CLIENT_ACTION_DIR(focus, Bottom)
 
 /* uicb_client_tab_dir() */
-#define client_tab(c) _client_tab(c, W->client)
+#define client_tab(c) _client_tab(W->client, c)
 CLIENT_ACTION_DIR(tab, Right)
 CLIENT_ACTION_DIR(tab, Left)
 CLIENT_ACTION_DIR(tab, Top)
@@ -323,6 +323,9 @@ client_grabbuttons(struct client *c, bool focused)
                ButtonMask, GrabModeAsync, GrabModeSync, None, None);
 }
 
+#define _XTEXT()                                \
+     if((xt = ((f >> 1) - (w >> 1) - PAD)) < 0) \
+          xt = 0;
 void
 client_frame_update(struct client *c, struct colpair *cp)
 {
@@ -338,7 +341,7 @@ client_frame_update(struct client *c, struct colpair *cp)
           c->titlebar->bg = cp->bg;
 
           SLIST_FOREACH(cc, &c->tag->clients, tnext)
-               if(cc->tbgeo == &c->geo)
+               if(cc->tabmaster == c)
                     ++n;
 
           barwin_reparent(c->titlebar, c->frame);
@@ -346,8 +349,7 @@ client_frame_update(struct client *c, struct colpair *cp)
           barwin_resize(c->titlebar, (f = (c->geo.w / n)), c->tbarw);
           barwin_refresh_color(c->titlebar);
 
-          if((xt = ((f >> 1) - (w >> 1) - PAD)) < 0)
-               xt = 0;
+          _XTEXT();
 
           draw_text(c->titlebar->dr, c->theme, xt,
                     TEXTY(c->theme, c->tbarw), cp->fg, c->title);
@@ -359,13 +361,12 @@ client_frame_update(struct client *c, struct colpair *cp)
                int x = f;
 
                SLIST_FOREACH(cc, &c->tag->clients, tnext)
-                    if(cc->tbgeo == &c->geo && cc->titlebar)
+                    if(cc->tabmaster == c && cc->titlebar)
                     {
                          cc->titlebar->bg = c->ncol.bg;
 
                          w = draw_textw(c->theme, cc->title);
-                         if((xt = ((f >> 1) - (w >> 1) - PAD)) < 0)
-                              xt = 0;
+                         _XTEXT();
 
                          barwin_map(cc->titlebar);
                          barwin_reparent(cc->titlebar, c->frame);
@@ -385,6 +386,110 @@ client_frame_update(struct client *c, struct colpair *cp)
 }
 
 void
+_client_tab(struct client *c, struct client *cm)
+{
+     /* Do not tab already tabed client */
+     if(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER))
+          return;
+
+     layout_split_arrange_closed(c);
+
+     struct geo g = cm->geo;
+
+     /* Isolate tabbed client */
+     client_unmap(c);
+     g.x += W->xmaxw;
+     g.y += W->xmaxh;
+     c->geo = c->tgeo = g;
+
+     c->tabmaster = cm;
+     cm->tabmaster = NULL;
+
+     c->flags |= CLIENT_TABBED;
+     cm->flags |= CLIENT_TABMASTER;
+
+     client_focus(cm);
+}
+
+
+static void
+client_tab_focus(struct client *c)
+{
+     if(c->flags & CLIENT_TABBED && c->tabmaster)
+     {
+          struct client *cc;
+          struct geo g = c->tabmaster->geo;
+
+          c->flags |=  CLIENT_TABMASTER;
+          c->flags &= ~CLIENT_TABBED;
+          client_moveresize(c, &c->tabmaster->geo);
+          client_map(c);
+
+          c->tabmaster->flags &= ~CLIENT_TABMASTER;
+          c->tabmaster->flags |=  CLIENT_TABBED;
+          client_unmap(c->tabmaster);
+
+          if(!(c->flags & CLIENT_DYING))
+          {
+               g.x += W->xmaxw;
+               g.y += W->xmaxh;
+               c->tabmaster->geo = c->tabmaster->tgeo = g;
+          }
+
+          SLIST_FOREACH(cc, &c->tag->clients, tnext)
+               if(cc != c && cc->tabmaster == c->tabmaster)
+                    cc->tabmaster = c;
+
+          c->tabmaster->tabmaster = c;
+          c->tabmaster = NULL;
+     }
+}
+
+static void
+client_untab(struct client *c)
+{
+     struct client *cc = c->tabmaster;
+     struct geo og = c->geo;
+
+     if(!(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER)))
+          return;
+
+     c->flags &= ~CLIENT_TABMASTER;
+
+     if(!cc)
+          SLIST_FOREACH(cc, &c->tag->clients, tnext)
+               if(cc->tabmaster == c)
+                    break;
+
+     if(cc)
+     {
+          client_tab_focus(cc);
+          c->flags &= ~CLIENT_TABBED;
+          c->tabmaster = NULL;
+
+          if(!(c->flags & CLIENT_DYING))
+          {
+               c->geo = c->tgeo = og;
+
+               layout_split_integrate(c, cc);
+               client_moveresize(c, &c->geo);
+               client_map(c);
+          }
+
+          client_frame_update(cc, CCOL(cc));
+     }
+}
+
+void
+uicb_client_untab(Uicb cmd)
+{
+     (void)cmd;
+
+     if(W->client)
+          client_untab(W->client);
+}
+
+void
 client_focus(struct client *c)
 {
      /* Unfocus selected */
@@ -399,35 +504,7 @@ client_focus(struct client *c)
      {
           c->tag->sel = c;
           client_grabbuttons(c, true);
-
-          if(c->flags & CLIENT_TABBED)
-          {
-               struct geo ocg = c->geo;
-               struct client *cc, *tc;
-
-               SLIST_FOREACH(cc, &c->tag->clients, tnext)
-                    if(c->tbgeo == &cc->geo)
-                    {
-                         c->flags  &= ~CLIENT_TABBED;
-                         cc->flags |=  CLIENT_TABBED;
-
-                         client_map(c);
-                         client_unmap(cc);
-
-                         client_moveresize(c, c->tbgeo);
-                         client_moveresize(cc, &ocg);
-
-                         cc->tbgeo = &c->geo;
-                         c->tbgeo  = NULL;
-
-                         SLIST_FOREACH(tc, &c->tag->clients, tnext)
-                              if(tc->flags & CLIENT_TABBED && tc->tbgeo == &cc->geo)
-                                   tc->tbgeo = &c->geo;
-
-                         break;
-                    }
-          }
-
+          client_tab_focus(c);
           client_frame_update(c, &c->scol);
           XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
      }
@@ -829,8 +906,6 @@ client_winsize(struct client *c, struct geo *g)
 void
 client_moveresize(struct client *c, struct geo *g)
 {
-     struct geo og = c->geo;
-
      if(c->flags & CLIENT_TABBED)
           return;
 
@@ -846,11 +921,8 @@ client_moveresize(struct client *c, struct geo *g)
           }
 
      /* Real geo regarding full root size */
-     if(!(c->flags & CLIENT_TABSLAVE))
-     {
-          c->rgeo.x += c->screen->ugeo.x;
-          c->rgeo.y += c->screen->ugeo.y;
-     }
+     c->rgeo.x += c->screen->ugeo.x;
+     c->rgeo.y += c->screen->ugeo.y;
 
      XMoveResizeWindow(W->dpy, c->frame,
                        c->rgeo.x, c->rgeo.y,
@@ -1094,10 +1166,12 @@ client_fac_hint(struct client *c)
 void
 client_remove(struct client *c)
 {
+     c->flags |= CLIENT_DYING;
      XGrabServer(W->dpy);
      XSetErrorHandler(wmfs_error_handler_dummy);
      XReparentWindow(W->dpy, c->win, W->root, c->rgeo.x, c->rgeo.y);
-     WIN_STATE(c->win, Map);
+     client_map(c);
+     client_untab(c);
      XDestroyWindow(W->dpy, c->frame);
 
      if(c->titlebar)

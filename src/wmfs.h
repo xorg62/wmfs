@@ -162,8 +162,7 @@ struct client
 #define CLIENT_RULED         0x20
 #define CLIENT_TABBED        0x40
 #define CLIENT_TABMASTER     0x80
-#define CLIENT_TABBING       0x100
-#define CLIENT_TABSLAVE      0x200
+#define CLIENT_DYING         0x100 /* Saddest flag ever */
      Flags flags;
      Window win, frame;
      SLIST_ENTRY(client) next;   /* Global list */

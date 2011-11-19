@@ -22,6 +22,8 @@ void client_swap2(struct client *c1, struct client *c2);
 void client_swap(struct client *c, enum position p);
 #define CCOL(c) (c == c->tag->sel ? &c->scol : &c->ncol)
 void client_frame_update(struct client *c, struct colpair *cp);
+void client_tab_pull(struct client *c);
+void _client_tab(struct client *c, struct client *cm);
 void client_focus(struct client *c);
 void client_get_name(struct client *c);
 void client_close(struct client *c);
@@ -43,6 +45,7 @@ void client_apply_tgeo(struct tag *t);
 void client_update_props(struct client *c, Flags f);
 
 inline void client_fac_hint(struct client *c);
+void uicb_client_untab(Uicb cmd);
 
 /* Generated */
 void uicb_client_resize_Right(Uicb);
@@ -85,6 +88,23 @@ client_prev(struct client *c)
      return cc;
 }
 
+static inline struct client*
+clien_tab_next(struct client *c)
+{
+     struct client *cc;
+
+     if(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER))
+          SLIST_FOREACH(cc, &c->tag->clients, tnext)
+          {
+               if(c == cc)
+                    continue;
+               if(c->tabmaster == c || c->tabmaster == c->tabmaster)
+                    return cc;
+          }
+
+     return NULL;
+}
+
 static inline void
 client_map(struct client *c)
 {
@@ -100,19 +120,37 @@ client_unmap(struct client *c)
 }
 
 static inline void
-_client_tab(struct client *c, struct client *cc)
+client_tab_slave(struct client *c)
 {
-     layout_split_arrange_closed(cc);
-
-     /* Fake geo to don't act in layout functions */
      struct geo g = { W->xmaxw + c->geo.x, W->xmaxh + c->geo.y, c->geo.w, c->geo.h };
 
-     cc->tbgeo = &c->geo;
+     c->flags &= ~CLIENT_TABMASTER;
+     c->flags |=  CLIENT_TABBED;
 
-     cc->flags |= CLIENT_TABBED;
+     c->geo = c->tgeo = g;
 
-     client_unmap(cc);
-     client_focus(c);
+     client_unmap(c);
+}
+
+static inline void
+client_tab_master(struct client *c)
+{
+     struct client *cc;
+
+     c->flags |=  CLIENT_TABMASTER;
+     c->flags &= ~CLIENT_TABBED;
+
+     client_moveresize(c, &c->tabmaster->geo);
+     client_map(c);
+     client_tab_slave(c->tabmaster);
+
+     /* Parent tabbed client take new master as tabmaster */
+     SLIST_FOREACH(cc, &c->tag->clients, tnext)
+          if(cc->tabmaster == c->tabmaster)
+               cc->tabmaster = c;
+
+     c->tabmaster->tabmaster = c;
+     c->tabmaster = NULL;
 }
 
 #endif /* CLIENT_H */

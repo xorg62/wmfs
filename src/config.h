@@ -60,6 +60,7 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "client_focus_prev",    uicb_client_focus_prev },
      { "client_swap_next",     uicb_client_swapsel_next },
      { "client_swap_prev",     uicb_client_swapsel_prev },
+     { "client_untab",         uicb_client_untab },
      { NULL, NULL }
 };
 
