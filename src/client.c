@@ -329,6 +329,9 @@ client_grabbuttons(struct client *c, bool focused)
 void
 client_frame_update(struct client *c, struct colpair *cp)
 {
+     if(c->flags & CLIENT_TABBED)
+          return;
+
      XSetWindowBackground(W->dpy, c->frame, cp->bg);
      XClearWindow(W->dpy, c->frame);
 
@@ -340,25 +343,26 @@ client_frame_update(struct client *c, struct colpair *cp)
           c->titlebar->fg = cp->fg;
           c->titlebar->bg = cp->bg;
 
-          SLIST_FOREACH(cc, &c->tag->clients, tnext)
-               if(cc->tabmaster == c)
-                    ++n;
+          /* Get number of tabbed client if c is tabmaster */
+          if(c->flags & CLIENT_TABMASTER)
+               SLIST_FOREACH(cc, &c->tag->clients, tnext)
+                    if(cc->tabmaster == c)
+                         ++n;
 
-          f = (c->geo.w - (c->border * (n - 1))) / n;
+          f = (c->geo.w - (c->border * (n - 2))) / n;
+          y = TEXTY(c->theme, c->tbarw);
+
+          _XTEXT();
 
           barwin_reparent(c->titlebar, c->frame);
           barwin_move(c->titlebar, 0, 0);
           barwin_resize(c->titlebar, f, c->tbarw);
           barwin_refresh_color(c->titlebar);
-
-          _XTEXT();
-
-          draw_text(c->titlebar->dr, c->theme, xt,
-                    (y = TEXTY(c->theme, c->tbarw)), cp->fg, c->title);
+          draw_text(c->titlebar->dr, c->theme, xt, y, cp->fg, c->title);
           barwin_refresh(c->titlebar);
 
           /* Tabbing case, multiple titlebar in frame */
-          if(n > 1)
+          if(c->flags & CLIENT_TABMASTER && n > 1)
           {
                int x = f;
 
@@ -376,8 +380,8 @@ client_frame_update(struct client *c, struct colpair *cp)
                          barwin_resize(cc->titlebar, f, c->tbarw);
                          barwin_refresh_color(cc->titlebar);
 
-                         draw_text(cc->titlebar->dr, c->theme, xt,
-                                   y, c->ncol.fg, cc->title);
+                         draw_text(cc->titlebar->dr, c->theme, xt, y,
+                                   c->ncol.fg, cc->title);
 
                          barwin_refresh(cc->titlebar);
 
@@ -386,33 +390,6 @@ client_frame_update(struct client *c, struct colpair *cp)
           }
      }
 }
-
-void
-_client_tab(struct client *c, struct client *cm)
-{
-     /* Do not tab already tabed client */
-     if(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER))
-          return;
-
-     layout_split_arrange_closed(c);
-
-     struct geo g = cm->geo;
-
-     /* Isolate tabbed client */
-     client_unmap(c);
-     g.x += W->xmaxw;
-     g.y += W->xmaxh;
-     c->geo = c->tgeo = g;
-
-     c->tabmaster = cm;
-     cm->tabmaster = NULL;
-
-     c->flags |= CLIENT_TABBED;
-     cm->flags |= CLIENT_TABMASTER;
-
-     client_focus(cm);
-}
-
 
 static void
 client_tab_focus(struct client *c)
@@ -445,6 +422,22 @@ client_tab_focus(struct client *c)
           c->tabmaster->tabmaster = c;
           c->tabmaster = NULL;
      }
+}
+
+void
+_client_tab(struct client *c, struct client *cm)
+{
+     /* Do not tab already tabed client */
+     if(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER))
+          return;
+
+     layout_split_arrange_closed(c);
+
+     cm->flags |= CLIENT_TABBED;
+     c->geo = cm->geo;
+     cm->tabmaster = c;
+
+     client_focus(cm);
 }
 
 static void

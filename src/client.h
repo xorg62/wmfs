@@ -91,7 +91,7 @@ client_prev(struct client *c)
 static inline struct client*
 client_tab_next(struct client *c)
 {
-     return (c->flags & CLIENT_TABBED ? c->tabmaster : c);
+     return (c && c->tabmaster ? c->tabmaster : c);
 }
 
 static inline void
