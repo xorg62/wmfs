@@ -54,7 +54,12 @@ tag_screen(struct screen *s, struct tag *t)
      if(!SLIST_EMPTY(&t->clients))
      {
           SLIST_FOREACH(c, &t->clients, tnext)
-               client_map(c);
+               if(!(c->flags & CLIENT_TABBED))
+                    client_map(c);
+
+          if(t->sel->flags & CLIENT_TABBED)
+               t->sel = t->sel->tabmaster;
+
           client_focus(t->sel);
      }
 
@@ -69,10 +74,12 @@ tag_screen(struct screen *s, struct tag *t)
 void
 tag_client(struct tag *t, struct client *c)
 {
+     struct tag *ot = c->tag;
+
      /* Remove client from its previous tag */
      if(c->tag && !(c->flags & CLIENT_RULED))
      {
-          if(c->tag == t)
+          if(c->tag == t || c->flags & CLIENT_TABBED)
                return;
 
           if(!(c->flags & CLIENT_IGNORE_LAYOUT))
@@ -105,7 +112,16 @@ tag_client(struct tag *t, struct client *c)
           c->flags ^= CLIENT_IGNORE_LAYOUT;
      else
           layout_split_integrate(c, t->sel);
- }
+
+     if(c->flags & CLIENT_TABMASTER)
+     {
+          struct client *cc;
+
+          SLIST_FOREACH(cc, &ot->clients, tnext)
+               if(cc->tabmaster == c)
+                    cc->tag = t;
+     }
+}
 
 void
 uicb_tag_set(Uicb cmd)

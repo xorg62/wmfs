@@ -454,12 +454,12 @@ client_untab(struct client *c)
      if(!(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER)))
           return;
 
-     c->flags &= ~CLIENT_TABMASTER;
-
      if(!cc)
+     {
           SLIST_FOREACH(cc, &c->tag->clients, tnext)
                if(cc->tabmaster == c)
                     break;
+     }
 
      if(cc)
      {
@@ -643,6 +643,26 @@ client_get_sizeh(struct client *c)
           c->flags |= CLIENT_HINT_FLAG;
 }
 
+/* Window id (unsigned int) is casted in Uicb type (char*) and restored */
+void
+uicb_client_focus_with_wid(Uicb cmd)
+{
+     struct client *c;
+     size_t i;
+     Window id = 0;
+
+     /* Re-build window id from cmd string */
+     for(i = 0; i < sizeof(Window); ++i)
+          ((char*)&id)[i] = cmd[i];
+
+     SLIST_FOREACH(c, &W->h.client, next)
+          if(c->win == id)
+          {
+               client_focus(c);
+               return;
+          }
+}
+
 static void
 client_frame_new(struct client *c)
 {
@@ -664,8 +684,17 @@ client_frame_new(struct client *c)
                                | CWBackPixel | CWEventMask), &at);
 
      if(c->tbarw > c->border)
+     {
+          struct geo g;
+          Uicb cmd = (Uicb)&c->win;
+
           c->titlebar = barwin_new(c->frame, 0, 0, 1, c->tbarw,
                                    c->ncol.fg, c->ncol.bg, true);
+
+          /* TODO: Refer to titlebar config */
+          barwin_mousebind_new(c->titlebar, Button1, false, g,
+                               uicb_client_focus_with_wid, cmd);
+     }
 
      XReparentWindow(W->dpy, c->win, c->frame, c->border, c->tbarw);
 }

@@ -104,8 +104,7 @@ barwin_mousebind_new(struct barwin *b, unsigned int button, bool u, struct geo a
      m->use_area = u;
      m->area = a;
      m->func = func;
-
-     m->cmd = (cmd ? xstrdup(cmd) : NULL);
+     m->cmd = cmd;
 
      SLIST_INSERT_HEAD(&b->mousebinds, m, next);
 }
