@@ -51,7 +51,7 @@ event_enternotify(XEvent *e)
      {
           if(c->flags & CLIENT_IGNORE_ENTER)
                c->flags ^= CLIENT_IGNORE_ENTER;
-          else
+          else if(c != W->client)
                client_focus(c);
      }
 }
@@ -112,7 +112,9 @@ event_destroynotify(XEvent *e)
 static void
 event_focusin(XEvent *e)
 {
-     if(W->client && e->xfocus.window != W->client->win)
+     if(W->client
+        && e->xfocus.window != W->client->win
+        && e->xfocus.window != W->client->frame)
           client_focus(W->client);
 }
 
@@ -189,22 +191,6 @@ event_unmapnotify(XEvent *e)
 }
 
 static void
-event_motionnotify(XEvent *e)
-{
-     XMotionEvent *ev = &e->xmotion;
-     struct client *c;
-
-     /*
-      * Check client window and tag frame to get focused
-      * window with mouse motion
-      */
-     if((c = client_gb_win(ev->subwindow))
-        || (c = client_gb_frame(ev->subwindow)))
-          if(c != c->tag->sel)
-               client_focus(c);
-}
-
-static void
 event_keypress(XEvent *e)
 {
      XKeyPressedEvent *ev = &e->xkey;
@@ -259,7 +245,6 @@ event_init(void)
      /*event_handle[MapNotify]        = event_mapnotify;*/
      event_handle[MapRequest]       = event_maprequest;
      event_handle[MappingNotify]    = event_mappingnotify;
-     event_handle[MotionNotify]     = event_motionnotify;
      event_handle[PropertyNotify]   = event_propertynotify;
      /*event_handle[ReparentNotify]   = event_reparentnotify;*/
      /*event_handle[SelectionClear]   = event_selectionclearevent;*/

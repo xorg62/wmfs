@@ -89,20 +89,9 @@ client_prev(struct client *c)
 }
 
 static inline struct client*
-clien_tab_next(struct client *c)
+client_tab_next(struct client *c)
 {
-     struct client *cc;
-
-     if(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER))
-          SLIST_FOREACH(cc, &c->tag->clients, tnext)
-          {
-               if(c == cc)
-                    continue;
-               if(c->tabmaster == c || c->tabmaster == c->tabmaster)
-                    return cc;
-          }
-
-     return NULL;
+     return (c->flags & CLIENT_TABBED ? c->tabmaster : c);
 }
 
 static inline void
@@ -117,40 +106,6 @@ client_unmap(struct client *c)
 {
      WIN_STATE(c->frame, Unmap);
      ewmh_set_wm_state(c->win, IconicState);
-}
-
-static inline void
-client_tab_slave(struct client *c)
-{
-     struct geo g = { W->xmaxw + c->geo.x, W->xmaxh + c->geo.y, c->geo.w, c->geo.h };
-
-     c->flags &= ~CLIENT_TABMASTER;
-     c->flags |=  CLIENT_TABBED;
-
-     c->geo = c->tgeo = g;
-
-     client_unmap(c);
-}
-
-static inline void
-client_tab_master(struct client *c)
-{
-     struct client *cc;
-
-     c->flags |=  CLIENT_TABMASTER;
-     c->flags &= ~CLIENT_TABBED;
-
-     client_moveresize(c, &c->tabmaster->geo);
-     client_map(c);
-     client_tab_slave(c->tabmaster);
-
-     /* Parent tabbed client take new master as tabmaster */
-     SLIST_FOREACH(cc, &c->tag->clients, tnext)
-          if(cc->tabmaster == c->tabmaster)
-               cc->tabmaster = c;
-
-     c->tabmaster->tabmaster = c;
-     c->tabmaster = NULL;
 }
 
 #endif /* CLIENT_H */

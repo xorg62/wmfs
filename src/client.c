@@ -325,7 +325,7 @@ client_grabbuttons(struct client *c, bool focused)
 
 #define _XTEXT()                                \
      if((xt = ((f >> 1) - (w >> 1) - PAD)) < 0) \
-          xt = 0;
+          xt = 1;
 void
 client_frame_update(struct client *c, struct colpair *cp)
 {
@@ -335,7 +335,7 @@ client_frame_update(struct client *c, struct colpair *cp)
      if(c->titlebar && c->title)
      {
           struct client *cc;
-          int f, n = 1, xt, w = draw_textw(c->theme, c->title);
+          int y, f, n = 1, xt, w = draw_textw(c->theme, c->title);
 
           c->titlebar->fg = cp->fg;
           c->titlebar->bg = cp->bg;
@@ -344,15 +344,17 @@ client_frame_update(struct client *c, struct colpair *cp)
                if(cc->tabmaster == c)
                     ++n;
 
+          f = (c->geo.w - (c->border * (n - 1))) / n;
+
           barwin_reparent(c->titlebar, c->frame);
           barwin_move(c->titlebar, 0, 0);
-          barwin_resize(c->titlebar, (f = (c->geo.w / n)), c->tbarw);
+          barwin_resize(c->titlebar, f, c->tbarw);
           barwin_refresh_color(c->titlebar);
 
           _XTEXT();
 
           draw_text(c->titlebar->dr, c->theme, xt,
-                    TEXTY(c->theme, c->tbarw), cp->fg, c->title);
+                    (y = TEXTY(c->theme, c->tbarw)), cp->fg, c->title);
           barwin_refresh(c->titlebar);
 
           /* Tabbing case, multiple titlebar in frame */
@@ -375,11 +377,11 @@ client_frame_update(struct client *c, struct colpair *cp)
                          barwin_refresh_color(cc->titlebar);
 
                          draw_text(cc->titlebar->dr, c->theme, xt,
-                                   TEXTY(c->theme, c->tbarw), c->ncol.fg, cc->title);
+                                   y, c->ncol.fg, cc->title);
 
                          barwin_refresh(cc->titlebar);
 
-                         x += f + 1;
+                         x += f + c->border;
                     }
           }
      }

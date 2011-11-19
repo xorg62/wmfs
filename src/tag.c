@@ -57,10 +57,7 @@ tag_screen(struct screen *s, struct tag *t)
                if(!(c->flags & CLIENT_TABBED))
                     client_map(c);
 
-          if(t->sel->flags & CLIENT_TABBED)
-               t->sel = t->sel->tabmaster;
-
-          client_focus(t->sel);
+          client_focus( client_tab_next(t->sel));
      }
 
      s->seltag = t;
@@ -89,7 +86,7 @@ tag_client(struct tag *t, struct client *c)
           SLIST_REMOVE(&c->tag->clients, c, client, tnext);
 
           if(c->tag->sel == c || W->client == c)
-               client_focus(client_next(c));
+               client_focus( client_tab_next( client_next(c)));
      }
 
      c->flags &= ~CLIENT_RULED;
