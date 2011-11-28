@@ -163,8 +163,9 @@ struct client
 #define CLIENT_TABBED        0x40
 #define CLIENT_TABMASTER     0x80
 #define CLIENT_DYING         0x100 /* Saddest flag ever */
+#define CLIENT_REMOVEALL     0x200
      Flags flags;
-     Window win, frame;
+     Window win, frame, tmp;
      SLIST_ENTRY(client) next;   /* Global list */
      SLIST_ENTRY(client) tnext;  /* struct tag list */
      SLIST_ENTRY(client) tbnext; /* Tabbed client list */

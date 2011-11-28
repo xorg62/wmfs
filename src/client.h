@@ -42,6 +42,7 @@ void client_apply_tgeo(struct tag *t);
 #define CPROP_LOC  0x01
 #define CPROP_FLAG 0x02
 #define CPROP_GEO  0x04
+#define CPROP_TAB  0x08
 void client_update_props(struct client *c, Flags f);
 
 inline void client_fac_hint(struct client *c);

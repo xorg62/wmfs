@@ -346,7 +346,7 @@ client_frame_update(struct client *c, struct colpair *cp)
           /* Get number of tabbed client if c is tabmaster */
           if(c->flags & CLIENT_TABMASTER)
                SLIST_FOREACH(cc, &c->tag->clients, tnext)
-                    if(cc->tabmaster == c)
+                    if(c == cc->tabmaster)
                          ++n;
 
           f = (c->geo.w - (c->border * (n - 2))) / n;
@@ -367,7 +367,7 @@ client_frame_update(struct client *c, struct colpair *cp)
                int x = f;
 
                SLIST_FOREACH(cc, &c->tag->clients, tnext)
-                    if(cc->tabmaster == c && cc->titlebar)
+                    if(c == cc->tabmaster && cc->titlebar)
                     {
                          cc->titlebar->bg = c->ncol.bg;
 
@@ -402,7 +402,8 @@ client_tab_focus(struct client *c)
           c->flags |=  CLIENT_TABMASTER;
           c->flags &= ~CLIENT_TABBED;
           client_moveresize(c, &c->tabmaster->geo);
-          client_map(c);
+          if(c->tag == c->screen->seltag)
+               client_map(c);
 
           c->tabmaster->flags &= ~CLIENT_TABMASTER;
           c->tabmaster->flags |=  CLIENT_TABBED;
@@ -417,10 +418,15 @@ client_tab_focus(struct client *c)
 
           SLIST_FOREACH(cc, &c->tag->clients, tnext)
                if(cc != c && cc->tabmaster == c->tabmaster)
+               {
                     cc->tabmaster = c;
+                    client_update_props(cc, CPROP_TAB);
+               }
 
           c->tabmaster->tabmaster = c;
+          client_update_props(c->tabmaster, CPROP_TAB);
           c->tabmaster = NULL;
+          client_update_props(c, CPROP_TAB);
      }
 }
 
@@ -438,6 +444,7 @@ _client_tab(struct client *c, struct client *cm)
      cm->tabmaster = c;
 
      client_focus(cm);
+     client_frame_update(cm, CCOL(cm));
 }
 
 static void
@@ -446,7 +453,7 @@ client_untab(struct client *c)
      struct client *cc = c->tabmaster;
      struct geo og = c->geo;
 
-     if(!(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER)))
+     if(c->flags & CLIENT_REMOVEALL || !(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER)))
           return;
 
      if(!cc)
@@ -859,6 +866,13 @@ client_update_props(struct client *c, Flags f)
                           PropModeReplace, (unsigned char*)g, 4);
 
      }
+
+     if(f & CPROP_TAB)
+     {
+          Window w = (c->tabmaster ? c->tabmaster->win : 0);
+          XChangeProperty(W->dpy, c->win, ATOM("_WMFS_TABMASTER"), XA_WINDOW, 32,
+                          PropModeReplace, (unsigned char*)&w, 1);
+     }
 }
 
 static void
@@ -1191,11 +1205,15 @@ void
 client_remove(struct client *c)
 {
      c->flags |= CLIENT_DYING;
+
      XGrabServer(W->dpy);
      XSetErrorHandler(wmfs_error_handler_dummy);
-     XReparentWindow(W->dpy, c->win, W->root, c->rgeo.x, c->rgeo.y);
+
      client_map(c);
+     XReparentWindow(W->dpy, c->win, W->root, c->rgeo.x, c->rgeo.y);
+
      client_untab(c);
+
      XDestroyWindow(W->dpy, c->frame);
 
      if(c->titlebar)

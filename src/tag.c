@@ -82,11 +82,13 @@ tag_client(struct tag *t, struct client *c)
           if(!(c->flags & CLIENT_IGNORE_LAYOUT))
                layout_split_arrange_closed(c);
 
+          if(!(c->flags & CLIENT_REMOVEALL))
+          {
+               SLIST_REMOVE(&c->tag->clients, c, client, tnext);
 
-          SLIST_REMOVE(&c->tag->clients, c, client, tnext);
-
-          if(c->tag->sel == c || W->client == c)
-               client_focus( client_tab_next( client_next(c)));
+               if(c->tag->sel == c || W->client == c)
+                    client_focus( client_tab_next( client_next(c)));
+          }
      }
 
      c->flags &= ~CLIENT_RULED;

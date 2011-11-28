@@ -184,13 +184,13 @@ static void
 wmfs_scan(void)
 {
      struct geo g;
-     struct client *c;
+     struct client *c, *cc;
      int i, n, rf;
      int tag = -1, screen = -1, flags = -1;
      unsigned long ir, il;
      long *ret;
      XWindowAttributes wa;
-     Window usl, usl2, *w = NULL;
+     Window usl, usl2, *w = NULL, tm;
      Atom rt;
 
      SLIST_INIT(&W->h.client);
@@ -243,6 +243,7 @@ wmfs_scan(void)
                               == Success && ret)
                     {
                          flags = *ret;
+                         flags &= ~(CLIENT_TABBED | CLIENT_REMOVEALL);
                          XFree(ret);
                     }
 
@@ -256,10 +257,23 @@ wmfs_scan(void)
                          g.w = ret[2];
                          g.h = ret[3];
 
+                        XFree(ret);
+                    }
+
+                    if(XGetWindowProperty(W->dpy, w[i], ATOM("_WMFS_TABMASTER"), 0, 32,
+                                          False, XA_WINDOW, &rt, &rf, &ir, &il,
+                                          (unsigned char**)&ret)
+                              == Success && ret)
+                    {
+                         tm = *ret;
                          XFree(ret);
                     }
 
                     c = client_new(w[i], &wa, true);
+
+                    if(tm != c->win)
+                         c->tmp = tm;
+                    tm = 0;
 
                     if(flags != -1)
                          c->flags |= flags;
@@ -274,6 +288,11 @@ wmfs_scan(void)
                     }
                }
           }
+
+     /* Re-adjust tabbed clients */
+     SLIST_FOREACH(c, &W->h.client, next)
+          if((cc = client_gb_win(c->tmp)) && cc != c)
+               _client_tab(c, cc);
 
      XFree(w);
 }
@@ -348,7 +367,7 @@ wmfs_quit(void)
      {
           c = SLIST_FIRST(&W->h.client);
           client_update_props(c, CPROP_LOC | CPROP_FLAG | CPROP_GEO);
-          c->flags |= CLIENT_IGNORE_LAYOUT;
+          c->flags |= (CLIENT_IGNORE_LAYOUT | CLIENT_REMOVEALL);
           client_remove(c);
      }
 
