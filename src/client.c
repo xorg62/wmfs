@@ -391,7 +391,7 @@ client_frame_update(struct client *c, struct colpair *cp)
      }
 }
 
-static void
+void
 client_tab_focus(struct client *c)
 {
      if(c->flags & CLIENT_TABBED && c->tabmaster)
@@ -472,7 +472,6 @@ client_untab(struct client *c)
 
           if(!(c->flags & CLIENT_DYING))
           {
-
                /* Looking for tabbed client in cc, if there is not
                 * remove cc CLIENT_TABMASTER flag.
                 */
@@ -833,7 +832,7 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
      if(!scan)
           tag_client((c->flags & CLIENT_RULED ? c->tag : c->screen->seltag), c);
 
-     /* Map */
+     /* Map, not at reload */
      if(c->tag == c->screen->seltag)
           client_map(c);
 

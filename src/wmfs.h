@@ -169,7 +169,6 @@ struct client
      Window win, frame, tmp;
      SLIST_ENTRY(client) next;   /* Global list */
      SLIST_ENTRY(client) tnext;  /* struct tag list */
-     SLIST_ENTRY(client) tbnext; /* Tabbed client list */
 };
 
 struct layout_set

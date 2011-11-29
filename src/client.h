@@ -24,6 +24,7 @@ void client_swap(struct client *c, enum position p);
 void client_frame_update(struct client *c, struct colpair *cp);
 void client_tab_pull(struct client *c);
 void _client_tab(struct client *c, struct client *cm);
+void client_tab_focus(struct client *c);
 void client_focus(struct client *c);
 void client_get_name(struct client *c);
 void client_close(struct client *c);

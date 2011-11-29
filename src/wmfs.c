@@ -195,6 +195,23 @@ wmfs_scan(void)
 
      SLIST_INIT(&W->h.client);
 
+     /* Set back selected tag */
+     if(XGetWindowProperty(W->dpy, W->root, W->net_atom[wmfs_current_tag], 0, 32,
+                           False, XA_CARDINAL, &rt, &rf, &ir, &il,
+                           (unsigned char**)&ret)
+               == Success && ret)
+     {
+          struct screen *s;
+
+          for(i = 0; i < (int)ir; ++i)
+          {
+               s = screen_gb_id(i);
+               tag_screen(s, tag_gb_id(s, ret[i]));
+          }
+
+          XFree(ret);
+     }
+
      if(XQueryTree(W->dpy, W->root, &usl, &usl2, &w, (unsigned int*)&n))
           for(i = n - 1; i != -1; --i)
           {
@@ -265,6 +282,7 @@ wmfs_scan(void)
                     {
                          c->screen = screen_gb_id(screen);
                          c->flags |= CLIENT_IGNORE_LAYOUT;
+                         client_map(c);
                          tag_client(tag_gb_id(c->screen, tag), c);
                          client_moveresize(c, &g);
                          client_get_name(c);
@@ -275,24 +293,9 @@ wmfs_scan(void)
      /* Re-adjust tabbed clients */
      SLIST_FOREACH(c, &W->h.client, next)
           if((cc = client_gb_win(c->tmp)) && cc != c)
-               _client_tab(c, cc);
-
-     /* Set back selected tag */
-     if(XGetWindowProperty(W->dpy, W->root, W->net_atom[wmfs_current_tag], 0, 32,
-                           False, XA_CARDINAL, &rt, &rf, &ir, &il,
-                           (unsigned char**)&ret)
-               == Success && ret)
-     {
-          struct screen *s;
-
-          for(i = 0; i < (int)ir; ++i)
           {
-               s = screen_gb_id(i);
-               tag_screen(s, tag_gb_id(s, ret[i]));
+               _client_tab(c, cc);
           }
-
-          XFree(ret);
-     }
 
      XFree(w);
 }
