@@ -134,6 +134,7 @@ struct tag
      struct screen *screen;
      struct client *sel;
      struct client *prevsel;
+     struct tag *prev;
      char *name;
      int id;
      Flags flags;
@@ -144,7 +145,7 @@ struct tag
 
 struct client
 {
-     struct tag *tag;
+     struct tag *tag, *prevtag;
      struct screen *screen;
      struct barwin *titlebar;
      struct geo geo, wgeo, tgeo, ttgeo, rgeo, *tbgeo;

@@ -450,8 +450,9 @@ _client_tab(struct client *c, struct client *cm)
 static void
 client_untab(struct client *c)
 {
-     struct client *cc = c->tabmaster;
+     struct client *ct, *cc = c->tabmaster;
      struct geo og = c->geo;
+     bool chk = false;
 
      if(c->flags & CLIENT_REMOVEALL || !(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER)))
           return;
@@ -471,6 +472,20 @@ client_untab(struct client *c)
 
           if(!(c->flags & CLIENT_DYING))
           {
+
+               /* Looking for tabbed client in cc, if there is not
+                * remove cc CLIENT_TABMASTER flag.
+                */
+               SLIST_FOREACH(ct, &c->tag->clients, tnext)
+                    if(ct->tabmaster == cc)
+                    {
+                         chk = true;
+                         break;
+                    }
+
+               if(!chk)
+                    cc->flags &= ~CLIENT_TABMASTER;
+
                c->geo = c->tgeo = og;
 
                layout_split_integrate(c, cc);

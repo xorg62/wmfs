@@ -43,9 +43,13 @@ tag_screen(struct screen *s, struct tag *t)
 {
      struct client *c;
 
+     t->prev = s->seltag;
+     s->seltag = t;
+
      /* Unmap previous tag's frame */
-     SLIST_FOREACH(c, &s->seltag->clients, tnext)
-          client_unmap(c);
+     if(t->prev != t)
+          SLIST_FOREACH(c, &t->prev->clients, tnext)
+               client_unmap(c);
 
      /*
       * Map selected tag's frame, only if there is
@@ -60,8 +64,6 @@ tag_screen(struct screen *s, struct tag *t)
           client_focus( client_tab_next(t->sel));
      }
 
-     s->seltag = t;
-
      infobar_elem_screen_update(s, ElemTag);
 
      ewmh_update_wmfs_props();
@@ -71,12 +73,10 @@ tag_screen(struct screen *s, struct tag *t)
 void
 tag_client(struct tag *t, struct client *c)
 {
-     struct tag *ot = c->tag;
-
      /* Remove client from its previous tag */
      if(c->tag && !(c->flags & CLIENT_RULED))
      {
-          if(c->tag == t || c->flags & CLIENT_TABBED)
+          if(c->tag == t)
                return;
 
           if(!(c->flags & CLIENT_IGNORE_LAYOUT))
@@ -97,6 +97,7 @@ tag_client(struct tag *t, struct client *c)
      if(!t)
           return;
 
+     c->prevtag = c->tag;
      c->tag = t;
 
      client_update_props(c, CPROP_LOC);
@@ -109,17 +110,20 @@ tag_client(struct tag *t, struct client *c)
 
      if(c->flags & CLIENT_IGNORE_LAYOUT)
           c->flags ^= CLIENT_IGNORE_LAYOUT;
-     else
+     else if(!(c->flags & CLIENT_TABBED))
           layout_split_integrate(c, t->sel);
 
      if(c->flags & CLIENT_TABMASTER)
      {
           struct client *cc;
 
-          SLIST_FOREACH(cc, &ot->clients, tnext)
+          SLIST_FOREACH(cc, &c->prevtag->clients, tnext)
                if(cc->tabmaster == c)
-                    cc->tag = t;
+                    tag_client(t, cc);
      }
+
+     if(t != W->screen->seltag)
+          client_unmap(c);
 }
 
 void
@@ -129,7 +133,7 @@ uicb_tag_set(Uicb cmd)
      struct tag *t;
 
      TAILQ_FOREACH(t, &W->screen->tags, next)
-          if(++i == n)
+          if(++i == n && t != W->screen->seltag)
           {
                tag_screen(W->screen, t);
                return;
@@ -142,7 +146,7 @@ uicb_tag_set_with_name(Uicb cmd)
      struct tag *t;
 
      TAILQ_FOREACH(t, &W->screen->tags, next)
-          if(!strcmp(cmd, t->name))
+          if(!strcmp(cmd, t->name) && t != W->screen->seltag)
           {
                tag_screen(W->screen, t);
                return;
@@ -172,6 +176,17 @@ uicb_tag_prev(Uicb cmd)
      else if( /* CIRCULAR OPTION */ 1)
           tag_screen(W->screen, TAILQ_LAST(&W->screen->tags, tsub));
 }
+
+void
+uicb_tag_client(Uicb cmd)
+{
+     struct tag *t;
+     int id = ATOI(cmd);
+
+     if((t = tag_gb_id(W->screen, id)))
+          tag_client(t, W->client);
+}
+
 
 static void
 tag_remove(struct tag *t)
