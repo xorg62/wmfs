@@ -184,13 +184,13 @@ static void
 wmfs_scan(void)
 {
      struct geo g;
-     struct client *c, *cc;
+     struct client *c, *cc, *fc;
      int i, n, rf;
      int tag = -1, screen = -1, flags = -1;
      unsigned long ir, il;
      long *ret;
      XWindowAttributes wa;
-     Window usl, usl2, *w = NULL, tm;
+     Window usl, usl2, *w = NULL, tm, focus;
      Atom rt;
 
      SLIST_INIT(&W->h.client);
@@ -211,6 +211,17 @@ wmfs_scan(void)
 
           XFree(ret);
      }
+
+     /* Previous focused client before reload */
+     if(XGetWindowProperty(W->dpy, W->root, W->net_atom[wmfs_focus], 0, 32,
+                           False, XA_WINDOW, &rt, &rf, &ir, &il,
+                           (unsigned char**)&ret)
+               == Success && ret)
+     {
+          focus = *ret;
+          XFree(ret);
+     }
+
 
      if(XQueryTree(W->dpy, W->root, &usl, &usl2, &w, (unsigned int*)&n))
           for(i = n - 1; i != -1; --i)
@@ -293,9 +304,10 @@ wmfs_scan(void)
      /* Re-adjust tabbed clients */
      SLIST_FOREACH(c, &W->h.client, next)
           if((cc = client_gb_win(c->tmp)) && cc != c)
-          {
-               _client_tab(c, cc);
-          }
+               _client_tab(c, cc, false);
+
+     if((fc = client_gb_win(focus)))
+          client_focus(fc);
 
      XFree(w);
 }

@@ -23,7 +23,7 @@ void client_swap(struct client *c, enum position p);
 #define CCOL(c) (c == c->tag->sel ? &c->scol : &c->ncol)
 void client_frame_update(struct client *c, struct colpair *cp);
 void client_tab_pull(struct client *c);
-void _client_tab(struct client *c, struct client *cm);
+void _client_tab(struct client *c, struct client *cm, bool focus);
 void client_tab_focus(struct client *c);
 void client_focus(struct client *c);
 void client_get_name(struct client *c);
@@ -99,15 +99,23 @@ client_tab_next(struct client *c)
 static inline void
 client_map(struct client *c)
 {
-     WIN_STATE(c->frame, Map);
-     ewmh_set_wm_state(c->win, NormalState);
+     if(!(c->flags & CLIENT_MAPPED))
+     {
+          WIN_STATE(c->frame, Map);
+          ewmh_set_wm_state(c->win, NormalState);
+          c->flags ^= CLIENT_MAPPED;
+     }
 }
 
 static inline void
 client_unmap(struct client *c)
 {
-     WIN_STATE(c->frame, Unmap);
-     ewmh_set_wm_state(c->win, IconicState);
+     if(c->flags & CLIENT_MAPPED)
+     {
+          WIN_STATE(c->frame, Unmap);
+          ewmh_set_wm_state(c->win, IconicState);
+          c->flags ^= CLIENT_MAPPED;
+     }
 }
 
 #endif /* CLIENT_H */

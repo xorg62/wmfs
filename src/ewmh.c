@@ -52,6 +52,7 @@ ewmh_init(void)
 
      /* WMFS hints */
      W->net_atom[wmfs_running]                   = ATOM("_WMFS_RUNNING");
+     W->net_atom[wmfs_focus]                     = ATOM("_WMFS_FOCUS");
      W->net_atom[wmfs_update_hints]              = ATOM("_WMFS_UPDATE_HINTS");
      W->net_atom[wmfs_set_screen]                = ATOM("_WMFS_SET_SCREEN");
      W->net_atom[wmfs_screen_count]              = ATOM("_WMFS_SCREEN_COUNT");
@@ -59,11 +60,8 @@ ewmh_init(void)
      W->net_atom[wmfs_tag_list]                  = ATOM("_WMFS_TAG_LIST");
      W->net_atom[wmfs_current_screen]            = ATOM("_WMFS_CURRENT_SCREEN");
      W->net_atom[wmfs_current_layout]            = ATOM("_WMFS_CURRENT_LAYOUT");
-     W->net_atom[wmfs_mwfact]                    = ATOM("_WMFS_MWFACT");
-     W->net_atom[wmfs_nmaster]                   = ATOM("_WMFS_NMASTER");
      W->net_atom[wmfs_function]                  = ATOM("_WMFS_FUNCTION");
      W->net_atom[wmfs_cmd]                       = ATOM("_WMFS_CMD");
-     W->net_atom[wmfs_font]                      = ATOM("_WMFS_FONT");
 
      XChangeProperty(W->dpy, W->root, W->net_atom[net_supported], XA_ATOM, 32,
                      PropModeReplace, (unsigned char*)W->net_atom, net_last);
@@ -120,6 +118,10 @@ ewmh_update_wmfs_props(void)
 
      XChangeProperty(W->dpy, W->root, W->net_atom[wmfs_current_tag], XA_CARDINAL, 32,
                      PropModeReplace, (unsigned char*)cts, n);
+
+     if(W->client)
+          XChangeProperty(W->dpy, W->root, W->net_atom[wmfs_focus], XA_WINDOW, 32,
+                          PropModeReplace, (unsigned char*)&W->client->win, 1);
 
      free(cts);
 }

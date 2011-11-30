@@ -55,6 +55,7 @@ enum
      utf8_string,
      /* WMFS HINTS */
      wmfs_running,
+     wmfs_focus,
      wmfs_update_hints,
      wmfs_current_tag,
      wmfs_current_screen,

@@ -61,7 +61,7 @@ CLIENT_ACTION_DIR(focus, Top)
 CLIENT_ACTION_DIR(focus, Bottom)
 
 /* uicb_client_tab_dir() */
-#define client_tab(c) _client_tab(W->client, c)
+#define client_tab(c) _client_tab(W->client, c, true)
 CLIENT_ACTION_DIR(tab, Right)
 CLIENT_ACTION_DIR(tab, Left)
 CLIENT_ACTION_DIR(tab, Top)
@@ -416,6 +416,7 @@ client_tab_focus(struct client *c)
                c->tabmaster->geo = c->tabmaster->tgeo = g;
           }
 
+          /* Update tabmaster of tabbed client */
           SLIST_FOREACH(cc, &c->tag->clients, tnext)
                if(cc != c && cc->tabmaster == c->tabmaster)
                {
@@ -431,7 +432,7 @@ client_tab_focus(struct client *c)
 }
 
 void
-_client_tab(struct client *c, struct client *cm)
+_client_tab(struct client *c, struct client *cm, bool focus)
 {
      /* Do not tab already tabed client */
      if(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER))
@@ -443,8 +444,8 @@ _client_tab(struct client *c, struct client *cm)
      c->geo = cm->geo;
      cm->tabmaster = c;
 
-     client_focus(cm);
-     client_frame_update(cm, CCOL(cm));
+     if(focus)
+          client_focus(cm);
 }
 
 static void
@@ -488,8 +489,9 @@ client_untab(struct client *c)
                c->geo = c->tgeo = og;
 
                layout_split_integrate(c, cc);
-               client_moveresize(c, &c->geo);
                client_map(c);
+               client_moveresize(c, &c->geo);
+               client_update_props(c, CPROP_TAB);
           }
 
           client_frame_update(cc, CCOL(cc));
@@ -512,7 +514,10 @@ client_focus(struct client *c)
      if(W->client && W->client != c)
      {
           client_grabbuttons(W->client, false);
-          client_frame_update(W->client, &W->client->ncol);
+
+          if(!(W->client->flags & CLIENT_TABMASTER
+             && c->tabmaster == W->client))
+               client_frame_update(W->client, &W->client->ncol);
      }
 
      /* Focus c */
@@ -521,7 +526,7 @@ client_focus(struct client *c)
           c->tag->sel = c;
           client_grabbuttons(c, true);
           client_tab_focus(c);
-          client_frame_update(c, &c->scol);
+          client_frame_update(c, CCOL(c));
           XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
      }
      else
@@ -529,6 +534,8 @@ client_focus(struct client *c)
           W->client = W->screen->seltag->sel = NULL;
           XSetInputFocus(W->dpy, W->root, RevertToPointerRoot, CurrentTime);
      }
+
+     ewmh_update_wmfs_props();
 }
 
 /** Get a client name
