@@ -304,9 +304,9 @@ wmfs_scan(void)
      /* Re-adjust tabbed clients */
      SLIST_FOREACH(c, &W->h.client, next)
           if((cc = client_gb_win(c->tmp)) && cc != c)
-               _client_tab(c, cc, false);
+               _client_tab(c, cc);
 
-     if((fc = client_gb_win(focus)))
+     if((fc = client_gb_win(focus)) && fc != W->client)
           client_focus(fc);
 
      XFree(w);

@@ -61,7 +61,7 @@ CLIENT_ACTION_DIR(focus, Top)
 CLIENT_ACTION_DIR(focus, Bottom)
 
 /* uicb_client_tab_dir() */
-#define client_tab(c) _client_tab(W->client, c, true)
+#define client_tab(c) _client_tab(W->client, c)
 CLIENT_ACTION_DIR(tab, Right)
 CLIENT_ACTION_DIR(tab, Left)
 CLIENT_ACTION_DIR(tab, Top)
@@ -432,7 +432,7 @@ client_tab_focus(struct client *c)
 }
 
 void
-_client_tab(struct client *c, struct client *cm, bool focus)
+_client_tab(struct client *c, struct client *cm)
 {
      /* Do not tab already tabed client */
      if(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER))
@@ -444,8 +444,7 @@ _client_tab(struct client *c, struct client *cm, bool focus)
      c->geo = cm->geo;
      cm->tabmaster = c;
 
-     if(focus)
-          client_focus(cm);
+     client_focus(cm);
 }
 
 static void

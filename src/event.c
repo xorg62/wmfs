@@ -51,11 +51,8 @@ event_enternotify(XEvent *e)
      {
           if(c->flags & CLIENT_IGNORE_ENTER)
                c->flags ^= CLIENT_IGNORE_ENTER;
-          else if(c != W->client)
-          {
+          else if(c != W->client && !(c->flags & CLIENT_TABBED))
                client_focus(c);
-               puts("ENTER");
-          }
      }
 }
 
@@ -115,10 +112,10 @@ event_destroynotify(XEvent *e)
 static void
 event_focusin(XEvent *e)
 {
-     /*if(W->client
+     if(W->client
         && e->xfocus.window != W->client->win
         && e->xfocus.window != W->client->frame)
-          client_focus(W->client);*/
+          client_focus(W->client);
 }
 
 static void
