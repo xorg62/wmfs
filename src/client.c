@@ -324,7 +324,7 @@ client_grabbuttons(struct client *c, bool focused)
 }
 
 #define _XTEXT()                                \
-     if((xt = ((f >> 1) - (w >> 1) - PAD)) < 0) \
+     if((xt = ((f >> 1) - (w >> 1))) < 0) \
           xt = 1;
 void
 client_frame_update(struct client *c, struct colpair *cp)
@@ -349,7 +349,7 @@ client_frame_update(struct client *c, struct colpair *cp)
                     if(c == cc->tabmaster)
                          ++n;
 
-          f = (c->geo.w - (c->border * (n - 2))) / n;
+          f = (c->geo.w - (c->border * (n - 1))) / n;
           y = TEXTY(c->theme, c->tbarw);
 
           _XTEXT();
