@@ -197,6 +197,8 @@ wmfs_scan(void)
 
      SLIST_INIT(&W->h.client);
 
+     W->flags |= WMFS_SCAN;
+
      /* Get previous selected tag to apply it at the end */
      if(XGetWindowProperty(W->dpy, W->root, W->net_atom[wmfs_current_tag], 0, 32,
                            False, XA_CARDINAL, &rt, &rf, &ir, &il,
@@ -307,14 +309,16 @@ wmfs_scan(void)
      /* Set back selected tag */
      if(pstag)
      {
-          for(i = 0; i < (int)nscreen; ++i)
+          for(i = 0; i < nscreen; ++i)
           {
                s = screen_gb_id(i);
-               tag_screen(screen_gb_id(i), tag_gb_id(s, tret[i]));
+               tag_screen(s, tag_gb_id(s, tret[i]));
           }
 
           XFree(tret);
      }
+
+     W->flags &= ~WMFS_SCAN;
 
      XFree(w);
      XSync(W->dpy, false);

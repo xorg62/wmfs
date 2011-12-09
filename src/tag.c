@@ -46,23 +46,10 @@ tag_screen(struct screen *s, struct tag *t)
      t->prev = s->seltag;
      s->seltag = t;
 
-     /* Unmap previous tag's frame */
-     if(t->prev != t)
-          SLIST_FOREACH(c, &t->prev->clients, tnext)
-               client_unmap(c);
+     clients_arrange_map();
 
-     /*
-      * Map selected tag's frame, only if there is
-      * clients in t
-      */
-     if(!SLIST_EMPTY(&t->clients))
-     {
-          SLIST_FOREACH(c, &t->clients, tnext)
-               if(!(c->flags & CLIENT_TABBED))
-                    client_map(c);
-
+     if(!SLIST_EMPTY(&t->clients) && !(W->flags & WMFS_SCAN))
           client_focus( client_tab_next(t->sel));
-     }
 
      infobar_elem_screen_update(s, ElemTag);
 

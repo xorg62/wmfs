@@ -250,6 +250,8 @@ struct wmfs
      int xscreen, xdepth;
      int xmaxw, xmaxh;
      Flags numlockmask;
+#define WMFS_SCAN 0x01
+     Flags flags;
      GC gc, rgc;
      Atom *net_atom;
      char **argv;

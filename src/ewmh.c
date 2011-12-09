@@ -5,6 +5,7 @@
 
 #include "ewmh.h"
 #include "util.h"
+#include "screen.h"
 
 void
 ewmh_init(void)
@@ -103,21 +104,22 @@ void
 ewmh_update_wmfs_props(void)
 {
      struct screen *s;
-     int n = 0;
-     unsigned char *cts = NULL;
+     int i, ns = 0;
+     long *cts = NULL;
 
      SLIST_FOREACH(s, &W->h.screen, next)
-          ++n;
+          ++ns;
 
-     cts = xcalloc(n, sizeof(char));
+     cts = xcalloc(ns, sizeof(long));
 
-     n = 0;
-
-     SLIST_FOREACH(s, &W->h.screen, next)
-          cts[n++] = s->seltag->id;
+     for(i = 0; i < ns; ++i)
+     {
+          s = screen_gb_id(i);
+          cts[i] = s->seltag->id;
+     }
 
      XChangeProperty(W->dpy, W->root, W->net_atom[wmfs_current_tag], XA_CARDINAL, 32,
-                     PropModeReplace, (unsigned char*)cts, n);
+                     PropModeReplace, (unsigned char*)cts, ns);
 
      if(W->client)
           XChangeProperty(W->dpy, W->root, W->net_atom[wmfs_focus], XA_WINDOW, 32,

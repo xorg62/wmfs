@@ -118,4 +118,18 @@ client_unmap(struct client *c)
      }
 }
 
+static inline void
+clients_arrange_map(void)
+{
+     struct client *c;
+
+     SLIST_FOREACH(c, &W->h.client, next)
+     {
+          if(c->tag == c->screen->seltag && !(c->flags & CLIENT_TABBED))
+               client_map(c);
+          else
+               client_unmap(c);
+     }
+}
+
 #endif /* CLIENT_H */
