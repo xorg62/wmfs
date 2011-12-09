@@ -113,7 +113,7 @@ tag_client(struct tag *t, struct client *c)
      else if(!(c->flags & CLIENT_TABBED))
           layout_split_integrate(c, t->sel);
 
-     if(c->flags & CLIENT_TABMASTER)
+     if(c->flags & CLIENT_TABMASTER && c->prevtag)
      {
           struct client *cc;
 

@@ -185,31 +185,26 @@ wmfs_scan(void)
 {
      struct geo g;
      struct client *c, *cc, *fc;
-     int i, n, rf;
+     struct screen *s;
+     int i, n, rf, nscreen;
      int tag = -1, screen = -1, flags = -1;
      unsigned long ir, il;
-     long *ret;
+     long *ret, *tret;
+     bool pstag = false;
      XWindowAttributes wa;
      Window usl, usl2, *w = NULL, tm, focus;
      Atom rt;
 
      SLIST_INIT(&W->h.client);
 
-     /* Set back selected tag */
+     /* Get previous selected tag to apply it at the end */
      if(XGetWindowProperty(W->dpy, W->root, W->net_atom[wmfs_current_tag], 0, 32,
                            False, XA_CARDINAL, &rt, &rf, &ir, &il,
-                           (unsigned char**)&ret)
+                           (unsigned char**)&tret)
                == Success && ret)
      {
-          struct screen *s;
-
-          for(i = 0; i < (int)ir; ++i)
-          {
-               s = screen_gb_id(i);
-               tag_screen(s, tag_gb_id(s, ret[i]));
-          }
-
-          XFree(ret);
+          pstag = true;
+          nscreen = (int)ir;
      }
 
      /* Previous focused client before reload */
@@ -309,7 +304,20 @@ wmfs_scan(void)
      if((fc = client_gb_win(focus)) && fc != W->client)
           client_focus(fc);
 
+     /* Set back selected tag */
+     if(pstag)
+     {
+          for(i = 0; i < (int)nscreen; ++i)
+          {
+               s = screen_gb_id(i);
+               tag_screen(screen_gb_id(i), tag_gb_id(s, tret[i]));
+          }
+
+          XFree(tret);
+     }
+
      XFree(w);
+     XSync(W->dpy, false);
 }
 
 static void
