@@ -513,11 +513,8 @@ client_focus(struct client *c)
      if(W->client && W->client != c)
      {
           client_grabbuttons(W->client, false);
-
-          if(!(W->client->flags & CLIENT_TABMASTER
-             && c->tabmaster == W->client))
-               client_frame_update(W->client, &W->client->ncol);
-     }
+          client_frame_update(W->client, &W->client->ncol);
+      }
 
      /* Focus c */
      if((W->client = c))

@@ -298,6 +298,22 @@ wmfs_scan(void)
                }
           }
 
+     /* Set back selected tag */
+     if(pstag)
+     {
+          struct tag *t;
+
+          for(i = 0; i < nscreen; ++i)
+          {
+               s = screen_gb_id(i);
+
+               if((t = tag_gb_id(s, tret[i])) != s->seltag)
+                    tag_screen(s, t);
+          }
+
+          XFree(tret);
+     }
+
      /* Re-adjust tabbed clients */
      SLIST_FOREACH(c, &W->h.client, next)
           if((cc = client_gb_win(c->tmp)) && cc != c)
@@ -305,18 +321,6 @@ wmfs_scan(void)
 
      if((fc = client_gb_win(focus)) && fc != W->client)
           client_focus(fc);
-
-     /* Set back selected tag */
-     if(pstag)
-     {
-          for(i = 0; i < nscreen; ++i)
-          {
-               s = screen_gb_id(i);
-               tag_screen(s, tag_gb_id(s, tret[i]));
-          }
-
-          XFree(tret);
-     }
 
      W->flags &= ~WMFS_SCAN;
 

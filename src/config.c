@@ -113,7 +113,6 @@ static void
 config_tag(void)
 {
      struct screen *s;
-     struct tag *t;
      size_t i, n;
      struct conf_sec *sec, **ks;
      char *name;
@@ -132,13 +131,7 @@ config_tag(void)
 
           SLIST_FOREACH(s, &W->h.screen, next)
                if(screenid == s->id || screenid == -1)
-               {
-                    t = tag_new(s, name);
-
-                    /* Set first tag as seltag */
-                    if(t == TAILQ_FIRST(&s->tags))
-                         s->seltag = t;
-               }
+                    tag_new(s, name);
      }
 
      free(ks);
@@ -182,14 +175,15 @@ config_rule(void)
           FLAGAPPLY(r->flags, fetch_opt_first(ks[i], "false", "max").boolean,        RULE_MAX);
           FLAGAPPLY(r->flags, fetch_opt_first(ks[i], "false", "ignore_tag").boolean, RULE_IGNORE_TAG);
 
-          tn = fetch_opt_first(ks[i], "", "theme").str;
-          SLIST_FOREACH(t, &W->h.theme, next)
-               if(!strcmp(tn, t->name))
-               {
-                    r->theme = t;
-                    break;
-               }
-
+          if((tn = fetch_opt_first(ks[i], "", "theme").str))
+          {
+               SLIST_FOREACH(t, &W->h.theme, next)
+                    if(!strcmp(tn, t->name))
+                    {
+                         r->theme = t;
+                         break;
+                    }
+          }
           SLIST_INSERT_HEAD(&W->h.rule, r, next);
      }
 

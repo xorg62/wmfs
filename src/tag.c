@@ -41,8 +41,6 @@ tag_new(struct screen *s, char *name)
 void
 tag_screen(struct screen *s, struct tag *t)
 {
-     struct client *c;
-
      t->prev = s->seltag;
      s->seltag = t;
 
