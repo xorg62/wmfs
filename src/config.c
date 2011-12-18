@@ -184,6 +184,9 @@ config_rule(void)
                          break;
                     }
           }
+          else
+               r->theme = SLIST_FIRST(&W->h.theme);
+
           SLIST_INSERT_HEAD(&W->h.rule, r, next);
      }
 
