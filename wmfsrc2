@@ -123,9 +123,9 @@
   [key] mod = {"Control","Alt"} key = "q" func = "quit" [/key]
   [key] mod = {"Control", "Alt"} key = "r" func = "reload" [/key]
 
-  [key] mod = {"Super"} key = "1" func = "tag_set" cmd = "1" [/key]
-  [key] mod = {"Super"} key = "2" func = "tag_set" cmd = "2" [/key]
-  [key] mod = {"Super"} key = "3" func = "tag_set" cmd = "3" [/key]
+  [key] mod = {"Super"} key = "1" func = "tag_set" cmd = "0" [/key]
+  [key] mod = {"Super"} key = "2" func = "tag_set" cmd = "1" [/key]
+  [key] mod = {"Super"} key = "3" func = "tag_set" cmd = "2" [/key]
   [key] mod = {"Super"} key = "s" func = "tag_next" [/key]
   [key] mod = {"Super"} key = "a" func = "tag_prev" [/key]
   [key] mod = {"Super"} key = "z" func = "tag" cmd = "tag2" [/key]

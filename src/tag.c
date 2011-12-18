@@ -118,7 +118,7 @@ uicb_tag_set(Uicb cmd)
      struct tag *t;
 
      TAILQ_FOREACH(t, &W->screen->tags, next)
-          if(++i == n && t != W->screen->seltag)
+          if(i++ == n && t != W->screen->seltag)
           {
                tag_screen(W->screen, t);
                return;
