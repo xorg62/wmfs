@@ -186,7 +186,7 @@ wmfs_scan(void)
      struct geo g;
      struct client *c, *cc, *fc;
      struct screen *s;
-     int i, n, rf, nscreen;
+     int i, n, rf, nscreen = 0;
      int tag = -1, screen = -1, flags = -1;
      unsigned long ir, il;
      long *ret, *tret;
@@ -205,7 +205,6 @@ wmfs_scan(void)
                            (unsigned char**)&tret)
                == Success && ret)
      {
-          pstag = true;
           nscreen = (int)ir;
      }
 
@@ -298,20 +297,19 @@ wmfs_scan(void)
                }
           }
 
-     /* Set back selected tag */
-     if(pstag)
+     if(!nscreen)
      {
-          struct tag *t;
-
+          SLIST_FOREACH(s, &W->h.screen, next)
+               tag_screen(s, TAILQ_FIRST(&s->tags));
+     }
+     else
+     {
+          /* Set back selected tag */
           for(i = 0; i < nscreen; ++i)
           {
                s = screen_gb_id(i);
-
-               if((t = tag_gb_id(s, tret[i])) != s->seltag)
-                    tag_screen(s, t);
+               tag_screen(s, tag_gb_id(s, tret[i]));
           }
-
-          XFree(tret);
      }
 
      /* Re-adjust tabbed clients */
@@ -323,6 +321,9 @@ wmfs_scan(void)
           client_focus(fc);
 
      W->flags &= ~WMFS_SCAN;
+
+     if(tret)
+          XFree(tret);
 
      XFree(w);
      XSync(W->dpy, false);

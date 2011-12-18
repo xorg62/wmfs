@@ -132,4 +132,16 @@ clients_arrange_map(void)
      }
 }
 
+static inline void
+clients_tag_arrange_map(struct tag *t)
+{
+     struct client *c;
+     void (*sfunc)(struct client*)
+          = (t == t->screen->seltag ? client_map : client_unmap);
+
+     SLIST_FOREACH(c, &t->clients, tnext)
+          sfunc(c);
+}
+
+
 #endif /* CLIENT_H */
