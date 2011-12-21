@@ -90,7 +90,6 @@ infobar_elem_tag_update(struct element *e)
           t = (struct tag*)b->ptr;
 
           /* Selected */
-          /* TODO: color from conf */
           if(t == sel)
           {
                b->fg = e->infobar->theme->tags_s.fg;

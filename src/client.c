@@ -734,8 +734,7 @@ client_apply_rule(struct client *c)
      Flags flags = 0;
      Atom rf;
      XClassHint xch;
-
-     XGetClassHint(W->dpy, c->win, &xch);
+     Status s = XGetClassHint(W->dpy, c->win, &xch);
 
      /* Get WM_WINDOW_ROLE */
      if(XGetWindowProperty(W->dpy, c->win, ATOM("WM_WINDOW_ROLE"), 0L, 0x7FFFFFFFL, false,
@@ -757,32 +756,32 @@ client_apply_rule(struct client *c)
 
      SLIST_FOREACH(r, &W->h.rule, next)
      {
-          FLAGAPPLY(flags, (xch.res_name && r->instance && !strcmp(xch.res_name, r->instance)),      RINSTANCE);
-          FLAGAPPLY(flags, (xch.res_class && r->class && !strcmp(xch.res_class, r->class)),          RCLASS);
-          FLAGAPPLY(flags, ((role && r->role && !strcmp(role, r->role)) || !role || !r->role),       RROLE);
-          FLAGAPPLY(flags, ((wmname && r->name && !strcmp(wmname, r->name)) || !wmname || !r->name), RNAME);
-
-          if(flags & RINSTANCE || flags & RCLASS)
+          if(s)
           {
-               if(flags & RROLE || flags & RNAME)
-               {
-                    c->screen = screen_gb_id(r->screen);
-                    c->tag    = tag_gb_id(c->screen, r->tag);
-                    c->theme  = r->theme;
-
-                    if(r->flags & RULE_FREE)
-                    { /* TODO */ }
-
-                    if(r->flags & RULE_MAX)
-                    { /* TODO */ }
-
-                    if(r->flags & RULE_IGNORE_TAG)
-                    { /* TODO */ }
-
-                    c->flags  = r->flags | CLIENT_RULED;
-               }
+               FLAGAPPLY(flags, (xch.res_name && r->instance && !strcmp(xch.res_name, r->instance)),      RINSTANCE);
+               FLAGAPPLY(flags, (xch.res_class && r->class && !strcmp(xch.res_class, r->class)),          RCLASS);
           }
 
+          FLAGAPPLY(flags, (wmname && r->name && !strcmp(wmname, r->name)), RNAME);
+          FLAGAPPLY(flags, ((role && r->role && !strcmp(role, r->role)) || !role || !r->role), RROLE);
+
+          if(flags & (RINSTANCE | RCLASS | RNAME) && flags & RROLE)
+          {
+               c->screen = screen_gb_id(r->screen);
+               c->tag    = tag_gb_id(c->screen, r->tag);
+               c->theme  = r->theme;
+
+               if(r->flags & RULE_FREE)
+               { /* TODO */ }
+
+               if(r->flags & RULE_MAX)
+               { /* TODO */ }
+
+               if(r->flags & RULE_IGNORE_TAG)
+               { /* TODO */ }
+
+               c->flags  = r->flags | CLIENT_RULED;
+          }
           flags = 0;
      }
 
