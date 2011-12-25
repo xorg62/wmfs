@@ -982,9 +982,10 @@ client_moveresize(struct client *c, struct geo *g)
                        c->rgeo.x, c->rgeo.y,
                        c->rgeo.w, c->rgeo.h);
 
-     XMoveResizeWindow(W->dpy, c->win,
-                       c->wgeo.x, c->wgeo.y,
-                       c->wgeo.w, c->wgeo.h);
+     if(!(c->flags & CLIENT_FULLSCREEN))
+          XMoveResizeWindow(W->dpy, c->win,
+                            c->wgeo.x, c->wgeo.y,
+                            c->wgeo.w, c->wgeo.h);
 
      c->flags &= ~CLIENT_DID_WINSIZE;
 

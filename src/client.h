@@ -102,6 +102,7 @@ client_map(struct client *c)
      if(!(c->flags & CLIENT_MAPPED))
      {
           WIN_STATE(c->frame, Map);
+          WIN_STATE(c->win, Map);
           ewmh_set_wm_state(c->win, NormalState);
           c->flags ^= CLIENT_MAPPED;
      }
@@ -113,6 +114,7 @@ client_unmap(struct client *c)
      if(c->flags & CLIENT_MAPPED)
      {
           WIN_STATE(c->frame, Unmap);
+          WIN_STATE(c->win, Unmap);
           ewmh_set_wm_state(c->win, IconicState);
           c->flags ^= CLIENT_MAPPED;
      }

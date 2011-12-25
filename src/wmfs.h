@@ -166,6 +166,7 @@ struct client
 #define CLIENT_DYING         0x100 /* Saddest flag ever */
 #define CLIENT_REMOVEALL     0x200
 #define CLIENT_MAPPED        0x400
+#define CLIENT_FULLSCREEN    0x800
      Flags flags;
      Window win, frame, tmp;
      SLIST_ENTRY(client) next;   /* Global list */

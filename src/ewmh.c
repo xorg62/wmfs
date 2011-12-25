@@ -6,6 +6,12 @@
 #include "ewmh.h"
 #include "util.h"
 #include "screen.h"
+#include "client.h"
+
+/* Taken From standards.freedesktop.org */
+#define _NET_WM_STATE_REMOVE 0 /* remove/unset property */
+#define _NET_WM_STATE_ADD    1 /* add/set property */
+#define _NET_WM_STATE_TOGGLE 2 /* toggle property  */
 
 void
 ewmh_init(void)
@@ -112,10 +118,11 @@ ewmh_update_wmfs_props(void)
 
      cts = xcalloc(ns, sizeof(long));
 
+
      for(i = 0; i < ns; ++i)
      {
           s = screen_gb_id(i);
-          cts[i] = s->seltag->id;
+          cts[i] = (s->seltag ? s->seltag->id : 0);
      }
 
      XChangeProperty(W->dpy, W->root, W->net_atom[wmfs_current_tag], XA_CARDINAL, 32,
@@ -126,5 +133,34 @@ ewmh_update_wmfs_props(void)
                           PropModeReplace, (unsigned char*)&W->client->win, 1);
 
      free(cts);
+}
+
+void
+ewmh_manage_state(long data[], struct client *c)
+{
+     /* _NET_WM_STATE_FULLSCREEN */
+     if(data[1] == (long)W->net_atom[net_wm_state_fullscreen])
+     {
+          if(data[0] == _NET_WM_STATE_ADD
+             || (data[0] == _NET_WM_STATE_TOGGLE && !(c->flags & CLIENT_FULLSCREEN)))
+          {
+               c->flags |= CLIENT_FULLSCREEN;
+
+               XReparentWindow(W->dpy, c->win, W->root, c->screen->geo.x, c->screen->geo.y);
+               XResizeWindow(W->dpy, c->win, c->screen->geo.w, c->screen->geo.h);
+
+               client_focus(c);
+
+               XRaiseWindow(W->dpy, c->win);
+          }
+          else if(data[0] == _NET_WM_STATE_REMOVE
+                  || (data[0] == _NET_WM_STATE_TOGGLE && c->flags & CLIENT_FULLSCREEN))
+          {
+               c->flags &= ~CLIENT_FULLSCREEN;
+
+               XReparentWindow(W->dpy, c->win, c->frame, c->wgeo.x, c->wgeo.y);
+               client_moveresize(c, &c->geo);
+          }
+     }
 }
 

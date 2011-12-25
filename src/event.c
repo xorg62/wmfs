@@ -59,9 +59,29 @@ event_enternotify(XEvent *e)
 static void
 event_clientmessageevent(XEvent *e)
 {
-     (void)e;
-     /*  XClientMessageEvent *ev = &e->xclient;
-         client *c;*/
+     XClientMessageEvent *ev = &e->xclient;
+     struct client *c;
+     int type = 0;
+
+     while(type < net_last && W->net_atom[type] != ev->message_type)
+          ++type;
+
+     switch(type)
+     {
+          /* _NET_WM_STATE */
+          case net_wm_state:
+               if((c = client_gb_win(ev->window)))
+                    ewmh_manage_state(ev->data.l, c);
+               break;
+          /* _NET_CLOSE_WINDOW */
+          case net_close_window:
+               if((c = client_gb_win(ev->window)))
+                    client_close(c);
+               break;
+          /* _NET_WM_DESKTOP */
+          case net_wm_desktop:
+               break;
+     }
 }
 
 static void
