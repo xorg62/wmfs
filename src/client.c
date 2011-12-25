@@ -853,6 +853,7 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
           client_get_name(c);
           client_focus(c);
           client_configure(c);
+          ewmh_manage_window_type(c);
      }
 
      return c;

@@ -76,5 +76,6 @@ void ewmh_init(void);
 void ewmh_set_wm_state(Window w, int state);
 void ewmh_update_wmfs_props(void);
 void ewmh_manage_state(long data[], struct client *c);
+void ewmh_manage_window_type(struct client *c);
 
 #endif /* EWMH_H */

@@ -169,3 +169,28 @@ ewmh_manage_state(long data[], struct client *c)
      }
 }
 
+void
+ewmh_manage_window_type(struct client *c)
+{
+     Atom *atom, rf;
+     int f;
+     unsigned long n, il, i;
+     unsigned char *data = NULL;
+     long ldata[5] = { _NET_WM_STATE_ADD };
+
+     /* _NET_WM_STATE at window mangement */
+     if(XGetWindowProperty(W->dpy, c->win, W->net_atom[net_wm_state], 0L, 0x7FFFFFFFL, false,
+                           XA_ATOM, &rf, &f, &n, &il, &data) == Success && n)
+     {
+          atom = (Atom*)data;
+
+          for(i = 0; i < n; ++i)
+          {
+               ldata[1] = atom[i];
+               ewmh_manage_state(ldata, c);
+          }
+
+          XFree(data);
+     }
+}
+
