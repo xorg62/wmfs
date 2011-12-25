@@ -148,6 +148,8 @@ ewmh_manage_state(long data[], struct client *c)
 
                XReparentWindow(W->dpy, c->win, W->root, c->screen->geo.x, c->screen->geo.y);
                XResizeWindow(W->dpy, c->win, c->screen->geo.w, c->screen->geo.h);
+               XChangeProperty(W->dpy, c->win, W->net_atom[net_wm_state], XA_ATOM, 32, PropModeReplace,
+                               (unsigned char*)&W->net_atom[net_wm_state_fullscreen], true);
 
                client_focus(c);
 
@@ -159,6 +161,9 @@ ewmh_manage_state(long data[], struct client *c)
                c->flags &= ~CLIENT_FULLSCREEN;
 
                XReparentWindow(W->dpy, c->win, c->frame, c->wgeo.x, c->wgeo.y);
+               XChangeProperty(W->dpy, c->win, W->net_atom[net_wm_state], XA_ATOM, 32, PropModeReplace,
+                               (unsigned char*)&W->net_atom[net_wm_state_fullscreen], false);
+
                client_moveresize(c, &c->geo);
           }
      }
