@@ -70,16 +70,18 @@
   #   S Statustext
 
   [bar]
+     #name = "default"
      position = 0
      screen = 0
-     elements = "t"
+     elements = "ts"
      theme = "perso"
   [/bar]
 
   [bar]
+     name = "bar"
      position = 1
      screen = 0
-     elements = "t"
+     elements = "st"
      theme = "default"
   [/bar]
 
