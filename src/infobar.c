@@ -246,6 +246,8 @@ infobar_elem_remove(struct element *e)
           SLIST_REMOVE_HEAD(&e->bars, enext);
           barwin_remove(b);
      }
+
+     free(e);
 }
 
 struct infobar*
@@ -297,6 +299,7 @@ infobar_remove(struct infobar *i)
 
      free(i->elemorder);
      free(i->name);
+     free(i->status);
 
      TAILQ_FOREACH(e, &i->elements, next)
           infobar_elem_remove(e);
