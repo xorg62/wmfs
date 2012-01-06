@@ -97,6 +97,7 @@ struct element
      struct geo geo;
      struct infobar *infobar;
      int type;
+     enum position align;
      void (*func_init)(struct element *e);
      void (*func_update)(struct element *e);
      SLIST_HEAD(, barwin) bars;
@@ -112,6 +113,7 @@ struct infobar
      enum barpos pos;
      char *elemorder;
      char *name;
+     char *status;
      TAILQ_HEAD(esub, element) elements;
      SLIST_ENTRY(infobar) next;
 };

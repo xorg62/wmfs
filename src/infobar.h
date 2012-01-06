@@ -11,7 +11,7 @@
 #include "draw.h"
 #include "tag.h"
 
-enum { ElemTag = 0, ElemLayout, ElemSelbar, ElemStatus, ElemCustom, ElemLast };
+enum { ElemTag = 0, ElemStatus, ElemCustom, ElemLast };
 
 struct infobar *infobar_new(struct screen *s, char *name, struct theme *theme, enum barpos pos, const char *elem);
 void infobar_elem_update(struct infobar *i);
@@ -25,9 +25,15 @@ infobar_elem_placement(struct element *e)
 {
      struct element *p = TAILQ_PREV(e, esub, next);
 
-     e->geo.y = e->geo.w = 0;
+     e->geo.y = 0;
      e->geo.h = e->infobar->geo.h;
-     e->geo.x = (p ? p->geo.x + p->geo.w + PAD : 0);
+
+     if(e->align == Left)
+          e->geo.x = (p ? p->geo.x + p->geo.w: 0);
+     else
+          e->geo.x = ((p = TAILQ_NEXT(e, next))
+                       ? p->geo.x - e->geo.w
+                       : e->infobar->geo.w - e->geo.w);
 }
 
 /* Bars placement management and usable space management */
