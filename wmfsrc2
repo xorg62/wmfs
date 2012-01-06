@@ -67,7 +67,7 @@
 
   # Element type:
   #   t Tags
-  #   S Statustext
+  #   s Statustext
 
   [bar]
      #name = "default"
