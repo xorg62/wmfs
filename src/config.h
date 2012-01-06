@@ -14,6 +14,7 @@
 #include "util.h"
 #include "tag.h"
 #include "client.h"
+#include "status.h"
 
 #define THEME_DEFAULT (SLIST_FIRST(&W->h.theme))
 
@@ -62,6 +63,10 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "client_swap_next",     uicb_client_swapsel_next },
      { "client_swap_prev",     uicb_client_swapsel_prev },
      { "client_untab",         uicb_client_untab },
+
+     /* Status */
+     { "status" , uicb_status },
+
      { NULL, NULL }
 };
 

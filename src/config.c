@@ -94,7 +94,7 @@ config_bars(void)
      /* [bar] */
      for(i = 0; i < n; ++i)
      {
-          name = fetch_opt_first(ks[i], "infobar", "name").str;
+          name = fetch_opt_first(ks[i], "default", "name").str;
           elem = fetch_opt_first(ks[i], "", "elements").str;
           screenid = fetch_opt_first(ks[i], "-1", "screen").num;
           t = name_to_theme(fetch_opt_first(ks[i], "default", "theme").str);

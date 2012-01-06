@@ -9,11 +9,11 @@
 #include "barwin.h"
 #include "util.h"
 #include "tag.h"
+#include "status.h"
 
 static void infobar_elem_tag_init(struct element *e);
 static void infobar_elem_tag_update(struct element *e);
 static void infobar_elem_status_init(struct element *e);
-static void infobar_elem_status_update(struct element *e);
 
 const struct elem_funcs
 {
@@ -22,8 +22,8 @@ const struct elem_funcs
      void (*func_update)(struct element *e);
 } elem_funcs[] =
 {
-     { 't', infobar_elem_tag_init, infobar_elem_tag_update },
-     { 's',  infobar_elem_status_init, infobar_elem_status_update },
+     { 't', infobar_elem_tag_init,    infobar_elem_tag_update },
+     { 's', infobar_elem_status_init, status_manage },
 
      /* { 'l',  infobar_elem_layout_init, infobar_elem_layout_update },
         { 'S',  infobar_elem_selbar_init, infobar_elem_selbar_update },
@@ -136,24 +136,6 @@ infobar_elem_status_init(struct element *e)
 
      e->infobar->screen->elemupdate |= FLAGINT(ElemStatus);
      e->infobar->status = strdup("wmfs2");
-}
-
-static void
-infobar_elem_status_update(struct element *e)
-{
-     struct barwin *b = SLIST_FIRST(&e->bars);
-     int l;
-
-     barwin_refresh_color(b);
-
-     /* TODO: status_manage, status.c */
-     if(e->infobar->status)
-     {
-          l = draw_textw(e->infobar->theme, e->infobar->status);
-          draw_text(b->dr, e->infobar->theme, e->geo.w - l,
-                    TEXTY(e->infobar->theme, e->geo.h), b->fg, e->infobar->status);
-          barwin_refresh(b);
-     }
 }
 
 #define ELEM_INIT(a)                                  \

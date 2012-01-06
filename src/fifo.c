@@ -34,7 +34,7 @@ static void
 fifo_parse(char *cmd)
 {
      void (*func)(Uicb);
-     char *p = NULL;
+     char *p = NULL, *arg;
 
      /* remove trailing newline */
      if((p = strchr(cmd, '\n')))
@@ -44,9 +44,12 @@ fifo_parse(char *cmd)
      if((p = strchr(cmd, ' ')))
           *p = '\0';
 
+     /* Avoid pointer out of bound if no arg */
+     arg = ((p + 1 == 1) ? NULL : p + 1);
+
      /* call the UICB function, p + 1 is command or NULL */
      if((func = uicb_name_func(cmd)))
-          func(p + 1);
+          func(arg);
 
      XSync(W->dpy, false);
 }
