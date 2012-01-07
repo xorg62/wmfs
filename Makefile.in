@@ -17,6 +17,7 @@ SRCS=                 \
       src/tag.c       \
       src/util.c      \
       src/fifo.c      \
+      src/status.c    \
       src/wmfs.c
 
 
