@@ -40,7 +40,7 @@ infobar_elem_tag_init(struct element *e)
      int s, j;
 
      /* Get final size before to use in placement */
-     e->geo.w = 0;
+     e->geo.w = e->infobar->theme->tags_border_width << 1;
      TAILQ_FOREACH(t, &e->infobar->screen->tags, next)
           e->geo.w += draw_textw(e->infobar->theme, t->name) + PAD;
 

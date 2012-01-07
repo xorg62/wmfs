@@ -34,7 +34,7 @@ static void
 fifo_parse(char *cmd)
 {
      void (*func)(Uicb);
-     char *p = NULL, *arg;
+     char *p = NULL, *arg = NULL;
 
      /* remove trailing newline */
      if((p = strchr(cmd, '\n')))
@@ -42,10 +42,10 @@ fifo_parse(char *cmd)
 
      /* If an argument is present, delimit function string */
      if((p = strchr(cmd, ' ')))
+     {
           *p = '\0';
-
-     /* Avoid pointer out of bound if no arg */
-     arg = ((p + 1 == 1) ? NULL : p + 1);
+          arg = p + 1;
+     }
 
      /* call the UICB function, p + 1 is command or NULL */
      if((func = uicb_name_func(cmd)))

@@ -29,7 +29,7 @@ infobar_elem_placement(struct element *e)
      e->geo.h = e->infobar->geo.h;
 
      if(e->align == Left)
-          e->geo.x = (p ? p->geo.x + p->geo.w: 0);
+          e->geo.x = (p ? p->geo.x + p->geo.w : 0);
      else
           e->geo.x = ((p = TAILQ_NEXT(e, next))
                        ? p->geo.x - e->geo.w
