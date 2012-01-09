@@ -8,6 +8,8 @@
 
 #include "wmfs.h"
 
+#include <string.h>
+
 /* Todo FREE_LIST(type, head, function_remove) */
 #define FREE_LIST(type, head)                   \
      do {                                       \
@@ -52,6 +54,19 @@ swap_ptr(void **x, void **y)
 
      *x = *y;
      *y = t;
+}
+
+static inline enum position
+str_to_position(char *str)
+{
+     enum position i;
+     static const char index[PositionLast][8] = { "right", "left", "top", "bottom", "center" };
+
+     for(i = 0; i < PositionLast; ++i)
+          if(!strcmp(index[i], str))
+               return i;
+
+     return Right;
 }
 
 void *xmalloc(size_t nmemb, size_t size);

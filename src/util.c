@@ -76,8 +76,8 @@ xstrdup(const char *str)
 {
      char *ret;
 
-     if (str == NULL || (ret = strdup(str)) == NULL)
-          err(EXIT_FAILURE, "strdup(%s)", str);
+     if(str == NULL || (ret = strdup(str)) == NULL)
+          warnx("strdup(%s)", str);
 
      return ret;
 }

@@ -46,6 +46,7 @@ enum position
      Top,
      Bottom,
      Center,
+     NoAlign,
      PositionLast
 };
 
@@ -92,6 +93,16 @@ struct barwin
      SLIST_ENTRY(barwin) enext; /* element barwin */
 };
 
+struct status_seq
+{
+     struct geo geo;
+     enum position align;
+     char type;
+     char *str;
+     Color color;
+     SLIST_ENTRY(status_seq) next;
+};
+
 struct element
 {
      struct geo geo;
@@ -115,6 +126,7 @@ struct infobar
      char *name;
      char *status;
      TAILQ_HEAD(esub, element) elements;
+     SLIST_HEAD(, status_seq) statushead;
      SLIST_ENTRY(infobar) next;
 };
 
