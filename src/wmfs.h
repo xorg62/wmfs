@@ -96,6 +96,7 @@ struct barwin
 struct status_seq
 {
      struct geo geo;
+     struct mousebind *mousebind;
      enum position align;
      char type;
      char *str;
