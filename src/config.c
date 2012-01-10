@@ -63,11 +63,7 @@ config_theme(void)
           t->client_titlebar_width = fetch_opt_first(ks[i], "12", "client_titlebar_width").num;
           t->client_border_width   = fetch_opt_first(ks[i], "1", "client_border_width").num;
 
-          /* insert_tail with SLIST */
-          if(SLIST_EMPTY(&W->h.theme))
-               SLIST_INSERT_HEAD(&W->h.theme, t, next);
-          else
-               SLIST_INSERT_AFTER(p, t, next);
+          SLIST_INSERT_TAIL(&W->h.theme, t, next, p);
 
           p = t;
      }

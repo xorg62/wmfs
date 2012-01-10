@@ -71,11 +71,7 @@ infobar_elem_tag_init(struct element *e)
           barwin_mousebind_new(b, Button4, false, g, uicb_tag_next, NULL);
           barwin_mousebind_new(b, Button5, false, g, uicb_tag_prev, NULL);
 
-          /* insert_tail with SLIST */
-          if(SLIST_EMPTY(&e->bars))
-               SLIST_INSERT_HEAD(&e->bars, b, enext);
-          else
-               SLIST_INSERT_AFTER(prev, b, enext);
+          SLIST_INSERT_TAIL(&e->bars, b, enext, prev);
 
           prev = b;
           j += s;

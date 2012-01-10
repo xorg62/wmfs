@@ -8,6 +8,7 @@
 
 #include "wmfs.h"
 
+void status_render(struct element *e);
 void status_manage(struct element *e);
 void uicb_status(Uicb cmd);
 

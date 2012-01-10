@@ -21,6 +21,13 @@
           }                                     \
      } while(/* CONSTCOND */ 0);
 
+/* Insert at the end with SLIST */
+#define SLIST_INSERT_TAIL(head, elem, field, prev) \
+     if(SLIST_EMPTY(head))                         \
+          SLIST_INSERT_HEAD(head, elem, field);    \
+     else                                          \
+          SLIST_INSERT_AFTER(prev, elem, field);
+
 /* t is Map or Unmap */
 #define WIN_STATE(w, t) do {      \
      X##t##Subwindows(W->dpy, w); \
