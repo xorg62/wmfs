@@ -96,11 +96,11 @@ struct barwin
 struct status_seq
 {
      struct geo geo;
-     struct mousebind *mousebind;
      enum position align;
      char type;
      char *str;
      Color color;
+     SLIST_HEAD(, mousebind) mousebinds;
      SLIST_ENTRY(status_seq) next;
 };
 
@@ -212,6 +212,7 @@ struct mousebind
      void (*func)(Uicb);
      Uicb cmd;
      SLIST_ENTRY(mousebind) next;
+     SLIST_ENTRY(mousebind) snext;
 };
 
 struct theme

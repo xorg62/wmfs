@@ -268,6 +268,8 @@ infobar_new(struct screen *s, char *name, struct theme *theme, enum barpos pos, 
      /* struct elements */
      infobar_elem_init(i);
 
+     SLIST_INIT(&i->statushead);
+
      /* Render, only if pos is Top or Bottom */
      if(!map)
           return i;

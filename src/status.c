@@ -10,43 +10,28 @@
 #include "util.h"
 
 #include <string.h>
-#include <ctype.h>
 
-/* Parse arg;between;semicolon */
-#define STATUS_GET_ARGS(i,  p, arg, n)                                  \
-     do {                                                               \
-          for(i = 0, p += 2, arg[0] = p; *p && *p != ']' && i < n; ++p) \
-               if(*p == ';')                                            \
-               {                                                        \
-                    *p = '\0';                                          \
-                    arg[++i] = ++p;                                     \
-               }                                                        \
-          *p = '\0';                                                    \
-     } while(/* CONSTCOND */ 0);
+static struct status_seq*
+status_new_seq(char type, int narg, int minarg, char *args[], int *shift)
+{
+     struct status_seq *sq = xcalloc(1, sizeof(struct status_seq));
 
-#define STATUS_CHECK_ARGS(i, n1, n2, str, end)  \
-     if(i != n1 && i != n2)                     \
-     {                                          \
-          str = end + 2;                        \
-          continue;                             \
+     SLIST_INIT(&sq->mousebinds);
+     sq->type = type;
+     *shift = 0;
+
+     if(narg == minarg ||  !strcmp(args[0], "right") || !strcmp(args[0], "left"))
+          sq->align = str_to_position(args[0]);
+     else
+     {
+          sq->align = NoAlign;
+          sq->geo.x = ATOI(args[0]);
+          sq->geo.y = ATOI(args[1]);
+          *shift = 1;
      }
 
-/* Alloc & fill status_sq struct with universal options: align/position and type */
-#define STATUS_FILL_SQ(sq, t, ma, shift, arg)                           \
-     do {                                                               \
-          sq = xcalloc(1, sizeof(struct status_seq));                   \
-          sq->type = t;                                                 \
-                                                                        \
-          if(i == ma || !strcmp(arg[0], "right") || !strcmp(arg[0], "left")) \
-               sq->align = str_to_position(arg[0]);                     \
-          else                                                          \
-          {                                                             \
-               sq->align = NoAlign;                                     \
-               sq->geo.x = ATOI(arg[0]);                                \
-               sq->geo.y = ATOI(arg[1]);                                \
-               shift = 1;                                               \
-          }                                                             \
-     } while(/* CONSTCOND */ 0);                                        \
+     return sq;
+}
 
 /* Parse mousebind sequence next normal sequence: \<seq>[](button;func;cmd) */
 static char*
@@ -54,19 +39,13 @@ status_parse_mouse(struct status_seq *sq, struct element *e, char *str)
 {
      struct mousebind *m;
      struct barwin *b = SLIST_FIRST(&e->bars);
-     char *arg[3] = { NULL };
+     char *end, *arg[3] = { NULL };
      int i;
 
-     if(*str != '(' || !strchr(str, ')'))
+     if(*str != '(' || !(end = strchr(str, ')')))
           return str + 1;
 
-     for(i = 0, ++str, arg[0] = str; *str && *str != ')' && i < 3; ++str)
-          if(*str == ';')
-          {
-               *str = '\0';
-               arg[++i] = ++str;
-          }
-     *str = '\0';
+     i = parse_args(++str, ';', ')', 3, arg);
 
      m = xcalloc(1, sizeof(struct mousebind));
 
@@ -75,13 +54,18 @@ status_parse_mouse(struct status_seq *sq, struct element *e, char *str)
      m->func     = uicb_name_func(arg[1]);
      m->cmd      = (i > 1 ? xstrdup(arg[2]) : NULL);
 
-     sq->mousebind = m;
-
      SLIST_INSERT_HEAD(&b->mousebinds, m, next);
+     SLIST_INSERT_HEAD(&sq->mousebinds, m, snext);
 
-     return str + 1;
+     return end + 1;
 }
 
+#define STATUS_CHECK_ARGS(i, n1, n2, str, end)  \
+     if(i != n1 && i != n2)                     \
+     {                                          \
+          str = end + 2;                        \
+          continue;                             \
+     }
 static void
 status_parse(struct element *e)
 {
@@ -102,15 +86,15 @@ status_parse(struct element *e)
                continue;
 
           /* Then parse & list it */
-          switch((type = tolower(*p)))
+          switch((type = *p) )
           {
           /*
            * Text sequence: \s[left/right;#color;text] OR \s[x;y;#color;text]
            */
           case 's':
-               STATUS_GET_ARGS(i, p, arg, 4);
+               i = parse_args(p + 2,  ';', ']', 4, arg);
                STATUS_CHECK_ARGS(i, 2, 3, dstr, end);
-               STATUS_FILL_SQ(sq, type, 2, shift, arg);
+               sq = status_new_seq(type, i, 2, arg, &shift);
 
                sq->color = color_atoh(arg[1 + shift]);
                sq->str = xstrdup(arg[2 + shift]);
@@ -120,10 +104,10 @@ status_parse(struct element *e)
          /*
           * Rectangle sequence: \R[left/right;w;h;#color] OR \R[x;y;w;h;#color]
           */
-          case 'r':
-               STATUS_GET_ARGS(i, p, arg, 5);
+          case 'R':
+               i = parse_args(p + 2, ';', ']', 5, arg);
                STATUS_CHECK_ARGS(i, 3, 4, dstr, end);
-               STATUS_FILL_SQ(sq, type, 3, shift, arg);
+               sq = status_new_seq(type, i, 3, arg, &shift);
 
                sq->geo.w = ATOI(arg[1 + shift]);
                sq->geo.h = ATOI(arg[2 + shift]);
@@ -134,22 +118,36 @@ status_parse(struct element *e)
 
           SLIST_INSERT_TAIL(&e->infobar->statushead, sq, next, prev);
 
-          dstr = status_parse_mouse(sq, e, end + 1);
+          /*
+           * Optional mousebind sequence(s) \<seq>[](button;func;cmd)
+           * Parse it while there is a mousebind sequence.
+           */
+          dstr = ++end;
+          while((*(dstr = status_parse_mouse(sq, e, dstr)) == '('));
 
-          printf(":%s\n", dstr);
-
-          shift = 0;
           prev = sq;
      }
 
      free(sauv);
 }
 
+#define STATUS_ALIGN(align)                             \
+     if(align == Left)                                  \
+     {                                                  \
+          sq->geo.x = left;                             \
+          left += sq->geo.w;                            \
+     }                                                  \
+     else if(align == Right)                            \
+     {                                                  \
+          sq->geo.x = e->geo.w - right - sq->geo.w;     \
+          right += sq->geo.w;                           \
+     }
 static void
 status_apply_list(struct element *e)
 {
      struct status_seq *sq;
      struct barwin *b = SLIST_FIRST(&e->bars);
+     struct mousebind *m;
      int left = 0, right = 0;
 
      SLIST_FOREACH(sq, &e->infobar->statushead, next)
@@ -164,48 +162,31 @@ status_apply_list(struct element *e)
                if(sq->align != NoAlign)
                     sq->geo.y = TEXTY(e->infobar->theme, e->geo.h);
 
-               if(sq->align == Left)
-               {
-                    sq->geo.x = left;
-                    left += sq->geo.w;
-               }
-               else if(sq->align == Right)
-               {
-                    sq->geo.x = e->geo.w - right - sq->geo.w;
-                    right += sq->geo.w;
-               }
+               STATUS_ALIGN(sq->align);
 
                draw_text(b->dr, e->infobar->theme, sq->geo.x, sq->geo.y, sq->color, sq->str);
 
-               if(sq->mousebind)
-               {
-                    sq->mousebind->area = sq->geo;
-                    sq->mousebind->area.y -= sq->geo.h;
-               }
+               if(!SLIST_EMPTY(&sq->mousebinds))
+                    SLIST_FOREACH(m, &sq->mousebinds, snext)
+                    {
+                         m->area = sq->geo;
+                         m->area.y -= sq->geo.h;
+                    }
 
                break;
 
           /* Rectangle */
-          case 'r':
+          case 'R':
                if(sq->align != NoAlign)
                     sq->geo.y = (e->geo.h >> 1) - (sq->geo.h >> 1);
 
-               if(sq->align == Left)
-               {
-                    sq->geo.x = left;
-                    left += sq->geo.w;
-               }
-               else if(sq->align == Right)
-               {
-                    sq->geo.x = e->geo.w - right - sq->geo.w;
-                    right += sq->geo.w;
-               }
-
+               STATUS_ALIGN(sq->align);
 
                draw_rect(b->dr, sq->geo, sq->color);
 
-               if(sq->mousebind)
-                    sq->mousebind->area = sq->geo;
+               if(!SLIST_EMPTY(&sq->mousebinds))
+                    SLIST_FOREACH(m, &sq->mousebinds, snext)
+                         m->area = sq->geo;
 
                break;
           }
@@ -243,8 +224,6 @@ status_manage(struct element *e)
      struct status_seq *sq;
      struct mousebind *m;
      struct barwin *b = SLIST_FIRST(&e->bars);
-
-     SLIST_INIT(&e->infobar->statushead);
 
      /*
       * Flush previous linked list of status sequences

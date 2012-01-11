@@ -81,6 +81,7 @@ void *xcalloc(size_t nmemb, size_t size);
 int xasprintf(char **strp, const char *fmt, ...);
 char *xstrdup(const char *str);
 pid_t spawn(const char *format, ...);
+int parse_args(char *str, char delim, char end, int narg, char *args[]);
 void uicb_spawn(Uicb cmd);
 
 #endif /* UTIL_H */

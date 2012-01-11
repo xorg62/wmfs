@@ -121,6 +121,23 @@ spawn(const char *format, ...)
      return pid;
 }
 
+int
+parse_args(char *str, char delim, char end, int narg, char *args[])
+{
+     int i = 0;
+
+     for(args[0] = str; *str && *str != end && i < narg; ++str)
+          if(*str == delim)
+          {
+               *str = '\0';
+               args[++i] = ++str;
+          }
+
+     *str = '\0';
+
+     return i;
+}
+
 void
 uicb_spawn(Uicb cmd)
 {
