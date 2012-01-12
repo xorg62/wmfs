@@ -99,7 +99,7 @@ client_next_tab(struct client *c)
      if(!(c->flags & CLIENT_TABMASTER))
           return NULL;
 
-     while(!(n->flags & CLIENT_TABBED) && n != c)
+     while((!(n->flags & CLIENT_TABBED) || n->tabmaster != c) && n != c)
           n = client_next(n);
 
      return n;
@@ -113,7 +113,7 @@ client_prev_tab(struct client *c)
      if(!(c->flags & CLIENT_TABMASTER))
           return NULL;
 
-     while(!(p->flags & CLIENT_TABBED) && p != c)
+     while((!(p->flags & CLIENT_TABBED) || p->tabmaster != c) && p != c)
           p = client_prev(p);
 
      return p;
