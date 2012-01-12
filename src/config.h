@@ -15,6 +15,7 @@
 #include "tag.h"
 #include "client.h"
 #include "status.h"
+#include "mouse.h"
 
 #define THEME_DEFAULT (SLIST_FIRST(&W->h.theme))
 
@@ -68,6 +69,10 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
 
      /* Status */
      { "status" , uicb_status },
+
+     /* Mouse */
+     { "mouse_resize", uicb_mouse_resize },
+     { "mouse_move",   uicb_mouse_move },
 
      { NULL, NULL }
 };

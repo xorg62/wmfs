@@ -12,6 +12,7 @@
 #include "barwin.h"
 #include "draw.h"
 #include "screen.h"
+#include "mouse.h"
 
 #define CLIENT_MOUSE_MOD Mod1Mask
 
@@ -146,6 +147,17 @@ client_gb_pos(struct tag *t, int x, int y)
      }
 
      return NULL;
+}
+
+struct client*
+client_gb_titlebar(Window w)
+{
+     struct client *c = SLIST_FIRST(&W->h.client);
+
+     while(c && c->titlebar->win != w)
+          c = SLIST_NEXT(c, next);
+
+     return c;
 }
 
 /*
@@ -719,6 +731,10 @@ client_frame_new(struct client *c)
           /* TODO: Refer to titlebar config */
           barwin_mousebind_new(c->titlebar, Button1, false, g,
                                uicb_client_focus_with_wid, cmd);
+          barwin_mousebind_new(c->titlebar, Button1, false, g,
+                               uicb_mouse_move, cmd);
+          barwin_mousebind_new(c->titlebar, Button3, false, g,
+                               uicb_mouse_resize, cmd);
      }
 
      XReparentWindow(W->dpy, c->win, c->frame, c->border, c->tbarw);

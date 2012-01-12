@@ -17,6 +17,7 @@ inline void client_configure(struct client *c);
 struct client *client_gb_win(Window w);
 struct client *client_gb_frame(Window w);
 struct client *client_gb_pos(struct tag *t, int x, int y);
+struct client *client_gb_titlebar(Window w);
 struct client *client_next_with_pos(struct client *bc, enum position p);
 void client_swap2(struct client *c1, struct client *c2);
 void client_swap(struct client *c, enum position p);
