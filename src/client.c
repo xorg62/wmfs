@@ -323,9 +323,9 @@ client_grabbuttons(struct client *c, bool focused)
                ButtonMask, GrabModeAsync, GrabModeSync, None, None);
 }
 
-#define _XTEXT()                                \
+#define _XTEXT()                          \
      if((xt = ((f >> 1) - (w >> 1))) < 0) \
-          xt = 1;
+          xt = c->border << 1;
 void
 client_frame_update(struct client *c, struct colpair *cp)
 {
@@ -365,6 +365,7 @@ client_frame_update(struct client *c, struct colpair *cp)
           if(c->flags & CLIENT_TABMASTER && n > 1)
           {
                int x = f;
+               struct geo g = { 0, 0, 1, c->titlebar->geo.h };
 
                SLIST_FOREACH(cc, &c->tag->clients, tnext)
                     if(c == cc->tabmaster && cc->titlebar)
@@ -374,18 +375,19 @@ client_frame_update(struct client *c, struct colpair *cp)
                          w = draw_textw(c->theme, cc->title);
                          _XTEXT();
 
-                         barwin_map(cc->titlebar);
                          barwin_reparent(cc->titlebar, c->frame);
-                         barwin_move(cc->titlebar, x, 0);
-                         barwin_resize(cc->titlebar, f, c->tbarw);
+                         barwin_map(cc->titlebar)
+                         barwin_move(cc->titlebar, x, 1);
+                         barwin_resize(cc->titlebar, f, c->tbarw - 2);
                          barwin_refresh_color(cc->titlebar);
 
-                         draw_text(cc->titlebar->dr, c->theme, xt, y,
+                         draw_rect(cc->titlebar->dr, g, c->scol.bg);
+                         draw_text(cc->titlebar->dr, c->theme, xt, y - 1,
                                    c->ncol.fg, cc->title);
 
                          barwin_refresh(cc->titlebar);
 
-                         x += f + c->border;
+                         x += f;
                     }
           }
      }

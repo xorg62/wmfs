@@ -86,7 +86,7 @@ status_parse(struct element *e)
                continue;
 
           /* Then parse & list it */
-          switch((type = *p) )
+          switch((type = *p))
           {
           /*
            * Text sequence: \s[left/right;#color;text] OR \s[x;y;#color;text]
