@@ -109,7 +109,10 @@ mouse_move(struct client *c)
      } while(ev.type != ButtonRelease);
 
      if(c2 && c2 != c)
+     {
+          _REV_SBORDER(c2);
           client_swap2(c, c2);
+     }
 
      XUngrabServer(W->dpy);
 }
