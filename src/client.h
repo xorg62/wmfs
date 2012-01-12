@@ -70,6 +70,8 @@ void uicb_client_focus_next(Uicb);
 void uicb_client_focus_prev(Uicb);
 void uicb_client_swapsel_next(Uicb);
 void uicb_client_swapsel_prev(Uicb);
+void uicb_client_focus_next_tab(Uicb);
+void uicb_client_focus_prev_tab(Uicb);
 
 static inline struct client*
 client_next(struct client *c)
@@ -88,6 +90,33 @@ client_prev(struct client *c)
           cc = SLIST_NEXT(cc, tnext);
 
      return cc;
+}
+static inline struct client*
+client_next_tab(struct client *c)
+{
+     struct client *n = client_next(c);
+
+     if(!(c->flags & CLIENT_TABMASTER))
+          return NULL;
+
+     while(!(n->flags & CLIENT_TABBED) && n != c)
+          n = client_next(n);
+
+     return n;
+}
+
+static inline struct client*
+client_prev_tab(struct client *c)
+{
+     struct client *p = client_prev(c);
+
+     if(!(c->flags & CLIENT_TABMASTER))
+          return NULL;
+
+     while(!(p->flags & CLIENT_TABBED) && p != c)
+          p = client_prev(p);
+
+     return p;
 }
 
 static inline struct client*

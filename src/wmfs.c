@@ -190,7 +190,6 @@ wmfs_scan(void)
      int tag = -1, screen = -1, flags = -1;
      unsigned long ir, il;
      long *ret, *tret;
-     bool pstag = false;
      XWindowAttributes wa;
      Window usl, usl2, *w = NULL, tm, focus;
      Atom rt;
@@ -466,6 +465,7 @@ int
 main(int argc, char **argv)
 {
      bool r;
+     (void)argc;
 
      W = (struct wmfs*)xcalloc(1, sizeof(struct wmfs));
 

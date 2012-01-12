@@ -134,8 +134,11 @@
 
   [key] mod = {"Super"} key = "q" func = "client_close" [/key]
 
-  # Focus next / prev client
-  [key] mod = { "Alt" } key = "Tab" func = "client_focus_next" [/key][key] mod = { "Alt", "Shift" } key = "Tab" func = "client_focus_prev" [/key]
+  # Focus next / prev client and next / prev tabbed client
+  [key] mod = { "Alt" } key = "Tab" func = "client_focus_next" [/key]
+  [key] mod = { "Alt", "Shift" } key = "Tab" func = "client_focus_prev" [/key]
+  [key] mod = { "Super" } key = "Tab" func = "client_focus_next_tab" [/key]
+  [key] mod = { "Super", "Shift" } key = "Tab" func = "client_focus_prev_tab" [/key]
 
   # Focus next client with direction
   [key] mod = {"Alt"} key = "h" func = "client_focus_left"   [/key]

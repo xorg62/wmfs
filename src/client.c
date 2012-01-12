@@ -82,6 +82,10 @@ CLIENT_ACTION_LIST(focus, prev)
 CLIENT_ACTION_LIST(swapsel, next)
 CLIENT_ACTION_LIST(swapsel, prev)
 
+/* uicb_client_focus_next/prev_tab() */
+CLIENT_ACTION_LIST(focus, next_tab)
+CLIENT_ACTION_LIST(focus, prev_tab)
+
 /** Send a ConfigureRequest event to the struct client
  * \param c struct client pointer
 */
