@@ -70,7 +70,7 @@ mouse_resize(struct client *c)
 
 #define _REV_SBORDER(c) draw_reversed_rect(W->root, &(c)->geo);
 void
-mouse_move(struct client *c)
+mouse_move(struct client *c, bool type)
 {
      struct client *c2 = NULL, *last = c;
      XEvent ev;
@@ -111,7 +111,11 @@ mouse_move(struct client *c)
      if(c2 && c2 != c)
      {
           _REV_SBORDER(c2);
-          client_swap2(c, c2);
+
+          if(type)
+               client_swap2(c, c2);
+          else
+               _client_tab(c, c2);
      }
 
      XUngrabServer(W->dpy);
@@ -134,5 +138,15 @@ uicb_mouse_move(Uicb cmd)
 
      if(mouse_check_client(W->client))
           if(W->client)
-               mouse_move(W->client);
+               mouse_move(W->client, true);
+}
+
+void
+uicb_mouse_tab(Uicb cmd)
+{
+     (void)cmd;
+
+     if(mouse_check_client(W->client))
+          if(W->client)
+               mouse_move(W->client, false);
 }

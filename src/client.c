@@ -733,6 +733,8 @@ client_frame_new(struct client *c)
                                uicb_client_focus_with_wid, cmd);
           barwin_mousebind_new(c->titlebar, Button1, false, g,
                                uicb_mouse_move, cmd);
+          barwin_mousebind_new(c->titlebar, Button2, false, g,
+                               uicb_mouse_tab, cmd);
           barwin_mousebind_new(c->titlebar, Button3, false, g,
                                uicb_mouse_resize, cmd);
      }
