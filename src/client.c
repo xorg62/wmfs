@@ -966,11 +966,13 @@ client_winsize(struct client *c, struct geo *g)
 
      /* Check possible problem for tile integration */
      if(ow < c->sizeh[MINW] || oh < c->sizeh[MINH])
-          if(ow + oh < og.w + og.h)
+     {
+          if(g->w < c->geo.w || g->h < c->geo.h)
           {
                c->wgeo = og;
                return true;
           }
+     }
 
      /* Balance position with new size */
      c->wgeo.x += (ow - c->wgeo.w) >> 1;
@@ -980,17 +982,20 @@ client_winsize(struct client *c, struct geo *g)
      return false;
 }
 
-void
+bool
 client_moveresize(struct client *c, struct geo *g)
 {
+     bool r = true;
+
      if(c->flags & CLIENT_TABBED)
-          return;
+          return false;
 
      c->ttgeo = c->tgeo = c->rgeo = c->geo = *g;
 
      if(!(c->flags & CLIENT_DID_WINSIZE))
           if(client_winsize(c, g))
           {
+               r = false;
                /* TODO
                 * Window required size not compatible
                 * with frame window size in tile mode
@@ -1015,6 +1020,8 @@ client_moveresize(struct client *c, struct geo *g)
      client_frame_update(c, CCOL(c));
      client_update_props(c, CPROP_GEO);
      client_configure(c);
+
+     return r;
 }
 
 void
@@ -1066,28 +1073,10 @@ _fac_arrange_row(struct client *c, enum position p, int fac)
                _fac_apply(cc, p, fac);
 }
 
-void
-_fac_resize(struct client *c, enum position p, int fac)
+static inline void
+_fac_check_to_reverse(struct client *c)
 {
-     struct client *cc, *gc = client_next_with_pos(c, p);
-     enum position rp = RPOS(p);
-
-     if(!gc || gc->screen != c->screen)
-          return;
-
-     SLIST_FOREACH(cc, &c->tag->clients, tnext)
-          cc->ttgeo = cc->tgeo;
-
-     if(GEO_CHECK2(c->geo, gc->geo, p))
-     {
-          _fac_apply(c, p, fac);
-          _fac_apply(gc, rp, -fac);
-     }
-     else
-     {
-          _fac_arrange_row(c, p, fac);
-          _fac_arrange_row(gc, rp, -fac);
-     }
+     struct client *gc, *cc;
 
      /*
       * Check if every clients are compatible with
@@ -1111,6 +1100,32 @@ _fac_resize(struct client *c, enum position p, int fac)
 
                return;
           }
+}
+
+void
+_fac_resize(struct client *c, enum position p, int fac)
+{
+     struct client *cc, *gc = client_next_with_pos(c, p);
+     enum position rp = RPOS(p);
+
+     if(!gc || gc->screen != c->screen)
+          return;
+
+     SLIST_FOREACH(cc, &c->tag->clients, tnext)
+          cc->ttgeo = cc->tgeo;
+
+     if(GEO_CHECK2(c->geo, gc->geo, p))
+     {
+          _fac_apply(c, p, fac);
+          _fac_apply(gc, rp, -fac);
+     }
+     else
+     {
+          _fac_arrange_row(c, p, fac);
+          _fac_arrange_row(gc, rp, -fac);
+     }
+
+     _fac_check_to_reverse(c);
 }
 
 void
