@@ -346,7 +346,7 @@ void
 client_frame_update(struct client *c, struct colpair *cp)
 {
      if(c->flags & CLIENT_TABBED)
-          return;
+          c = c->tabmaster;
 
      XSetWindowBackground(W->dpy, c->frame, cp->bg);
      XClearWindow(W->dpy, c->frame);
