@@ -144,7 +144,7 @@ mouse_move(struct client *c, bool type)
                     _client_tab(c, c2);
           }
      }
-     else if(t)
+     else if(t && t != (struct tag*)c)
           tag_client(t, c);
 }
 
