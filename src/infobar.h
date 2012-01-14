@@ -91,5 +91,4 @@ infobar_gb_name(const char *name)
      return SLIST_FIRST(&s->infobars);
 }
 
-
 #endif /* INFOBAR_H */

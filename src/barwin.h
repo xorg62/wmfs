@@ -11,7 +11,7 @@
 #define BARWIN_MASK                                                  \
      (SubstructureRedirectMask | SubstructureNotifyMask              \
       | ButtonMask | MouseMask | ExposureMask | VisibilityChangeMask \
-      | StructureNotifyMask | SubstructureRedirectMask)
+      | StructureNotifyMask)
 
 #define BARWIN_ENTERMASK (EnterWindowMask | LeaveWindowMask | FocusChangeMask)
 #define BARWIN_WINCW     (CWOverrideRedirect | CWBackPixmap | CWEventMask)

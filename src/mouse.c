@@ -5,6 +5,7 @@
 
 #include "wmfs.h"
 #include "mouse.h"
+#include "barwin.h"
 #include "client.h"
 #include "draw.h"
 
@@ -68,16 +69,34 @@ mouse_resize(struct client *c)
      XUngrabServer(W->dpy);
 }
 
+static struct tag*
+mouse_drag_tag(struct client *c, Window w)
+{
+     struct barwin *b;
+     struct tag *t;
+     Window rw;
+     int d, u;
+
+     XQueryPointer(W->dpy, w, &rw, &rw, &d, &d, &d, &d, (uint *)&u);
+
+     SLIST_FOREACH(b, &W->h.barwin, next)
+          if(b->win == rw
+             && (t = (struct tag*)b->ptr)
+             && t != c->tag)
+               return t;
+
+     return NULL;
+}
+
 #define _REV_SBORDER(c) draw_reversed_rect(W->root, &(c)->geo);
 void
 mouse_move(struct client *c, bool type)
 {
      struct client *c2 = NULL, *last = c;
+     struct tag *t;
      XEvent ev;
      Window w;
      int d, u;
-
-     XGrabServer(W->dpy);
 
      if(c->flags & CLIENT_TABBED && !(c->flags & CLIENT_TABMASTER))
           c = c->tabmaster;
@@ -97,28 +116,36 @@ mouse_move(struct client *c, bool type)
                if(!(c2 = client_gb_frame(w)))
                     c2 = client_gb_titlebar(w);
 
-          if(c2 && c2 != last)
+          if(c2)
           {
-               _REV_SBORDER(last);
-               _REV_SBORDER(c2);
-               last = c2;
+               if(c2 != last)
+               {
+                    _REV_SBORDER(last);
+                    _REV_SBORDER(c2);
+                    last = c2;
+               }
           }
+          else
+               t = mouse_drag_tag(c, w);
 
           XSync(W->dpy, false);
 
      } while(ev.type != ButtonRelease);
 
-     if(c2 && c2 != c)
+     if(c2)
      {
-          _REV_SBORDER(c2);
+          if(c2 != c)
+          {
+               _REV_SBORDER(c2);
 
-          if(type)
-               client_swap2(c, c2);
-          else
-               _client_tab(c, c2);
+               if(type)
+                    client_swap2(c, c2);
+               else
+                    _client_tab(c, c2);
+          }
      }
-
-     XUngrabServer(W->dpy);
+     else if(t)
+          tag_client(t, c);
 }
 
 void
@@ -126,9 +153,8 @@ uicb_mouse_resize(Uicb cmd)
 {
      (void)cmd;
 
-     if(mouse_check_client(W->client))
-          if(W->client)
-               mouse_resize(W->client);
+     if(W->client && mouse_check_client(W->client))
+          mouse_resize(W->client);
 }
 
 void
@@ -136,9 +162,8 @@ uicb_mouse_move(Uicb cmd)
 {
      (void)cmd;
 
-     if(mouse_check_client(W->client))
-          if(W->client)
-               mouse_move(W->client, true);
+     if(W->client && mouse_check_client(W->client))
+          mouse_move(W->client, true);
 }
 
 void
@@ -146,7 +171,6 @@ uicb_mouse_tab(Uicb cmd)
 {
      (void)cmd;
 
-     if(mouse_check_client(W->client))
-          if(W->client)
-               mouse_move(W->client, false);
+     if(W->client && mouse_check_client(W->client))
+          mouse_move(W->client, false);
 }

@@ -73,6 +73,7 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      /* Mouse */
      { "mouse_resize", uicb_mouse_resize },
      { "mouse_move",   uicb_mouse_move },
+     { "mouse_swap",   uicb_mouse_move },
      { "mouse_tab",    uicb_mouse_tab },
 
      { NULL, NULL }
