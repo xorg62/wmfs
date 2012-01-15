@@ -1250,8 +1250,6 @@ client_fac_hint(struct client *c)
      if(c->tgeo.h < h)
           _fac_resize(c, Bottom, (h - c->tgeo.h));
 
-     client_apply_tgeo(c->tag);
-
      if(c->geo.w < w)
           _fac_resize(c, Left, (w - c->geo.w));
      if(c->tgeo.w < w)
