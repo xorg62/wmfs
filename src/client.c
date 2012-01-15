@@ -1116,7 +1116,7 @@ _fac_resize(struct client *c, enum position p, int fac)
      SLIST_FOREACH(cc, &c->tag->clients, tnext)
           cc->ttgeo = cc->tgeo;
 
-     if(GEO_CHECK2(c->geo, gc->geo, p))
+     if(GEO_CHECK2(c->tgeo, gc->tgeo, p))
      {
           _fac_apply(c, p, fac);
           _fac_apply(gc, rp, -fac);
@@ -1245,17 +1245,17 @@ client_fac_hint(struct client *c)
      int w = c->sizeh[MINW] + c->border + c->border;
      int h = c->sizeh[MINH] + c->tbarw + c->border;
 
-     if(c->geo.w < w)
-          _fac_resize(c, Left, (w - c->geo.w));
-     if(c->tgeo.w < w)
-          _fac_resize(c, Right, (w - c->tgeo.w));
-
-     client_apply_tgeo(c->tag);
-
      if(c->geo.h < h)
           _fac_resize(c, Top, (h - c->geo.h));
      if(c->tgeo.h < h)
           _fac_resize(c, Bottom, (h - c->tgeo.h));
+
+     client_apply_tgeo(c->tag);
+
+     if(c->geo.w < w)
+          _fac_resize(c, Left, (w - c->geo.w));
+     if(c->tgeo.w < w)
+          _fac_resize(c, Right, (w - c->tgeo.w));
 
      client_apply_tgeo(c->tag);
 }
