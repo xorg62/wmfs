@@ -43,5 +43,8 @@ screen_gb_mouse(void)
 void screen_init(void);
 struct screen* screen_update_sel(void);
 void screen_free(void);
+void uicb_screen_next(Uicb cmd);
+void uicb_screen_prev(Uicb cmd);
+
 
 #endif /* SCREEN_H */

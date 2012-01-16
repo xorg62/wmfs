@@ -130,7 +130,10 @@
   #[key] mod = {"Super"} key = "z" func = "tag" cmd = "2" [/key]
 
   [key] mod = {"Control"} key = "Right" func = "tag_next" [/key]
-  [key] mod = {"Control"} key = "Left" func = "tag_prev" [/key]
+  [key] mod = {"Control"} key = "Left"  func = "tag_prev" [/key]
+
+  [key] mod = {"Control"} key = "Up"  func = "screen_next" [/key]
+  [key] mod = {"Control"} key = "Down" func = "screen_prev" [/key]
 
   [key] mod = {"Super"} key = "q" func = "client_close" [/key]
 

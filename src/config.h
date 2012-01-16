@@ -16,6 +16,7 @@
 #include "client.h"
 #include "status.h"
 #include "mouse.h"
+#include "screen.h"
 
 #define THEME_DEFAULT (SLIST_FIRST(&W->h.theme))
 
@@ -75,6 +76,10 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "mouse_move",   uicb_mouse_move },
      { "mouse_swap",   uicb_mouse_move },
      { "mouse_tab",    uicb_mouse_tab },
+
+     /* Screen */
+     { "screen_next", uicb_screen_next },
+     { "screen_prev", uicb_screen_prev },
 
      { NULL, NULL }
 };

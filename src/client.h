@@ -21,7 +21,7 @@ struct client *client_gb_titlebar(Window w);
 struct client *client_next_with_pos(struct client *bc, enum position p);
 void client_swap2(struct client *c1, struct client *c2);
 void client_swap(struct client *c, enum position p);
-#define CCOL(c) (c == c->tag->sel ? &c->scol : &c->ncol)
+#define CCOL(c) (c == W->client ? &c->scol : &c->ncol)
 void client_frame_update(struct client *c, struct colpair *cp);
 void client_tab_pull(struct client *c);
 void _client_tab(struct client *c, struct client *cm);

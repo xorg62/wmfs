@@ -88,6 +88,44 @@ screen_update_sel(void)
      return W->screen;
 }
 
+static void
+screen_select(struct screen *s)
+{
+     XWarpPointer(W->dpy, None, W->root, 0, 0, 0, 0,
+                  s->ugeo.x + (s->ugeo.w >> 1),
+                  s->ugeo.y + (s->ugeo.h >> 1));
+
+     W->screen = s;
+}
+
+void
+uicb_screen_next(Uicb cmd)
+{
+     struct screen *s;
+     (void)cmd;
+
+     if(!(s = SLIST_NEXT(W->screen, next)))
+          s = SLIST_FIRST(&W->h.screen);
+
+     screen_select(s);
+}
+
+void
+uicb_screen_prev(Uicb cmd)
+{
+     struct screen *s;
+     (void)cmd;
+
+     SLIST_FOREACH(s, &W->h.screen, next)
+          if(SLIST_NEXT(W->screen, next) == s)
+          {
+               screen_select(s);
+               return;
+          }
+
+     screen_select(SLIST_FIRST(&W->h.screen));
+}
+
 void
 screen_free(void)
 {

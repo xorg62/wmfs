@@ -825,7 +825,7 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
      /* C attributes */
      c->win    = w;
      c->flags  = 0;
-     c->screen = W->screen;
+     c->screen = screen_update_sel();
      c->theme  = THEME_DEFAULT;
      c->tag    = NULL;
      c->tabmaster = NULL;
