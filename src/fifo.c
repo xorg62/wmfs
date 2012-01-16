@@ -34,7 +34,7 @@ static void
 fifo_parse(char *cmd)
 {
      void (*func)(Uicb);
-     char *p = NULL, *arg = NULL;
+     char *p, *arg = NULL;
 
      /* remove trailing newline */
      if((p = strchr(cmd, '\n')))

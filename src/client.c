@@ -453,7 +453,8 @@ void
 _client_tab(struct client *c, struct client *cm)
 {
      /* Do not tab already tabed client */
-     if(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER))
+     if(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER)
+        || c->tag != cm->tag)
           return;
 
      layout_split_arrange_closed(c);
