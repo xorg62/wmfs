@@ -491,7 +491,7 @@ main(int argc, char **argv)
                     printf("usage: %s [-hv] [-C <file>]\n"
                            "   -h        Show this page\n"
                            "   -v        Show WMFS version\n"
-                           "   -C <file> Launch WMFS a specified configuration file\n", argv[0]);
+                           "   -C <file> Launch WMFS with a specified configuration file\n", argv[0]);
                     free(W);
                     exit(EXIT_SUCCESS);
                     break;
