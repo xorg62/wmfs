@@ -190,6 +190,7 @@ wmfs_scan(void)
      int tag = -1, screen = -1, flags = -1;
      unsigned long ir, il;
      long *ret, *tret;
+     bool getg = false;
      XWindowAttributes wa;
      Window usl, usl2, *w = NULL, tm, focus;
      Atom rt;
@@ -263,6 +264,7 @@ wmfs_scan(void)
                          g.w = ret[2];
                          g.h = ret[3];
 
+                         getg = true;
                          XFree(ret);
                     }
 
@@ -287,10 +289,16 @@ wmfs_scan(void)
                     if(tag != -1 && screen != -1)
                     {
                          c->screen = screen_gb_id(screen);
-                         c->flags |= CLIENT_IGNORE_LAYOUT;
+
+                         if(getg)
+                              c->flags |= CLIENT_IGNORE_LAYOUT;
+
                          client_map(c);
                          tag_client(tag_gb_id(c->screen, tag), c);
-                         client_moveresize(c, &g);
+
+                         if(getg)
+                              client_moveresize(c, &g);
+
                          client_get_name(c);
                     }
                }

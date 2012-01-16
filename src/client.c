@@ -233,7 +233,7 @@ _swap_get(struct client *c, enum position p)
 }
 
 #define _REV_SBORDER() \
-          draw_reversed_rect(W->root, &c2->geo);
+          draw_reversed_rect(W->root, c2, false);
 void
 client_swap(struct client *c, enum position p)
 {
@@ -1146,8 +1146,7 @@ client_apply_tgeo(struct tag *t)
 #define _REV_BORDER()                                        \
      do {                                                    \
           SLIST_FOREACH(gc, &c->tag->clients, tnext)         \
-               draw_reversed_rect(W->root, &gc->tgeo);       \
-      /* draw_reversed_cross(W->root, &c->tag->sel->tgeo);*/ \
+               draw_reversed_rect(W->root, gc, true);        \
      } while(/* CONSTCOND */ 0);
 void
 client_fac_resize(struct client *c, enum position p, int fac)

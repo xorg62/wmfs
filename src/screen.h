@@ -7,6 +7,7 @@
 #define SCREEN_H
 
 #include "wmfs.h"
+#include "util.h"
 
 static inline struct screen*
 screen_gb_id(int id)
@@ -18,6 +19,25 @@ screen_gb_id(int id)
                return s;
 
      return SLIST_FIRST(&W->h.screen);
+}
+
+static inline struct screen*
+screen_gb_mouse(void)
+{
+     struct screen *s;
+     Window w;
+     int d, x, y;
+
+     XQueryPointer(W->dpy, W->root, &w, &w, &x, &y, &d, &d, (unsigned int *)&d);
+
+     SLIST_FOREACH(s, &W->h.screen, next)
+          if(INAREA(x, y, s->geo))
+               break;
+
+     if(!s)
+          s = SLIST_FIRST(&W->h.screen);
+
+     return s;
 }
 
 void screen_init(void);

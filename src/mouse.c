@@ -9,10 +9,10 @@
 #include "client.h"
 #include "draw.h"
 
-#define _REV_BORDER()                                        \
-     do {                                                    \
-          SLIST_FOREACH(gc, &c->tag->clients, tnext)         \
-               draw_reversed_rect(W->root, &gc->tgeo);       \
+#define _REV_BORDER()                                  \
+     do {                                              \
+          SLIST_FOREACH(gc, &c->tag->clients, tnext)   \
+               draw_reversed_rect(W->root, gc, true);  \
      } while(/* CONSTCOND */ 0);
 static void
 mouse_resize(struct client *c)
@@ -88,7 +88,7 @@ mouse_drag_tag(struct client *c, Window w)
      return NULL;
 }
 
-#define _REV_SBORDER(c) draw_reversed_rect(W->root, &(c)->geo);
+#define _REV_SBORDER(c) draw_reversed_rect(W->root, c, false);
 void
 mouse_move(struct client *c, bool type)
 {

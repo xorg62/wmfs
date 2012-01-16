@@ -79,22 +79,7 @@ screen_update_sel(void)
 {
 #ifdef HAVE_XINERAMA
      if(XineramaIsActive(W->dpy))
-     {
-          struct screen *s;
-          Window w;
-          int d, x, y;
-
-          XQueryPointer(W->dpy, W->root, &w, &w, &x, &y, &d, &d, (unsigned int *)&d);
-
-          SLIST_FOREACH(s, &W->h.screen, next)
-               if(INAREA(x, y, s->geo))
-                    break;
-
-          if(!s)
-               s = SLIST_FIRST(&W->h.screen);
-
-          return (W->screen = s);
-     }
+          return (W->screen = screen_gb_mouse());
 #endif /* HAVE_XINERAMA */
 
      return W->screen;

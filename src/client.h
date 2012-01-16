@@ -92,6 +92,7 @@ client_prev(struct client *c)
 
      return cc;
 }
+
 static inline struct client*
 client_next_tab(struct client *c)
 {

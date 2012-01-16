@@ -103,15 +103,18 @@ layout_free_set(struct tag *t)
      }
 }
 
-#define _REV_BORDER()                 \
-     SLIST_FOREACH(g, &l->geos, next) \
-          draw_reversed_rect(W->root, &g->geo);
+#define _REV_BORDER()                              \
+     SLIST_FOREACH(g, &l->geos, next) {            \
+          cd.geo = g->geo;                         \
+          draw_reversed_rect(W->root, &cd, false); \
+     }
 static void
 _historic_set(struct tag *t, bool prev)
 {
      struct keybind *k;
      struct layout_set *l;
      struct geo_list *g;
+     struct client cd = { .screen = t->screen, .theme = THEME_DEFAULT };
      bool b = true;
      XEvent ev;
      KeySym keysym;

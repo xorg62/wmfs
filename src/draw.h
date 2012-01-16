@@ -12,6 +12,7 @@
 
 #include "wmfs.h"
 #include "config.h"
+#include "screen.h"
 
 #define TEXTY(t, w) ((t->font.height - t->font.de) + ((w - t->font.height) >> 1))
 #define PAD (8)
@@ -34,10 +35,11 @@ draw_rect(Drawable d, struct geo g, Color bg)
  * For client use
  */
 static inline void
-draw_reversed_rect(Drawable dr, struct geo *g)
+draw_reversed_rect(Drawable dr, struct client *c, bool t)
 {
-     struct geo *ug = &W->screen->ugeo;
-     int i = THEME_DEFAULT->client_border_width;
+     struct geo *g = (t ? &c->tgeo : &c->geo);
+     struct geo *ug = &c->screen->ugeo;
+     int i = c->theme->client_border_width;
 
      XDrawRectangle(W->dpy, dr, W->rgc,
                     ug->x + g->x + i,
