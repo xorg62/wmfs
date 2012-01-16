@@ -1,11 +1,15 @@
 #!/bin/sh
 #WMFS status.sh example file
-#Will be executed if put in ~/.config/wmfs/
-#Timing adjustable in wmfsrc (misc -> status_timing)
+
+TIMING=10
 
 statustext()
 {
-     wmfs -s "`date`"
+     echo "status default `date`" > /tmp/wmfs-$DISPLAY.fifo
 }
 
-while true; do statustext; sleep 10; done
+while true;
+do
+    statustext
+    sleep $TIMING
+done
