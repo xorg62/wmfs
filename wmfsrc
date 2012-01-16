@@ -2,57 +2,39 @@
 # WMFS2 configuration file
 #
 
+# Possible file inclusion:
+# @include "file"
+
+# Multi theme section
 [themes]
 
-
   [theme]
+     # No name mean default
      # name = "default"
 
      font = "fixed"
 
      # Bars
      bars_width = 14
-     bars_fg = "#CCCCCC"
-     bars_bg = "#222222"
+     bars_fg = "#AABBAA"
+     bars_bg = "#223322"
 
      # Element tags
-     tags_normal_fg = "#CCCCCC"
-     tags_normal_bg = "#222222"
-     tags_sel_fg    = "#222222"
-     tags_sel_bg    = "#CCCCCC"
-     tags_border_color = "#888888"
+     tags_normal_fg = "#AABBAA"
+     tags_normal_bg = "#223322"
+     tags_sel_fg    = "#223322"
+     tags_sel_bg    = "#AABBAA"
+     tags_border_color = "#112211"
      tags_border_width = 1
 
      # Frame / Client
-     client_normal_fg = "#CCCCCC"
-     client_normal_bg = "#222222"
-     client_sel_fg = "#222222"
-     client_sel_bg = "#CCCCCC"
+     client_normal_fg = "#AABBAA"
+     client_normal_bg = "#223322"
+     client_sel_fg = "#223322"
+     client_sel_bg = "#AABBAA"
      frame_bg = "#555555"
-     client_titlebar_width = 12 #useless for now
+     client_titlebar_width = 12
      client_border_width = 1
-
-   [/theme]
-
-   [theme]
-     name = "perso"
-
-     font = "-*-fixed-bold-*-*-18"
-
-     bars_width = 20
-     bars_fg = "#222222"
-     bars_bg = "#CCCCCC"
-
-     tags_sel_bg = "#33AA33"
-     tags_normal_fg = "#AA3333"
-
-     client_normal_fg = "#CCCCCC"
-     client_normal_bg = "#222222"
-     client_sel_fg = "#222222"
-     client_sel_bg = "#33AA33"
-
-     client_titlebar_width = 16
-
 
    [/theme]
 
@@ -61,55 +43,54 @@
 [bars]
 
   # Position:
-  #   0 Top
-  #   1 Bottom
-  #   2 Hide
+  #
+  # 0  Top
+  # 1  Bottom
+  # 2  Hide
 
   # Element type:
-  #   t Tags
-  #   s Statustext
+  #
+  # t  Tags
+  # s  Statustext (will take available space)
 
   [bar]
-     #name = "default"
      position = 0
      screen = 0
-     elements = "ts"
-     theme = "perso"
-  [/bar]
-
-  [bar]
-     name = "bar"
-     position = 1
-     screen = 0
-     elements = "st"
+     elements = "ts"    # element order in bar
      theme = "default"
   [/bar]
+
+# [bar]
+#    position = 0
+#    screen = 1
+#    elements = "ts"
+#    theme = "default"
+# [/bar]
 
 [/bars]
 
 [tags]
 
-  [tag] screen = 0 name = "one" [/tag]
-  [tag] screen = 0 name = "two" [/tag]
-  [tag] screen = 0 name = "three" [/tag]
-
-  [tag] screen = 1 name = "four" [/tag]
-  [tag] screen = 1 name = "five" [/tag]
-
-  [tag] name = "universal tag" [/tag]
+  [tag] screen = 0 name = "1" [/tag]
+  [tag] screen = 0 name = "2" [/tag]
+  [tag] screen = 0 name = "3" [/tag]
+  [tag] screen = 0 name = "4" [/tag]
+  [tag] screen = 0 name = "5" [/tag]
+  [tag] screen = 0 name = "6" [/tag]
+  [tag] screen = 0 name = "7" [/tag]
 
 [/tags]
 
 [rules]
 
   [rule]
-      class    = "xterm"
-      instance = "xterm"
-#     role     = ""
-#     name     = ""
-      theme    = "perso"
+      instance = "chromium"
 
-      tag = 0
+      # role   = ""
+      # name   = ""
+      # theme  = "default"
+
+      tag    = 1  # 2nd tag
       screen = 0
 
       free       = false
@@ -121,23 +102,42 @@
 
 [keys]
 
-  [key] mod = {"Super"} key = "Return" func = "spawn" cmd = "xterm" [/key]
-  [key] mod = {"Control","Alt"} key = "q" func = "quit" [/key]
+  [key] mod = {"Super"} key = "Return" func = "spawn" cmd = "urxvt || xterm" [/key]
+
+  [key] mod = {"Control", "Alt"} key = "q" func = "quit" [/key]
   [key] mod = {"Control", "Alt"} key = "r" func = "reload" [/key]
 
-  [key] mod = {"Super"} key = "1" func = "tag_set" cmd = "0" [/key]
-  [key] mod = {"Super"} key = "2" func = "tag_set" cmd = "1" [/key]
-  [key] mod = {"Super"} key = "3" func = "tag_set" cmd = "2" [/key]
-  [key] mod = {"Super"} key = "s" func = "tag_next" [/key]
-  [key] mod = {"Super"} key = "a" func = "tag_prev" [/key]
-  [key] mod = {"Super"} key = "z" func = "tag" cmd = "tag2" [/key]
+  # Tag manipulation
+  [key] mod = {"Super"} key = "F1" func = "tag_set" cmd = "0" [/key]
+  [key] mod = {"Super"} key = "F2" func = "tag_set" cmd = "1" [/key]
+  [key] mod = {"Super"} key = "F3" func = "tag_set" cmd = "2" [/key]
+  [key] mod = {"Super"} key = "F4" func = "tag_set" cmd = "3" [/key]
+  [key] mod = {"Super"} key = "F5" func = "tag_set" cmd = "4" [/key]
+  [key] mod = {"Super"} key = "F6" func = "tag_set" cmd = "5" [/key]
+  [key] mod = {"Super"} key = "F7" func = "tag_set" cmd = "6" [/key]
+  [key] mod = {"Super"} key = "F8" func = "tag_set" cmd = "7" [/key]
+
+  [key] mod = {"Super", "Shift"} key = "F1" func = "tag_client" cmd = "0" [/key]
+  [key] mod = {"Super", "Shift"} key = "F2" func = "tag_client" cmd = "1" [/key]
+  [key] mod = {"Super", "Shift"} key = "F3" func = "tag_client" cmd = "2" [/key]
+  [key] mod = {"Super", "Shift"} key = "F4" func = "tag_client" cmd = "3" [/key]
+  [key] mod = {"Super", "Shift"} key = "F5" func = "tag_client" cmd = "4" [/key]
+  [key] mod = {"Super", "Shift"} key = "F6" func = "tag_client" cmd = "5" [/key]
+  [key] mod = {"Super", "Shift"} key = "F7" func = "tag_client" cmd = "6" [/key]
+  [key] mod = {"Super", "Shift"} key = "F8" func = "tag_client" cmd = "7" [/key]
+
+  # tag function: cmd = nameofthetag
+  #[key] mod = {"Super"} key = "z" func = "tag" cmd = "2" [/key]
+
+  [key] mod = {"Control"} key = "Right" func = "tag_next" [/key]
+  [key] mod = {"Control"} key = "Left" func = "tag_prev" [/key]
 
   [key] mod = {"Super"} key = "q" func = "client_close" [/key]
 
   # Focus next / prev client and next / prev tabbed client
-  [key] mod = { "Alt" } key = "Tab" func = "client_focus_next" [/key]
-  [key] mod = { "Alt", "Shift" } key = "Tab" func = "client_focus_prev" [/key]
-  [key] mod = { "Super" } key = "Tab" func = "client_focus_next_tab" [/key]
+  [key] mod = { "Alt" }            key = "Tab" func = "client_focus_next" [/key]
+  [key] mod = { "Alt", "Shift" }   key = "Tab" func = "client_focus_prev" [/key]
+  [key] mod = { "Super" }          key = "Tab" func = "client_focus_next_tab" [/key]
   [key] mod = { "Super", "Shift" } key = "Tab" func = "client_focus_prev_tab" [/key]
 
   # Focus next client with direction
@@ -175,6 +175,7 @@
   [key] mod = {"Super"}          key = "r" func = "layout_rotate_right" [/key]
   [key] mod = {"Super", "Shift"} key = "r" func = "layout_rotate_left" [/key]
 
+  # Layout set historic travelling function (TESTING)
   [key] mod = {"Super"} key = "o" func = "layout_prev_set" [/key]
   [key] mod = {"Super"} key = "p" func = "layout_next_set" [/key]
 

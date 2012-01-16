@@ -58,6 +58,8 @@ screen_init(void)
                screen_new(&g, i);
           }
 
+          W->nscreen = n;
+
           XFree(xsi);
      }
      else
@@ -68,6 +70,7 @@ screen_init(void)
           g.h = DisplayHeight(W->dpy, W->xscreen);
 
           screen_new(&g, 0);
+          W->nscreen = 1;
      }
 }
 

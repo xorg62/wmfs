@@ -41,6 +41,9 @@ tag_new(struct screen *s, char *name)
 void
 tag_screen(struct screen *s, struct tag *t)
 {
+     if(!t)
+          t = TAILQ_FIRST(&s->tags);
+
      t->prev = s->seltag;
      s->seltag = t;
 

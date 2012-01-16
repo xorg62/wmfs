@@ -22,6 +22,7 @@
 #include <X11/Xatom.h>
 
 /* Local */
+#define CONFIG_DEFAULT_PATH ".config/wmfs/wmfsrc"
 
 #define ButtonMask (ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
 #define MouseMask  (ButtonMask | PointerMotionMask)
@@ -259,6 +260,8 @@ struct rule
      SLIST_ENTRY(rule) next;
 };
 
+#define MAX_PATH_LEN 8192
+
 struct wmfs
 {
      /* X11 stuffs */
@@ -266,12 +269,14 @@ struct wmfs
      Window root;
      int xscreen, xdepth;
      int xmaxw, xmaxh;
+     int nscreen;
      Flags numlockmask;
 #define WMFS_SCAN 0x01
      Flags flags;
      GC gc, rgc;
      Atom *net_atom;
      char **argv;
+     char confpath[MAX_PATH_LEN];
      bool running, reload;
 
      /* FIFO stuffs */

@@ -307,7 +307,8 @@ wmfs_scan(void)
      if(!nscreen)
      {
           SLIST_FOREACH(s, &W->h.screen, next)
-               tag_screen(s, TAILQ_FIRST(&s->tags));
+               if(!TAILQ_EMPTY(&s->tags))
+                    tag_screen(s, TAILQ_FIRST(&s->tags));
      }
      else
      {
@@ -472,10 +473,38 @@ uicb_quit(Uicb cmd)
 int
 main(int argc, char **argv)
 {
+     int i;
      bool r;
      (void)argc;
 
      W = (struct wmfs*)xcalloc(1, sizeof(struct wmfs));
+
+     /* Default path ~/.config/wmfs/wmfsrc */
+     sprintf(W->confpath, "%s/"CONFIG_DEFAULT_PATH, getenv("HOME"));
+
+     /* Opt */
+     while((i = getopt(argc, argv, "hvC:")) != -1)
+     {
+          switch(i)
+          {
+               case 'h':
+                    printf("usage: %s [-hv] [-C <file>]\n"
+                           "   -h        Show this page\n"
+                           "   -v        Show WMFS version\n"
+                           "   -C <file> Launch WMFS a specified configuration file\n", argv[0]);
+                    free(W);
+                    exit(EXIT_SUCCESS);
+                    break;
+               case 'v':
+                    printf("wmfs("WMFS_VERSION") 2 beta\n");
+                    free(W);
+                    exit(EXIT_SUCCESS);
+                    break;
+               case 'C':
+                    strncpy(W->confpath, optarg, sizeof(W->confpath));
+                    break;
+          }
+     }
 
      /* Get X display */
      if(!(W->dpy = XOpenDisplay(NULL)))
@@ -483,23 +512,6 @@ main(int argc, char **argv)
           fprintf(stderr, "%s: Can't open X server\n", argv[0]);
           exit(EXIT_FAILURE);
      }
-
-     /* Opt */
-     /*
-     int i;
-     while((i = getopt(argc, argv, "hviC:")) != -1)
-     {
-          switch(i)
-          {
-               case 'h':
-                    break;
-               case 'v':
-                    break;
-               case 'C':
-                    break;
-          }
-     }
-     */
 
      /* Core */
      wmfs_init();

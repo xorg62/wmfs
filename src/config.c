@@ -11,8 +11,6 @@
 #include "infobar.h"
 #include "util.h"
 
-#define CONFIG_DEFAULT_PATH ".config/wmfs/wmfsrc2" /* tmp */
-
 static void
 config_theme(void)
 {
@@ -245,12 +243,14 @@ config_keybind(void)
 void
 config_init(void)
 {
-     char *path;
+     if(get_conf(W->confpath) == -1)
+     {
+          warn("parsing configuration file (%s) failed.", W->confpath);
+          sprintf(W->confpath, "%s/"CONFIG_DEFAULT_PATH, getenv("HOME"));
 
-     xasprintf(&path, "%s/"CONFIG_DEFAULT_PATH, getenv("HOME"));
-
-     if(get_conf(path) == -1)
-          errx(1, "parsing configuration file (%s) failed.", path);
+          if(get_conf(W->confpath) == -1)
+               errx(1, "parsing default configuration file (%s) failed.", W->confpath);
+     }
 
      config_theme();
      config_keybind();
@@ -258,6 +258,5 @@ config_init(void)
      config_bars();
      config_rule();
 
-     free(path);
      free_conf();
 }
