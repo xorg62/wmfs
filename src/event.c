@@ -93,15 +93,10 @@ event_configureevent(XEvent *e)
 
      if((c = client_gb_win(ev->window)))
      {
-         /* if(ev->value_mask & CWX)
-               c->geo.x = ev->x;
-          if(ev->value_mask & CWY)
-               c->geo.y = ev->y; */
-
           if(ev->value_mask & CWWidth)
-               _fac_resize(c, Right, (ev->width - (c->geo.w - c->border - c->border)));
+               _fac_resize(c, Right, ev->width - c->wgeo.w);
           if(ev->value_mask & CWHeight)
-               _fac_resize(c, Bottom, (ev->height - (c->geo.h - c->tbarw)));
+               _fac_resize(c, Bottom, ev->height - c->wgeo.h);
 
           client_apply_tgeo(c->tag);
      }
