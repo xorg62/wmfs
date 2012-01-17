@@ -271,13 +271,14 @@ struct wmfs
      int xmaxw, xmaxh;
      int nscreen;
      Flags numlockmask;
-#define WMFS_SCAN 0x01
+#define WMFS_SCAN     0x01
+#define WMFS_RUNNING  0x02
+#define WMFS_RELOAD   0x04
      Flags flags;
      GC gc, rgc;
      Atom *net_atom;
      char **argv;
      char confpath[MAX_PATH_LEN];
-     bool running, reload;
 
      /* FIFO stuffs */
      struct

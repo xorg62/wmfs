@@ -154,7 +154,7 @@ wmfs_xinit(void)
       */
      SLIST_INIT(&W->h.barwin);
 
-     W->running = true;
+     W->flags |= WMFS_RUNNING;
 }
 
 void
@@ -344,7 +344,7 @@ wmfs_loop(void)
      int maxfd, fd = ConnectionNumber(W->dpy);
      fd_set iset;
 
-     while(W->running)
+     while(W->flags & WMFS_RUNNING)
      {
           maxfd = fd + 1;
 
@@ -361,7 +361,7 @@ wmfs_loop(void)
           {
                if(FD_ISSET(fd, &iset))
                {
-                    while(W->running && XPending(W->dpy))
+                    while((W->flags & WMFS_RUNNING) && XPending(W->dpy))
                     {
                          XNextEvent(W->dpy, &ev);
                          EVENT_HANDLE(&ev);
@@ -446,7 +446,7 @@ wmfs_quit(void)
           unlink(W->fifo.path);
      }
 
-     W->running = false;
+     W->flags &= ~WMFS_RUNNING;
 
      XCloseDisplay(W->dpy);
 }
@@ -458,8 +458,8 @@ uicb_reload(Uicb cmd)
 {
      (void)cmd;
 
-     W->running = false;
-     W->reload  = true;
+     W->flags &= ~WMFS_RUNNING;
+     W->flags |= WMFS_RELOAD;
 }
 
 void
@@ -467,7 +467,7 @@ uicb_quit(Uicb cmd)
 {
      (void)cmd;
 
-     W->running = false;
+     W->flags &= ~WMFS_RUNNING;
 }
 
 int
@@ -519,7 +519,7 @@ main(int argc, char **argv)
      wmfs_loop();
      wmfs_quit();
 
-     r = W->reload;
+     r = (W->flags & WMFS_RELOAD);
      free(W);
 
      if(r)
