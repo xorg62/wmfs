@@ -73,7 +73,7 @@ static struct tag*
 mouse_drag_tag(struct client *c, Window w)
 {
      struct barwin *b;
-     struct tag *t;
+     struct tag *t, *tt;
      Window rw;
      int d, u;
 
@@ -83,7 +83,12 @@ mouse_drag_tag(struct client *c, Window w)
           if(b->win == rw
              && (t = (struct tag*)b->ptr)
              && t != c->tag)
-               return t;
+          {
+               /* Check if tag exist */
+               TAILQ_FOREACH(tt, &c->screen->tags, next)
+                    if(tt == t)
+                         return t;
+          }
 
      return NULL;
 }
