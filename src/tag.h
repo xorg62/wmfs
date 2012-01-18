@@ -30,6 +30,8 @@ void uicb_tag_set_with_name(Uicb cmd);
 void uicb_tag_next(Uicb cmd);
 void uicb_tag_prev(Uicb cmd);
 void uicb_tag_client(Uicb cmd);
+void uicb_tag_move_client_next(Uicb cmd);
+void uicb_tag_move_client_prev(Uicb cmd);
 
 
 #endif /* TAG_H */

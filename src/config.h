@@ -28,11 +28,13 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "reload", uicb_reload },
 
      /* Tag */
-     { "tag_set",    uicb_tag_set },
-     { "tag",        uicb_tag_set_with_name },
-     { "tag_next",   uicb_tag_next },
-     { "tag_prev",   uicb_tag_prev },
-     { "tag_client", uicb_tag_client },
+     { "tag_set",              uicb_tag_set },
+     { "tag",                  uicb_tag_set_with_name },
+     { "tag_next",             uicb_tag_next },
+     { "tag_prev",             uicb_tag_prev },
+     { "tag_client",           uicb_tag_client },
+     { "tag_move_client_next", uicb_tag_move_client_next },
+     { "tag_move_client_prev", uicb_tag_move_client_prev },
 
      /* Layout */
      { "layout_vmirror",      uicb_layout_vmirror },

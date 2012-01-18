@@ -176,6 +176,35 @@ uicb_tag_client(Uicb cmd)
           tag_client(t, W->client);
 }
 
+void
+uicb_tag_move_client_next(Uicb cmd)
+{
+     (void)cmd;
+     struct tag *t;
+
+     /* Remove from current tag */
+     tag_client(NULL, W->client);
+
+     if((t = TAILQ_PREV(W->screen->seltag, tsub, next)))
+          tag_client(t, W->client);
+     else if( /* CIRCULAR OPTION */ 1)
+          tag_client(TAILQ_FIRST(&W->screen->tags, tsub), W->client);
+}
+
+void
+uicb_tag_move_client_prev(Uicb cmd)
+{
+     (void)cmd;
+     struct tag *t;
+
+     /* Remove from current tag */
+     tag_client(NULL, W->client);
+
+     if((t = TAILQ_PREV(W->screen->seltag, tsub, next)))
+          tag_client(t, W->client);
+     else if( /* CIRCULAR OPTION */ 1)
+          tag_client(TAILQ_LAST(&W->screen->tags, tsub), W->client);
+}
 
 static void
 tag_remove(struct tag *t)
