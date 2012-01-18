@@ -73,7 +73,7 @@ static struct tag*
 mouse_drag_tag(struct client *c, Window w)
 {
      struct barwin *b;
-     struct tag *t;
+     struct tag *t = NULL;
      Window rw;
      int d, u;
 
@@ -93,7 +93,7 @@ void
 mouse_move(struct client *c, bool type)
 {
      struct client *c2 = NULL, *last = c;
-     struct tag *t;
+     struct tag *t = NULL;
      XEvent ev;
      Window w;
      int d, u;
