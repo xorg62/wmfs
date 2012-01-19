@@ -130,7 +130,6 @@ static void
 screen_move_client(struct client *c, struct screen *s)
 {
      if (c && s) {
-          c->screen = s;
           tag_client(s->seltag, c);
      }
 }
