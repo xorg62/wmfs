@@ -105,7 +105,7 @@ spawn(const char *format, ...)
           return -1;
      }
 
-     if(!(sh = getenv("SHELL")))
+     if(!(sh = getenv("SHELL")) || sh[0] != '/')
           sh = "/bin/sh";
 
      if((pid = fork()) == 0)
