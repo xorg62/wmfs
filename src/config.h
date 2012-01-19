@@ -82,6 +82,8 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      /* Screen */
      { "screen_next", uicb_screen_next },
      { "screen_prev", uicb_screen_prev },
+     { "screen_move_client_next", uicb_screen_move_client_next },
+     { "screen_move_client_prev", uicb_screen_move_client_prev },
 
      { NULL, NULL }
 };

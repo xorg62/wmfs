@@ -126,6 +126,43 @@ uicb_screen_prev(Uicb cmd)
      screen_select(SLIST_FIRST(&W->h.screen));
 }
 
+static void
+screen_move_client(struct client *c, struct screen *s)
+{
+     if (c && s) {
+          c->screen = s;
+          tag_client(s->seltag, c);
+     }
+}
+
+void
+uicb_screen_move_client_next(Uicb cmd)
+{
+     struct screen *s;
+     (void)cmd;
+
+     if(!(s = SLIST_NEXT(W->screen, next)))
+          s = SLIST_FIRST(&W->h.screen);
+
+     screen_move_client(W->client, s);
+}
+
+void
+uicb_screen_move_client_prev(Uicb cmd)
+{
+     struct screen *s;
+     (void)cmd;
+
+     SLIST_FOREACH(s, &W->h.screen, next)
+          if(SLIST_NEXT(W->screen, next) == s)
+          {
+               screen_move_client(W->client, s);
+               return;
+          }
+
+     screen_move_client(W->client, SLIST_FIRST(&W->h.screen));
+}
+
 void
 screen_free(void)
 {
