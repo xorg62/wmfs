@@ -45,6 +45,8 @@ struct screen* screen_update_sel(void);
 void screen_free(void);
 void uicb_screen_next(Uicb cmd);
 void uicb_screen_prev(Uicb cmd);
+void uicb_screen_move_client_next(Uicb cmd);
+void uicb_screen_move_client_prev(Uicb cmd);
 
 
 #endif /* SCREEN_H */
