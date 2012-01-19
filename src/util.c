@@ -74,7 +74,7 @@ xasprintf(char **strp, const char *fmt, ...)
 char *
 xstrdup(const char *str)
 {
-     char *ret;
+     char *ret = NULL;
 
      if(str == NULL || (ret = strdup(str)) == NULL)
           warnx("strdup(%s)", str);
