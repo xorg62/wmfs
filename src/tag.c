@@ -26,6 +26,7 @@ tag_new(struct screen *s, char *name)
      t->flags  = 0;
      t->id     = 0;
      t->sel    = NULL;
+     t->prev   = NULL;
 
      if((l = TAILQ_LAST(&s->tags, tsub)))
           t->id = l->id + 1;
@@ -41,6 +42,9 @@ tag_new(struct screen *s, char *name)
 void
 tag_screen(struct screen *s, struct tag *t)
 {
+     if(t == s->seltag)
+          t = t->prev;
+
      if(!t)
           t = TAILQ_FIRST(&s->tags);
 
@@ -122,7 +126,7 @@ uicb_tag_set(Uicb cmd)
      struct tag *t;
 
      TAILQ_FOREACH(t, &W->screen->tags, next)
-          if(i++ == n && t != W->screen->seltag)
+          if(i++ == n)
           {
                tag_screen(W->screen, t);
                return;
@@ -135,7 +139,7 @@ uicb_tag_set_with_name(Uicb cmd)
      struct tag *t;
 
      TAILQ_FOREACH(t, &W->screen->tags, next)
-          if(!strcmp(cmd, t->name) && t != W->screen->seltag)
+          if(!strcmp(cmd, t->name))
           {
                tag_screen(W->screen, t);
                return;
