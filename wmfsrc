@@ -71,13 +71,18 @@
 
 [tags]
 
-  [tag] screen = 0 name = "1" [/tag]
-  [tag] screen = 0 name = "2" [/tag]
-  [tag] screen = 0 name = "3" [/tag]
-  [tag] screen = 0 name = "4" [/tag]
-  [tag] screen = 0 name = "5" [/tag]
-  [tag] screen = 0 name = "6" [/tag]
-  [tag] screen = 0 name = "7" [/tag]
+  # Use no screen option or screen = -1 to set tag on each screen
+  [tag]
+      screen = -1
+      name = "1"
+  [/tag]
+
+  [tag] name = "2" [/tag]
+  [tag] name = "3" [/tag]
+  [tag] name = "4" [/tag]
+  [tag] name = "5" [/tag]
+  [tag] name = "6" [/tag]
+  [tag] name = "7" [/tag]
 
   # Mousebinds associated to Tags element button
   [mouse] button = "1" func = "tag_click" [/mouse]

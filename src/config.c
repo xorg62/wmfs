@@ -24,8 +24,8 @@ config_mouse_section(struct mbhead *mousebinds, struct conf_sec **sec)
      {
           m = xcalloc(1, sizeof(struct mousebind));
 
-          m->button   = fetch_opt_first(sec[i], "1", "button").num;
-          m->func     = uicb_name_func(fetch_opt_first(sec[i], "", "func").str);
+          m->button = fetch_opt_first(sec[i], "1", "button").num;
+          m->func   = uicb_name_func(fetch_opt_first(sec[i], "", "func").str);
 
           if((p = fetch_opt_first(sec[i], "", "cmd").str))
                m->cmd = xstrdup(p);
@@ -160,6 +160,11 @@ config_tag(void)
                if(screenid == s->id || screenid == -1)
                     tag_new(s, name);
      }
+
+     /* If no tag at all on a screen, add one anyway */
+     SLIST_FOREACH(s, &W->h.screen, next)
+          if(TAILQ_EMPTY(&s->tags))
+               tag_new(s, "tag");
 
      free(ks);
 }
