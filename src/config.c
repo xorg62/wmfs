@@ -14,8 +14,9 @@
 static void
 config_mouse_section(struct mbhead *mousebinds, struct conf_sec **sec)
 {
-     int i = 0;
      struct mousebind *m;
+     int i = 0;
+     char *p;
 
      SLIST_INIT(mousebinds);
 
@@ -25,7 +26,10 @@ config_mouse_section(struct mbhead *mousebinds, struct conf_sec **sec)
 
           m->button   = fetch_opt_first(sec[i], "1", "button").num;
           m->func     = uicb_name_func(fetch_opt_first(sec[i], "", "func").str);
-          m->cmd      = xstrdup(fetch_opt_first(sec[i], "", "cmd").str);
+
+          if((p = fetch_opt_first(sec[i], "", "cmd").str))
+               m->cmd = xstrdup(p);
+
           m->use_area = false;
 
           SLIST_INSERT_HEAD(mousebinds, m, next);

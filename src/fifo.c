@@ -4,6 +4,8 @@
  *  For license, see COPYING.
  */
 
+#include <sys/stat.h> /* access */
+
 #include "wmfs.h"
 #include "util.h"
 #include "config.h"
@@ -23,6 +25,10 @@ void
 fifo_init(void)
 {
      xasprintf(&(W->fifo.path), "%s/wmfs-%s.fifo", P_tmpdir, DisplayString(W->dpy));
+
+     /* Check if fifo already exists */
+     if(access(W->fifo.path, F_OK) != -1)
+          unlink(W->fifo.path);
 
      if(mkfifo(W->fifo.path, 0644) < 0)
           warnx("Can't create FIFO: %s\n", strerror(errno));
