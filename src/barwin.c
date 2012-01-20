@@ -70,9 +70,6 @@ barwin_remove(struct barwin *b)
      XDestroyWindow(W->dpy, b->win);
      XFreePixmap(W->dpy, b->dr);
 
-     /* Free mousebinds */
-     FREE_LIST(mousebind, b->mousebinds);
-
      free(b);
 }
 
@@ -93,20 +90,6 @@ barwin_resize(struct barwin *b, int w, int h)
      b->geo.h = h;
 
      XResizeWindow(W->dpy, b->win, w, h);
-}
-
-void
-barwin_mousebind_new(struct barwin *b, unsigned int button, bool u, struct geo a, void (*func)(Uicb), Uicb cmd)
-{
-     struct mousebind *m = (struct mousebind*)xcalloc(1, sizeof(struct mousebind));
-
-     m->button = button;
-     m->use_area = u;
-     m->area = a;
-     m->func = func;
-     m->cmd = cmd;
-
-     SLIST_INSERT_HEAD(&b->mousebinds, m, next);
 }
 
 /** Refresh the barwin Color

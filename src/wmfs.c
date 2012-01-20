@@ -391,6 +391,7 @@ wmfs_quit(void)
      struct rule *r;
      struct theme *t;
      struct client *c;
+     struct mousebind *m;
 
      /* Will free:
       *
@@ -437,6 +438,14 @@ wmfs_quit(void)
           SLIST_REMOVE_HEAD(&W->h.keybind, next);
           free((void*)k->cmd);
           free(k);
+     }
+
+     while(!SLIST_EMPTY(&W->h.mousebind))
+     {
+          m = SLIST_FIRST(&W->h.mousebind);
+          SLIST_REMOVE_HEAD(&W->h.mousebind, globnext);
+          free((void*)m->cmd);
+          free(m);
      }
 
      /* FIFO stuffs */

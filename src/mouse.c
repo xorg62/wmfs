@@ -133,14 +133,11 @@ mouse_move(struct client *c, void (*func)(struct client*, struct client*))
      } while(ev.type != ButtonRelease);
 
      if(c2)
-     {
-          if(last == c2)
-               _REV_SBORDER(c2);
-
           func(c, c2);
-     }
      else if(t && t != (struct tag*)c)
           tag_client(t, c);
+     else
+          _REV_SBORDER(c);
 }
 
 void

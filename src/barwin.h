@@ -28,7 +28,6 @@
 struct barwin* barwin_new(Window parent, int x, int y, int w, int h, Color fg, Color bg, bool entermask);
 void barwin_remove(struct barwin *b);
 void barwin_resize(struct barwin *b, int w, int h);
-void barwin_mousebind_new(struct barwin *b, unsigned int button, bool u, struct geo a, void (*func)(Uicb), Uicb cmd);
 void barwin_refresh_color(struct barwin *b);
 
 #endif /* BARWIN_H */

@@ -214,6 +214,7 @@ struct mousebind
      Uicb cmd;
      SLIST_ENTRY(mousebind) next;
      SLIST_ENTRY(mousebind) snext;
+     SLIST_ENTRY(mousebind) globnext;
 };
 
 struct theme
@@ -297,6 +298,7 @@ struct wmfs
           SLIST_HEAD(, barwin) barwin;
           SLIST_HEAD(, theme) theme;
           SLIST_HEAD(, rule) rule;
+          SLIST_HEAD(, mousebind) mousebind;
      } h;
 
      /*
