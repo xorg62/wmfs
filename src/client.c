@@ -454,7 +454,7 @@ _client_tab(struct client *c, struct client *cm)
 {
      /* Do not tab already tabed client */
      if(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER)
-        || c->tag != cm->tag)
+        || c->tag != cm->tag || c == cm)
           return;
 
      layout_split_arrange_closed(c);
@@ -704,6 +704,7 @@ uicb_client_focus_with_wid(Uicb cmd)
 static void
 client_frame_new(struct client *c)
 {
+     struct barwin *frameb;
      XSetWindowAttributes at =
      {
           .background_pixel  = c->ncol.bg,
@@ -712,32 +713,27 @@ client_frame_new(struct client *c)
           .event_mask        = BARWIN_MASK | BARWIN_ENTERMASK
      };
 
-     c->frame = XCreateWindow(W->dpy, W->root,
-                              c->geo.x, c->geo.y,
-                              c->geo.w, c->geo.h,
-                              0, CopyFromParent,
-                              InputOutput,
-                              CopyFromParent,
-                              (CWOverrideRedirect | CWBackPixmap
-                               | CWBackPixel | CWEventMask), &at);
+     /* Use a fake barwin only to store mousebinds of frame win */
+     frameb = barwin_new(W->root, 0, 0, 1, 1, 0, 0, false);
+
+     frameb->win =
+          c->frame = XCreateWindow(W->dpy, W->root,
+                                   c->geo.x, c->geo.y,
+                                   c->geo.w, c->geo.h,
+                                   0, CopyFromParent,
+                                   InputOutput,
+                                   CopyFromParent,
+                                   (CWOverrideRedirect | CWBackPixmap
+                                    | CWBackPixel | CWEventMask), &at);
+
+     frameb->mousebinds = W->tmp_head.client;
 
      if(c->tbarw > c->border)
      {
-          struct geo g;
-          Uicb cmd = (Uicb)&c->win;
-
           c->titlebar = barwin_new(c->frame, 0, 0, 1, c->tbarw,
                                    c->ncol.fg, c->ncol.bg, true);
 
-          /* TODO: Refer to titlebar config */
-          barwin_mousebind_new(c->titlebar, Button1, false, g,
-                               uicb_client_focus_with_wid, cmd);
-          barwin_mousebind_new(c->titlebar, Button1, false, g,
-                               uicb_mouse_move, cmd);
-          barwin_mousebind_new(c->titlebar, Button2, false, g,
-                               uicb_mouse_tab, cmd);
-          barwin_mousebind_new(c->titlebar, Button3, false, g,
-                               uicb_mouse_resize, cmd);
+          c->titlebar->mousebinds = W->tmp_head.client;
      }
 
      XReparentWindow(W->dpy, c->win, c->frame, c->border, c->tbarw);

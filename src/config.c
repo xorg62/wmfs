@@ -12,6 +12,27 @@
 #include "util.h"
 
 static void
+config_mouse_section(struct mbhead *mousebinds, struct conf_sec **sec)
+{
+     int i = 0;
+     struct mousebind *m;
+
+     SLIST_INIT(mousebinds);
+
+     for(; sec[i]; ++i)
+     {
+          m = xcalloc(1, sizeof(struct mousebind));
+
+          m->button   = fetch_opt_first(sec[i], "1", "button").num;
+          m->func     = uicb_name_func(fetch_opt_first(sec[i], "", "func").str);
+          m->cmd      = fetch_opt_first(sec[i], "", "cmd").str;
+          m->use_area = false;
+
+          SLIST_INSERT_HEAD(mousebinds, m, next);
+     }
+}
+
+static void
 config_theme(void)
 {
      struct theme *t, *p = NULL;
@@ -108,7 +129,7 @@ config_tag(void)
 {
      struct screen *s;
      size_t i, n;
-     struct conf_sec *sec, **ks;
+     struct conf_sec *sec, **ks, **mb;
      char *name;
      int screenid;
 
@@ -116,6 +137,13 @@ config_tag(void)
      sec = fetch_section_first(NULL, "tags");
      ks = fetch_section(sec, "tag");
      n = fetch_section_count(ks);
+
+     /* [mouse] */
+     if((mb = fetch_section(sec, "mouse")))
+     {
+          config_mouse_section(&W->tmp_head.tag, mb);
+          free(mb);
+     }
 
      /* [tag] */
      for(i = 0; i < n; ++i)
@@ -129,6 +157,23 @@ config_tag(void)
      }
 
      free(ks);
+}
+
+static void
+config_client(void)
+{
+     struct conf_sec *sec, **mb;
+
+     /* [client] */
+     sec = fetch_section_first(NULL, "client");
+
+     /* [mouse] */
+     /* for client frame AND titlebar */
+     if((mb = fetch_section(sec, "mouse")))
+     {
+          config_mouse_section(&W->tmp_head.client, mb);
+          free(mb);
+     }
 }
 
 #define ISTRDUP(t, s)             \
@@ -255,6 +300,7 @@ config_init(void)
      config_theme();
      config_keybind();
      config_tag();
+     config_client();
      config_bars();
      config_rule();
 

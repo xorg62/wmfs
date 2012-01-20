@@ -89,7 +89,7 @@ struct barwin
      Drawable dr;
      Color fg, bg;
      void *ptr; /* Special cases */
-     SLIST_HEAD(, mousebind) mousebinds;
+     SLIST_HEAD(mbhead, mousebind) mousebinds;
      SLIST_ENTRY(barwin) next;  /* global barwin */
      SLIST_ENTRY(barwin) enext; /* element barwin */
 };
@@ -279,6 +279,7 @@ struct wmfs
      Atom *net_atom;
      char **argv;
      char confpath[MAX_PATH_LEN];
+     struct barwin *last_clicked_barwin;
 
      /* FIFO stuffs */
      struct
@@ -297,6 +298,18 @@ struct wmfs
           SLIST_HEAD(, theme) theme;
           SLIST_HEAD(, rule) rule;
      } h;
+
+     /*
+      * Temporary head of mousebind list from config
+      * Will be copied in barwin of clickable drawable
+      * later in code
+      */
+     struct
+     {
+          struct mbhead tag;
+          struct mbhead client;
+          struct mbhead root;
+     } tmp_head;
 
      /*
       * Selected screen, client

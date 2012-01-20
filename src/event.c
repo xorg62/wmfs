@@ -25,6 +25,8 @@ event_buttonpress(XEvent *e)
      SLIST_FOREACH(b, &W->h.barwin, next)
           if(b->win == ev->window)
           {
+               W->last_clicked_barwin = b;
+
                SLIST_FOREACH(m, &b->mousebinds, next)
                     if(m->button == ev->button)
                          if(!m->use_area || (m->use_area && INAREA(ev->x, ev->y, m->area)))

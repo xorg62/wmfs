@@ -200,6 +200,17 @@ uicb_tag_move_client_prev(Uicb cmd)
           tag_client(TAILQ_LAST(&W->screen->tags, tsub), W->client);
 }
 
+void
+uicb_tag_click(Uicb cmd)
+{
+     (void)cmd;
+     struct tag *t;
+
+     if((t = (struct tag*)W->last_clicked_barwin->ptr)
+        && t->screen == W->screen)
+          tag_screen(W->screen, t);
+}
+
 static void
 tag_remove(struct tag *t)
 {

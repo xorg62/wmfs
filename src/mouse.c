@@ -90,7 +90,7 @@ mouse_drag_tag(struct client *c, Window w)
 
 #define _REV_SBORDER(c) draw_reversed_rect(W->root, c, false);
 void
-mouse_move(struct client *c, bool type)
+mouse_move(struct client *c, void (*func)(struct client*, struct client*))
 {
      struct client *c2 = NULL, *last = c;
      struct tag *t = NULL;
@@ -134,15 +134,10 @@ mouse_move(struct client *c, bool type)
 
      if(c2)
      {
-          if(c2 != c)
-          {
+          if(last == c2)
                _REV_SBORDER(c2);
 
-               if(type)
-                    client_swap2(c, c2);
-               else
-                    _client_tab(c, c2);
-          }
+          func(c, c2);
      }
      else if(t && t != (struct tag*)c)
           tag_client(t, c);
@@ -163,7 +158,7 @@ uicb_mouse_move(Uicb cmd)
      (void)cmd;
 
      if(W->client && mouse_check_client(W->client))
-          mouse_move(W->client, true);
+          mouse_move(W->client, client_swap2);
 }
 
 void
@@ -172,5 +167,5 @@ uicb_mouse_tab(Uicb cmd)
      (void)cmd;
 
      if(W->client && mouse_check_client(W->client))
-          mouse_move(W->client, false);
+          mouse_move(W->client, _client_tab);
 }

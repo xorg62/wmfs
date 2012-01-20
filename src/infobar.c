@@ -36,7 +36,6 @@ infobar_elem_tag_init(struct element *e)
 {
      struct tag *t;
      struct barwin *b, *prev = NULL;
-     struct geo g = { 0, 0, 0, 0 };
      int s, j;
 
      /* Get final size before to use in placement */
@@ -66,10 +65,7 @@ infobar_elem_tag_init(struct element *e)
           b->ptr = (void*)t;
           barwin_map(b);
 
-          /* TODO: refer to tag element configuration */
-          barwin_mousebind_new(b, Button1, false, g, uicb_tag_set_with_name, (Uicb)t->name);
-          barwin_mousebind_new(b, Button4, false, g, uicb_tag_next, NULL);
-          barwin_mousebind_new(b, Button5, false, g, uicb_tag_prev, NULL);
+          b->mousebinds = W->tmp_head.tag;
 
           SLIST_INSERT_TAIL(&e->bars, b, enext, prev);
 

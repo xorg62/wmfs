@@ -79,7 +79,21 @@
   [tag] screen = 0 name = "6" [/tag]
   [tag] screen = 0 name = "7" [/tag]
 
+  # Mousebinds associated to Tags element button
+  [mouse] button = "1" func = "tag_click" [/mouse]
+  [mouse] button = "4" func = "tag_next"  [/mouse]
+  [mouse] button = "5" func = "tag_prev"  [/mouse]
+
+
 [/tags]
+
+[client]
+
+  [mouse] button = "1" func = "mouse_swap"   [/mouse]
+  [mouse] button = "2" func = "mouse_tab"    [/mouse]
+  [mouse] button = "3" func = "mouse_resize" [/mouse]
+
+[/client]
 
 [rules]
 
