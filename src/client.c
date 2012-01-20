@@ -553,6 +553,17 @@ client_focus(struct client *c)
      ewmh_update_wmfs_props();
 }
 
+void
+uicb_client_focus_click(Uicb cmd)
+{
+     (void)cmd;
+     struct client *c;
+
+     if((c = client_gb_titlebar(W->last_clicked_barwin->win))
+        || (c = client_gb_frame(W->last_clicked_barwin->win)))
+          client_focus(c);
+}
+
 /** Get a client name
  * \param c struct client pointer
 */
@@ -679,26 +690,6 @@ client_get_sizeh(struct client *c)
      if(c->sizeh[MAXW] && c->sizeh[MINW] && c->sizeh[MAXH] && c->sizeh[MINH]
         && c->sizeh[MAXW] == c->sizeh[MINW] && c->sizeh[MAXH] == c->sizeh[MINH])
           c->flags |= CLIENT_HINT_FLAG;
-}
-
-/* Window id (unsigned int) is casted in Uicb type (char*) and restored */
-void
-uicb_client_focus_with_wid(Uicb cmd)
-{
-     struct client *c;
-     size_t i;
-     Window id = 0;
-
-     /* Re-build window id from cmd string */
-     for(i = 0; i < sizeof(Window); ++i)
-          ((char*)&id)[i] = cmd[i];
-
-     SLIST_FOREACH(c, &W->h.client, next)
-          if(c->win == id)
-          {
-               client_focus(c);
-               return;
-          }
 }
 
 static void

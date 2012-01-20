@@ -89,6 +89,7 @@
 
 [client]
 
+  [mouse] button = "1" func = "client_focus_click" [/mouse]
   [mouse] button = "1" func = "mouse_swap"   [/mouse]
   [mouse] button = "2" func = "mouse_tab"    [/mouse]
   [mouse] button = "3" func = "mouse_resize" [/mouse]
