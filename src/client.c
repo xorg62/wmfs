@@ -402,7 +402,6 @@ client_frame_update(struct client *c, struct colpair *cp)
                     barwin_refresh_color(c->titlebar);
                     draw_text(c->titlebar->dr, c->theme, xt, y, cp->fg, c->title);
                     barwin_refresh(c->titlebar);
-                    barwin_refresh(cc->titlebar);
                     x += f;
                }
                if(cc->tabmaster == c)
