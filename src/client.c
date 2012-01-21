@@ -342,11 +342,15 @@ client_grabbuttons(struct client *c, bool focused)
 #define _XTEXT()                          \
      if((xt = ((f >> 1) - (w >> 1))) < 0) \
           xt = c->border << 1;
+
+#define _REMAINDER()                                            \
+     if((rm = ((x + f) - (c->rgeo.w - c->border))) >  0)        \
+          f -= rm;
 void
 client_frame_update(struct client *c, struct colpair *cp)
 {
      struct client *cc;
-     int y, f, xt, w, n = 1;
+     int y, f, xt, rm, w, n = 1;
 
      if(c->flags & CLIENT_TABBED)
           c = c->tabmaster;
@@ -368,7 +372,7 @@ client_frame_update(struct client *c, struct colpair *cp)
                     ++n;
      }
 
-     f = c->geo.w / n;
+     f = (c->rgeo.w / n) + (c->border * 1.5);
      y = TEXTY(c->theme, c->tbarw);
 
      if(n == 1)
@@ -386,8 +390,8 @@ client_frame_update(struct client *c, struct colpair *cp)
      /* Tabbing case, multiple titlebar in frame */
      else
      {
-          struct geo g = { 0, 0, 1, c->titlebar->geo.h };
-          int x = 0;
+          struct geo g = { f - 1, 0, 1, c->titlebar->geo.h };
+          int x = c->border;
 
           SLIST_FOREACH(cc, &c->tag->clients, tnext)
           {
@@ -398,10 +402,15 @@ client_frame_update(struct client *c, struct colpair *cp)
                {
                     barwin_reparent(c->titlebar, c->frame);
                     barwin_move(c->titlebar, x, 0);
+
+                    _REMAINDER();
                     barwin_resize(c->titlebar, f, c->tbarw);
+
                     barwin_refresh_color(c->titlebar);
+                    draw_rect(cc->titlebar->dr, g, c->scol.bg);
                     draw_text(c->titlebar->dr, c->theme, xt, y, cp->fg, c->title);
                     barwin_refresh(c->titlebar);
+
                     x += f;
                }
                if(cc->tabmaster == c)
@@ -409,11 +418,15 @@ client_frame_update(struct client *c, struct colpair *cp)
                     barwin_reparent(cc->titlebar, c->frame);
                     barwin_map(cc->titlebar);
                     barwin_move(cc->titlebar, x, 1);
+
+                    _REMAINDER();
                     barwin_resize(cc->titlebar, f, c->tbarw - 2);
+
                     barwin_refresh_color(cc->titlebar);
                     draw_rect(cc->titlebar->dr, g, c->scol.bg);
                     draw_text(cc->titlebar->dr, c->theme, xt, y - 1, c->ncol.fg, cc->title);
                     barwin_refresh(cc->titlebar);
+
                     x += f;
                }
           }
