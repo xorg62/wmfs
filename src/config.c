@@ -278,7 +278,7 @@ config_keybind(void)
           /* func = */
           if(!(k->func = uicb_name_func(fetch_opt_first(ks[i], "", "func").str)))
           {
-               warnx("configuration: Unknown Function \"%s\".",
+               warnxl("configuration: Unknown Function \"%s\".",
                          fetch_opt_first(ks[i], "", "func").str);
                k->func = uicb_spawn;
           }
@@ -300,11 +300,11 @@ config_init(void)
 {
      if(get_conf(W->confpath) == -1)
      {
-          warn("parsing configuration file (%s) failed.", W->confpath);
+          warnl("parsing configuration file (%s) failed.", W->confpath);
           sprintf(W->confpath, "%s/"CONFIG_DEFAULT_PATH, getenv("HOME"));
 
           if(get_conf(W->confpath) == -1)
-               errx(1, "parsing default configuration file (%s) failed.", W->confpath);
+               errxl(1, "parsing default configuration file (%s) failed.", W->confpath);
      }
 
      config_theme();

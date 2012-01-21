@@ -123,7 +123,7 @@ push_keyword(struct keyword *tail, enum keyword_t type, char *buf, size_t *offse
 #ifdef DEBUG
      for(i = 0; kw_t_name[i].type != NONE; ++i)
           if(kw_t_name[i].type == kw->type)
-               warnx("%s %s %s:%d\n", kw_t_name[i].name,
+               warnxl("%s %s %s:%d\n", kw_t_name[i].name,
                          (kw->name) ? kw->name : "",
                          kw->file->name, kw->line);
 #endif
@@ -174,20 +174,20 @@ parse_keywords(const char *filename)
 
      if(stat(filename, &st) == -1 || (fd = open(filename, O_RDONLY)) == -1)
      {
-          warn("%s", filename);
+          warnxl("%s", filename);
           return NULL;
      }
 
      if(!st.st_size)
      {
-          warnx("%s: empty file", filename);
+          warnxl("%s: empty file", filename);
           close(fd);
           return NULL;
      }
 
      if(!realpath(filename, path))
      {
-          warn("%s", filename);
+          warnxl("%s", filename);
           close(fd);
           return NULL;
      }
@@ -196,7 +196,7 @@ parse_keywords(const char *filename)
 
      if(read(fd, buf, st.st_size) == -1)
      {
-          warn("%s", filename);
+          warnxl("%s", filename);
           free(buf);
           close(fd);
           return NULL;
@@ -334,7 +334,7 @@ parse_keywords(const char *filename)
      free(buf);
      free(bufname);
      close(fd);
-     warnx("%s read", file->name);
+     warnxl("%s read", file->name);
 
      return (error ? NULL: head);
 }
@@ -385,7 +385,7 @@ include(struct keyword *head)
 
      if(!(kw = parse_keywords(filename)))
      {
-          warnx("no config found in include file %s", head->name);
+          warnxl("no config found in include file %s", head->name);
 
           if(filename != head->name)
                free(filename);
@@ -630,7 +630,7 @@ free_conf(void)
                if(f[i] == kw->file)
                {
                     if(!(f = realloc(f, sizeof(*f) * (++i))))
-                         err(EXIT_FAILURE, "realloc");
+                         errl(EXIT_FAILURE, "realloc");
 
                     f[i - 1] = kw->file;
                }

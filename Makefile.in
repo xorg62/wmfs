@@ -19,6 +19,7 @@ SRCS=                 \
       src/fifo.c      \
       src/status.c    \
       src/mouse.c     \
+      src/log.c       \
       src/wmfs.c
 
 

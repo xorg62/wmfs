@@ -18,7 +18,7 @@ fifo_open(void)
           close(W->fifo.fd);
 
      if(!(W->fifo.fd = open(W->fifo.path, O_RDONLY | O_NDELAY, 0)))
-          warnx("Can't open FIFO: %s\n", strerror(errno));
+          warnxl("Can't open FIFO: %s\n", strerror(errno));
 }
 
 void
@@ -31,7 +31,7 @@ fifo_init(void)
           unlink(W->fifo.path);
 
      if(mkfifo(W->fifo.path, 0644) < 0)
-          warnx("Can't create FIFO: %s\n", strerror(errno));
+          warnxl("Can't create FIFO: %s\n", strerror(errno));
 
      fifo_open();
 }

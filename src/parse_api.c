@@ -67,7 +67,7 @@ print_unused(struct conf_sec *sec)
 
      SLIST_FOREACH(o, &sec->optlist, entry)
           if(!o->used)
-               warnx("%s:%d, unused param %s", o->filename, o->line, o->name);
+               warnxl("%s:%d, unused param %s", o->filename, o->line, o->name);
 
      TAILQ_FOREACH(s, &sec->sub, entry)
           if(!TAILQ_EMPTY(&s->sub))
