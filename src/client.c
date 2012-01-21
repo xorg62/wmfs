@@ -345,29 +345,35 @@ client_grabbuttons(struct client *c, bool focused)
 void
 client_frame_update(struct client *c, struct colpair *cp)
 {
+     struct client *cc;
+     int y, f, xt, w, n = 1;
+
      if(c->flags & CLIENT_TABBED)
           c = c->tabmaster;
 
      XSetWindowBackground(W->dpy, c->frame, cp->bg);
      XClearWindow(W->dpy, c->frame);
 
-     if(c->titlebar && c->title)
+     if(!c->titlebar || !c->title)
+          return;
+
+     c->titlebar->fg = cp->fg;
+     c->titlebar->bg = cp->bg;
+
+     /* Get number of tabbed client if c is tabmaster */
+     if(c->flags & CLIENT_TABMASTER)
      {
-          struct client *cc;
-          int y, f, n = 1, xt, w = draw_textw(c->theme, c->title);
+          SLIST_FOREACH(cc, &c->tag->clients, tnext)
+               if(c == cc->tabmaster)
+                    ++n;
+     }
 
-          c->titlebar->fg = cp->fg;
-          c->titlebar->bg = cp->bg;
+     f = c->geo.w / n;
+     y = TEXTY(c->theme, c->tbarw);
 
-          /* Get number of tabbed client if c is tabmaster */
-          if(c->flags & CLIENT_TABMASTER)
-               SLIST_FOREACH(cc, &c->tag->clients, tnext)
-                    if(c == cc->tabmaster)
-                         ++n;
-
-          f = (c->geo.w - (c->border * (n - 1))) / n;
-          y = TEXTY(c->theme, c->tbarw);
-
+     if(n == 1)
+     {
+          w = draw_textw(c->theme, c->title);
           _XTEXT();
 
           barwin_reparent(c->titlebar, c->frame);
@@ -376,38 +382,45 @@ client_frame_update(struct client *c, struct colpair *cp)
           barwin_refresh_color(c->titlebar);
           draw_text(c->titlebar->dr, c->theme, xt, y, cp->fg, c->title);
           barwin_refresh(c->titlebar);
+     }
+     /* Tabbing case, multiple titlebar in frame */
+     else
+     {
+          struct geo g = { 0, 0, 1, c->titlebar->geo.h };
+          int x = 0;
 
-          /* Tabbing case, multiple titlebar in frame */
-          if(c->flags & CLIENT_TABMASTER && n > 1)
+          SLIST_FOREACH(cc, &c->tag->clients, tnext)
           {
-               int x = f;
-               struct geo g = { 0, 0, 1, c->titlebar->geo.h };
+               w = (cc->title ? draw_textw(c->theme, cc->title) : 0);
+               _XTEXT();
 
-               SLIST_FOREACH(cc, &c->tag->clients, tnext)
-                    if(c == cc->tabmaster && cc->titlebar)
-                    {
-                         cc->titlebar->bg = c->ncol.bg;
-
-                         w = draw_textw(c->theme, cc->title);
-                         _XTEXT();
-
-                         barwin_reparent(cc->titlebar, c->frame);
-                         barwin_map(cc->titlebar)
-                         barwin_move(cc->titlebar, x, 1);
-                         barwin_resize(cc->titlebar, f, c->tbarw - 2);
-                         barwin_refresh_color(cc->titlebar);
-
-                         draw_rect(cc->titlebar->dr, g, c->scol.bg);
-                         draw_text(cc->titlebar->dr, c->theme, xt, y - 1,
-                                   c->ncol.fg, cc->title);
-
-                         barwin_refresh(cc->titlebar);
-
-                         x += f;
-                    }
+               if(cc == c)
+               {
+                    barwin_reparent(c->titlebar, c->frame);
+                    barwin_move(c->titlebar, x, 0);
+                    barwin_resize(c->titlebar, f, c->tbarw);
+                    barwin_refresh_color(c->titlebar);
+                    draw_text(c->titlebar->dr, c->theme, xt, y, cp->fg, c->title);
+                    barwin_refresh(c->titlebar);
+                    barwin_refresh(cc->titlebar);
+                    x += f;
+               }
+               if(cc->tabmaster == c)
+               {
+                    barwin_reparent(cc->titlebar, c->frame);
+                    barwin_map(cc->titlebar);
+                    barwin_move(cc->titlebar, x, 1);
+                    barwin_resize(cc->titlebar, f, c->tbarw - 2);
+                    barwin_refresh_color(cc->titlebar);
+                    draw_rect(cc->titlebar->dr, g, c->scol.bg);
+                    draw_text(cc->titlebar->dr, c->theme, xt, y - 1, c->ncol.fg, cc->title);
+                    barwin_refresh(cc->titlebar);
+                    x += f;
+               }
           }
      }
 }
+
 
 void
 client_tab_focus(struct client *c)
