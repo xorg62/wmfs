@@ -14,6 +14,7 @@
 static void infobar_elem_tag_init(struct element *e);
 static void infobar_elem_tag_update(struct element *e);
 static void infobar_elem_status_init(struct element *e);
+static void infobar_elem_status_update(struct element *e);
 
 const struct elem_funcs
 {
@@ -23,7 +24,7 @@ const struct elem_funcs
 } elem_funcs[] =
 {
      { 't', infobar_elem_tag_init,    infobar_elem_tag_update },
-     { 's', infobar_elem_status_init, status_manage },
+     { 's', infobar_elem_status_init, infobar_elem_status_update },
 
      /* { 'l',  infobar_elem_layout_init, infobar_elem_layout_update },
         { 'S',  infobar_elem_selbar_init, infobar_elem_selbar_update },
@@ -126,8 +127,16 @@ infobar_elem_status_init(struct element *e)
 
      SLIST_INSERT_HEAD(&e->bars, b, enext);
 
+     e->infobar->statusctx = status_new_ctx(b, e->infobar->theme);
+
      e->infobar->screen->elemupdate |= FLAGINT(ElemStatus);
-     e->infobar->status = strdup("wmfs2");
+     e->infobar->statusctx.status = strdup("wmfs2");
+}
+
+static void
+infobar_elem_status_update(struct element *e)
+{
+     status_manage(&e->infobar->statusctx);
 }
 
 #define ELEM_INIT(a)                                  \
@@ -263,8 +272,6 @@ infobar_new(struct screen *s, char *name, struct theme *theme, enum barpos pos, 
 
      /* struct elements */
      infobar_elem_init(i);
-
-     SLIST_INIT(&i->statushead);
 
      /* Render, only if pos is Top or Bottom */
      if(!map)

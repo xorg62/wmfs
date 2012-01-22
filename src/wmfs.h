@@ -107,6 +107,14 @@ struct status_seq
      SLIST_ENTRY(status_seq) next;
 };
 
+struct status_ctx
+{
+     struct barwin *barwin;
+     struct theme *theme;
+     char *status;
+     SLIST_HEAD(, status_seq) statushead;
+};
+
 struct element
 {
      struct geo geo;
@@ -125,12 +133,12 @@ struct infobar
      struct geo geo;
      struct screen *screen;
      struct theme *theme;
+     struct status_ctx statusctx;
      enum barpos pos;
      char *elemorder;
      char *name;
      char *status;
      TAILQ_HEAD(esub, element) elements;
-     SLIST_HEAD(, status_seq) statushead;
      SLIST_ENTRY(infobar) next;
 };
 

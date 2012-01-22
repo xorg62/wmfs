@@ -8,8 +8,9 @@
 
 #include "wmfs.h"
 
-void status_render(struct element *e);
-void status_manage(struct element *e);
+struct status_ctx status_new_ctx(struct barwin *b, struct theme *t);
+void status_render(struct status_ctx *ctx);
+void status_manage(struct status_ctx *ctx);
 void uicb_status(Uicb cmd);
 
 #endif /* STATUS_H */

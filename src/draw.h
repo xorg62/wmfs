@@ -37,21 +37,24 @@ draw_rect(Drawable d, struct geo *g, Color bg)
 
 #ifdef HAVE_IMLIB2
 
+/*
+ * Draw image on drawable with g geo
+ * Require that the image was loaded with draw_image_load()
+ */
 static inline void
-draw_image(Drawable d, struct geo *g, char *path)
+draw_image(Drawable d, struct geo *g)
 {
-     Imlib_Image image = imlib_load_image(path);
-
      imlib_context_set_drawable(d);
-     imlib_context_set_image(image);
-
      imlib_render_image_on_drawable_at_size(g->x, g->y, g->w, g->h);
-
      imlib_free_image();
 }
 
+/*
+ * Load image, set it in imlib context, and return
+ * width & height as argument 2 & 3
+ */
 static inline void
-draw_image_get_size(char *path, int *w, int *h)
+draw_image_load(char *path, int *w, int *h)
 {
      Imlib_Image image = imlib_load_image(path);
 
@@ -59,8 +62,6 @@ draw_image_get_size(char *path, int *w, int *h)
 
      *w = imlib_image_get_width();
      *h = imlib_image_get_height();
-
-     imlib_free_image();
 }
 
 #endif /* HAVE_IMLIB2 */

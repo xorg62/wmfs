@@ -12,7 +12,7 @@
 
 #include <string.h>
 
-static struct status_seq*
+struct status_seq*
 status_new_seq(char type, int narg, int minarg, char *args[], int *shift)
 {
      struct status_seq *sq = xcalloc(1, sizeof(struct status_seq));
@@ -34,12 +34,21 @@ status_new_seq(char type, int narg, int minarg, char *args[], int *shift)
      return sq;
 }
 
+struct status_ctx
+status_new_ctx(struct barwin *b, struct theme *t)
+{
+     struct status_ctx ctx = { .barwin = b, .theme = t };
+
+     SLIST_INIT(&ctx.statushead);
+
+     return ctx;
+}
+
 /* Parse mousebind sequence next normal sequence: \<seq>[](button;func;cmd) */
 static char*
-status_parse_mouse(struct status_seq *sq, struct element *e, char *str)
+status_parse_mouse(struct status_seq *sq, struct status_ctx *ctx, char *str)
 {
      struct mousebind *m;
-     struct barwin *b = SLIST_FIRST(&e->bars);
      char *end, *arg[3] = { NULL };
      int i;
 
@@ -55,7 +64,7 @@ status_parse_mouse(struct status_seq *sq, struct element *e, char *str)
      m->func     = uicb_name_func(arg[1]);
      m->cmd      = (i > 1 ? xstrdup(arg[2]) : NULL);
 
-     SLIST_INSERT_HEAD(&b->mousebinds, m, next);
+     SLIST_INSERT_HEAD(&ctx->barwin->mousebinds, m, next);
      SLIST_INSERT_HEAD(&sq->mousebinds, m, snext);
 
      return end + 1;
@@ -68,11 +77,11 @@ status_parse_mouse(struct status_seq *sq, struct element *e, char *str)
           continue;                             \
      }
 static void
-status_parse(struct element *e)
+status_parse(struct status_ctx *ctx)
 {
      struct status_seq *sq, *prev = NULL;
      int i, shift = 0;
-     char *dstr = xstrdup(e->infobar->status), *sauv = dstr;
+     char *dstr = xstrdup(ctx->status), *sauv = dstr;
      char type, *p, *end, *arg[6] = { NULL };
 
      for(; *dstr; ++dstr)
@@ -133,14 +142,14 @@ status_parse(struct element *e)
 #endif /* HAVE_IMLIB2 */
           }
 
-          SLIST_INSERT_TAIL(&e->infobar->statushead, sq, next, prev);
+          SLIST_INSERT_TAIL(&ctx->statushead, sq, next, prev);
 
           /*
            * Optional mousebind sequence(s) \<seq>[](button;func;cmd)
            * Parse it while there is a mousebind sequence.
            */
           dstr = ++end;
-          while((*(dstr = status_parse_mouse(sq, e, dstr)) == '('));
+          while((*(dstr = status_parse_mouse(sq, ctx, dstr)) == '('));
 
           prev = sq;
      }
@@ -148,40 +157,39 @@ status_parse(struct element *e)
      free(sauv);
 }
 
-#define STATUS_ALIGN(align)                             \
-     if(align == Left)                                  \
-     {                                                  \
-          sq->geo.x = left;                             \
-          left += sq->geo.w;                            \
-     }                                                  \
-     else if(align == Right)                            \
-     {                                                  \
-          sq->geo.x = e->geo.w - right - sq->geo.w;     \
-          right += sq->geo.w;                           \
+#define STATUS_ALIGN(align)                                       \
+     if(align == Left)                                            \
+     {                                                            \
+          sq->geo.x = left;                                       \
+          left += sq->geo.w;                                      \
+     }                                                            \
+     else if(align == Right)                                      \
+     {                                                            \
+          sq->geo.x = ctx->barwin->geo.w - right - sq->geo.w;     \
+          right += sq->geo.w;                                     \
      }
 static void
-status_apply_list(struct element *e)
+status_apply_list(struct status_ctx *ctx)
 {
      struct status_seq *sq;
-     struct barwin *b = SLIST_FIRST(&e->bars);
      struct mousebind *m;
      int left = 0, right = 0, w, h;
 
-     SLIST_FOREACH(sq, &e->infobar->statushead, next)
+     SLIST_FOREACH(sq, &ctx->statushead, next)
      {
           switch(sq->type)
           {
           /* Text */
           case 's':
-               sq->geo.w = draw_textw(e->infobar->theme, sq->str);
-               sq->geo.h = e->infobar->theme->font.height;
+               sq->geo.w = draw_textw(ctx->theme, sq->str);
+               sq->geo.h = ctx->theme->font.height;
 
                if(sq->align != NoAlign)
-                    sq->geo.y = TEXTY(e->infobar->theme, e->geo.h);
+                    sq->geo.y = TEXTY(ctx->theme, ctx->barwin->geo.h);
 
                STATUS_ALIGN(sq->align);
 
-               draw_text(b->dr, e->infobar->theme, sq->geo.x, sq->geo.y, sq->color, sq->str);
+               draw_text(ctx->barwin->dr, ctx->theme, sq->geo.x, sq->geo.y, sq->color, sq->str);
 
                if(!SLIST_EMPTY(&sq->mousebinds))
                     SLIST_FOREACH(m, &sq->mousebinds, snext)
@@ -195,11 +203,11 @@ status_apply_list(struct element *e)
           /* Rectangle */
           case 'R':
                if(sq->align != NoAlign)
-                    sq->geo.y = (e->geo.h >> 1) - (sq->geo.h >> 1);
+                    sq->geo.y = (ctx->barwin->geo.h >> 1) - (sq->geo.h >> 1);
 
                STATUS_ALIGN(sq->align);
 
-               draw_rect(b->dr, &sq->geo, sq->color);
+               draw_rect(ctx->barwin->dr, &sq->geo, sq->color);
 
                if(!SLIST_EMPTY(&sq->mousebinds))
                     SLIST_FOREACH(m, &sq->mousebinds, snext)
@@ -210,7 +218,7 @@ status_apply_list(struct element *e)
           /* Image */
 #ifdef HAVE_IMLIB2
           case 'i':
-               draw_image_get_size(sq->str, &w, &h);
+               draw_image_load(sq->str, &w, &h);
 
                if(sq->geo.w <= 0)
                     sq->geo.w = w;
@@ -218,11 +226,11 @@ status_apply_list(struct element *e)
                     sq->geo.h = h;
 
                if(sq->align != NoAlign)
-                    sq->geo.y = (e->geo.h >> 1) - (sq->geo.h >> 1);
+                    sq->geo.y = (ctx->barwin->geo.h >> 1) - (sq->geo.h >> 1);
 
                STATUS_ALIGN(sq->align);
 
-               draw_image(b->dr, &sq->geo, sq->str);
+               draw_image(ctx->barwin->dr, &sq->geo);
 
                if(!SLIST_EMPTY(&sq->mousebinds))
                     SLIST_FOREACH(m, &sq->mousebinds, snext)
@@ -237,57 +245,53 @@ status_apply_list(struct element *e)
 
 /* Render current statustext of an element */
 void
-status_render(struct element *e)
+status_render(struct status_ctx *ctx)
 {
-     struct barwin *b = SLIST_FIRST(&e->bars);
-
-     if(!e->infobar->status)
+     if(!ctx->status)
           return;
 
-     barwin_refresh_color(b);
+     barwin_refresh_color(ctx->barwin);
 
      /* Use simple text instead sequence if no sequence found */
-     if(SLIST_EMPTY(&e->infobar->statushead))
+     if(SLIST_EMPTY(&ctx->statushead))
      {
-          int l = draw_textw(e->infobar->theme, e->infobar->status);
-          draw_text(b->dr, e->infobar->theme, e->geo.w - l,
-                    TEXTY(e->infobar->theme, e->geo.h), b->fg, e->infobar->status);
+          int l = draw_textw(ctx->theme, ctx->status);
+          draw_text(ctx->barwin->dr, ctx->theme, ctx->barwin->geo.w - l,
+                    TEXTY(ctx->theme, ctx->barwin->geo.h), ctx->barwin->fg, ctx->status);
      }
      else
-          status_apply_list(e);
+          status_apply_list(ctx);
 
-     barwin_refresh(b);
+     barwin_refresh(ctx->barwin);
 }
 
 /* Parse and render statustext */
 void
-status_manage(struct element *e)
+status_manage(struct status_ctx *ctx)
 {
      struct status_seq *sq;
      struct mousebind *m;
-     struct barwin *b = SLIST_FIRST(&e->bars);
 
      /*
       * Flush previous linked list of status sequences
       * and mousebind of status barwin
       */
-     while(!SLIST_EMPTY(&e->infobar->statushead))
+     while(!SLIST_EMPTY(&ctx->statushead))
      {
-          sq = SLIST_FIRST(&e->infobar->statushead);
-          SLIST_REMOVE_HEAD(&e->infobar->statushead, next);
+          sq = SLIST_FIRST(&ctx->statushead);
+          SLIST_REMOVE_HEAD(&ctx->statushead, next);
           free(sq->str);
           free(sq);
      }
-     while(!SLIST_EMPTY(&b->mousebinds))
+     while(!SLIST_EMPTY(&ctx->barwin->mousebinds))
      {
-          m = SLIST_FIRST(&b->mousebinds);
-          SLIST_REMOVE_HEAD(&b->mousebinds, next);
+          m = SLIST_FIRST(&ctx->barwin->mousebinds);
+          SLIST_REMOVE_HEAD(&ctx->barwin->mousebinds, next);
           free((void*)m->cmd);
           free(m);
      }
-
-     status_parse(e);
-     status_render(e);
+     status_parse(ctx);
+     status_render(ctx);
 }
 
 /* Syntax: "<infobar name> <status string>" */
@@ -310,8 +314,8 @@ uicb_status(Uicb cmd)
           SLIST_FOREACH(ib, &s->infobars, next)
                if(!strcmp(cmd, ib->name))
                {
-                    free(ib->status);
-                    ib->status = xstrdup(p);
+                    free(ib->statusctx.status);
+                    ib->statusctx.status = xstrdup(p);
                     infobar_elem_screen_update(s, ElemStatus);
                }
      }
