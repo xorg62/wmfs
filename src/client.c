@@ -407,7 +407,7 @@ client_frame_update(struct client *c, struct colpair *cp)
                     barwin_resize(c->titlebar, f, c->tbarw);
 
                     barwin_refresh_color(c->titlebar);
-                    draw_rect(c->titlebar->dr, g, c->scol.bg);
+                    draw_rect(c->titlebar->dr, &g, c->scol.bg);
                     draw_text(c->titlebar->dr, c->theme, xt, y, cp->fg, c->title);
                     barwin_refresh(c->titlebar);
 
@@ -423,7 +423,7 @@ client_frame_update(struct client *c, struct colpair *cp)
                     barwin_resize(cc->titlebar, f, c->tbarw - 2);
 
                     barwin_refresh_color(cc->titlebar);
-                    draw_rect(cc->titlebar->dr, g, c->scol.bg);
+                    draw_rect(cc->titlebar->dr, &g, c->scol.bg);
                     draw_text(cc->titlebar->dr, c->theme, xt, y - 1, c->ncol.fg, cc->title);
                     barwin_refresh(cc->titlebar);
 

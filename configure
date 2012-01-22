@@ -11,61 +11,65 @@ MANPREFIX="$PREFIX/man"
 XDG_CONFIG_DIR="$PREFIX/etc/xdg"
 
 while true; do
-	case "$1" in
-		--without-xinerama)
-			USE_XINERAMA="";  shift;;
-		--prefix)
-			[ -z "$2" ] && echo "Missing argument" && exit 1
-			PREFIX=$2; shift 2;;
-		--xdg-config-dir)
-			[ -z "$2" ] && echo "Missing argument" && exit 1
-			XDG_CONFIG_DIR=$2; shift 2;;
-		--help|-h)
-			echo "Usage: ./configure [options]
+    case "$1" in
+        --without-xinerama)
+	    USE_XINERAMA="";  shift;;
+        --without-imlib2)
+            USE_IMLIB2="";  shift;;
+	--prefix)
+	    [ -z "$2" ] && echo "Missing argument" && exit 1
+	    PREFIX=$2; shift 2;;
+	--xdg-config-dir)
+	    [ -z "$2" ] && echo "Missing argument" && exit 1
+	    XDG_CONFIG_DIR=$2; shift 2;;
+	--help|-h)
+	    echo "Usage: ./configure [options]
 	--without-xinerama		: compile without xinerama support
+        --without-imlib2                : compile without imlib2 support
 	--prefix DIRECTORY		: install binary with specified prefix (default $PREFIX)
 	--xdg-config-dir DIRECTORY	: install configuration to specified directory (default $XDG_CONFIG_DIR)"
-			exit 0;;
-		*) break;;
-	esac
+	    exit 0;;
+	*) break;;
+    esac
 done
 
-LIBS="$LIBS $USE_XINERAMA"
+LIBS="$LIBS $USE_XINERAMA $USE_IMLIB2"
 
 which pkg-config > /dev/null 2>&1
 
 if [ $? -eq 0 ];
 then
-	CFLAGS=`pkg-config --cflags-only-I $LIBS`
-	LDFLAGS=`pkg-config --libs $LIBS`
+    CFLAGS=`pkg-config --cflags-only-I $LIBS`
+    LDFLAGS=`pkg-config --libs $LIBS`
 else
 	# Try to use some known paths
-	case $OS in
-		FreeBSD)
-			CFLAGS="-I/usr/local/include"
-			LDFLAGS="-L/usr/local/lib";;
-		OpenBSD)
-			CFLAGS="-I/usr/X11R6/include -I/usr/local/include"
-			LDFLAGS="-L/usr/X11R6/lib -L/usr/local/lib";;
-		NetBSD)
-			CFLAGS="-I/usr/X11R7/include -I/usr/local/include"
-			LDFLAGS="-L/usr/X11R7/lib -L/usr/local/lib";;
-		Linux)
-			CFLAGS=""
-			LDFLAGS=""
-			;;
-		*)
-			echo "No default CFLAGS and LDFLAGS found for your OS, feel free to contribute or install pkg-config :)"
-			exit 1;;
-	esac
+    case $OS in
+	FreeBSD)
+	    CFLAGS="-I/usr/local/include"
+	    LDFLAGS="-L/usr/local/lib";;
+	OpenBSD)
+	    CFLAGS="-I/usr/X11R6/include -I/usr/local/include"
+	    LDFLAGS="-L/usr/X11R6/lib -L/usr/local/lib";;
+	NetBSD)
+	    CFLAGS="-I/usr/X11R7/include -I/usr/local/include"
+	    LDFLAGS="-L/usr/X11R7/lib -L/usr/local/lib";;
+	Linux)
+	    CFLAGS=""
+	    LDFLAGS=""
+	    ;;
+	*)
+	    echo "No default CFLAGS and LDFLAGS found for your OS, feel free to contribute or install pkg-config :)"
+	    exit 1;;
+    esac
 
-	LDFLAGS="$LDFLAGS -lX11"
+    LDFLAGS="$LDFLAGS -lX11"
 
-	[ -n "$USE_XINERAMA" ] && LDFLAGS="$LDFLAGS -lXinerama"
-
+    [ -n "$USE_XINERAMA" ] && LDFLAGS="$LDFLAGS -lXinerama"
+    [ -n "$USE_IMLIB2" ] && LDFLAGS="$LDFLAGS -lImlib2"
 fi
 
 [ -n "$USE_XINERAMA" ] && CFLAGS="$CFLAGS -DHAVE_XINERAMA"
+[ -n "$USE_IMLIB2" ] && CFLAGS="$CFLAGS -DHAVE_IMLIB2"
 
 cat > Makefile << EOF
 PREFIX=$PREFIX

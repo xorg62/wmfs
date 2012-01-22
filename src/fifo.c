@@ -11,6 +11,8 @@
 #include "config.h"
 #include "fifo.h"
 
+#define READ_SIZE (32768)
+
 static void
 fifo_open(void)
 {
@@ -63,7 +65,7 @@ fifo_parse(char *cmd)
 void
 fifo_read(void)
 {
-     char buf[256] = { 0 };
+     char buf[READ_SIZE] = { 0 };
      int ret;
 
      if((ret = read(W->fifo.fd, buf, sizeof(buf) - 1)) > 0)

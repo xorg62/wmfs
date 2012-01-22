@@ -8,6 +8,7 @@
 #include "config.h"
 #include "infobar.h"
 #include "util.h"
+#include "draw.h"
 
 #include <string.h>
 
@@ -82,7 +83,7 @@ status_parse(struct element *e)
 
           p = ++dstr;
 
-          if(!(strchr("sR", *p)) || !(end = strchr(p, ']')))
+          if(!(strchr("sRi", *p)) || !(end = strchr(p, ']')))
                continue;
 
           /* Then parse & list it */
@@ -114,6 +115,22 @@ status_parse(struct element *e)
                sq->color = color_atoh(arg[3 + shift]);
 
                break;
+
+          /*
+           * Image sequence: \i[left/right;w;h;/path/img] OR \i[x;y;w;h;/path/img]
+           */
+#ifdef HAVE_IMLIB2
+          case 'i':
+               i = parse_args(p + 2, ';', ']', 5, arg);
+               STATUS_CHECK_ARGS(i, 3, 4, dstr, end);
+               sq = status_new_seq(type, i, 3, arg, &shift);
+
+               sq->geo.w = ATOI(arg[1 + shift]);
+               sq->geo.h = ATOI(arg[2 + shift]);
+               sq->str   = xstrdup(arg[3 + shift]);
+
+               break;
+#endif /* HAVE_IMLIB2 */
           }
 
           SLIST_INSERT_TAIL(&e->infobar->statushead, sq, next, prev);
@@ -148,7 +165,7 @@ status_apply_list(struct element *e)
      struct status_seq *sq;
      struct barwin *b = SLIST_FIRST(&e->bars);
      struct mousebind *m;
-     int left = 0, right = 0;
+     int left = 0, right = 0, w, h;
 
      SLIST_FOREACH(sq, &e->infobar->statushead, next)
      {
@@ -182,13 +199,38 @@ status_apply_list(struct element *e)
 
                STATUS_ALIGN(sq->align);
 
-               draw_rect(b->dr, sq->geo, sq->color);
+               draw_rect(b->dr, &sq->geo, sq->color);
 
                if(!SLIST_EMPTY(&sq->mousebinds))
                     SLIST_FOREACH(m, &sq->mousebinds, snext)
                          m->area = sq->geo;
 
                break;
+
+          /* Image */
+#ifdef HAVE_IMLIB2
+          case 'i':
+               draw_image_get_size(sq->str, &w, &h);
+
+               if(sq->geo.w <= 0)
+                    sq->geo.w = w;
+               if(sq->geo.h <= 0)
+                    sq->geo.h = h;
+
+               if(sq->align != NoAlign)
+                    sq->geo.y = (e->geo.h >> 1) - (sq->geo.h >> 1);
+
+               STATUS_ALIGN(sq->align);
+
+               draw_image(b->dr, &sq->geo, sq->str);
+
+               if(!SLIST_EMPTY(&sq->mousebinds))
+                    SLIST_FOREACH(m, &sq->mousebinds, snext)
+                         m->area = sq->geo;
+
+               break;
+#endif /* HAVE_IMLIB2 */
+
           }
      }
 }

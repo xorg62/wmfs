@@ -7,6 +7,10 @@
 #include <X11/keysym.h>
 #include <X11/cursorfont.h>
 
+#ifdef HAVE_IMLIB2
+#include <Imlib2.h>
+#endif /* HAVE_IMLIB2 */
+
 #include "wmfs.h"
 #include "event.h"
 #include "ewmh.h"
@@ -153,6 +157,15 @@ wmfs_xinit(void)
       * Barwin linked list
       */
      SLIST_INIT(&W->h.barwin);
+
+     /*
+      * Optional dep init
+      */
+#ifdef HAVE_IMLIB2
+     imlib_context_set_display(W->dpy);
+     imlib_context_set_visual(DefaultVisual(W->dpy, W->xscreen));
+     imlib_context_set_colormap(DefaultColormap(W->dpy, W->xscreen));
+#endif /* HAVE_IMLIB2 */
 
      W->flags |= WMFS_RUNNING;
 }

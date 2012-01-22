@@ -10,6 +10,10 @@
 #include <string.h>
 #include <X11/Xlib.h>
 
+#ifdef HAVE_IMLIB2
+#include <Imlib2.h>
+#endif /* HAVE_IMLIB2 */
+
 #include "wmfs.h"
 #include "config.h"
 #include "screen.h"
@@ -25,11 +29,41 @@ draw_text(Drawable d, struct theme *t, int x, int y, Color fg, const char *str)
 }
 
 static inline void
-draw_rect(Drawable d, struct geo g, Color bg)
+draw_rect(Drawable d, struct geo *g, Color bg)
 {
      XSetForeground(W->dpy, W->gc, bg);
-     XFillRectangle(W->dpy, d, W->gc, g.x, g.y, g.w, g.h);
+     XFillRectangle(W->dpy, d, W->gc, g->x, g->y, g->w, g->h);
 }
+
+#ifdef HAVE_IMLIB2
+
+static inline void
+draw_image(Drawable d, struct geo *g, char *path)
+{
+     Imlib_Image image = imlib_load_image(path);
+
+     imlib_context_set_drawable(d);
+     imlib_context_set_image(image);
+
+     imlib_render_image_on_drawable_at_size(g->x, g->y, g->w, g->h);
+
+     imlib_free_image();
+}
+
+static inline void
+draw_image_get_size(char *path, int *w, int *h)
+{
+     Imlib_Image image = imlib_load_image(path);
+
+     imlib_context_set_image(image);
+
+     *w = imlib_image_get_width();
+     *h = imlib_image_get_height();
+
+     imlib_free_image();
+}
+
+#endif /* HAVE_IMLIB2 */
 
 /*
  * For client use
