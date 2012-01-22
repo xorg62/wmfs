@@ -21,11 +21,11 @@ xmalloc(size_t nmemb, size_t size)
      void *ret;
 
      if(SIZE_MAX / nmemb < size)
-          err(EXIT_FAILURE, "xmalloc(%zu, %zu), "
+          errl(EXIT_FAILURE, "xmalloc(%zu, %zu), "
                     "size_t overflow detected", nmemb, size);
 
      if((ret = malloc(nmemb * size)) == NULL)
-          err(EXIT_FAILURE, "malloc(%zu)", nmemb * size);
+          errl(EXIT_FAILURE, "malloc(%zu)", nmemb * size);
 
      return ret;
 }
@@ -41,7 +41,7 @@ xcalloc(size_t nmemb, size_t size)
      void *ret;
 
      if((ret = calloc(nmemb, size)) == NULL)
-          err(EXIT_FAILURE, "calloc(%zu * %zu)", nmemb, size);
+          errl(EXIT_FAILURE, "calloc(%zu * %zu)", nmemb, size);
 
      return ret;
 }
@@ -62,7 +62,7 @@ xasprintf(char **strp, const char *fmt, ...)
      va_end(args);
 
      if (ret == -1)
-          err(EXIT_FAILURE, "asprintf(%s)", fmt);
+          errl(EXIT_FAILURE, "asprintf(%s)", fmt);
 
      return ret;
 }
@@ -77,7 +77,7 @@ xstrdup(const char *str)
      char *ret = NULL;
 
      if(str == NULL || (ret = strdup(str)) == NULL)
-          warnx("strdup(%s)", str);
+          warnxl("strdup(%s)", str);
 
      return ret;
 }
@@ -101,7 +101,7 @@ spawn(const char *format, ...)
 
      if (len >= sizeof(cmd))
      {
-          warnx("command too long (> 512 bytes)");
+          warnxl("command too long (> 512 bytes)");
           return -1;
      }
 
@@ -112,11 +112,11 @@ spawn(const char *format, ...)
      {
           setsid();
           if (execl(sh, sh, "-c", cmd, (char*)NULL) == -1)
-               warn("execl(sh -c %s)", cmd);
+               warnl("execl(sh -c %s)", cmd);
           exit(EXIT_FAILURE);
      }
      else if (pid == -1)
-          warn("fork");
+          warnl("fork");
 
      return pid;
 }

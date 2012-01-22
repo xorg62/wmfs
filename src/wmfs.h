@@ -22,6 +22,8 @@
 #include <X11/Xatom.h>
 
 /* Local */
+#include "log.h"
+
 #define CONFIG_DEFAULT_PATH ".config/wmfs/wmfsrc"
 
 #define ButtonMask (ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
@@ -288,6 +290,9 @@ struct wmfs
           char *path;
           int fd;
      } fifo;
+
+     /* Log file */
+     FILE *log;
 
      /* Lists heads */
      struct

@@ -25,7 +25,7 @@ wmfs_error_handler(Display *d, XErrorEvent *event)
       /* Check if there is another WM running */
       if(event->error_code == BadAccess
                 && W->root == event->resourceid)
-           errx(EXIT_FAILURE, "Another Window Manager is already running.");
+           errl(EXIT_FAILURE, "Another Window Manager is already running.");
 
       /* Ignore focus change error for unmapped client
        * 42 = X_SetInputFocus
@@ -39,7 +39,7 @@ wmfs_error_handler(Display *d, XErrorEvent *event)
 
 
      if(XGetErrorText(d, event->error_code, mess, 128))
-          warnx("%s(%d) opcodes %d/%d\n  resource #%lx\n",
+          warnxl("%s(%d) opcodes %d/%d\n  resource #%lx\n",
                     mess,
                     event->error_code,
                     event->request_code,
@@ -82,7 +82,7 @@ wmfs_init_font(char *font, struct theme *t)
 
      if(!(t->font.fontset = XCreateFontSet(W->dpy, font, &misschar, &d, &defstring)))
      {
-          warnx("Can't load font '%s'", font);
+          warnxl("Can't load font '%s'", font);
           t->font.fontset = XCreateFontSet(W->dpy, "fixed", &misschar, &d, &defstring);
      }
 
@@ -376,6 +376,7 @@ wmfs_loop(void)
 static inline void
 wmfs_init(void)
 {
+     log_init();
      wmfs_xinit();
      ewmh_init();
      screen_init();
@@ -454,6 +455,10 @@ wmfs_quit(void)
           close(W->fifo.fd);
           unlink(W->fifo.path);
      }
+
+     /* close log */
+     if(W->log)
+          fclose(W->log), W->log = NULL;
 
      W->flags &= ~WMFS_RUNNING;
 
