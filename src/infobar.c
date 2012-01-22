@@ -49,6 +49,8 @@ infobar_elem_tag_init(struct element *e)
      j = e->geo.x;
      e->geo.h -= (e->infobar->theme->tags_border_width << 1);
 
+     e->statusctx = &e->infobar->theme->tags_n_sl;
+
      TAILQ_FOREACH(t, &e->infobar->screen->tags, next)
      {
           s = draw_textw(e->infobar->theme, t->name) + PAD;
@@ -92,14 +94,32 @@ infobar_elem_tag_update(struct element *e)
           {
                b->fg = e->infobar->theme->tags_s.fg;
                b->bg = e->infobar->theme->tags_s.bg;
+               e->statusctx = &e->infobar->theme->tags_s_sl;
           }
           else
           {
-               b->fg = e->infobar->theme->tags_n.fg;
-               b->bg = e->infobar->theme->tags_n.bg;
+               if(SLIST_EMPTY(&t->clients))
+               {
+                    b->fg = e->infobar->theme->tags_n.fg;
+                    b->bg = e->infobar->theme->tags_n.bg;
+                    e->statusctx = &e->infobar->theme->tags_n_sl;
+               }
+               /* Occupied tag */
+               else
+               {
+                    b->fg = e->infobar->theme->tags_o.fg;
+                    b->bg = e->infobar->theme->tags_o.bg;
+                    e->statusctx = &e->infobar->theme->tags_o_sl;
+               }
           }
 
           barwin_refresh_color(b);
+
+          /* Manage status line */
+          e->statusctx->barwin = b;
+          status_flush_mousebind(e->statusctx);
+          status_copy_mousebind(e->statusctx);
+          status_render(e->statusctx);
 
           draw_text(b->dr, e->infobar->theme, (PAD >> 1),
                     TEXTY(e->infobar->theme, e->geo.h), b->fg, t->name);

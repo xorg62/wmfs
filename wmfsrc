@@ -22,8 +22,16 @@
      # Element tags
      tags_normal_fg = "#AABBAA"
      tags_normal_bg = "#223322"
+     # tags_normal_statusline = ""
+
      tags_sel_fg    = "#223322"
      tags_sel_bg    = "#AABBAA"
+     # tags_sel_statusline = ""
+
+     tags_occupied_fg = "#AABBAA"
+     tags_occupied_bg = "#445544"
+     tags_occupied_statusline = "\R[0;0;3;3;#AABBAA]"
+
      tags_border_color = "#112211"
      tags_border_width = 1
 

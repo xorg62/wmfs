@@ -9,6 +9,11 @@
 #include "wmfs.h"
 
 struct status_ctx status_new_ctx(struct barwin *b, struct theme *t);
+void status_free_ctx(struct status_ctx *ctx);
+void status_flush_list(struct status_ctx *ctx);
+void status_flush_mousebind(struct status_ctx *ctx);
+void status_copy_mousebind(struct status_ctx *ctx);
+void status_parse(struct status_ctx *ctx);
 void status_render(struct status_ctx *ctx);
 void status_manage(struct status_ctx *ctx);
 void uicb_status(Uicb cmd);

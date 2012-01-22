@@ -44,6 +44,17 @@ status_new_ctx(struct barwin *b, struct theme *t)
      return ctx;
 }
 
+void
+status_free_ctx(struct status_ctx *ctx)
+{
+     free(ctx->status);
+
+     if(ctx->barwin)
+          status_flush_mousebind(ctx);
+
+     status_flush_list(ctx);
+}
+
 /* Parse mousebind sequence next normal sequence: \<seq>[](button;func;cmd) */
 static char*
 status_parse_mouse(struct status_seq *sq, struct status_ctx *ctx, char *str)
@@ -63,8 +74,11 @@ status_parse_mouse(struct status_seq *sq, struct status_ctx *ctx, char *str)
      m->button   = ATOI(arg[0]);
      m->func     = uicb_name_func(arg[1]);
      m->cmd      = (i > 1 ? xstrdup(arg[2]) : NULL);
+     m->flags   |= MOUSEBIND_STATUS;
 
-     SLIST_INSERT_HEAD(&ctx->barwin->mousebinds, m, next);
+     if(ctx->barwin)
+          SLIST_INSERT_HEAD(&ctx->barwin->mousebinds, m, next);
+
      SLIST_INSERT_HEAD(&sq->mousebinds, m, snext);
 
      return end + 1;
@@ -76,7 +90,7 @@ status_parse_mouse(struct status_seq *sq, struct status_ctx *ctx, char *str)
           str = end + 2;                        \
           continue;                             \
      }
-static void
+void
 status_parse(struct status_ctx *ctx)
 {
      struct status_seq *sq, *prev = NULL;
@@ -265,17 +279,12 @@ status_render(struct status_ctx *ctx)
      barwin_refresh(ctx->barwin);
 }
 
-/* Parse and render statustext */
 void
-status_manage(struct status_ctx *ctx)
+status_flush_list(struct status_ctx *ctx)
 {
      struct status_seq *sq;
-     struct mousebind *m;
 
-     /*
-      * Flush previous linked list of status sequences
-      * and mousebind of status barwin
-      */
+     /* Flush previous linked list of status sequences */
      while(!SLIST_EMPTY(&ctx->statushead))
      {
           sq = SLIST_FIRST(&ctx->statushead);
@@ -283,13 +292,43 @@ status_manage(struct status_ctx *ctx)
           free(sq->str);
           free(sq);
      }
-     while(!SLIST_EMPTY(&ctx->barwin->mousebinds))
+}
+
+void
+status_flush_mousebind(struct status_ctx *ctx)
+{
+     struct mousebind *m;
+
+     SLIST_FOREACH(m, &ctx->barwin->mousebinds, next)
+          if(m->flags & MOUSEBIND_STATUS)
+               SLIST_REMOVE(&ctx->barwin->mousebinds, m, mousebind, next);
+}
+
+void
+status_copy_mousebind(struct status_ctx *ctx)
+{
+     struct mousebind *m;
+     struct status_seq *sq;
+
+     if(!ctx->barwin)
+          return;
+
+     SLIST_FOREACH(sq, &ctx->statushead, next)
      {
-          m = SLIST_FIRST(&ctx->barwin->mousebinds);
-          SLIST_REMOVE_HEAD(&ctx->barwin->mousebinds, next);
-          free((void*)m->cmd);
-          free(m);
+          SLIST_FOREACH(m, &sq->mousebinds, snext)
+               SLIST_INSERT_HEAD(&ctx->barwin->mousebinds, m, next);
      }
+}
+
+/* Parse and render statustext */
+void
+status_manage(struct status_ctx *ctx)
+{
+     if(!ctx->status)
+          return;
+
+     status_flush_list(ctx);
+     status_flush_mousebind(ctx);
      status_parse(ctx);
      status_render(ctx);
 }

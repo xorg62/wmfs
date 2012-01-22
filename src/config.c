@@ -10,6 +10,7 @@
 #include "screen.h"
 #include "infobar.h"
 #include "util.h"
+#include "status.h"
 
 static void
 config_mouse_section(struct mbhead *mousebinds, struct conf_sec **sec)
@@ -75,8 +76,23 @@ config_theme(void)
           t->tags_n.bg         = color_atoh(fetch_opt_first(ks[i], "#222222", "tags_normal_bg").str);
           t->tags_s.fg         = color_atoh(fetch_opt_first(ks[i], "#222222", "tags_sel_fg").str);
           t->tags_s.bg         = color_atoh(fetch_opt_first(ks[i], "#CCCCCC", "tags_sel_bg").str);
+          t->tags_o.fg         = color_atoh(fetch_opt_first(ks[i], "#CCCCCC", "tags_occupied_fg").str);
+          t->tags_o.bg         = color_atoh(fetch_opt_first(ks[i], "#444444", "tags_occupied_bg").str);
           t->tags_border_col   = color_atoh(fetch_opt_first(ks[i], "#888888", "tags_border_color").str);
           t->tags_border_width = fetch_opt_first(ks[i], "0", "tags_border_width").num;
+
+
+          /* status line */
+          t->tags_n_sl = status_new_ctx(NULL, t);
+          t->tags_s_sl = status_new_ctx(NULL, t);
+          t->tags_o_sl = status_new_ctx(NULL, t);
+
+          if((t->tags_n_sl.status = xstrdup(fetch_opt_first(ks[i], "", "tags_normal_statusline").str)))
+               status_parse(&t->tags_n_sl);
+          if((t->tags_s_sl.status = xstrdup(fetch_opt_first(ks[i], "", "tags_sel_statusline").str)))
+               status_parse(&t->tags_s_sl);
+          if((t->tags_o_sl.status = xstrdup(fetch_opt_first(ks[i], "", "tags_occupied_statusline").str)))
+               status_parse(&t->tags_o_sl);
 
           /* Client / frame */
           t->client_n.fg = color_atoh(fetch_opt_first(ks[i], "#CCCCCC", "client_normal_fg").str);

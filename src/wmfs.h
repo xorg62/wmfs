@@ -119,6 +119,7 @@ struct element
 {
      struct geo geo;
      struct infobar *infobar;
+     struct status_ctx *statusctx;
      int type;
      enum position align;
      void (*func_init)(struct element *e);
@@ -218,6 +219,8 @@ struct keybind
 struct mousebind
 {
      struct geo area;
+#define MOUSEBIND_STATUS 0x01
+     Flags flags;
      unsigned int button;
      bool use_area;
      void (*func)(Uicb);
@@ -243,7 +246,8 @@ struct theme
      int bars_width;
 
      /* struct elements */
-     struct colpair tags_n, tags_s; /* normal / selected */
+     struct colpair tags_n, tags_s, tags_o; /* normal / selected / occupied */
+     struct status_ctx tags_n_sl, tags_s_sl, tags_o_sl; /* status line */
      int tags_border_width;
      Color tags_border_col;
 

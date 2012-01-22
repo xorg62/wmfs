@@ -439,6 +439,9 @@ wmfs_quit(void)
      {
           r = SLIST_FIRST(&W->h.rule);
           SLIST_REMOVE_HEAD(&W->h.rule, next);
+          status_free_ctx(&t->tags_n_sl);
+          status_free_ctx(&t->tags_s_sl);
+          status_free_ctx(&t->tags_o_sl);
           free(r->class);
           free(r->instance);
           free(r->role);
