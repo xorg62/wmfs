@@ -442,6 +442,8 @@ wmfs_quit(void)
           status_free_ctx(&t->tags_n_sl);
           status_free_ctx(&t->tags_s_sl);
           status_free_ctx(&t->tags_o_sl);
+          status_free_ctx(&t->client_n_sl);
+          status_free_ctx(&t->client_s_sl);
           free(r->class);
           free(r->instance);
           free(r->role);

@@ -13,6 +13,11 @@
 
 #define EVDPY(e) (e)->xany.display
 
+#define MOUSE_CHECK_BIND(m)                                                   \
+     if(m->button == ev->button)                                              \
+          if(!m->use_area || (m->use_area && INAREA(ev->x, ev->y, m->area)))  \
+               if(m->func)                                                    \
+                    m->func(m->cmd);
 static void
 event_buttonpress(XEvent *e)
 {
@@ -28,10 +33,10 @@ event_buttonpress(XEvent *e)
                W->last_clicked_barwin = b;
 
                SLIST_FOREACH(m, &b->mousebinds, next)
-                    if(m->button == ev->button)
-                         if(!m->use_area || (m->use_area && INAREA(ev->x, ev->y, m->area)))
-                              if(m->func)
-                                   m->func(m->cmd);
+                    MOUSE_CHECK_BIND(m);
+
+               SLIST_FOREACH(m, &b->statusmousebinds, next)
+                    MOUSE_CHECK_BIND(m);
 
                break;
           }

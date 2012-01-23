@@ -32,6 +32,7 @@ config_mouse_section(struct mbhead *mousebinds, struct conf_sec **sec)
                m->cmd = xstrdup(p);
 
           m->use_area = false;
+          m->flags = 0;
 
           SLIST_INSERT_HEAD(mousebinds, m, next);
           SLIST_INSERT_HEAD(&W->h.mousebind, m, globnext);
@@ -102,6 +103,15 @@ config_theme(void)
           t->frame_bg    = color_atoh(fetch_opt_first(ks[i], "#555555", "frame_bg").str);
           t->client_titlebar_width = fetch_opt_first(ks[i], "12", "client_titlebar_width").num;
           t->client_border_width   = fetch_opt_first(ks[i], "1", "client_border_width").num;
+
+          /* status line */
+          t->client_n_sl = status_new_ctx(NULL, t);
+          t->client_s_sl = status_new_ctx(NULL, t);
+
+          if((t->client_n_sl.status = xstrdup(fetch_opt_first(ks[i], "", "client_normal_statusline").str)))
+               status_parse(&t->client_n_sl);
+          if((t->client_s_sl.status = xstrdup(fetch_opt_first(ks[i], "", "client_sel_statusline").str)))
+               status_parse(&t->client_s_sl);
 
           SLIST_INSERT_TAIL(&W->h.theme, t, next, p);
 

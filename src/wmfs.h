@@ -92,6 +92,7 @@ struct barwin
      Color fg, bg;
      void *ptr; /* Special cases */
      SLIST_HEAD(mbhead, mousebind) mousebinds;
+     SLIST_HEAD(, mousebind) statusmousebinds;
      SLIST_ENTRY(barwin) next;  /* global barwin */
      SLIST_ENTRY(barwin) enext; /* element barwin */
 };
@@ -253,6 +254,7 @@ struct theme
 
      /* client / frame */
      struct colpair client_n, client_s;
+     struct status_ctx client_n_sl, client_s_sl;
      Color frame_bg;
      int client_titlebar_width;
      int client_border_width;

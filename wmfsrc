@@ -38,8 +38,12 @@
      # Frame / Client
      client_normal_fg = "#AABBAA"
      client_normal_bg = "#223322"
+     client_normal_statusline = "\s[left;#ff0000; x](1;client_close)"
+
      client_sel_fg = "#223322"
      client_sel_bg = "#AABBAA"
+     client_sel_statusline = "\s[left;#ff0000; x](1;client_close)"
+
      frame_bg = "#555555"
      client_titlebar_width = 12
      client_border_width = 1

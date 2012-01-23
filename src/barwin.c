@@ -51,6 +51,7 @@ barwin_new(Window parent, int x, int y, int w, int h, Color fg, Color bg, bool e
      b->fg = fg;
 
      SLIST_INIT(&b->mousebinds);
+     SLIST_INIT(&b->statusmousebinds);
 
      /* Attach */
      SLIST_INSERT_HEAD(&W->h.barwin, b, next);

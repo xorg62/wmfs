@@ -346,10 +346,17 @@ client_grabbuttons(struct client *c, bool focused)
 #define _REMAINDER()                                            \
      if((rm = ((x + f) - (c->rgeo.w - c->border))) >  0)        \
           f -= rm;
+
+#define _STATUSLINE(C, b)                                          \
+     sctx = (b ? &c->theme->client_s_sl : &c->theme->client_n_sl); \
+     sctx->barwin = C->titlebar;                                   \
+     status_copy_mousebind(sctx);                                  \
+     status_render(sctx);
 void
 client_frame_update(struct client *c, struct colpair *cp)
 {
      struct client *cc;
+     struct status_ctx *sctx;
      int y, f, xt, rm, w, n = 1;
 
      if(c->flags & CLIENT_TABBED)
@@ -384,6 +391,9 @@ client_frame_update(struct client *c, struct colpair *cp)
           barwin_move(c->titlebar, 0, 0);
           barwin_resize(c->titlebar, f, c->tbarw);
           barwin_refresh_color(c->titlebar);
+
+          _STATUSLINE(c, (cp == &c->scol));
+
           draw_text(c->titlebar->dr, c->theme, xt, y, cp->fg, c->title);
           barwin_refresh(c->titlebar);
      }
@@ -407,6 +417,8 @@ client_frame_update(struct client *c, struct colpair *cp)
                     barwin_resize(c->titlebar, f, c->tbarw);
 
                     barwin_refresh_color(c->titlebar);
+
+                    _STATUSLINE(c, true);
                     draw_rect(c->titlebar->dr, &g, c->scol.bg);
                     draw_text(c->titlebar->dr, c->theme, xt, y, cp->fg, c->title);
                     barwin_refresh(c->titlebar);
@@ -423,6 +435,8 @@ client_frame_update(struct client *c, struct colpair *cp)
                     barwin_resize(cc->titlebar, f, c->tbarw - 2);
 
                     barwin_refresh_color(cc->titlebar);
+
+                    _STATUSLINE(cc, false);
                     draw_rect(cc->titlebar->dr, &g, c->scol.bg);
                     draw_text(cc->titlebar->dr, c->theme, xt, y - 1, c->ncol.fg, cc->title);
                     barwin_refresh(cc->titlebar);

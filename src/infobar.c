@@ -117,7 +117,6 @@ infobar_elem_tag_update(struct element *e)
 
           /* Manage status line */
           e->statusctx->barwin = b;
-          status_flush_mousebind(e->statusctx);
           status_copy_mousebind(e->statusctx);
           status_render(e->statusctx);
 
