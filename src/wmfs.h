@@ -345,6 +345,7 @@ struct wmfs
       */
      struct
      {
+          struct barwin *barwin;
           Window win;
           SLIST_HEAD(, _systray) head;
      } systray;
