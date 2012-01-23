@@ -10,6 +10,7 @@
 #include "client.h"
 #include "barwin.h"
 #include "screen.h"
+#include "systray.h"
 
 #define EVDPY(e) (e)->xany.display
 
@@ -53,6 +54,9 @@ event_enternotify(XEvent *e)
                && ev->window != W->root)
           return;
 
+     if(ev->window == W->systray.win /* || systray_find(ev->window) */)
+          return;
+
      if((c = client_gb_win(ev->window))
         || (c = client_gb_frame(ev->window)))
      {
@@ -68,10 +72,31 @@ event_clientmessageevent(XEvent *e)
 {
      XClientMessageEvent *ev = &e->xclient;
      struct client *c;
+     struct _systray *sy;
      int type = 0;
 
      while(type < net_last && W->net_atom[type] != ev->message_type)
           ++type;
+
+     /*
+      * Systray message
+      * _NET_WM_SYSTRAY_TRAY_OPCODE
+      */
+     if(ev->window == W->systray.win && type == net_wm_system_tray_opcode)
+     {
+          if(ev->data.l[1] == XEMBED_EMBEDDED_NOTIFY)
+          {
+               /* systray_add(ev->data.l[2]); */
+               /* systray_update() */
+          }
+          else if(ev->data.l[1] == XEMBED_REQUEST_FOCUS)
+          {
+               /* if((sy = systray_find(ev->data.l[2])))
+                    ewmh_send_message(sy->win, sy->win, "_XEMBED", XEMBED_FOCUS_IN,
+                    XEMBED_FOCUS_CURRENT, 0, 0, 0);*/
+
+          }
+     }
 
      switch(type)
      {
@@ -126,9 +151,16 @@ event_destroynotify(XEvent *e)
 {
      XDestroyWindowEvent *ev = &e->xdestroywindow;
      struct client *c;
+     struct _systray *s;
 
      if((c = client_gb_win(ev->window)))
           client_remove(c);
+     /*else if((s = systray_find(ev->window)))
+     {
+          ewmh_set_wm_state(s->win, WithdrawnState);
+          systray_del(s);
+          systray_update();
+          }*/
 }
 
 static void
@@ -145,14 +177,20 @@ event_maprequest(XEvent *e)
 {
      XMapRequestEvent *ev = &e->xmaprequest;
      XWindowAttributes at;
+     struct _systray *s;
 
      /* Which windows to manage */
      if(!XGetWindowAttributes(EVDPY(e), ev->window, &at)
-               || at.override_redirect)
+        || at.override_redirect)
           return;
 
      if(!client_gb_win(ev->window))
           client_new(ev->window, &at, false);
+     /*else if((s = systray_find(ev->window)))
+     {
+          ewmh_send_message(s->win, s->win, "_XEMBED", CurrentTime, XEMBED_WINDOW_ACTIVATE, 0, 0, 0);
+          systray_update();
+          }*/
 }
 
 static void
@@ -170,6 +208,7 @@ event_propertynotify(XEvent *e)
 {
      XPropertyEvent *ev = &e->xproperty;
      struct client *c;
+     struct _systray *s;
 
      if(ev->state == PropertyDelete)
           return;
@@ -200,6 +239,11 @@ event_propertynotify(XEvent *e)
                     break;
           }
      }
+     /*else if((s = systray_find(ev->window)))
+     {
+          systray_state(s);
+          systray_update();
+          }*/
 }
 
 static void
@@ -207,9 +251,15 @@ event_unmapnotify(XEvent *e)
 {
      XUnmapEvent *ev = &e->xunmap;
      struct client *c;
+     struct systray *s;
 
      if((c = client_gb_win(ev->window)) && ev->send_event)
           client_remove(c);
+     /*else if((s = systray_find(ev->window)))
+     {
+          systray_del(s);
+          systray_update(s);
+          }*/
 }
 
 static void
@@ -242,6 +292,35 @@ event_expose(XEvent *e)
 }
 
 static void
+event_mapnotify(XEvent *e)
+{
+     XMapEvent *ev = &e->xmap;
+     struct client *c;
+     struct _systray *s;
+
+     if(ev->window != ev->event && !ev->send_event)
+          return;
+
+     if((c = client_gb_win(ev->window)))
+          ewmh_set_wm_state(c->win, NormalState);
+     /*else if((s = systray_find(ev->window)))
+     {
+          ewmh_set_wm_state(s->win, NormalState);
+          ewmh_send_message(s->win, s->win, "_XEMBED", CurrentTime, XEMBED_WINDOW_ACTIVATE, 0, 0, 0);
+          }*/
+}
+
+static void
+event_selectionclearevent(XEvent *ev)
+{
+     /* Getting selection if lost it */
+/*     if(ev->xselectionclear.window == W->systray.win)
+          systray_acquire();
+
+          systray_update();*/
+}
+
+static void
 event_dummy(XEvent *e)
 {
    /*  printf("%d\n", e->type);*/
@@ -264,12 +343,12 @@ event_init(void)
      event_handle[Expose]           = event_expose;
      event_handle[FocusIn]          = event_focusin;
      event_handle[KeyPress]         = event_keypress;
-     /*event_handle[MapNotify]        = event_mapnotify;*/
+     event_handle[MapNotify]        = event_mapnotify;
      event_handle[MapRequest]       = event_maprequest;
      event_handle[MappingNotify]    = event_mappingnotify;
      event_handle[PropertyNotify]   = event_propertynotify;
      /*event_handle[ReparentNotify]   = event_reparentnotify;*/
-     /*event_handle[SelectionClear]   = event_selectionclearevent;*/
+     event_handle[SelectionClear]   = event_selectionclearevent;
      event_handle[UnmapNotify]      = event_unmapnotify;
 }
 

@@ -275,6 +275,13 @@ struct rule
      SLIST_ENTRY(rule) next;
 };
 
+struct _systray
+{
+     struct geo geo;
+     Window win;
+     SLIST_ENTRY(_systray) next;
+};
+
 #define MAX_PATH_LEN 8192
 
 struct wmfs
@@ -289,6 +296,8 @@ struct wmfs
 #define WMFS_SCAN     0x01
 #define WMFS_RUNNING  0x02
 #define WMFS_RELOAD   0x04
+#define WMFS_SYSTRAY  0x08
+#define WMFS_LOG      0x10
      Flags flags;
      GC gc, rgc;
      Atom *net_atom;
@@ -329,6 +338,16 @@ struct wmfs
           struct mbhead client;
           struct mbhead root;
      } tmp_head;
+
+     /*
+      * Because there is only one systray per display,
+      * set struct there
+      */
+     struct
+     {
+          Window win;
+          SLIST_HEAD(, _systray) head;
+     } systray;
 
      /*
       * Selected screen, client

@@ -106,6 +106,31 @@ ewmh_set_wm_state(Window w, int state)
                      W->net_atom[wm_state], 32, PropModeReplace, d, 2);
 }
 
+/*
+ * Get xembed state
+ */
+long
+ewmh_get_xembed_state(Window win)
+{
+     Atom rf;
+     int f;
+     long ret = 0;
+     unsigned long n, il;
+     unsigned char *data = NULL;
+
+     if(XGetWindowProperty(W->dpy, win, W->net_atom[xembedinfo], 0L, 2, False,
+                           W->net_atom[xembedinfo], &rf, &f, &n, &il, &data) != Success)
+          return 0;
+
+     if(rf == W->net_atom[xembedinfo] && n == 2)
+          ret = (long)data[1];
+
+     if(n && data)
+          XFree(data);
+
+     return ret;
+}
+
 void
 ewmh_update_wmfs_props(void)
 {
@@ -117,7 +142,6 @@ ewmh_update_wmfs_props(void)
           ++ns;
 
      cts = xcalloc(ns, sizeof(long));
-
 
      for(i = 0; i < ns; ++i)
      {

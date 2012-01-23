@@ -11,6 +11,29 @@
 #include <X11/Xutil.h>
 
 #include "wmfs.h"
+#include "util.h"
+
+/* EWMH/Xembed const from freedesktop */
+#define XEMBED_MAPPED                 (1 << 0)
+#define XEMBED_EMBEDDED_NOTIFY        0
+#define XEMBED_WINDOW_ACTIVATE        1
+#define XEMBED_WINDOW_DEACTIVATE      2
+#define XEMBED_REQUEST_FOCUS          3
+#define XEMBED_FOCUS_IN               4
+#define XEMBED_FOCUS_OUT              5
+#define XEMBED_FOCUS_NEXT             6
+#define XEMBED_FOCUS_PREV             7
+/* 8-9 were used for XEMBED_GRAB_KEY/XEMBED_UNGRAB_KEY */
+#define XEMBED_MODALITY_ON            10
+#define XEMBED_MODALITY_OFF           11
+#define XEMBED_REGISTER_ACCELERATOR   12
+#define XEMBED_UNREGISTER_ACCELERATOR 13
+#define XEMBED_ACTIVATE_ACCELERATOR   14
+
+/* Details for  XEMBED_FOCUS_IN: */
+#define XEMBED_FOCUS_CURRENT0
+#define XEMBED_FOCUS_FIRST 1
+#define XEMBED_FOCUS_LAST2
 
 /* Ewmh hints list */
 enum
@@ -72,8 +95,28 @@ enum
      net_last
 };
 
+static inline void
+ewmh_send_message(Window d, Window w, char *atom, long d0, long d1, long d2, long d3, long d4)
+{
+     XClientMessageEvent e;
+
+     e.type          = ClientMessage;
+     e.message_type  = ATOM(atom);
+     e.window        = w;
+     e.format        = 32;
+     e.data.l[0]     = d0;
+     e.data.l[1]     = d1;
+     e.data.l[2]     = d2;
+     e.data.l[3]     = d3;
+     e.data.l[4]     = d4;
+
+     XSendEvent(W->dpy, d, false, StructureNotifyMask, (XEvent*)&e);
+     XSync(W->dpy, False);
+}
+
 void ewmh_init(void);
 void ewmh_set_wm_state(Window w, int state);
+long ewmh_get_xembed_state(Window win);
 void ewmh_update_wmfs_props(void);
 void ewmh_manage_state(long data[], struct client *c);
 void ewmh_manage_window_type(struct client *c);
