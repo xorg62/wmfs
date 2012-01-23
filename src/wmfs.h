@@ -220,8 +220,6 @@ struct keybind
 struct mousebind
 {
      struct geo area;
-#define MOUSEBIND_STATUS 0x01
-     Flags flags;
      unsigned int button;
      bool use_area;
      void (*func)(Uicb);

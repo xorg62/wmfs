@@ -32,7 +32,6 @@ config_mouse_section(struct mbhead *mousebinds, struct conf_sec **sec)
                m->cmd = xstrdup(p);
 
           m->use_area = false;
-          m->flags = 0;
 
           SLIST_INSERT_HEAD(mousebinds, m, next);
           SLIST_INSERT_HEAD(&W->h.mousebind, m, globnext);

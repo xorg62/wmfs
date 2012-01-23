@@ -74,7 +74,6 @@ status_parse_mouse(struct status_seq *sq, char *str)
      m->button   = ATOI(arg[0]);
      m->func     = uicb_name_func(arg[1]);
      m->cmd      = (i > 1 ? xstrdup(arg[2]) : NULL);
-     m->flags   |= MOUSEBIND_STATUS;
 
      SLIST_INSERT_HEAD(&sq->mousebinds, m, snext);
 
