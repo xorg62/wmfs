@@ -64,7 +64,7 @@ status_parse_mouse(struct status_seq *sq, char *str)
      int i;
 
      if(*str != '(' || !(end = strchr(str, ')')))
-          return str + 1;
+          return str;
 
      i = parse_args(++str, ';', ')', 3, arg);
 
@@ -98,7 +98,7 @@ status_parse(struct status_ctx *ctx)
      for(; *dstr; ++dstr)
      {
           /* Check if this is a sequence */
-          if(*dstr != '\\')
+          if(*dstr != '^' && *dstr != '\\')
                continue;
 
           p = ++dstr;
@@ -159,8 +159,9 @@ status_parse(struct status_ctx *ctx)
            * Optional mousebind sequence(s) \<seq>[](button;func;cmd)
            * Parse it while there is a mousebind sequence.
            */
-          dstr = ++end;
+          dstr = end + 1;
           while((*(dstr = status_parse_mouse(sq, dstr)) == '('));
+          --dstr;
 
           prev = sq;
      }
