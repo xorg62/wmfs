@@ -178,7 +178,6 @@ infobar_elem_status_update(struct element *e)
           status_render(&e->infobar->statusctx);
           status_copy_mousebind(&e->infobar->statusctx);
      }
-     puts("status");
 }
 
 static void

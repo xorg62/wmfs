@@ -185,7 +185,6 @@ systray_update(void)
      {
           W->systray.redim = false;
           infobar_elem_reinit(W->systray.infobar);
-          puts("update");
      }
 
      SLIST_FOREACH(i, &W->systray.head, next)
