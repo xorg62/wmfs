@@ -202,7 +202,7 @@ wmfs_scan(void)
      int i, n, rf, nscreen = 0;
      int tag = -1, screen = -1, flags = -1;
      unsigned long ir, il;
-     long *ret = NULL, *tret;
+     long *ret = NULL, *tret = NULL;
      bool getg = false;
      XWindowAttributes wa;
      Window usl, usl2, *w = NULL, tm, focus;
@@ -216,7 +216,7 @@ wmfs_scan(void)
      if(XGetWindowProperty(W->dpy, W->root, W->net_atom[wmfs_current_tag], 0, 32,
                            False, XA_CARDINAL, &rt, &rf, &ir, &il,
                            (unsigned char**)&tret)
-               == Success && ret)
+               == Success && tret)
      {
           nscreen = (int)ir;
      }
