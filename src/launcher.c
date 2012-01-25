@@ -175,6 +175,7 @@ launcher_process(struct launcher *l)
      XUngrabKeyboard(W->dpy, CurrentTime);
 
      free(cmd);
+     free(data);
 
      /* 'Close' launcher elements */
      W->flags ^= WMFS_LAUNCHER;
