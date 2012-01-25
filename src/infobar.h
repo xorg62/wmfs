@@ -8,16 +8,16 @@
 
 #include "wmfs.h"
 #include "util.h"
-#include "draw.h"
 #include "tag.h"
 
-enum { ElemTag = 0, ElemStatus, ElemCustom, ElemLast };
+enum { ElemTag = 0, ElemStatus, ElemSystray, ElemCustom, ElemLast };
 
 struct infobar *infobar_new(struct screen *s, char *name, struct theme *theme, enum barpos pos, const char *elem);
-void infobar_elem_update(struct infobar *i);
+void infobar_elem_update(struct infobar *i, int type);
 void infobar_refresh(struct infobar *i);
 void infobar_remove(struct infobar *i);
 void infobar_free(struct screen *s);
+void infobar_elem_reinit(struct infobar *i);
 
 /* Basic placement of elements */
 static inline void
@@ -63,16 +63,13 @@ infobar_placement(struct infobar *i, enum barpos p)
 }
 
 static inline void
-infobar_elem_screen_update(struct screen *s, int addf)
+infobar_elem_screen_update(struct screen *s, int type)
 {
      struct infobar *i;
 
-     s->elemupdate |= FLAGINT(addf);
-
      SLIST_FOREACH(i, &s->infobars, next)
-          infobar_elem_update(i);
+          infobar_elem_update(i, type);
 
-     s->elemupdate &= ~FLAGINT(addf);
 }
 
 static inline struct infobar*

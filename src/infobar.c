@@ -10,11 +10,14 @@
 #include "util.h"
 #include "tag.h"
 #include "status.h"
+#include "systray.h"
 
 static void infobar_elem_tag_init(struct element *e);
 static void infobar_elem_tag_update(struct element *e);
 static void infobar_elem_status_init(struct element *e);
 static void infobar_elem_status_update(struct element *e);
+static void infobar_elem_systray_init(struct element *e);
+static void infobar_elem_systray_update(struct element *e);
 
 const struct elem_funcs
 {
@@ -23,12 +26,9 @@ const struct elem_funcs
      void (*func_update)(struct element *e);
 } elem_funcs[] =
 {
-     { 't', infobar_elem_tag_init,    infobar_elem_tag_update },
-     { 's', infobar_elem_status_init, infobar_elem_status_update },
-
-     /* { 'l',  infobar_elem_layout_init, infobar_elem_layout_update },
-        { 'S',  infobar_elem_selbar_init, infobar_elem_selbar_update },
-     */
+     { 't', infobar_elem_tag_init,     infobar_elem_tag_update },
+     { 's', infobar_elem_status_init,  infobar_elem_status_update },
+     { 'y', infobar_elem_systray_init, infobar_elem_systray_update },
      { '\0', NULL, NULL }
 };
 
@@ -51,32 +51,41 @@ infobar_elem_tag_init(struct element *e)
 
      e->statusctx = &e->infobar->theme->tags_n_sl;
 
-     TAILQ_FOREACH(t, &e->infobar->screen->tags, next)
+     if(SLIST_EMPTY(&e->bars))
      {
-          s = draw_textw(e->infobar->theme, t->name) + PAD;
-
-          /* Init barwin */
-          b = barwin_new(e->infobar->bar->win, j, 0, s, e->geo.h, 0, 0, false);
-
-          /* Set border */
-          if(e->infobar->theme->tags_border_width)
+          TAILQ_FOREACH(t, &e->infobar->screen->tags, next)
           {
-               XSetWindowBorder(W->dpy, b->win, e->infobar->theme->tags_border_col);
-               XSetWindowBorderWidth(W->dpy, b->win, e->infobar->theme->tags_border_width);
+               s = draw_textw(e->infobar->theme, t->name) + PAD;
+
+               /* Init barwin */
+               b = barwin_new(e->infobar->bar->win, j, 0, s, e->geo.h, 0, 0, false);
+
+               /* Set border */
+               if(e->infobar->theme->tags_border_width)
+               {
+                    XSetWindowBorder(W->dpy, b->win, e->infobar->theme->tags_border_col);
+                    XSetWindowBorderWidth(W->dpy, b->win, e->infobar->theme->tags_border_width);
+               }
+
+               b->ptr = (void*)t;
+               barwin_map(b);
+
+               b->mousebinds = W->tmp_head.tag;
+
+               SLIST_INSERT_TAIL(&e->bars, b, enext, prev);
+
+               prev = b;
+               j += s;
           }
-
-          b->ptr = (void*)t;
-          barwin_map(b);
-
-          b->mousebinds = W->tmp_head.tag;
-
-          SLIST_INSERT_TAIL(&e->bars, b, enext, prev);
-
-          prev = b;
-          j += s;
      }
-
-     e->infobar->screen->elemupdate |= FLAGINT(ElemTag);
+     else
+     {
+          SLIST_FOREACH(b, &e->bars, enext)
+          {
+               barwin_move(b, j, 0);
+               j += b->geo.w;
+          }
+     }
 }
 
 static void
@@ -137,25 +146,77 @@ infobar_elem_status_init(struct element *e)
 
      e->geo.w = e->infobar->geo.w - e->geo.x - (en ? e->infobar->geo.w - en->geo.x : 0);
 
-     b = barwin_new(e->infobar->bar->win, e->geo.x, 0, e->geo.w, e->geo.h, 0, 0, false);
+     if(!(b = SLIST_FIRST(&e->bars)))
+     {
+          b = barwin_new(e->infobar->bar->win, e->geo.x, 0, e->geo.w, e->geo.h, 0, 0, false);
+          barwin_refresh_color(b);
+          SLIST_INSERT_HEAD(&e->bars, b, enext);
+
+          e->infobar->statusctx = status_new_ctx(b, e->infobar->theme);
+          e->infobar->statusctx.status = strdup("wmfs2");
+          e->infobar->statusctx.update = true;
+     }
+     else
+     {
+          barwin_move(b, e->geo.x, e->geo.y);
+          barwin_resize(b, e->geo.w, e->geo.h);
+     }
 
      b->fg = e->infobar->theme->bars.fg;
      b->bg = e->infobar->theme->bars.bg;
 
      barwin_map(b);
-
-     SLIST_INSERT_HEAD(&e->bars, b, enext);
-
-     e->infobar->statusctx = status_new_ctx(b, e->infobar->theme);
-
-     e->infobar->screen->elemupdate |= FLAGINT(ElemStatus);
-     e->infobar->statusctx.status = strdup("wmfs2");
 }
 
 static void
 infobar_elem_status_update(struct element *e)
 {
-     status_manage(&e->infobar->statusctx);
+     if(e->infobar->statusctx.update)
+          status_manage(&e->infobar->statusctx);
+     else
+     {
+          status_render(&e->infobar->statusctx);
+          status_copy_mousebind(&e->infobar->statusctx);
+     }
+     puts("status");
+}
+
+static void
+infobar_elem_systray_init(struct element *e)
+{
+     struct barwin *b;
+
+     /* Activate systray mask; no more systray element allowed now */
+     W->flags |= WMFS_SYSTRAY;
+
+     W->systray.infobar = e->infobar;
+
+     e->geo.w = systray_get_width();
+     infobar_elem_placement(e);
+
+     if(!(b = SLIST_FIRST(&e->bars)))
+     {
+          b = barwin_new(e->infobar->bar->win, e->geo.x, 0, e->geo.w, e->geo.h, 0, 0, false);
+          XFreePixmap(W->dpy, b->dr);
+          SLIST_INSERT_HEAD(&e->bars, b, enext);
+          W->systray.barwin = b;
+          systray_acquire();
+     }
+     else
+     {
+          barwin_move(b, e->geo.x, e->geo.y);
+          barwin_resize(b, e->geo.w, e->geo.h);
+     }
+
+     XMoveResizeWindow(W->dpy, W->systray.win, 0, 0, e->geo.w, e->geo.h);
+}
+
+static void
+infobar_elem_systray_update(struct element *e)
+{
+     (void)e;
+
+     systray_update();
 }
 
 #define ELEM_INIT(a)                                  \
@@ -187,15 +248,16 @@ infobar_elem_init(struct infobar *i)
                break;
           }
 
+          /* Only one systray element in a wmfs session */
+          if(i->elemorder[n] == 'y' && W->flags & WMFS_SYSTRAY)
+               continue;
+
           for(j = 0; j < (int)LEN(elem_funcs); ++j)
                if(elem_funcs[j].c == i->elemorder[n])
                {
                     ELEM_INIT(Left);
 
-                    if(TAILQ_EMPTY(&i->elements))
-                         TAILQ_INSERT_HEAD(&i->elements, e, next);
-                    else
-                         TAILQ_INSERT_TAIL(&i->elements, e, next);
+                    TAILQ_INSERT_TAIL(&i->elements, e, next);
 
                     e->func_init(e);
                     es = e;
@@ -211,7 +273,7 @@ infobar_elem_init(struct infobar *i)
           for(k = l - 1; k >= n; --k)
           {
                /* Only one status */
-               if(i->elemorder[k] == 's')
+               if(i->elemorder[k] == 's' || (i->elemorder[n] == 'y' && W->flags & WMFS_SYSTRAY))
                     continue;
 
                for(j = 0; j < (int)LEN(elem_funcs); ++j)
@@ -244,12 +306,12 @@ infobar_elem_init(struct infobar *i)
 }
 
 void
-infobar_elem_update(struct infobar *i)
+infobar_elem_update(struct infobar *i, int type)
 {
      struct element *e;
 
      TAILQ_FOREACH(e, &i->elements, next)
-          if(i->screen->elemupdate & FLAGINT(e->type))
+          if(type == e->type || type == -1)
                e->func_update(e);
 }
 
@@ -268,6 +330,38 @@ infobar_elem_remove(struct element *e)
      }
 
      free(e);
+}
+
+void
+infobar_elem_reinit(struct infobar *i)
+{
+     struct element *e;
+
+     TAILQ_FOREACH(e, &i->elements, next)
+     {
+          /* Status element found, scan from the tail now */
+          if(e->type == ElemStatus)
+          {
+               struct element *ee;
+
+               TAILQ_FOREACH_REVERSE(ee, &i->elements, esub, next)
+               {
+                    if(e == ee)
+                         break;
+
+                    ee->func_init(ee);
+                    ee->func_update(ee);
+               }
+
+               e->func_init(e);
+               e->func_update(e);
+
+               return;
+          }
+
+          e->func_init(e);
+          e->func_update(e);
+     }
 }
 
 struct infobar*
@@ -307,7 +401,7 @@ infobar_new(struct screen *s, char *name, struct theme *theme, enum barpos pos, 
 void
 infobar_refresh(struct infobar *i)
 {
-     infobar_elem_update(i);
+     infobar_elem_update(i, -1);
 
      barwin_refresh(i->bar);
 }
@@ -320,6 +414,9 @@ infobar_remove(struct infobar *i)
      free(i->elemorder);
      free(i->name);
      free(i->status);
+
+     if(i == W->systray.infobar)
+          systray_freeicons();
 
      TAILQ_FOREACH(e, &i->elements, next)
           infobar_elem_remove(e);

@@ -129,7 +129,7 @@ uicb_screen_prev(Uicb cmd)
 static void
 screen_move_client(struct client *c, struct screen *s)
 {
-          tag_client(s->seltag, c);
+     tag_client(s->seltag, c);
 }
 
 void

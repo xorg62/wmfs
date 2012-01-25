@@ -31,15 +31,16 @@
 #define XEMBED_ACTIVATE_ACCELERATOR   14
 
 /* Details for  XEMBED_FOCUS_IN: */
-#define XEMBED_FOCUS_CURRENT0
-#define XEMBED_FOCUS_FIRST 1
-#define XEMBED_FOCUS_LAST2
+#define XEMBED_FOCUS_CURRENT 0
+#define XEMBED_FOCUS_FIRST   1
+#define XEMBED_FOCUS_LAST    2
 
 /* Ewmh hints list */
 enum
 {
      /* ICCCM */
      wm_state,
+     wm_class,
      /* EWMH */
      net_supported,
      net_wm_name,
@@ -67,7 +68,7 @@ enum
      net_wm_state_fullscreen,
      net_wm_state_sticky,
      net_wm_state_demands_attention,
-     net_wm_system_tray_opcode,
+     net_system_tray_opcode,
      net_system_tray_message_data,
      net_system_tray_s,
      net_system_tray_visual,

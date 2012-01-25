@@ -101,6 +101,8 @@ tag_client(struct tag *t, struct client *c)
       */
      SLIST_INSERT_HEAD(&t->clients, c, tnext);
 
+     infobar_elem_screen_update(t->screen, ElemTag);
+
      if(c->flags & CLIENT_IGNORE_LAYOUT)
           c->flags ^= CLIENT_IGNORE_LAYOUT;
      else if(!(c->flags & CLIENT_TABBED))
@@ -117,6 +119,7 @@ tag_client(struct tag *t, struct client *c)
 
      if(t != c->screen->seltag || c->flags & CLIENT_TABBED)
           client_unmap(c);
+
 }
 
 void

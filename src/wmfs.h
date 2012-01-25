@@ -113,6 +113,7 @@ struct status_ctx
      struct barwin *barwin;
      struct theme *theme;
      char *status;
+     bool update;
      SLIST_HEAD(, status_seq) statushead;
 };
 
@@ -149,7 +150,6 @@ struct screen
      struct geo geo, ugeo;
      struct tag *seltag;
      int id;
-     Flags elemupdate;
      TAILQ_HEAD(tsub, tag) tags;
      SLIST_HEAD(, infobar) infobars;
      SLIST_ENTRY(screen) next;
@@ -346,6 +346,8 @@ struct wmfs
      struct
      {
           struct barwin *barwin;
+          struct infobar *infobar;
+          bool redim;
           Window win;
           SLIST_HEAD(, _systray) head;
      } systray;

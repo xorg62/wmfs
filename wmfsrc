@@ -38,11 +38,11 @@
      # Frame / Client
      client_normal_fg = "#AABBAA"
      client_normal_bg = "#223322"
-     client_normal_statusline = "\s[left;#ff0000; x](1;client_close)"
+     client_normal_statusline = "\s[3;9;#121212;x] \s[2;8;#ff0000;x](1;client_close)"
 
      client_sel_fg = "#223322"
      client_sel_bg = "#AABBAA"
-     client_sel_statusline = "\s[left;#ff0000; x](1;client_close)"
+     client_sel_statusline = "\s[3;9;#121212;x] \s[2;8;#ff0000;x](1;client_close)"
 
      frame_bg = "#555555"
      client_titlebar_width = 12
@@ -64,11 +64,12 @@
   #
   # t  Tags
   # s  Statustext (will take available space)
+  # y  Systray (can be set only ONE time among all element)
 
   [bar]
      position = 0
      screen = 0
-     elements = "ts"    # element order in bar
+     elements = "tsy"   # element order in bar
      theme = "default"
   [/bar]
 

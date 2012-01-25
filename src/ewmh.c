@@ -22,6 +22,7 @@ ewmh_init(void)
 
      /* EWMH hints */
      W->net_atom[wm_state]                       = ATOM("WM_STATE");
+     W->net_atom[wm_class]                       = ATOM("WM_CLASS");
      W->net_atom[net_supported]                  = ATOM("_NET_SUPPORTED");
      W->net_atom[net_client_list]                = ATOM("_NET_CLIENT_LIST");
      W->net_atom[net_frame_extents]              = ATOM("_NET_FRAME_EXTENTS");
@@ -48,7 +49,8 @@ ewmh_init(void)
      W->net_atom[net_wm_state_fullscreen]        = ATOM("_NET_WM_STATE_FULLSCREEN");
      W->net_atom[net_wm_state_sticky]            = ATOM("_NET_WM_STATE_STICKY");
      W->net_atom[net_wm_state_demands_attention] = ATOM("_NET_WM_STATE_DEMANDS_ATTENTION");
-     W->net_atom[net_wm_system_tray_opcode]      = ATOM("_NET_SYSTEM_TRAY_OPCODE");
+     W->net_atom[net_system_tray_s]              = ATOM("_NET_SYSTEM_TRAY_S0");
+     W->net_atom[net_system_tray_opcode]         = ATOM("_NET_SYSTEM_TRAY_OPCODE");
      W->net_atom[net_system_tray_message_data]   = ATOM("_NET_SYSTEM_TRAY_MESSAGE_DATA");
      W->net_atom[net_system_tray_visual]         = ATOM("_NET_SYSTEM_TRAY_VISUAL");
      W->net_atom[net_system_tray_orientation]    = ATOM("_NET_SYSTEM_TRAY_ORIENTATION");
@@ -79,12 +81,14 @@ ewmh_init(void)
      /* Set _NET_SUPPORTING_WM_CHECK */
      XChangeProperty(W->dpy, W->root, W->net_atom[net_supporting_wm_check], XA_WINDOW, 32,
                      PropModeReplace, (unsigned char*)&W->root, 1);
-     /*
-     XChangeProperty(W->dpy, W->root, W->net_atom[net_wm_name], W->net_atom[utf8_string], 8,
-                     PropModeReplace, (unsigned char*)&rootn, strlen(rootn));
 
      XChangeProperty(W->dpy, W->root, ATOM("WM_CLASS"), XA_STRING, 8,
-                     PropModeReplace, (unsigned char*)&class, strlen(class));
+                     PropModeReplace, (unsigned char*)&"wmfs", 4);
+
+     XChangeProperty(W->dpy, W->root, W->net_atom[net_wm_name], W->net_atom[utf8_string], 8,
+                     PropModeReplace, (unsigned char*)&"wmfs2", 5);
+
+         /*
 
       * Set _NET_WM_PID
      XChangeProperty(W->dpy, W->root, W->net_atom[net_wm_pid], XA_CARDINAL, 32,

@@ -202,7 +202,7 @@ wmfs_scan(void)
      int i, n, rf, nscreen = 0;
      int tag = -1, screen = -1, flags = -1;
      unsigned long ir, il;
-     long *ret, *tret;
+     long *ret = NULL, *tret;
      bool getg = false;
      XWindowAttributes wa;
      Window usl, usl2, *w = NULL, tm, focus;

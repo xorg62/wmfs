@@ -22,8 +22,13 @@
 #define barwin_refresh(b)       XCopyArea(W->dpy, b->dr, b->win, W->gc, 0, 0, b->geo.w, b->geo.h, 0, 0)
 #define barwin_map(b)           XMapWindow(W->dpy, b->win);
 #define barwin_unmap(b)         XUnmapWindow(W->dpy, b->win);
-#define barwin_move(b, x, y)    XMoveWindow(W->dpy, b->win, x, y);
 #define barwin_reparent(b, w)   XReparentWindow(W->dpy, b->win, w, 0, 0);
+
+static inline void
+barwin_move(struct barwin *b, int x, int y)
+{
+     XMoveWindow(W->dpy, b->win, (b->geo.x = x), (b->geo.y = y));
+}
 
 struct barwin* barwin_new(Window parent, int x, int y, int w, int h, Color fg, Color bg, bool entermask);
 void barwin_remove(struct barwin *b);

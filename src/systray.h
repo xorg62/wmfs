@@ -8,11 +8,13 @@
 
 #include "wmfs.h"
 
-bool systray_acquire(void);
+void systray_acquire(void);
 void systray_add(Window win);
 void systray_del(struct _systray *s);
 void systray_state(struct _systray *s);
 void systray_freeicons(void);
 struct _systray *systray_find(Window win);
+int systray_get_width(void);
+void systray_update(void);
 
 #endif /* SYSTRAY_H */

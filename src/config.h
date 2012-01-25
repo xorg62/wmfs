@@ -17,6 +17,7 @@
 #include "status.h"
 #include "mouse.h"
 #include "screen.h"
+#include "infobar.h"
 
 #define THEME_DEFAULT (SLIST_FIRST(&W->h.theme))
 

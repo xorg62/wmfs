@@ -327,6 +327,8 @@ status_manage(struct status_ctx *ctx)
      if(!ctx->status)
           return;
 
+     ctx->update = false;
+
      status_flush_list(ctx);
      status_parse(ctx);
      status_render(ctx);
@@ -355,6 +357,7 @@ uicb_status(Uicb cmd)
                {
                     free(ib->statusctx.status);
                     ib->statusctx.status = xstrdup(p);
+                    ib->statusctx.update = true;
                     infobar_elem_screen_update(s, ElemStatus);
                }
      }

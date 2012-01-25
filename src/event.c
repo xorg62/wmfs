@@ -54,7 +54,7 @@ event_enternotify(XEvent *e)
                && ev->window != W->root)
           return;
 
-     if(ev->window == W->systray.win /* || systray_find(ev->window) */)
+     if(ev->window == W->systray.win || systray_find(ev->window))
           return;
 
      if((c = client_gb_win(ev->window))
@@ -82,20 +82,26 @@ event_clientmessageevent(XEvent *e)
       * Systray message
       * _NET_WM_SYSTRAY_TRAY_OPCODE
       */
-     if(ev->window == W->systray.win && type == net_wm_system_tray_opcode)
+     if(ev->window == W->systray.win && type == net_system_tray_opcode)
      {
           if(ev->data.l[1] == XEMBED_EMBEDDED_NOTIFY)
           {
-               /* systray_add(ev->data.l[2]); */
-               /* systray_update() */
+               systray_add(ev->data.l[2]);
+               systray_update();
           }
           else if(ev->data.l[1] == XEMBED_REQUEST_FOCUS)
           {
-               /* if((sy = systray_find(ev->data.l[2])))
+               if((sy = systray_find(ev->data.l[2])))
                     ewmh_send_message(sy->win, sy->win, "_XEMBED", XEMBED_FOCUS_IN,
-                    XEMBED_FOCUS_CURRENT, 0, 0, 0);*/
+                                      XEMBED_FOCUS_CURRENT, 0, 0, 0);
 
           }
+     }
+     else if(ev->window == W->root)
+     {
+          if(type == net_active_window)
+               if((sy = systray_find(ev->data.l[0])))
+                    XSetInputFocus(W->dpy, sy->win, RevertToNone, CurrentTime);
      }
 
      switch(type)
@@ -155,12 +161,12 @@ event_destroynotify(XEvent *e)
 
      if((c = client_gb_win(ev->window)))
           client_remove(c);
-     /*else if((s = systray_find(ev->window)))
+     else if((s = systray_find(ev->window)))
      {
           ewmh_set_wm_state(s->win, WithdrawnState);
           systray_del(s);
           systray_update();
-          }*/
+     }
 }
 
 static void
@@ -186,11 +192,12 @@ event_maprequest(XEvent *e)
 
      if(!client_gb_win(ev->window))
           client_new(ev->window, &at, false);
-     /*else if((s = systray_find(ev->window)))
+     else if((s = systray_find(ev->window)))
      {
-          ewmh_send_message(s->win, s->win, "_XEMBED", CurrentTime, XEMBED_WINDOW_ACTIVATE, 0, 0, 0);
+          ewmh_send_message(s->win, s->win, "_XEMBED", CurrentTime,
+                            XEMBED_WINDOW_ACTIVATE, 0, 0, 0);
           systray_update();
-          }*/
+     }
 }
 
 static void
@@ -239,11 +246,11 @@ event_propertynotify(XEvent *e)
                     break;
           }
      }
-     /*else if((s = systray_find(ev->window)))
+     else if((s = systray_find(ev->window)))
      {
           systray_state(s);
           systray_update();
-          }*/
+     }
 }
 
 static void
@@ -251,15 +258,15 @@ event_unmapnotify(XEvent *e)
 {
      XUnmapEvent *ev = &e->xunmap;
      struct client *c;
-     struct systray *s;
+     struct _systray *s;
 
      if((c = client_gb_win(ev->window)) && ev->send_event)
           client_remove(c);
-     /*else if((s = systray_find(ev->window)))
+     else if((s = systray_find(ev->window)))
      {
           systray_del(s);
-          systray_update(s);
-          }*/
+          systray_update();
+     }
 }
 
 static void
@@ -303,21 +310,22 @@ event_mapnotify(XEvent *e)
 
      if((c = client_gb_win(ev->window)))
           ewmh_set_wm_state(c->win, NormalState);
-     /*else if((s = systray_find(ev->window)))
+     else if((s = systray_find(ev->window)))
      {
           ewmh_set_wm_state(s->win, NormalState);
-          ewmh_send_message(s->win, s->win, "_XEMBED", CurrentTime, XEMBED_WINDOW_ACTIVATE, 0, 0, 0);
-          }*/
+          ewmh_send_message(s->win, s->win, "_XEMBED", CurrentTime,
+                            XEMBED_WINDOW_ACTIVATE, 0, 0, 0);
+     }
 }
 
 static void
 event_selectionclearevent(XEvent *ev)
 {
      /* Getting selection if lost it */
-/*     if(ev->xselectionclear.window == W->systray.win)
+     if(ev->xselectionclear.window == W->systray.win)
           systray_acquire();
 
-          systray_update();*/
+     systray_update();
 }
 
 static void
