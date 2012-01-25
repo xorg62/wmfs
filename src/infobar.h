@@ -10,7 +10,7 @@
 #include "util.h"
 #include "tag.h"
 
-enum { ElemTag = 0, ElemStatus, ElemSystray, ElemCustom, ElemLast };
+enum { ElemTag = 0, ElemStatus, ElemSystray, ElemLauncher, ElemCustom, ElemLast };
 
 struct infobar *infobar_new(struct screen *s, char *name, struct theme *theme, enum barpos pos, const char *elem);
 void infobar_elem_update(struct infobar *i, int type);

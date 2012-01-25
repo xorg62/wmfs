@@ -65,11 +65,12 @@
   # t  Tags
   # s  Statustext (will take available space)
   # y  Systray (can be set only ONE time among all element)
+  # l  Launcher (will be expended at launcher use)
 
   [bar]
      position = 0
      screen = 0
-     elements = "tsy"   # element order in bar
+     elements = "tlsy"   # element order in bar
      theme = "default"
   [/bar]
 
@@ -134,6 +135,22 @@
   [/rule]
 
 [/rules]
+
+[launchers]
+
+  # command can be an uicb function or an uicb function + extension (see example)
+  [launcher]
+     name = "exec"
+     prompt = "Run:"
+
+     # Example of uicb + ext:
+     #   command = "spawn xterm -e"
+     command = "spawn"
+
+     width = 150
+  [/launcher]
+
+[/launchers]
 
 [keys]
 
@@ -215,6 +232,9 @@
 
   # Layout set historic travelling function (TESTING)
   [key] mod = {"Super"} key = "o" func = "layout_prev_set" [/key]
-  [key] mod = {"Super"} key = "p" func = "layout_next_set" [/key]
+  [key] mod = {"Super", "Shift"} key = "o" func = "layout_next_set" [/key]
+
+  # Launcher
+  [key] mod = {"Super"} key = "p" func = "launcher" cmd = "exec" [/key]
 
 [/keys]

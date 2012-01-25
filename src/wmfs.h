@@ -123,6 +123,7 @@ struct element
      struct infobar *infobar;
      struct status_ctx *statusctx;
      int type;
+     char *data;
      enum position align;
      void (*func_init)(struct element *e);
      void (*func_update)(struct element *e);
@@ -140,7 +141,6 @@ struct infobar
      enum barpos pos;
      char *elemorder;
      char *name;
-     char *status;
      TAILQ_HEAD(esub, element) elements;
      SLIST_ENTRY(infobar) next;
 };
@@ -275,6 +275,18 @@ struct rule
      SLIST_ENTRY(rule) next;
 };
 
+struct launcher
+{
+     char *name;
+     char *prompt;
+     char *command;
+#define HISTOLEN 64
+     char histo[HISTOLEN][256];
+     int nhisto;
+     int width;
+     SLIST_ENTRY(launcher) next;
+};
+
 struct _systray
 {
      struct geo geo;
@@ -298,6 +310,7 @@ struct wmfs
 #define WMFS_RELOAD   0x04
 #define WMFS_SYSTRAY  0x08
 #define WMFS_LOG      0x10
+#define WMFS_LAUNCHER 0x20
      Flags flags;
      GC gc, rgc;
      Atom *net_atom;
@@ -325,6 +338,7 @@ struct wmfs
           SLIST_HEAD(, theme) theme;
           SLIST_HEAD(, rule) rule;
           SLIST_HEAD(, mousebind) mousebind;
+          SLIST_HEAD(, launcher) launcher;
      } h;
 
      /*

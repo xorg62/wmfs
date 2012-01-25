@@ -268,6 +268,38 @@ config_rule(void)
 }
 
 static void
+config_launcher(void)
+{
+     struct conf_sec *sec, **ks;
+     struct launcher *l;
+     int n, i;
+
+     /* [launchers] */
+     sec = fetch_section_first(NULL, "launchers");
+     ks = fetch_section(sec, "launcher");
+     n = fetch_section_count(ks);
+
+     SLIST_INIT(&W->h.launcher);
+
+     /* [launcher] */
+     for(i = 0; i < n; ++i)
+     {
+          l = xcalloc(1, sizeof(struct launcher));
+
+          l->name    = xstrdup(fetch_opt_first(ks[i], "default", "name").str);
+          l->prompt  = xstrdup(fetch_opt_first(ks[i], ":",       "prompt").str);
+          l->command = xstrdup(fetch_opt_first(ks[i], "spawn",   "command").str);
+
+          if((l->width = fetch_opt_first(ks[i], "150", "width").num) <= 0)
+               l->width = 150;
+
+          SLIST_INSERT_HEAD(&W->h.launcher, l, next);
+     }
+
+     free(ks);
+}
+
+static void
 config_keybind(void)
 {
      int i, n;
@@ -338,6 +370,7 @@ config_init(void)
      config_client();
      config_bars();
      config_rule();
+     config_launcher();
 
      free_conf();
 }

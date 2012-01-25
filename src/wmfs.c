@@ -406,6 +406,7 @@ wmfs_quit(void)
      struct theme *t;
      struct client *c;
      struct mousebind *m;
+     struct launcher *l;
 
      ewmh_update_wmfs_props();
 
@@ -418,7 +419,6 @@ wmfs_quit(void)
           c->flags |= (CLIENT_IGNORE_LAYOUT | CLIENT_REMOVEALL);
           client_remove(c);
      }
-
 
      /* Will free:
       *
@@ -458,6 +458,16 @@ wmfs_quit(void)
           SLIST_REMOVE_HEAD(&W->h.keybind, next);
           free((void*)k->cmd);
           free(k);
+     }
+
+     while(!SLIST_EMPTY(&W->h.launcher))
+     {
+          l = SLIST_FIRST(&W->h.launcher);
+          SLIST_REMOVE_HEAD(&W->h.launcher, next);
+          free((void*)l->name);
+          free((void*)l->prompt);
+          free((void*)l->command);
+          free(l);
      }
 
      while(!SLIST_EMPTY(&W->h.mousebind))

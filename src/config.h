@@ -18,6 +18,7 @@
 #include "mouse.h"
 #include "screen.h"
 #include "infobar.h"
+#include "launcher.h"
 
 #define THEME_DEFAULT (SLIST_FIRST(&W->h.theme))
 
@@ -87,6 +88,9 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "screen_prev", uicb_screen_prev },
      { "screen_move_client_next", uicb_screen_move_client_next },
      { "screen_move_client_prev", uicb_screen_move_client_prev },
+
+     /* Launcher */
+     { "launcher", uicb_launcher },
 
      { NULL, NULL }
 };

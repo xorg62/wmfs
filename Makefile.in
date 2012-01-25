@@ -11,6 +11,7 @@ SRCS=                 \
       src/ewmh.c      \
       src/infobar.c   \
       src/layout.c    \
+      src/launcher.c  \
       src/parse_api.c \
       src/parse.c     \
       src/screen.c    \

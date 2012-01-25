@@ -18,6 +18,8 @@ static void infobar_elem_status_init(struct element *e);
 static void infobar_elem_status_update(struct element *e);
 static void infobar_elem_systray_init(struct element *e);
 static void infobar_elem_systray_update(struct element *e);
+static void infobar_elem_launcher_init(struct element *e);
+static void infobar_elem_launcher_update(struct element *e);
 
 const struct elem_funcs
 {
@@ -26,9 +28,10 @@ const struct elem_funcs
      void (*func_update)(struct element *e);
 } elem_funcs[] =
 {
-     { 't', infobar_elem_tag_init,     infobar_elem_tag_update },
-     { 's', infobar_elem_status_init,  infobar_elem_status_update },
-     { 'y', infobar_elem_systray_init, infobar_elem_systray_update },
+     { 't', infobar_elem_tag_init,      infobar_elem_tag_update },
+     { 's', infobar_elem_status_init,   infobar_elem_status_update },
+     { 'y', infobar_elem_systray_init,  infobar_elem_systray_update },
+     { 'l', infobar_elem_launcher_init, infobar_elem_launcher_update },
      { '\0', NULL, NULL }
 };
 
@@ -218,12 +221,60 @@ infobar_elem_systray_update(struct element *e)
      systray_update();
 }
 
+static void
+infobar_elem_launcher_init(struct element *e)
+{
+     struct barwin *b;
+
+     if(!(W->flags & WMFS_LAUNCHER))
+          e->geo.w = 1;
+
+     infobar_elem_placement(e);
+
+     if(!(b = SLIST_FIRST(&e->bars)))
+     {
+          b = barwin_new(e->infobar->bar->win, e->geo.x, 0, e->geo.w, e->geo.h, 0, 0, false);
+          b->fg = e->infobar->theme->bars.fg;
+          b->bg = e->infobar->theme->bars.bg;
+          SLIST_INSERT_HEAD(&e->bars, b, enext);
+     }
+     else
+     {
+          barwin_move(b, e->geo.x, e->geo.y);
+          barwin_resize(b, e->geo.w, e->geo.h);
+     }
+
+     barwin_refresh_color(b);
+     barwin_refresh(b);
+}
+
+static void
+infobar_elem_launcher_update(struct element *e)
+{
+     struct barwin *b = SLIST_FIRST(&e->bars);
+     int l;
+
+     if(!(W->flags & WMFS_LAUNCHER))
+          return;
+
+     barwin_refresh_color(b);
+
+     l = draw_textw(e->infobar->theme, e->data) + 2;
+     draw_text(b->dr, e->infobar->theme, 1, TEXTY(e->infobar->theme, e->geo.h), b->fg, e->data);
+
+     /* Cursor */
+     XDrawLine(W->dpy, b->dr, W->gc, l, 2, l, e->geo.h - 4);
+
+     barwin_refresh(b);
+}
+
 #define ELEM_INIT(a)                                  \
      do {                                             \
           e = xcalloc(1, sizeof(struct element));     \
           SLIST_INIT(&e->bars);                       \
           e->infobar = i;                             \
           e->type = j;                                \
+          e->data = NULL;                             \
           e->align = a;                               \
           e->func_init = elem_funcs[j].func_init;     \
           e->func_update = elem_funcs[j].func_update; \
@@ -336,6 +387,8 @@ infobar_elem_reinit(struct infobar *i)
 {
      struct element *e;
 
+     barwin_refresh_color(i->bar);
+
      TAILQ_FOREACH(e, &i->elements, next)
      {
           /* Status element found, scan from the tail now */
@@ -361,6 +414,8 @@ infobar_elem_reinit(struct infobar *i)
           e->func_init(e);
           e->func_update(e);
      }
+
+     barwin_refresh(i->bar);
 }
 
 struct infobar*
@@ -412,7 +467,6 @@ infobar_remove(struct infobar *i)
 
      free(i->elemorder);
      free(i->name);
-     free(i->status);
 
      if(i == W->systray.infobar)
           systray_freeicons();
