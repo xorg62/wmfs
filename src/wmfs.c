@@ -407,14 +407,7 @@ wmfs_quit(void)
      struct client *c;
      struct mousebind *m;
 
-     /* Will free:
-      *
-      * Screens -> tags
-      *         -> Infobars -> Elements
-      */
      ewmh_update_wmfs_props();
-
-     screen_free();
 
      XFreeGC(W->dpy, W->rgc);
 
@@ -425,6 +418,14 @@ wmfs_quit(void)
           c->flags |= (CLIENT_IGNORE_LAYOUT | CLIENT_REMOVEALL);
           client_remove(c);
      }
+
+
+     /* Will free:
+      *
+      * Screens -> tags
+      *         -> Infobars -> Elements
+      */
+     screen_free();
 
      /* Conf stuffs */
      while(!SLIST_EMPTY(&W->h.theme))
