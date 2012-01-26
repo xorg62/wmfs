@@ -34,12 +34,14 @@ void layout_free_set(struct tag *t);
 void layout_split_integrate(struct client *c, struct client *sc);
 void layout_split_arrange_closed(struct client *ghost);
 inline void layout_fix_hole(struct client *c);
+void layout_client(struct client *c);
 void uicb_layout_vmirror(Uicb cmd);
 void uicb_layout_hmirror(Uicb cmd);
 void uicb_layout_rotate_left(Uicb cmd);
 void uicb_layout_rotate_right(Uicb cmd);
 void uicb_layout_prev_set(Uicb cmd);
 void uicb_layout_next_set(Uicb cmd);
+void uicb_layout_toggle_free(Uicb cmd);
 
 #endif /* LAYOUT_H */
 

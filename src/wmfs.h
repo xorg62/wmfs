@@ -177,7 +177,7 @@ struct client
      struct tag *tag, *prevtag;
      struct screen *screen;
      struct barwin *titlebar;
-     struct geo geo, wgeo, tgeo, ttgeo, rgeo, *tbgeo;
+     struct geo geo, wgeo, tgeo, ttgeo, rgeo, *tbgeo, fgeo;
      struct colpair ncol, scol;
      struct theme *theme;
      struct client *tabmaster;
@@ -196,6 +196,7 @@ struct client
 #define CLIENT_REMOVEALL     0x200
 #define CLIENT_MAPPED        0x400
 #define CLIENT_FULLSCREEN    0x800
+#define CLIENT_FREE          0x1000
      Flags flags;
      Window win, frame, tmp;
      SLIST_ENTRY(client) next;   /* Global list */

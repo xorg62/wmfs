@@ -13,6 +13,11 @@
 
 #define TCLIENT_CHECK(C) (C->flags & CLIENT_TABBED && !(C->flags & CLIENT_TABMASTER))
 
+/* SLIST_FOREACH for client with no free client */
+#define FOREACH_NFCLIENT(V, H, F) \
+     SLIST_FOREACH(V, H, F)       \
+     if(!(V->flags & CLIENT_FREE))
+
 inline void client_configure(struct client *c);
 struct client *client_gb_win(Window w);
 struct client *client_gb_frame(Window w);

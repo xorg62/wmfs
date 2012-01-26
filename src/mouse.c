@@ -9,11 +9,15 @@
 #include "client.h"
 #include "draw.h"
 
-#define _REV_BORDER()                                  \
-     do {                                              \
-          SLIST_FOREACH(gc, &c->tag->clients, tnext)   \
-               draw_reversed_rect(W->root, gc, true);  \
+
+#define _REV_SBORDER(c) draw_reversed_rect(W->root, c, false);
+
+#define _REV_BORDER()                                   \
+     do {                                               \
+          FOREACH_NFCLIENT(gc, &c->tag->clients, tnext) \
+               draw_reversed_rect(W->root, gc, true);   \
      } while(/* CONSTCOND */ 0);
+
 static void
 mouse_resize(struct client *c)
 {
@@ -25,7 +29,12 @@ mouse_resize(struct client *c)
      XQueryPointer(W->dpy, W->root, &w, &w, &ox, &oy, &d, &d, (uint *)&u);
      XGrabServer(W->dpy);
 
-     _REV_BORDER();
+     if(c->flags & CLIENT_FREE)
+     {
+          _REV_SBORDER(c);
+     }
+     else
+          _REV_BORDER();
 
      if(c->flags & CLIENT_TABBED && !(c->flags & CLIENT_TABMASTER))
           c = c->tabmaster;
@@ -40,31 +49,54 @@ mouse_resize(struct client *c)
           if(ev.type != MotionNotify)
                continue;
 
-          _REV_BORDER();
+          if(c->flags & CLIENT_FREE)
+          {
+               _REV_SBORDER(c);
 
-          if(ix >= c->geo.x + (c->geo.w >> 1))
-               _fac_resize(c, Right, ev.xmotion.x_root - ox);
+               c->geo.w = ((ev.xmotion.x_root - c->geo.x < c->sizeh[MINW])
+                           ? c->sizeh[MINW]
+                           : ev.xmotion.x_root - c->geo.x);
+               c->geo.h = ((ev.xmotion.y_root - c->geo.y < c->sizeh[MINH])
+                           ? c->sizeh[MINH]
+                           : ev.xmotion.y_root - c->geo.y);
+
+               _REV_SBORDER(c);
+          }
           else
-               _fac_resize(c, Left, ox - ev.xmotion.x_root);
+          {
+               _REV_BORDER();
 
-          if(iy >= c->geo.y + (c->geo.h >> 1))
-               _fac_resize(c, Bottom, ev.xmotion.y_root - oy);
-          else
-               _fac_resize(c, Top, oy - ev.xmotion.y_root);
+               if(ix >= c->geo.x + (c->geo.w >> 1))
+                    _fac_resize(c, Right, ev.xmotion.x_root - ox);
+               else
+                    _fac_resize(c, Left, ox - ev.xmotion.x_root);
 
-          ox = ev.xmotion.x_root;
-          oy = ev.xmotion.y_root;
+               if(iy >= c->geo.y + (c->geo.h >> 1))
+                    _fac_resize(c, Bottom, ev.xmotion.y_root - oy);
+               else
+                    _fac_resize(c, Top, oy - ev.xmotion.y_root);
 
-          _REV_BORDER();
+               ox = ev.xmotion.x_root;
+               oy = ev.xmotion.y_root;
+
+               _REV_BORDER();
+          }
 
           XSync(W->dpy, false);
 
      } while(ev.type != ButtonRelease);
 
-     _REV_BORDER();
-
-     client_apply_tgeo(c->tag);
-     layout_save_set(c->tag);
+     if(c->flags & CLIENT_FREE)
+     {
+          _REV_SBORDER(c);
+          client_moveresize(c, &c->geo);
+     }
+     else
+     {
+          _REV_BORDER();
+          client_apply_tgeo(c->tag);
+          layout_save_set(c->tag);
+     }
 
      XUngrabServer(W->dpy);
 }
@@ -88,7 +120,6 @@ mouse_drag_tag(struct client *c, Window w)
      return NULL;
 }
 
-#define _REV_SBORDER(c) draw_reversed_rect(W->root, c, false);
 void
 mouse_move(struct client *c, void (*func)(struct client*, struct client*))
 {
@@ -96,10 +127,16 @@ mouse_move(struct client *c, void (*func)(struct client*, struct client*))
      struct tag *t = NULL;
      XEvent ev;
      Window w;
-     int d, u;
+     int d, u, ox, oy;
+     int ocx, ocy;
+
+     ocx = c->geo.x;
+     ocy = c->geo.y;
 
      if(c->flags & CLIENT_TABBED && !(c->flags & CLIENT_TABMASTER))
           c = c->tabmaster;
+
+     XQueryPointer(W->dpy, W->root, &w, &w, &ox, &oy, &d, &d, (uint *)&u);
 
      _REV_SBORDER(c);
 
@@ -110,23 +147,35 @@ mouse_move(struct client *c, void (*func)(struct client*, struct client*))
           if(ev.type != MotionNotify)
                continue;
 
-          XQueryPointer(W->dpy, W->root, &w, &w, &d, &d, &d, &d, (uint *)&u);
-
-          if(!(c2 = client_gb_win(w)))
-               if(!(c2 = client_gb_frame(w)))
-                    c2 = client_gb_titlebar(w);
-
-          if(c2)
+          if(c->flags & CLIENT_FREE)
           {
-               if(c2 != last)
-               {
-                    _REV_SBORDER(last);
-                    _REV_SBORDER(c2);
-                    last = c2;
-               }
+               _REV_SBORDER(c);
+
+               c->geo.x = (ocx + (ev.xmotion.x_root - ox));
+               c->geo.y = (ocy + (ev.xmotion.y_root - oy));
+
+               _REV_SBORDER(c);
           }
           else
-               t = mouse_drag_tag(c, w);
+          {
+               XQueryPointer(W->dpy, W->root, &w, &w, &d, &d, &d, &d, (uint *)&u);
+
+               if(!(c2 = client_gb_win(w)))
+                    if(!(c2 = client_gb_frame(w)))
+                         c2 = client_gb_titlebar(w);
+
+               if(c2)
+               {
+                    if(c2 != last)
+                    {
+                         _REV_SBORDER(last);
+                         _REV_SBORDER(c2);
+                         last = c2;
+                    }
+               }
+               else
+                    t = mouse_drag_tag(c, w);
+          }
 
           XSync(W->dpy, false);
 
@@ -137,7 +186,13 @@ mouse_move(struct client *c, void (*func)(struct client*, struct client*))
      else if(t && t != (struct tag*)c)
           tag_client(t, c);
      else
+     {
+          /* No func mean free client resize */
+          if(!func)
+               client_moveresize(c, &c->geo);
+
           _REV_SBORDER(c);
+     }
 }
 
 void
@@ -155,7 +210,7 @@ uicb_mouse_move(Uicb cmd)
      (void)cmd;
 
      if(W->client && mouse_check_client(W->client))
-          mouse_move(W->client, client_swap2);
+          mouse_move(W->client, (W->client->flags & CLIENT_FREE ? NULL : client_swap2));
 }
 
 void

@@ -74,7 +74,7 @@ tag_client(struct tag *t, struct client *c)
           if(c->tag == t)
                return;
 
-          if(!(c->flags & CLIENT_IGNORE_LAYOUT))
+          if(!(c->flags & (CLIENT_IGNORE_LAYOUT | CLIENT_FREE)))
                layout_split_arrange_closed(c);
 
           if(!(c->flags & CLIENT_REMOVEALL))
@@ -98,18 +98,11 @@ tag_client(struct tag *t, struct client *c)
 
      client_update_props(c, CPROP_LOC);
 
-     /*
-      * Insert in new tag list before
-      * layout_split_integrate, because of set historic.
-      */
      SLIST_INSERT_HEAD(&t->clients, c, tnext);
 
      infobar_elem_screen_update(t->screen, ElemTag);
 
-     if(c->flags & CLIENT_IGNORE_LAYOUT)
-          c->flags ^= CLIENT_IGNORE_LAYOUT;
-     else if(!(c->flags & CLIENT_TABBED))
-          layout_split_integrate(c, t->sel);
+     layout_client(c);
 
      if(c->flags & CLIENT_TABMASTER && c->prevtag)
      {

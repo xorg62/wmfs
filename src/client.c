@@ -136,12 +136,13 @@ client_gb_pos(struct tag *t, int x, int y)
 {
      struct client *c = SLIST_FIRST(&t->clients);
 
-     while(c)
+     FOREACH_NFCLIENT(c, &t->clients, tnext)
      {
+          if(c->flags & CLIENT_FREE)
+               continue;
+
           if(INAREA(x, y, c->geo))
                return c;
-
-          c = SLIST_NEXT(c, tnext);
      }
 
      return NULL;
@@ -579,6 +580,10 @@ client_focus(struct client *c)
           client_grabbuttons(c, true);
           client_tab_focus(c);
           client_frame_update(c, CCOL(c));
+
+          if(c->flags & CLIENT_FREE)
+               XRaiseWindow(W->dpy, c->frame);
+
           XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
      }
      else
@@ -825,7 +830,7 @@ client_apply_rule(struct client *c)
                c->theme  = r->theme;
 
                if(r->flags & RULE_FREE)
-               { /* TODO */ }
+                    c->flags |= CLIENT_FREE;
 
                if(r->flags & RULE_MAX)
                { /* TODO */ }
@@ -833,7 +838,7 @@ client_apply_rule(struct client *c)
                if(r->flags & RULE_IGNORE_TAG)
                { /* TODO */ }
 
-               c->flags  = r->flags | CLIENT_RULED;
+               c->flags |= CLIENT_RULED;
           }
           flags = 0;
      }
@@ -863,7 +868,7 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
      c->geo.y = wa->y;
      c->geo.w = wa->width;
      c->geo.h = wa->height;
-     c->tgeo = c->wgeo = c->rgeo = c->geo;
+     c->tgeo = c->wgeo = c->rgeo = c->fgeo = c->geo;
      c->tbgeo = NULL;
 
      client_apply_rule(c);
@@ -1021,7 +1026,10 @@ client_moveresize(struct client *c, struct geo *g)
      if(c->flags & CLIENT_TABBED)
           return false;
 
-     c->ttgeo = c->tgeo = c->rgeo = c->geo = *g;
+     if(c->flags & CLIENT_FREE)
+          c->fgeo = c->rgeo = c->geo = *g;
+     else
+          c->ttgeo = c->tgeo = c->rgeo = c->geo = *g;
 
      if(!(c->flags & CLIENT_DID_WINSIZE))
           if(client_winsize(c, g))
@@ -1099,7 +1107,7 @@ _fac_arrange_row(struct client *c, enum position p, int fac)
      struct client *cc;
 
      /* Travel clients to search row parents and apply fac */
-     SLIST_FOREACH(cc, &c->tag->clients, tnext)
+     FOREACH_NFCLIENT(cc, &c->tag->clients, tnext)
           if(GEO_PARENTROW(g, cc->tgeo, p))
                _fac_apply(cc, p, fac);
 }
@@ -1115,7 +1123,7 @@ _fac_check_to_reverse(struct client *c)
       * resize client because of possible error with next
       * clients in linked list.
       */
-     SLIST_FOREACH(gc, &c->tag->clients, tnext)
+     FOREACH_NFCLIENT(gc, &c->tag->clients, tnext)
           if(gc->flags & CLIENT_FAC_APPLIED
              && client_winsize(gc, &gc->tgeo))
           {
@@ -1142,7 +1150,7 @@ _fac_resize(struct client *c, enum position p, int fac)
      if(!gc || gc->screen != c->screen)
           return;
 
-     SLIST_FOREACH(cc, &c->tag->clients, tnext)
+     FOREACH_NFCLIENT(cc, &c->tag->clients, tnext)
           cc->ttgeo = cc->tgeo;
 
      if(GEO_CHECK2(c->tgeo, gc->tgeo, p))
@@ -1164,17 +1172,17 @@ client_apply_tgeo(struct tag *t)
 {
      struct client *c;
 
-     SLIST_FOREACH(c, &t->clients, tnext)
+     FOREACH_NFCLIENT(c, &t->clients, tnext)
      {
           client_moveresize(c, &c->tgeo);
           c->flags &= ~CLIENT_FAC_APPLIED;
      }
 }
 
-#define _REV_BORDER()                                        \
-     do {                                                    \
-          SLIST_FOREACH(gc, &c->tag->clients, tnext)         \
-               draw_reversed_rect(W->root, gc, true);        \
+#define _REV_BORDER()                                           \
+     do {                                                       \
+          FOREACH_NFCLIENT(gc, &c->tag->clients, tnext)         \
+               draw_reversed_rect(W->root, gc, true);           \
      } while(/* CONSTCOND */ 0);
 void
 client_fac_resize(struct client *c, enum position p, int fac)
@@ -1256,7 +1264,7 @@ client_fac_resize(struct client *c, enum position p, int fac)
      /* Aborted with escape, Set back original geos */
      else
      {
-          SLIST_FOREACH(gc, &c->tag->clients, tnext)
+          FOREACH_NFCLIENT(gc, &c->tag->clients, tnext)
           {
                gc->tgeo = gc->geo;
                gc->flags &= ~CLIENT_DID_WINSIZE;

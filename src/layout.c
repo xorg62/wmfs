@@ -23,7 +23,7 @@ layout_save_set(struct tag *t)
      l = xcalloc(1, sizeof(struct layout_set));
      SLIST_INIT(&l->geos);
 
-     SLIST_FOREACH(c, &t->clients, tnext)
+     FOREACH_NFCLIENT(c, &t->clients, tnext)
      {
           g = xcalloc(1, sizeof(struct geo_list));
           g->geo = c->geo;
@@ -49,7 +49,7 @@ layout_apply_set(struct tag *t, struct layout_set *l)
      struct client *c;
      int nc = 1;
 
-     SLIST_FOREACH(c, &t->clients, tnext)
+     FOREACH_NFCLIENT(c, &t->clients, tnext)
           ++nc;
 
      /* TODO: Adapt different client number case */
@@ -275,7 +275,7 @@ layout_split_check_row_dir(struct client *c, struct client *g, enum position p)
      struct client *cc;
      int s = 0, cs = (LDIR(p) ? g->geo.h : g->geo.w);
 
-     SLIST_FOREACH(cc, &c->tag->clients, tnext)
+     FOREACH_NFCLIENT(cc, &c->tag->clients, tnext)
           if(GEO_PARENTROW(cgeo, cc->geo, RPOS(p))
              && GEO_CHECK_ROW(cc->geo, g->geo, p))
           {
@@ -347,7 +347,7 @@ layout_split_arrange_closed(struct client *ghost)
                     && layout_split_check_row_dir(c, ghost, p))
           {
                g = c->geo;
-               SLIST_FOREACH(cc, &c->tag->clients, tnext)
+               FOREACH_NFCLIENT(cc, &c->tag->clients, tnext)
                     if(GEO_PARENTROW(g, cc->geo, RPOS(p))
                        && GEO_CHECK_ROW(cc->geo, ghost->geo, p))
                     {
@@ -366,14 +366,16 @@ layout_split_integrate(struct client *c, struct client *sc)
 {
      struct geo g;
 
-     /* No sc */
-     if(!sc || sc == c || sc->tag != c->tag)
+     /* No sc or not compatible sc */
+     if(!sc || sc == c || sc->tag != c->tag
+        || sc->flags & CLIENT_FREE)
      {
           /*
            * Not even a first client in list, then
            * maximize the lonely client
            */
-          if(!(sc = SLIST_NEXT(SLIST_FIRST(&c->tag->clients), tnext)))
+          if(!(sc = SLIST_NEXT(SLIST_FIRST(&c->tag->clients), tnext))
+             || sc->flags & CLIENT_FREE)
           {
                client_maximize(c);
                return;
@@ -460,7 +462,7 @@ layout_rotate(struct tag *t, void (*pfunc)(struct geo*, struct geo*, struct geo*
      float f1 = (float)t->screen->ugeo.w / (float)t->screen->ugeo.h;
      float f2 = 1 / f1;
 
-     SLIST_FOREACH(c, &t->clients, tnext)
+     FOREACH_NFCLIENT(c, &t->clients, tnext)
      {
           pfunc(&g, ug, &c->geo);
 
@@ -474,7 +476,7 @@ layout_rotate(struct tag *t, void (*pfunc)(struct geo*, struct geo*, struct geo*
      }
 
      /* Rotate sometimes do not set back perfect size.. */
-     SLIST_FOREACH(c, &t->clients, tnext)
+     FOREACH_NFCLIENT(c, &t->clients, tnext)
           layout_fix_hole(c);
 
      layout_save_set(t);
@@ -518,7 +520,7 @@ uicb_layout_vmirror(Uicb cmd)
      (void)cmd;
      struct client *c;
 
-     SLIST_FOREACH(c, &W->screen->seltag->clients, tnext)
+     FOREACH_NFCLIENT(c, &W->screen->seltag->clients, tnext)
      {
           c->geo.x = W->screen->ugeo.w - (c->geo.x + c->geo.w);
           client_moveresize(c, &c->geo);
@@ -533,7 +535,7 @@ uicb_layout_hmirror(Uicb cmd)
      (void)cmd;
      struct client *c;
 
-     SLIST_FOREACH(c, &W->screen->seltag->clients, tnext)
+     FOREACH_NFCLIENT(c, &W->screen->seltag->clients, tnext)
      {
           c->geo.y = W->screen->ugeo.h - (c->geo.y + c->geo.h);
           client_moveresize(c, &c->geo);
@@ -541,3 +543,36 @@ uicb_layout_hmirror(Uicb cmd)
 
      layout_save_set(W->screen->seltag);
 }
+
+void
+layout_client(struct client *c)
+{
+     if(c->flags & CLIENT_IGNORE_LAYOUT)
+     {
+          c->flags ^= CLIENT_IGNORE_LAYOUT;
+          return;
+     }
+
+     if(c->flags & CLIENT_FREE)
+     {
+          layout_split_arrange_closed(c);
+          client_moveresize(c, &c->fgeo);
+          XRaiseWindow(W->dpy, c->frame);
+     }
+     else if(!(c->flags & CLIENT_TABBED))
+          layout_split_integrate(c, c->tag->sel);
+}
+
+void
+uicb_layout_toggle_free(Uicb cmd)
+{
+     (void)cmd;
+
+     if(!(W->client))
+          return;
+
+     W->client->flags ^= CLIENT_FREE;
+     layout_client(W->client);
+}
+
+
