@@ -83,7 +83,6 @@ config_theme(void)
           t->tags_border_col   = color_atoh(fetch_opt_first(ks[i], "#888888", "tags_border_color").str);
           t->tags_border_width = fetch_opt_first(ks[i], "0", "tags_border_width").num;
 
-
           /* status line */
           t->tags_n_sl = status_new_ctx(NULL, t);
           t->tags_s_sl = status_new_ctx(NULL, t);
@@ -206,6 +205,8 @@ config_client(void)
 
      /* [client] */
      sec = fetch_section_first(NULL, "client");
+
+     W->client_mod = modkey_keysym(fetch_opt_first(sec, "Super", "key_modifier").str);
 
      /* [mouse] */
      /* for client frame AND titlebar */

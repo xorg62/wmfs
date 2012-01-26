@@ -14,8 +14,6 @@
 #include "screen.h"
 #include "mouse.h"
 
-#define CLIENT_MOUSE_MOD Mod1Mask
-
 #define CLIENT_RESIZE_DIR(D)                          \
 void uicb_client_resize_##D(Uicb cmd)                 \
 {                                                     \
@@ -322,13 +320,13 @@ client_grabbuttons(struct client *c, bool focused)
 
           while(i++ != Button5)
           {
-               XGrabButton(W->dpy, i, CLIENT_MOUSE_MOD, c->win, False,
+               XGrabButton(W->dpy, i, W->client_mod, c->win, False,
                          ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-               XGrabButton(W->dpy, i, CLIENT_MOUSE_MOD | LockMask, c->win, False,
+               XGrabButton(W->dpy, i, W->client_mod | LockMask, c->win, False,
                          ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-               XGrabButton(W->dpy, i, CLIENT_MOUSE_MOD | W->numlockmask, c->win, False,
+               XGrabButton(W->dpy, i, W->client_mod | W->numlockmask, c->win, False,
                          ButtonMask, GrabModeAsync, GrabModeSync, None, None);
-               XGrabButton(W->dpy, i, CLIENT_MOUSE_MOD | LockMask | W->numlockmask, c->win, False,
+               XGrabButton(W->dpy, i, W->client_mod | LockMask | W->numlockmask, c->win, False,
                          ButtonMask, GrabModeAsync, GrabModeSync, None, None);
           }
 
@@ -735,6 +733,7 @@ static void
 client_frame_new(struct client *c)
 {
      struct barwin *frameb;
+     struct barwin *clientb;
      XSetWindowAttributes at =
      {
           .background_pixel  = c->ncol.bg,
@@ -745,6 +744,7 @@ client_frame_new(struct client *c)
 
      /* Use a fake barwin only to store mousebinds of frame win */
      frameb = barwin_new(W->root, 0, 0, 1, 1, 0, 0, false);
+     clientb = barwin_new(W->root, 0, 0, 1, 1, 0, 0, false);
 
      frameb->win =
           c->frame = XCreateWindow(W->dpy, W->root,
@@ -755,8 +755,10 @@ client_frame_new(struct client *c)
                                    CopyFromParent,
                                    (CWOverrideRedirect | CWBackPixmap
                                     | CWBackPixel | CWEventMask), &at);
+     clientb->win = c->win;
 
      frameb->mousebinds = W->tmp_head.client;
+     clientb->mousebinds = W->tmp_head.client;
 
      if(c->tbarw > c->border)
      {

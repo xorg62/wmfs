@@ -305,6 +305,7 @@ struct wmfs
      int xscreen, xdepth;
      int xmaxw, xmaxh;
      int nscreen;
+     unsigned int client_mod;
      Flags numlockmask;
 #define WMFS_SCAN     0x01
 #define WMFS_RUNNING  0x02
