@@ -165,6 +165,7 @@ struct tag
      struct tag *prev;
      char *name;
      int id;
+#define TAG_URGENT 0x01
      Flags flags;
      SLIST_HEAD(, client) clients;
      TAILQ_HEAD(ssub, layout_set) sets;
@@ -245,8 +246,8 @@ struct theme
      int bars_width;
 
      /* struct elements */
-     struct colpair tags_n, tags_s, tags_o; /* normal / selected / occupied */
-     struct status_ctx tags_n_sl, tags_s_sl, tags_o_sl; /* status line */
+     struct colpair tags_n, tags_s, tags_o, tags_u; /* normal / selected / occupied */
+     struct status_ctx tags_n_sl, tags_s_sl, tags_o_sl, tags_u_sl; /* status line */
      int tags_border_width;
      Color tags_border_col;
 

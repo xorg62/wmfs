@@ -56,6 +56,9 @@ tag_screen(struct screen *s, struct tag *t)
      if(!SLIST_EMPTY(&t->clients) && !(W->flags & WMFS_SCAN))
           client_focus( client_tab_next(t->sel));
 
+     if(t->flags & TAG_URGENT)
+          t->flags ^= TAG_URGENT;
+
      infobar_elem_screen_update(s, ElemTag);
 
      ewmh_update_wmfs_props();

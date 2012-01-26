@@ -32,6 +32,7 @@ void client_get_name(struct client *c);
 void client_close(struct client *c);
 void uicb_client_close(Uicb cmd);
 struct client *client_new(Window w, XWindowAttributes *wa, bool scan);
+void client_get_sizeh(struct client *c);
 bool client_winsize(struct client *c, struct geo *geo);
 bool client_moveresize(struct client *c, struct geo *g);
 void client_maximize(struct client *c);

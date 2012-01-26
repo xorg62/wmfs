@@ -11,6 +11,7 @@
 #include "barwin.h"
 #include "screen.h"
 #include "systray.h"
+#include "infobar.h"
 
 #define EVDPY(e) (e)->xany.display
 
@@ -214,6 +215,7 @@ static void
 event_propertynotify(XEvent *e)
 {
      XPropertyEvent *ev = &e->xproperty;
+     XWMHints *h;
      struct client *c;
      struct _systray *s;
 
@@ -226,20 +228,23 @@ event_propertynotify(XEvent *e)
           {
                case XA_WM_TRANSIENT_FOR:
                     break;
-               case XA_WM_NORMAL_HINTS:
-                    /* client_get_size_hints(c); */
-                    break;
-               case XA_WM_HINTS:
-                    /*
-                    XWMHints *h;
 
-                    if((h = XGetWMHints(EVDPY, c->win)) && (h->flags & XUrgencyHint) && c != sel)
+               case XA_WM_NORMAL_HINTS:
+                    client_get_sizeh(c);
+                    break;
+
+               case XA_WM_HINTS:
+                    if((h = XGetWMHints(EVDPY(e), c->win))
+                       && (h->flags & XUrgencyHint)
+                       && c->tag != W->screen->seltag)
                     {
-                         client_urgent(c, True);
+                         c->tag->flags |= TAG_URGENT;
+                         infobar_elem_screen_update(c->screen, ElemTag);
                          XFree(h);
                     }
-                     */
+
                     break;
+
                default:
                     if(ev->atom == XA_WM_NAME || ev->atom == W->net_atom[net_wm_name])
                          client_get_name(c);

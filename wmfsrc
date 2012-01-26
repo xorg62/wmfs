@@ -32,6 +32,10 @@
      tags_occupied_bg = "#445544"
      tags_occupied_statusline = "\R[0;0;3;3;#AABBAA]"
 
+     tags_urgent_fg    = "#223322"
+     tags_urgent_bg    = "#CC5544"
+     # tags_urgent_statusline = ""
+
      tags_border_color = "#112211"
      tags_border_width = 1
 

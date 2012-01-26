@@ -8,7 +8,6 @@
 
 #include "wmfs.h"
 
-
 static inline struct tag*
 tag_gb_id(struct screen *s, int id)
 {
@@ -33,6 +32,5 @@ void uicb_tag_client(Uicb cmd);
 void uicb_tag_move_client_next(Uicb cmd);
 void uicb_tag_move_client_prev(Uicb cmd);
 void uicb_tag_click(Uicb cmd);
-
 
 #endif /* TAG_H */

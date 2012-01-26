@@ -110,11 +110,19 @@ infobar_elem_tag_update(struct element *e)
           }
           else
           {
+               /* Normal tag */
                if(SLIST_EMPTY(&t->clients))
                {
                     b->fg = e->infobar->theme->tags_n.fg;
                     b->bg = e->infobar->theme->tags_n.bg;
                     e->statusctx = &e->infobar->theme->tags_n_sl;
+               }
+               /* Urgent tag */
+               else if(t->flags & TAG_URGENT)
+               {
+                    b->fg = e->infobar->theme->tags_u.fg;
+                    b->bg = e->infobar->theme->tags_u.bg;
+                    e->statusctx = &e->infobar->theme->tags_u_sl;
                }
                /* Occupied tag */
                else

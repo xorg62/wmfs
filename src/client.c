@@ -668,7 +668,7 @@ uicb_client_close(Uicb cmd)
           client_close(W->client);
 }
 
-static void
+void
 client_get_sizeh(struct client *c)
 {
      long msize;
