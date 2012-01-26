@@ -581,7 +581,7 @@ client_focus(struct client *c)
           client_tab_focus(c);
           client_frame_update(c, CCOL(c));
 
-          if(c->flags & CLIENT_FREE)
+          if(c->flags & CLIENT_FREE && !(c->flags & CLIENT_FULLSCREEN))
                XRaiseWindow(W->dpy, c->frame);
 
           XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
@@ -950,7 +950,7 @@ client_update_props(struct client *c, Flags f)
      }
 }
 
-static void
+void
 client_geo_hints(struct geo *g, int *s)
 {
      /* base */
@@ -1324,6 +1324,28 @@ client_remove(struct client *c)
      XSetErrorHandler(wmfs_error_handler);
 
      free(c);
+}
+
+void
+uicb_client_toggle_free(Uicb cmd)
+{
+     struct client *c;
+     (void)cmd;
+
+     if(!(W->client))
+          return;
+
+     W->client->flags ^= CLIENT_FREE;
+
+     /* Set tabbed client of toggled client as free */
+     if(W->client->flags & CLIENT_TABMASTER)
+     {
+          SLIST_FOREACH(c, &W->client->tag->clients, tnext)
+               if(c->tabmaster == W->client)
+                    c->flags ^= CLIENT_FREE;
+     }
+
+     layout_client(W->client);
 }
 
 void

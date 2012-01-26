@@ -371,16 +371,26 @@ layout_split_integrate(struct client *c, struct client *sc)
         || sc->flags & CLIENT_FREE)
      {
           /*
-           * Not even a first client in list, then
+           * check for the first tiled client or
            * maximize the lonely client
            */
-          if(!(sc = SLIST_NEXT(SLIST_FIRST(&c->tag->clients), tnext))
-             || sc->flags & CLIENT_FREE)
+          FOREACH_NFCLIENT(sc, &c->tag->clients, tnext)
+          {
+               if(!(sc->flags & CLIENT_TILED) || sc == c)
+                    continue;
+               break;
+          }
+
+          /* Ok there is no client to integrate in */
+          if(!sc)
           {
                client_maximize(c);
+               c->flags |= CLIENT_TILED;
                return;
           }
      }
+
+     c->flags |= CLIENT_TILED;
 
      g = layout_split(sc, (sc->geo.h < sc->geo.w));
 
@@ -555,6 +565,7 @@ layout_client(struct client *c)
 
      if(c->flags & CLIENT_FREE)
      {
+          c->flags &= ~CLIENT_TILED;
           layout_split_arrange_closed(c);
           client_moveresize(c, &c->fgeo);
           XRaiseWindow(W->dpy, c->frame);
@@ -562,17 +573,3 @@ layout_client(struct client *c)
      else if(!(c->flags & CLIENT_TABBED))
           layout_split_integrate(c, c->tag->sel);
 }
-
-void
-uicb_layout_toggle_free(Uicb cmd)
-{
-     (void)cmd;
-
-     if(!(W->client))
-          return;
-
-     W->client->flags ^= CLIENT_FREE;
-     layout_client(W->client);
-}
-
-

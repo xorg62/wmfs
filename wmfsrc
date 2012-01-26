@@ -240,6 +240,9 @@
   [key] mod = {"Super"} key = "o" func = "layout_prev_set" [/key]
   [key] mod = {"Super", "Shift"} key = "o" func = "layout_next_set" [/key]
 
+  # Toggle client free/tile
+  [key] mod = {"Super"} key = "f" func = "client_toggle_free" [/key]
+
   # Launcher
   [key] mod = {"Super"} key = "p" func = "launcher" cmd = "exec" [/key]
 

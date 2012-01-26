@@ -46,7 +46,6 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "layout_rotate_right", uicb_layout_rotate_right },
      { "layout_prev_set",     uicb_layout_prev_set },
      { "layout_next_set",     uicb_layout_next_set },
-     { "layout_toggle_free",  uicb_layout_toggle_free },
 
      /* Client */
      { "client_close",          uicb_client_close },
@@ -74,6 +73,7 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "client_focus_next_tab", uicb_client_focus_next_tab },
      { "client_focus_prev_tab", uicb_client_focus_prev_tab },
      { "client_focus_click",    uicb_client_focus_click },
+     { "client_toggle_free",    uicb_client_toggle_free },
 
      /* Status */
      { "status" , uicb_status },

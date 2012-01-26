@@ -9,7 +9,6 @@
 #include "client.h"
 #include "draw.h"
 
-
 #define _REV_SBORDER(c) draw_reversed_rect(W->root, c, false);
 
 #define _REV_BORDER()                                   \
