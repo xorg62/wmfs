@@ -132,12 +132,28 @@ event_configureevent(XEvent *e)
 
      if((c = client_gb_win(ev->window)))
      {
-          if(ev->value_mask & CWWidth)
-               _fac_resize(c, Right, ev->width - c->wgeo.w);
-          if(ev->value_mask & CWHeight)
-               _fac_resize(c, Bottom, ev->height - c->wgeo.h);
+          if(c->flags & CLIENT_FREE)
+          {
+               if(ev->value_mask & CWX)
+                    c->geo.x = ev->x;
+               if(ev->value_mask & CWY)
+                    c->geo.y = ev->y;
+               if(ev->value_mask & CWWidth)
+                    c->geo.w = ev->width + c->border + c->border;
+               if(ev->value_mask & CWHeight)
+                    c->geo.h = ev->height + c->tbarw + c->border;
 
-          client_apply_tgeo(c->tag);
+               client_moveresize(c, &c->geo);
+          }
+          else
+          {
+               if(ev->value_mask & CWWidth)
+                    _fac_resize(c, Right, ev->width - c->wgeo.w);
+               if(ev->value_mask & CWHeight)
+                    _fac_resize(c, Bottom, ev->height - c->wgeo.h);
+
+               client_apply_tgeo(c->tag);
+          }
      }
      else
      {

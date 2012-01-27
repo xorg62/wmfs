@@ -904,6 +904,9 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
      /* Set tag */
      client_get_sizeh(c);
 
+     if(c->flags & CLIENT_HINT_FLAG /* && OPTIONKIVABIEN */)
+          c->flags |= CLIENT_FREE;
+
      if(!scan)
           tag_client((c->flags & CLIENT_RULED ? c->tag : c->screen->seltag), c);
 
