@@ -92,7 +92,7 @@ status_parse(struct status_ctx *ctx)
      struct status_seq *sq, *prev = NULL;
      int i, shift = 0;
      char *dstr = xstrdup(ctx->status), *sauv = dstr;
-     char type, *p, *end, *arg[6] = { NULL };
+     char type, *p, *pp, *end, *arg[6] = { NULL };
 
      for(; *dstr; ++dstr)
      {
@@ -102,7 +102,11 @@ status_parse(struct status_ctx *ctx)
 
           p = ++dstr;
 
-          if(!(strchr("sRi", *p)) || !(end = strchr(p, ']')))
+          /* Search end of sequence (] without \ behind) */
+          for(end = strchr(p, ']'); *(end - 1) == '\\';)
+               end = strchr(end + 1, ']');
+
+          if(!(strchr("sRi", *p)) || !end )
                continue;
 
           /* Then parse & list it */
@@ -118,6 +122,10 @@ status_parse(struct status_ctx *ctx)
 
                sq->color = color_atoh(arg[1 + shift]);
                sq->str = xstrdup(arg[2 + shift]);
+
+               /* Remove \ from string */
+               for(pp = sq->str; (pp = strchr(sq->str, '\\'));)
+                    memmove(pp, pp + 1, strlen(pp));
 
                break;
 

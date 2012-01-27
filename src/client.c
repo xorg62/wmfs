@@ -446,7 +446,6 @@ client_frame_update(struct client *c, struct colpair *cp)
      }
 }
 
-
 void
 client_tab_focus(struct client *c)
 {
@@ -490,7 +489,7 @@ client_tab_focus(struct client *c)
 void
 _client_tab(struct client *c, struct client *cm)
 {
-     int m[2] = { CLIENT_TILED, CLIENT_FREE };
+     long m[2] = { CLIENT_TILED, CLIENT_FREE };
 
      /* Do not tab already tabed client */
      if(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER)
@@ -1147,7 +1146,7 @@ _fac_check_to_reverse(struct client *c)
                 * Reverse back the flag and the window geo
                 * in previous affected clients
                 */
-               SLIST_FOREACH(cc, &c->tag->clients, tnext)
+               FOREACH_NFCLIENT(cc, &c->tag->clients, tnext)
                {
                     cc->tgeo = cc->ttgeo;
                     cc->flags &= ~CLIENT_DID_WINSIZE;
