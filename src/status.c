@@ -152,7 +152,10 @@ status_parse(struct status_ctx *ctx)
 #endif /* HAVE_IMLIB2 */
           }
 
-          SLIST_INSERT_TAIL(&ctx->statushead, sq, next, prev);
+          if (sq->align == Right)
+              SLIST_INSERT_HEAD(&ctx->statushead, sq, next);
+          else
+              SLIST_INSERT_TAIL(&ctx->statushead, sq, next, prev);
 
           /*
            * Optional mousebind sequence(s) \<seq>[](button;func;cmd)
