@@ -102,11 +102,12 @@ status_parse(struct status_ctx *ctx)
 
           p = ++dstr;
 
-          /* Search end of sequence (] without \ behind) */
-          for(end = strchr(p, ']'); *(end - 1) == '\\';)
-               end = strchr(end + 1, ']');
+          /* Search for correct end of sequence (] without \ behind) */
+          if((end = strchr(p, ']')))
+               while(*(end - 1) == '\\')
+                    end = strchr(end + 1, ']');
 
-          if(!(strchr("sRi", *p)) || !end )
+          if(!(strchr("sRi", *p)) || !end)
                continue;
 
           /* Then parse & list it */
