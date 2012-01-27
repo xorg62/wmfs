@@ -804,8 +804,8 @@ client_apply_rule(struct client *c)
      }
 
      /* Get _NET_WM_NAME */
-     if(XGetWindowProperty(W->dpy, c->win, ATOM("_NET_WM_NAME"), 0, 0x77777777, false,
-                           ATOM("UTF8_STRING"), &rf, &f, &n, &il, &data)
+     if(XGetWindowProperty(W->dpy, c->win, W->net_atom[net_wm_name], 0, 0x77777777, false,
+                           W->net_atom[utf8_string], &rf, &f, &n, &il, &data)
                == Success && data)
      {
           wmname = xstrdup((char*)data);
@@ -816,8 +816,8 @@ client_apply_rule(struct client *c)
      {
           if(s)
           {
-               FLAGAPPLY(flags, (xch.res_name && r->instance && !strcmp(xch.res_name, r->instance)),      RINSTANCE);
-               FLAGAPPLY(flags, (xch.res_class && r->class && !strcmp(xch.res_class, r->class)),          RCLASS);
+               FLAGAPPLY(flags, (xch.res_name && r->instance && !strcmp(xch.res_name, r->instance)), RINSTANCE);
+               FLAGAPPLY(flags, (xch.res_class && r->class && !strcmp(xch.res_class, r->class)),     RCLASS);
           }
 
           FLAGAPPLY(flags, (wmname && r->name && !strcmp(wmname, r->name)), RNAME);

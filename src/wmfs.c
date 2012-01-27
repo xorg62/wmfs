@@ -433,23 +433,13 @@ wmfs_quit(void)
           t = SLIST_FIRST(&W->h.theme);
           SLIST_REMOVE_HEAD(&W->h.theme, next);
           XFreeFontSet(W->dpy, t->font.fontset);
-          free(t);
-     }
-
-     while(!SLIST_EMPTY(&W->h.rule))
-     {
-          r = SLIST_FIRST(&W->h.rule);
-          SLIST_REMOVE_HEAD(&W->h.rule, next);
           status_free_ctx(&t->tags_n_sl);
           status_free_ctx(&t->tags_s_sl);
           status_free_ctx(&t->tags_o_sl);
+          status_free_ctx(&t->tags_u_sl);
           status_free_ctx(&t->client_n_sl);
           status_free_ctx(&t->client_s_sl);
-          free(r->class);
-          free(r->instance);
-          free(r->role);
-          free(r->name);
-          free(r);
+          free(t);
      }
 
      while(!SLIST_EMPTY(&W->h.keybind))
@@ -458,6 +448,14 @@ wmfs_quit(void)
           SLIST_REMOVE_HEAD(&W->h.keybind, next);
           free((void*)k->cmd);
           free(k);
+     }
+
+     while(!SLIST_EMPTY(&W->h.mousebind))
+     {
+          m = SLIST_FIRST(&W->h.mousebind);
+          SLIST_REMOVE_HEAD(&W->h.mousebind, globnext);
+          free((void*)m->cmd);
+          free(m);
      }
 
      while(!SLIST_EMPTY(&W->h.launcher))
@@ -470,12 +468,15 @@ wmfs_quit(void)
           free(l);
      }
 
-     while(!SLIST_EMPTY(&W->h.mousebind))
+     while(!SLIST_EMPTY(&W->h.rule))
      {
-          m = SLIST_FIRST(&W->h.mousebind);
-          SLIST_REMOVE_HEAD(&W->h.mousebind, globnext);
-          free((void*)m->cmd);
-          free(m);
+          r = SLIST_FIRST(&W->h.rule);
+          SLIST_REMOVE_HEAD(&W->h.rule, next);
+          free(r->class);
+          free(r->instance);
+          free(r->role);
+          free(r->name);
+          free(r);
      }
 
      /* FIFO stuffs */
