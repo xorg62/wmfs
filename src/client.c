@@ -490,6 +490,8 @@ client_tab_focus(struct client *c)
 void
 _client_tab(struct client *c, struct client *cm)
 {
+     int m[2] = { CLIENT_TILED, CLIENT_FREE };
+
      /* Do not tab already tabed client */
      if(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER)
         || c->tag != cm->tag || c == cm)
@@ -500,6 +502,17 @@ _client_tab(struct client *c, struct client *cm)
      cm->flags |= CLIENT_TABBED;
      c->geo = cm->geo;
      cm->tabmaster = c;
+
+     if(cm->flags & CLIENT_FREE)
+     {
+          /* Swap masks to add/del from cm->flags */
+          m[1] = m[0] ^ m[1];
+          m[0] = m[1] ^ m[0];
+          m[1] = m[0] ^ m[1];
+     }
+
+     c->flags |= m[0];
+     c->flags &= ~m[1];
 
      client_focus(cm);
 }
@@ -544,7 +557,8 @@ client_untab(struct client *c)
           {
                c->geo = c->tgeo = og;
 
-               layout_split_integrate(c, cc);
+               c->tag->sel = cc;
+               layout_client(c);
                client_map(c);
                client_moveresize(c, &c->geo);
                client_update_props(c, CPROP_TAB);
@@ -581,7 +595,8 @@ client_focus(struct client *c)
           client_tab_focus(c);
           client_frame_update(c, CCOL(c));
 
-          if(c->flags & CLIENT_FREE && !(c->flags & CLIENT_FULLSCREEN))
+          if(c->flags & CLIENT_FREE
+             && !(c->flags & (CLIENT_FULLSCREEN | CLIENT_TABMASTER)))
                XRaiseWindow(W->dpy, c->frame);
 
           XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
@@ -871,7 +886,8 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
      c->tgeo = c->wgeo = c->rgeo = c->fgeo = c->geo;
      c->tbgeo = NULL;
 
-     client_apply_rule(c);
+     if(!scan)
+          client_apply_rule(c);
 
      /*
       * Conf option set per client, for possibility
@@ -1027,7 +1043,7 @@ client_moveresize(struct client *c, struct geo *g)
           return false;
 
      if(c->flags & CLIENT_FREE)
-          c->fgeo = c->rgeo = c->geo = *g;
+          c->ttgeo = c->fgeo = c->rgeo = c->geo = *g;
      else
           c->ttgeo = c->tgeo = c->rgeo = c->geo = *g;
 
