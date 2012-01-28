@@ -1,0 +1,14 @@
+wmfs (201201-2) unstable; urgency=low
+
+  * Added a manpage
+  * Modified the debian/rules script
+  * Filled debian/copying
+  * Added dependencies
+
+ -- Mickaël Raybaud-Roig <skami@skami-laptop.dyndns.org>  Sat, 28 Jan 2012 11:05:02 +0100
+
+wmfs (201201-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Mickaël Raybaud-Roig <skami@skami-laptop.dyndns.org>  Sat, 21 Jan 2012 13:22:37 +0100
