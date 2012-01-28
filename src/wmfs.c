@@ -3,6 +3,7 @@
  *  For license, see COPYING.
  */
 
+#include <string.h>
 #include <getopt.h>
 #include <X11/keysym.h>
 #include <X11/cursorfont.h>
@@ -514,6 +515,21 @@ uicb_quit(Uicb cmd)
      W->flags &= ~WMFS_RUNNING;
 }
 
+static void
+exec_uicb_function(char *func, char *cmd)
+{
+     XChangeProperty(W->dpy, W->root, ATOM("_WMFS_FUNCTION"), ATOM("UTF8_STRING"),
+                     8, PropModeReplace, (unsigned char*)func, strlen(func));
+
+     if(!cmd)
+          cmd = "";
+
+     XChangeProperty(W->dpy, W->root, ATOM("_WMFS_CMD"), ATOM("UTF8_STRING"),
+                     8, PropModeReplace, (unsigned char*)cmd, strlen(cmd));
+
+     ewmh_send_message(W->root, W->root, "_WMFS_FUNCTION", 0, 0, 0, 0, True);
+}
+
 int
 main(int argc, char **argv)
 {
@@ -527,23 +543,42 @@ main(int argc, char **argv)
      sprintf(W->confpath, "%s/"CONFIG_DEFAULT_PATH, getenv("HOME"));
 
      /* Opt */
-     while((i = getopt(argc, argv, "hvC:")) != -1)
+     while((i = getopt(argc, argv, "hvC:c:")) != -1)
      {
           switch(i)
           {
+               default:
                case 'h':
-                    printf("usage: %s [-hv] [-C <file>]\n"
-                           "   -h        Show this page\n"
-                           "   -v        Show WMFS version\n"
-                           "   -C <file> Launch WMFS with a specified configuration file\n", argv[0]);
+                    printf("usage: %s [-hv] [-c <func> <cmd] [-C <file>]\n"
+                           "   -h                Show this page\n"
+                           "   -v                Show WMFS version\n"
+                           "   -c <func> <cmd>   Execute a specified UICB function\n"
+                           "   -C <file>         Launch WMFS with a specified configuration file\n", argv[0]);
                     free(W);
                     exit(EXIT_SUCCESS);
                     break;
+
                case 'v':
                     printf("wmfs("WMFS_VERSION") 2 beta\n");
                     free(W);
                     exit(EXIT_SUCCESS);
                     break;
+
+               case 'c':
+                    if(!(W->dpy = XOpenDisplay(NULL)))
+                    {
+                         fprintf(stderr, "%s: Can't open X server\n", argv[0]);
+                         exit(EXIT_FAILURE);
+                    }
+                    W->root = DefaultRootWindow(W->dpy);
+
+                    exec_uicb_function(optarg, argv[optind]);
+
+                    XCloseDisplay(W->dpy);
+                    free(W);
+                    exit(EXIT_SUCCESS);
+               break;
+
                case 'C':
                     strncpy(W->confpath, optarg, sizeof(W->confpath));
                     break;

@@ -5,6 +5,7 @@
 
 #include "event.h"
 #include "ewmh.h"
+#include "config.h"
 #include "util.h"
 #include "wmfs.h"
 #include "client.h"
@@ -100,6 +101,31 @@ event_clientmessageevent(XEvent *e)
      }
      else if(ev->window == W->root)
      {
+          /* WMFS message */
+          if(ev->data.l[4])
+          {
+               /* Manage _WMFS_FUNCTION && _WMFS_CMD */
+               if(type == wmfs_function || type == wmfs_cmd)
+               {
+                    int d;
+                    unsigned char *ret = NULL, *ret_cmd = NULL;
+                    void (*func)(Uicb);
+
+                    XGetWindowProperty(EVDPY(e), W->root, W->net_atom[wmfs_function], 0, 4096,
+                                       False, W->net_atom[utf8_string], (Atom*)&d, &d,
+                                       (long unsigned int*)&d, (long unsigned int*)&d, &ret);
+                    XGetWindowProperty(EVDPY(e), W->root, W->net_atom[wmfs_cmd], 0, 4096,
+                                       False, W->net_atom[utf8_string], (Atom*)&d, &d,
+                                       (long unsigned int*)&d, (long unsigned int*)&d, &ret_cmd);
+
+                    if((func = uicb_name_func((char*)ret)))
+                         func((Uicb)ret_cmd);
+
+                    XFree(ret_cmd);
+                    XFree(ret);
+               }
+          }
+
           if(type == net_active_window)
                if((sy = systray_find(ev->data.l[0])))
                     XSetInputFocus(W->dpy, sy->win, RevertToNone, CurrentTime);
