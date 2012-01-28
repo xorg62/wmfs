@@ -866,14 +866,14 @@ client_apply_rule(struct client *c)
 
           if(flags & (RINSTANCE | RCLASS | RNAME) && flags & RROLE)
           {
-               if(r->screen > 0)
+               if(r->screen != 1)
                     c->screen = screen_gb_id(r->screen);
 
                c->tag = c->screen->seltag;
-               if(r->tag > 0)
+               if(r->tag != 1)
                     c->tag = tag_gb_id(c->screen, r->tag);
 
-               c->theme  = r->theme;
+               c->theme = r->theme;
 
                FLAGAPPLY(c->flags, (r->flags & RULE_FREE), CLIENT_FREE);
 
@@ -885,7 +885,6 @@ client_apply_rule(struct client *c)
                   if(r->flags & RULE_IGNORE_TAG)
                   {}
                */
-
                c->flags |= CLIENT_RULED;
           }
           flags = 0;
