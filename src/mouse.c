@@ -192,11 +192,11 @@ mouse_move(struct client *c, void (*func)(struct client*, struct client*))
           tag_client(t, c);
      else
      {
+          _REV_SBORDER(c);
+
           /* No func mean free client resize */
           if(!func)
                client_moveresize(c, &c->geo);
-
-          _REV_SBORDER(c);
      }
 }
 
