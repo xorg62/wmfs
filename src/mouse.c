@@ -52,12 +52,18 @@ mouse_resize(struct client *c)
           {
                _REV_SBORDER(c);
 
-               c->geo.w = ((ev.xmotion.x_root - c->geo.x < c->sizeh[MINW])
-                           ? c->sizeh[MINW]
+               c->geo.w = ((ev.xmotion.x_root - c->geo.x <= c->sizeh[MINW] + c->border + c->border)
+                           ? c->sizeh[MINW] + c->border + c->border
                            : ev.xmotion.x_root - c->geo.x);
-               c->geo.h = ((ev.xmotion.y_root - c->geo.y < c->sizeh[MINH])
-                           ? c->sizeh[MINH]
+               c->geo.h = ((ev.xmotion.y_root - c->geo.y <= (c->sizeh[MINH] + c->tbarw + c->border))
+                           ? c->sizeh[MINH] + c->tbarw + c->border
                            : ev.xmotion.y_root - c->geo.y);
+
+               client_geo_hints(&c->geo, (int*)c->sizeh);
+
+               /* For border preview cohesion */
+               c->geo.h += c->tbarw + c->border;
+               c->geo.w += c->border + c->border;
 
                _REV_SBORDER(c);
           }

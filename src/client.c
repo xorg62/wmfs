@@ -456,7 +456,9 @@ client_tab_focus(struct client *c)
 
           c->flags |=  CLIENT_TABMASTER;
           c->flags &= ~CLIENT_TABBED;
+
           client_moveresize(c, &c->tabmaster->geo);
+
           if(c->tag == c->screen->seltag)
                client_map(c);
 
@@ -900,10 +902,9 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
      c->scol = c->theme->client_s;
 
      client_frame_new(c);
-
-     /* Set tag */
      client_get_sizeh(c);
 
+     /* Set tag */
      if(c->flags & CLIENT_HINT_FLAG /* && OPTIONKIVABIEN */)
           c->flags |= CLIENT_FREE;
 
@@ -1004,6 +1005,7 @@ client_geo_hints(struct geo *g, int *s)
           g->h = s[MAXH];
 }
 
+/* Manage window size in frame in tiling mode */
 bool
 client_winsize(struct client *c, struct geo *g)
 {
@@ -1020,13 +1022,11 @@ client_winsize(struct client *c, struct geo *g)
 
      /* Check possible problem for tile integration */
      if(ow < c->sizeh[MINW] || oh < c->sizeh[MINH])
-     {
           if(g->w < c->geo.w || g->h < c->geo.h)
           {
                c->wgeo = og;
                return true;
           }
-     }
 
      /* Balance position with new size */
      c->wgeo.x += (ow - c->wgeo.w) >> 1;
@@ -1036,28 +1036,36 @@ client_winsize(struct client *c, struct geo *g)
      return false;
 }
 
-bool
+void
 client_moveresize(struct client *c, struct geo *g)
 {
-     bool r = true;
-
      if(c->flags & CLIENT_TABBED)
-          return false;
+          return;
 
+     /* Adjust frame regarding window required size */
      if(c->flags & CLIENT_FREE)
-          c->ttgeo = c->fgeo = c->rgeo = c->geo = *g;
+     {
+          g->w -= c->border + c->border;
+          g->h -= c->tbarw + c->border;
+
+          client_geo_hints(g, (int*)c->sizeh);
+
+          c->wgeo = c->geo = c->rgeo = *g;
+          c->wgeo.x = c->border;
+          c->wgeo.y = c->tbarw;
+          c->geo.w = c->rgeo.w = c->wgeo.w + c->border + c->border;
+          c->geo.h = c->rgeo.h = c->wgeo.h + c->tbarw + c->border;
+
+          c->fgeo = c->geo;
+     }
+     /* Adjust window regarding required size for frame (tiling) */
      else
+     {
           c->ttgeo = c->tgeo = c->rgeo = c->geo = *g;
 
-     if(!(c->flags & CLIENT_DID_WINSIZE))
-          if(client_winsize(c, g))
-          {
-               r = false;
-               /* TODO
-                * Window required size not compatible
-                * with frame window size in tile mode
-                */
-          }
+          if(!(c->flags & CLIENT_DID_WINSIZE))
+               client_winsize(c, g);
+     }
 
      /* Real geo regarding full root size */
      c->rgeo.x += c->screen->ugeo.x;
@@ -1077,8 +1085,6 @@ client_moveresize(struct client *c, struct geo *g)
      client_frame_update(c, CCOL(c));
      client_update_props(c, CPROP_GEO);
      client_configure(c);
-
-     return r;
 }
 
 void

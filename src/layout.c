@@ -556,6 +556,9 @@ uicb_layout_hmirror(Uicb cmd)
 void
 layout_client(struct client *c)
 {
+     if(c->flags & CLIENT_TABBED)
+          c = c->tabmaster;
+
      if(c->flags & CLIENT_IGNORE_LAYOUT)
      {
           c->flags ^= CLIENT_IGNORE_LAYOUT;
