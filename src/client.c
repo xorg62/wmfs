@@ -866,11 +866,11 @@ client_apply_rule(struct client *c)
 
           if(flags & (RINSTANCE | RCLASS | RNAME) && flags & RROLE)
           {
-               if(r->screen != 1)
+               if(r->screen != -1)
                     c->screen = screen_gb_id(r->screen);
 
                c->tag = c->screen->seltag;
-               if(r->tag != 1)
+               if(r->tag != -1)
                     c->tag = tag_gb_id(c->screen, r->tag);
 
                c->theme = r->theme;
