@@ -375,7 +375,7 @@ layout_split_integrate(struct client *c, struct client *sc)
            */
           FOREACH_NFCLIENT(sc, &c->tag->clients, tnext)
           {
-               if(!(sc->flags & CLIENT_TILED) || sc == c)
+               if(sc == c || sc->flags & CLIENT_TABBED)
                     continue;
                break;
           }
@@ -567,8 +567,8 @@ layout_client(struct client *c)
 
      if(c->flags & CLIENT_FREE)
      {
-          c->flags &= ~CLIENT_TILED;
           layout_split_arrange_closed(c);
+          c->flags ^= CLIENT_TILED;
           client_moveresize(c, &c->fgeo);
           XRaiseWindow(W->dpy, c->frame);
      }

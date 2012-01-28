@@ -493,7 +493,7 @@ _client_tab(struct client *c, struct client *cm)
 {
      long m[2] = { CLIENT_TILED, CLIENT_FREE };
 
-     /* Do not tab already tabed client */
+     /* Do not tab already tabbed client */
      if(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER)
         || c->tag != cm->tag || c == cm)
           return;
@@ -841,18 +841,25 @@ client_apply_rule(struct client *c)
 
           if(flags & (RINSTANCE | RCLASS | RNAME) && flags & RROLE)
           {
-               c->screen = screen_gb_id(r->screen);
-               c->tag    = tag_gb_id(c->screen, r->tag);
+               if(r->screen > 0)
+                    c->screen = screen_gb_id(r->screen);
+
+               c->tag = c->screen->seltag;
+               if(r->tag > 0)
+                    c->tag = tag_gb_id(c->screen, r->tag);
+
                c->theme  = r->theme;
 
-               if(r->flags & RULE_FREE)
-                    c->flags |= CLIENT_FREE;
+               FLAGAPPLY(c->flags, (r->flags & RULE_FREE), CLIENT_FREE);
 
-               if(r->flags & RULE_MAX)
-               { /* TODO */ }
 
-               if(r->flags & RULE_IGNORE_TAG)
-               { /* TODO */ }
+               /* TODO
+                  if(r->flags & RULE_MAX)
+                  {}
+
+                  if(r->flags & RULE_IGNORE_TAG)
+                  {}
+               */
 
                c->flags |= CLIENT_RULED;
           }
@@ -1055,8 +1062,6 @@ client_moveresize(struct client *c, struct geo *g)
           c->wgeo.y = c->tbarw;
           c->geo.w = c->rgeo.w = c->wgeo.w + c->border + c->border;
           c->geo.h = c->rgeo.h = c->wgeo.h + c->tbarw + c->border;
-
-          c->fgeo = c->geo;
      }
      /* Adjust window regarding required size for frame (tiling) */
      else
@@ -1066,6 +1071,8 @@ client_moveresize(struct client *c, struct geo *g)
           if(!(c->flags & CLIENT_DID_WINSIZE))
                client_winsize(c, g);
      }
+
+     c->fgeo = c->geo;
 
      /* Real geo regarding full root size */
      c->rgeo.x += c->screen->ugeo.x;
@@ -1361,15 +1368,15 @@ uicb_client_toggle_free(Uicb cmd)
 
      W->client->flags ^= CLIENT_FREE;
 
+     layout_client(W->client);
+
      /* Set tabbed client of toggled client as free */
      if(W->client->flags & CLIENT_TABMASTER)
      {
           SLIST_FOREACH(c, &W->client->tag->clients, tnext)
-               if(c->tabmaster == W->client)
+               if(c->tabmaster == W->client && c != W->client)
                     c->flags ^= CLIENT_FREE;
      }
-
-     layout_client(W->client);
 }
 
 void

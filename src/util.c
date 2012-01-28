@@ -110,10 +110,14 @@ spawn(const char *format, ...)
 
      if((pid = fork()) == 0)
      {
-          setsid();
-          if (execl(sh, sh, "-c", cmd, (char*)NULL) == -1)
-               warnl("execl(sh -c %s)", cmd);
-          exit(EXIT_FAILURE);
+          if((pid = fork()) == 0)
+          {
+               setsid();
+               if (execl(sh, sh, "-c", cmd, (char*)NULL) == -1)
+                    warnl("execl(sh -c %s)", cmd);
+               exit(EXIT_FAILURE);
+          }
+          exit(EXIT_SUCCESS);
      }
      else if (pid == -1)
           warnl("fork");
