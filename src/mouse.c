@@ -24,6 +24,7 @@ mouse_resize(struct client *c)
      XEvent ev;
      Window w;
      int d, u, ox, oy, ix, iy;
+     int mx, my;
 
      XQueryPointer(W->dpy, W->root, &w, &w, &ox, &oy, &d, &d, (uint *)&u);
      XGrabServer(W->dpy);
@@ -48,16 +49,22 @@ mouse_resize(struct client *c)
           if(ev.type != MotionNotify)
                continue;
 
+          mx = ev.xmotion.x_root;
+          my = ev.xmotion.y_root;
+
           if(c->flags & CLIENT_FREE)
           {
                _REV_SBORDER(c);
 
-               c->geo.w = ((ev.xmotion.x_root - c->geo.x <= c->sizeh[MINW] + c->border + c->border)
+               mx -= c->screen->ugeo.x;
+               my -= c->screen->ugeo.y;
+
+               c->geo.w = ((mx - c->geo.x <= c->sizeh[MINW] + c->border + c->border)
                            ? c->sizeh[MINW] + c->border + c->border
-                           : ev.xmotion.x_root - c->geo.x);
-               c->geo.h = ((ev.xmotion.y_root - c->geo.y <= (c->sizeh[MINH] + c->tbarw + c->border))
+                           : mx - c->geo.x);
+               c->geo.h = ((my - c->geo.y <= (c->sizeh[MINH] + c->tbarw + c->border))
                            ? c->sizeh[MINH] + c->tbarw + c->border
-                           : ev.xmotion.y_root - c->geo.y);
+                           : my - c->geo.y);
 
                client_geo_hints(&c->geo, (int*)c->sizeh);
 
@@ -71,18 +78,18 @@ mouse_resize(struct client *c)
           {
                _REV_BORDER();
 
-               if(ix >= c->geo.x + (c->geo.w >> 1))
-                    _fac_resize(c, Right, ev.xmotion.x_root - ox);
+               if(ix >= c->rgeo.x + (c->geo.w >> 1))
+                    _fac_resize(c, Right, mx - ox);
                else
-                    _fac_resize(c, Left, ox - ev.xmotion.x_root);
+                    _fac_resize(c, Left, ox - mx);
 
-               if(iy >= c->geo.y + (c->geo.h >> 1))
-                    _fac_resize(c, Bottom, ev.xmotion.y_root - oy);
+               if(iy >= c->rgeo.y + (c->geo.h >> 1))
+                    _fac_resize(c, Bottom, my - oy);
                else
-                    _fac_resize(c, Top, oy - ev.xmotion.y_root);
+                    _fac_resize(c, Top, oy - my);
 
-               ox = ev.xmotion.x_root;
-               oy = ev.xmotion.y_root;
+               ox = mx;
+               oy = my;
 
                _REV_BORDER();
           }

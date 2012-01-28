@@ -110,7 +110,10 @@ tag_client(struct tag *t, struct client *c)
 
           SLIST_FOREACH(cc, &c->prevtag->clients, tnext)
                if(cc->tabmaster == c)
+               {
+                    cc->flags |= CLIENT_IGNORE_LAYOUT;
                     tag_client(t, cc);
+               }
      }
 
      if(t != c->screen->seltag || c->flags & CLIENT_TABBED)

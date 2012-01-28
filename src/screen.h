@@ -22,22 +22,26 @@ screen_gb_id(int id)
 }
 
 static inline struct screen*
-screen_gb_mouse(void)
+screen_gb_geo(int x, int y)
 {
      struct screen *s;
+
+     SLIST_FOREACH(s, &W->h.screen, next)
+          if(INAREA(x, y, s->geo))
+               return s;
+
+     return SLIST_FIRST(&W->h.screen);
+}
+
+static inline struct screen*
+screen_gb_mouse(void)
+{
      Window w;
      int d, x, y;
 
      XQueryPointer(W->dpy, W->root, &w, &w, &x, &y, &d, &d, (unsigned int *)&d);
 
-     SLIST_FOREACH(s, &W->h.screen, next)
-          if(INAREA(x, y, s->geo))
-               break;
-
-     if(!s)
-          s = SLIST_FIRST(&W->h.screen);
-
-     return s;
+     return screen_gb_geo(x, y);
 }
 
 void screen_init(void);

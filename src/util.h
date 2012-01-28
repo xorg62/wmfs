@@ -63,6 +63,14 @@ swap_ptr(void **x, void **y)
      *y = t;
 }
 
+static inline void
+swap_int(int *x, int *y)
+{
+     *y = *x ^ *y;
+     *x = *y ^ *x;
+     *y = *x ^ *y;
+}
+
 static inline enum position
 str_to_position(char *str)
 {

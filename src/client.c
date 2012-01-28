@@ -186,38 +186,68 @@ client_next_with_pos(struct client *bc, enum position p)
      return c;
 }
 
+#define FLAG_SWAP2(f1, f2, m1)                  \
+     if((f1 & m1) != (f2 & m1))                 \
+     {                                          \
+          f1 ^= m1;                             \
+          f2 ^= m1;                             \
+     }
+#define SWAP_ARRANGE_TAB(C)                                             \
+     SLIST_FOREACH(c, &C->tag->clients, tnext)                          \
+     {                                                                  \
+          if(c->tabmaster == C)                                         \
+          {                                                             \
+               c->screen = C->screen;                                   \
+               if((C->flags & CLIENT_FREE) != (c->flags & CLIENT_FREE)) \
+               {                                                        \
+                    c->flags ^= CLIENT_FREE;                            \
+                    c->flags ^= CLIENT_TILED;                           \
+               }                                                        \
+          }                                                             \
+     }
 void
 client_swap2(struct client *c1, struct client *c2)
 {
+     struct client *c;
      struct tag *t;
+     struct geo g;
 
      /* Conflict / errors */
      if(c1 == c2 || !c1 || !c2)
           return;
 
-     /* are swapped geos compatible? */
-     if(client_winsize(c1, &c2->geo)
-        || client_winsize(c2, &c1->geo))
-          return;
+     /* Reverse FREE/TILED flags if there are different */
+     FLAG_SWAP2(c1->flags, c2->flags, CLIENT_FREE);
+     FLAG_SWAP2(c1->flags, c2->flags, CLIENT_TILED);
 
      if(c1->screen != c2->screen)
           swap_ptr((void**)&c1->screen, (void**)&c2->screen);
 
+     /*
+      * Arrange flags for all tabbed client of
+      * possible c1/c2 tabmaster
+      */
+     if(c1->flags & CLIENT_TABMASTER)
+          SWAP_ARRANGE_TAB(c1);
+     if(c2->flags & CLIENT_TABMASTER)
+          SWAP_ARRANGE_TAB(c2);
+
      if(c1->tag != c2->tag)
      {
+          c1->flags |= CLIENT_IGNORE_LAYOUT;
+          c2->flags |= CLIENT_IGNORE_LAYOUT;
+
           t = c1->tag;
           tag_client(c2->tag, c1);
           tag_client(t, c2);
      }
 
-     c1->tgeo = c2->geo;
-     c2->tgeo = c1->geo;
+     g = c1->geo;
+     client_moveresize(c1, &c2->geo);
+     client_moveresize(c2, &g);
 
      c1->flags |= CLIENT_IGNORE_ENTER;
      c2->flags |= CLIENT_IGNORE_ENTER;
-
-     client_moveresize(c1, &c1->tgeo);
-     client_moveresize(c2, &c2->tgeo);
 }
 
 static inline struct client*
@@ -491,7 +521,7 @@ client_tab_focus(struct client *c)
 void
 _client_tab(struct client *c, struct client *cm)
 {
-     long m[2] = { CLIENT_TILED, CLIENT_FREE };
+     Flags m[2] = { CLIENT_TILED, CLIENT_FREE };
 
      /* Do not tab already tabbed client */
      if(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER)
@@ -505,12 +535,7 @@ _client_tab(struct client *c, struct client *cm)
      cm->tabmaster = c;
 
      if(cm->flags & CLIENT_FREE)
-     {
-          /* Swap masks to add/del from cm->flags */
-          m[1] = m[0] ^ m[1];
-          m[0] = m[1] ^ m[0];
-          m[1] = m[0] ^ m[1];
-     }
+          swap_int((int*)&m[0], (int*)&m[1]);
 
      c->flags |= m[0];
      c->flags &= ~m[1];
@@ -597,7 +622,7 @@ client_focus(struct client *c)
           client_frame_update(c, CCOL(c));
 
           if(c->flags & CLIENT_FREE
-             && !(c->flags & (CLIENT_FULLSCREEN | CLIENT_TABMASTER)))
+             && !(c->flags & (CLIENT_FULLSCREEN | CLIENT_TABBED)))
                XRaiseWindow(W->dpy, c->frame);
 
           XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
@@ -891,7 +916,7 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
      c->geo.y = wa->y;
      c->geo.w = wa->width;
      c->geo.h = wa->height;
-     c->tgeo = c->wgeo = c->rgeo = c->fgeo = c->geo;
+     c->tgeo = c->wgeo = c->rgeo = c->geo;
      c->tbgeo = NULL;
 
      if(!scan)
@@ -1071,8 +1096,6 @@ client_moveresize(struct client *c, struct geo *g)
           if(!(c->flags & CLIENT_DID_WINSIZE))
                client_winsize(c, g);
      }
-
-     c->fgeo = c->geo;
 
      /* Real geo regarding full root size */
      c->rgeo.x += c->screen->ugeo.x;

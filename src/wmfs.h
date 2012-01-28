@@ -177,7 +177,7 @@ struct client
      struct tag *tag, *prevtag;
      struct screen *screen;
      struct barwin *titlebar;
-     struct geo geo, wgeo, tgeo, ttgeo, rgeo, *tbgeo, fgeo;
+     struct geo geo, wgeo, tgeo, ttgeo, rgeo, *tbgeo;
      struct colpair ncol, scol;
      struct theme *theme;
      struct client *tabmaster;

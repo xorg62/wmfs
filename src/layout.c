@@ -556,9 +556,6 @@ uicb_layout_hmirror(Uicb cmd)
 void
 layout_client(struct client *c)
 {
-     if(c->flags & CLIENT_TABBED)
-          c = c->tabmaster;
-
      if(c->flags & CLIENT_IGNORE_LAYOUT)
      {
           c->flags ^= CLIENT_IGNORE_LAYOUT;
@@ -569,7 +566,7 @@ layout_client(struct client *c)
      {
           layout_split_arrange_closed(c);
           c->flags ^= CLIENT_TILED;
-          client_moveresize(c, &c->fgeo);
+          client_moveresize(c, &c->geo);
           XRaiseWindow(W->dpy, c->frame);
      }
      else if(!(c->flags & CLIENT_TABBED))
