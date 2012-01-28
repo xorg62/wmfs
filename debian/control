@@ -1,0 +1,16 @@
+Source: wmfs
+Section: x11
+Priority: extra
+Maintainer: Mickaël Raybaud-Roig <skami@skami-laptop.dyndns.org>
+Build-Depends: debhelper (>= 8.0.0), autotools-dev
+Standards-Version: 3.9.2
+Homepage: http://wmfs.info
+Vcs-Git: git://git.wmfs.info/wmfs.git
+Vcs-Browser: http://git.wmfs.info/wmfs.git/
+
+Package: wmfs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libxinerama1, libimlib2, libxcb1, libfreetype6
+Description: Window Manager From Scratch
+ WMFS (Window Manager From Scratch) is a lightweight and highly configurable
+ tiling window manager for X.
