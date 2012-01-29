@@ -12,6 +12,12 @@
 #include "util.h"
 #include "status.h"
 
+#define ISTRDUP(t, s)             \
+     do {                         \
+          if((tmp = s))           \
+               t = xstrdup(tmp);  \
+     } while(/* CONSTCOND */ 0);
+
 static void
 config_mouse_section(struct mbhead *mousebinds, struct conf_sec **sec)
 {
@@ -202,11 +208,14 @@ static void
 config_client(void)
 {
      struct conf_sec *sec, **mb;
+     char *tmp;
 
      /* [client] */
      sec = fetch_section_first(NULL, "client");
 
      W->client_mod = modkey_keysym(fetch_opt_first(sec, "Super", "key_modifier").str);
+     tmp = fetch_opt_first(sec, "default", "theme").str;
+     W->ctheme = name_to_theme(tmp);
 
      /* [mouse] */
      /* for client frame AND titlebar */
@@ -217,18 +226,12 @@ config_client(void)
      }
 }
 
-#define ISTRDUP(t, s)             \
-     do {                         \
-          if((tmp = s))           \
-                t = xstrdup(tmp); \
-     } while(/* CONSTCOND */ 0);
 static void
 config_rule(void)
 {
      int i, n;
      struct conf_sec *sec, **ks;
      struct rule *r;
-     struct theme *t;
      char *tn, *tmp;
 
      /* [rules] */
@@ -256,14 +259,7 @@ config_rule(void)
           FLAGAPPLY(r->flags, fetch_opt_first(ks[i], "false", "ignore_tag").boolean, RULE_IGNORE_TAG);
 
           if((tn = fetch_opt_first(ks[i], "", "theme").str))
-          {
-               SLIST_FOREACH(t, &W->h.theme, next)
-                    if(!strcmp(tn, t->name))
-                    {
-                         r->theme = t;
-                         break;
-                    }
-          }
+               r->theme = name_to_theme(tn);
           else
                r->theme = SLIST_FIRST(&W->h.theme);
 

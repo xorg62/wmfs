@@ -112,6 +112,7 @@
 
 [client]
 
+  theme = "default"
   key_modifier = "Super"
 
   [mouse] button = "1" func = "client_focus_click"    [/mouse]

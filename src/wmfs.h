@@ -322,6 +322,7 @@ struct wmfs
      char **argv;
      char *confpath;
      struct barwin *last_clicked_barwin;
+     struct theme *ctheme;
 
      /* FIFO stuffs */
      struct
