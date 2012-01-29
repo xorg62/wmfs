@@ -364,6 +364,7 @@ void
 layout_split_integrate(struct client *c, struct client *sc)
 {
      struct geo g;
+     bool f;
 
      /* No sc or not compatible sc */
      if(!sc || sc == c || sc->tag != c->tag
@@ -374,14 +375,14 @@ layout_split_integrate(struct client *c, struct client *sc)
            * maximize the lonely client
            */
           FOREACH_NFCLIENT(sc, &c->tag->clients, tnext)
-          {
-               if(sc == c || sc->flags & CLIENT_TABBED)
-                    continue;
-               break;
-          }
+               if(sc != c && !(sc->flags & CLIENT_TABBED))
+               {
+                    f = true;
+                    break;
+               }
 
           /* Ok there is no client to integrate in */
-          if(!sc)
+          if(!f)
           {
                client_maximize(c);
                c->flags |= CLIENT_TILED;

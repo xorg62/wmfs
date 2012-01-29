@@ -137,13 +137,8 @@ client_gb_pos(struct tag *t, int x, int y)
      struct client *c = SLIST_FIRST(&t->clients);
 
      FOREACH_NFCLIENT(c, &t->clients, tnext)
-     {
-          if(c->flags & CLIENT_FREE)
-               continue;
-
           if(INAREA(x, y, c->geo))
                return c;
-     }
 
      return NULL;
 }

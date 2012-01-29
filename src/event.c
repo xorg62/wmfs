@@ -161,9 +161,9 @@ event_configureevent(XEvent *e)
           if(c->flags & CLIENT_FREE)
           {
                if(ev->value_mask & CWX)
-                    c->geo.x = ev->x;
+                    c->geo.x = ev->x - c->border;
                if(ev->value_mask & CWY)
-                    c->geo.y = ev->y;
+                    c->geo.y = ev->y - c->tbarw;
                if(ev->value_mask & CWWidth)
                     c->geo.w = ev->width + c->border + c->border;
                if(ev->value_mask & CWHeight)
