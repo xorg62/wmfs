@@ -50,6 +50,7 @@ config_theme(void)
      struct theme *t, *p = NULL;
      size_t i, n;
      struct conf_sec *sec, **ks;
+     char *tmp;
 
      /* [themes] */
      sec = fetch_section_first(NULL, "themes");
@@ -95,13 +96,18 @@ config_theme(void)
           t->tags_o_sl = status_new_ctx(NULL, t);
           t->tags_u_sl = status_new_ctx(NULL, t);
 
-          if((t->tags_n_sl.status = xstrdup(fetch_opt_first(ks[i], "", "tags_normal_statusline").str)))
+          ISTRDUP(t->tags_n_sl.status, fetch_opt_first(ks[i], "", "tags_normal_statusline").str);
+          ISTRDUP(t->tags_s_sl.status, fetch_opt_first(ks[i], "", "tags_sel_statusline").str);
+          ISTRDUP(t->tags_o_sl.status, fetch_opt_first(ks[i], "", "tags_occupied_statusline").str);
+          ISTRDUP(t->tags_u_sl.status, fetch_opt_first(ks[i], "", "tags_urgent_statusline").str);
+
+          if(t->tags_n_sl.status)
                status_parse(&t->tags_n_sl);
-          if((t->tags_s_sl.status = xstrdup(fetch_opt_first(ks[i], "", "tags_sel_statusline").str)))
+          if(t->tags_s_sl.status)
                status_parse(&t->tags_s_sl);
-          if((t->tags_o_sl.status = xstrdup(fetch_opt_first(ks[i], "", "tags_occupied_statusline").str)))
+          if(t->tags_o_sl.status)
                status_parse(&t->tags_o_sl);
-          if((t->tags_u_sl.status = xstrdup(fetch_opt_first(ks[i], "", "tags_urgent_statusline").str)))
+          if(t->tags_u_sl.status)
                status_parse(&t->tags_u_sl);
 
           /* Client / frame */
@@ -117,9 +123,12 @@ config_theme(void)
           t->client_n_sl = status_new_ctx(NULL, t);
           t->client_s_sl = status_new_ctx(NULL, t);
 
-          if((t->client_n_sl.status = xstrdup(fetch_opt_first(ks[i], "", "client_normal_statusline").str)))
+          ISTRDUP(t->client_n_sl.status, fetch_opt_first(ks[i], "", "client_normal_statusline").str);
+          ISTRDUP(t->client_s_sl.status, fetch_opt_first(ks[i], "", "client_sel_statusline").str);
+
+          if(t->client_n_sl.status)
                status_parse(&t->client_n_sl);
-          if((t->client_s_sl.status = xstrdup(fetch_opt_first(ks[i], "", "client_sel_statusline").str)))
+          if(t->client_s_sl.status)
                status_parse(&t->client_s_sl);
 
           SLIST_INSERT_TAIL(&W->h.theme, t, next, p);
