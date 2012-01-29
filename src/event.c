@@ -64,6 +64,8 @@ event_enternotify(XEvent *e)
      {
           if(c->flags & CLIENT_IGNORE_ENTER)
                c->flags ^= CLIENT_IGNORE_ENTER;
+          else if(c->tag->flags & TAG_IGNORE_ENTER)
+               c->tag->flags ^= TAG_IGNORE_ENTER;
           else if(c != W->client && !(c->flags & CLIENT_TABBED))
                client_focus(c);
      }

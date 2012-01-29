@@ -165,7 +165,8 @@ struct tag
      struct tag *prev;
      char *name;
      int id;
-#define TAG_URGENT 0x01
+#define TAG_URGENT       0x01
+#define TAG_IGNORE_ENTER 0x02
      Flags flags;
      SLIST_HEAD(, client) clients;
      TAILQ_HEAD(ssub, layout_set) sets;

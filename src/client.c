@@ -559,6 +559,7 @@ client_untab(struct client *c)
      {
           client_tab_focus(cc);
           c->flags &= ~CLIENT_TABBED;
+          c->flags |= CLIENT_IGNORE_ENTER;
           c->tabmaster = NULL;
 
           /* Looking for tabbed client in cc, if there is not
@@ -618,7 +619,10 @@ client_focus(struct client *c)
 
           if(c->flags & CLIENT_FREE
              && !(c->flags & (CLIENT_FULLSCREEN | CLIENT_TABBED)))
+          {
+               c->tag->flags |= CLIENT_IGNORE_ENTER;
                XRaiseWindow(W->dpy, c->frame);
+          }
 
           XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
      }

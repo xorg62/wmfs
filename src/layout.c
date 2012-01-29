@@ -319,6 +319,9 @@ layout_split_arrange_closed(struct client *ghost)
      bool b = false;
      enum position p;
 
+     if(!(ghost->flags & CLIENT_TILED))
+          return;
+
      /* Search for single parent for easy resize
       * Example case:
       *  ___________               ___________
