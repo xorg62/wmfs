@@ -320,7 +320,7 @@ struct wmfs
      GC gc, rgc;
      Atom *net_atom;
      char **argv;
-     char confpath[MAX_PATH_LEN];
+     char *confpath;
      struct barwin *last_clicked_barwin;
 
      /* FIFO stuffs */

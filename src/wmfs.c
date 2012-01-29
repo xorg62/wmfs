@@ -514,18 +514,28 @@ uicb_quit(Uicb cmd)
 }
 
 static void
-exec_uicb_function(char *func, char *cmd)
+exec_uicb_function(Display *dpy, Window root, char *func, char *cmd)
 {
-     XChangeProperty(W->dpy, W->root, ATOM("_WMFS_FUNCTION"), ATOM("UTF8_STRING"),
+     Atom utf8s = XInternAtom(dpy, "UTF8_STRING", false);
+     XClientMessageEvent e = {
+          .type         = ClientMessage,
+          .message_type = XInternAtom(dpy, "_WMFS_FUNCTION", false),
+          .window       = root,
+          .format       = 32,
+          .data.l[4]    = true
+     };
+
+     XChangeProperty(dpy,root, XInternAtom(dpy, "_WMFS_FUNCTION", false), utf8s,
                      8, PropModeReplace, (unsigned char*)func, strlen(func));
 
      if(!cmd)
           cmd = "";
 
-     XChangeProperty(W->dpy, W->root, ATOM("_WMFS_CMD"), ATOM("UTF8_STRING"),
+     XChangeProperty(dpy, root, XInternAtom(dpy, "_WMFS_CMD", false), utf8s,
                      8, PropModeReplace, (unsigned char*)cmd, strlen(cmd));
 
-     ewmh_send_message(W->root, W->root, "_WMFS_FUNCTION", 0, 0, 0, 0, True);
+     XSendEvent(dpy, root, false, StructureNotifyMask, (XEvent*)&e);
+     XSync(dpy, False);
 }
 
 int
@@ -533,12 +543,11 @@ main(int argc, char **argv)
 {
      int i;
      bool r;
+     Display *dpy;
+     char path[MAX_PATH_LEN] = { 0 };
      (void)argc;
 
-     W = (struct wmfs*)xcalloc(1, sizeof(struct wmfs));
-
-     /* Default path ~/.config/wmfs/wmfsrc */
-     sprintf(W->confpath, "%s/"CONFIG_DEFAULT_PATH, getenv("HOME"));
+     sprintf(path, "%s/"CONFIG_DEFAULT_PATH, getenv("HOME"));
 
      /* Opt */
      while((i = getopt(argc, argv, "hvC:c:")) != -1)
@@ -552,36 +561,37 @@ main(int argc, char **argv)
                            "   -v                Show WMFS version\n"
                            "   -c <func> <cmd>   Execute a specified UICB function\n"
                            "   -C <file>         Launch WMFS with a specified configuration file\n", argv[0]);
-                    free(W);
                     exit(EXIT_SUCCESS);
                     break;
 
                case 'v':
                     printf("wmfs("WMFS_VERSION") 2 beta\n");
-                    free(W);
                     exit(EXIT_SUCCESS);
                     break;
 
                case 'c':
-                    if(!(W->dpy = XOpenDisplay(NULL)))
+                    if(!(dpy = XOpenDisplay(NULL)))
                     {
                          fprintf(stderr, "%s: Can't open X server\n", argv[0]);
                          exit(EXIT_FAILURE);
                     }
-                    W->root = DefaultRootWindow(W->dpy);
 
-                    exec_uicb_function(optarg, argv[optind]);
+                    exec_uicb_function(dpy,  DefaultRootWindow(dpy), optarg, argv[optind]);
 
-                    XCloseDisplay(W->dpy);
-                    free(W);
+                    XCloseDisplay(dpy);
                     exit(EXIT_SUCCESS);
                break;
 
                case 'C':
-                    strncpy(W->confpath, optarg, sizeof(W->confpath));
+                    strncpy(path, optarg, sizeof(W->confpath));
                     break;
           }
      }
+
+     W = (struct wmfs*)xcalloc(1, sizeof(struct wmfs));
+
+     /* Default path ~/.config/wmfs/wmfsrc */
+     W->confpath = path;
 
      /* Get X display */
      if(!(W->dpy = XOpenDisplay(NULL)))
