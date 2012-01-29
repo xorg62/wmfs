@@ -557,6 +557,35 @@ uicb_layout_hmirror(Uicb cmd)
      layout_save_set(W->screen->seltag);
 }
 
+#define LAYOUT_INTEGRATE_DIR(D)\
+     void uicb_layout_integrate_##D(Uicb cmd)                           \
+     {                                                                  \
+          (void)cmd;                                                    \
+          if(W->client)                                                 \
+               layout_integrate(W->client, D);                          \
+     }
+static void
+layout_integrate(struct client *c, enum position p)
+{
+     struct client *n;
+     struct client ghost = *c;
+
+     if(!(c->flags & CLIENT_TILED))
+          return;
+
+     if((n = client_next_with_pos(c, p))
+        && (n->flags & CLIENT_TILED))
+     {
+          layout_split_integrate(c, n);
+          layout_split_arrange_closed(&ghost);
+     }
+}
+
+LAYOUT_INTEGRATE_DIR(Left);
+LAYOUT_INTEGRATE_DIR(Right);
+LAYOUT_INTEGRATE_DIR(Top);
+LAYOUT_INTEGRATE_DIR(Bottom);
+
 void
 layout_client(struct client *c)
 {

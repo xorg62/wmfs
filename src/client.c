@@ -14,38 +14,38 @@
 #include "screen.h"
 #include "mouse.h"
 
-#define CLIENT_RESIZE_DIR(D)                          \
-void uicb_client_resize_##D(Uicb cmd)                 \
-{                                                     \
-     if(W->client)                                    \
-          client_fac_resize(W->client, D, ATOI(cmd)); \
-}
+#define CLIENT_RESIZE_DIR(D)                                    \
+     void uicb_client_resize_##D(Uicb cmd)                      \
+     {                                                          \
+          if(W->client)                                         \
+               client_fac_resize(W->client, D, ATOI(cmd));      \
+     }
 
-#define CLIENT_ACTION_DIR(A, D)                                \
-void uicb_client_##A##_##D(Uicb cmd)                           \
-{                                                              \
-     (void)cmd;                                                \
-     struct client *c;                                         \
-     if(W->client && (c = client_next_with_pos(W->client, D))) \
-          client_##A(c);                                       \
-}
+#define CLIENT_ACTION_DIR(A, D)                                         \
+     void uicb_client_##A##_##D(Uicb cmd)                               \
+     {                                                                  \
+          (void)cmd;                                                    \
+          struct client *c;                                             \
+          if(W->client && (c = client_next_with_pos(W->client, D)))     \
+               client_##A(c);                                           \
+     }
 
-#define CLIENT_ACTION_IDIR(A, D)     \
-void uicb_client_##A##_##D(Uicb cmd) \
-{                                    \
-     (void)cmd;                      \
-     if(W->client)                   \
-          client_##A(W->client, D);  \
-}
+#define CLIENT_ACTION_IDIR(A, D)                \
+     void uicb_client_##A##_##D(Uicb cmd)       \
+     {                                          \
+          (void)cmd;                            \
+          if(W->client)                         \
+               client_##A(W->client, D);        \
+     }
 
-#define CLIENT_ACTION_LIST(A, L)                  \
-void uicb_client_##A##_##L(Uicb cmd)              \
-{                                                 \
-     (void)cmd;                                   \
-     struct client *c;                            \
-     if(W->client && (c = client_##L(W->client))) \
-          client_##A(c);                          \
-}
+#define CLIENT_ACTION_LIST(A, L)                        \
+     void uicb_client_##A##_##L(Uicb cmd)               \
+     {                                                  \
+          (void)cmd;                                    \
+          struct client *c;                             \
+          if(W->client && (c = client_##L(W->client)))  \
+               client_##A(c);                           \
+     }
 
 /* uicb_client_resize_dir() */
 CLIENT_RESIZE_DIR(Right)
