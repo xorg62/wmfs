@@ -88,7 +88,7 @@ CLIENT_ACTION_LIST(focus, prev_tab)
 /** Send a ConfigureRequest event to the struct client
  * \param c struct client pointer
 */
-inline void
+void
 client_configure(struct client *c)
 {
      XConfigureEvent ev =
@@ -1352,7 +1352,7 @@ client_fac_resize(struct client *c, enum position p, int fac)
      XUngrabKeyboard(W->dpy, CurrentTime);
 }
 
-inline void
+void
 client_fac_hint(struct client *c)
 {
      int w = c->sizeh[MINW] + c->border + c->border;

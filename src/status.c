@@ -171,7 +171,11 @@ status_parse(struct status_ctx *ctx)
            * Parse it while there is a mousebind sequence.
            */
           dstr = end + 1;
-          while((*(dstr = status_parse_mouse(sq, dstr)) == '('));
+
+          do
+               dstr = status_parse_mouse(sq, dstr);
+          while(*dstr == '(');
+
           --dstr;
 
           prev = sq;

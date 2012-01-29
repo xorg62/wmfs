@@ -18,7 +18,7 @@
      SLIST_FOREACH(V, H, F)       \
      if(!(V->flags & CLIENT_FREE))
 
-inline void client_configure(struct client *c);
+void client_configure(struct client *c);
 struct client *client_gb_win(Window w);
 struct client *client_gb_frame(Window w);
 struct client *client_gb_pos(struct tag *t, int x, int y);
@@ -55,7 +55,7 @@ void client_apply_tgeo(struct tag *t);
 #define CPROP_TAB  0x08
 void client_update_props(struct client *c, Flags f);
 
-inline void client_fac_hint(struct client *c);
+void client_fac_hint(struct client *c);
 void uicb_client_untab(Uicb cmd);
 void uicb_client_toggle_free(Uicb cmd);
 
