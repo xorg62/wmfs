@@ -153,7 +153,7 @@ client_gb_titlebar(Window w)
 {
      struct client *c = SLIST_FIRST(&W->h.client);
 
-     while(c && c->titlebar->win != w)
+     while(c && c->titlebar && c->titlebar->win != w)
           c = SLIST_NEXT(c, next);
 
      return c;

@@ -492,8 +492,6 @@ wmfs_quit(void)
           fclose(W->log), W->log = NULL;
 
      W->flags &= ~WMFS_RUNNING;
-
-     XCloseDisplay(W->dpy);
 }
 
 /** Reload WMFS binary
@@ -603,6 +601,8 @@ main(int argc, char **argv)
 
      if(r)
           execvp(argv[0], argv);
+
+     XCloseDisplay(W->dpy);
 
      return 1;
 }
