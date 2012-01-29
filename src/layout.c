@@ -557,7 +557,7 @@ uicb_layout_hmirror(Uicb cmd)
      layout_save_set(W->screen->seltag);
 }
 
-#define LAYOUT_INTEGRATE_DIR(D)\
+#define LAYOUT_INTEGRATE_DIR(D)                                         \
      void uicb_layout_integrate_##D(Uicb cmd)                           \
      {                                                                  \
           (void)cmd;                                                    \

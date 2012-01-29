@@ -23,6 +23,7 @@
 #include "config.h"
 #include "client.h"
 #include "fifo.h"
+#include "layout.h"
 
 int
 wmfs_error_handler(Display *d, XErrorEvent *event)
@@ -343,6 +344,9 @@ wmfs_scan(void)
 
      if((fc = client_gb_win(focus)) && fc != W->client)
           client_focus(fc);
+
+     SLIST_FOREACH(c, &W->h.client, next)
+          layout_fix_hole(c);
 
      W->flags &= ~WMFS_SCAN;
 
