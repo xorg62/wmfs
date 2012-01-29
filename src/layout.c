@@ -367,7 +367,7 @@ void
 layout_split_integrate(struct client *c, struct client *sc)
 {
      struct geo g;
-     bool f;
+     bool f = false;
 
      /* No sc or not compatible sc */
      if(!sc || sc == c || sc->tag != c->tag
