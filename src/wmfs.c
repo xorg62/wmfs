@@ -5,6 +5,8 @@
 
 #include <string.h>
 #include <getopt.h>
+#include <signal.h>
+#include <sys/wait.h>
 #include <X11/keysym.h>
 #include <X11/cursorfont.h>
 
@@ -538,6 +540,21 @@ exec_uicb_function(Display *dpy, Window root, char *func, char *cmd)
      XSync(dpy, False);
 }
 
+static void
+signal_handle(int sig)
+{
+     switch (sig)
+     {
+     case SIGQUIT:
+     case SIGTERM:
+          W->flags &= ~WMFS_RUNNING;
+          break;
+     case SIGCHLD:
+          while(waitpid(-1, NULL, WNOHANG) > 0);
+          break;
+     }
+}
+
 int
 main(int argc, char **argv)
 {
@@ -545,6 +562,7 @@ main(int argc, char **argv)
      bool r;
      Display *dpy;
      char path[MAX_PATH_LEN] = { 0 };
+     struct sigaction sa;
      (void)argc;
 
      sprintf(path, "%s/"CONFIG_DEFAULT_PATH, getenv("HOME"));
@@ -599,6 +617,14 @@ main(int argc, char **argv)
           fprintf(stderr, "%s: Can't open X server\n", argv[0]);
           exit(EXIT_FAILURE);
      }
+
+     /* Set signal handler */
+     memset(&sa, 0, sizeof(sa));
+     sa.sa_handler = signal_handle;
+     sigemptyset(&sa.sa_mask);
+     sigaction(SIGQUIT, &sa, NULL);
+     sigaction(SIGTERM, &sa, NULL);
+     sigaction(SIGCHLD, &sa, NULL);
 
      /* Core */
      wmfs_init();

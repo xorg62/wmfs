@@ -108,16 +108,12 @@ spawn(const char *format, ...)
      if(!(sh = getenv("SHELL")) || sh[0] != '/')
           sh = "/bin/sh";
 
-     if((pid = fork()) == 0)
+     if(!(pid = fork()))
      {
-          if((pid = fork()) == 0)
-          {
-               setsid();
-               if (execl(sh, sh, "-c", cmd, (char*)NULL) == -1)
-                    warnl("execl(sh -c %s)", cmd);
-               exit(EXIT_FAILURE);
-          }
-          exit(EXIT_SUCCESS);
+          setsid();
+          if (execl(sh, sh, "-c", cmd, (char*)NULL) == -1)
+               warnl("execl(sh -c %s)", cmd);
+          exit(EXIT_FAILURE);
      }
      else if (pid == -1)
           warnl("fork");
