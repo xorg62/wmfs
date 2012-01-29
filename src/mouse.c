@@ -165,7 +165,7 @@ mouse_move(struct client *c, void (*func)(struct client*, struct client*))
           if(ev.type != MotionNotify)
                continue;
 
-          if(c->flags & CLIENT_FREE)
+          if(!func && c->flags & CLIENT_FREE)
           {
                _REV_SBORDER(c);
 
