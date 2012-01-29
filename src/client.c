@@ -1086,6 +1086,32 @@ client_moveresize(struct client *c, struct geo *g)
           c->wgeo.y = c->tbarw;
           c->geo.w = c->rgeo.w = c->wgeo.w + c->border + c->border;
           c->geo.h = c->rgeo.h = c->wgeo.h + c->tbarw + c->border;
+
+          c->rgeo.x += c->screen->ugeo.x;
+          c->rgeo.y += c->screen->ugeo.y;
+
+          if(!INAREA(c->rgeo.x, c->rgeo.y, c->screen->ugeo))
+          {
+               /* New screen (moved by mouse) */
+               if(c->flags & CLIENT_MOUSE)
+               {
+                    c->flags |= CLIENT_IGNORE_LAYOUT;
+                    c->screen = screen_gb_geo(c->rgeo.x, c->rgeo.y);
+                    tag_client(c->screen->seltag, c);
+
+                    c->geo.x = c->rgeo.x - c->screen->ugeo.x;
+                    c->geo.y = c->rgeo.y - c->screen->ugeo.y;
+
+               }
+               /* Out of the screen case */
+               else
+               {
+                    c->geo.x = (c->screen->ugeo.w >> 1) - (c->geo.w >> 1);
+                    c->geo.y = (c->screen->ugeo.h >> 1) - (c->geo.h >> 1);
+                    c->rgeo.x = c->screen->ugeo.x + c->geo.x;
+                    c->rgeo.y = c->screen->ugeo.y + c->geo.y;
+               }
+          }
      }
      /* Adjust window regarding required size for frame (tiling) */
      else
@@ -1094,11 +1120,10 @@ client_moveresize(struct client *c, struct geo *g)
 
           if(!(c->flags & CLIENT_DID_WINSIZE))
                client_winsize(c, g);
-     }
 
-     /* Real geo regarding full root size */
-     c->rgeo.x += c->screen->ugeo.x;
-     c->rgeo.y += c->screen->ugeo.y;
+          c->rgeo.x += c->screen->ugeo.x;
+          c->rgeo.y += c->screen->ugeo.y;
+     }
 
      XMoveResizeWindow(W->dpy, c->frame,
                        c->rgeo.x, c->rgeo.y,

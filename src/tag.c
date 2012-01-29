@@ -118,7 +118,6 @@ tag_client(struct tag *t, struct client *c)
 
      if(t != c->screen->seltag || c->flags & CLIENT_TABBED)
           client_unmap(c);
-
 }
 
 void

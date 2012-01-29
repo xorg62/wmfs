@@ -83,19 +83,6 @@ draw_reversed_rect(Drawable dr, struct client *c, bool t)
                     g->h - (i << 1));
 }
 
-static inline void
-draw_reversed_cross(Drawable dr, struct geo *g)
-{
-     int x = g->x + W->screen->ugeo.x;
-     int y = g->y + W->screen->ugeo.y;
-
-     XDrawLine(W->dpy, dr, W->rgc,
-               x, y, x + g->w, y + g->h);
-
-     XDrawLine(W->dpy, dr, W->rgc,
-               x + g->w, y, x, y + g->h);
-}
-
 static inline unsigned short
 draw_textw(struct theme *t, const char *str)
 {

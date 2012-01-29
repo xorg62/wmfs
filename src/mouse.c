@@ -42,6 +42,8 @@ mouse_resize(struct client *c)
      ix = ox;
      iy = oy;
 
+     c->flags |= CLIENT_MOUSE;
+
      do
      {
           XMaskEvent(W->dpy, MouseMask | SubstructureRedirectMask, &ev);
@@ -110,6 +112,8 @@ mouse_resize(struct client *c)
           layout_save_set(c->tag);
      }
 
+     c->flags &= ~CLIENT_MOUSE;
+
      XUngrabServer(W->dpy);
 }
 
@@ -151,6 +155,8 @@ mouse_move(struct client *c, void (*func)(struct client*, struct client*))
      XQueryPointer(W->dpy, W->root, &w, &w, &ox, &oy, &d, &d, (uint *)&u);
 
      _REV_SBORDER(c);
+
+     c->flags |= CLIENT_MOUSE;
 
      do
      {
@@ -205,6 +211,8 @@ mouse_move(struct client *c, void (*func)(struct client*, struct client*))
           if(!func)
                client_moveresize(c, &c->geo);
      }
+
+     c->flags &= ~CLIENT_MOUSE;
 }
 
 void
