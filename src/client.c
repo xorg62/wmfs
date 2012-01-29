@@ -1224,7 +1224,7 @@ _fac_resize(struct client *c, enum position p, int fac)
      struct client *cc, *gc = client_next_with_pos(c, p);
      enum position rp = RPOS(p);
 
-     if(!gc || gc->screen != c->screen)
+     if(!gc || gc->screen != c->screen || !(c->flags & CLIENT_TILED))
           return;
 
      FOREACH_NFCLIENT(cc, &c->tag->clients, tnext)
