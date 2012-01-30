@@ -86,6 +86,7 @@ str_to_position(char *str)
 
 void *xmalloc(size_t nmemb, size_t size);
 void *xcalloc(size_t nmemb, size_t size);
+void *xrealloc(void *ptr, size_t nmemb, size_t size);
 int xasprintf(char **strp, const char *fmt, ...);
 char *xstrdup(const char *str);
 pid_t spawn(const char *format, ...);

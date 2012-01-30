@@ -3,14 +3,233 @@
  *  For license, see COPYING.
  */
 
-#include <X11/Xutil.h>
 #include <string.h>
+#include <fts.h>
+#include <sys/stat.h>
+#include <X11/Xutil.h>
 
 #include "wmfs.h"
 #include "event.h"
 #include "util.h"
 #include "infobar.h"
 #include "config.h"
+
+static int
+fts_alphasort(const FTSENT **a, const FTSENT **b)
+{
+     return (strcmp((*a)->fts_name, (*b)->fts_name));
+}
+
+static char **
+complete_on_command(char *start)
+{
+     char **paths, *path, *p, **namelist = NULL;
+     int count;
+     FTS *tree;
+     FTSENT *node;
+
+     if(!(path = getenv("PATH")) || !start)
+          return NULL;
+
+     /* split PATH into paths */
+     path = p = xstrdup(path);
+
+     for(count = 1, p = path; strchr(p, ':'); ++p, ++count);
+
+     paths = xcalloc(count, sizeof(*paths));
+
+     for(paths[0] = p = path, count = 1; (p = strchr(p, ':')); ++p, ++count)
+     {
+          paths[count] = p + 1;
+          *p = '\0';
+     }
+
+     paths[count] = NULL;
+
+     if(!(tree = fts_open(paths, FTS_NOCHDIR, fts_alphasort)))
+     {
+          warn("fts_open");
+          free(paths);
+          free(path);
+          return NULL;
+     }
+
+     count = 0;
+     while((node = fts_read(tree)))
+     {
+          if(node->fts_level > 0)
+               fts_set(tree, node, FTS_SKIP);
+
+          if(node->fts_level
+             && (node->fts_info & FTS_F)
+             && (node->fts_info & FTS_NS)
+             && (node->fts_statp->st_mode & S_IXOTH)
+             && !strncmp(node->fts_name, start, strlen(start)))
+          {
+               namelist = xrealloc(namelist, ++count, sizeof(*namelist));
+               namelist[count - 1] = xstrdup(node->fts_name + strlen(start));
+          }
+     }
+
+     if(count)
+     {
+          namelist = xrealloc(namelist, ++count, sizeof(*namelist));
+          namelist[count - 1] = NULL;
+     }
+
+     if(fts_close(tree))
+          warn("fts_close");
+
+     free(paths);
+     free(path);
+
+     return namelist;
+}
+
+/*
+ * Complete a filename or directory name.
+ * works like complete_on_command.
+ */
+static char **
+complete_on_files(char *start)
+{
+     char *p, *home, *path, *dirname = NULL, *paths[2], **namelist = NULL;
+     int count;
+     FTS *tree;
+     FTSENT *node;
+
+     p = start;
+
+     /*
+      * Search the directory to open and set
+      * the beginning of file to complete on pointer 'p'.
+      */
+     if(*p == '\0' || !strrchr(p, '/'))
+          path = xstrdup(".");
+     else
+     {
+          if(!(home = getenv("HOME")))
+               return NULL;
+
+          /* remplace ~ by $HOME in dirname */
+          if(!strncmp(p, "~/", 2) && home)
+               xasprintf(&dirname, "%s%s", home, p+1);
+          else
+               dirname = xstrdup(p);
+
+          /* Set p to filename to be complete
+           * and path the directory containing the file
+           * /foooooo/baaaaaar/somethinglikethis<tab>
+           * <---- path - ---><------- p ------>
+           */
+          p = strrchr(dirname, '/');
+          if(p != dirname)
+          {
+               *(p++) = '\0';
+               path = xstrdup(dirname);
+          }
+          else
+          {
+               path = xstrdup("/");
+               p++;
+          }
+     }
+
+     paths[0] = path;
+     paths[1] = NULL;
+
+     if(!(tree = fts_open(paths, FTS_NOCHDIR, fts_alphasort)))
+     {
+          warn("fts_open");
+          free(dirname);
+          free(path);
+          return NULL;
+     }
+
+     count = 0;
+     while((node = fts_read(tree)))
+     {
+          if(node->fts_level > 0)
+               fts_set(tree, node, FTS_SKIP);
+
+          if(node->fts_level && !strncmp(node->fts_name, p, strlen(p)))
+          {
+               namelist = xrealloc(namelist, ++count, sizeof(*namelist));
+               namelist[count - 1] = xstrdup(node->fts_name + strlen(p));
+          }
+     }
+
+     if(count)
+     {
+          namelist = xrealloc(namelist, ++count, sizeof(*namelist));
+          namelist[count - 1] = NULL;
+     }
+
+     if(fts_close(tree))
+          warn("fts_close");
+
+     free(dirname);
+     free(path);
+
+     return namelist;
+}
+
+static void
+complete_cache_free(struct launcher_ccache *cache)
+{
+     int i;
+
+     /* release memory */
+     free(cache->start);
+
+     if(cache->namelist)
+     {
+          for(i = 0; cache->namelist[i]; i++)
+               free(cache->namelist[i]);
+          free(cache->namelist);
+     }
+
+     /* init */
+     cache->hits = 0;
+     cache->start = NULL;
+     cache->namelist = NULL;
+}
+
+static char *
+complete(struct launcher_ccache *cache, char *start)
+{
+     char *p = NULL, *comp = NULL;
+
+     if(!start || !cache)
+          return NULL;
+
+     if((p = strrchr(start, ' ')))
+          p++;
+     else
+          p = start;
+
+     if(cache->start && !strcmp(cache->start, start))
+     {
+          if(cache->namelist && !cache->namelist[cache->hits])
+               cache->hits = 0;
+     }
+     else
+     {
+          complete_cache_free(cache);
+          cache->start = xstrdup(start);
+
+          if(p == start)
+               cache->namelist = complete_on_command(p);
+          else
+               cache->namelist = complete_on_files(p);
+
+     }
+
+     if(cache->namelist && cache->namelist[cache->hits])
+          comp = cache->namelist[cache->hits];
+
+     return comp;
+}
 
 #define LAUNCHER_INIT_ELEM(width)                       \
      SLIST_FOREACH(ib, &W->screen->infobars, next)      \
@@ -29,10 +248,11 @@ launcher_process(struct launcher *l)
 {
      struct infobar *ib;
      struct element *e;
-     bool loop = true;
-     char buf[512] = { 0 };
+     struct launcher_ccache cache = {NULL, NULL, 0};
+     bool loop = true, found = false, lastwastab = false;
+     char tmpbuf[512] = { 0 }, buf[512] = { 0 };
      char tmp[32] = { 0 };
-     char *p, *data, *arg, *cmd = xstrdup(l->command);
+     char *p, *data, *arg, *end, *cmd = xstrdup(l->command);
      int i, pos = 0, histpos = 0;
      void (*func)(Uicb);
      XEvent ev;
@@ -140,16 +360,41 @@ launcher_process(struct launcher *l)
                loop = false;
                break;
 
-          /* TODO: Completion */
+          /* Completion */
           case XK_Tab:
+               buf[pos] = '\0';
+               if(lastwastab)
+                    ++cache.hits;
+               else
+               {
+                    cache.hits = 0;
+                    strncpy(tmpbuf, buf, sizeof(tmpbuf));
+               }
+
+               if(pos && (end = complete(&cache, tmpbuf)))
+               {
+                    strncpy(buf, tmpbuf, sizeof(buf));
+                    strncat(buf, end, sizeof(buf));
+                    found = true;
+               }
+
+               lastwastab = true;
+
+               /* start a new round of tabbing */
+               if(!found)
+                    cache.hits = 0;
+
+               pos = strlen(buf);
                break;
 
           case XK_BackSpace:
+               lastwastab = false;
                if(pos)
                     buf[--pos] = '\0';
                break;
 
           default:
+               lastwastab = false;
                strncat(buf, tmp, sizeof(tmp));
                ++pos;
                break;
@@ -174,6 +419,7 @@ launcher_process(struct launcher *l)
 
      XUngrabKeyboard(W->dpy, CurrentTime);
 
+     complete_cache_free(&cache);
      free(cmd);
      free(data);
 

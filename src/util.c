@@ -46,6 +46,28 @@ xcalloc(size_t nmemb, size_t size)
      return ret;
 }
 
+/** realloc with error support and size_t overflow check
+ * \param ptr old pointer
+ * \param nmemb number of objects
+ * \param size size of single object
+ * \return non null void pointer
+ */
+void *
+xrealloc(void *ptr, size_t nmemb, size_t size)
+{
+     void *ret;
+
+     if(SIZE_MAX / nmemb < size)
+          err(EXIT_FAILURE, "xrealloc(%p, %zu, %zu), "
+              "size_t overflow detected", ptr, nmemb, size);
+
+     if((ret = realloc(ptr, nmemb * size)) == NULL)
+          err(EXIT_FAILURE, "realloc(%p, %zu)", ptr, nmemb * size);
+
+     return ret;
+}
+
+
 /** asprintf wrapper
  * \param strp target string
  * \param fmt format

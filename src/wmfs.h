@@ -292,6 +292,13 @@ struct launcher
      SLIST_ENTRY(launcher) next;
 };
 
+struct launcher_ccache
+{
+     char *start;
+     char **namelist;
+     size_t hits;
+};
+
 struct _systray
 {
      struct geo geo;
