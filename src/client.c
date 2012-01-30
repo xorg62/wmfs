@@ -873,7 +873,11 @@ client_apply_rule(struct client *c)
 
                c->theme = r->theme;
 
-               FLAGAPPLY(c->flags, (r->flags & RULE_FREE), CLIENT_FREE);
+               if(r->flags & RULE_FREE)
+                    c->flags |=  CLIENT_FREE;
+               /* free = false for originally free client */
+               else
+                    c->flags &= ~CLIENT_FREE;
 
 
                /* TODO
@@ -916,8 +920,14 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
      c->tgeo = c->wgeo = c->rgeo = c->geo;
      c->tbgeo = NULL;
 
+     client_get_sizeh(c);
+
      if(!scan)
+     {
+          if(c->flags & CLIENT_HINT_FLAG /* && OPTIONKIVABIEN */)
+               c->flags |= CLIENT_FREE;
           client_apply_rule(c);
+     }
 
      /*
       * Conf option set per client, for possibility
@@ -931,11 +941,6 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
      c->scol = c->theme->client_s;
 
      client_frame_new(c);
-     client_get_sizeh(c);
-
-     /* Set tag */
-     if(c->flags & CLIENT_HINT_FLAG /* && OPTIONKIVABIEN */)
-          c->flags |= CLIENT_FREE;
 
      if(!scan)
           tag_client((c->flags & CLIENT_RULED ? c->tag : c->screen->seltag), c);
