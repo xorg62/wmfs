@@ -9,7 +9,6 @@
 #include "config.h"
 #include "event.h"
 #include "barwin.h"
-#include "barwin.h"
 #include "draw.h"
 #include "screen.h"
 #include "mouse.h"
@@ -105,8 +104,8 @@ client_configure(struct client *c)
           .override_redirect = 0
      };
 
-     XSendEvent(W->dpy, c->win, False, StructureNotifyMask, (XEvent *)&ev);
-     XSync(W->dpy, False);
+     XSendEvent(W->dpy, c->win, false, StructureNotifyMask, (XEvent *)&ev);
+     XSync(W->dpy, false);
 }
 
 struct client*
