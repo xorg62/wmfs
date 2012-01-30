@@ -48,7 +48,7 @@ complete_on_command(char *start)
 
      if(!(tree = fts_open(paths, FTS_NOCHDIR, fts_alphasort)))
      {
-          warn("fts_open");
+          warnl("fts_open");
           free(paths);
           free(path);
           return NULL;
@@ -78,7 +78,7 @@ complete_on_command(char *start)
      }
 
      if(fts_close(tree))
-          warn("fts_close");
+          warnl("fts_close");
 
      free(paths);
      free(path);
@@ -140,7 +140,7 @@ complete_on_files(char *start)
 
      if(!(tree = fts_open(paths, FTS_NOCHDIR, fts_alphasort)))
      {
-          warn("fts_open");
+          warnl("fts_open");
           free(dirname);
           free(path);
           return NULL;
@@ -166,7 +166,7 @@ complete_on_files(char *start)
      }
 
      if(fts_close(tree))
-          warn("fts_close");
+          warnl("fts_close");
 
      free(dirname);
      free(path);
