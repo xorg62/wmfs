@@ -4,7 +4,7 @@
  */
 
 #include <string.h>
-#include <fts.h>
+#include <dirent.h>
 #include <sys/stat.h>
 #include <X11/Xutil.h>
 
@@ -15,18 +15,18 @@
 #include "config.h"
 
 static int
-fts_alphasort(const FTSENT **a, const FTSENT **b)
+qsort_string_compare(const void * a, const void * b)
 {
-     return (strcmp((*a)->fts_name, (*b)->fts_name));
+     return (strcmp(*(char **)a, *(char **)b));
 }
 
 static char **
 complete_on_command(char *start)
 {
+     struct dirent *content;
+     DIR *dir;
      char **paths, *path, *p, **namelist = NULL;
-     int count;
-     FTS *tree;
-     FTSENT *node;
+     int i, count;
 
      if(!(path = getenv("PATH")) || !start)
           return NULL;
@@ -46,39 +46,30 @@ complete_on_command(char *start)
 
      paths[count] = NULL;
 
-     if(!(tree = fts_open(paths, FTS_NOCHDIR, fts_alphasort)))
+     /* recursively open PATH */
+     for(i = count = 0; paths[i]; ++i)
      {
-          warnl("fts_open");
-          free(paths);
-          free(path);
-          return NULL;
-     }
+          if(!(dir = opendir(paths[i])))
+               continue;
 
-     count = 0;
-     while((node = fts_read(tree)))
-     {
-          if(node->fts_level > 0)
-               fts_set(tree, node, FTS_SKIP);
-
-          if(node->fts_level
-             && (node->fts_info & FTS_F)
-             && (node->fts_info & FTS_NS)
-             && (node->fts_statp->st_mode & S_IXOTH)
-             && !strncmp(node->fts_name, start, strlen(start)))
+          while((content = readdir(dir)))
           {
-               namelist = xrealloc(namelist, ++count, sizeof(*namelist));
-               namelist[count - 1] = xstrdup(node->fts_name + strlen(start));
+               if(strncmp(content->d_name, ".", 1)
+                  && !strncmp(content->d_name, start, strlen(start)))
+               {
+                    namelist = xrealloc(namelist, ++count, sizeof(*namelist));
+                    namelist[count - 1] = xstrdup(content->d_name + strlen(start));
+               }
           }
+          closedir(dir);
      }
 
      if(count)
      {
+          qsort(namelist, count, sizeof(char *), qsort_string_compare);
           namelist = xrealloc(namelist, ++count, sizeof(*namelist));
           namelist[count - 1] = NULL;
      }
-
-     if(fts_close(tree))
-          warnl("fts_close");
 
      free(paths);
      free(path);
@@ -93,12 +84,12 @@ complete_on_command(char *start)
 static char **
 complete_on_files(char *start)
 {
-     char *p, *home, *path, *dirname = NULL, *paths[2], **namelist = NULL;
-     int count;
-     FTS *tree;
-     FTSENT *node;
-
-     p = start;
+     struct dirent *content = NULL;
+     struct stat st;
+     DIR *dir;
+     char *home, *path, *dirname = NULL;
+     char **namelist = NULL, *filepath, *p = start;
+     int count = 0;
 
      /*
       * Search the directory to open and set
@@ -135,28 +126,33 @@ complete_on_files(char *start)
           }
      }
 
-     paths[0] = path;
-     paths[1] = NULL;
-
-     if(!(tree = fts_open(paths, FTS_NOCHDIR, fts_alphasort)))
+     if((dir = opendir(path)))
      {
-          warnl("fts_open");
-          free(dirname);
-          free(path);
-          return NULL;
-     }
-
-     count = 0;
-     while((node = fts_read(tree)))
-     {
-          if(node->fts_level > 0)
-               fts_set(tree, node, FTS_SKIP);
-
-          if(node->fts_level && !strncmp(node->fts_name, p, strlen(p)))
+          while((content = readdir(dir)))
           {
-               namelist = xrealloc(namelist, ++count, sizeof(*namelist));
-               namelist[count - 1] = xstrdup(node->fts_name + strlen(p));
+               if(!strcmp(content->d_name, ".")
+                  || !strcmp(content->d_name, "..")
+                  || strncmp(content->d_name, p, strlen(p)))
+                    continue;
+
+               /* If it's a directory append '/' to the completion */
+               xasprintf(&filepath, "%s/%s", path, content->d_name);
+
+               if(filepath && stat(filepath, &st) != -1)
+               {
+                    namelist = xrealloc(namelist, ++count, sizeof(*namelist));
+
+                    if(S_ISDIR(st.st_mode))
+                         xasprintf(&namelist[count - 1], "%s/", content->d_name + strlen(p));
+                    else
+                         namelist[count - 1] = xstrdup(content->d_name + strlen(p));
+               }
+               else
+                    warnl("%s", filepath);
+
+               free(filepath);
           }
+          closedir(dir);
      }
 
      if(count)
@@ -164,9 +160,6 @@ complete_on_files(char *start)
           namelist = xrealloc(namelist, ++count, sizeof(*namelist));
           namelist[count - 1] = NULL;
      }
-
-     if(fts_close(tree))
-          warnl("fts_close");
 
      free(dirname);
      free(path);
