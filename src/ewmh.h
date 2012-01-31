@@ -68,6 +68,7 @@ enum
      net_wm_state_fullscreen,
      net_wm_state_sticky,
      net_wm_state_demands_attention,
+     net_wm_state_hidden,
      net_system_tray_opcode,
      net_system_tray_message_data,
      net_system_tray_s,

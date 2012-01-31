@@ -425,10 +425,12 @@ client_frame_update(struct client *c, struct colpair *cp)
      {
           struct geo g = { f - 1, 0, 1, c->titlebar->geo.h };
           int x = c->border;
+          char *title;
 
           SLIST_FOREACH(cc, &c->tag->clients, tnext)
           {
-               w = (cc->title ? draw_textw(c->theme, cc->title) : 0);
+               title = (cc->title ? cc->title : "WMFS");
+               w = draw_textw(c->theme, title);
                _XTEXT();
 
                if(cc == c)
@@ -443,7 +445,7 @@ client_frame_update(struct client *c, struct colpair *cp)
 
                     _STATUSLINE(c, true);
                     draw_rect(c->titlebar->dr, &g, c->scol.bg);
-                    draw_text(c->titlebar->dr, c->theme, xt, y, cp->fg, c->title);
+                    draw_text(c->titlebar->dr, c->theme, xt, y, cp->fg, title);
                     barwin_refresh(c->titlebar);
 
                     x += f;
@@ -461,7 +463,7 @@ client_frame_update(struct client *c, struct colpair *cp)
 
                     _STATUSLINE(cc, false);
                     draw_rect(cc->titlebar->dr, &g, c->scol.bg);
-                    draw_text(cc->titlebar->dr, c->theme, xt, y - 1, c->ncol.fg, cc->title);
+                    draw_text(cc->titlebar->dr, c->theme, xt, y - 1, c->ncol.fg, title);
                     barwin_refresh(cc->titlebar);
 
                     x += f;

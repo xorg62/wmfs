@@ -215,7 +215,6 @@ complete(struct launcher_ccache *cache, char *start)
                cache->namelist = complete_on_command(p);
           else
                cache->namelist = complete_on_files(p);
-
      }
 
      if(cache->namelist && cache->namelist[cache->hits])

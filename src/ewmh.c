@@ -49,6 +49,7 @@ ewmh_init(void)
      W->net_atom[net_wm_state_fullscreen]        = ATOM("_NET_WM_STATE_FULLSCREEN");
      W->net_atom[net_wm_state_sticky]            = ATOM("_NET_WM_STATE_STICKY");
      W->net_atom[net_wm_state_demands_attention] = ATOM("_NET_WM_STATE_DEMANDS_ATTENTION");
+     W->net_atom[net_wm_state_hidden]            = ATOM("_NET_WM_STATE_HIDDEN");
      W->net_atom[net_system_tray_s]              = ATOM("_NET_SYSTEM_TRAY_S0");
      W->net_atom[net_system_tray_opcode]         = ATOM("_NET_SYSTEM_TRAY_OPCODE");
      W->net_atom[net_system_tray_message_data]   = ATOM("_NET_SYSTEM_TRAY_MESSAGE_DATA");
