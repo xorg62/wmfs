@@ -5,7 +5,9 @@ TIMING=10
 
 statustext()
 {
-     echo "status default `date`" > /tmp/wmfs-$DISPLAY.fifo
+    # Syntax : status <bar name> <data>
+    # possible sequences as data: \s[] \R[] \i[]
+    wmfs -c "status default `date`"
 }
 
 while true;
