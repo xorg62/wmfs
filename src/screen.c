@@ -126,38 +126,30 @@ uicb_screen_prev(Uicb cmd)
      screen_select(SLIST_FIRST(&W->h.screen));
 }
 
-static void
-screen_move_client(struct client *c, struct screen *s)
-{
-     tag_client(s->seltag, c);
-}
-
 void
 uicb_screen_move_client_next(Uicb cmd)
 {
-     struct screen *s;
+     struct screen *s = SLIST_NEXT(W->screen, next);;
      (void)cmd;
 
-     if(!(s = SLIST_NEXT(W->screen, next)))
+     if(!s)
           s = SLIST_FIRST(&W->h.screen);
 
-     screen_move_client(W->client, s);
+     if(W->client)
+          tag_client(s->seltag, W->client);
 }
 
 void
 uicb_screen_move_client_prev(Uicb cmd)
 {
-     struct screen *s;
+     struct screen *s = SLIST_FIRST(&W->h.screen);
      (void)cmd;
 
-     SLIST_FOREACH(s, &W->h.screen, next)
-          if(SLIST_NEXT(W->screen, next) == s)
-          {
-               screen_move_client(W->client, s);
-               return;
-          }
+     while(SLIST_NEXT(s, next) && SLIST_NEXT(s, next) != s)
+          s = SLIST_NEXT(s, next);
 
-     screen_move_client(W->client, SLIST_FIRST(&W->h.screen));
+     if(W->client)
+          tag_client(s->seltag, W->client);
 }
 
 void
