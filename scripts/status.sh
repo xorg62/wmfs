@@ -7,7 +7,7 @@ statustext()
 {
     # Syntax : status <bar name> <data>
     # possible sequences as data: \s[] \R[] \i[]
-    wmfs -c "status default `date`"
+    wmfs -c status "default `date`"
 }
 
 while true;
