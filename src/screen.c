@@ -101,10 +101,10 @@ screen_select(struct screen *s)
 void
 uicb_screen_next(Uicb cmd)
 {
-     struct screen *s;
+     struct screen *s = SLIST_NEXT(W->screen, next);
      (void)cmd;
 
-     if(!(s = SLIST_NEXT(W->screen, next)))
+     if(!s)
           s = SLIST_FIRST(&W->h.screen);
 
      screen_select(s);
@@ -113,23 +113,19 @@ uicb_screen_next(Uicb cmd)
 void
 uicb_screen_prev(Uicb cmd)
 {
-     struct screen *s;
+     struct screen *s = SLIST_FIRST(&W->h.screen);
      (void)cmd;
 
-     SLIST_FOREACH(s, &W->h.screen, next)
-          if(SLIST_NEXT(W->screen, next) == s)
-          {
-               screen_select(s);
-               return;
-          }
+     while(SLIST_NEXT(s, next) && SLIST_NEXT(s, next) != s)
+          s = SLIST_NEXT(s, next);
 
-     screen_select(SLIST_FIRST(&W->h.screen));
+     screen_select(s);
 }
 
 void
 uicb_screen_move_client_next(Uicb cmd)
 {
-     struct screen *s = SLIST_NEXT(W->screen, next);;
+     struct screen *s = SLIST_NEXT(W->screen, next);
      (void)cmd;
 
      if(!s)

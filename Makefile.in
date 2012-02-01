@@ -17,7 +17,6 @@ SRCS=                 \
       src/screen.c    \
       src/tag.c       \
       src/util.c      \
-      src/fifo.c      \
       src/status.c    \
       src/systray.c   \
       src/mouse.c     \

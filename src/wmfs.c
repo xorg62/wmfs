@@ -22,7 +22,6 @@
 #include "util.h"
 #include "config.h"
 #include "client.h"
-#include "fifo.h"
 #include "layout.h"
 
 int
@@ -357,39 +356,26 @@ wmfs_scan(void)
      XSync(W->dpy, false);
 }
 
+static inline void
+wmfs_sigchld(void)
+{
+     if(W->flags & WMFS_SIGCHLD)
+     {
+          while(waitpid(-1, NULL, WNOHANG) > 0);
+          W->flags ^= WMFS_SIGCHLD;
+     }
+}
+
 static void
 wmfs_loop(void)
 {
      XEvent ev;
-     int maxfd, fd = ConnectionNumber(W->dpy);
-     fd_set iset;
 
-     while(W->flags & WMFS_RUNNING)
+     while((W->flags & WMFS_RUNNING) && !XNextEvent(W->dpy, &ev))
      {
-          maxfd = fd + 1;
-
-          FD_ZERO(&iset);
-          FD_SET(fd, &iset);
-
-          if(W->fifo.fd > 0)
-          {
-               maxfd += W->fifo.fd;
-               FD_SET(W->fifo.fd, &iset);
-          }
-
-          if(select(maxfd, &iset, NULL, NULL, NULL) > 0)
-          {
-               if(FD_ISSET(fd, &iset))
-               {
-                    while((W->flags & WMFS_RUNNING) && XPending(W->dpy))
-                    {
-                         XNextEvent(W->dpy, &ev);
-                         EVENT_HANDLE(&ev);
-                    }
-               }
-               else if(W->fifo.fd > 0 && FD_ISSET(W->fifo.fd, &iset))
-                    fifo_read();
-          }
+          /* Manage SIGCHLD event here, X is not safe with it */
+          wmfs_sigchld();
+          EVENT_HANDLE(&ev);
      }
 }
 
@@ -402,7 +388,6 @@ wmfs_init(void)
      screen_init();
      event_init();
      config_init();
-     fifo_init();
 }
 
 void
@@ -486,13 +471,6 @@ wmfs_quit(void)
           free(r);
      }
 
-     /* FIFO stuffs */
-     if(W->fifo.fd > 0)
-     {
-          close(W->fifo.fd);
-          unlink(W->fifo.path);
-     }
-
      /* close log */
      if(W->log)
           fclose(W->log), W->log = NULL;
@@ -554,7 +532,7 @@ signal_handle(int sig)
           W->flags &= ~WMFS_RUNNING;
           break;
      case SIGCHLD:
-          while(waitpid(-1, NULL, WNOHANG) > 0);
+          W->flags |= WMFS_SIGCHLD;
           break;
      }
 }

@@ -133,7 +133,7 @@ client_gb_frame(Window w)
 struct client*
 client_gb_pos(struct tag *t, int x, int y)
 {
-     struct client *c = SLIST_FIRST(&t->clients);
+     struct client *c;
 
      FOREACH_NFCLIENT(c, &t->clients, tnext)
           if(INAREA(x, y, c->geo))

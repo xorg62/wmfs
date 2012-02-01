@@ -324,6 +324,7 @@ struct wmfs
 #define WMFS_SYSTRAY  0x08
 #define WMFS_LOG      0x10
 #define WMFS_LAUNCHER 0x20
+#define WMFS_SIGCHLD  0x40
      Flags flags;
      GC gc, rgc;
      Atom *net_atom;
@@ -331,13 +332,6 @@ struct wmfs
      char *confpath;
      struct barwin *last_clicked_barwin;
      struct theme *ctheme;
-
-     /* FIFO stuffs */
-     struct
-     {
-          char *path;
-          int fd;
-     } fifo;
 
      /* Log file */
      FILE *log;
