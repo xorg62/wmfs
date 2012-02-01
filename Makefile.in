@@ -53,6 +53,7 @@ install: all
 	install ${PROG} ${DESTDIR}${PREFIX}/bin
 	@echo installing xsession file to ${DESTDIR}${PREFIX}/share/xsessions
 	mkdir -p ${DESTDIR}${PREFIX}/share/xsessions
+	install -m 444 wmfs.desktop ${DESTDIR}${PREFIX}/share/xsessions
 	@echo installing default config file to ${DESTDIR}${XDG_CONFIG_DIR}/wmfs/
 	mkdir -p ${DESTDIR}${XDG_CONFIG_DIR}/wmfs/
 	install -m 444 wmfsrc ${DESTDIR}${XDG_CONFIG_DIR}/wmfs/
