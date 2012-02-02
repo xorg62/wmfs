@@ -185,6 +185,9 @@
   [key] mod = {"Super", "Shift"} key = "F7" func = "tag_client" cmd = "6" [/key]
   [key] mod = {"Super", "Shift"} key = "F8" func = "tag_client" cmd = "7" [/key]
 
+  [key] mod = {"Super"} key = "minus" func = "tag_del" [/key]
+  [key] mod = {"Super", "Shift"} key = "minus" func = "tag_new" [/key]
+
   # tag function: cmd = nameofthetag
   #[key] mod = {"Super"} key = "z" func = "tag" cmd = "2" [/key]
 
@@ -230,6 +233,7 @@
   [key] mod = {"Alt", "Shift"} key = "k" func = "client_tab_top"    [/key]
   [key] mod = {"Alt", "Shift"} key = "j" func = "client_tab_bottom" [/key]
   [key] mod = {"Alt", "Shift"} key = "u" func = "client_untab" [/key]
+  [key] mod = {"Super"}        key = "t" func = "client_tab_next_opened" [/key]
 
   # Layout manipulation
   [key] mod = {"Super"}          key = "m" func = "layout_vmirror" [/key]

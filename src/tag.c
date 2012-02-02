@@ -30,7 +30,7 @@ tag_new(struct screen *s, char *name)
      if((l = TAILQ_LAST(&s->tags, tsub)))
           t->id = l->id + 1;
 
-     if(!strlen(name))
+     if(!name || !strlen(name))
           xasprintf(&t->name, "%d", t->id + 1);
      else
           t->name = xstrdup(name);
