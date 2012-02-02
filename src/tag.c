@@ -256,8 +256,11 @@ uicb_tag_del(Uicb cmd)
      if(SLIST_EMPTY(&t->clients)
         && TAILQ_NEXT(TAILQ_FIRST(&W->screen->tags), next))
      {
+          struct tag *n = (TAILQ_NEXT(t, next)
+                           ? TAILQ_NEXT(t, next)
+                           : TAILQ_FIRST(&W->screen->tags));
 
-          tag_screen(W->screen, TAILQ_NEXT(t, next));
+          tag_screen(W->screen, n);
           tag_remove(t);
 
           W->screen->flags |= SCREEN_TAG_UPDATE;
