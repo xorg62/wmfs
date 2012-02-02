@@ -22,7 +22,6 @@ tag_new(struct screen *s, char *name)
      t = xcalloc(1, sizeof(struct tag));
 
      t->screen = s;
-     t->name   = xstrdup(name);
      t->flags  = 0;
      t->id     = 0;
      t->sel    = NULL;
@@ -30,6 +29,11 @@ tag_new(struct screen *s, char *name)
 
      if((l = TAILQ_LAST(&s->tags, tsub)))
           t->id = l->id + 1;
+
+     if(!strlen(name))
+          xasprintf(&t->name, "%d", t->id + 1);
+     else
+          t->name = xstrdup(name);
 
      SLIST_INIT(&t->clients);
      TAILQ_INIT(&t->sets);
@@ -219,6 +223,8 @@ uicb_tag_click(Uicb cmd)
 static void
 tag_remove(struct tag *t)
 {
+     TAILQ_REMOVE(&t->screen->tags, t, next);
+
      free(t->name);
 
      layout_free_set(t);
@@ -227,13 +233,45 @@ tag_remove(struct tag *t)
 }
 
 void
+uicb_tag_new(Uicb cmd)
+{
+     struct screen *s = W->screen;
+     struct infobar *i;
+
+     tag_new(s, (char*)cmd);
+
+     s->flags |= SCREEN_TAG_UPDATE;
+
+     SLIST_FOREACH(i, &s->infobars, next)
+          infobar_elem_reinit(i);
+}
+
+void
+uicb_tag_del(Uicb cmd)
+{
+     struct infobar *i;
+     struct tag *t = W->screen->seltag;
+     (void)cmd;
+
+     if(SLIST_EMPTY(&t->clients)
+        && TAILQ_NEXT(TAILQ_FIRST(&W->screen->tags), next))
+     {
+
+          tag_screen(W->screen, TAILQ_NEXT(t, next));
+          tag_remove(t);
+
+          W->screen->flags |= SCREEN_TAG_UPDATE;
+
+          SLIST_FOREACH(i, &W->screen->infobars, next)
+               infobar_elem_reinit(i);
+     }
+}
+
+void
 tag_free(struct screen *s)
 {
      struct tag *t;
 
      TAILQ_FOREACH(t, &s->tags, next)
-     {
-          TAILQ_REMOVE(&s->tags, t, next);
           tag_remove(t);
-     }
 }

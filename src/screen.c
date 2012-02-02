@@ -21,6 +21,7 @@ screen_new(struct geo *g, int id)
      s->geo = s->ugeo = *g;
      s->seltag = NULL;
      s->id = id;
+     s->flags = 0;
 
      TAILQ_INIT(&s->tags);
      SLIST_INIT(&s->infobars);

@@ -149,6 +149,8 @@ struct screen
 {
      struct geo geo, ugeo;
      struct tag *seltag;
+#define SCREEN_TAG_UPDATE 0x01
+     Flags flags;
      int id;
      TAILQ_HEAD(tsub, tag) tags;
      SLIST_HEAD(, infobar) infobars;

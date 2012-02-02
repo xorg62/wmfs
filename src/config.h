@@ -38,6 +38,8 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "tag_move_client_next", uicb_tag_move_client_next },
      { "tag_move_client_prev", uicb_tag_move_client_prev },
      { "tag_click",            uicb_tag_click },
+     { "tag_new",              uicb_tag_new },
+     { "tag_del",              uicb_tag_del },
 
      /* Layout */
      { "layout_vmirror",          uicb_layout_vmirror },

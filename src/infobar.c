@@ -12,6 +12,14 @@
 #include "status.h"
 #include "systray.h"
 
+#define ELEM_FREE_BARWIN(e)                     \
+     while(!SLIST_EMPTY(&e->bars))              \
+     {                                          \
+          b = SLIST_FIRST(&e->bars);            \
+          SLIST_REMOVE_HEAD(&e->bars, enext);   \
+          barwin_remove(b);                     \
+     }
+
 static void infobar_elem_tag_init(struct element *e);
 static void infobar_elem_tag_update(struct element *e);
 static void infobar_elem_status_init(struct element *e);
@@ -54,8 +62,15 @@ infobar_elem_tag_init(struct element *e)
 
      e->statusctx = &e->infobar->theme->tags_n_sl;
 
-     if(SLIST_EMPTY(&e->bars))
+     if(SLIST_EMPTY(&e->bars) || (e->infobar->screen->flags & SCREEN_TAG_UPDATE))
      {
+          if((e->infobar->screen->flags & SCREEN_TAG_UPDATE))
+          {
+               ELEM_FREE_BARWIN(e);
+               SLIST_INIT(&e->bars);
+               e->infobar->screen->flags ^= SCREEN_TAG_UPDATE;
+          }
+
           TAILQ_FOREACH(t, &e->infobar->screen->tags, next)
           {
                s = draw_textw(e->infobar->theme, t->name) + PAD;
@@ -380,12 +395,7 @@ infobar_elem_remove(struct element *e)
 
      TAILQ_REMOVE(&e->infobar->elements, e, next);
 
-     while(!SLIST_EMPTY(&e->bars))
-     {
-          b = SLIST_FIRST(&e->bars);
-          SLIST_REMOVE_HEAD(&e->bars, enext);
-          barwin_remove(b);
-     }
+     ELEM_FREE_BARWIN(e);
 
      free(e);
 }
