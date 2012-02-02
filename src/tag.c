@@ -35,6 +35,8 @@ tag_new(struct screen *s, char *name)
      else
           t->name = xstrdup(name);
 
+     printf("->t->name <%s>\n", t->name);
+
      SLIST_INIT(&t->clients);
      TAILQ_INIT(&t->sets);
 
@@ -46,7 +48,7 @@ tag_new(struct screen *s, char *name)
 void
 tag_screen(struct screen *s, struct tag *t)
 {
-     if(t == s->seltag)
+     if(t == s->seltag && TAILQ_NEXT(t, next))
           t = t->prev;
 
      if(!t)
@@ -256,11 +258,7 @@ uicb_tag_del(Uicb cmd)
      if(SLIST_EMPTY(&t->clients)
         && TAILQ_NEXT(TAILQ_FIRST(&W->screen->tags), next))
      {
-          struct tag *n = (TAILQ_NEXT(t, next)
-                           ? TAILQ_NEXT(t, next)
-                           : TAILQ_FIRST(&W->screen->tags));
-
-          tag_screen(W->screen, n);
+          tag_screen(W->screen, TAILQ_NEXT(t, next));
           tag_remove(t);
 
           W->screen->flags |= SCREEN_TAG_UPDATE;
