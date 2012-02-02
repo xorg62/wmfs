@@ -68,7 +68,6 @@ infobar_elem_tag_init(struct element *e)
           {
                ELEM_FREE_BARWIN(e);
                SLIST_INIT(&e->bars);
-               e->infobar->screen->flags ^= SCREEN_TAG_UPDATE;
           }
 
           TAILQ_FOREACH(t, &e->infobar->screen->tags, next)

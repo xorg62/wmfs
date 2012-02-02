@@ -35,8 +35,6 @@ tag_new(struct screen *s, char *name)
      else
           t->name = xstrdup(name);
 
-     printf("->t->name <%s>\n", t->name);
-
      SLIST_INIT(&t->clients);
      TAILQ_INIT(&t->sets);
 
@@ -246,6 +244,8 @@ uicb_tag_new(Uicb cmd)
 
      SLIST_FOREACH(i, &s->infobars, next)
           infobar_elem_reinit(i);
+
+     s->flags ^= SCREEN_TAG_UPDATE;
 }
 
 void
@@ -265,6 +265,8 @@ uicb_tag_del(Uicb cmd)
 
           SLIST_FOREACH(i, &W->screen->infobars, next)
                infobar_elem_reinit(i);
+
+          W->screen->flags ^= SCREEN_TAG_UPDATE;
      }
 }
 
