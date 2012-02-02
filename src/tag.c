@@ -102,8 +102,6 @@ tag_client(struct tag *t, struct client *c)
 
      infobar_elem_screen_update(t->screen, ElemTag);
 
-     layout_client(c);
-
      if(c->flags & CLIENT_TABMASTER && c->prevtag)
      {
           struct client *cc;
@@ -115,6 +113,8 @@ tag_client(struct tag *t, struct client *c)
                     tag_client(t, cc);
                }
      }
+
+     layout_client(c);
 
      if(t != c->screen->seltag || c->flags & CLIENT_TABBED)
           client_unmap(c);

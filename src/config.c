@@ -264,7 +264,7 @@ config_rule(void)
           r->tag      = fetch_opt_first(ks[i], "-1", "tag").num;
 
           FLAGAPPLY(r->flags, fetch_opt_first(ks[i], "false", "free").boolean,       RULE_FREE);
-          FLAGAPPLY(r->flags, fetch_opt_first(ks[i], "false", "max").boolean,        RULE_MAX);
+          FLAGAPPLY(r->flags, fetch_opt_first(ks[i], "false", "tab").boolean,        RULE_TAB);
           FLAGAPPLY(r->flags, fetch_opt_first(ks[i], "false", "ignore_tag").boolean, RULE_IGNORE_TAG);
 
           if((tn = fetch_opt_first(ks[i], "", "theme").str))

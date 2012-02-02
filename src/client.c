@@ -875,20 +875,21 @@ client_apply_rule(struct client *c)
 
                c->theme = r->theme;
 
+               /* free = false for originally free client */
                if(r->flags & RULE_FREE)
                     c->flags |=  CLIENT_FREE;
-               /* free = false for originally free client */
                else
                     c->flags &= ~CLIENT_FREE;
 
+               /* Free rule is not compatible with tab rule */
+               if(r->flags & RULE_TAB)
+                    W->flags ^= WMFS_TABNOC; /* < can be disable by client_tab_next_opened */
 
                /* TODO
-                  if(r->flags & RULE_MAX)
-                  {}
-
                   if(r->flags & RULE_IGNORE_TAG)
                   {}
                */
+
                c->flags |= CLIENT_RULED;
           }
           flags = 0;

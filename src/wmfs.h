@@ -274,7 +274,7 @@ struct rule
      char *name;
      int tag, screen;
 #define RULE_FREE       0x01
-#define RULE_MAX        0x02
+#define RULE_TAB        0x02
 #define RULE_IGNORE_TAG 0x04
      Flags flags;
      SLIST_ENTRY(rule) next;

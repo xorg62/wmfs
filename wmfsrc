@@ -137,7 +137,7 @@
       screen = 0
 
       free       = false
-      max        = false
+      tab        = false
       ignore_tag = false
   [/rule]
 
