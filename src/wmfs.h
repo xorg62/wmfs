@@ -325,6 +325,7 @@ struct wmfs
 #define WMFS_LOG      0x10
 #define WMFS_LAUNCHER 0x20
 #define WMFS_SIGCHLD  0x40
+#define WMFS_TABNOC   0x80 /* tab next opened client */
      Flags flags;
      GC gc, rgc;
      Atom *net_atom;

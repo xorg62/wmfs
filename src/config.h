@@ -78,6 +78,7 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "client_focus_prev_tab",   uicb_client_focus_prev_tab },
      { "client_focus_click",      uicb_client_focus_click },
      { "client_toggle_free",      uicb_client_toggle_free },
+     { "client_tab_next_opened",  uicb_client_tab_next_opened },
 
      /* Status */
      { "status" , uicb_status },

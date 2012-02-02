@@ -393,6 +393,14 @@ layout_split_integrate(struct client *c, struct client *sc)
           }
      }
 
+     /* Tab Next Opened Client */
+     if(W->flags & WMFS_TABNOC)
+     {
+          W->flags ^= WMFS_TABNOC;
+          _client_tab(c, sc);
+          return;
+     }
+
      c->flags |= CLIENT_TILED;
 
      g = layout_split(sc, (sc->geo.h < sc->geo.w));

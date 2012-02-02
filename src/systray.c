@@ -72,7 +72,7 @@ systray_add(Window win)
      s->geo.h = W->systray.barwin->geo.h;
      s->geo.w = W->systray.barwin->geo.h + SYSTRAY_SPACING;
 
-     ewmh_set_wm_state(s->win, WithdrawnState);
+     ewmh_set_wm_state(s->win, NormalState);
      XSelectInput(W->dpy, s->win, StructureNotifyMask | PropertyChangeMask| EnterWindowMask | FocusChangeMask);
      XReparentWindow(W->dpy, s->win, W->systray.win, 0, 0);
 

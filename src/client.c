@@ -1432,6 +1432,14 @@ uicb_client_toggle_free(Uicb cmd)
 }
 
 void
+uicb_client_tab_next_opened(Uicb cmd)
+{
+     (void)cmd;
+
+     W->flags ^= WMFS_TABNOC;
+}
+
+void
 client_free(void)
 {
      FREE_LIST(client, W->h.client);
