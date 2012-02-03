@@ -90,9 +90,9 @@ void
 status_parse(struct status_ctx *ctx)
 {
      struct status_seq *sq, *prev = NULL;
-     int i, shift = 0;
+     int i, tmp, shift = 0;
      char *dstr = xstrdup(ctx->status), *sauv = dstr;
-     char type, *p, *pp, *end, *arg[6] = { NULL };
+     char type, *p, *pp, *end, *arg[10] = { NULL };
 
      for(; *dstr; ++dstr)
      {
@@ -107,7 +107,7 @@ status_parse(struct status_ctx *ctx)
                while(*(end - 1) == '\\')
                     end = strchr(end + 1, ']');
 
-          if(!(strchr("sRi", *p)) || !end)
+          if(!(strchr("sRpi", *p)) || !end)
                continue;
 
           /* Then parse & list it */
@@ -145,6 +145,26 @@ status_parse(struct status_ctx *ctx)
                break;
 
           /*
+           * Progress bar sequence: \p[left/right;w;h;bord;val;valmax;bg;fg] OR x;y
+           */
+          case 'p':
+               i = parse_args(p + 2, ';', ']', 9, arg);
+               STATUS_CHECK_ARGS(i, 7, 8, dstr, end);
+               sq = status_new_seq(type, i, 7, arg, &shift);
+
+               sq->geo.w = ATOI(arg[1 + shift]);
+               sq->geo.h = ATOI(arg[2 + shift]);
+
+               sq->data[0] = ATOI(arg[3 + shift]);                     /* Border */
+               sq->data[1] = ((tmp = ATOI(arg[4 + shift])) ? tmp : 1); /* Value */
+               sq->data[2] = ATOI(arg[5 + shift]);                     /* Value Max */
+
+               sq->color   = color_atoh(arg[6 + shift]);
+               sq->color2  = color_atoh(arg[7 + shift]);
+
+               break;
+
+          /*
            * Image sequence: \i[left/right;w;h;/path/img] OR \i[x;y;w;h;/path/img]
            */
 #ifdef HAVE_IMLIB2
@@ -161,7 +181,7 @@ status_parse(struct status_ctx *ctx)
 #endif /* HAVE_IMLIB2 */
           }
 
-          if (sq->align == Right)
+          if(sq->align == Right)
               SLIST_INSERT_HEAD(&ctx->statushead, sq, next);
           else
               SLIST_INSERT_TAIL(&ctx->statushead, sq, next, prev);
@@ -200,6 +220,7 @@ status_apply_list(struct status_ctx *ctx)
 {
      struct status_seq *sq;
      struct mousebind *m;
+     struct geo g;
      int left = 0, right = 0, w, h;
 
      SLIST_FOREACH(sq, &ctx->statushead, next)
@@ -239,6 +260,26 @@ status_apply_list(struct status_ctx *ctx)
                if(!SLIST_EMPTY(&sq->mousebinds))
                     SLIST_FOREACH(m, &sq->mousebinds, snext)
                          m->area = sq->geo;
+
+               break;
+
+          /* Progress */
+          case 'p':
+               if(sq->align != NoAlign)
+                    sq->geo.y = (ctx->barwin->geo.h >> 1) - (sq->geo.h >> 1);
+
+               STATUS_ALIGN(sq->align);
+
+               draw_rect(ctx->barwin->dr, &sq->geo, sq->color);
+
+               /* Progress bar geo */
+               g.x = sq->geo.x + sq->data[0];
+               g.y = sq->geo.y + sq->data[0];
+               g.w = sq->geo.w - sq->data[0] - sq->data[0];
+               g.w /= ((float)sq->data[2] / (float)sq->data[1]);
+               g.h = sq->geo.h - sq->data[0] - sq->data[0];
+
+               draw_rect(ctx->barwin->dr, &g, sq->color2);
 
                break;
 

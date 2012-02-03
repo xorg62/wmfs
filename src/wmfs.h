@@ -101,9 +101,10 @@ struct status_seq
 {
      struct geo geo;
      enum position align;
+     int data[4];
      char type;
      char *str;
-     Color color;
+     Color color, color2;
      SLIST_HEAD(, mousebind) mousebinds;
      SLIST_ENTRY(status_seq) next;
 };
