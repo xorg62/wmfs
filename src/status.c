@@ -215,6 +215,10 @@ status_parse(struct status_ctx *ctx)
           sq->geo.x = ctx->barwin->geo.w - right - sq->geo.w;     \
           right += sq->geo.w;                                     \
      }
+#define STORE_MOUSEBIND()                                       \
+     if(!SLIST_EMPTY(&sq->mousebinds))                          \
+          SLIST_FOREACH(m, &sq->mousebinds, snext)              \
+               m->area = sq->geo;
 static void
 status_apply_list(struct status_ctx *ctx)
 {
@@ -254,12 +258,8 @@ status_apply_list(struct status_ctx *ctx)
                     sq->geo.y = (ctx->barwin->geo.h >> 1) - (sq->geo.h >> 1);
 
                STATUS_ALIGN(sq->align);
-
                draw_rect(ctx->barwin->dr, &sq->geo, sq->color);
-
-               if(!SLIST_EMPTY(&sq->mousebinds))
-                    SLIST_FOREACH(m, &sq->mousebinds, snext)
-                         m->area = sq->geo;
+               STORE_MOUSEBIND();
 
                break;
 
@@ -281,6 +281,8 @@ status_apply_list(struct status_ctx *ctx)
 
                draw_rect(ctx->barwin->dr, &g, sq->color2);
 
+               STORE_MOUSEBIND();
+
                break;
 
           /* Image */
@@ -297,12 +299,8 @@ status_apply_list(struct status_ctx *ctx)
                     sq->geo.y = (ctx->barwin->geo.h >> 1) - (sq->geo.h >> 1);
 
                STATUS_ALIGN(sq->align);
-
                draw_image(ctx->barwin->dr, &sq->geo);
-
-               if(!SLIST_EMPTY(&sq->mousebinds))
-                    SLIST_FOREACH(m, &sq->mousebinds, snext)
-                         m->area = sq->geo;
+               STORE_MOUSEBIND();
 
                break;
 #endif /* HAVE_IMLIB2 */
