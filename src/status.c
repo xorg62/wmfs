@@ -308,10 +308,15 @@ status_parse(struct status_ctx *ctx)
           sq->geo.x = ctx->barwin->geo.w - right - sq->geo.w;     \
           right += sq->geo.w;                                     \
      }
+
 #define STORE_MOUSEBIND()                                       \
      if(!SLIST_EMPTY(&sq->mousebinds))                          \
           SLIST_FOREACH(m, &sq->mousebinds, snext)              \
                m->area = sq->geo;
+
+#define NOALIGN_Y()                                                     \
+     if(sq->align != NoAlign)                                           \
+          sq->geo.y = (ctx->barwin->geo.h >> 1) - (sq->geo.h >> 1);
 static void
 status_apply_list(struct status_ctx *ctx)
 {
@@ -347,20 +352,18 @@ status_apply_list(struct status_ctx *ctx)
 
           /* Rectangle */
           case 'R':
-               if(sq->align != NoAlign)
-                    sq->geo.y = (ctx->barwin->geo.h >> 1) - (sq->geo.h >> 1);
-
+               NOALIGN_Y();
                STATUS_ALIGN(sq->align);
+
                draw_rect(ctx->barwin->dr, &sq->geo, sq->color);
+
                STORE_MOUSEBIND();
 
                break;
 
           /* Progress */
           case 'p':
-               if(sq->align != NoAlign)
-                    sq->geo.y = (ctx->barwin->geo.h >> 1) - (sq->geo.h >> 1);
-
+               NOALIGN_Y();
                STATUS_ALIGN(sq->align);
 
                draw_rect(ctx->barwin->dr, &sq->geo, sq->color);
@@ -380,9 +383,7 @@ status_apply_list(struct status_ctx *ctx)
 
           /* Graph */
           case 'g':
-               if(sq->align != NoAlign)
-                    sq->geo.y = (ctx->barwin->geo.h >> 1) - (sq->geo.h >> 1);
-
+               NOALIGN_Y();
                STATUS_ALIGN(sq->align);
 
                draw_rect(ctx->barwin->dr, &sq->geo, sq->color);
