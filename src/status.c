@@ -77,11 +77,13 @@ static void
 status_graph_draw(struct status_ctx *ctx, struct status_seq *sq, struct status_gcache *gc)
 {
      int i, j, y;
-     int ys = sq->geo.y + sq->geo.h;
+     int ys = sq->geo.y + sq->geo.h - 1;
 
      XSetForeground(W->dpy, W->gc, sq->color2);
 
-     for(i = sq->geo.x + sq->geo.w, j = gc->ndata; j >= 0 && i >= sq->geo.x; --j, --i)
+     for(i = sq->geo.x + sq->geo.w - 1, j = gc->ndata - 1;
+         j >= 0 && i >= sq->geo.x;
+         --j, --i)
      {
           y = ys - (sq->geo.h / ((float)sq->data[2] / (float)gc->datas[j]));
           draw_line(ctx->barwin->dr, i, y, i, ys);
