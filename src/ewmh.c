@@ -112,6 +112,33 @@ ewmh_set_wm_state(Window w, int state)
 }
 
 /*
+ * _NET_CLIENT_LIST
+ */
+void
+ewmh_get_client_list(void)
+{
+     Window *list;
+     struct client *c;
+     int win_n = 0;
+
+     SLIST_FOREACH(c, &W->h.client, next)
+          ++win_n;
+
+     list = xcalloc(win_n, sizeof(Window));
+
+     win_n = 0;
+     SLIST_FOREACH(c, &W->h.client, next)
+          list[win_n++] = c->win;
+
+     XChangeProperty(W->dpy, W->root, W->net_atom[net_client_list], XA_WINDOW, 32,
+                     PropModeReplace, (unsigned char *)list, win_n);
+
+     XFree(list);
+
+     return;
+}
+
+/*
  * Get xembed state
  */
 long

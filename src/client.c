@@ -970,6 +970,8 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
           ewmh_manage_window_type(c);
      }
 
+     ewmh_get_client_list();
+
      return c;
 }
 
@@ -1408,6 +1410,8 @@ client_remove(struct client *c)
      XSetErrorHandler(wmfs_error_handler);
 
      free(c);
+
+     ewmh_get_client_list();
 }
 
 void
