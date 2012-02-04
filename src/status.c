@@ -85,8 +85,12 @@ status_graph_draw(struct status_ctx *ctx, struct status_seq *sq, struct status_g
          j >= 0 && i >= sq->geo.x;
          --j, --i)
      {
-          y = ys - (sq->geo.h / ((float)sq->data[2] / (float)gc->datas[j]));
-          draw_line(ctx->barwin->dr, i, y, i, ys);
+          /* You divided by zero didn't you? */
+          if(gc->datas[j])
+          {
+               y = ys - (sq->geo.h / ((float)sq->data[2] / (float)gc->datas[j])) + 1;
+               draw_line(ctx->barwin->dr, i, y, i, ys);
+          }
      }
 }
 
@@ -243,8 +247,8 @@ status_parse(struct status_ctx *ctx)
                sq->geo.w = ATOI(arg[1 + shift]);
                sq->geo.h = ATOI(arg[2 + shift]);
 
-               sq->data[1] = ((tmp = ATOI(arg[3 + shift])) ? tmp : 1); /* Value */
-               sq->data[2] = ATOI(arg[4 + shift]);                     /* Value Max */
+               sq->data[1] = ATOI(arg[3 + shift]); /* Value */
+               sq->data[2] = ATOI(arg[4 + shift]); /* Value Max */
 
                sq->color   = color_atoh(arg[5 + shift]);
                sq->color2  = color_atoh(arg[6 + shift]);
