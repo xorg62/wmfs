@@ -76,21 +76,14 @@ status_free_ctx(struct status_ctx *ctx)
 static void
 status_graph_draw(struct status_ctx *ctx, struct status_seq *sq, struct status_gcache *gc)
 {
-     struct geo g =
-     {
-          sq->geo.x + sq->data[0],
-          sq->geo.y + sq->data[0],
-          sq->geo.w - sq->data[0] - sq->data[0],
-          sq->geo.h - sq->data[0] - sq->data[0]
-     };
      int i, j, y;
-     int ys = g.y + g.h;
+     int ys = sq->geo.y + sq->geo.h;
 
      XSetForeground(W->dpy, W->gc, sq->color2);
 
-     for(i = g.x + g.w, j = gc->ndata; j >= 0 && i >= g.x; --j, --i)
+     for(i = sq->geo.x + sq->geo.w, j = gc->ndata; j >= 0 && i >= sq->geo.x; --j, --i)
      {
-          y = g.y + g.h - (g.h / ((float)sq->data[2] / (float)gc->datas[j]));
+          y = ys - (sq->geo.h / ((float)sq->data[2] / (float)gc->datas[j]));
           draw_line(ctx->barwin->dr, i, y, i, ys);
      }
 }
@@ -98,7 +91,7 @@ status_graph_draw(struct status_ctx *ctx, struct status_seq *sq, struct status_g
 static void
 status_graph_process(struct status_ctx *ctx, struct status_seq *sq, char *name)
 {
-     int i, j;
+     int j;
      struct status_gcache *gc;
 
      /* Graph already exist and have a cache */
@@ -106,7 +99,7 @@ status_graph_process(struct status_ctx *ctx, struct status_seq *sq, char *name)
           if(!strcmp(name, gc->name))
           {
                /* shift buffer to remove unused old value */
-               if(gc->ndata > ((sq->geo.w - sq->data[0] - sq->data[0]) << 1))
+               if(gc->ndata > (sq->geo.w << 1))
                     for(gc->ndata /= 2, j = 0;
                         j < gc->ndata;
                         gc->datas[j] = gc->datas[j + gc->ndata], ++j);
@@ -238,24 +231,23 @@ status_parse(struct status_ctx *ctx)
                break;
 
           /*
-           * Graph sequence: \p[left/right;w;h;bord;val;valmax;bg;fg;name] OR x;y
+           * Graph sequence: \p[left/right;w;h;val;valmax;bg;fg;name] OR x;y
            */
           case 'g':
-               i = parse_args(p + 2, ';', ']', 10, arg);
-               STATUS_CHECK_ARGS(i, 8, 9, dstr, end);
-               sq = status_new_seq(type, i, 8, arg, &shift);
+               i = parse_args(p + 2, ';', ']', 9, arg);
+               STATUS_CHECK_ARGS(i, 7, 8, dstr, end);
+               sq = status_new_seq(type, i, 7, arg, &shift);
 
                sq->geo.w = ATOI(arg[1 + shift]);
                sq->geo.h = ATOI(arg[2 + shift]);
 
-               sq->data[0] = ATOI(arg[3 + shift]);                     /* Border */
-               sq->data[1] = ((tmp = ATOI(arg[4 + shift])) ? tmp : 1); /* Value */
-               sq->data[2] = ATOI(arg[5 + shift]);                     /* Value Max */
+               sq->data[1] = ((tmp = ATOI(arg[3 + shift])) ? tmp : 1); /* Value */
+               sq->data[2] = ATOI(arg[4 + shift]);                     /* Value Max */
 
-               sq->color   = color_atoh(arg[6 + shift]);
-               sq->color2  = color_atoh(arg[7 + shift]);
+               sq->color   = color_atoh(arg[5 + shift]);
+               sq->color2  = color_atoh(arg[6 + shift]);
 
-               sq->str = xstrdup(arg[8 + shift]);
+               sq->str = xstrdup(arg[7 + shift]);
 
                break;
 
