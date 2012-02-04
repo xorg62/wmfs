@@ -115,7 +115,16 @@ struct status_ctx
      struct theme *theme;
      char *status;
      bool update;
+     SLIST_HEAD(, status_gcache) gcache;
      SLIST_HEAD(, status_seq) statushead;
+};
+
+struct status_gcache
+{
+     char *name;
+     int *datas;
+     int ndata;
+     SLIST_ENTRY(status_gcache) next;
 };
 
 struct element
