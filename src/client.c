@@ -626,6 +626,8 @@ client_focus(struct client *c)
           }
 
           XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
+          XChangeProperty(W->dpy, W->root, W->net_atom[net_active_window], XA_WINDOW, 32,
+                          PropModeReplace, (unsigned char *)&c->win, 1);
      }
      else
      {

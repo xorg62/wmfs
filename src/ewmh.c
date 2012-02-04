@@ -134,8 +134,6 @@ ewmh_get_client_list(void)
                      PropModeReplace, (unsigned char *)list, win_n);
 
      XFree(list);
-
-     return;
 }
 
 /*
