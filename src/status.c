@@ -179,7 +179,7 @@ status_parse(struct status_ctx *ctx)
                while(*(end - 1) == '\\')
                     end = strchr(end + 1, ']');
 
-          if(!(strchr("sRpig", *p)) || !end)
+          if(!(strchr("sRpPig", *p)) || !end)
                continue;
 
           /* Then parse & list it */
@@ -218,8 +218,10 @@ status_parse(struct status_ctx *ctx)
 
           /*
            * Progress bar sequence: \p[left/right;w;h;bord;val;valmax;bg;fg] OR x;y
+           * Position bar sequence: \P[left/right;w;h;tickbord;val;valmax;bg;fg] OR x;y
            */
           case 'p':
+          case 'P':
                i = parse_args(p + 2, ';', ']', 9, arg);
                STATUS_CHECK_ARGS(i, 7, 8, dstr, end);
                sq = status_new_seq(type, i, 7, arg, &shift);
@@ -237,7 +239,7 @@ status_parse(struct status_ctx *ctx)
                break;
 
           /*
-           * Graph sequence: \p[left/right;w;h;val;valmax;bg;fg;name] OR x;y
+           * Graph sequence: \g[left/right;w;h;val;valmax;bg;fg;name] OR x;y
            */
           case 'g':
                i = parse_args(p + 2, ';', ']', 9, arg);
@@ -382,6 +384,24 @@ status_apply_list(struct status_ctx *ctx)
                     g.h /= ((float)sq->data[2] / (float)sq->data[1]);
                     g.y -= g.h;
                }
+
+               draw_rect(ctx->barwin->dr, &g, sq->color2);
+
+               STORE_MOUSEBIND();
+
+               break;
+
+          /* Position */
+          case 'P':
+               NOALIGN_Y();
+               STATUS_ALIGN(sq->align);
+
+               draw_rect(ctx->barwin->dr, &sq->geo, sq->color);
+
+               g.x = sq->geo.x + ((sq->geo.w - sq->data[0]) / ((float)sq->data[2] / (float)sq->data[1]));
+               g.y = sq->geo.y;
+               g.w = sq->data[0];
+               g.h = sq->geo.h;
 
                draw_rect(ctx->barwin->dr, &g, sq->color2);
 
