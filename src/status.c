@@ -545,6 +545,7 @@ static void
 status_surface(int w, int h, Color bg, char *status)
 {
      struct barwin *b;
+     struct screen *s;
      struct status_ctx ctx;
      int d, x, y;
 
@@ -552,6 +553,12 @@ status_surface(int w, int h, Color bg, char *status)
           return;
 
      XQueryPointer(W->dpy, W->root, (Window*)&d, (Window*)&d, &x, &y, &d, &d, (unsigned int *)&d);
+     s = screen_gb_geo(x, y);
+
+     if(x + w > s->geo.x + s->geo.w)
+          x -= w;
+     if(y + h > s->geo.y + s->geo.h)
+          y -= h;
 
      b = barwin_new(W->root, x, y, w, h, 0, bg, false);
      barwin_map(b);
