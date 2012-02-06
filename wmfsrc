@@ -30,7 +30,7 @@
 
      tags_occupied_fg = "#AABBAA"
      tags_occupied_bg = "#445544"
-     tags_occupied_statusline = "\R[0;0;3;3;#AABBAA]"
+     tags_occupied_statusline = "\R[0;0;100;1;#AABBAA]"
 
      tags_urgent_fg    = "#223322"
      tags_urgent_bg    = "#CC5544"
