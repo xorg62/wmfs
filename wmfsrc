@@ -93,6 +93,7 @@
   [tag]
       screen = -1
       name = "1"
+      # statusline=""
   [/tag]
 
   [tag] name = "2" [/tag]

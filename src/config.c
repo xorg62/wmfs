@@ -177,9 +177,10 @@ static void
 config_tag(void)
 {
      struct screen *s;
+     struct tag *t;
      size_t i, n;
      struct conf_sec *sec, **ks, **mb;
-     char *name;
+     char *name, *tmp;
      int screenid;
 
      /* [tags] */
@@ -202,7 +203,14 @@ config_tag(void)
 
           SLIST_FOREACH(s, &W->h.screen, next)
                if(screenid == s->id || screenid == -1)
-                    tag_new(s, name);
+               {
+                    t = tag_new(s, name);
+
+                    t->statusctx = status_new_ctx(NULL, NULL);
+                    ISTRDUP(t->statusctx.status, fetch_opt_first(ks[i], "", "statusline").str);
+                    if(t->statusctx.status)
+                         status_parse(&t->statusctx);
+               }
      }
 
      /* If no tag at all on a screen, add one anyway */

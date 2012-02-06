@@ -77,6 +77,9 @@ infobar_elem_tag_init(struct element *e)
                /* Init barwin */
                b = barwin_new(e->infobar->bar->win, j, 0, s, e->geo.h, 0, 0, false);
 
+               /* Status doesn't have theme yet */
+               t->statusctx.theme = e->infobar->theme;
+
                /* Set border */
                if(e->infobar->theme->tags_border_width)
                {
@@ -153,6 +156,10 @@ infobar_elem_tag_update(struct element *e)
           e->statusctx->barwin = b;
           status_copy_mousebind(e->statusctx);
           status_render(e->statusctx);
+
+          t->statusctx.barwin = b;
+          status_copy_mousebind(&t->statusctx);
+          status_render(&t->statusctx);
 
           draw_text(b->dr, e->infobar->theme, (PAD >> 1),
                     TEXTY(e->infobar->theme, e->geo.h), b->fg, t->name);

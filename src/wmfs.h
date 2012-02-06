@@ -175,6 +175,7 @@ struct tag
      struct client *sel;
      struct client *prevsel;
      struct tag *prev;
+     struct status_ctx statusctx;
      char *name;
      int id;
 #define TAG_URGENT       0x01
