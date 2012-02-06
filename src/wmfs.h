@@ -95,6 +95,7 @@ struct barwin
      SLIST_HEAD(, mousebind) statusmousebinds;
      SLIST_ENTRY(barwin) next;  /* global barwin */
      SLIST_ENTRY(barwin) enext; /* element barwin */
+     SLIST_ENTRY(barwin) vnext; /* volatile barwin */
 };
 
 struct status_seq
@@ -363,6 +364,7 @@ struct wmfs
           SLIST_HEAD(, rule) rule;
           SLIST_HEAD(, mousebind) mousebind;
           SLIST_HEAD(, launcher) launcher;
+          SLIST_HEAD(, barwin) vbarwin;
      } h;
 
      /*

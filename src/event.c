@@ -29,6 +29,7 @@ event_buttonpress(XEvent *e)
      struct barwin *b;
 
      screen_update_sel();
+     status_flush_surface();
 
      SLIST_FOREACH(b, &W->h.barwin, next)
           if(b->win == ev->window)
@@ -325,6 +326,7 @@ event_keypress(XEvent *e)
      struct keybind *k;
 
      screen_update_sel();
+     status_flush_surface();
 
      SLIST_FOREACH(k, &W->h.keybind, next)
           if(k->keysym == keysym && KEYPRESS_MASK(k->mod) == KEYPRESS_MASK(ev->state))

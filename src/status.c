@@ -528,6 +528,68 @@ status_manage(struct status_ctx *ctx)
      status_copy_mousebind(ctx);
 }
 
+void
+status_flush_surface(void)
+{
+     struct barwin *b;
+
+     while(!SLIST_EMPTY(&W->h.vbarwin))
+     {
+          b = SLIST_FIRST(&W->h.vbarwin);
+          SLIST_REMOVE_HEAD(&W->h.vbarwin, vnext);
+          barwin_remove(b);
+     }
+}
+
+static void
+status_surface(int w, int h, Color bg, char *status)
+{
+     struct barwin *b;
+     struct status_ctx ctx;
+     int d, x, y;
+
+     if(!status)
+          return;
+
+     XQueryPointer(W->dpy, W->root, (Window*)&d, (Window*)&d, &x, &y, &d, &d, (unsigned int *)&d);
+
+     b = barwin_new(W->root, x, y, w, h, 0, bg, false);
+     barwin_map(b);
+
+     ctx = status_new_ctx(b, SLIST_FIRST(&W->h.theme));
+     ctx.status = xstrdup(status);
+
+     SLIST_INSERT_HEAD(&W->h.vbarwin, b, vnext);
+
+     status_manage(&ctx);
+     status_free_ctx(&ctx);
+}
+
+void
+uicb_status_surface(Uicb cmd)
+{
+     char *p, *ccmd = xstrdup(cmd);
+     int w, h;
+     Color bg;
+
+     if(!ccmd || !(p = strchr(ccmd, ' ')))
+          return;
+
+     if(sscanf(ccmd, "%d,%d,#%x", &w, &h, &bg) != 3
+        || !w || !h)
+     {
+          free(ccmd);
+          return;
+     }
+
+     *p = '\0';
+     ++p;
+
+     status_surface(w, h, bg, p);
+
+     free(ccmd);
+}
+
 /* Syntax: "<infobar name> <status string>" */
 void
 uicb_status(Uicb cmd)

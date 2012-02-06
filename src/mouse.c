@@ -26,7 +26,7 @@ mouse_resize(struct client *c)
      int d, u, ox, oy, ix, iy;
      int mx, my;
 
-     XQueryPointer(W->dpy, W->root, &w, &w, &ox, &oy, &d, &d, (uint *)&u);
+     XQueryPointer(W->dpy, W->root, &w, &w, &ox, &oy, &d, &d, (unsigned int *)&u);
      XGrabServer(W->dpy);
 
      if(c->flags & CLIENT_FREE)

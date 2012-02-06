@@ -83,7 +83,8 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "client_tab_next_opened",  uicb_client_tab_next_opened },
 
      /* Status */
-     { "status" , uicb_status },
+     { "status" ,        uicb_status },
+     { "status_surface", uicb_status_surface },
 
      /* Mouse */
      { "mouse_resize", uicb_mouse_resize },
