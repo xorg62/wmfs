@@ -542,17 +542,19 @@ status_flush_surface(void)
 }
 
 static void
-status_surface(int w, int h, Color bg, char *status)
+status_surface(int x, int y, int w, int h, Color bg, char *status)
 {
      struct barwin *b;
      struct screen *s;
      struct status_ctx ctx;
-     int d, x, y;
+     int d;
 
      if(!status)
           return;
 
-     XQueryPointer(W->dpy, W->root, (Window*)&d, (Window*)&d, &x, &y, &d, &d, (unsigned int *)&d);
+     if(x + y < 0)
+          XQueryPointer(W->dpy, W->root, (Window*)&d, (Window*)&d, &x, &y, &d, &d, (unsigned int *)&d);
+
      s = screen_gb_geo(x, y);
 
      if(x + w > s->geo.x + s->geo.w)
@@ -576,23 +578,23 @@ void
 uicb_status_surface(Uicb cmd)
 {
      char *p, *ccmd = xstrdup(cmd);
-     int w, h;
+     int s, d = 0, w, h, x = -1, y = -1;
      Color bg;
 
      if(!ccmd || !(p = strchr(ccmd, ' ')))
           return;
 
-     if(sscanf(ccmd, "%d,%d,#%x", &w, &h, &bg) != 3
-        || !w || !h)
+     *p = '\0';
+     ++p;
+
+     if(!(((s = sscanf(ccmd, "%d,%d,#%x", &w, &h, &bg)) == 3)
+        || (s = sscanf(ccmd, "%d,%d,%d,%d,#%x", &x, &y, &w, &h, &bg)) == 5))
      {
           free(ccmd);
           return;
      }
 
-     *p = '\0';
-     ++p;
-
-     status_surface(w, h, bg, p);
+     status_surface(x, y, w, h, bg, p);
 
      free(ccmd);
 }
