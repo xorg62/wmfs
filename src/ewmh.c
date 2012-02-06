@@ -193,30 +193,29 @@ void
 ewmh_manage_state(long data[], struct client *c)
 {
      /* _NET_WM_STATE_FULLSCREEN */
-     if(data[1] == (long)W->net_atom[net_wm_state_fullscreen])
+     if(data[1] == (long)W->net_atom[net_wm_state_fullscreen]
+        || data[2] == (long)W->net_atom[net_wm_state_fullscreen])
      {
           if(data[0] == _NET_WM_STATE_ADD
              || (data[0] == _NET_WM_STATE_TOGGLE && !(c->flags & CLIENT_FULLSCREEN)))
           {
                c->flags |= CLIENT_FULLSCREEN;
 
+               XChangeProperty(W->dpy, c->win, W->net_atom[net_wm_state], XA_ATOM, 32, PropModeReplace,
+                               (unsigned char*)&W->net_atom[net_wm_state_fullscreen], 1);
                XReparentWindow(W->dpy, c->win, W->root, c->screen->geo.x, c->screen->geo.y);
                XResizeWindow(W->dpy, c->win, c->screen->geo.w, c->screen->geo.h);
-               XChangeProperty(W->dpy, c->win, W->net_atom[net_wm_state], XA_ATOM, 32, PropModeReplace,
-                               (unsigned char*)&W->net_atom[net_wm_state_fullscreen], true);
 
                client_focus(c);
 
                XRaiseWindow(W->dpy, c->win);
           }
-          else if(data[0] == _NET_WM_STATE_REMOVE
-                  || (data[0] == _NET_WM_STATE_TOGGLE && c->flags & CLIENT_FULLSCREEN))
+          else
           {
                c->flags &= ~CLIENT_FULLSCREEN;
-
-               XReparentWindow(W->dpy, c->win, c->frame, c->wgeo.x, c->wgeo.y);
                XChangeProperty(W->dpy, c->win, W->net_atom[net_wm_state], XA_ATOM, 32, PropModeReplace,
-                               (unsigned char*)&W->net_atom[net_wm_state_fullscreen], false);
+                               (unsigned char*)0, 0);
+               XReparentWindow(W->dpy, c->win, c->frame, c->wgeo.x, c->wgeo.y);
 
                client_moveresize(c, &c->geo);
           }
