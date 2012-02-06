@@ -181,7 +181,7 @@ uicb_tag_client(Uicb cmd)
      struct tag *t;
      int id = ATOI(cmd);
 
-     if((t = tag_gb_id(W->screen, id)))
+     if(W->client && (t = tag_gb_id(W->screen, id)))
           tag_client(t, W->client);
 }
 
@@ -190,6 +190,9 @@ uicb_tag_move_client_next(Uicb cmd)
 {
      (void)cmd;
      struct tag *t;
+
+     if(!W->client)
+          return;
 
      if((t = TAILQ_NEXT(W->screen->seltag, next)))
           tag_client(t, W->client);
@@ -202,6 +205,9 @@ uicb_tag_move_client_prev(Uicb cmd)
 {
      (void)cmd;
      struct tag *t;
+
+     if(!W->client)
+          return;
 
      if((t = TAILQ_PREV(W->screen->seltag, tsub, next)))
           tag_client(t, W->client);
