@@ -61,6 +61,7 @@ infobar_elem_tag_init(struct element *e)
      e->geo.h -= (e->infobar->theme->tags_border_width << 1);
 
      e->statusctx = &e->infobar->theme->tags_n_sl;
+     e->statusctx->flags |= STATUS_BLOCK_REFRESH;
 
      if(SLIST_EMPTY(&e->bars) || (e->infobar->screen->flags & SCREEN_TAG_UPDATE))
      {
@@ -79,6 +80,7 @@ infobar_elem_tag_init(struct element *e)
 
                /* Status doesn't have theme yet */
                t->statusctx.theme = e->infobar->theme;
+               t->statusctx.flags |= STATUS_BLOCK_REFRESH;
 
                /* Set border */
                if(e->infobar->theme->tags_border_width)

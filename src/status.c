@@ -453,7 +453,8 @@ status_render(struct status_ctx *ctx)
      if(!ctx->status)
           return;
 
-     barwin_refresh_color(ctx->barwin);
+     if(!(ctx->flags & STATUS_BLOCK_REFRESH))
+          barwin_refresh_color(ctx->barwin);
 
      /* Use simple text instead sequence if no sequence found */
      if(SLIST_EMPTY(&ctx->statushead))

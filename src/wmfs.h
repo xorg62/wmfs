@@ -113,6 +113,8 @@ struct status_ctx
 {
      struct barwin *barwin;
      struct theme *theme;
+#define STATUS_BLOCK_REFRESH 0x01
+     Flags flags;
      char *status;
      bool update;
      SLIST_HEAD(, status_gcache) gcache;
