@@ -92,6 +92,8 @@ tag_client(struct tag *t, struct client *c)
 
      c->flags &= ~CLIENT_RULED;
 
+     infobar_elem_screen_update(c->screen, ElemTag);
+
      /* Client remove */
      if(!t)
           return;
@@ -103,8 +105,6 @@ tag_client(struct tag *t, struct client *c)
      client_update_props(c, CPROP_LOC);
 
      SLIST_INSERT_HEAD(&t->clients, c, tnext);
-
-     infobar_elem_screen_update(t->screen, ElemTag);
 
      if(c->flags & CLIENT_TABMASTER && c->prevtag)
      {
