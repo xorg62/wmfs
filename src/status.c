@@ -565,7 +565,8 @@ status_surface(int x, int y, int w, int h, Color bg, char *status)
      b = barwin_new(W->root, x, y, w, h, 0, bg, false);
      barwin_map(b);
 
-     ctx = status_new_ctx(b, SLIST_FIRST(&W->h.theme));
+     /* Use client theme */
+     ctx = status_new_ctx(b, W->ctheme);
      ctx.status = xstrdup(status);
 
      SLIST_INSERT_HEAD(&W->h.vbarwin, b, vnext);
