@@ -578,7 +578,7 @@ void
 uicb_status_surface(Uicb cmd)
 {
      char *p, *ccmd = xstrdup(cmd);
-     int s, d = 0, w, h, x = -1, y = -1;
+     int s, w, h, x = -1, y = -1;
      Color bg;
 
      if(!ccmd || !(p = strchr(ccmd, ' ')))
