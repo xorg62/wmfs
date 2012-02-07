@@ -55,7 +55,7 @@ l41="^s[15;620;#7D7D7D;toggle client free:  Super + f]"
 l42="^s[15;640;#7D7D7D;prev/next tag:       Control + Left/Right]"
 l43="^s[15;655;#7D7D7D;prev/next screen:    Control + Up/Down]"
 l44="^s[15;670;#7D7D7D;set tag (x):         Super + F(x)]"
-l45="^s[15;805;#7D7D7D;tag client with (x): Super + Shift + F(x)]"
+l45="^s[15;685;#7D7D7D;tag client with (x): Super + Shift + F(x)]"
 l46="^s[15;700;#7D7D7D;add tag:             Super + -]"
 l47="^s[15;715;#7D7D7D;delete tag:          Super + Shift + -]"
 
