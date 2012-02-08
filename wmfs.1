@@ -477,6 +477,59 @@ uicb function to launch\&.
 \fB\ cmd\fR
 if\fB\ func = "spawn"\fR set the external command to launch\&.
 .sp
+.SH "STATUS"
+statusbars, tags, surfaces and titlebars support sequences to display text, images bars and graphs through the\fB\ wmfs -c status\fR command.
+.PP
+\fB\ Syntax\fR
+.PP
+.RS 4
+\fB\ position:\fR “left/right” (relative) or “x;y” (absolute)\&.
+.PP
+\fB\ dimension:\fR “ww;hh” for width;height of the rectangle or the image, to display an image at its original size, set it to “0;0”\&.
+.PP
+\fB\ color:\fR ”#rrggbb”\&.
+.PP
+\fB\ imagepath:\fR absolute path for the image\&.
+.PP
+\fB\ border:\fR width of the progressbar border in pixels\&.
+.PP
+\fB\ curser:\fR width of the curser in the positionbar\&.
+.PP
+\fB\ value:\fR a variable, to draw progressbar\&.
+.PP
+\fB\ valuemax:\fR maximum value of the ‘value’ used in the progressbar\&.
+.RE
+.PP
+\fB\ basic usage\fR
+wmfs -c status "<barname> TEXT visible on 'barname'"\&.
+.PP
+\fB\ display colors\fR
+wmfs -c status "<barname> ^s[<position>;<color>;<text>]"\&.
+.PP
+\fB\ display rectangles\fR
+wmfs -c status "<barname> ^R[<position>;<dimensions>;<color>]"\&.
+.PP
+\fB\ display images\fR
+wmfs -c status "<barname> ^i[<position>;<dimensions>;<imagepath>]"\&.
+.PP
+\fB\ display progressbars\fR
+wmfs -c status "<barname> ^p[<position>;<dimensions>;<border>;<value>;<valuemax>;<bgcolor>;<fgcolor>]"\&.
+.PP
+\fB\ display positionbars\fR
+wmfs -c status "<barname> ^P[<position>;<dimensions>;<curser>;<value>;<valuemax>;<bgcolor>;<fgcolor>]"\&.
+.PP
+\fB\ display graph\fR
+wmfs -c status "<barname> ^g[<position>;<dimensions>;<value>;<valuemax>;<bgcolor>;<fgcolor>;<name>]"\&.
+.RE
+.PP
+\fB\ mousebinds\fR
+sequences supports mousebinds with format\fB\ (<key>;<uicb-function>)\fR or\fB\ (<key>;<spawn>;<command>)\fR
+.RE
+.PP
+\fB\ surfaces\fR
+you can display popups from the statusbar with the mousebind\fB\ (<key>;status_surface;<position>,<dimension>,<color> <datas>)\fR
+.PP 
+.sp
 .SH "UICB Functions"
 UICB functions list. for “User Interface Call Backs”\&.
 .PP
