@@ -57,6 +57,9 @@ install: all
 	@echo installing default config file to ${DESTDIR}${XDG_CONFIG_DIR}/wmfs/
 	mkdir -p ${DESTDIR}${XDG_CONFIG_DIR}/wmfs/
 	install -m 444 wmfsrc ${DESTDIR}${XDG_CONFIG_DIR}/wmfs/
+	@echo installing manual pages to ${DESTDIR}${MANPREFIX}/man1/
+	mkdir -p ${DESTDIR}${MANPREFIX}/man1/
+	install -m 644 wmfs.1 ${DESTDIR}${MANPREFIX}/man1/wmfs.1
 
 uninstall:
 	@echo removing executable file from ${DESTDIR}${PREFIX}/bin
@@ -65,6 +68,8 @@ uninstall:
 	@echo removing config file from ${DESTDIR}${XDG_CONFIG_DIR}/wmfs/
 	rm -f ${DESTDIR}${XDG_CONFIG_DIR}/wmfs/wmfsrc
 	rmdir ${DESTDIR}${XDG_CONFIG_DIR}/wmfs/
+	@echo removing manual pages from ${DESTDIR}${MANPREFIX}/man1
+	rm -f ${DESTDIR}${MANPREFIX}/man1/wmfs.1
 
 dist:
 	@echo "Generate wmfs-`date +%Y%m`.tar.gz"
