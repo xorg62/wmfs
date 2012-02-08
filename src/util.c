@@ -149,7 +149,7 @@ parse_args(char *str, char delim, char end, int narg, char *args[])
      int i = 0;
 
      for(args[0] = str; *str && (*str != end || *(str - 1) == '\\') && i < narg; ++str)
-          if(*str == delim)
+          if(*str == delim && i < narg - 1)
           {
                *str = '\0';
                args[++i] = ++str;

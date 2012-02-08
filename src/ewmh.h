@@ -118,6 +118,7 @@ ewmh_send_message(Window d, Window w, char *atom, long d0, long d1, long d2, lon
 
 void ewmh_init(void);
 void ewmh_set_wm_state(Window w, int state);
+void ewmh_get_client_list(void);
 long ewmh_get_xembed_state(Window win);
 void ewmh_update_wmfs_props(void);
 void ewmh_manage_state(long data[], struct client *c);

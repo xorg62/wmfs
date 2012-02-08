@@ -12,6 +12,14 @@
 #include "status.h"
 #include "systray.h"
 
+#define ELEM_FREE_BARWIN(e)                     \
+     while(!SLIST_EMPTY(&e->bars))              \
+     {                                          \
+          b = SLIST_FIRST(&e->bars);            \
+          SLIST_REMOVE_HEAD(&e->bars, enext);   \
+          barwin_remove(b);                     \
+     }
+
 static void infobar_elem_tag_init(struct element *e);
 static void infobar_elem_tag_update(struct element *e);
 static void infobar_elem_status_init(struct element *e);
@@ -53,15 +61,26 @@ infobar_elem_tag_init(struct element *e)
      e->geo.h -= (e->infobar->theme->tags_border_width << 1);
 
      e->statusctx = &e->infobar->theme->tags_n_sl;
+     e->statusctx->flags |= STATUS_BLOCK_REFRESH;
 
-     if(SLIST_EMPTY(&e->bars))
+     if(SLIST_EMPTY(&e->bars) || (e->infobar->screen->flags & SCREEN_TAG_UPDATE))
      {
+          if((e->infobar->screen->flags & SCREEN_TAG_UPDATE))
+          {
+               ELEM_FREE_BARWIN(e);
+               SLIST_INIT(&e->bars);
+          }
+
           TAILQ_FOREACH(t, &e->infobar->screen->tags, next)
           {
                s = draw_textw(e->infobar->theme, t->name) + PAD;
 
                /* Init barwin */
                b = barwin_new(e->infobar->bar->win, j, 0, s, e->geo.h, 0, 0, false);
+
+               /* Status doesn't have theme yet */
+               t->statusctx.theme = e->infobar->theme;
+               t->statusctx.flags |= STATUS_BLOCK_REFRESH;
 
                /* Set border */
                if(e->infobar->theme->tags_border_width)
@@ -139,6 +158,10 @@ infobar_elem_tag_update(struct element *e)
           e->statusctx->barwin = b;
           status_copy_mousebind(e->statusctx);
           status_render(e->statusctx);
+
+          t->statusctx.barwin = b;
+          status_copy_mousebind(&t->statusctx);
+          status_render(&t->statusctx);
 
           draw_text(b->dr, e->infobar->theme, (PAD >> 1),
                     TEXTY(e->infobar->theme, e->geo.h), b->fg, t->name);
@@ -380,12 +403,7 @@ infobar_elem_remove(struct element *e)
 
      TAILQ_REMOVE(&e->infobar->elements, e, next);
 
-     while(!SLIST_EMPTY(&e->bars))
-     {
-          b = SLIST_FIRST(&e->bars);
-          SLIST_REMOVE_HEAD(&e->bars, enext);
-          barwin_remove(b);
-     }
+     ELEM_FREE_BARWIN(e);
 
      free(e);
 }

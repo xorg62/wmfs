@@ -40,8 +40,24 @@ status_new_ctx(struct barwin *b, struct theme *t)
      struct status_ctx ctx = { .barwin = b, .theme = t };
 
      SLIST_INIT(&ctx.statushead);
+     SLIST_INIT(&ctx.gcache);
 
      return ctx;
+}
+
+static void
+status_gcache_free(struct status_ctx *ctx)
+{
+     struct status_gcache *gc;
+
+     while(!SLIST_EMPTY(&ctx->gcache))
+     {
+          gc = SLIST_FIRST(&ctx->gcache);
+          SLIST_REMOVE_HEAD(&ctx->gcache, next);
+          free(gc->datas);
+          free(gc->name);
+          free(gc);
+     }
 }
 
 void
@@ -53,6 +69,62 @@ status_free_ctx(struct status_ctx *ctx)
           SLIST_INIT(&ctx->barwin->statusmousebinds);
 
      status_flush_list(ctx);
+     status_gcache_free(ctx);
+
+}
+
+static void
+status_graph_draw(struct status_ctx *ctx, struct status_seq *sq, struct status_gcache *gc)
+{
+     int i, j, y;
+     int ys = sq->geo.y + sq->geo.h - 1;
+
+     XSetForeground(W->dpy, W->gc, sq->color2);
+
+     for(i = sq->geo.x + sq->geo.w - 1, j = gc->ndata - 1;
+         j >= 0 && i >= sq->geo.x;
+         --j, --i)
+     {
+          /* You divided by zero didn't you? */
+          if(gc->datas[j])
+          {
+               y = ys - (sq->geo.h / ((float)sq->data[2] / (float)gc->datas[j])) + 1;
+               draw_line(ctx->barwin->dr, i, y, i, ys);
+          }
+     }
+}
+
+static void
+status_graph_process(struct status_ctx *ctx, struct status_seq *sq, char *name)
+{
+     int j;
+     struct status_gcache *gc;
+
+     /* Graph already exist and have a cache */
+     SLIST_FOREACH(gc, &ctx->gcache, next)
+          if(!strcmp(name, gc->name))
+          {
+               /* shift buffer to remove unused old value */
+               if(gc->ndata > (sq->geo.w << 1))
+                    for(gc->ndata /= 2, j = 0;
+                        j < gc->ndata;
+                        gc->datas[j] = gc->datas[j + gc->ndata], ++j);
+
+               gc->datas[gc->ndata++] = sq->data[1];
+               status_graph_draw(ctx, sq, gc);
+               return;
+          }
+
+     /* No? Make a cache for it */
+     gc = xcalloc(1, sizeof(struct status_gcache));
+     gc->name = xstrdup(name);
+     gc->ndata = 1;
+     gc->datas = xcalloc(sq->geo.w + sq->geo.w, sizeof(int));
+     gc->datas[0] = sq->data[1];
+
+     SLIST_INSERT_HEAD(&ctx->gcache, gc, next);
+
+     status_graph_draw(ctx, sq, gc);
 }
 
 /* Parse mousebind sequence next normal sequence: \<seq>[](button;func;cmd) */
@@ -90,9 +162,9 @@ void
 status_parse(struct status_ctx *ctx)
 {
      struct status_seq *sq, *prev = NULL;
-     int i, shift = 0;
+     int i, tmp, shift = 0;
      char *dstr = xstrdup(ctx->status), *sauv = dstr;
-     char type, *p, *pp, *end, *arg[6] = { NULL };
+     char type, *p, *pp, *end, *arg[10] = { NULL };
 
      for(; *dstr; ++dstr)
      {
@@ -107,7 +179,7 @@ status_parse(struct status_ctx *ctx)
                while(*(end - 1) == '\\')
                     end = strchr(end + 1, ']');
 
-          if(!(strchr("sRi", *p)) || !end)
+          if(!(strchr("sRpPig", *p)) || !end)
                continue;
 
           /* Then parse & list it */
@@ -145,6 +217,49 @@ status_parse(struct status_ctx *ctx)
                break;
 
           /*
+           * Progress bar sequence: \p[left/right;w;h;bord;val;valmax;bg;fg] OR x;y
+           * Position bar sequence: \P[left/right;w;h;tickbord;val;valmax;bg;fg] OR x;y
+           */
+          case 'p':
+          case 'P':
+               i = parse_args(p + 2, ';', ']', 9, arg);
+               STATUS_CHECK_ARGS(i, 7, 8, dstr, end);
+               sq = status_new_seq(type, i, 7, arg, &shift);
+
+               sq->geo.w = ATOI(arg[1 + shift]);
+               sq->geo.h = ATOI(arg[2 + shift]);
+
+               sq->data[0] = ATOI(arg[3 + shift]);                     /* Border */
+               sq->data[1] = ((tmp = ATOI(arg[4 + shift])) ? tmp : 1); /* Value */
+               sq->data[2] = ATOI(arg[5 + shift]);                     /* Value Max */
+
+               sq->color   = color_atoh(arg[6 + shift]);
+               sq->color2  = color_atoh(arg[7 + shift]);
+
+               break;
+
+          /*
+           * Graph sequence: \g[left/right;w;h;val;valmax;bg;fg;name] OR x;y
+           */
+          case 'g':
+               i = parse_args(p + 2, ';', ']', 9, arg);
+               STATUS_CHECK_ARGS(i, 7, 8, dstr, end);
+               sq = status_new_seq(type, i, 7, arg, &shift);
+
+               sq->geo.w = ATOI(arg[1 + shift]);
+               sq->geo.h = ATOI(arg[2 + shift]);
+
+               sq->data[1] = ATOI(arg[3 + shift]); /* Value */
+               sq->data[2] = ATOI(arg[4 + shift]); /* Value Max */
+
+               sq->color   = color_atoh(arg[5 + shift]);
+               sq->color2  = color_atoh(arg[6 + shift]);
+
+               sq->str = xstrdup(arg[7 + shift]);
+
+               break;
+
+          /*
            * Image sequence: \i[left/right;w;h;/path/img] OR \i[x;y;w;h;/path/img]
            */
 #ifdef HAVE_IMLIB2
@@ -161,7 +276,7 @@ status_parse(struct status_ctx *ctx)
 #endif /* HAVE_IMLIB2 */
           }
 
-          if (sq->align == Right)
+          if(sq->align == Right)
               SLIST_INSERT_HEAD(&ctx->statushead, sq, next);
           else
               SLIST_INSERT_TAIL(&ctx->statushead, sq, next, prev);
@@ -195,11 +310,21 @@ status_parse(struct status_ctx *ctx)
           sq->geo.x = ctx->barwin->geo.w - right - sq->geo.w;     \
           right += sq->geo.w;                                     \
      }
+
+#define STORE_MOUSEBIND()                                       \
+     if(!SLIST_EMPTY(&sq->mousebinds))                          \
+          SLIST_FOREACH(m, &sq->mousebinds, snext)              \
+               m->area = sq->geo;
+
+#define NOALIGN_Y()                                                     \
+     if(sq->align != NoAlign)                                           \
+          sq->geo.y = (ctx->barwin->geo.h >> 1) - (sq->geo.h >> 1);
 static void
 status_apply_list(struct status_ctx *ctx)
 {
      struct status_seq *sq;
      struct mousebind *m;
+     struct geo g;
      int left = 0, right = 0, w, h;
 
      SLIST_FOREACH(sq, &ctx->statushead, next)
@@ -229,16 +354,71 @@ status_apply_list(struct status_ctx *ctx)
 
           /* Rectangle */
           case 'R':
-               if(sq->align != NoAlign)
-                    sq->geo.y = (ctx->barwin->geo.h >> 1) - (sq->geo.h >> 1);
-
+               NOALIGN_Y();
                STATUS_ALIGN(sq->align);
 
                draw_rect(ctx->barwin->dr, &sq->geo, sq->color);
 
-               if(!SLIST_EMPTY(&sq->mousebinds))
-                    SLIST_FOREACH(m, &sq->mousebinds, snext)
-                         m->area = sq->geo;
+               STORE_MOUSEBIND();
+
+               break;
+
+          /* Progress */
+          case 'p':
+               NOALIGN_Y();
+               STATUS_ALIGN(sq->align);
+
+               draw_rect(ctx->barwin->dr, &sq->geo, sq->color);
+
+               /* Progress bar geo */
+               g.x = sq->geo.x + sq->data[0];
+               g.y = sq->geo.y + sq->data[0];
+               g.w = sq->geo.w - sq->data[0] - sq->data[0];
+               g.h = sq->geo.h - sq->data[0] - sq->data[0];
+
+               if(sq->geo.w > sq->geo.h)
+                    g.w /= ((float)sq->data[2] / (float)sq->data[1]);
+               else
+               {
+                    g.y += g.h;
+                    g.h /= ((float)sq->data[2] / (float)sq->data[1]);
+                    g.y -= g.h;
+               }
+
+               draw_rect(ctx->barwin->dr, &g, sq->color2);
+
+               STORE_MOUSEBIND();
+
+               break;
+
+          /* Position */
+          case 'P':
+               NOALIGN_Y();
+               STATUS_ALIGN(sq->align);
+
+               draw_rect(ctx->barwin->dr, &sq->geo, sq->color);
+
+               g.x = sq->geo.x + ((sq->geo.w - sq->data[0]) / ((float)sq->data[2] / (float)sq->data[1]));
+               g.y = sq->geo.y;
+               g.w = sq->data[0];
+               g.h = sq->geo.h;
+
+               draw_rect(ctx->barwin->dr, &g, sq->color2);
+
+               STORE_MOUSEBIND();
+
+               break;
+
+          /* Graph */
+          case 'g':
+               NOALIGN_Y();
+               STATUS_ALIGN(sq->align);
+
+               draw_rect(ctx->barwin->dr, &sq->geo, sq->color);
+
+               status_graph_process(ctx, sq, sq->str);
+
+               STORE_MOUSEBIND();
 
                break;
 
@@ -256,12 +436,8 @@ status_apply_list(struct status_ctx *ctx)
                     sq->geo.y = (ctx->barwin->geo.h >> 1) - (sq->geo.h >> 1);
 
                STATUS_ALIGN(sq->align);
-
                draw_image(ctx->barwin->dr, &sq->geo);
-
-               if(!SLIST_EMPTY(&sq->mousebinds))
-                    SLIST_FOREACH(m, &sq->mousebinds, snext)
-                         m->area = sq->geo;
+               STORE_MOUSEBIND();
 
                break;
 #endif /* HAVE_IMLIB2 */
@@ -277,7 +453,8 @@ status_render(struct status_ctx *ctx)
      if(!ctx->status)
           return;
 
-     barwin_refresh_color(ctx->barwin);
+     if(!(ctx->flags & STATUS_BLOCK_REFRESH))
+          barwin_refresh_color(ctx->barwin);
 
      /* Use simple text instead sequence if no sequence found */
      if(SLIST_EMPTY(&ctx->statushead))
@@ -349,6 +526,78 @@ status_manage(struct status_ctx *ctx)
      status_parse(ctx);
      status_render(ctx);
      status_copy_mousebind(ctx);
+}
+
+void
+status_flush_surface(void)
+{
+     struct barwin *b;
+
+     while(!SLIST_EMPTY(&W->h.vbarwin))
+     {
+          b = SLIST_FIRST(&W->h.vbarwin);
+          SLIST_REMOVE_HEAD(&W->h.vbarwin, vnext);
+          barwin_remove(b);
+     }
+}
+
+static void
+status_surface(int x, int y, int w, int h, Color bg, char *status)
+{
+     struct barwin *b;
+     struct screen *s;
+     struct status_ctx ctx;
+     int d;
+
+     if(!status)
+          return;
+
+     if(x + y < 0)
+          XQueryPointer(W->dpy, W->root, (Window*)&d, (Window*)&d, &x, &y, &d, &d, (unsigned int *)&d);
+
+     s = screen_gb_geo(x, y);
+
+     if(x + w > s->geo.x + s->geo.w)
+          x -= w;
+     if(y + h > s->geo.y + s->geo.h)
+          y -= h;
+
+     b = barwin_new(W->root, x, y, w, h, 0, bg, false);
+     barwin_map(b);
+
+     /* Use client theme */
+     ctx = status_new_ctx(b, W->ctheme);
+     ctx.status = xstrdup(status);
+
+     SLIST_INSERT_HEAD(&W->h.vbarwin, b, vnext);
+
+     status_manage(&ctx);
+     status_free_ctx(&ctx);
+}
+
+void
+uicb_status_surface(Uicb cmd)
+{
+     char *p, *ccmd = xstrdup(cmd);
+     int s, w, h, x = -1, y = -1;
+     Color bg;
+
+     if(!ccmd || !(p = strchr(ccmd, ' ')))
+          return;
+
+     *p = '\0';
+     ++p;
+
+     if(!(((s = sscanf(ccmd, "%d,%d,#%x", &w, &h, &bg)) == 3)
+        || (s = sscanf(ccmd, "%d,%d,%d,%d,#%x", &x, &y, &w, &h, &bg)) == 5))
+     {
+          free(ccmd);
+          return;
+     }
+
+     status_surface(x, y, w, h, bg, p);
+
+     free(ccmd);
 }
 
 /* Syntax: "<infobar name> <status string>" */

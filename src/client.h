@@ -58,6 +58,7 @@ void client_update_props(struct client *c, Flags f);
 void client_fac_hint(struct client *c);
 void uicb_client_untab(Uicb cmd);
 void uicb_client_toggle_free(Uicb cmd);
+void uicb_client_tab_next_opened(Uicb cmd);
 
 /* Generated */
 void uicb_client_resize_Right(Uicb);

@@ -389,8 +389,17 @@ layout_split_integrate(struct client *c, struct client *sc)
           {
                client_maximize(c);
                c->flags |= CLIENT_TILED;
+               W->flags &= ~WMFS_TABNOC;
                return;
           }
+     }
+
+     /* Tab Next Opened Client */
+     if(W->flags & WMFS_TABNOC)
+     {
+          W->flags ^= WMFS_TABNOC;
+          _client_tab(c, sc);
+          return;
      }
 
      c->flags |= CLIENT_TILED;

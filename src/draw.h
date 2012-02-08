@@ -83,6 +83,12 @@ draw_reversed_rect(Drawable dr, struct client *c, bool t)
                     g->h - (i << 1));
 }
 
+static inline void
+draw_line(Drawable d, int x1, int y1, int x2, int y2)
+{
+     XDrawLine(W->dpy, d, W->gc, x1, y1, x2, y2);
+}
+
 static inline unsigned short
 draw_textw(struct theme *t, const char *str)
 {

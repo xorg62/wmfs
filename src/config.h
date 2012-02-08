@@ -38,6 +38,8 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "tag_move_client_next", uicb_tag_move_client_next },
      { "tag_move_client_prev", uicb_tag_move_client_prev },
      { "tag_click",            uicb_tag_click },
+     { "tag_new",              uicb_tag_new },
+     { "tag_del",              uicb_tag_del },
 
      /* Layout */
      { "layout_vmirror",          uicb_layout_vmirror },
@@ -78,9 +80,11 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "client_focus_prev_tab",   uicb_client_focus_prev_tab },
      { "client_focus_click",      uicb_client_focus_click },
      { "client_toggle_free",      uicb_client_toggle_free },
+     { "client_tab_next_opened",  uicb_client_tab_next_opened },
 
      /* Status */
-     { "status" , uicb_status },
+     { "status" ,        uicb_status },
+     { "status_surface", uicb_status_surface },
 
      /* Mouse */
      { "mouse_resize", uicb_mouse_resize },

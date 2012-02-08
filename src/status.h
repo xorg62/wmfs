@@ -16,6 +16,8 @@ void status_copy_mousebind(struct status_ctx *ctx);
 void status_parse(struct status_ctx *ctx);
 void status_render(struct status_ctx *ctx);
 void status_manage(struct status_ctx *ctx);
+void status_flush_surface(void);
 void uicb_status(Uicb cmd);
+void uicb_status_surface(Uicb cmd);
 
 #endif /* STATUS_H */

@@ -95,15 +95,17 @@ struct barwin
      SLIST_HEAD(, mousebind) statusmousebinds;
      SLIST_ENTRY(barwin) next;  /* global barwin */
      SLIST_ENTRY(barwin) enext; /* element barwin */
+     SLIST_ENTRY(barwin) vnext; /* volatile barwin */
 };
 
 struct status_seq
 {
      struct geo geo;
      enum position align;
+     int data[4];
      char type;
      char *str;
-     Color color;
+     Color color, color2;
      SLIST_HEAD(, mousebind) mousebinds;
      SLIST_ENTRY(status_seq) next;
 };
@@ -112,9 +114,20 @@ struct status_ctx
 {
      struct barwin *barwin;
      struct theme *theme;
+#define STATUS_BLOCK_REFRESH 0x01
+     Flags flags;
      char *status;
      bool update;
+     SLIST_HEAD(, status_gcache) gcache;
      SLIST_HEAD(, status_seq) statushead;
+};
+
+struct status_gcache
+{
+     char *name;
+     int *datas;
+     int ndata;
+     SLIST_ENTRY(status_gcache) next;
 };
 
 struct element
@@ -149,6 +162,8 @@ struct screen
 {
      struct geo geo, ugeo;
      struct tag *seltag;
+#define SCREEN_TAG_UPDATE 0x01
+     Flags flags;
      int id;
      TAILQ_HEAD(tsub, tag) tags;
      SLIST_HEAD(, infobar) infobars;
@@ -163,6 +178,7 @@ struct tag
      struct client *sel;
      struct client *prevsel;
      struct tag *prev;
+     struct status_ctx statusctx;
      char *name;
      int id;
 #define TAG_URGENT       0x01
@@ -274,7 +290,7 @@ struct rule
      char *name;
      int tag, screen;
 #define RULE_FREE       0x01
-#define RULE_MAX        0x02
+#define RULE_TAB        0x02
 #define RULE_IGNORE_TAG 0x04
      Flags flags;
      SLIST_ENTRY(rule) next;
@@ -325,6 +341,7 @@ struct wmfs
 #define WMFS_LOG      0x10
 #define WMFS_LAUNCHER 0x20
 #define WMFS_SIGCHLD  0x40
+#define WMFS_TABNOC   0x80 /* tab next opened client */
      Flags flags;
      GC gc, rgc;
      Atom *net_atom;
@@ -347,6 +364,7 @@ struct wmfs
           SLIST_HEAD(, rule) rule;
           SLIST_HEAD(, mousebind) mousebind;
           SLIST_HEAD(, launcher) launcher;
+          SLIST_HEAD(, barwin) vbarwin;
      } h;
 
      /*

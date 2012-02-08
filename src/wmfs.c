@@ -160,6 +160,7 @@ wmfs_xinit(void)
       * Barwin linked list
       */
      SLIST_INIT(&W->h.barwin);
+     SLIST_INIT(&W->h.vbarwin);
 
      /*
       * Optional dep init

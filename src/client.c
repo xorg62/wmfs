@@ -626,6 +626,8 @@ client_focus(struct client *c)
           }
 
           XSetInputFocus(W->dpy, c->win, RevertToPointerRoot, CurrentTime);
+          XChangeProperty(W->dpy, W->root, W->net_atom[net_active_window], XA_WINDOW, 32,
+                          PropModeReplace, (unsigned char *)&c->win, 1);
      }
      else
      {
@@ -875,20 +877,21 @@ client_apply_rule(struct client *c)
 
                c->theme = r->theme;
 
+               /* free = false for originally free client */
                if(r->flags & RULE_FREE)
                     c->flags |=  CLIENT_FREE;
-               /* free = false for originally free client */
                else
                     c->flags &= ~CLIENT_FREE;
 
+               /* Free rule is not compatible with tab rule */
+               if(r->flags & RULE_TAB)
+                    W->flags ^= WMFS_TABNOC; /* < can be disable by client_tab_next_opened */
 
                /* TODO
-                  if(r->flags & RULE_MAX)
-                  {}
-
                   if(r->flags & RULE_IGNORE_TAG)
                   {}
                */
+
                c->flags |= CLIENT_RULED;
           }
           flags = 0;
@@ -968,6 +971,8 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
           client_configure(c);
           ewmh_manage_window_type(c);
      }
+
+     ewmh_get_client_list();
 
      return c;
 }
@@ -1407,6 +1412,8 @@ client_remove(struct client *c)
      XSetErrorHandler(wmfs_error_handler);
 
      free(c);
+
+     ewmh_get_client_list();
 }
 
 void
@@ -1429,6 +1436,14 @@ uicb_client_toggle_free(Uicb cmd)
                if(c->tabmaster == W->client && c != W->client)
                     c->flags ^= CLIENT_FREE;
      }
+}
+
+void
+uicb_client_tab_next_opened(Uicb cmd)
+{
+     (void)cmd;
+
+     W->flags ^= WMFS_TABNOC;
 }
 
 void
