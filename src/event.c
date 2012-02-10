@@ -309,7 +309,9 @@ event_unmapnotify(XEvent *e)
      struct client *c;
      struct _systray *s;
 
-     if((c = client_gb_win(ev->window)) && ev->send_event)
+     if((c = client_gb_win(ev->window))
+        && ev->send_event
+        && c->flags & CLIENT_MAPPED)
           client_remove(c);
      else if((s = systray_find(ev->window)))
      {
