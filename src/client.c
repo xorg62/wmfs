@@ -1392,6 +1392,7 @@ client_remove(struct client *c)
      XGrabServer(W->dpy);
      XSetErrorHandler(wmfs_error_handler_dummy);
 
+     client_map(c);
      XReparentWindow(W->dpy, c->win, W->root, c->rgeo.x, c->rgeo.y);
 
      client_untab(c);
