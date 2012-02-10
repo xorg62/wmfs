@@ -1408,7 +1408,6 @@ client_remove(struct client *c)
      ewmh_set_wm_state(c->win, WithdrawnState);
 
      XUngrabServer(W->dpy);
-     XSync(W->dpy, False);
      XSetErrorHandler(wmfs_error_handler);
 
      free(c);
