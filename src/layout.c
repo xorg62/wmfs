@@ -598,9 +598,9 @@ LAYOUT_INTEGRATE_DIR(Bottom);
 void
 layout_client(struct client *c)
 {
-     if(c->flags & CLIENT_IGNORE_LAYOUT)
+     if(c->flags & (CLIENT_IGNORE_LAYOUT | CLIENT_FULLSCREEN))
      {
-          c->flags ^= CLIENT_IGNORE_LAYOUT;
+          c->flags &= ~CLIENT_IGNORE_LAYOUT;
           return;
      }
 

@@ -206,7 +206,8 @@ ewmh_manage_state(long data[], struct client *c)
                XReparentWindow(W->dpy, c->win, W->root, c->screen->geo.x, c->screen->geo.y);
                XResizeWindow(W->dpy, c->win, c->screen->geo.w, c->screen->geo.h);
 
-               client_focus(c);
+               if(c->tag)
+                    client_focus(c);
 
                XRaiseWindow(W->dpy, c->win);
           }
@@ -217,7 +218,7 @@ ewmh_manage_state(long data[], struct client *c)
                                (unsigned char*)0, 0);
                XReparentWindow(W->dpy, c->win, c->frame, c->wgeo.x, c->wgeo.y);
 
-               client_moveresize(c, &c->geo);
+               layout_client(c);
           }
      }
 }
@@ -230,6 +231,21 @@ ewmh_manage_window_type(struct client *c)
      unsigned long n, il, i;
      unsigned char *data = NULL;
      long ldata[5] = { _NET_WM_STATE_ADD };
+
+
+     if(XGetWindowProperty(W->dpy, c->win, W->net_atom[net_wm_window_type], 0L, 0x7FFFFFFFL,
+                           False, XA_ATOM, &rf, &f, &n, &il, &data) == Success && n)
+     {
+          atom = (Atom*)data;
+
+          for(i = 0; i < n; ++i)
+          {
+               /* MANAGE _NET_WM_WINDOW_TYPE_DIALOG */
+               if(atom[i] == W->net_atom[net_wm_window_type_dialog])
+                    c->flags |= CLIENT_FREE;
+          }
+          XFree(data);
+     }
 
      /* _NET_WM_STATE at window mangement */
      if(XGetWindowProperty(W->dpy, c->win, W->net_atom[net_wm_state], 0L, 0x7FFFFFFFL, false,

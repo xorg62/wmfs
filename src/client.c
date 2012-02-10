@@ -948,7 +948,10 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
      client_frame_new(c);
 
      if(!scan)
+     {
+          ewmh_manage_window_type(c);
           tag_client((c->flags & CLIENT_RULED ? c->tag : c->screen->seltag), c);
+     }
 
      /* Map, not at reload */
      if(c->tag == c->screen->seltag)
@@ -969,7 +972,6 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
           client_get_name(c);
           client_focus(c);
           client_configure(c);
-          ewmh_manage_window_type(c);
      }
 
      ewmh_get_client_list();
