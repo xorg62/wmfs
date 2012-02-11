@@ -1392,8 +1392,6 @@ client_remove(struct client *c)
      XGrabServer(W->dpy);
      XSetErrorHandler(wmfs_error_handler_dummy);
      XReparentWindow(W->dpy, c->win, W->root, c->rgeo.x, c->rgeo.y);
-     if(c->flags & CLIENT_REMOVEALL)
-          XMapWindow(W->dpy, c->win);
      XUngrabButton(W->dpy, AnyButton, AnyModifier, c->win);
      ewmh_set_wm_state(c->win, WithdrawnState);
 

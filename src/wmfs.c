@@ -418,6 +418,7 @@ wmfs_quit(void)
           c = SLIST_FIRST(&W->h.client);
           client_update_props(c, CPROP_LOC | CPROP_FLAG | CPROP_GEO);
           c->flags |= (CLIENT_IGNORE_LAYOUT | CLIENT_REMOVEALL);
+          XMapWindow(W->dpy, c->win);
           client_remove(c);
      }
 
