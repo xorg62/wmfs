@@ -311,6 +311,7 @@ event_unmapnotify(XEvent *e)
 
      if((c = client_gb_win(ev->window))
         && ev->send_event
+        && ev->event == W->root
         && c->flags & CLIENT_MAPPED
         && !(c->flags & CLIENT_DYING))
           client_remove(c);
