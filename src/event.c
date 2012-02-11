@@ -163,9 +163,9 @@ event_configureevent(XEvent *e)
           if(c->flags & CLIENT_FREE)
           {
                if(ev->value_mask & CWX)
-                    c->geo.x = ev->x - c->border;
+                    c->geo.x = ev->x;
                if(ev->value_mask & CWY)
-                    c->geo.y = ev->y - c->tbarw;
+                    c->geo.y = ev->y - c->tbarw - c->border - c->border;
                if(ev->value_mask & CWWidth)
                     c->geo.w = ev->width + c->border + c->border;
                if(ev->value_mask & CWHeight)
@@ -311,10 +311,17 @@ event_unmapnotify(XEvent *e)
 
      if((c = client_gb_win(ev->window))
         && ev->send_event
-        && ev->event == W->root
-        && c->flags & CLIENT_MAPPED
-        && !(c->flags & CLIENT_DYING))
-          client_remove(c);
+        && ev->event == W->root)
+     {
+          int d;
+          unsigned char *ret = NULL;
+
+          if(XGetWindowProperty(EVDPY(e), c->win, W->net_atom[wm_state], 0, 2,
+                                False, W->net_atom[wm_state], (Atom*)&d, &d,
+                                (long unsigned int*)&d, (long unsigned int*)&d, &ret) == Success)
+               if(*ret == NormalState)
+                    client_remove(c);
+     }
      else if((s = systray_find(ev->window)))
      {
           systray_del(s);
