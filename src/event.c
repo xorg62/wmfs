@@ -370,7 +370,7 @@ event_mapnotify(XEvent *e)
           return;
 
      if((c = client_gb_win(ev->window)))
-          ewmh_set_wm_state(c->win, NormalState);
+          client_map(c);
      else if((s = systray_find(ev->window)))
      {
           ewmh_set_wm_state(s->win, NormalState);

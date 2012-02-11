@@ -346,7 +346,8 @@ wmfs_scan(void)
           client_focus(fc);
 
      SLIST_FOREACH(c, &W->h.client, next)
-          layout_fix_hole(c);
+          if(c->flags & CLIENT_TILED)
+               layout_fix_hole(c);
 
      W->flags &= ~WMFS_SCAN;
 

@@ -965,8 +965,6 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
      /* Attach */
      SLIST_INSERT_HEAD(&W->h.client, c, next);
 
-     ewmh_set_wm_state(w, NormalState);
-
      if(!scan)
      {
           client_get_name(c);
