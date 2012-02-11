@@ -23,6 +23,7 @@
 #include "config.h"
 #include "client.h"
 #include "layout.h"
+#include "systray.h"
 
 int
 wmfs_error_handler(Display *d, XErrorEvent *event)
@@ -243,6 +244,12 @@ wmfs_scan(void)
 
                if(!wa.override_redirect && wa.map_state == IsViewable)
                {
+                    if(ewmh_get_xembed_state(w[i]))
+                    {
+                         systray_add(w[i]);
+                         continue;
+                    }
+
                     if(XGetWindowProperty(W->dpy, w[i], ATOM("_WMFS_TAG"), 0, 32,
                                           False, XA_CARDINAL, &rt, &rf, &ir, &il,
                                           (unsigned char**)&ret)
