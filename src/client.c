@@ -1394,6 +1394,8 @@ client_remove(struct client *c)
 
      XReparentWindow(W->dpy, c->win, W->root, c->rgeo.x, c->rgeo.y);
      XMapWindow(W->dpy, c->win);
+     XUngrabButton(W->dpy, AnyButton, AnyModifier, c->win);
+     ewmh_set_wm_state(c->win, WithdrawnState);
 
      client_untab(c);
 
@@ -1401,19 +1403,15 @@ client_remove(struct client *c)
           barwin_remove(c->titlebar);
      XDestroyWindow(W->dpy, c->frame);
 
+     XUngrabServer(W->dpy);
+
      /* Remove from global client list */
      SLIST_REMOVE(&W->h.client, c, client, next);
 
      tag_client(NULL, c);
 
-     ewmh_set_wm_state(c->win, WithdrawnState);
-
-     XUngrabServer(W->dpy);
-
      free(c);
-
      ewmh_get_client_list();
-
      XSetErrorHandler(wmfs_error_handler);
 }
 
