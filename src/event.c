@@ -110,21 +110,28 @@ event_clientmessageevent(XEvent *e)
                if(type == wmfs_function || type == wmfs_cmd)
                {
                     int d;
+                    long unsigned int len;
                     unsigned char *ret = NULL, *ret_cmd = NULL;
                     void (*func)(Uicb);
 
-                    XGetWindowProperty(EVDPY(e), W->root, W->net_atom[wmfs_function], 0, 4096,
-                                       False, W->net_atom[utf8_string], (Atom*)&d, &d,
-                                       (long unsigned int*)&d, (long unsigned int*)&d, &ret);
-                    XGetWindowProperty(EVDPY(e), W->root, W->net_atom[wmfs_cmd], 0, 4096,
-                                       False, W->net_atom[utf8_string], (Atom*)&d, &d,
-                                       (long unsigned int*)&d, (long unsigned int*)&d, &ret_cmd);
+                    if(XGetWindowProperty(EVDPY(e), W->root, W->net_atom[wmfs_function], 0, 65536,
+                                          False, W->net_atom[utf8_string], (Atom*)&d, &d,
+                                          (long unsigned int*)&d, (long unsigned int*)&d, &ret) == Success
+                       && ret && ((func = uicb_name_func((char*)ret))))
+                    {
+                         if(XGetWindowProperty(EVDPY(e), W->root, W->net_atom[wmfs_cmd], 0, 65536,
+                                               False, W->net_atom[utf8_string], (Atom*)&d, &d,
+                                               &len, (long unsigned int*)&d, &ret_cmd) == Success
+                            && len && ret_cmd)
+                         {
+                              func((Uicb)ret_cmd);
+                              XFree(ret_cmd);
+                         }
+                         else
+                              func(NULL);
 
-                    if((func = uicb_name_func((char*)ret)))
-                         func((Uicb)ret_cmd);
-
-                    XFree(ret_cmd);
-                    XFree(ret);
+                         XFree(ret);
+                    }
                }
           }
 

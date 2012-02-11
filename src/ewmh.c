@@ -23,6 +23,7 @@ ewmh_init(void)
      /* EWMH hints */
      W->net_atom[wm_state]                       = ATOM("WM_STATE");
      W->net_atom[wm_class]                       = ATOM("WM_CLASS");
+     W->net_atom[wm_name]                        = ATOM("WM_NAME");
      W->net_atom[net_supported]                  = ATOM("_NET_SUPPORTED");
      W->net_atom[net_client_list]                = ATOM("_NET_CLIENT_LIST");
      W->net_atom[net_frame_extents]              = ATOM("_NET_FRAME_EXTENTS");

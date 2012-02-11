@@ -41,6 +41,7 @@ enum
      /* ICCCM */
      wm_state,
      wm_class,
+     wm_name,
      /* EWMH */
      net_supported,
      net_wm_name,

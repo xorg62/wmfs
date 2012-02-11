@@ -660,10 +660,10 @@ client_get_name(struct client *c)
      unsigned long ir, il;
 
      /* This one instead XFetchName for utf8 name support */
-     if(XGetWindowProperty(W->dpy, c->win, ATOM("_NET_WM_NAME"), 0, 4096,
-                    False, ATOM("UTF8_STRING"), &rt, &rf, &ir, &il, (unsigned char**)&c->title) != Success)
-          XGetWindowProperty(W->dpy, c->win, ATOM("WM_NAME"), 0, 4096,
-                             False, ATOM("UTF8_STRING"), &rt, &rf, &ir, &il, (unsigned char**)&c->title);
+     if(XGetWindowProperty(W->dpy, c->win, W->net_atom[net_wm_name], 0, 65536,
+                    False, W->net_atom[utf8_string], &rt, &rf, &ir, &il, (unsigned char**)&c->title) != Success)
+          XGetWindowProperty(W->dpy, c->win, W->net_atom[net_wm_name], 0, 65536,
+                             False, W->net_atom[utf8_string], &rt, &rf, &ir, &il, (unsigned char**)&c->title);
 
      /* Still no title... */
      if(!c->title)
