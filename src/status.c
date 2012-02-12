@@ -64,13 +64,8 @@ void
 status_free_ctx(struct status_ctx *ctx)
 {
      free(ctx->status);
-
-     if(ctx->barwin)
-          SLIST_INIT(&ctx->barwin->statusmousebinds);
-
      status_flush_list(ctx);
      status_gcache_free(ctx);
-
 }
 
 static void

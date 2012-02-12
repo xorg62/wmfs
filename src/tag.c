@@ -282,8 +282,6 @@ uicb_tag_del(Uicb cmd)
 void
 tag_free(struct screen *s)
 {
-     struct tag *t;
-
-     TAILQ_FOREACH(t, &s->tags, next)
-          tag_remove(t);
+     while(!TAILQ_EMPTY(&s->tags))
+          tag_remove(TAILQ_FIRST(&s->tags));
 }

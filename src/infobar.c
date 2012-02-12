@@ -397,18 +397,6 @@ infobar_elem_update(struct infobar *i, int type)
 }
 
 void
-infobar_elem_remove(struct element *e)
-{
-     struct barwin *b;
-
-     TAILQ_REMOVE(&e->infobar->elements, e, next);
-
-     ELEM_FREE_BARWIN(e);
-
-     free(e);
-}
-
-void
 infobar_elem_reinit(struct infobar *i)
 {
      struct element *e;
@@ -490,6 +478,7 @@ void
 infobar_remove(struct infobar *i)
 {
      struct element *e;
+     struct barwin *b;
 
      free(i->elemorder);
      free(i->name);
@@ -497,8 +486,13 @@ infobar_remove(struct infobar *i)
      if(i == W->systray.infobar)
           systray_freeicons();
 
-     TAILQ_FOREACH(e, &i->elements, next)
-          infobar_elem_remove(e);
+     while(!TAILQ_EMPTY(&i->elements))
+     {
+          e = TAILQ_FIRST(&i->elements);
+          TAILQ_REMOVE(&i->elements, e, next);
+          ELEM_FREE_BARWIN(e);
+          free(e);
+     }
 
      barwin_remove(i->bar);
 

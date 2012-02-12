@@ -95,8 +95,9 @@ layout_free_set(struct tag *t)
 {
      struct layout_set *l;
 
-     TAILQ_FOREACH(l, &t->sets, next)
+     while(!TAILQ_EMPTY(&t->sets))
      {
+          l = TAILQ_FIRST(&t->sets);
           TAILQ_REMOVE(&t->sets, l, next);
           FREE_LIST(geo_list, l->geos);
           free(l);
