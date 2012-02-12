@@ -114,7 +114,7 @@ status_graph_process(struct status_ctx *ctx, struct status_seq *sq, char *name)
      gc = xcalloc(1, sizeof(struct status_gcache));
      gc->name = xstrdup(name);
      gc->ndata = 1;
-     gc->datas = xcalloc(sq->geo.w + sq->geo.w, sizeof(int));
+     gc->datas = xcalloc(sq->geo.w << 2, sizeof(int));
      gc->datas[0] = sq->data[1];
 
      SLIST_INSERT_HEAD(&ctx->gcache, gc, next);
@@ -487,6 +487,8 @@ status_flush_list(struct status_ctx *ctx)
           free(sq->str);
           free(sq);
      }
+
+     SLIST_INIT(&ctx->statushead);
 }
 
 void

@@ -23,7 +23,7 @@
 
 /* Insert at the end with SLIST */
 #define SLIST_INSERT_TAIL(head, elem, field, prev) \
-     if(SLIST_EMPTY(head))                         \
+     if(!prev)                                     \
           SLIST_INSERT_HEAD(head, elem, field);    \
      else                                          \
           SLIST_INSERT_AFTER(prev, elem, field);
