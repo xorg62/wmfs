@@ -1,0 +1,189 @@
+/* options -----------------------------------------------------------*/
+* { padding:0; margin:0; }
+a { color: #ccc; text-decoration: none; }
+a:hover { color: #aaa; }
+/* body --------------------------------------------------------------*/
+body {
+	font: 12px/18px sans-serif;
+	color: #aaa;
+	background-color: #0F0F0F;
+}
+/* container ---------------------------------------------------------*/
+#container {
+	width: 100%;
+	height: 100%;
+	margin: 0px auto;
+	background-color: #444;
+	overflow: hidden;
+}
+/* header ------------------------------------------------------------*/
+#header {
+    position: fixed;
+    top: 0px;
+    z-index: 10;
+    width: 100%;
+    padding: 3px 5px 5px 2px;
+    background-color: #0F0F0F;
+    -webkit-box-shadow: 1px 1px 12px #000;
+    -moz-box-shadow: 1px 1px 12px #000;
+    box-shadow: 1px 1px 12px #000;
+}
+
+#header h1 {
+	font: 30px sans-serif;
+    text-align: right;
+    margin-right: 20px;
+}
+#header h1 span {
+	margin-right: 40px;
+	font-size: 13px;
+}
+#header h2 {
+    position: absolute;
+    font: 18px sans-serif;
+	left: 20px;
+    top: 10px;
+}
+/* links -------------------------------------------------------------*/
+#links {
+	display: block;
+	margin: 60px auto 5px auto;
+	width: 100%;
+}
+.categorie {
+	padding: 0 10px 15px 25px;
+	margin: 0 auto 10px auto;
+	position: relative;
+	width: 90%;
+	background-color: #2B2B2B;
+    -webkit-box-shadow: 1px 1px 12px #000;
+    -moz-box-shadow: 1px 1px 12px #000;
+    box-shadow: 1px 1px 12px #000;
+}
+
+/* footer ------------------------------------------------------------*/
+#footer {
+	margin: 20px auto 0px auto;
+	display: block;
+    width: 100%;
+	padding: 0px 5px 0px 5px;
+	background-color: #0F0F0F;
+    font-size: 10px;
+    text-align: center;
+    -webkit-box-shadow: 1px 1px 12px #000;
+    -moz-box-shadow: 1px 1px 12px #000;
+    box-shadow: 1px 1px 12px #000;
+}
+/* cc BY-NC-SA License :: arpinux :: 2011 :: http://arpinux.org */
+
+/* slideshow */
+/*
+Skin Name: Nivo Slider Default Theme
+Skin URI: http://nivo.dev7studios.com
+Skin Type: flexible
+Description: The default skin for the Nivo Slider.
+Version: 1.0
+Author: Gilbert Pellegrom
+Author URI: http://dev7studios.com
+*/
+
+.theme-default .nivoSlider {
+	position:relative;
+	background:#444 url(icons/loading.gif) no-repeat 50% 50%;
+    margin-bottom:20px;
+    -webkit-box-shadow: 1px 1px 12px #000;
+    -moz-box-shadow: 1px 1px 12px #000;
+    box-shadow: 1px 1px 12px #000;
+}
+.theme-default .nivoSlider img {
+	position:absolute;
+	top:0px;
+	left:0px;
+	display:none;
+}
+
+.theme-default .nivo-controlNav {
+	position:absolute;
+	left:5%;
+	bottom:-42px;
+    margin-left:-40px; /* Tweak this to center bullets */
+}
+
+.theme-default .nivo-directionNav a {
+	display:block;
+	width:30px;
+	height:30px;
+	background:url(icons/arrows.png) no-repeat;
+	text-indent:-9999px;
+	border:0;
+}
+.theme-default a.nivo-nextNav {
+	background-position:-30px 0;
+	right:15px;
+}
+.theme-default a.nivo-prevNav {
+	left:15px;
+}
+
+table {
+	border-collapse:separate;
+	border-spacing:0;
+}
+
+.theme-default #slider {
+    margin: 0 auto 20px auto;
+    width:800px; /* Make sure your images are the same size */
+    height:345px; /* Make sure your images are the same size */
+}
+
+.clear {
+	clear:both;
+}
+/*
+ * jQuery Nivo Slider v2.7.1
+ * http://nivo.dev7studios.com
+ *
+ * Copyright 2011, Gilbert Pellegrom
+ * Free to use and abuse under the MIT license.
+ * http://www.opensource.org/licenses/mit-license.php
+ * 
+ * March 2010
+ */
+ 
+ 
+/* The Nivo Slider styles */
+.nivoSlider {
+	position:relative;
+}
+.nivoSlider img {
+	position:absolute;
+	top:0px;
+	left:0px;
+}
+
+/* The slices and boxes in the Slider */
+.nivo-slice {
+	display:block;
+	position:absolute;
+	z-index:5;
+	height:100%;
+}
+.nivo-box {
+	display:block;
+	position:absolute;
+	z-index:5;
+}
+
+/* Direction nav styles (e.g. Next & Prev) */
+.nivo-directionNav a {
+	position:absolute;
+	top:45%;
+	z-index:9;
+	cursor:pointer;
+}
+.nivo-prevNav {
+	left:0px;
+}
+.nivo-nextNav {
+	right:0px;
+}
