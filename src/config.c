@@ -278,7 +278,7 @@ config_rule(void)
           if((tn = fetch_opt_first(ks[i], "", "theme").str))
                r->theme = name_to_theme(tn);
           else
-               r->theme = SLIST_FIRST(&W->h.theme);
+               r->theme = W->ctheme;
 
           SLIST_INSERT_HEAD(&W->h.rule, r, next);
      }
