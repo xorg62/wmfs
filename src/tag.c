@@ -189,6 +189,13 @@ uicb_tag_client(Uicb cmd)
 }
 
 void
+uicb_tag_client_and_set(Uicb cmd)
+{
+    uicb_tag_client(cmd);
+    uicb_tag_set(cmd);
+}
+
+void
 uicb_tag_move_client_next(Uicb cmd)
 {
      (void)cmd;
