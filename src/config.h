@@ -35,6 +35,7 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "tag_next",             uicb_tag_next },
      { "tag_prev",             uicb_tag_prev },
      { "tag_client",           uicb_tag_client },
+     { "tag_client_and_set",   uicb_tag_client_and_set },
      { "tag_move_client_next", uicb_tag_move_client_next },
      { "tag_move_client_prev", uicb_tag_move_client_prev },
      { "tag_click",            uicb_tag_click },
