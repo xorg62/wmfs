@@ -62,8 +62,7 @@ body {
     box-shadow: 1px 1px 12px #000;
 }
 .categorie a { text-decoration: underline ; }
-.categorie h2 { padding: 10px 0 0 10px; }
-.categorie p {padding-bottom: 10px; }
+.categorie h2 { padding: 15px 0 5px 10px; }
 
 /* footer ------------------------------------------------------------*/
 #footer {
@@ -135,7 +134,7 @@ table {
 }
 
 .theme-default #slider {
-    margin: 0 auto 20px auto;
+    margin: 20px auto 20px auto;
     width:800px; /* Make sure your images are the same size */
     height:345px; /* Make sure your images are the same size */
 }
