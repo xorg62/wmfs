@@ -186,5 +186,25 @@ clients_tag_arrange_map(struct tag *t)
           sfunc(c);
 }
 
+static inline struct client*
+client_get_larger(struct tag *t)
+{
+     struct client *c, *lc = NULL;
+     int tmp, l = 0;
+
+     FOREACH_NFCLIENT(c, &t->clients, tnext)
+     {
+          if((tmp = (c->geo.w + c->geo.h)) > l)
+          {
+               l = tmp;
+               lc = c;
+          }
+     }
+
+     if(lc && (lc->flags & CLIENT_TABBED))
+          lc = lc->tabmaster;
+
+     return lc;
+}
 
 #endif /* CLIENT_H */

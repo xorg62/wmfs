@@ -370,10 +370,15 @@ layout_split_integrate(struct client *c, struct client *sc)
      struct geo g;
      bool f = false;
 
-     /* No sc or not compatible sc */
-     if(!sc || sc == c || sc->tag != c->tag
-        || sc->flags & CLIENT_FREE)
+     /* No sc or not compatible sc to integrate in */
+     if(!sc
+        || sc == c
+        || sc->tag != c->tag
+        || (sc->flags & CLIENT_FREE))
      {
+          /* Larger tiled one?
+             if(!(sc = client_get_larger(c->tag)) || sc == c)*/
+
           /*
            * check for the first tiled client or
            * maximize the lonely client
