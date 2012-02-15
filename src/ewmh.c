@@ -215,6 +215,7 @@ ewmh_manage_state(long data[], struct client *c)
           else
           {
                c->flags &= ~CLIENT_FULLSCREEN;
+
                XChangeProperty(W->dpy, c->win, W->net_atom[net_wm_state], XA_ATOM, 32, PropModeReplace,
                                (unsigned char*)0, 0);
                XReparentWindow(W->dpy, c->win, c->frame, c->wgeo.x, c->wgeo.y);

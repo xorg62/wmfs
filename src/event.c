@@ -316,21 +316,18 @@ event_unmapnotify(XEvent *e)
      struct client *c;
      struct _systray *s;
 
-     if((c = client_gb_win(ev->window)))
+     if((c = client_gb_win(ev->window))
+        && ev->send_event
+        && ev->event == W->root)
      {
-          if(!ev->send_event)
-          {
-               int d;
-               unsigned char *ret = NULL;
+          int d;
+          unsigned char *ret = NULL;
 
-               if(XGetWindowProperty(EVDPY(e), c->win, W->net_atom[wm_state], 0, 2,
-                                     False, W->net_atom[wm_state], (Atom*)&d, &d,
-                                     (long unsigned int*)&d, (long unsigned int*)&d, &ret) == Success)
-                    if(*ret == NormalState)
-                         client_remove(c);
-          }
-          else
-               client_unmap(c);
+          if(XGetWindowProperty(EVDPY(e), c->win, W->net_atom[wm_state], 0, 2,
+                                False, W->net_atom[wm_state], (Atom*)&d, &d,
+                                (long unsigned int*)&d, (long unsigned int*)&d, &ret) == Success)
+               if(*ret == NormalState)
+                    client_remove(c);
      }
      else if((s = systray_find(ev->window)))
      {
