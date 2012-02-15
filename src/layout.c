@@ -363,26 +363,33 @@ layout_split_arrange_closed(struct client *ghost)
      layout_save_set(ghost->tag);
 }
 
-/* Integrate a client in split layout: split sc and fill c in new geo */
+/*
+ * Integrate a client in split layout:
+ *   - Check if there is no sc
+ *   - Check if sc is on a different tag than c
+ *   - Check if sc is not in free mode
+ *
+ * So from there, sc is not compatible, so we will integrate
+ * c in the larger tiled client of c tag:
+ *   - Check if the larger client is correct and not equal to c
+ *
+ * Checks all failed? Get first tiled client of the tag to integrate in.
+ * Still no client, it means that c is the first tiled client of the tag, then maximize it.
+ */
 void
 layout_split_integrate(struct client *c, struct client *sc)
 {
      struct geo g;
+     struct client *larger = client_get_larger(c->tag);
      bool f = false;
 
      /* No sc or not compatible sc to integrate in */
      if(!sc
         || sc == c
         || sc->tag != c->tag
-        || (sc->flags & CLIENT_FREE))
+        || (sc->flags & CLIENT_FREE)
+        || (!(sc = larger) || sc == c))
      {
-          /* Larger tiled one?
-             if(!(sc = client_get_larger(c->tag)) || sc == c)*/
-
-          /*
-           * check for the first tiled client or
-           * maximize the lonely client
-           */
           FOREACH_NFCLIENT(sc, &c->tag->clients, tnext)
                if(sc != c && !(sc->flags & CLIENT_TABBED))
                {
@@ -400,7 +407,7 @@ layout_split_integrate(struct client *c, struct client *sc)
           }
      }
 
-     /* Tab Next Opened Client */
+     /* Tab Next Opened Client option */
      if(W->flags & WMFS_TABNOC)
      {
           W->flags ^= WMFS_TABNOC;
