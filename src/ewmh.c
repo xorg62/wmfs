@@ -220,7 +220,7 @@ ewmh_manage_state(long data[], struct client *c)
                                (unsigned char*)0, 0);
                XReparentWindow(W->dpy, c->win, c->frame, c->wgeo.x, c->wgeo.y);
 
-               layout_client(c);
+               layout_fix_hole(c);
           }
      }
 }
