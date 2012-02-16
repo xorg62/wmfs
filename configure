@@ -19,6 +19,9 @@ while true; do
 	--prefix)
 	    [ -z "$2" ] && echo "Missing argument" && exit 1
 	    PREFIX=$2; shift 2;;
+	--man-prefix)
+	    [ -z "$2" ] && echo "Missing argument" && exit 1
+	    MANPREFIX=$2; shift 2;;
 	--xdg-config-dir)
 	    [ -z "$2" ] && echo "Missing argument" && exit 1
 	    XDG_CONFIG_DIR=$2; shift 2;;
@@ -27,6 +30,7 @@ while true; do
 	--without-xinerama		: compile without xinerama support
         --without-imlib2                : compile without imlib2 support
 	--prefix DIRECTORY		: install binary with specified prefix (default $PREFIX)
+	--man-prefix DIRECTORY		: install binary with specified prefix (default $PREFIX)
 	--xdg-config-dir DIRECTORY	: install configuration to specified directory (default $XDG_CONFIG_DIR)"
 	    exit 0;;
 	*) break;;
