@@ -371,7 +371,7 @@ layout_split_arrange_closed(struct client *ghost)
  *
  * So from there, sc is not compatible, so we will integrate
  * c in the larger tiled client of c tag:
- *   - Check if the larger client is correct and not equal to c
+ *   - Check if the larger client is correct
  *
  * Checks all failed? Get first tiled client of the tag to integrate in.
  * Still no client, it means that c is the first tiled client of the tag, then maximize it.
@@ -380,15 +380,17 @@ void
 layout_split_integrate(struct client *c, struct client *sc)
 {
      struct geo g;
-     struct client *larger = client_get_larger(c->tag);
      bool f = false;
 
-     /* No sc or not compatible sc to integrate in */
+     /* No sc or not compatible, get the largest of the tag */
      if(!sc
         || sc == c
         || sc->tag != c->tag
-        || (sc->flags & CLIENT_FREE)
-        || (!(sc = larger) || sc == c))
+        || (sc->flags & CLIENT_FREE))
+          sc = client_get_larger(c->tag);
+
+     /* Largest not correct */
+     if(!sc || sc == c)
      {
           FOREACH_NFCLIENT(sc, &c->tag->clients, tnext)
                if(sc != c && !(sc->flags & CLIENT_TABBED))
