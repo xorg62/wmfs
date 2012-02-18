@@ -10,7 +10,7 @@
 export DH_VERBOSE=1
 
 override_dh_auto_build:
-	./configure --prefix /usr --xdg-config-dir /etc/xdg
+	./configure --prefix=/usr --xdg-config-dir=/etc/xdg --man-prefix=/usr/share/man/
 	dh_auto_build
 
 %:

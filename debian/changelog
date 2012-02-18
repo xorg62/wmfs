@@ -1,4 +1,11 @@
-wmfs (201201-2) unstable; urgency=low
+wmfs (2~beta-3) unstable; urgency=low
+
+  * Modified build script (debian/rules)
+  * Modified versions in changelog
+
+ -- Mickaël Raybaud-Roig <raybaudroigm@gmail.com>  Sat, 18 Feb 2012 19:22:56 +0100
+
+wmfs (2~beta-2) unstable; urgency=low
 
   * Added a manpage
   * Modified the debian/rules script
@@ -7,7 +14,7 @@ wmfs (201201-2) unstable; urgency=low
 
  -- Mickaël Raybaud-Roig <raybaudroigm@gmail.com>  Sat, 28 Jan 2012 12:44:18 +0100
 
-wmfs (201201-1) unstable; urgency=low
+wmfs (2~beta-1) unstable; urgency=low
 
   * Initial release
 
