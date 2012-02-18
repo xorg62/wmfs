@@ -2,8 +2,11 @@ wmfs (2~beta-3) unstable; urgency=low
 
   * Modified build script (debian/rules)
   * Modified versions in changelog
+  * Removed the old manpage
+  * The configuration is done in override_dh_auto_configure (in debian/rules)
+  * The .desktop file is installed by dh_install
 
- -- Mickaël Raybaud-Roig <raybaudroigm@gmail.com>  Sat, 18 Feb 2012 19:22:56 +0100
+ -- Mickaël Raybaud-Roig <raybaudroigm@gmail.com>  Sat, 18 Feb 2012 19:40:09 +0100
 
 wmfs (2~beta-2) unstable; urgency=low
 
