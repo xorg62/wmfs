@@ -317,11 +317,12 @@ wmfs_scan(void)
                          if(getg)
                               c->flags |= CLIENT_IGNORE_LAYOUT;
 
-                         client_map(c);
                          tag_client(tag_gb_id(c->screen, tag), c);
 
-                         if(getg)
+                         if(getg && tag <= TAILQ_LAST(&c->screen->tags, tsub)->id)
                               client_moveresize(c, &g);
+                         else
+                              layout_split_integrate(c, NULL);
 
                          client_get_name(c);
                     }
