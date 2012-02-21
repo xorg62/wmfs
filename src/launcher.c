@@ -426,6 +426,9 @@ uicb_launcher(Uicb cmd)
 {
      struct launcher *l;
 
+     if(!cmd)
+          return;
+
      SLIST_FOREACH(l, &W->h.launcher, next)
           if(!strcmp(l->name, cmd))
           {
