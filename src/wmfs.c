@@ -319,10 +319,14 @@ wmfs_scan(void)
 
                          tag_client(tag_gb_id(c->screen, tag), c);
 
-                         if(getg && tag <= TAILQ_LAST(&c->screen->tags, tsub)->id)
+                         if(getg && tag <= TAILQ_LAST(&c->screen->tags, tsub)->id - 1)
                               client_moveresize(c, &g);
+                         /* In a removed tag */
                          else
-                              layout_split_integrate(c, NULL);
+                         {
+                              c->geo = g;
+                              layout_client(c);
+                         }
 
                          client_get_name(c);
                     }

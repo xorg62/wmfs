@@ -49,9 +49,12 @@
 static inline Color
 color_atoh(const char *col)
 {
-     int shift = (col[0] == '#');
+     XColor xcolor;
 
-     return (Color)strtol(col + shift, NULL, 16);
+     if(!XAllocNamedColor(W->dpy, DefaultColormap(W->dpy, W->xscreen), col, &xcolor, &xcolor))
+          warnl("Error: cannot allocate color \"%s\".", col);
+
+     return xcolor.pixel;
 }
 
 static inline void
