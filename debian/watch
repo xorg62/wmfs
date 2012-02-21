@@ -8,4 +8,5 @@ version=3
 
 # Uncomment to examine a Webpage
 # <Webpage URL> <string match>
-http://git.wmfs.info/wmfs.git/commit/ wmfs-master\.tar\.gz
+http://git.wmfs.info/wmfs.git/commit/ https://github.com/xorg62/wmfs/tarball/master
+https://github.com/m-r-r/wmfs/tags https://github.com/m-r-r/wmfs/zipball/(.*)
