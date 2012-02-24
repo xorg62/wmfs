@@ -63,6 +63,16 @@ body {
 }
 .categorie a { text-decoration: underline ; }
 .categorie h2 { padding: 15px 0 5px 10px; }
+/* iframe for irc ----------------------------------------------------*/
+iframe {
+    opacity: 0.9;
+    -moz-opacity : 0.9;
+    -ms-filter: "alpha(opacity=90)";
+    margin: 15px auto 0 -10px;
+    -webkit-box-shadow: 1px 1px 12px #000;
+    -moz-box-shadow: 1px 1px 12px #000;
+    box-shadow: 1px 1px 12px #000;
+}
 
 /* footer ------------------------------------------------------------*/
 #footer {
