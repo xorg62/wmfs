@@ -372,10 +372,6 @@ client_grabbuttons(struct client *c, bool focused)
 
 #define _STATUSLINE(C, b)                                               \
      do {                                                               \
-          sctx = (b ? &c->theme->client_s_sl : &c->theme->client_n_sl); \
-          sctx->barwin = C->titlebar;                                   \
-          status_copy_mousebind(sctx);                                  \
-          status_render(sctx);                                          \
           if(C->flags & CLIENT_FREE)                                    \
           {                                                             \
                sctx = &c->theme->client_f_sl;                           \
@@ -383,6 +379,10 @@ client_grabbuttons(struct client *c, bool focused)
                status_copy_mousebind(sctx);                             \
                status_render(sctx);                                     \
           }                                                             \
+          sctx = (b ? &c->theme->client_s_sl : &c->theme->client_n_sl); \
+          sctx->barwin = C->titlebar;                                   \
+          status_copy_mousebind(sctx);                                  \
+          status_render(sctx);                                          \
      } while(/* CONSTCOND */ 0);
 void
 client_frame_update(struct client *c, struct colpair *cp)
