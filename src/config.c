@@ -122,14 +122,18 @@ config_theme(void)
           /* status line */
           t->client_n_sl = status_new_ctx(NULL, t);
           t->client_s_sl = status_new_ctx(NULL, t);
+          t->client_f_sl = status_new_ctx(NULL, t);
 
           ISTRDUP(t->client_n_sl.status, fetch_opt_first(ks[i], "", "client_normal_statusline").str);
           ISTRDUP(t->client_s_sl.status, fetch_opt_first(ks[i], "", "client_sel_statusline").str);
+          ISTRDUP(t->client_f_sl.status, fetch_opt_first(ks[i], "", "client_free_statusline").str);
 
           if(t->client_n_sl.status)
                status_parse(&t->client_n_sl);
           if(t->client_s_sl.status)
                status_parse(&t->client_s_sl);
+          if(t->client_f_sl.status)
+               status_parse(&t->client_f_sl);
 
           SLIST_INSERT_TAIL(&W->h.theme, t, next, p);
 

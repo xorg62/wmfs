@@ -273,7 +273,7 @@ struct theme
 
      /* client / frame */
      struct colpair client_n, client_s;
-     struct status_ctx client_n_sl, client_s_sl;
+     struct status_ctx client_n_sl, client_s_sl, client_f_sl;
      Color frame_bg;
      int client_titlebar_width;
      int client_border_width;
