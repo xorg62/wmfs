@@ -372,20 +372,17 @@ client_grabbuttons(struct client *c, bool focused)
 
 #define _STATUSLINE(C, b)                                               \
      do {                                                               \
+          sctx = (b ? &c->theme->client_s_sl : &c->theme->client_n_sl); \
+          sctx->barwin = C->titlebar;                                   \
+          status_copy_mousebind(sctx);                                  \
+          status_render(sctx);                                          \
           if(C->flags & CLIENT_FREE)                                    \
           {                                                             \
                sctx = &c->theme->client_f_sl;                           \
                sctx->barwin = C->titlebar;                              \
                status_copy_mousebind(sctx);                             \
                status_render(sctx);                                     \
-               fl = STATUS_BLOCK_REFRESH;                               \
           }                                                             \
-          sctx = (b ? &c->theme->client_s_sl : &c->theme->client_n_sl); \
-          sctx->flags = fl;                                             \
-          sctx->barwin = C->titlebar;                                   \
-          status_copy_mousebind(sctx);                                  \
-          status_render(sctx);                                          \
-          fl = 0;                                                       \
      } while(/* CONSTCOND */ 0);
 void
 client_frame_update(struct client *c, struct colpair *cp)
@@ -393,7 +390,6 @@ client_frame_update(struct client *c, struct colpair *cp)
      struct client *cc;
      struct status_ctx *sctx;
      int y, f, xt, rm, w, n = 1;
-     Flags fl = 0;
 
      if(c->flags & CLIENT_TABBED)
           c = c->tabmaster;
