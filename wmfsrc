@@ -48,6 +48,8 @@
      client_sel_bg = "#AABBAA"
      client_sel_statusline = "\s[3;9;#121212;x] \s[2;8;#ff0000;x](1;client_close)"
 
+     # client_free_statusline = ""
+
      frame_bg = "#555555"
      client_titlebar_width = 12
      client_border_width = 1
