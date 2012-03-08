@@ -396,6 +396,9 @@ status_apply_list(struct status_ctx *ctx)
 
                draw_rect(ctx->barwin->dr, &sq->geo, sq->color);
 
+               if(sq->data[1] > sq->data[2])
+                    sq->data[1] = sq->data[2];
+
                g.x = sq->geo.x + ((sq->geo.w - sq->data[0]) / ((float)sq->data[2] / (float)sq->data[1]));
                g.y = sq->geo.y;
                g.w = sq->data[0];
