@@ -176,13 +176,11 @@ mouse_move(struct client *c, void (*func)(struct client*, struct client*))
           }
           else
           {
+               c2 = NULL;
+
                XQueryPointer(W->dpy, W->root, &w, &w, &d, &d, &d, &d, (uint *)&u);
 
-               if(!(c2 = client_gb_win(w)))
-                    if(!(c2 = client_gb_frame(w)))
-                         c2 = client_gb_titlebar(w);
-
-               if(c2)
+               if((c2 = client_gb_win(w)) || (c2 = client_gb_frame(w)) || (c2 = client_gb_titlebar(w)))
                {
                     if(c2 != last)
                     {
@@ -240,4 +238,5 @@ uicb_mouse_tab(Uicb cmd)
 
      if(W->client && mouse_check_client(W->client))
           mouse_move(W->client, _client_tab);
+
 }

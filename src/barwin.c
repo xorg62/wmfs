@@ -23,7 +23,7 @@ barwin_new(Window parent, int x, int y, int w, int h, Color fg, Color bg, bool e
      struct barwin *b = (struct barwin*)xcalloc(1, sizeof(struct barwin));
      XSetWindowAttributes at =
      {
-          .override_redirect = True,
+          .override_redirect = true,
           .background_pixmap = ParentRelative,
           .event_mask = BARWIN_MASK
      };

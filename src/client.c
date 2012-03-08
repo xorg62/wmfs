@@ -113,10 +113,15 @@ client_gb_win(Window w)
 {
      struct client *c = SLIST_FIRST(&W->h.client);
 
-     while(c && c->win != w)
-          c = SLIST_NEXT(c, next);
+     while(c)
+     {
+          if(c->win == w)
+               return c;
 
-     return c;
+          c = SLIST_NEXT(c, next);
+     }
+
+     return NULL;
 }
 
 struct client*
@@ -124,10 +129,15 @@ client_gb_frame(Window w)
 {
      struct client *c = SLIST_FIRST(&W->h.client);
 
-     while(c && c->frame != w)
-          c = SLIST_NEXT(c, next);
+     while(c)
+     {
+          if(c->frame == w)
+               return c;
 
-     return c;
+          c = SLIST_NEXT(c, next);
+     }
+
+     return NULL;
 }
 
 struct client*
@@ -147,10 +157,18 @@ client_gb_titlebar(Window w)
 {
      struct client *c = SLIST_FIRST(&W->h.client);
 
-     while(c && c->titlebar && c->titlebar->win != w)
-          c = SLIST_NEXT(c, next);
+     if(!c->titlebar)
+          return NULL;
 
-     return c;
+     while(c && c->titlebar->win != w)
+     {
+          if(c->titlebar->win == w)
+               return c;
+
+          c = SLIST_NEXT(c, next);
+     }
+
+     return NULL;
 }
 
 /*
