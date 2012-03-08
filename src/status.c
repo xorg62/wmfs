@@ -110,6 +110,9 @@ status_graph_process(struct status_ctx *ctx, struct status_seq *sq, char *name)
                return;
           }
 
+     if(sq->data[1] > sq->data[2])
+          sq->data[1] = sq->data[2];
+
      /* No? Make a cache for it */
      gc = xcalloc(1, sizeof(struct status_gcache));
      gc->name = xstrdup(name);
