@@ -160,7 +160,7 @@ client_gb_titlebar(Window w)
      if(!c->titlebar)
           return NULL;
 
-     while(c && c->titlebar->win != w)
+     while(c)
      {
           if(c->titlebar->win == w)
                return c;
