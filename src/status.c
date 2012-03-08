@@ -371,6 +371,9 @@ status_apply_list(struct status_ctx *ctx)
                g.w = sq->geo.w - sq->data[0] - sq->data[0];
                g.h = sq->geo.h - sq->data[0] - sq->data[0];
 
+               if(sq->data[1] > sq->data[2])
+                    sq->data[1] = sq->data[2];
+
                if(sq->geo.w > sq->geo.h)
                     g.w /= ((float)sq->data[2] / (float)sq->data[1]);
                else
