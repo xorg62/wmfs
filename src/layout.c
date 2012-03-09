@@ -12,6 +12,9 @@
 #include "event.h"
 #include "util.h"
 
+/* Shift in client split to keep clients's parent at close arrange */
+static int shiftv = 1, shifth = 1;
+
 void
 layout_save_set(struct tag *t)
 {
@@ -229,20 +232,26 @@ layout_split(struct client *c, bool vertical)
      if(vertical)
      {
           c->geo.w >>= 1;
+          c->geo.w += shiftv;
           geo.x = c->geo.x + c->geo.w;
           geo.w >>= 1;
 
           /* Remainder */
           geo.w += (og.x + og.w) - (geo.x + geo.w);
+
+          shiftv = -shiftv;
      }
      else
      {
           c->geo.h >>= 1;
+          c->geo.h += shifth;
           geo.y = c->geo.y + c->geo.h;
           geo.h >>= 1;
 
           /* Remainder */
           geo.h += (og.y + og.h) - (geo.y + geo.h);
+
+          shifth = -shifth;
      }
 
      return geo;
