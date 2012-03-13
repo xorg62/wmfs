@@ -598,7 +598,7 @@ main(int argc, char **argv)
                break;
 
                case 'C':
-                    strncpy(path, optarg, sizeof(W->confpath));
+                    strncpy(path, optarg, MAX_PATH_LEN);
                     break;
           }
      }
