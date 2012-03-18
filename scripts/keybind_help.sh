@@ -56,8 +56,8 @@ l42="^s[15;640;$fg;prev/next tag:]^s[190;640;$fg;Control + Left/Right]"
 l43="^s[15;655;$fg;prev/next screen:]^s[190;655;$fg;Control + Up/Down]"
 l44="^s[15;670;$fg;set tag (x):]^s[190;670;$fg;Super + F(x)]"
 l45="^s[15;685;$fg;tag client with (x):]^s[190;685;$fg;Super + Shift + F(x)]"
-l46="^s[15;700;$fg;add tag:]^s[190;700;$fg;Super + -]"
-l47="^s[15;715;$fg;delete tag:]^s[190;715;$fg;Super + Shift + -]"
+l46="^s[15;700;$fg;add tag:]^s[190;700;$fg;Super + Shift + -]"
+l47="^s[15;715;$fg;delete tag:]^s[190;715;$fg;Super + -]"
 
 frame="^R[0;0;350;15;$fg] ^R[0;728;350;2;$fg] ^R[0;0;2;730;$fg] ^R[348;0;2;730;$fg]"
 
