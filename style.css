@@ -25,9 +25,6 @@ body {
     width: 100%;
     padding: 3px 5px 5px 2px;
     background-color: #2B2B2B;
-    -webkit-box-shadow: 1px 1px 12px #000;
-    -moz-box-shadow: 1px 1px 12px #000;
-    box-shadow: 1px 1px 12px #000;
 }
 
 #header h1 {
