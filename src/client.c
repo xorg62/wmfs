@@ -884,7 +884,7 @@ static void
 client_apply_rule(struct client *c)
 {
      struct rule *r;
-					struct rule *defaultr = NULL;
+     struct rule *defaultr = NULL;
      char *wmname = NULL;
      char *role = NULL;
      int f;
