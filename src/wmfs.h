@@ -349,7 +349,6 @@ struct wmfs
      char *confpath;
      struct barwin *last_clicked_barwin;
      struct theme *ctheme;
-     struct rule *crule;
 
      /* Log file */
      FILE *log;

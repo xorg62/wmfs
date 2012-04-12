@@ -261,7 +261,6 @@ config_rule(void)
      n = fetch_section_count(ks);
 
      SLIST_INIT(&W->h.rule);
-     W->crule = NULL;
 
      /* [rule] */
      for(i = 0; i < n; ++i)
@@ -285,12 +284,7 @@ config_rule(void)
           else
                r->theme = W->ctheme;
 
-          if (r->name && !strcmp(r->name, "default"))
-          {
-               W->crule = r;
-          }
-          else
-               SLIST_INSERT_HEAD(&W->h.rule, r, next);
+										SLIST_INSERT_HEAD(&W->h.rule, r, next);
      }
 
      free(ks);
