@@ -849,31 +849,31 @@ client_frame_new(struct client *c)
 static void
 _apply_rule(struct client *c, struct rule *r)
 {
-					if(r->screen != -1)
-										c->screen = screen_gb_id(r->screen);
+     if(r->screen != -1)
+          c->screen = screen_gb_id(r->screen);
 
-					c->tag = c->screen->seltag;
-					if(r->tag != -1)
-										c->tag = tag_gb_id(c->screen, r->tag);
+     c->tag = c->screen->seltag;
+     if(r->tag != -1)
+          c->tag = tag_gb_id(c->screen, r->tag);
 
-					c->theme = r->theme;
+     c->theme = r->theme;
 
-					/* free = false for originally free client */
-					if(r->flags & RULE_FREE)
-										c->flags |=  CLIENT_FREE;
-					else
-										c->flags &= ~CLIENT_FREE;
+     /* free = false for originally free client */
+     if(r->flags & RULE_FREE)
+          c->flags |=  CLIENT_FREE;
+     else
+          c->flags &= ~CLIENT_FREE;
 
-					/* Free rule is not compatible with tab rule */
-					if(r->flags & RULE_TAB)
-										W->flags ^= WMFS_TABNOC; /* < can be disable by client_tab_next_opened */
+     /* Free rule is not compatible with tab rule */
+     if(r->flags & RULE_TAB)
+          W->flags ^= WMFS_TABNOC; /* < can be disable by client_tab_next_opened */
 
-					/* TODO
- 				if(r->flags & RULE_IGNORE_TAG)
-					{}
-					*/
+     /* TODO
+     if(r->flags & RULE_IGNORE_TAG)
+     {}
+     */
 
-					c->flags |= CLIENT_RULED;
+     c->flags |= CLIENT_RULED;
 }
 
 #define RINSTANCE 0x01
@@ -916,8 +916,8 @@ client_apply_rule(struct client *c)
      /* Apply a specific rule */
      SLIST_FOREACH(r, &W->h.rule, next)
      {
-										if (r->instance && !strcmp(r->instance, "*"))
-															defaultr = r;
+          if (r->instance && !strcmp(r->instance, "*"))
+               defaultr = r;
           if(s)
           {
                FLAGAPPLY(flags, (xch.res_name && r->instance && !strcmp(xch.res_name, r->instance)), RINSTANCE);
@@ -928,7 +928,7 @@ client_apply_rule(struct client *c)
           FLAGAPPLY(flags, ((role && r->role && !strcmp(role, r->role)) || !role || !r->role), RROLE);
 
           if(flags & (RINSTANCE | RCLASS | RNAME) && flags & RROLE)
-															_apply_rule(c, r);
+               _apply_rule(c, r);
           flags = 0;
      }
 
@@ -940,7 +940,7 @@ client_apply_rule(struct client *c)
 
      /* Apply default rule */
      if (!(c->flags & CLIENT_RULED) && defaultr != NULL)
-										_apply_rule(c, defaultr);
+          _apply_rule(c, defaultr);
 }
 
 struct client*

@@ -284,7 +284,7 @@ config_rule(void)
           else
                r->theme = W->ctheme;
 
-										SLIST_INSERT_HEAD(&W->h.rule, r, next);
+          SLIST_INSERT_HEAD(&W->h.rule, r, next);
      }
 
      free(ks);
