@@ -46,6 +46,8 @@ tag_new(struct screen *s, char *name)
 void
 tag_screen(struct screen *s, struct tag *t)
 {
+     struct client *c;
+
      if(t == s->seltag && TAILQ_NEXT(TAILQ_FIRST(&s->tags), next))
           t = t->prev;
 
@@ -55,6 +57,10 @@ tag_screen(struct screen *s, struct tag *t)
      t->prev = s->seltag;
      s->seltag = t;
 
+     /* Move clients if they ignore tags */
+     SLIST_FOREACH(c, &W->h.client, next)
+          if (c->flags & CLIENT_IGNORE_TAG)
+               tag_client(c->screen->seltag, c);
      clients_arrange_map();
 
      if(!SLIST_EMPTY(&t->clients) && !(W->flags & WMFS_SCAN))
