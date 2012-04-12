@@ -903,8 +903,7 @@ client_apply_rule(struct client *c)
                if(r->tag != -1)
                     c->tag = tag_gb_id(c->screen, r->tag);
 
-               if (r->theme)
-                    c->theme = r->theme;
+															c->theme = r->theme;
 
                /* free = false for originally free client */
                if(r->flags & RULE_FREE)
@@ -942,8 +941,7 @@ client_apply_rule(struct client *c)
           if(r->tag != -1)
                c->tag = tag_gb_id(c->screen, r->tag);
 
-          if (r->theme)
-               c->theme = r->theme;
+										c->theme = r->theme;
 
           /* free = false for originally free client */
           if(r->flags & RULE_FREE)

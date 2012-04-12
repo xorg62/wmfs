@@ -285,7 +285,7 @@ config_rule(void)
           else
                r->theme = W->ctheme;
 
-          if (!strcmp(r->name, "default"))
+          if (r->name && !strcmp(r->name, "default"))
           {
                W->crule = r;
           }
