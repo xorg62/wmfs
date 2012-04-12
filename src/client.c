@@ -882,6 +882,7 @@ client_apply_rule(struct client *c)
           XFree(data);
      }
 
+     // Apply a specific rule
      SLIST_FOREACH(r, &W->h.rule, next)
      {
           if(s)
@@ -902,7 +903,8 @@ client_apply_rule(struct client *c)
                if(r->tag != -1)
                     c->tag = tag_gb_id(c->screen, r->tag);
 
-               c->theme = r->theme;
+               if (r->theme)
+                    c->theme = r->theme;
 
                /* free = false for originally free client */
                if(r->flags & RULE_FREE)
@@ -929,6 +931,37 @@ client_apply_rule(struct client *c)
 
      if(wmname)
           free(wmname);
+
+     // Apply default rule
+     if (!(c->flags & CLIENT_RULED) && (r = W->crule) != NULL)
+     {
+          if(r->screen != -1)
+               c->screen = screen_gb_id(r->screen);
+
+          c->tag = c->screen->seltag;
+          if(r->tag != -1)
+               c->tag = tag_gb_id(c->screen, r->tag);
+
+          if (r->theme)
+               c->theme = r->theme;
+
+          /* free = false for originally free client */
+          if(r->flags & RULE_FREE)
+               c->flags |=  CLIENT_FREE;
+          else
+               c->flags &= ~CLIENT_FREE;
+
+          /* Free rule is not compatible with tab rule */
+          if(r->flags & RULE_TAB)
+               W->flags ^= WMFS_TABNOC; /* < can be disable by client_tab_next_opened */
+
+          /* TODO
+             if(r->flags & RULE_IGNORE_TAG)
+             {}
+             */
+
+          c->flags |= CLIENT_RULED;
+     }
 }
 
 struct client*
