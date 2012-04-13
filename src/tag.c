@@ -61,7 +61,19 @@ tag_screen(struct screen *s, struct tag *t)
      SLIST_FOREACH(c, &W->h.client, next)
           if (c->flags & CLIENT_IGNORE_TAG)
                tag_client(c->screen->seltag, c);
+
      clients_arrange_map();
+
+     /* Update focus */
+     if (t->sel == NULL)
+     {
+          SLIST_FOREACH(c, &W->h.client, next)
+               if (c->tag == t)
+               {
+                    client_focus(c);
+                    break;
+               }
+     }
 
      if(!SLIST_EMPTY(&t->clients) && !(W->flags & WMFS_SCAN))
           client_focus( client_tab_next(t->sel));
