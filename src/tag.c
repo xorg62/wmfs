@@ -59,8 +59,8 @@ tag_screen(struct screen *s, struct tag *t)
 
      /* Move clients if they ignore tags */
      SLIST_FOREACH(c, &W->h.client, next)
-          if (c->flags & CLIENT_IGNORE_TAG)
-               tag_client(c->screen->seltag, c);
+          if (c->flags & CLIENT_IGNORE_TAG && c->screen == s)
+               tag_client(s->seltag, c);
 
      clients_arrange_map();
 
