@@ -98,8 +98,7 @@ tag_client(struct tag *t, struct client *c)
           }
      }
 
-     if (!(c->flags & CLIENT_IGNORE_TAG))
-          c->flags &= ~CLIENT_RULED;
+     c->flags &= ~CLIENT_RULED;
 
      /* Client remove */
      if(!t)
