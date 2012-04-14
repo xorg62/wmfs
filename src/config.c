@@ -235,8 +235,19 @@ config_client(void)
      sec = fetch_section_first(NULL, "client");
 
      W->client_mod = modkey_keysym(fetch_opt_first(sec, "Super", "key_modifier").str);
+
+     /* Get theme */
      tmp = fetch_opt_first(sec, "default", "theme").str;
      W->ctheme = name_to_theme(tmp);
+
+     /* Get focus configuration */
+     tmp = fetch_opt_first(sec, "enter", "focus").str;
+     if(!strcmp(tmp, "enter"))
+          W->cfocus = CFOCUS_ENTER;
+     else if(!strcmp(tmp, "click"))
+          W->cfocus = CFOCUS_CLICK;
+     else
+          W->cfocus = 0;
 
      /* [mouse] */
      /* for client frame AND titlebar */
