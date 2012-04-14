@@ -46,17 +46,26 @@ tag_new(struct screen *s, char *name)
 void
 tag_screen(struct screen *s, struct tag *t)
 {
+     struct client *c;
+
+     /* Return to the previous tag */
      if(t == s->seltag && TAILQ_NEXT(TAILQ_FIRST(&s->tags), next))
           t = t->prev;
 
      if(!t)
           t = TAILQ_FIRST(&s->tags);
 
+     /* Move clients which ignore tags */
+     SLIST_FOREACH(c, &W->h.client, next)
+          if (c->flags & CLIENT_IGNORE_TAG)
+               tag_client(t, c);
+
      t->prev = s->seltag;
      s->seltag = t;
 
      clients_arrange_map();
 
+     /* Update focus */
      if(!SLIST_EMPTY(&t->clients) && !(W->flags & WMFS_SCAN))
           client_focus( client_tab_next(t->sel));
 

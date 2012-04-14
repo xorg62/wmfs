@@ -548,7 +548,8 @@ _client_tab(struct client *c, struct client *cm)
 
      /* Do not tab already tabbed client */
      if(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER)
-        || c->tag != cm->tag || c == cm)
+        || c->tag != cm->tag || c == cm
+        || !COMPCLIENT(c, cm))
           return;
 
      layout_split_arrange_closed(c);
@@ -1456,6 +1457,25 @@ uicb_client_toggle_free(Uicb cmd)
           SLIST_FOREACH(c, &W->client->tag->clients, tnext)
                if(c->tabmaster == W->client && c != W->client)
                     c->flags ^= CLIENT_FREE;
+     }
+}
+
+void uicb_client_toggle_ignore_tag(Uicb cmd)
+{
+     struct client *c;
+     (void)cmd;
+
+     if(!(W->client))
+          return;
+
+     W->client->flags ^= CLIENT_IGNORE_TAG;
+
+     /* Set tabbed client of toggled client as ignore_tag */
+     if(W->client->flags & CLIENT_TABMASTER)
+     {
+          SLIST_FOREACH(c, &W->client->tag->clients, tnext)
+               if(c->tabmaster == W->client && c != W->client)
+                    c->flags ^= CLIENT_IGNORE_TAG;
      }
 }
 
