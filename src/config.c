@@ -241,13 +241,12 @@ config_client(void)
      W->ctheme = name_to_theme(tmp);
 
      /* Get focus configuration */
+     W->cfocus = 0;
      tmp = fetch_opt_first(sec, "enter", "focus").str;
-     if(!strcmp(tmp, "enter"))
-          W->cfocus = CFOCUS_ENTER;
-     else if(!strcmp(tmp, "click"))
-          W->cfocus = CFOCUS_CLICK;
-     else
-          W->cfocus = 0;
+     if(strstr(tmp, "enter"))
+          W->cfocus |= CFOCUS_ENTER;
+     if(strstr(tmp, "click"))
+          W->cfocus |= CFOCUS_CLICK;
 
      /* [mouse] */
      /* for client frame AND titlebar */
