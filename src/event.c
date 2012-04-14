@@ -27,6 +27,7 @@ event_buttonpress(XEvent *e)
      XButtonEvent *ev = &e->xbutton;
      struct mousebind *m;
      struct barwin *b;
+     struct client *c;
 
      screen_update_sel();
      status_flush_surface();
@@ -44,6 +45,9 @@ event_buttonpress(XEvent *e)
 
                break;
           }
+     if((c = client_gb_win(ev->window)) && c != W->client
+         && ev->button == 1 && W->cfocus & CFOCUS_CLICK)
+          client_focus(c);
 }
 
 static void
@@ -67,7 +71,8 @@ event_enternotify(XEvent *e)
                c->flags ^= CLIENT_IGNORE_ENTER;
           else if(c->tag->flags & TAG_IGNORE_ENTER)
                c->tag->flags ^= TAG_IGNORE_ENTER;
-          else if(c != W->client && !(c->flags & CLIENT_TABBED))
+          else if(c != W->client && !(c->flags & CLIENT_TABBED)
+                  && W->cfocus & CFOCUS_ENTER)
                client_focus(c);
      }
 }

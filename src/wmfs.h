@@ -349,6 +349,9 @@ struct wmfs
      char *confpath;
      struct barwin *last_clicked_barwin;
      struct theme *ctheme;
+#define CFOCUS_ENTER 0x01
+#define CFOCUS_CLICK 0x02
+     Flags cfocus; /* Focus configuration, can be set to 0, CFOCUS_ENTER or CFOCUS_CLICK*/
 
      /* Log file */
      FILE *log;
