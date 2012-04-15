@@ -263,7 +263,7 @@
   [key] mod = {"Super"} key = "f" func = "client_toggle_free" [/key]
 
   # Toggle client ignore_tag
-  [key] mod = {"Super", "Shift"} key = "f" func = "client_toggle_free" [/key]
+  [key] mod = {"Super", "Shift"} key = "f" func = "client_toggle_ignore_tag" [/key]
 
   # Launcher
   [key] mod = {"Super"} key = "p" func = "launcher" cmd = "exec" [/key]
