@@ -915,10 +915,8 @@ client_apply_rule(struct client *c)
                if(r->flags & RULE_TAB)
                     W->flags ^= WMFS_TABNOC; /* < can be disable by client_tab_next_opened */
 
-               /* TODO
-                  if(r->flags & RULE_IGNORE_TAG)
-                  {}
-               */
+               if(r->flags & RULE_IGNORE_TAG)
+                    c->flags |= CLIENT_IGNORE_TAG;
 
                c->flags |= CLIENT_RULED;
           }
