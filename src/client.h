@@ -18,6 +18,9 @@
      SLIST_FOREACH(V, H, F)       \
      if(!(V->flags & CLIENT_FREE))
 
+/* Are two clients compatibles ? (to be tabbed together) */
+#define COMPCLIENT(C1, C2) ((C1->flags & CLIENT_IGNORE_TAG) == (C2->flags & CLIENT_IGNORE_TAG))
+
 void client_configure(struct client *c);
 struct client *client_gb_win(Window w);
 struct client *client_gb_frame(Window w);
@@ -58,6 +61,7 @@ void client_update_props(struct client *c, Flags f);
 void client_fac_hint(struct client *c);
 void uicb_client_untab(Uicb cmd);
 void uicb_client_toggle_free(Uicb cmd);
+void uicb_client_toggle_ignore_tag(Uicb cmd);
 void uicb_client_tab_next_opened(Uicb cmd);
 
 /* Generated */
@@ -187,14 +191,14 @@ clients_tag_arrange_map(struct tag *t)
 }
 
 static inline struct client*
-client_get_larger(struct tag *t)
+client_get_larger(struct tag *t, bool ignoring_tag)
 {
      struct client *c, *lc = NULL;
      int tmp, l = 0;
 
      FOREACH_NFCLIENT(c, &t->clients, tnext)
      {
-          if((tmp = (c->geo.w + c->geo.h)) > l)
+          if((tmp = (c->geo.w + c->geo.h)) > l && (c->flags & CLIENT_IGNORE_TAG) == ignoring_tag)
           {
                l = tmp;
                lc = c;

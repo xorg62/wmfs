@@ -216,6 +216,7 @@ struct client
 #define CLIENT_FREE          0x1000
 #define CLIENT_TILED         0x2000
 #define CLIENT_MOUSE         0x4000
+#define CLIENT_IGNORE_TAG    0x8000
      Flags flags;
      Window win, frame, tmp;
      SLIST_ENTRY(client) next;   /* Global list */
@@ -349,6 +350,9 @@ struct wmfs
      char *confpath;
      struct barwin *last_clicked_barwin;
      struct theme *ctheme;
+#define CFOCUS_ENTER 0x01
+#define CFOCUS_CLICK 0x02
+     Flags cfocus; /* Focus configuration, can be set to 0, CFOCUS_ENTER or CFOCUS_CLICK*/
 
      /* Log file */
      FILE *log;
