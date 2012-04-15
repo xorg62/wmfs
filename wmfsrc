@@ -136,6 +136,7 @@
 [rules]
 
   [rule]
+      # use instance = "*" for a all-clients rule
       instance = "chromium"
 
       # role   = ""
