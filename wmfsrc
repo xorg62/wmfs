@@ -118,6 +118,12 @@
   theme = "default"
   key_modifier = "Super"
 
+  # Focus type:
+  #  enter : focus follow mouse (default)
+  #  click : click to focus
+  #  everything-else : disable mouse focus support
+  focus = enter
+
   [mouse] button = "1" func = "client_focus_click"    [/mouse]
   [mouse] button = "1" func = "mouse_swap"            [/mouse]
   [mouse] button = "2" func = "mouse_tab"             [/mouse]
@@ -130,6 +136,7 @@
 [rules]
 
   [rule]
+      # use instance = "*" for a all-clients rule
       instance = "chromium"
 
       # role   = ""
@@ -255,6 +262,9 @@
 
   # Toggle client free/tile
   [key] mod = {"Super"} key = "f" func = "client_toggle_free" [/key]
+
+  # Toggle client ignore_tag
+  [key] mod = {"Super", "Shift"} key = "f" func = "client_toggle_ignore_tag" [/key]
 
   # Launcher
   [key] mod = {"Super"} key = "p" func = "launcher" cmd = "exec" [/key]
