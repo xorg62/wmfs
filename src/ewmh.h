@@ -125,5 +125,6 @@ long ewmh_get_xembed_state(Window win);
 void ewmh_update_wmfs_props(void);
 void ewmh_manage_state(long data[], struct client *c);
 void ewmh_manage_window_type(struct client *c);
+bool ewmh_manage_window_type_desktop(Window win);
 
 #endif /* EWMH_H */

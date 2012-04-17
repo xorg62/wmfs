@@ -268,3 +268,36 @@ ewmh_manage_window_type(struct client *c)
      }
 }
 
+bool
+ewmh_manage_window_type_desktop(Window win)
+{
+     Atom *atom, rf;
+     int f;
+     unsigned long n, il, i;
+     unsigned char *data = NULL;
+     bool is_desktop = false;
+
+     if(XGetWindowProperty(W->dpy, win, W->net_atom[net_wm_window_type], 0L, 0x7FFFFFFF,
+                           False, XA_ATOM, &rf, &f, &n, &il, &data) == Success && n)
+     {
+          atom = (Atom*)data;
+
+          for(i = 0; i < n; ++i)
+          {
+               /* If it is a _NET_WM_WINDOW_TYPE_DESKTOP window */
+               if(atom[i] == W->net_atom[net_wm_window_type_desktop])
+               {
+                    /* map it, but don't manage it */
+                    XMapWindow(W->dpy, win);
+                    XMapSubwindows(W->dpy, win);
+
+                    is_desktop = true;
+                    break;
+               }
+          }
+
+          XFree(data);
+     }
+
+     return is_desktop;
+}
