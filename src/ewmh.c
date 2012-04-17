@@ -42,6 +42,7 @@ ewmh_init(void)
      W->net_atom[net_supporting_wm_check]        = ATOM("_NET_SUPPORTING_WM_CHECK");
      W->net_atom[net_wm_window_opacity]          = ATOM("_NET_WM_WINDOW_OPACITY");
      W->net_atom[net_wm_window_type_normal]      = ATOM("_NET_WM_WINDOW_TYPE_NORMAL");
+     W->net_atom[net_wm_window_type_desktop]     = ATOM("_NET_WM_WINDOW_TYPE_DESKTOP");
      W->net_atom[net_wm_window_type_dock]        = ATOM("_NET_WM_WINDOW_TYPE_DOCK");
      W->net_atom[net_wm_window_type_splash]      = ATOM("_NET_WM_WINDOW_TYPE_SPLASH");
      W->net_atom[net_wm_window_type_dialog]      = ATOM("_NET_WM_WINDOW_TYPE_DIALOG");

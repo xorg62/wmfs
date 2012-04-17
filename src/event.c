@@ -242,10 +242,36 @@ event_maprequest(XEvent *e)
      XWindowAttributes at;
      struct _systray *s;
 
+     Atom *atom, rf;
+     int f;
+     unsigned long n, il, i;
+     unsigned char *data = NULL;
+
      /* Which windows to manage */
      if(!XGetWindowAttributes(EVDPY(e), ev->window, &at)
         || at.override_redirect)
           return;
+
+     if(XGetWindowProperty(EVDPY(e), ev->window, W->net_atom[net_wm_window_type], 0L, 0x7FFFFFFF,
+                           False, XA_ATOM, &rf, &f, &n, &il, &data) == Success && n)
+     {
+          atom = (Atom*)data;
+
+          for(i = 0; i < n; ++i)
+          {
+               /* If it is a _NET_WM_WINDOW_TYPE_DESKTOP window */
+               if(atom[i] == W->net_atom[net_wm_window_type_desktop])
+               {
+                    /* map it, but don't manage it */
+                    XMapWindow(EVDPY(e), ev->window);
+                    XMapSubwindows(EVDPY(e), ev->window);
+                    XFree(data);
+                    return;
+               }
+          }
+
+          XFree(data);
+     }
 
      if(!client_gb_win(ev->window))
           client_new(ev->window, &at, false);

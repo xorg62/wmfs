@@ -60,6 +60,7 @@ enum
      net_supporting_wm_check,
      net_wm_window_opacity,
      net_wm_window_type_normal,
+     net_wm_window_type_desktop,
      net_wm_window_type_dock,
      net_wm_window_type_splash,
      net_wm_window_type_dialog,
