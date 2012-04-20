@@ -2,7 +2,7 @@
 .\"    dev: xorg62
 .\"    man: arpinux
 .\"
-.TH "WMFS" "1" "2012/02/08" "wmfs" "manual of wmfs"
+.TH "WMFS" "1" "2012/04/20" "wmfs" "manual of wmfs"
 .\" disable hyphenation
 .nh
 .\" disable justification (adjust text to left margin only)
@@ -265,7 +265,7 @@ Restore next layout
 .PP
 \fBSuper + p\fR
 .RS 4
-Make a launcher in the statusbar to run an unix command\fR
+Display a launcher in the statusbar to run an unix command\fR
 .RE
 .PP
 \fBSuper + F[1\&.\&.9]\fR
@@ -291,7 +291,7 @@ Add current tag\fR
 WMFS is configured by \fI$HOME/\&.config/wmfs/wmfsrc\fR\&.
 .RE
 .PP
-\fB\ include\fR
+\fB\ include:\fR
 wmfsrc supports ”@include” to split configuration file by section\&.
 .RS 2
 \fB\ Usage:\fR "@include ~/.config/wmfs/wmfs_themes"\&.
@@ -302,121 +302,124 @@ wmfsrc supports themes for client and statusbar\&.
 .RS 2
 \fB Misc\fR
 .RS 2
-\fB\ name\fR
-theme name: will be used in next sections\&.
+\fB\ name:\fR
+theme name, will be used in next sections\&.
 .PP
-\fB\ font\fR
-theme font: in XLFD format\&.
+\fB\ font:\fR
+theme font in XLFD format\&.
 .PP
 .RE
 \fB\ Bars\fR
 .RS 2
-\fB\ bars_width\fR
+\fB\ bars_width:\fR
 bar height in pixels\&.
 .PP
-\fB\ bars_fg/bg\fR
+\fB\ bars_fg/bg:\fR
 statusbar text/background color\&.
 .PP
 .RE
 \fB\ Tags\fR
 .RS 2
-\fB\ tags_normal_fg/bg\fR
+\fB\ tags_normal_fg/bg:\fR
 normal tag text/button color\&.
 .PP
-\fB\ tags_normal_statusline\fR
+\fB\ tags_normal_statusline:\fR
 normal tag statusline\&.
 .PP
-\fB\ tags_sel_fg/bg\fR
+\fB\ tags_sel_fg/bg:\fR
 selected tag text/button color\&.
 .PP
-\fB\ tags_sel_statusline\fR
+\fB\ tags_sel_statusline:\fR
 selected tag statusline\&.
 .PP
-\fB\ tags_occupied_fg/bg\fR
+\fB\ tags_occupied_fg/bg:\fR
 occupied tag text/button color\&.
 .PP
-\fB\ tags_occupied_statusline\fR
+\fB\ tags_occupied_statusline:\fR
 occupied tag statusline\&.
 .PP
-\fB\ tags_urgent_fg/bg\fR
+\fB\ tags_urgent_fg/bg:\fR
 urgent tag text/button color\&.
 .PP
-\fB\ tags_urgent_statusline\fR
+\fB\ tags_urgent_statusline:\fR
 urgent tag statusline\&.
 .PP
-\fB\ tags_border_color\fR
+\fB\ tags_border_color:\fR
 tag button border color\&.
 .PP
-\fB\ tags_border_width\fR
+\fB\ tags_border_width:\fR
 tag button border width\&.
 .PP
 .RE
 \fB\ Clients\fR
 .RS 2
-\fB\ client_normal_fg/bg\fR
+\fB\ client_normal_fg/bg:\fR
 normal client titlebar text/background color\&.
 .PP
-\fB\ client_normal_statusline\fR
+\fB\ client_normal_statusline:\fR
 normal client statusline\&.
 .PP
-\fB\ client_sel_fg/bg\fR
+\fB\ client_sel_fg/bg:\fR
 selected client titlebar text/background color\&.
 .PP
-\fB\ client_sel_statusline\fR
+\fB\ client_sel_statusline:\fR
 selected client statusline\&.
 .PP
-\fB\ frame_bg\fR
+\fB\ frame_bg:\fR
 client border color\&.
 .PP
-\fB\ client_titlebar_width\fR
+\fB\ client_titlebar_width:\fR
 client titlebar height in pixels\&.
 .PP
-\fB\ client_border_width\fR
+\fB\ client_border_width:\fR
 client border height in pixels\&.
 .RE
 .PP
 .RE
 \fB\ [bars]\fR
 .RS 2
-\fB\ position\fR
-statusbar position on screen: 0=Top; 1=Bottom, 2=Hide\&.
+\fB\ position:\fR
+statusbar position on screen (0=Top; 1=Bottom, 2=Hide)\&.
 .PP
-\fB\ screen\fR
-screen to display statusbar(start ar 0), set to\fB -1\fR to display on every screen\&.
+\fB\ screen:\fR
+screen to display statusbar (start ar 0), set to\fB -1\fR to display on every screen\&.
 .PP
-\fB\ elements\fR
-t=Tags, s=Statustext, y=Systray, l=Launcher\&.
+\fB\ elements:\fR
+ordered statusbar elements t=Tags, s=Statustext, y=Systray, l=Launcher\&.
 .PP
-\fB\ theme\fR
+\fB\ theme:\fR
 names of the statusbar theme\&.
 .RE
 .PP
 .RE
 \fB\ [tags]\fR
 .RS 2
-\fB\ screen\fR
+\fB\ screen:\fR
 screen to display tag. use no screen option or screen =\fB -1\fR to set tag on each screen\&.
 .PP
-\fB\ name\fR
+\fB\ name:\fR
 display tagname\&.
 .PP
-\fB\ statusline\fR
+\fB\ statusline:\fR
 draw a custom statusline in the specific tag (can display any sequences)\&.
 .PP
-\fB\ mousebinds\fR
+\fB\ mousebinds:\fR
 mouse actions on the tag buttons\&.
 .RE
 .PP
 .RE
 \fB\ [client]\fR
 .RS 2
-\fB\ theme\fR
+\fB\ theme:\fR
 apply theme to client by default\&.
 .PP
-\fB\ key_modifier\fR
+\fB\ key_modifier:\fR
 key modifier to perform actions on clients\&.
 .PP
-\fB\ mousebinds\fR
+\fB\ focus:\fR
+select the focus mouse options; enter=focus follow mouse, click=click to focus, everything-else=disable focus mouse support\&.
+.PP
+\fB\ mousebinds:\fR
 mouse actions on client\&.
 .RE
 .PP
@@ -424,44 +427,47 @@ mouse actions on client\&.
 \fB\ [rules]\fR
 specific rules for clients: to identify an application, use xprop\&.
 .RS 2
-\fB\ instance\fR
+\fB\ instance:\fR
 first part of WM_CLASS\&.
 .PP
-\fB\ class\fR
+\fB\ class:\fR
 second part of WM_CLASS\&.
 .PP
-\fB\ role\fR
+\fB\ role:\fR
 WM_WINDOW_ROLE\&.
 .PP
-\fB\ name\fR
+\fB\ name:\fR
 _NET_WM_NAME\&.
 .PP
-\fB\ theme\fR
+\fB\ theme:\fR
 apply theme to client\&.
 .PP
-\fB\ tag\fR
-set tag to client(start at 0)\&.
+\fB\ tag:\fR
+specify a tag to display client (start at 0)\&.
 .PP
-\fB\ screen\fR
+\fB\ screen:\fR
 display client on a specific screen\&.
 .PP
-\fB\ free\fR
+\fB\ free:\fR
 client in auto-free mode (true/false)\&.
 .PP
-\fB\ tab\fR
+\fB\ tab:\fR
 open client in a tab (true/false)\&.
+.PP
+\fB\ ignore_tag:\fR
+specify to client to ignore tags (client is displayed on every tag)\&.
 .RE
 .PP
 .RE
 \fB\ [launchers]\fR
 .RS 2
-\fB\ name\fR
+\fB\ name:\fR
 launcher-name, will be used in the [keys] section\&.
 .PP
-\fB\ prompt\fR
+\fB\ prompt:\fR
 display text at the beginning of the prompt\&.
 .PP
-\fB\ command\fR
+\fB\ command:\fR
 command used by the launcher. can be an uicb function or an uicb function + extension\&.
 .RE
 .PP
@@ -470,16 +476,16 @@ command used by the launcher. can be an uicb function or an uicb function + exte
 .RS 2
 each line is contained within\fB\ [key]...[/key]\fR
 .PP
-\fB\ mod\fR
+\fB\ mod:\fR
 key modifier (Alt, Control, Shift, Super)\&.
 .PP
-\fB\ key\fR
-key to press\&.
+\fB\ key:\fR
+key to press, you can identify it with "xev"\&.
 .PP
-\fB\ func\fR
+\fB\ func:\fR
 uicb function to launch\&.
 .PP
-\fB\ cmd\fR
+\fB\ cmd:\fR
 if\fB\ func = "spawn"\fR set the external command to launch\&.
 .sp
 .SH "STATUS"
@@ -505,33 +511,33 @@ statusbars, tags, surfaces and titlebars support sequences to display text, imag
 \fB\ valuemax:\fR maximum value of the ‘value’ used in the progressbar\&.
 .RE
 .PP
-\fB\ basic usage\fR
+\fB\ basic usage:\fR
 wmfs -c status "<barname> TEXT visible on 'barname'"\&.
 .PP
-\fB\ display colors\fR
+\fB\ display colors:\fR
 wmfs -c status "<barname> ^s[<position>;<color>;<text>]"\&.
 .PP
-\fB\ display rectangles\fR
+\fB\ display rectangles:\fR
 wmfs -c status "<barname> ^R[<position>;<dimensions>;<color>]"\&.
 .PP
-\fB\ display images\fR
+\fB\ display images:\fR
 wmfs -c status "<barname> ^i[<position>;<dimensions>;<imagepath>]"\&.
 .PP
-\fB\ display progressbars\fR
+\fB\ display progressbars:\fR
 wmfs -c status "<barname> ^p[<position>;<dimensions>;<border>;<value>;<valuemax>;<bgcolor>;<fgcolor>]"\&.
 .PP
-\fB\ display positionbars\fR
+\fB\ display positionbars:\fR
 wmfs -c status "<barname> ^P[<position>;<dimensions>;<curser>;<value>;<valuemax>;<bgcolor>;<fgcolor>]"\&.
 .PP
-\fB\ display graph\fR
+\fB\ display graph:\fR
 wmfs -c status "<barname> ^g[<position>;<dimensions>;<value>;<valuemax>;<bgcolor>;<fgcolor>;<name>]"\&.
 .RE
 .PP
-\fB\ mousebinds\fR
+\fB\ mousebinds:\fR
 sequences supports mousebinds with format\fB\ (<key>;<uicb-function>)\fR or\fB\ (<key>;<spawn>;<command>)\fR
 .RE
 .PP
-\fB\ surfaces\fR
+\fB\ surfaces:\fR
 you can display popups from the statusbar with the mousebind\fB\ (<key>;status_surface;<position>,<dimension>,<color> <datas>)\fR
 .PP 
 .sp
@@ -545,122 +551,202 @@ UICB functions list. for “User Interface Call Backs”\&.
 \fB\ usage in your terminal:\fR wmfs -c tag_next\&.
 .PP
 \fB\ spawn\fR
+.RS 4
 launch a command. ex: func = "spawn" cmd = "urxvtc -e screen irssi"\&.
+.RE
 .PP
 \fB\ quit\fR
+.RS 4
 quit wmfs\&.
+.RE
 .PP
 \fB\ reload\fR
+.RS 4
 reload wmfs\&.
+.RE
 .PP
 \fB\ tag_set\fR
+.RS 4
 set tag by number\&.
+.RE
 .PP
 \fB\ tag\fR
+.RS 4
 set tag by name\&.
+.RE
 .PP
 \fB\ tag_next/prev\fR
+.RS 4
 set next/previous tag\&.
+.RE
 .PP
 \fB\ tag_client\fR
+.RS 4
 tag the client\&.
+.RE
 .PP
 \fB\ tag_client_and_set\fR
+.RS 4
 teg the client and set the tag\&.
+.RE
 .PP
 \fB\ tag_move_client_next/prev\fR
+.RS 4
 tag the client with next/previous tag\&.
+.RE
 .PP
 \fB\ tag_click\fR
+.RS 4
 display tag with a clic on tag button\&.
+.RE
 .PP
 \fB\ tag_new/del\fR
+.RS 4
 add/delete a tag\&.
+.RE
 .PP
 \fB\ layout_vmirror\fR
+.RS 4
 vertical mirror tiling\&.
+.RE
 .PP
 \fB\ layout_hmirror\fR
+.RS 4
 horizontal mirror tiling\&.
+.RE
 .PP
 \fB\ layout_rotate_left\fR
+.RS 4
 tiling rotate anti/clockwise\&.
+.RE
 .PP
 \fB\ layout_prev_set\fR
+.RS 4
 back to previous set layout\&.
+.RE
 .PP
 \fB\ layout_next_set\fR
+.RS 4
 go to next set layout\&.
+.RE
 .PP
 \fB\ layout_integrate_left/right/top/bottom\fR
+.RS 4
 client integration in the client zone by direction\&.
+.RE
 .PP
 \fB\ client_close\fR
+.RS 4
 close the client\&.
+.RE
 .PP
 \fB\ client_resize_right/left/top/bottom\fR
+.RS 4
 resize client with direction\&.
+.RE
 .PP
 \fB\ client_focus_right/left/top/bottom\fR
+.RS 4
 focus client with direction\&.
+.RE
 .PP
 \fB\ client_tab_right/left/top/bottom\fR
+.RS 4
 tab client with direction\&.
+.RE
 .PP
 \fB\ client_swap_right/left/top/bottom\fR
+.RS 4
 swap client with direction\&.
+.RE
 .PP
 \fB\ client_focus_next/prev\fR
+.RS 4
 move focus to the next/previous client\&.
+.RE
 .PP
 \fB\ client_swap_next/prev\fR
+.RS 4
 swap with the next/previous client\&.
+.RE
 .PP
 \fB\ client_untab\fR
+.RS 4
 untab the client\&.
+.RE
 .PP
 \fB\ client_focus_next_tab\fR
+.RS 4
 move focus to next tab-client\&.
+.RE
 .PP
 \fB\ client_focus_prev_tab\fR
+.RS 4
 move focus to previous tab-client\&.
+.RE
 .PP
 \fB\ client_focus_click\fR
+.RS 4
 give focus to client with a clic\&.
+.RE
 .PP
 \fB\ client_toggle_free\fR
+.RS 4
 toggle free the selected client\&.
+.RE
 .PP
 \fB\ client_toggle_ignore_tag\fR
+.RS 4
 toggle ignore_tag the selected client\&.
+.RE
+.PP
 \fB\ client_tab_next_opened\fR
+.RS 4
 open the client in a tab\&.
+.RE
 .PP
 \fB\ status\fR
+.RS 4
 display the argument text in the statusbar\&.
+.RE
 .PP
 \fB\ status_surface\fR
+.RS 4
 display a surface. can contain sequences\&.
+.RE
 .PP
 \fB\ mouse_resize\fR
+.RS 4
 resize the client\&.
+.RE
 .PP
 \fB\ mouse_move\fR
+.RS 4
 move the client\&.
+.RE
 .PP
 \fB\ mouse_swap\fR
+.RS 4
 swap the client\&.
+.RE
 .PP
 \fB\ mouse_tab\fR
+.RS 4
 tab the client\&.
+.RE
 .PP
 \fB\ screen_next/prev\fR
+.RS 4
 go to next/previous screen\&.
+.RE
 .PP
 \fB\ screen_move_client_next/prev\fR
+.RS 4
 move the client to next/previous screen\&.
+.RE
 .PP
 \fB\ launcher\fR
+.RS 4
 native prompt. ex:\fB\ func = "launcher" cmd = "exec"\fR display the “exec” launcher\&.
 .RE
 .PP
@@ -668,7 +754,7 @@ native prompt. ex:\fB\ func = "launcher" cmd = "exec"\fR display the “exec” 
 .SH "BUGS"
 WMFS isn\'t stable for now\&. So it certainly contains some bugs\&.
 .sp
-.SH "AUTHORS"
+.SH "AUTHOR"
 Martin Duquesnoy <\fIxorg62@gmail\&.com\fR\&[1]>\&.
 .sp
 .SH "WWW"
@@ -680,10 +766,4 @@ Bug tracker: \fIhttps://github\&.com/xorg62/wmfs/issues\fR
 .sp
 .SH "COPYING"
 WMFS is under the BSD license\&. See COPYING for more information\&.
-.sp
-.SH "NOTES"
-.IP " 1." 4
-xorg62@gmail.com
-.RS 4
-\%mailto:xorg62@gmail.com
 .RE
