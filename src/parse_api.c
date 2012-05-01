@@ -42,7 +42,7 @@ string_to_opt(char *s)
      ret.fnum = strtod(s, NULL);
 
      ret.boolean = (!strcmp(s, "true")
-                   || !strcmp(s, "true")
+                   || !strcmp(s, "True")
                    || !strcmp(s, "TRUE")
                    || !strcmp(s, "1"));
 
