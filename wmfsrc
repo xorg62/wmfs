@@ -117,6 +117,9 @@
 
 [client]
 
+  # Padding betwen clients (default: 0) :
+  # padding = 75
+
   theme = "default"
   key_modifier = "Super"
 

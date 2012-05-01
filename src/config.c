@@ -192,7 +192,8 @@ config_tag(void)
      ks = fetch_section(sec, "tag");
      n = fetch_section_count(ks);
 
-     W->tag_circular = fetch_opt_first(sec, "1", "circular").boolean;
+     if (fetch_opt_first(sec, "1", "circular").boolean)
+          W->flags |= WMFS_TAGCIRC;
 
      /* [mouse] */
      if((mb = fetch_section(sec, "mouse")))
@@ -236,6 +237,7 @@ config_client(void)
      /* [client] */
      sec = fetch_section_first(NULL, "client");
 
+     W->padding = fetch_opt_first(sec, "0", "padding").num;
      W->client_mod = modkey_keysym(fetch_opt_first(sec, "Super", "key_modifier").str);
 
      /* Get theme */

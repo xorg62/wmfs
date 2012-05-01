@@ -1174,13 +1174,13 @@ client_moveresize(struct client *c, struct geo *g)
      }
 
      XMoveResizeWindow(W->dpy, c->frame,
-                       c->rgeo.x, c->rgeo.y,
-                       c->rgeo.w, c->rgeo.h);
+                       c->rgeo.x + W->padding / 4, c->rgeo.y + W->padding / 4,
+                       c->rgeo.w - W->padding / 2, c->rgeo.h - W->padding / 2);
 
      if(!(c->flags & CLIENT_FULLSCREEN))
           XMoveResizeWindow(W->dpy, c->win,
                             c->wgeo.x, c->wgeo.y,
-                            c->wgeo.w, c->wgeo.h);
+                            c->wgeo.w - W->padding / 2, c->wgeo.h - W->padding / 2);
 
      c->flags &= ~CLIENT_DID_WINSIZE;
 
