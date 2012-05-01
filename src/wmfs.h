@@ -354,6 +354,8 @@ struct wmfs
 #define CFOCUS_CLICK 0x02
      Flags cfocus; /* Focus configuration, can be set to 0, CFOCUS_ENTER or CFOCUS_CLICK*/
 
+     bool tag_circular;
+
      /* Log file */
      FILE *log;
 

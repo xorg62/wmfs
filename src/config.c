@@ -192,6 +192,8 @@ config_tag(void)
      ks = fetch_section(sec, "tag");
      n = fetch_section_count(ks);
 
+     W->tag_circular = fetch_opt_first(sec, "1", "circular").boolean;
+
      /* [mouse] */
      if((mb = fetch_section(sec, "mouse")))
      {
