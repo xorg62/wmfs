@@ -170,7 +170,7 @@ uicb_tag_next(Uicb cmd)
 
      if((t = TAILQ_NEXT(W->screen->seltag, next)))
                tag_screen(W->screen, t);
-     else if(W->tag_circular)
+     else if(W->flags & WMFS_TAGCIRC)
           tag_screen(W->screen, TAILQ_FIRST(&W->screen->tags));
 }
 
@@ -182,7 +182,7 @@ uicb_tag_prev(Uicb cmd)
 
      if((t = TAILQ_PREV(W->screen->seltag, tsub, next)))
           tag_screen(W->screen, t);
-     else if(W->tag_circular)
+     else if(W->flags & WMFS_TAGCIRC)
           tag_screen(W->screen, TAILQ_LAST(&W->screen->tags, tsub));
 }
 
@@ -214,7 +214,7 @@ uicb_tag_move_client_next(Uicb cmd)
 
      if((t = TAILQ_NEXT(W->screen->seltag, next)))
           tag_client(t, W->client);
-     else if(W->tag_circular)
+     else if(W->flags & WMFS_TAGCIRC)
           tag_client(TAILQ_FIRST(&W->screen->tags), W->client);
 }
 
@@ -229,7 +229,7 @@ uicb_tag_move_client_prev(Uicb cmd)
 
      if((t = TAILQ_PREV(W->screen->seltag, tsub, next)))
           tag_client(t, W->client);
-     else if(W->tag_circular)
+     else if(W->flags & WMFS_TAGCIRC)
           tag_client(TAILQ_LAST(&W->screen->tags, tsub), W->client);
 }
 

@@ -335,14 +335,15 @@ struct wmfs
      int nscreen;
      unsigned int client_mod;
      Flags numlockmask;
-#define WMFS_SCAN     0x01
-#define WMFS_RUNNING  0x02
-#define WMFS_RELOAD   0x04
-#define WMFS_SYSTRAY  0x08
-#define WMFS_LOG      0x10
-#define WMFS_LAUNCHER 0x20
-#define WMFS_SIGCHLD  0x40
-#define WMFS_TABNOC   0x80 /* tab next opened client */
+#define WMFS_SCAN     0x001
+#define WMFS_RUNNING  0x002
+#define WMFS_RELOAD   0x004 
+#define WMFS_SYSTRAY  0x008
+#define WMFS_LOG      0x010
+#define WMFS_LAUNCHER 0x020
+#define WMFS_SIGCHLD  0x040
+#define WMFS_TABNOC   0x080 /* tab next opened client */
+#define WMFS_TAGCIRC  0x100 /* tab_next on last tag -> go to first tag / tab_prev on first tag -> go to last tag */
      Flags flags;
      GC gc, rgc;
      Atom *net_atom;
@@ -354,7 +355,7 @@ struct wmfs
 #define CFOCUS_CLICK 0x02
      Flags cfocus; /* Focus configuration, can be set to 0, CFOCUS_ENTER or CFOCUS_CLICK*/
 
-     bool tag_circular;
+     int padding;
 
      /* Log file */
      FILE *log;

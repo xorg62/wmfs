@@ -1090,18 +1090,22 @@ client_winsize(struct client *c, struct geo *g)
 {
      int ow, oh;
      struct geo og = c->wgeo;
+     struct geo tmp = *g;
+
+     tmp.w -= W->padding >> 1;
+     tmp.h -= W->padding >> 1;
 
      /* Window geo */
      c->wgeo.x = c->border;
      c->wgeo.y = c->tbarw;
-     c->wgeo.h = oh = g->h - (c->border + c->tbarw);
-     c->wgeo.w = ow = g->w - (c->border << 1);
+     c->wgeo.h = oh = tmp.h - (c->border + c->tbarw);
+     c->wgeo.w = ow = tmp.w - (c->border << 1);
 
      client_geo_hints(&c->wgeo, (int*)c->sizeh);
 
      /* Check possible problem for tile integration */
      if(ow < c->sizeh[MINW] || oh < c->sizeh[MINH])
-          if(g->w < c->geo.w || g->h < c->geo.h)
+          if(tmp.w < c->geo.w || tmp.h < c->geo.h)
           {
                c->wgeo = og;
                return true;
@@ -1171,6 +1175,11 @@ client_moveresize(struct client *c, struct geo *g)
 
           c->rgeo.x += c->screen->ugeo.x;
           c->rgeo.y += c->screen->ugeo.y;
+
+          c->rgeo.x += W->padding >> 2;
+          c->rgeo.y += W->padding >> 2;
+          c->rgeo.w -= W->padding >> 1;
+          c->rgeo.h -= W->padding >> 1;
      }
 
      XMoveResizeWindow(W->dpy, c->frame,
