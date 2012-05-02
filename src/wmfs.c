@@ -250,6 +250,9 @@ wmfs_scan(void)
                          continue;
                     }
 
+                    if(ewmh_manage_window_type_desktop(w[i]))
+                         continue;
+
                     if(XGetWindowProperty(W->dpy, w[i], ATOM("_WMFS_TAG"), 0, 32,
                                           False, XA_CARDINAL, &rt, &rf, &ir, &il,
                                           (unsigned char**)&ret)
