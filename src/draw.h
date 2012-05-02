@@ -76,11 +76,22 @@ draw_reversed_rect(Drawable dr, struct client *c, bool t)
      struct geo *ug = &c->screen->ugeo;
      int i = c->theme->client_border_width;
 
-     XDrawRectangle(W->dpy, dr, W->rgc,
-                    ug->x + g->x + i,
-                    ug->y + g->y + i,
-                    g->w - (i << 1),
-                    g->h - (i << 1));
+     if(c->flags & CLIENT_FREE)
+     {
+          XDrawRectangle(W->dpy, dr, W->rgc,
+                         ug->x + g->x + i,
+                         ug->y + g->y + i,
+                         g->w - (i << 1),
+                         g->h - (i << 1));
+     }
+     else
+     {
+          XDrawRectangle(W->dpy, dr, W->rgc,
+                         ug->x + g->x + i + W->padding >> 2,
+                         ug->y + g->y + i + W->padding >> 2,
+                         g->w - (i << 1) - W->padding >> 1,
+                         g->h - (i << 1) - W->padding >> 1);
+     }
 }
 
 static inline void
