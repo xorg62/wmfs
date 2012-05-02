@@ -87,10 +87,10 @@ draw_reversed_rect(Drawable dr, struct client *c, bool t)
      else
      {
           XDrawRectangle(W->dpy, dr, W->rgc,
-                         ug->x + g->x + i + W->padding >> 2,
-                         ug->y + g->y + i + W->padding >> 2,
-                         g->w - (i << 1) - W->padding >> 1,
-                         g->h - (i << 1) - W->padding >> 1);
+                         ug->x + g->x + i + (W->padding >> 2),
+                         ug->y + g->y + i + (W->padding >> 2),
+                         g->w - (i << 1) - (W->padding >> 1),
+                         g->h - (i << 1) - (W->padding >> 1));
      }
 }
 
