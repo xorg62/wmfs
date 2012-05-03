@@ -2,7 +2,7 @@
 .\"    dev: xorg62
 .\"    man: arpinux
 .\"
-.TH "WMFS" "1" "2012/04/20" "wmfs" "manual of wmfs"
+.TH "WMFS" "1" "2012/05/02" "wmfs" "manual of wmfs"
 .\" disable hyphenation
 .nh
 .\" disable justification (adjust text to left margin only)
@@ -394,6 +394,9 @@ names of the statusbar theme\&.
 .RE
 \fB\ [tags]\fR
 .RS 2
+\fB\ circular:\fR
+enable tag wrapping. default is true\&.
+.PP
 \fB\ screen:\fR
 screen to display tag. use no screen option or screen =\fB -1\fR to set tag on each screen\&.
 .PP
@@ -421,6 +424,12 @@ select the focus mouse options; enter=focus follow mouse, click=click to focus, 
 .PP
 \fB\ mousebinds:\fR
 mouse actions on client\&.
+.PP
+\fB\ padding:\fR
+enable padding between clients. default is 0\&.
+.PP
+\fB\ autofocus:\fR
+give focus to new created clients. default is false\&.
 .RE
 .PP
 .RE
