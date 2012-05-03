@@ -335,15 +335,16 @@ struct wmfs
      int nscreen;
      unsigned int client_mod;
      Flags numlockmask;
-#define WMFS_SCAN     0x001
-#define WMFS_RUNNING  0x002
-#define WMFS_RELOAD   0x004 
-#define WMFS_SYSTRAY  0x008
-#define WMFS_LOG      0x010
-#define WMFS_LAUNCHER 0x020
-#define WMFS_SIGCHLD  0x040
-#define WMFS_TABNOC   0x080 /* tab next opened client */
-#define WMFS_TAGCIRC  0x100 /* tab_next on last tag -> go to first tag / tab_prev on first tag -> go to last tag */
+#define WMFS_SCAN      0x001
+#define WMFS_RUNNING   0x002
+#define WMFS_RELOAD    0x004
+#define WMFS_SYSTRAY   0x008
+#define WMFS_LOG       0x010
+#define WMFS_LAUNCHER  0x020
+#define WMFS_SIGCHLD   0x040
+#define WMFS_TABNOC    0x080 /* tab next opened client */
+#define WMFS_TAGCIRC   0x100 /* tab_next on last tag -> go to first tag / tab_prev on first tag -> go to last tag */
+#define WMFS_AUTOFOCUS 0x200
      Flags flags;
      GC gc, rgc;
      Atom *net_atom;

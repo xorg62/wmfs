@@ -1006,7 +1006,8 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
      if(!scan)
      {
           client_get_name(c);
-          client_focus(c);
+          if(W->flags & WMFS_AUTOFOCUS)
+               client_focus(c);
           client_configure(c);
      }
 

@@ -240,6 +240,9 @@ config_client(void)
      W->padding = fetch_opt_first(sec, "0", "padding").num;
      W->client_mod = modkey_keysym(fetch_opt_first(sec, "Super", "key_modifier").str);
 
+     if(fetch_opt_first(sec, "0", "autofocus").boolean)
+          W->flags |= WMFS_AUTOFOCUS;
+
      /* Get theme */
      tmp = fetch_opt_first(sec, "default", "theme").str;
      W->ctheme = name_to_theme(tmp);
