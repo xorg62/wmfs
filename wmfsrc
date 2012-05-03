@@ -91,6 +91,7 @@
 
 [tags]
 
+  # Tag wrapping navigation
   circular = false
 
   # Use no screen option or screen = -1 to set tag on each screen
@@ -117,8 +118,11 @@
 
 [client]
 
-  # Padding betwen clients (default: 0) :
-  padding = 75
+  # Padding between clients (default: 0) :
+  #padding = 75
+
+  # Give focus to new created client (default = false)
+  autofocus = false
 
   theme = "default"
   key_modifier = "Super"
