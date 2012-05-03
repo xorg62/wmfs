@@ -151,7 +151,7 @@ struct infobar
      struct screen *screen;
      struct theme *theme;
      struct status_ctx statusctx;
-     enum barpos pos;
+     enum barpos opos, pos;
      char *elemorder;
      char *name;
      TAILQ_HEAD(esub, element) elements;

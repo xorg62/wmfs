@@ -211,4 +211,13 @@ client_get_larger(struct tag *t, bool ignoring_tag)
      return lc;
 }
 
+static inline void
+clients_layout_refresh(void)
+{
+     struct client *c;
+
+     SLIST_FOREACH(c, &W->h.client, next)
+          layout_fix_hole(c);
+}
+
 #endif /* CLIENT_H */

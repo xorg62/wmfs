@@ -88,4 +88,6 @@ infobar_gb_name(const char *name)
      return SLIST_FIRST(&s->infobars);
 }
 
+void uicb_infobar_toggle_hide(Uicb iname);
+
 #endif /* INFOBAR_H */
