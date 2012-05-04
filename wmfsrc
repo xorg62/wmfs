@@ -275,6 +275,9 @@
   # Toggle client ignore_tag
   [key] mod = {"Super", "Shift"} key = "f" func = "client_toggle_ignore_tag" [/key]
 
+  # Toggle infobar visibility
+  [key] mod = {"Super", "Shift"} key = "h" func = "infobar_toggle_hide" cmd = "default" [/key]
+
   # Launcher
   [key] mod = {"Super"} key = "p" func = "launcher" cmd = "exec" [/key]
 
