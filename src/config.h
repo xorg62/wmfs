@@ -88,6 +88,9 @@ static const struct { char *name; void (*func)(Uicb cmd); } uicb_list[] =
      { "status" ,        uicb_status },
      { "status_surface", uicb_status_surface },
 
+     /* Infobar */
+     { "infobar_toggle_hide", uicb_infobar_toggle_hide },
+
      /* Mouse */
      { "mouse_resize", uicb_mouse_resize },
      { "mouse_move",   uicb_mouse_move },
