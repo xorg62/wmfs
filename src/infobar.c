@@ -515,8 +515,48 @@ infobar_free(struct screen *s)
      }
 }
 
+void
+uicb_infobar_toggle_hide(Uicb iname)
+{
+     struct infobar *i;
 
+     if (iname)
+          i = infobar_gb_name(iname);
+     else
+          i = SLIST_FIRST(&W->screen->infobars);
 
+     if(i->pos == BarHide)
+     {
+          i->pos = i->opos;
 
+          if(infobar_placement(i, i->pos))
+          {
+               barwin_map(i->bar);
+               barwin_map_subwin(i->bar);
+               barwin_refresh_color(i->bar);
+               infobar_refresh(i);
+          }
+     }
+     else
+     {
+          i->opos = i->pos;
+          i->pos = BarHide;
 
+          barwin_unmap_subwin(i->bar);
+          barwin_unmap(i->bar);
+
+          switch(i->opos)
+          {
+               case BarTop:
+                    i->screen->ugeo.y -= i->geo.h;
+               case BarBottom:
+                    i->screen->ugeo.h += i->geo.h;
+               case BarHide:
+               default:
+                    break;
+          }
+     }
+
+     clients_layout_refresh();
+}
 

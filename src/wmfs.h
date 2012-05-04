@@ -151,7 +151,7 @@ struct infobar
      struct screen *screen;
      struct theme *theme;
      struct status_ctx statusctx;
-     enum barpos pos;
+     enum barpos opos, pos;
      char *elemorder;
      char *name;
      TAILQ_HEAD(esub, element) elements;
@@ -217,6 +217,7 @@ struct client
 #define CLIENT_TILED         0x2000
 #define CLIENT_MOUSE         0x4000
 #define CLIENT_IGNORE_TAG    0x8000
+#define CLIENT_STICKY        0x10000
      Flags flags;
      Window win, frame, tmp;
      SLIST_ENTRY(client) next;   /* Global list */

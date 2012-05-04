@@ -227,6 +227,38 @@ ewmh_manage_state(long data[], struct client *c)
                     layout_fix_hole(c);
           }
      }
+
+}
+
+void
+ewmh_manage_state_sticky(struct client *c)
+{
+     Atom *atom, rf;
+     int f;
+     unsigned long n, il, i;
+     unsigned char *data = NULL;
+
+     if(XGetWindowProperty(W->dpy, c->win, W->net_atom[net_wm_state], 0L, 0x7FFFFFFFL, false,
+                           XA_ATOM, &rf, &f, &n, &il, &data) == Success && n)
+     {
+          atom = (Atom*)data;
+
+          for(i = 0; i < n; ++i)
+          {
+               /* manage _NET_WM_STATE_STICKY */
+               if(atom[i] == W->net_atom[net_wm_state_sticky])
+               {
+                    c->flags |= CLIENT_STICKY;
+                    c->flags |= CLIENT_FREE;
+
+                    client_place_at_mouse(c);
+
+                    break;
+               }
+          }
+
+          XFree(data);
+     }
 }
 
 void

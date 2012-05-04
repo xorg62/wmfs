@@ -44,6 +44,7 @@ void client_geo_hints(struct geo *g, int *s);
 void client_get_sizeh(struct client *c);
 bool client_winsize(struct client *c, struct geo *geo);
 void client_moveresize(struct client *c, struct geo *g);
+void client_place_at_mouse(struct client *c);
 void client_maximize(struct client *c);
 void client_fac_resize(struct client *c, enum position p, int fac);
 void client_fac_adjust(struct client *c);
@@ -209,6 +210,15 @@ client_get_larger(struct tag *t, bool ignoring_tag)
           lc = lc->tabmaster;
 
      return lc;
+}
+
+static inline void
+clients_layout_refresh(void)
+{
+     struct client *c;
+
+     SLIST_FOREACH(c, &W->h.client, next)
+          layout_fix_hole(c);
 }
 
 #endif /* CLIENT_H */
