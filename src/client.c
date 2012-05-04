@@ -972,12 +972,14 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
           client_apply_rule(c);
      }
 
+     ewmh_manage_state_sticky(c);
+
      /*
       * Conf option set per client, for possibility
       * to config only one client
       */
      c->border = c->theme->client_border_width;
-     if(!(c->tbarw = c->theme->client_titlebar_width))
+     if(!(c->tbarw = c->theme->client_titlebar_width) || (c->flags & CLIENT_STICKY))
           c->tbarw = c->border;
 
      c->ncol = c->theme->client_n;
@@ -1197,6 +1199,25 @@ client_moveresize(struct client *c, struct geo *g)
      client_frame_update(c, CCOL(c));
      client_update_props(c, CPROP_GEO);
      client_configure(c);
+}
+
+void
+client_place_at_mouse(struct client *c)
+{
+     int x, y;
+
+     Window w;
+     int d, u;
+
+     XQueryPointer(W->dpy, W->root, &w, &w, &x, &y, &d, &d, (uint *)&u);
+
+     if(x < c->screen->ugeo.x)
+          x = 0;
+     if(y < c->screen->ugeo.y)
+          y = 0;
+
+     c->geo.x = ((x + c->geo.w) > c->screen->ugeo.w ? c->screen->ugeo.w - c->geo.w : x);
+     c->geo.y = ((y + c->geo.h) > c->screen->ugeo.h ? c->screen->ugeo.h - c->geo.h : y);
 }
 
 void
