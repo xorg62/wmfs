@@ -245,7 +245,8 @@ event_maprequest(XEvent *e)
      /* Which windows to manage */
      if(!XGetWindowAttributes(EVDPY(e), ev->window, &at)
         || at.override_redirect
-        || ewmh_manage_window_type_desktop(ev->window))
+        || ewmh_manage_window_type_desktop(ev->window)
+        || ewmh_manage_state_sticky(ev->window))
           return;
 
      if(!client_gb_win(ev->window))
