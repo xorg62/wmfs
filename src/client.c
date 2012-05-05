@@ -972,14 +972,12 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
           client_apply_rule(c);
      }
 
-     ewmh_manage_state_sticky(c);
-
      /*
       * Conf option set per client, for possibility
       * to config only one client
       */
      c->border = c->theme->client_border_width;
-     if(!(c->tbarw = c->theme->client_titlebar_width) || (c->flags & CLIENT_STICKY))
+     if(!(c->tbarw = c->theme->client_titlebar_width))
           c->tbarw = c->border;
 
      c->ncol = c->theme->client_n;
