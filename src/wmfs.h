@@ -217,7 +217,6 @@ struct client
 #define CLIENT_TILED         0x2000
 #define CLIENT_MOUSE         0x4000
 #define CLIENT_IGNORE_TAG    0x8000
-#define CLIENT_STICKY        0x10000
      Flags flags;
      Window win, frame, tmp;
      SLIST_ENTRY(client) next;   /* Global list */

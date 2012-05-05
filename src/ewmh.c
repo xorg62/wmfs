@@ -230,15 +230,16 @@ ewmh_manage_state(long data[], struct client *c)
 
 }
 
-void
-ewmh_manage_state_sticky(struct client *c)
+bool
+ewmh_manage_state_sticky(Window win)
 {
      Atom *atom, rf;
      int f;
      unsigned long n, il, i;
      unsigned char *data = NULL;
+     bool is_sticky = false;
 
-     if(XGetWindowProperty(W->dpy, c->win, W->net_atom[net_wm_state], 0L, 0x7FFFFFFFL, false,
+     if(XGetWindowProperty(W->dpy, win, W->net_atom[net_wm_state], 0L, 0x7FFFFFFFL, false,
                            XA_ATOM, &rf, &f, &n, &il, &data) == Success && n)
      {
           atom = (Atom*)data;
@@ -248,17 +249,59 @@ ewmh_manage_state_sticky(struct client *c)
                /* manage _NET_WM_STATE_STICKY */
                if(atom[i] == W->net_atom[net_wm_state_sticky])
                {
-                    c->flags |= CLIENT_STICKY;
-                    c->flags |= CLIENT_FREE;
+                    XWindowAttributes at;
 
-                    client_place_at_mouse(c);
+                    XMapWindow(W->dpy, win);
+                    XMapSubwindows(W->dpy, win);
 
+                    if(XGetWindowAttributes(W->dpy, win, &at))
+                    {
+                         struct geo g;
+
+                         if(at.x < W->screen->ugeo.x)
+                              g.x = W->screen->ugeo.x;
+                         else if((at.x + at.width) > W->screen->ugeo.w)
+                              g.x = W->screen->ugeo.w - at.width;
+                         else
+                              g.x = at.x;
+
+                         if(at.y < W->screen->ugeo.y)
+                              g.y = W->screen->ugeo.y;
+                         else if((at.y + at.height) > W->screen->ugeo.h)
+                              g.y = W->screen->ugeo.h - at.height;
+                         else
+                              g.y = at.y;
+
+                         XMoveWindow(W->dpy, win, g.x, g.y);
+                    }
+
+                    if(W->client)
+                    {
+                         XUngrabButton(W->dpy, AnyButton, AnyModifier, W->client->win);
+                         XGrabButton(W->dpy, AnyButton, AnyModifier, W->client->win, False,
+                                   ButtonMask, GrabModeAsync, GrabModeSync, None, None);
+
+                         client_frame_update(W->client, &W->client->ncol);
+
+                         W->client = NULL;
+                    }
+
+
+                    XRaiseWindow(W->dpy, win);
+
+                    XSetInputFocus(W->dpy, win, RevertToPointerRoot, CurrentTime);
+                    XChangeProperty(W->dpy, W->root, W->net_atom[net_active_window], XA_WINDOW, 32,
+                                    PropModeReplace, (unsigned char *)&win, 1);
+
+                    is_sticky = true;
                     break;
                }
           }
 
           XFree(data);
      }
+
+     return is_sticky;
 }
 
 void

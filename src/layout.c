@@ -631,7 +631,7 @@ layout_client(struct client *c)
           return;
      }
 
-     if(c->flags & (CLIENT_FREE | CLIENT_STICKY))
+     if(c->flags & CLIENT_FREE)
      {
           layout_split_arrange_closed(c);
           c->flags ^= CLIENT_TILED;
