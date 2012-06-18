@@ -55,8 +55,8 @@ else
 	    CFLAGS="-I/usr/X11R6/include -I/usr/local/include"
 	    LDFLAGS="-L/usr/X11R6/lib -L/usr/local/lib";;
 	NetBSD)
-	    CFLAGS="-I/usr/X11R7/include -I/usr/local/include"
-	    LDFLAGS="-L/usr/X11R7/lib -L/usr/local/lib";;
+	    CFLAGS="-I/usr/X11R7/include -I/usr/pkg/include"
+	    LDFLAGS="-L/usr/X11R7/lib -L/usr/pkg/lib";;
 	Linux)
 	    CFLAGS=""
 	    LDFLAGS=""
