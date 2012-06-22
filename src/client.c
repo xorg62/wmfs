@@ -304,7 +304,7 @@ client_swap(struct client *c, enum position p)
           if(ev.type == KeyPress)
           {
                XKeyPressedEvent *ke = &ev.xkey;
-               keysym = XKeycodeToKeysym(W->dpy, (KeyCode)ke->keycode, 0);
+               keysym = XkbKeycodeToKeysym(W->dpy, (KeyCode)ke->keycode, 0, 0);
 
                _REV_SBORDER();
 
@@ -1368,7 +1368,7 @@ client_fac_resize(struct client *c, enum position p, int fac)
           if(ev.type == KeyPress)
           {
                XKeyPressedEvent *ke = &ev.xkey;
-               keysym = XKeycodeToKeysym(W->dpy, (KeyCode)ke->keycode, 0);
+               keysym = XkbKeycodeToKeysym(W->dpy, (KeyCode)ke->keycode, 0, 0);
 
                _REV_BORDER();
 

@@ -6,6 +6,8 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
+#include <X11/XKBlib.h>
+
 #include "wmfs.h"
 #include "layout.h"
 #include "ewmh.h"
