@@ -11,6 +11,7 @@
 #include "tag.h"
 #include "status.h"
 #include "systray.h"
+#include "client.h"
 
 #define ELEM_FREE_BARWIN(e)                     \
      while(!SLIST_EMPTY(&e->bars))              \
@@ -518,9 +519,10 @@ infobar_free(struct screen *s)
 void
 uicb_infobar_toggle_hide(Uicb iname)
 {
+     struct client *c;
      struct infobar *i;
 
-     if (iname)
+     if(iname)
           i = infobar_gb_name(iname);
      else
           i = SLIST_FIRST(&W->screen->infobars);
@@ -557,6 +559,6 @@ uicb_infobar_toggle_hide(Uicb iname)
           }
      }
 
-     clients_layout_refresh();
+     SLIST_FOREACH(c, &W->h.client, next)
+          layout_fix_hole(c);
 }
-
