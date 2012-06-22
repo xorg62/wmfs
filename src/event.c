@@ -347,7 +347,7 @@ static void
 event_keypress(XEvent *e)
 {
      XKeyPressedEvent *ev = &e->xkey;
-     KeySym keysym = XKeycodeToKeysym(EVDPY(e), (KeyCode)ev->keycode, 0);
+     KeySym keysym = XkbKeycodeToKeysym(EVDPY(e), (KeyCode)ev->keycode, 0, 0);
      struct keybind *k;
 
      screen_update_sel();
@@ -434,4 +434,3 @@ event_init(void)
      event_handle[SelectionClear]   = event_selectionclearevent;
      event_handle[UnmapNotify]      = event_unmapnotify;
 }
-

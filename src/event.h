@@ -6,6 +6,8 @@
 #ifndef EVENT_H
 #define EVENT_H
 
+#include <X11/XKBlib.h>
+
 #include "wmfs.h"
 
 #define MAX_EV 256
