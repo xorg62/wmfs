@@ -1,3 +1,11 @@
+wmfs (2~beta201206) unstable; urgency=low
+
+  * Updated changelog version
+  * Added build-depends to the control file
+  * Updated Vcs-* fields in the control file
+
+ -- Mickaël Raybaud-Roig <raybaudroigm@gmail.com>  Sun, 24 Jun 2012 13:12:26 +0200
+
 wmfs (2~beta-3) unstable; urgency=low
 
   * Modified build script (debian/rules)
