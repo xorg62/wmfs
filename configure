@@ -75,6 +75,14 @@ fi
 [ -n "$USE_XINERAMA" ] && CFLAGS="$CFLAGS -DHAVE_XINERAMA"
 [ -n "$USE_IMLIB2" ] && CFLAGS="$CFLAGS -DHAVE_IMLIB2"
 
+# Debian hardening options http://wiki.debian.org/Hardening
+which dpkg-buildflags > /dev/null 2>&1
+if [ $? -eq 0 ];
+then
+    CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2 `dpkg-buildflags --get CFLAGS`"
+    LDFLAGS="$LDFLAGS `dpkg-buildflags --get LDFLAGS`"
+fi
+
 cat > Makefile << EOF
 PREFIX=$PREFIX
 XDG_CONFIG_DIR=$XDG_CONFIG_DIR
