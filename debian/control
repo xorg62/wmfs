@@ -3,7 +3,7 @@ Section: x11
 Priority: extra
 Maintainer: Mickaël Raybaud-Roig <raybaudroigm@gmail.com>
 Build-Depends: debhelper (>= 8.0.0), libimlib2-dev, libxinerama-dev, libx11-dev
-Standards-Version: 3.9.2
+Standards-Version: 3.9.3
 Homepage: http://wmfs.info
 Vcs-Git: git://github.com/xorg62/wmfs.git
 Vcs-Browser: https://github.com/xorg62/wmfs
