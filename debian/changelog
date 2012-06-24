@@ -1,4 +1,11 @@
-wmfs (2~beta201206) unstable; urgency=low
+wmfs (2~beta201206-2) unstable; urgency=low
+
+  * Fixed some Lintian warnings
+  * New standards version
+
+ -- Mickaël Raybaud-Roig <raybaudroigm@gmail.com>  Sun, 24 Jun 2012 15:19:38 +0200
+
+wmfs (2~beta201206-1) unstable; urgency=low
 
   * Updated changelog version
   * Added build-depends to the control file
