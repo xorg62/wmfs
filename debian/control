@@ -2,11 +2,11 @@ Source: wmfs
 Section: x11
 Priority: extra
 Maintainer: Mickaël Raybaud-Roig <raybaudroigm@gmail.com>
-Build-Depends: debhelper (>= 8.0.0), autotools-dev
+Build-Depends: debhelper (>= 8.0.0), libimlib2-dev, libxinerama-dev, libx11-dev
 Standards-Version: 3.9.2
 Homepage: http://wmfs.info
-Vcs-Git: git://git.wmfs.info/wmfs.git
-Vcs-Browser: http://git.wmfs.info/wmfs.git/
+Vcs-Git: git://github.com/xorg62/wmfs.git
+Vcs-Browser: https://github.com/xorg62/wmfs
 
 Package: wmfs
 Architecture: any
