@@ -554,12 +554,13 @@ status_surface(int x, int y, int w, int h, Color bg, char *status)
      struct screen *s;
      struct status_ctx ctx;
      int d;
+     Window rw;
 
      if(!status)
           return;
 
      if(x + y < 0)
-          XQueryPointer(W->dpy, W->root, (Window*)&d, (Window*)&d, &x, &y, &d, &d, (unsigned int *)&d);
+          XQueryPointer(W->dpy, W->root, &rw, &rw, &x, &y, &d, &d, (unsigned int *)&d);
 
      s = screen_gb_geo(x, y);
 
