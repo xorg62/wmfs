@@ -114,19 +114,20 @@ event_clientmessageevent(XEvent *e)
                /* Manage _WMFS_FUNCTION && _WMFS_CMD */
                if(type == wmfs_function || type == wmfs_cmd)
                {
+                    Atom rt;
                     int d;
-                    long unsigned int len;
+                    long unsigned int len, il;
                     unsigned char *ret = NULL, *ret_cmd = NULL;
                     void (*func)(Uicb);
 
                     if(XGetWindowProperty(EVDPY(e), W->root, W->net_atom[wmfs_function], 0, 65536,
-                                          False, W->net_atom[utf8_string], (Atom*)&d, &d,
-                                          (long unsigned int*)&d, (long unsigned int*)&d, &ret) == Success
+                                          False, W->net_atom[utf8_string], &rt, &d,
+                                          &len, &il, &ret) == Success
                        && ret && ((func = uicb_name_func((char*)ret))))
                     {
                          if(XGetWindowProperty(EVDPY(e), W->root, W->net_atom[wmfs_cmd], 0, 65536,
-                                               False, W->net_atom[utf8_string], (Atom*)&d, &d,
-                                               &len, (long unsigned int*)&d, &ret_cmd) == Success
+                                               False, W->net_atom[utf8_string], &rt, &d,
+                                               &len, &il, &ret_cmd) == Success
                             && len && ret_cmd)
                          {
                               func((Uicb)ret_cmd);
@@ -327,12 +328,14 @@ event_unmapnotify(XEvent *e)
         && ev->send_event
         && ev->event == W->root)
      {
+          Atom rt;
+          unsigned long n, il;
           int d;
           unsigned char *ret = NULL;
 
           if(XGetWindowProperty(EVDPY(e), c->win, W->net_atom[wm_state], 0, 2,
-                                False, W->net_atom[wm_state], (Atom*)&d, &d,
-                                (long unsigned int*)&d, (long unsigned int*)&d, &ret) == Success)
+                                False, W->net_atom[wm_state], &rt, &d,
+                                &n, &il, &ret) == Success)
                if(*ret == NormalState)
                     client_remove(c);
      }
