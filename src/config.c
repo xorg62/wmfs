@@ -401,7 +401,13 @@ config_init(void)
           sprintf(W->confpath, "%s/"CONFIG_DEFAULT_PATH, getenv("HOME"));
 
           if(get_conf(W->confpath) == -1)
-               errxl(1, "parsing default configuration file (%s) failed.", W->confpath);
+          {
+               warnxl("parsing default configuration file (%s) failed.", W->confpath);
+               sprintf(W->confpath, "%s/wmfs/wmfsrc", XDG_CONFIG_DIR);
+
+               if(get_conf(W->confpath) == -1)
+                   errxl(1, "parsing system configuration file (%s) failed.", W->confpath);
+          }
      }
 
      config_theme();
