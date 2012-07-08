@@ -72,6 +72,7 @@ static void
 status_graph_draw(struct status_ctx *ctx, struct status_seq *sq, struct status_gcache *gc)
 {
      int i, j, y;
+     float c;
      int ys = sq->geo.y + sq->geo.h - 1;
 
      XSetForeground(W->dpy, W->gc, sq->color2);
@@ -83,7 +84,8 @@ status_graph_draw(struct status_ctx *ctx, struct status_seq *sq, struct status_g
           /* You divided by zero didn't you? */
           if(gc->datas[j])
           {
-               y = ys - (sq->geo.h / ((float)sq->data[2] / (float)gc->datas[j])) + 1;
+               c = (float)sq->data[2] / (float)gc->datas[j];
+               y = ys - (sq->geo.h / (c > 1 ? c : 1)) + 1;
                draw_line(ctx->barwin->dr, i, y, i, ys);
           }
      }
