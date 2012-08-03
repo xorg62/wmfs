@@ -27,7 +27,7 @@ SRCS=                 \
 # flags
 CFLAGS+= -DXDG_CONFIG_DIR=\"${XDG_CONFIG_DIR}\"
 CFLAGS+= -DWMFS_VERSION=\"${VERSION}\"
-CFLAGS+= -Wall -Wextra
+CFLAGS+= -Wall -Wextra -Werror
 
 OBJS= ${SRCS:.c=.o}
 
