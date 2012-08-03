@@ -444,7 +444,7 @@ client_frame_update(struct client *c, struct colpair *cp)
 
           _STATUSLINE(c, (cp == &c->scol));
 
-          draw_text(c->titlebar->dr, c->theme, xt, y, cp->fg, c->title);
+          draw_text(c->titlebar->xftdraw, c->theme, xt, y, cp->fg, c->title);
           barwin_refresh(c->titlebar);
      }
      /* Tabbing case, multiple titlebar in frame */
@@ -472,7 +472,7 @@ client_frame_update(struct client *c, struct colpair *cp)
 
                     _STATUSLINE(c, true);
                     draw_rect(c->titlebar->dr, &g, c->scol.bg);
-                    draw_text(c->titlebar->dr, c->theme, xt, y, cp->fg, title);
+                    draw_text(c->titlebar->xftdraw, c->theme, xt, y, cp->fg, title);
                     barwin_refresh(c->titlebar);
 
                     x += f;
@@ -490,7 +490,7 @@ client_frame_update(struct client *c, struct colpair *cp)
 
                     _STATUSLINE(cc, false);
                     draw_rect(cc->titlebar->dr, &g, c->scol.bg);
-                    draw_text(cc->titlebar->dr, c->theme, xt, y - 1, c->ncol.fg, title);
+                    draw_text(cc->titlebar->xftdraw, c->theme, xt, y - 1, c->ncol.fg, title);
                     barwin_refresh(cc->titlebar);
 
                     x += f;
@@ -819,8 +819,8 @@ client_frame_new(struct client *c)
      };
 
      /* Use a fake barwin only to store mousebinds of frame win */
-     frameb = barwin_new(W->root, 0, 0, 1, 1, 0, 0, false);
-     clientb = barwin_new(W->root, 0, 0, 1, 1, 0, 0, false);
+     frameb = barwin_new(W->root, 0, 0, 1, 1, c->ncol.fg, 0, false);
+     clientb = barwin_new(W->root, 0, 0, 1, 1, c->ncol.fg, 0, false);
 
      frameb->win =
           c->frame = XCreateWindow(W->dpy, W->root,

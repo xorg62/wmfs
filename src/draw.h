@@ -18,14 +18,13 @@
 #include "config.h"
 #include "screen.h"
 
-#define TEXTY(t, w) ((t->font.height - t->font.de) + ((w - t->font.height) >> 1))
+#define TEXTY(t, w) ((t->font->height - t->font->descent) + ((w - t->font->height) >> 1))
 #define PAD (8)
 
 static inline void
-draw_text(Drawable d, struct theme *t, int x, int y, Color fg, const char *str)
+draw_text(XftDraw *xftdraw, struct theme *t, int x, int y, XftColor fg, const char *str)
 {
-     XSetForeground(W->dpy, W->gc, fg);
-     XmbDrawString(W->dpy, d, t->font.fontset, W->gc, x, y, str, strlen(str));
+     XftDrawString8(xftdraw, &fg, t->font, x, y, (XftChar8*) str, strlen(str));
 }
 
 static inline void
@@ -103,9 +102,9 @@ draw_line(Drawable d, int x1, int y1, int x2, int y2)
 static inline unsigned short
 draw_textw(struct theme *t, const char *str)
 {
-     XRectangle r;
+     XGlyphInfo r;
 
-     XmbTextExtents(t->font.fontset, str, strlen(str), NULL, &r);
+     XftTextExtents8(W->dpy, t->font, (XftChar8*) str, strlen(str), &r);
 
      return r.width;
 }

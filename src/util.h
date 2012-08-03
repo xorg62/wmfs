@@ -57,6 +57,17 @@ color_atoh(const char *col)
      return xcolor.pixel;
 }
 
+static inline XftColor
+xftcolor_atoh(const char *col)
+{
+     XftColor xcolor;
+
+     if (!XftColorAllocName(W->dpy, DefaultVisual(W->dpy, W->xscreen), DefaultColormap(W->dpy, W->xscreen), col, &xcolor))
+          warnl("Error: cannot allocate color \"%s\".", col);
+
+     return xcolor;
+}
+
 static inline void
 swap_ptr(void **x, void **y)
 {

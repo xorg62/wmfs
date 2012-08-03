@@ -84,27 +84,11 @@ wmfs_numlockmask(void)
 void
 wmfs_init_font(char *font, struct theme *t)
 {
-     XFontStruct **xfs = NULL;
-     char **misschar, **names, *defstring;
-     int d;
-
-     if(!(t->font.fontset = XCreateFontSet(W->dpy, font, &misschar, &d, &defstring)))
+     if(!(t->font = XftFontOpenName(W->dpy, W->xscreen, font)))
      {
           warnxl("Can't load font '%s'", font);
-          t->font.fontset = XCreateFontSet(W->dpy, "fixed", &misschar, &d, &defstring);
+          t->font = XftFontOpenName(W->dpy, W->xscreen, "fixed");
      }
-
-     XExtentsOfFontSet(t->font.fontset);
-     XFontsOfFontSet(t->font.fontset, &xfs, &names);
-
-     t->font.as    = xfs[0]->max_bounds.ascent;
-     t->font.de    = xfs[0]->max_bounds.descent;
-     t->font.width = xfs[0]->max_bounds.width;
-
-     t->font.height = t->font.as + t->font.de;
-
-     if(misschar)
-          XFreeStringList(misschar);
 }
 
 static void
@@ -442,7 +426,7 @@ wmfs_quit(void)
      {
           t = SLIST_FIRST(&W->h.theme);
           SLIST_REMOVE_HEAD(&W->h.theme, next);
-          XFreeFontSet(W->dpy, t->font.fontset);
+          XftFontClose(W->dpy, t->font);
           status_free_ctx(&t->tags_n_sl);
           status_free_ctx(&t->tags_s_sl);
           status_free_ctx(&t->tags_o_sl);

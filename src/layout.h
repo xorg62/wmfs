@@ -7,7 +7,6 @@
 #define LAYOUT_H
 
 #include "wmfs.h"
-#include "client.h"
 
 /* Check lateral direction (if p is Right or Left) */
 #define LDIR(P) (P < Top)

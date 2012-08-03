@@ -72,20 +72,20 @@ config_theme(void)
           wmfs_init_font(fetch_opt_first(ks[i], "fixed", "font").str, t);
 
           /* bars */
-          t->bars.fg    = color_atoh(fetch_opt_first(ks[i], "#CCCCCC", "bars_fg").str);
+          t->bars.fg    = xftcolor_atoh(fetch_opt_first(ks[i], "#CCCCCC", "bars_fg").str);
           t->bars.bg    = color_atoh(fetch_opt_first(ks[i], "#222222", "bars_bg").str);
           t->bars_width = fetch_opt_first(ks[i], "12", "bars_width").num;
 
           /*
            * Elements
            */
-          t->tags_n.fg         = color_atoh(fetch_opt_first(ks[i], "#CCCCCC", "tags_normal_fg").str);
+          t->tags_n.fg         = xftcolor_atoh(fetch_opt_first(ks[i], "#CCCCCC", "tags_normal_fg").str);
           t->tags_n.bg         = color_atoh(fetch_opt_first(ks[i], "#222222", "tags_normal_bg").str);
-          t->tags_s.fg         = color_atoh(fetch_opt_first(ks[i], "#222222", "tags_sel_fg").str);
+          t->tags_s.fg         = xftcolor_atoh(fetch_opt_first(ks[i], "#222222", "tags_sel_fg").str);
           t->tags_s.bg         = color_atoh(fetch_opt_first(ks[i], "#CCCCCC", "tags_sel_bg").str);
-          t->tags_o.fg         = color_atoh(fetch_opt_first(ks[i], "#CCCCCC", "tags_occupied_fg").str);
+          t->tags_o.fg         = xftcolor_atoh(fetch_opt_first(ks[i], "#CCCCCC", "tags_occupied_fg").str);
           t->tags_o.bg         = color_atoh(fetch_opt_first(ks[i], "#444444", "tags_occupied_bg").str);
-          t->tags_u.fg         = color_atoh(fetch_opt_first(ks[i], "#444444", "tags_urgent_fg").str);
+          t->tags_u.fg         = xftcolor_atoh(fetch_opt_first(ks[i], "#444444", "tags_urgent_fg").str);
           t->tags_u.bg         = color_atoh(fetch_opt_first(ks[i], "#CC4444", "tags_urgent_bg").str);
           t->tags_border_col   = color_atoh(fetch_opt_first(ks[i], "#888888", "tags_border_color").str);
           t->tags_border_width = fetch_opt_first(ks[i], "0", "tags_border_width").num;
@@ -111,9 +111,9 @@ config_theme(void)
                status_parse(&t->tags_u_sl);
 
           /* Client / frame */
-          t->client_n.fg = color_atoh(fetch_opt_first(ks[i], "#CCCCCC", "client_normal_fg").str);
+          t->client_n.fg = xftcolor_atoh(fetch_opt_first(ks[i], "#CCCCCC", "client_normal_fg").str);
           t->client_n.bg = color_atoh(fetch_opt_first(ks[i], "#222222", "client_normal_bg").str);
-          t->client_s.fg = color_atoh(fetch_opt_first(ks[i], "#222222", "client_sel_fg").str);
+          t->client_s.fg = xftcolor_atoh(fetch_opt_first(ks[i], "#222222", "client_sel_fg").str);
           t->client_s.bg = color_atoh(fetch_opt_first(ks[i], "#CCCCCC", "client_sel_bg").str);
           t->frame_bg    = color_atoh(fetch_opt_first(ks[i], "#555555", "frame_bg").str);
           t->client_titlebar_width = fetch_opt_first(ks[i], "12", "client_titlebar_width").num;

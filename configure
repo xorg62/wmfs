@@ -1,10 +1,9 @@
 #!/bin/sh
 
-LIBS="x11"
+LIBS="x11 xft freetype2"
 USE_XINERAMA="xinerama"
 USE_XRANDR="xrandr"
 USE_IMLIB2="imlib2"
-USE_XFT="xft freetype2"
 OS=`uname -s`
 PREFIX=/usr/local
 MANPREFIX="$PREFIX/man"

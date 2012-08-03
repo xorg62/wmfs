@@ -77,7 +77,7 @@ infobar_elem_tag_init(struct element *e)
                s = draw_textw(e->infobar->theme, t->name) + PAD;
 
                /* Init barwin */
-               b = barwin_new(e->infobar->bar->win, j, 0, s, e->geo.h, 0, 0, false);
+               b = barwin_new(e->infobar->bar->win, j, 0, s, e->geo.h, e->infobar->theme->bars.fg, 0, false);
 
                /* Status doesn't have theme yet */
                t->statusctx.theme = e->infobar->theme;
@@ -164,7 +164,7 @@ infobar_elem_tag_update(struct element *e)
           status_copy_mousebind(&t->statusctx);
           status_render(&t->statusctx);
 
-          draw_text(b->dr, e->infobar->theme, (PAD >> 1),
+          draw_text(b->xftdraw, e->infobar->theme, (PAD >> 1),
                     TEXTY(e->infobar->theme, e->geo.h), b->fg, t->name);
 
           barwin_refresh(b);
@@ -183,7 +183,7 @@ infobar_elem_status_init(struct element *e)
 
      if(!(b = SLIST_FIRST(&e->bars)))
      {
-          b = barwin_new(e->infobar->bar->win, e->geo.x, 0, e->geo.w, e->geo.h, 0, 0, false);
+          b = barwin_new(e->infobar->bar->win, e->geo.x, 0, e->geo.w, e->geo.h, e->infobar->theme->bars.fg, 0, false);
           barwin_refresh_color(b);
           SLIST_INSERT_HEAD(&e->bars, b, enext);
 
@@ -230,7 +230,7 @@ infobar_elem_systray_init(struct element *e)
 
      if(!(b = SLIST_FIRST(&e->bars)))
      {
-          b = barwin_new(e->infobar->bar->win, e->geo.x, 0, e->geo.w, e->geo.h, 0, 0, false);
+          b = barwin_new(e->infobar->bar->win, e->geo.x, 0, e->geo.w, e->geo.h, e->infobar->theme->bars.fg, 0, false);
           XFreePixmap(W->dpy, b->dr);
           SLIST_INSERT_HEAD(&e->bars, b, enext);
           W->systray.barwin = b;
@@ -265,7 +265,7 @@ infobar_elem_launcher_init(struct element *e)
 
      if(!(b = SLIST_FIRST(&e->bars)))
      {
-          b = barwin_new(e->infobar->bar->win, e->geo.x, 0, e->geo.w, e->geo.h, 0, 0, false);
+          b = barwin_new(e->infobar->bar->win, e->geo.x, 0, e->geo.w, e->geo.h, e->infobar->theme->bars.fg, 0, false);
           b->fg = e->infobar->theme->bars.fg;
           b->bg = e->infobar->theme->bars.bg;
           SLIST_INSERT_HEAD(&e->bars, b, enext);
@@ -292,7 +292,7 @@ infobar_elem_launcher_update(struct element *e)
      barwin_refresh_color(b);
 
      l = draw_textw(e->infobar->theme, e->data) + 2;
-     draw_text(b->dr, e->infobar->theme, 1, TEXTY(e->infobar->theme, e->geo.h), b->fg, e->data);
+     draw_text(b->xftdraw, e->infobar->theme, 1, TEXTY(e->infobar->theme, e->geo.h), b->fg, e->data);
 
      /* Cursor */
      XDrawLine(W->dpy, b->dr, W->gc, l, 2, l, e->geo.h - 4);

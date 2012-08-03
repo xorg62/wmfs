@@ -21,6 +21,9 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 
+/* Xft */
+#include <X11/Xft/Xft.h>
+
 /* Local */
 #include "log.h"
 
@@ -81,7 +84,8 @@ struct geo_list
 
 struct colpair
 {
-     Color fg, bg;
+     XftColor fg;
+     Color bg;
 };
 
 struct barwin
@@ -89,7 +93,9 @@ struct barwin
      struct geo geo;
      Window win;
      Drawable dr;
-     Color fg, bg;
+     XftDraw *xftdraw;
+     XftColor fg;
+     Color bg;
      void *ptr; /* Special cases */
      SLIST_HEAD(mbhead, mousebind) mousebinds;
      SLIST_HEAD(, mousebind) statusmousebinds;
@@ -105,7 +111,8 @@ struct status_seq
      int data[4];
      char type;
      char *str;
-     Color color, color2;
+     XftColor fg;
+     Color bg;
      SLIST_HEAD(, mousebind) mousebinds;
      SLIST_ENTRY(status_seq) next;
 };
@@ -256,11 +263,7 @@ struct theme
      char *name;
 
      /* Font */
-     struct
-     {
-          int as, de, width, height;
-          XFontSet fontset;
-     } font;
+     XftFont *font;
 
      /* Bars */
      struct colpair bars;
