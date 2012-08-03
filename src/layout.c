@@ -152,7 +152,7 @@ _historic_set(struct tag *t, bool prev)
           if(ev.type == KeyPress)
           {
                XKeyPressedEvent *ke = &ev.xkey;
-               keysym = XKeycodeToKeysym(W->dpy, (KeyCode)ke->keycode, 0);
+               keysym = XkbKeycodeToKeysym(W->dpy, (KeyCode)ke->keycode, 0, 0);
 
                _REV_BORDER();
 
