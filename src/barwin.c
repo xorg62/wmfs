@@ -18,7 +18,7 @@
  * \return The BarWindow pointer
 */
 struct barwin*
-barwin_new(Window parent, int x, int y, int w, int h, Color fg, Color bg, bool entermask)
+barwin_new(Window parent, int x, int y, int w, int h, FgColor fg, BgColor bg, bool entermask)
 {
      struct barwin *b = (struct barwin*)xcalloc(1, sizeof(struct barwin));
      XSetWindowAttributes at =
@@ -41,6 +41,9 @@ barwin_new(Window parent, int x, int y, int w, int h, Color fg, Color bg, bool e
                             &at);
 
      b->dr = XCreatePixmap(W->dpy, parent, w, h, W->xdepth);
+#ifdef HAVE_XFT
+     b->xftdraw = XftDrawCreate(W->dpy, b->dr, DefaultVisual(W->dpy, W->xscreen), DefaultColormap(W->dpy, W->xscreen));
+#endif /* HAVE_XFT */
 
      /* Property */
      b->geo.x = x;
@@ -69,6 +72,9 @@ barwin_remove(struct barwin *b)
 
      XSelectInput(W->dpy, b->win, NoEventMask);
      XDestroyWindow(W->dpy, b->win);
+#ifdef HAVE_XFT
+     XftDrawDestroy(b->xftdraw);
+#endif /* HAVE_XFT */
      XFreePixmap(W->dpy, b->dr);
 
      free(b);
@@ -83,9 +89,15 @@ void
 barwin_resize(struct barwin *b, int w, int h)
 {
      /* Frame */
+#ifdef HAVE_XFT
+     XftDrawDestroy(b->xftdraw);
+#endif /* HAVE_XFT */
      XFreePixmap(W->dpy, b->dr);
 
      b->dr = XCreatePixmap(W->dpy, W->root, w, h, W->xdepth);
+#ifdef HAVE_XFT
+     b->xftdraw = XftDrawCreate(W->dpy, b->dr, DefaultVisual(W->dpy, W->xscreen), DefaultColormap(W->dpy, W->xscreen));
+#endif /* HAVE_XFT */
 
      b->geo.w = w;
      b->geo.h = h;

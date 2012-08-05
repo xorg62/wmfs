@@ -18,18 +18,31 @@
 #include "config.h"
 #include "screen.h"
 
+#ifdef HAVE_XFT
+#define TEXTY(t, w) ((t->font->height - t->font->descent) + ((w - t->font->height) >> 1))
+#else
 #define TEXTY(t, w) ((t->font.height - t->font.de) + ((w - t->font.height) >> 1))
+#endif /* HAVE_XFT */
+
 #define PAD (8)
 
+#ifdef HAVE_XFT
 static inline void
-draw_text(Drawable d, struct theme *t, int x, int y, Color fg, const char *str)
+draw_text(XftDraw *xftdraw, struct theme *t, int x, int y, FgColor fg, const char *str)
+{
+     XftDrawString8(xftdraw, &fg, t->font, x, y, (XftChar8*) str, strlen(str));
+}
+#else
+static inline void
+draw_text(Drawable d, struct theme *t, int x, int y, FgColor fg, const char *str)
 {
      XSetForeground(W->dpy, W->gc, fg);
      XmbDrawString(W->dpy, d, t->font.fontset, W->gc, x, y, str, strlen(str));
 }
+#endif /* HAVE_XFT */
 
 static inline void
-draw_rect(Drawable d, struct geo *g, Color bg)
+draw_rect(Drawable d, struct geo *g, BgColor bg)
 {
      XSetForeground(W->dpy, W->gc, bg);
      XFillRectangle(W->dpy, d, W->gc, g->x, g->y, g->w, g->h);
@@ -100,14 +113,22 @@ draw_line(Drawable d, int x1, int y1, int x2, int y2)
      XDrawLine(W->dpy, d, W->gc, x1, y1, x2, y2);
 }
 
+#ifdef HAVE_XFT
+static inline unsigned short
+draw_textw(struct theme *t, const char *str)
+{
+     XGlyphInfo r;
+     XftTextExtents8(W->dpy, t->font, (XftChar8*) str, strlen(str), &r);
+     return r.width;
+}
+#else
 static inline unsigned short
 draw_textw(struct theme *t, const char *str)
 {
      XRectangle r;
-
      XmbTextExtents(t->font.fontset, str, strlen(str), NULL, &r);
-
      return r.width;
 }
+#endif /* HAVE_XFT */
 
 #endif /* DRAW_H */

@@ -75,7 +75,7 @@ status_graph_draw(struct status_ctx *ctx, struct status_seq *sq, struct status_g
      float c;
      int ys = sq->geo.y + sq->geo.h - 1;
 
-     XSetForeground(W->dpy, W->gc, sq->color2);
+     XSetForeground(W->dpy, W->gc, sq->bg);
 
      for(i = sq->geo.x + sq->geo.w - 1, j = gc->ndata - 1;
          j >= 0 && i >= sq->geo.x;
@@ -193,7 +193,7 @@ status_parse(struct status_ctx *ctx)
                STATUS_CHECK_ARGS(i, 2, 3, dstr, end);
                sq = status_new_seq(type, i, 2, arg, &shift);
 
-               sq->color = color_atoh(arg[1 + shift]);
+               sq->fg = fgcolor_atoh(arg[1 + shift]);
                sq->str = xstrdup(arg[2 + shift]);
 
                /* Remove \ from string */
@@ -212,7 +212,7 @@ status_parse(struct status_ctx *ctx)
 
                sq->geo.w = ATOI(arg[1 + shift]);
                sq->geo.h = ATOI(arg[2 + shift]);
-               sq->color = color_atoh(arg[3 + shift]);
+               sq->fg = fgcolor_atoh(arg[3 + shift]);
 
                break;
 
@@ -233,8 +233,8 @@ status_parse(struct status_ctx *ctx)
                sq->data[1] = ((tmp = ATOI(arg[4 + shift])) ? tmp : 1); /* Value */
                sq->data[2] = ATOI(arg[5 + shift]);                     /* Value Max */
 
-               sq->color   = color_atoh(arg[6 + shift]);
-               sq->color2  = color_atoh(arg[7 + shift]);
+               sq->fg = fgcolor_atoh(arg[6 + shift]);
+               sq->bg = bgcolor_atoh(arg[7 + shift]);
 
                break;
 
@@ -252,8 +252,8 @@ status_parse(struct status_ctx *ctx)
                sq->data[1] = ATOI(arg[3 + shift]); /* Value */
                sq->data[2] = ATOI(arg[4 + shift]); /* Value Max */
 
-               sq->color   = color_atoh(arg[5 + shift]);
-               sq->color2  = color_atoh(arg[6 + shift]);
+               sq->fg = fgcolor_atoh(arg[5 + shift]);
+               sq->bg = bgcolor_atoh(arg[6 + shift]);
 
                sq->str = xstrdup(arg[7 + shift]);
 
@@ -334,14 +334,22 @@ status_apply_list(struct status_ctx *ctx)
           /* Text */
           case 's':
                sq->geo.w = draw_textw(ctx->theme, sq->str);
+#ifdef HAVE_XFT
+               sq->geo.h = ctx->theme->font->height;
+#else
                sq->geo.h = ctx->theme->font.height;
+#endif
 
                if(sq->align != NoAlign)
                     sq->geo.y = TEXTY(ctx->theme, ctx->barwin->geo.h);
 
                STATUS_ALIGN(sq->align);
 
-               draw_text(ctx->barwin->dr, ctx->theme, sq->geo.x, sq->geo.y, sq->color, sq->str);
+#ifdef HAVE_XFT
+               draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, sq->str);
+#else
+               draw_text(ctx->barwin->dr, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, sq->str);
+#endif /* HAVE_XFT */
 
                if(!SLIST_EMPTY(&sq->mousebinds))
                     SLIST_FOREACH(m, &sq->mousebinds, snext)
@@ -357,7 +365,7 @@ status_apply_list(struct status_ctx *ctx)
                NOALIGN_Y();
                STATUS_ALIGN(sq->align);
 
-               draw_rect(ctx->barwin->dr, &sq->geo, sq->color);
+               draw_rect(ctx->barwin->dr, &sq->geo, sq->bg);
 
                STORE_MOUSEBIND();
 
@@ -368,7 +376,7 @@ status_apply_list(struct status_ctx *ctx)
                NOALIGN_Y();
                STATUS_ALIGN(sq->align);
 
-               draw_rect(ctx->barwin->dr, &sq->geo, sq->color);
+               draw_rect(ctx->barwin->dr, &sq->geo, sq->bg);
 
                /* Progress bar geo */
                g.x = sq->geo.x + sq->data[0];
@@ -388,7 +396,7 @@ status_apply_list(struct status_ctx *ctx)
                     g.y -= g.h;
                }
 
-               draw_rect(ctx->barwin->dr, &g, sq->color2);
+               draw_rect(ctx->barwin->dr, &g, sq->bg);
 
                STORE_MOUSEBIND();
 
@@ -399,7 +407,7 @@ status_apply_list(struct status_ctx *ctx)
                NOALIGN_Y();
                STATUS_ALIGN(sq->align);
 
-               draw_rect(ctx->barwin->dr, &sq->geo, sq->color);
+               draw_rect(ctx->barwin->dr, &sq->geo, sq->bg);
 
                if(sq->data[1] > sq->data[2])
                     sq->data[1] = sq->data[2];
@@ -409,7 +417,7 @@ status_apply_list(struct status_ctx *ctx)
                g.w = sq->data[0];
                g.h = sq->geo.h;
 
-               draw_rect(ctx->barwin->dr, &g, sq->color2);
+               draw_rect(ctx->barwin->dr, &g, sq->bg);
 
                STORE_MOUSEBIND();
 
@@ -420,7 +428,7 @@ status_apply_list(struct status_ctx *ctx)
                NOALIGN_Y();
                STATUS_ALIGN(sq->align);
 
-               draw_rect(ctx->barwin->dr, &sq->geo, sq->color);
+               draw_rect(ctx->barwin->dr, &sq->geo, sq->bg);
 
                status_graph_process(ctx, sq, sq->str);
 
@@ -466,8 +474,13 @@ status_render(struct status_ctx *ctx)
      if(SLIST_EMPTY(&ctx->statushead))
      {
           int l = draw_textw(ctx->theme, ctx->status);
+#ifdef HAVE_XFT
+          draw_text(ctx->barwin->xftdraw, ctx->theme, ctx->barwin->geo.w - l,
+                    TEXTY(ctx->theme, ctx->barwin->geo.h), ctx->barwin->fg, ctx->status);
+#else
           draw_text(ctx->barwin->dr, ctx->theme, ctx->barwin->geo.w - l,
                     TEXTY(ctx->theme, ctx->barwin->geo.h), ctx->barwin->fg, ctx->status);
+#endif /* HAVE_XFT */
      }
      else
           status_apply_list(ctx);
@@ -550,7 +563,7 @@ status_flush_surface(void)
 }
 
 static void
-status_surface(int x, int y, int w, int h, Color bg, char *status)
+status_surface(int x, int y, int w, int h, BgColor bg, char *status)
 {
      struct barwin *b;
      struct screen *s;
@@ -571,7 +584,7 @@ status_surface(int x, int y, int w, int h, Color bg, char *status)
      if(y + h > s->geo.y + s->geo.h)
           y -= h;
 
-     b = barwin_new(W->root, x, y, w, h, 0, bg, false);
+     b = barwin_new(W->root, x, y, w, h, W->ctheme->bars.fg, bg, false);
      barwin_map(b);
 
      /* Use client theme */
@@ -589,7 +602,7 @@ uicb_status_surface(Uicb cmd)
 {
      char *p, *ccmd = xstrdup(cmd);
      int s, w, h, x = -1, y = -1;
-     Color bg;
+     BgColor bg;
 
      if(!ccmd || !(p = strchr(ccmd, ' ')))
           return;
