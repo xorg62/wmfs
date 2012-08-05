@@ -57,6 +57,7 @@ color_atoh(const char *col)
      return xcolor.pixel;
 }
 
+#ifdef HAVE_XFT
 static inline XftColor
 xftcolor_atoh(const char *col)
 {
@@ -67,6 +68,15 @@ xftcolor_atoh(const char *col)
 
      return xcolor;
 }
+#endif /* HAVE_XFT */
+
+#ifdef HAVE_XFT
+#define fgcolor_atoh xftcolor_atoh
+#define bgcolor_atoh color_atoh
+#else
+#define fgcolor_atoh color_atoh
+#define bgcolor_atoh color_atoh
+#endif /* HAVE_XFT */
 
 static inline void
 swap_ptr(void **x, void **y)

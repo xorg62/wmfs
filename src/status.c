@@ -193,7 +193,7 @@ status_parse(struct status_ctx *ctx)
                STATUS_CHECK_ARGS(i, 2, 3, dstr, end);
                sq = status_new_seq(type, i, 2, arg, &shift);
 
-               sq->fg = xftcolor_atoh(arg[1 + shift]);
+               sq->fg = fgcolor_atoh(arg[1 + shift]);
                sq->str = xstrdup(arg[2 + shift]);
 
                /* Remove \ from string */
@@ -212,7 +212,7 @@ status_parse(struct status_ctx *ctx)
 
                sq->geo.w = ATOI(arg[1 + shift]);
                sq->geo.h = ATOI(arg[2 + shift]);
-               sq->fg = xftcolor_atoh(arg[3 + shift]);
+               sq->fg = fgcolor_atoh(arg[3 + shift]);
 
                break;
 
@@ -233,8 +233,8 @@ status_parse(struct status_ctx *ctx)
                sq->data[1] = ((tmp = ATOI(arg[4 + shift])) ? tmp : 1); /* Value */
                sq->data[2] = ATOI(arg[5 + shift]);                     /* Value Max */
 
-               sq->fg = xftcolor_atoh(arg[6 + shift]);
-               sq->bg = color_atoh(arg[7 + shift]);
+               sq->fg = fgcolor_atoh(arg[6 + shift]);
+               sq->bg = bgcolor_atoh(arg[7 + shift]);
 
                break;
 
@@ -252,8 +252,8 @@ status_parse(struct status_ctx *ctx)
                sq->data[1] = ATOI(arg[3 + shift]); /* Value */
                sq->data[2] = ATOI(arg[4 + shift]); /* Value Max */
 
-               sq->fg = xftcolor_atoh(arg[5 + shift]);
-               sq->bg = color_atoh(arg[6 + shift]);
+               sq->fg = fgcolor_atoh(arg[5 + shift]);
+               sq->bg = bgcolor_atoh(arg[6 + shift]);
 
                sq->str = xstrdup(arg[7 + shift]);
 
@@ -334,14 +334,22 @@ status_apply_list(struct status_ctx *ctx)
           /* Text */
           case 's':
                sq->geo.w = draw_textw(ctx->theme, sq->str);
+#ifdef HAVE_XFT
                sq->geo.h = ctx->theme->font->height;
+#else
+               sq->geo.h = ctx->theme->font.height;
+#endif
 
                if(sq->align != NoAlign)
                     sq->geo.y = TEXTY(ctx->theme, ctx->barwin->geo.h);
 
                STATUS_ALIGN(sq->align);
 
+#ifdef HAVE_XFT
                draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, sq->str);
+#else
+               draw_text(ctx->barwin->dr, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, sq->str);
+#endif /* HAVE_XFT */
 
                if(!SLIST_EMPTY(&sq->mousebinds))
                     SLIST_FOREACH(m, &sq->mousebinds, snext)
@@ -466,8 +474,13 @@ status_render(struct status_ctx *ctx)
      if(SLIST_EMPTY(&ctx->statushead))
      {
           int l = draw_textw(ctx->theme, ctx->status);
+#ifdef HAVE_XFT
           draw_text(ctx->barwin->xftdraw, ctx->theme, ctx->barwin->geo.w - l,
                     TEXTY(ctx->theme, ctx->barwin->geo.h), ctx->barwin->fg, ctx->status);
+#else
+          draw_text(ctx->barwin->dr, ctx->theme, ctx->barwin->geo.w - l,
+                    TEXTY(ctx->theme, ctx->barwin->geo.h), ctx->barwin->fg, ctx->status);
+#endif /* HAVE_XFT */
      }
      else
           status_apply_list(ctx);
@@ -550,7 +563,7 @@ status_flush_surface(void)
 }
 
 static void
-status_surface(int x, int y, int w, int h, Color bg, char *status)
+status_surface(int x, int y, int w, int h, BgColor bg, char *status)
 {
      struct barwin *b;
      struct screen *s;
@@ -589,7 +602,7 @@ uicb_status_surface(Uicb cmd)
 {
      char *p, *ccmd = xstrdup(cmd);
      int s, w, h, x = -1, y = -1;
-     Color bg;
+     BgColor bg;
 
      if(!ccmd || !(p = strchr(ccmd, ' ')))
           return;

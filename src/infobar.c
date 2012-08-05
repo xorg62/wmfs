@@ -164,8 +164,13 @@ infobar_elem_tag_update(struct element *e)
           status_copy_mousebind(&t->statusctx);
           status_render(&t->statusctx);
 
+#ifdef HAVE_XFT
           draw_text(b->xftdraw, e->infobar->theme, (PAD >> 1),
                     TEXTY(e->infobar->theme, e->geo.h), b->fg, t->name);
+#else
+          draw_text(b->dr, e->infobar->theme, (PAD >> 1),
+                    TEXTY(e->infobar->theme, e->geo.h), b->fg, t->name);
+#endif /* HAVE_XFT */
 
           barwin_refresh(b);
      }
@@ -292,7 +297,11 @@ infobar_elem_launcher_update(struct element *e)
      barwin_refresh_color(b);
 
      l = draw_textw(e->infobar->theme, e->data) + 2;
+#ifdef HAVE_XFT
      draw_text(b->xftdraw, e->infobar->theme, 1, TEXTY(e->infobar->theme, e->geo.h), b->fg, e->data);
+#else
+     draw_text(b->dr, e->infobar->theme, 1, TEXTY(e->infobar->theme, e->geo.h), b->fg, e->data);
+#endif /* HAVE_XFT */
 
      /* Cursor */
      XDrawLine(W->dpy, b->dr, W->gc, l, 2, l, e->geo.h - 4);
