@@ -71,9 +71,24 @@ status_free_ctx(struct status_ctx *ctx)
 static void
 status_graph_draw(struct status_ctx *ctx, struct status_seq *sq, struct status_gcache *gc)
 {
+     int max = 0;
      int i, j, y;
      float c;
      int ys = sq->geo.y + sq->geo.h - 1;
+
+     /* If invalid maximum, we have to compute it ourselves */
+     if(sq->data[2] <= 0)
+     {
+         for(i = sq->geo.x + sq->geo.w - 1, j = gc->ndata - 1;
+             j >= 0 && i >= sq->geo.x;
+             --j, --i)
+         {
+              if(j > max)
+                  max = gc->datas[j];
+         }
+     }
+     else
+        max = sq->data[2];
 
      XSetForeground(W->dpy, W->gc, sq->color2);
 
@@ -84,7 +99,7 @@ status_graph_draw(struct status_ctx *ctx, struct status_seq *sq, struct status_g
           /* You divided by zero didn't you? */
           if(gc->datas[j])
           {
-               c = (float)sq->data[2] / (float)gc->datas[j];
+               c = (float)max / (float)gc->datas[j];
                y = ys - (sq->geo.h / (c > 1 ? c : 1)) + 1;
                draw_line(ctx->barwin->dr, i, y, i, ys);
           }
