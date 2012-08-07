@@ -83,7 +83,7 @@ status_graph_draw(struct status_ctx *ctx, struct status_seq *sq, struct status_g
              j >= 0 && i >= sq->geo.x;
              --j, --i)
          {
-              if(j > max)
+              if(gc->datas[j] > max)
                   max = gc->datas[j];
          }
      }
