@@ -189,7 +189,7 @@ infobar_elem_status_init(struct element *e)
 
           e->infobar->statusctx = status_new_ctx(b, e->infobar->theme);
           e->infobar->statusctx.status = strdup("wmfs2");
-          e->infobar->statusctx.update = true;
+          e->infobar->statusctx.flags |= STATUS_UPDATE;
      }
      else
      {
@@ -206,7 +206,7 @@ infobar_elem_status_init(struct element *e)
 static void
 infobar_elem_status_update(struct element *e)
 {
-     if(e->infobar->statusctx.update)
+     if(e->infobar->statusctx.flags & STATUS_UPDATE)
           status_manage(&e->infobar->statusctx);
      else
      {

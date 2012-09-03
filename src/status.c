@@ -540,10 +540,10 @@ status_copy_mousebind(struct status_ctx *ctx)
 void
 status_manage(struct status_ctx *ctx)
 {
-     if(!ctx->status)
+     if(!(ctx->flags & STATUS_UPDATE))
           return;
 
-     ctx->update = false;
+     ctx->flags &= ~STATUS_UPDATE;
 
      status_flush_list(ctx);
      status_parse(ctx);
@@ -646,7 +646,7 @@ uicb_status(Uicb cmd)
                {
                     free(ib->statusctx.status);
                     ib->statusctx.status = xstrdup(p);
-                    ib->statusctx.update = true;
+                    ib->statusctx.flags |= STATUS_UPDATE;
                     infobar_elem_screen_update(s, ElemStatus);
                }
      }
