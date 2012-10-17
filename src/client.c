@@ -879,6 +879,7 @@ _apply_rule(struct client *c, struct rule *r)
 #define RCLASS    0x02
 #define RROLE     0x04
 #define RNAME     0x08
+#define RCMACHINE 0x10
 static void
 client_apply_rule(struct client *c)
 {
@@ -886,6 +887,7 @@ client_apply_rule(struct client *c)
      struct rule *defaultr = NULL;
      char *wmname = NULL;
      char *role = NULL;
+     char *wmclientmachine = NULL;
      int f;
      unsigned char *data = NULL;
      unsigned long n, il;
@@ -902,6 +904,16 @@ client_apply_rule(struct client *c)
           role = xstrdup((char*)data);
           XFree(data);
      }
+
+     /* Get WM_CLIENT_MACHINE */
+     if(XGetWindowProperty(W->dpy, c->win, ATOM("WM_CLIENT_MACHINE"), 0L, 0x7FFFFFFFL, false,
+                           XA_STRING, &rf, &f, &n, &il, &data)
+               == Success && data)
+     {
+          wmclientmachine = xstrdup((char*)data);
+          XFree(data);
+     }
+
 
      /* Get _NET_WM_NAME */
      if(XGetWindowProperty(W->dpy, c->win, W->net_atom[net_wm_name], 0, 0x77777777, false,
@@ -925,8 +937,9 @@ client_apply_rule(struct client *c)
 
           FLAGAPPLY(flags, (wmname && r->name && !strcmp(wmname, r->name)), RNAME);
           FLAGAPPLY(flags, ((role && r->role && !strcmp(role, r->role)) || !role || !r->role), RROLE);
+          FLAGAPPLY(flags, (wmclientmachine && r->client_machine && !strcmp(wmclientmachine, r->client_machine)), RCMACHINE);
 
-          if(flags & (RINSTANCE | RCLASS | RNAME) && flags & RROLE)
+          if((flags & (RINSTANCE | RCLASS | RNAME) && flags & RROLE) || flags & RCMACHINE)
                _apply_rule(c, r);
           flags = 0;
      }
