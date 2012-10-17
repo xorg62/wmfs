@@ -289,6 +289,7 @@ struct rule
      char *instance;
      char *role;
      char *name;
+     char *client_machine;
      int tag, screen;
 #define RULE_FREE       0x01
 #define RULE_TAB        0x02
