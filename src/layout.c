@@ -16,8 +16,8 @@
 /* Shift in client split to keep clients's parent at close arrange */
 static int shiftv = 1, shifth = 1;
 
-void
-layout_save_set(struct tag *t)
+static struct layout_set*
+layout_get_current(struct tag *t)
 {
      struct client *c;
      struct layout_set *l;
@@ -43,7 +43,18 @@ layout_save_set(struct tag *t)
 
      l->n = n;
 
-     TAILQ_INSERT_TAIL(&t->sets, l, next);
+     return l;
+}
+
+void
+layout_save_set(struct tag *t)
+{
+     struct layout_set *l;
+
+     l = layout_get_current(t);
+
+     if(l)
+          TAILQ_INSERT_TAIL(&t->sets, l, next);
 }
 
 static void
@@ -221,6 +232,109 @@ uicb_layout_next_set(Uicb cmd)
      (void)cmd;
 
      _historic_set(W->screen->seltag, false);
+}
+
+void
+uicb_layout_serialize_set(Uicb cmd)
+{
+     char fn[FILENAME_MAX + 1];
+     struct tag *t;
+     struct layout_set *l;
+     struct client *c;
+     struct geo_list *g;
+
+     sprintf(fn, "%s/.config/wmfs/layout/%s", getenv("HOME"), cmd);
+     fn[FILENAME_MAX] = '\0';
+
+     FILE *fp = fopen(fn, "w+");
+     if(!fp) {
+          return;
+     }
+
+     t = W->screen->seltag;
+     l = layout_get_current(t);
+
+     fprintf(fp, "n=%d\n", l->n - 1);
+
+     for(g = SLIST_FIRST(&l->geos), c = SLIST_FIRST(&t->clients);
+         c; c = SLIST_NEXT(c, tnext))
+     {
+          if(g)
+          {
+               fprintf(fp, "x=%d y=%d w=%d h=%d\n", g->geo.x, g->geo.y, g->geo.w, g->geo.h);
+               g = SLIST_NEXT(g, next);
+          }
+     }
+
+     fclose(fp);
+
+     FREE_LIST(geo_list, l->geos);
+     free(l);
+}
+
+void
+uicb_layout_deserialize_set(Uicb cmd)
+{
+     struct tag *t = W->screen->seltag;
+     struct layout_set *l = NULL;
+     struct geo_list *g, *gp;
+     int n, i;
+
+     char fn[FILENAME_MAX + 1];
+
+     sprintf(fn, "%s/.config/wmfs/layout/%s", getenv("HOME"), cmd);
+     fn[FILENAME_MAX] = '\0';
+
+     FILE *fp = fopen(fn, "r");
+     if(!fp) {
+          return;
+     }
+
+     char buf[256];
+
+     if(fgets(buf, sizeof(buf) - 1, fp) == NULL)
+          goto end;
+     if(sscanf(buf, "n=%d", &n) != 1)
+          goto end;
+
+     l = xcalloc(1, sizeof(struct layout_set));
+     SLIST_INIT(&l->geos);
+
+     l->n = n + 1;
+
+     for(i = 0; i < n; ++i)
+     {
+          int x, y, w, h;
+
+          if(fgets(buf, sizeof(buf) - 1, fp) == NULL)
+               goto end;
+          if(sscanf(buf, "x=%d y=%d w=%d h=%d", &x, &y, &w, &h) != 4)
+               goto end;
+
+          g = xcalloc(1, sizeof(struct geo_list));
+          g->geo.x = x;
+          g->geo.y = y;
+          g->geo.w = w;
+          g->geo.h = h;
+
+          if(!SLIST_FIRST(&l->geos))
+               SLIST_INSERT_HEAD(&l->geos, g, next);
+          else
+               SLIST_INSERT_AFTER(gp, g, next);
+
+          gp = g;
+
+     }
+
+     layout_apply_set(t, l);
+
+end:
+     if(l)
+     {
+          FREE_LIST(geo_list, l->geos);
+          free(l);
+     }
+     fclose(fp);
 }
 
 static struct geo

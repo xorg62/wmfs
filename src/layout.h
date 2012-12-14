@@ -42,6 +42,8 @@ void uicb_layout_rotate_left(Uicb cmd);
 void uicb_layout_rotate_right(Uicb cmd);
 void uicb_layout_prev_set(Uicb cmd);
 void uicb_layout_next_set(Uicb cmd);
+void uicb_layout_serialize_set(Uicb cmd);
+void uicb_layout_deserialize_set(Uicb cmd);
 
 /* Generated */
 void uicb_layout_integrate_Left(Uicb);
