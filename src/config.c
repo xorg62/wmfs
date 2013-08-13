@@ -284,10 +284,11 @@ config_rule(void)
      {
           r = (struct rule*)xcalloc(1, sizeof(struct rule));
 
-          ISTRDUP(r->class,    fetch_opt_first(ks[i], "", "class").str);
-          ISTRDUP(r->instance, fetch_opt_first(ks[i], "", "instance").str);
-          ISTRDUP(r->role,     fetch_opt_first(ks[i], "", "role").str);
-          ISTRDUP(r->name ,    fetch_opt_first(ks[i], "", "name").str);
+          ISTRDUP(r->class,          fetch_opt_first(ks[i], "", "class").str);
+          ISTRDUP(r->instance,       fetch_opt_first(ks[i], "", "instance").str);
+          ISTRDUP(r->role,           fetch_opt_first(ks[i], "", "role").str);
+          ISTRDUP(r->name ,          fetch_opt_first(ks[i], "", "name").str);
+          ISTRDUP(r->client_machine, fetch_opt_first(ks[i], "", "client_machine").str);
 
           r->screen   = fetch_opt_first(ks[i], "-1", "screen").num;
           r->tag      = fetch_opt_first(ks[i], "-1", "tag").num;
