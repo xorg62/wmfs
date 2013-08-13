@@ -56,6 +56,12 @@ event_enternotify(XEvent *e)
      XCrossingEvent *ev = &e->xcrossing;
      struct client *c;
 
+     if(W->flags & WMFS_IGN_ENTER)
+     {
+          W->flags &= ~WMFS_IGN_ENTER;
+          return;
+     }
+
      if((ev->mode != NotifyNormal
          || ev->detail == NotifyInferior)
                && ev->window != W->root)

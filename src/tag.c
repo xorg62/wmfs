@@ -67,7 +67,10 @@ tag_screen(struct screen *s, struct tag *t)
 
      /* Update focus */
      if(!SLIST_EMPTY(&t->clients) && !(W->flags & WMFS_SCAN))
+     {
           client_focus( client_tab_next(t->sel));
+          W->flags |= WMFS_IGN_ENTER;
+     }
 
      t->flags &= ~TAG_URGENT;
 

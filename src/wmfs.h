@@ -346,6 +346,7 @@ struct wmfs
 #define WMFS_TABNOC    0x080 /* tab next opened client */
 #define WMFS_TAGCIRC   0x100 /* tab_next on last tag -> go to first tag / tab_prev on first tag -> go to last tag */
 #define WMFS_AUTOFOCUS 0x200
+#define WMFS_IGN_ENTER 0x400
      Flags flags;
      GC gc, rgc;
      Atom *net_atom;
