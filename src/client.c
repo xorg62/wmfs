@@ -409,9 +409,6 @@ client_frame_update(struct client *c, struct colpair *cp)
      struct status_ctx *sctx;
      int y, f, xt, rm, w, n = 1;
 
-     if(c->flags & CLIENT_TABBED)
-          c = c->tabmaster;
-
      XSetWindowBackground(W->dpy, c->frame, cp->bg);
      XClearWindow(W->dpy, c->frame);
 
@@ -435,11 +432,18 @@ client_frame_update(struct client *c, struct colpair *cp)
      if(n == 1)
      {
           w = draw_textw(c->theme, c->title);
+
+          if(!(c->flags & CLIENT_TABBED))
+          {
+               barwin_reparent(c->titlebar, c->frame);
+               barwin_move(c->titlebar, 0, 0);
+               barwin_resize(c->titlebar, f, c->tbarw);
+          }
+          else
+               f = c->titlebar->geo.w + (c->border * 1.5);
+
           _XTEXT();
 
-          barwin_reparent(c->titlebar, c->frame);
-          barwin_move(c->titlebar, 0, 0);
-          barwin_resize(c->titlebar, f, c->tbarw);
           barwin_refresh_color(c->titlebar);
 
           _STATUSLINE(c, (cp == &c->scol));
