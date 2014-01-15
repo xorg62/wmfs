@@ -366,7 +366,7 @@ launcher_process(struct launcher *l)
                if(pos && (end = complete(&cache, tmpbuf)))
                {
                     strncpy(buf, tmpbuf, sizeof(buf));
-                    strncat(buf, end, sizeof(buf));
+                    strncat(buf, end, sizeof(buf) - 1);
                     found = true;
                }
 
@@ -387,7 +387,7 @@ launcher_process(struct launcher *l)
 
           default:
                lastwastab = false;
-               strncat(buf, tmp, sizeof(tmp));
+               strncat(buf, tmp, sizeof(buf) - 1);
                ++pos;
                break;
           }
