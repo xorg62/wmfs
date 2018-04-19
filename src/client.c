@@ -509,6 +509,8 @@ client_frame_update(struct client *c, struct colpair *cp)
 void
 _client_tab_focus(struct client *c, const char *caller_func)
 {
+     (void)caller_func;
+
      if(c->flags & CLIENT_TABBED && c->tabmaster)
      {
           struct client *cc;
@@ -639,6 +641,7 @@ uicb_client_untab(Uicb cmd)
 void
 _client_focus(struct client *c, const char *caller_func)
 {
+     (void)caller_func;
      /* Unfocus selected */
      if(W->client && W->client != c)
      {
@@ -1144,6 +1147,8 @@ client_winsize(struct client *c, struct geo *g)
 void
 _client_moveresize(struct client *c, struct geo *g, const char *caller_func)
 {
+     (void)caller_func;
+
      if(c->flags & CLIENT_TABBED)
           return;
 
@@ -1242,6 +1247,8 @@ client_place_at_mouse(struct client *c)
 void
 _client_maximize(struct client *c, const char *caller_func)
 {
+     (void)caller_func;
+
      c->geo.x = c->geo.y = 0;
      c->geo.w = c->screen->ugeo.w;
      c->geo.h = c->screen->ugeo.h;
