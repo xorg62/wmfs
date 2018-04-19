@@ -357,7 +357,7 @@ layout_split_arrange_closed(struct client *ghost)
      for(p = Right; p < Center && !b; ++p)
      {
           if((c = client_next_with_pos(ghost, p))
-                    && layout_split_check_row_dir(c, ghost, p))
+             && layout_split_check_row_dir(c, ghost, p))
           {
                g = c->geo;
                FOREACH_NFCLIENT(cc, &c->tag->clients, tnext)
@@ -378,6 +378,7 @@ layout_split_arrange_closed(struct client *ghost)
  *   - Check if there is no sc
  *   - Check if sc is on a different tag than c
  *   - Check if sc is not in free mode
+ *   - Check if sc is not tabbed into c, in case of c being a tabmaster
  *
  * So from there, sc is not compatible, so we will integrate
  * c in the larger tiled client of c tag:
@@ -397,7 +398,8 @@ layout_split_integrate(struct client *c, struct client *sc)
         || sc == c
         || sc->tag != c->tag
         || (sc->flags & CLIENT_FREE)
-								|| !COMPCLIENT(c, sc))
+        || !COMPCLIENT(c, sc)
+        || (c->flags & CLIENT_TABMASTER && sc->tabmaster == c))
           sc = client_get_larger(c->tag, c->flags & CLIENT_IGNORE_TAG);
 
      /* Largest not correct */

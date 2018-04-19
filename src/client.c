@@ -195,6 +195,9 @@ client_next_with_pos(struct client *bc, enum position p)
           y += scanfac[ip];
      }
 
+     if(c && c->flags & CLIENT_TABBED)
+          c = c->tabmaster;
+
      return c;
 }
 
@@ -504,7 +507,7 @@ client_frame_update(struct client *c, struct colpair *cp)
 }
 
 void
-client_tab_focus(struct client *c)
+_client_tab_focus(struct client *c, const char *caller_func)
 {
      if(c->flags & CLIENT_TABBED && c->tabmaster)
      {
@@ -552,7 +555,8 @@ _client_tab(struct client *c, struct client *cm)
 
      /* Do not tab already tabbed client */
      if(c->flags & (CLIENT_TABBED | CLIENT_TABMASTER)
-        || c->tag != cm->tag || c == cm
+        || c->tag != cm->tag
+        || c == cm
         || !COMPCLIENT(c, cm))
           return;
 
@@ -633,7 +637,7 @@ uicb_client_untab(Uicb cmd)
 }
 
 void
-client_focus(struct client *c)
+_client_focus(struct client *c, const char *caller_func)
 {
      /* Unfocus selected */
      if(W->client && W->client != c)
@@ -1138,7 +1142,7 @@ client_winsize(struct client *c, struct geo *g)
 }
 
 void
-client_moveresize(struct client *c, struct geo *g)
+_client_moveresize(struct client *c, struct geo *g, const char *caller_func)
 {
      if(c->flags & CLIENT_TABBED)
           return;
@@ -1236,7 +1240,7 @@ client_place_at_mouse(struct client *c)
 }
 
 void
-client_maximize(struct client *c)
+_client_maximize(struct client *c, const char *caller_func)
 {
      c->geo.x = c->geo.y = 0;
      c->geo.w = c->screen->ugeo.w;

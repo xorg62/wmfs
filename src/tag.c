@@ -86,12 +86,15 @@ tag_client(struct tag *t, struct client *c)
      /* Remove client from its previous tag */
      if(c->tag && !(c->flags & CLIENT_RULED))
      {
+          /* Same tag.. */
           if(c->tag == t)
                return;
 
+          /* Fix layout of the left tag */
           if(!(c->flags & (CLIENT_IGNORE_LAYOUT | CLIENT_FREE)))
                layout_split_arrange_closed(c);
 
+          /* Remove client from tag client list and give focus on next available client */
           if(!(c->flags & CLIENT_REMOVEALL))
           {
                SLIST_REMOVE(&c->tag->clients, c, client, tnext);
@@ -120,16 +123,35 @@ tag_client(struct tag *t, struct client *c)
 
      infobar_elem_screen_update(c->screen, ElemTag);
 
+     /*
+      * Handle tabbed clients if c is a tabmaster:
+      * We cannot iterate clients via the linked list here;
+      * the tag client list move as we re-tag them, so we just
+      * store them in an array..
+      */
      if(c->flags & CLIENT_TABMASTER && c->prevtag)
      {
           struct client *cc;
+          int n_tabbed = 0;
 
           SLIST_FOREACH(cc, &c->prevtag->clients, tnext)
                if(cc->tabmaster == c)
-               {
-                    cc->flags |= CLIENT_IGNORE_LAYOUT;
-                    tag_client(t, cc);
-               }
+                    ++n_tabbed;
+
+          if(n_tabbed)
+          {
+               struct client **tabbed_clients = xcalloc(n_tabbed + 1, sizeof(struct client *));
+               int i = 0;
+
+               SLIST_FOREACH(cc, &c->prevtag->clients, tnext)
+                    if(cc->tabmaster == c)
+                         tabbed_clients[i++] = cc;
+
+               for(i = 0; i < n_tabbed; ++i)
+                    tag_client(t, tabbed_clients[i]);
+
+               free(tabbed_clients);
+          }
      }
 
      layout_client(c);

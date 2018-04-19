@@ -36,7 +36,7 @@ mouse_resize(struct client *c)
      else
           _REV_BORDER();
 
-     if(c->flags & CLIENT_TABBED && !(c->flags & CLIENT_TABMASTER))
+     if(c->flags & CLIENT_TABBED)
           c = c->tabmaster;
 
      ix = ox;
@@ -146,11 +146,11 @@ mouse_move(struct client *c, void (*func)(struct client*, struct client*))
      int d, u, ox, oy;
      int ocx, ocy;
 
+     if(c->flags & CLIENT_TABBED)
+          c = c->tabmaster;
+
      ocx = c->geo.x;
      ocy = c->geo.y;
-
-     if(c->flags & CLIENT_TABBED && !(c->flags & CLIENT_TABMASTER))
-          c = c->tabmaster;
 
      XQueryPointer(W->dpy, W->root, &w, &w, &ox, &oy, &d, &d, (uint *)&u);
 

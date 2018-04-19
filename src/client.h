@@ -35,8 +35,13 @@ void client_swap(struct client *c, enum position p);
 void client_frame_update(struct client *c, struct colpair *cp);
 void client_tab_pull(struct client *c);
 void _client_tab(struct client *c, struct client *cm);
-void client_tab_focus(struct client *c);
-void client_focus(struct client *c);
+
+#define client_tab_focus(C) _client_tab_focus(C, __func__)
+void _client_tab_focus(struct client *c, const char *caller_func);
+
+#define client_focus(C) _client_focus(C, __func__)
+void _client_focus(struct client *c, const char *caller_func);
+
 void uicb_client_focus_click(Uicb);
 void client_get_name(struct client *c);
 void client_close(struct client *c);
@@ -45,9 +50,15 @@ struct client *client_new(Window w, XWindowAttributes *wa, bool scan);
 void client_geo_hints(struct geo *g, int *s);
 void client_get_sizeh(struct client *c);
 bool client_winsize(struct client *c, struct geo *geo);
-void client_moveresize(struct client *c, struct geo *g);
+
+#define client_moveresize(C, G) _client_moveresize(C, G, __func__)
+void _client_moveresize(struct client *c, struct geo *g, const char *caller_func);
+
 void client_place_at_mouse(struct client *c);
-void client_maximize(struct client *c);
+
+#define client_maximize(C) _client_maximize(C, __func__)
+void _client_maximize(struct client *c, const char *caller_func);
+
 void client_fac_resize(struct client *c, enum position p, int fac);
 void client_fac_adjust(struct client *c);
 void client_remove(struct client *c);
