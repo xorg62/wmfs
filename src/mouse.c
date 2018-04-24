@@ -142,7 +142,8 @@ mouse_move(struct client *c, void (*func)(struct client*, struct client*))
      struct client *c2 = NULL, *last = c;
      struct tag *t = NULL;
      XEvent ev;
-     Window w;
+     Window w, cw;
+     int x, y;
      int d, u, ox, oy;
      int ocx, ocy;
 
@@ -152,7 +153,7 @@ mouse_move(struct client *c, void (*func)(struct client*, struct client*))
      ocx = c->geo.x;
      ocy = c->geo.y;
 
-     XQueryPointer(W->dpy, W->root, &w, &w, &ox, &oy, &d, &d, (uint *)&u);
+     XQueryPointer(W->dpy, W->root, &w, &cw, &ox, &oy, &d, &d, (uint *)&u);
 
      _REV_SBORDER(c);
 
@@ -178,9 +179,9 @@ mouse_move(struct client *c, void (*func)(struct client*, struct client*))
           {
                c2 = NULL;
 
-               XQueryPointer(W->dpy, W->root, &w, &w, &d, &d, &d, &d, (uint *)&u);
+               XQueryPointer(W->dpy, W->root, &w, &cw, &x, &y, &d, &d, (uint *)&u);
 
-               if((c2 = client_gb_win(w)) || (c2 = client_gb_frame(w)) || (c2 = client_gb_titlebar(w)))
+               if((c2 = client_gb_win(cw)) || (c2 = client_gb_frame(cw)) || (c2 = client_gb_titlebar(cw)))
                {
                     if(c2 != last)
                     {
@@ -189,8 +190,14 @@ mouse_move(struct client *c, void (*func)(struct client*, struct client*))
                          last = c2;
                     }
                }
+               else if(w == W->root && cw == None)
+               {
+                    struct screen *s = screen_gb_geo(x, y);
+
+                    t = s->seltag;
+               }
                else
-                    t = mouse_drag_tag(c, w);
+                    t = mouse_drag_tag(c, cw);
           }
 
           XSync(W->dpy, false);

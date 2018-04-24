@@ -45,6 +45,7 @@ event_buttonpress(XEvent *e)
 
                break;
           }
+
      if((c = client_gb_win(ev->window)) && c != W->client
          && ev->button == 1 && W->cfocus & CFOCUS_CLICK)
           client_focus(c);
