@@ -190,14 +190,23 @@ mouse_move(struct client *c, void (*func)(struct client*, struct client*))
                          last = c2;
                     }
                }
-               else if(w == W->root && cw == None)
+               else if(w == W->root)
                {
+                    struct infobar *ib;
                     struct screen *s = screen_gb_geo(x, y);
+                    bool ibwin = false;
 
-                    t = s->seltag;
+                    SLIST_FOREACH(ib, &s->infobars, next)
+                         if(cw == ib->bar->win)
+                         {
+                              ibwin = true;
+                              break;
+                         }
+
+                    if(ibwin || cw == None)
+                         if(!(t = mouse_drag_tag(c, cw)))
+                              t = s->seltag;
                }
-               else
-                    t = mouse_drag_tag(c, cw);
           }
 
           XSync(W->dpy, false);
