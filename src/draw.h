@@ -18,7 +18,7 @@
 #include "config.h"
 #include "screen.h"
 
-#define TEXTY(t, w) ((t->font.height - t->font.de) + ((w - t->font.height) >> 1))
+#define TEXTY(t, w) ((t->font.height - t->font.de) + ((w - t->font.height) / 2))
 #define PAD (8)
 
 static inline void
@@ -81,16 +81,16 @@ draw_reversed_rect(Drawable dr, struct client *c, bool t)
           XDrawRectangle(W->dpy, dr, W->rgc,
                          ug->x + g->x + i,
                          ug->y + g->y + i,
-                         g->w - (i << 1),
-                         g->h - (i << 1));
+                         g->w - (i * 2),
+                         g->h - (i * 2));
      }
      else
      {
           XDrawRectangle(W->dpy, dr, W->rgc,
-                         ug->x + g->x + i + (W->padding >> 2),
-                         ug->y + g->y + i + (W->padding >> 2),
-                         g->w - (i << 1) - (W->padding >> 1),
-                         g->h - (i << 1) - (W->padding >> 1));
+                         ug->x + g->x + i + (W->padding / 4),
+                         ug->y + g->y + i + (W->padding / 4),
+                         g->w - (i * 2) - (W->padding / 2),
+                         g->h - (i * 2) - (W->padding / 2));
      }
 }
 

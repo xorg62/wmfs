@@ -184,9 +184,9 @@ client_next_with_pos(struct client *bc, enum position p)
      int y = bc->geo.y + ((p == Bottom) ? bc->geo.h : 0);
 
      if(p > Left)
-          x += bc->geo.w >> 1;
+          x += bc->geo.w / 2;
      if(LDIR(p))
-          y += bc->geo.h >> 1;
+          y += bc->geo.h / 2;
 
      /* Scan in right direction to next(p) physical client */
      while((c = client_gb_pos(bc->tag, x, y)) == bc)
@@ -384,8 +384,8 @@ client_grabbuttons(struct client *c, bool focused)
 }
 
 #define _XTEXT()                          \
-     if((xt = ((f >> 1) - (w >> 1))) < 0) \
-          xt = c->border << 1;
+     if((xt = ((f / 2) - (w / 2))) < 0) \
+          xt = c->border * 2;
 
 #define _REMAINDER()                                            \
      if((rm = ((x + f) - (c->rgeo.w - c->border))) >  0)        \
@@ -1113,18 +1113,18 @@ client_geo_hints(struct geo *g, int *s)
 bool
 client_winsize(struct client *c, struct geo *g)
 {
-     int ow, oh;
      struct geo og = c->wgeo;
      struct geo tmp = *g;
+     int ow, oh;
 
-     tmp.w -= W->padding >> 1;
-     tmp.h -= W->padding >> 1;
+     tmp.w -= W->padding / 2;
+     tmp.h -= W->padding / 2;
 
      /* Window geo */
      c->wgeo.x = c->border;
      c->wgeo.y = c->tbarw;
      c->wgeo.h = oh = tmp.h - (c->border + c->tbarw);
-     c->wgeo.w = ow = tmp.w - (c->border << 1);
+     c->wgeo.w = ow = tmp.w - (c->border * 2);
 
      client_geo_hints(&c->wgeo, (int*)c->sizeh);
 
@@ -1137,7 +1137,7 @@ client_winsize(struct client *c, struct geo *g)
           }
 
      /* Balance position with new size */
-     c->wgeo.x += (ow - c->wgeo.w) >> 1;
+     c->wgeo.x += (ow - c->wgeo.w) / 2;
 
      c->flags |= CLIENT_DID_WINSIZE;
 
@@ -1185,8 +1185,8 @@ _client_moveresize(struct client *c, struct geo *g, const char *caller_func)
                /* Out of the screen case */
                else
                {
-                    c->geo.x = (c->screen->ugeo.w >> 1) - (c->geo.w >> 1);
-                    c->geo.y = (c->screen->ugeo.h >> 1) - (c->geo.h >> 1);
+                    c->geo.x = (c->screen->ugeo.w / 2) - (c->geo.w / 2);
+                    c->geo.y = (c->screen->ugeo.h / 2) - (c->geo.h / 2);
                     c->rgeo.x = c->screen->ugeo.x + c->geo.x;
                     c->rgeo.y = c->screen->ugeo.y + c->geo.y;
                }
@@ -1203,10 +1203,10 @@ _client_moveresize(struct client *c, struct geo *g, const char *caller_func)
           c->rgeo.x += c->screen->ugeo.x;
           c->rgeo.y += c->screen->ugeo.y;
 
-          c->rgeo.x += W->padding >> 2;
-          c->rgeo.y += W->padding >> 2;
-          c->rgeo.w -= W->padding >> 1;
-          c->rgeo.h -= W->padding >> 1;
+          c->rgeo.x += W->padding / 4;
+          c->rgeo.y += W->padding / 4;
+          c->rgeo.w -= W->padding / 2;
+          c->rgeo.h -= W->padding / 2;
      }
 
      XMoveResizeWindow(W->dpy, c->frame,
@@ -1228,10 +1228,8 @@ _client_moveresize(struct client *c, struct geo *g, const char *caller_func)
 void
 client_place_at_mouse(struct client *c)
 {
-     int x, y;
-
+     int x, y, d, u;
      Window w;
-     int d, u;
 
      XQueryPointer(W->dpy, W->root, &w, &w, &x, &y, &d, &d, (uint *)&u);
 

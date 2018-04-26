@@ -93,8 +93,8 @@ static void
 screen_select(struct screen *s)
 {
      XWarpPointer(W->dpy, None, W->root, 0, 0, 0, 0,
-                  s->ugeo.x + (s->ugeo.w >> 1),
-                  s->ugeo.y + (s->ugeo.h >> 1));
+                  s->ugeo.x + (s->ugeo.w / 2),
+                  s->ugeo.y + (s->ugeo.h / 2));
 
      W->screen = s;
 }

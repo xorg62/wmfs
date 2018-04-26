@@ -232,10 +232,10 @@ layout_split(struct client *c, bool vertical)
 
      if(vertical)
      {
-          c->geo.w >>= 1;
+          c->geo.w /= 2;
           c->geo.w += shiftv;
           geo.x = c->geo.x + c->geo.w;
-          geo.w >>= 1;
+          geo.w /= 2;
 
           /* Remainder */
           geo.w += (og.x + og.w) - (geo.x + geo.w);
@@ -244,10 +244,10 @@ layout_split(struct client *c, bool vertical)
      }
      else
      {
-          c->geo.h >>= 1;
+          c->geo.h /= 2;
           c->geo.h += shifth;
           geo.y = c->geo.y + c->geo.h;
-          geo.h >>= 1;
+          geo.h /= 2;
 
           /* Remainder */
           geo.h += (og.y + og.h) - (geo.y + geo.h);

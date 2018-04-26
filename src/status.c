@@ -117,7 +117,7 @@ status_graph_process(struct status_ctx *ctx, struct status_seq *sq, char *name)
           if(!strcmp(name, gc->name))
           {
                /* shift buffer to remove unused old value */
-               if(gc->ndata > (sq->geo.w << 1))
+               if(gc->ndata > (sq->geo.w * 2))
                     for(gc->ndata /= 2, j = 0;
                         j < gc->ndata;
                         gc->datas[j] = gc->datas[j + gc->ndata], ++j);
@@ -134,7 +134,7 @@ status_graph_process(struct status_ctx *ctx, struct status_seq *sq, char *name)
      gc = xcalloc(1, sizeof(struct status_gcache));
      gc->name = xstrdup(name);
      gc->ndata = 1;
-     gc->datas = xcalloc(sq->geo.w << 2, sizeof(int));
+     gc->datas = xcalloc(sq->geo.w * 4, sizeof(int));
      gc->datas[0] = sq->data[1];
 
      SLIST_INSERT_HEAD(&ctx->gcache, gc, next);
@@ -333,7 +333,7 @@ status_parse(struct status_ctx *ctx)
 
 #define NOALIGN_Y()                                                     \
      if(sq->align != NoAlign)                                           \
-          sq->geo.y = (ctx->barwin->geo.h >> 1) - (sq->geo.h >> 1);
+          sq->geo.y = (ctx->barwin->geo.h / 2) - (sq->geo.h / 2);
 static void
 status_apply_list(struct status_ctx *ctx)
 {
@@ -454,7 +454,7 @@ status_apply_list(struct status_ctx *ctx)
                     sq->geo.h = h;
 
                if(sq->align != NoAlign)
-                    sq->geo.y = (ctx->barwin->geo.h >> 1) - (sq->geo.h >> 1);
+                    sq->geo.y = (ctx->barwin->geo.h / 2) - (sq->geo.h / 2);
 
                STATUS_ALIGN(sq->align);
                draw_image(ctx->barwin->dr, &sq->geo);

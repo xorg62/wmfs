@@ -52,14 +52,14 @@ infobar_elem_tag_init(struct element *e)
      int s, j;
 
      /* Get final size before to use in placement */
-     e->geo.w = e->infobar->theme->tags_border_width << 1;
+     e->geo.w = e->infobar->theme->tags_border_width * 2;
      TAILQ_FOREACH(t, &e->infobar->screen->tags, next)
           e->geo.w += draw_textw(e->infobar->theme, t->name) + PAD;
 
      infobar_elem_placement(e);
 
      j = e->geo.x;
-     e->geo.h -= (e->infobar->theme->tags_border_width << 1);
+     e->geo.h -= (e->infobar->theme->tags_border_width * 2);
 
      e->statusctx = &e->infobar->theme->tags_n_sl;
      e->statusctx->flags |= STATUS_BLOCK_REFRESH;
@@ -164,7 +164,7 @@ infobar_elem_tag_update(struct element *e)
           status_copy_mousebind(&t->statusctx);
           status_render(&t->statusctx);
 
-          draw_text(b->dr, e->infobar->theme, (PAD >> 1),
+          draw_text(b->dr, e->infobar->theme, (PAD / 2),
                     TEXTY(e->infobar->theme, e->geo.h), b->fg, t->name);
 
           barwin_refresh(b);

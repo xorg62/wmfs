@@ -80,12 +80,12 @@ mouse_resize(struct client *c)
           {
                _REV_BORDER();
 
-               if(ix >= c->rgeo.x + (c->geo.w >> 1))
+               if(ix >= c->rgeo.x + (c->geo.w / 2))
                     _fac_resize(c, Right, mx - ox);
                else
                     _fac_resize(c, Left, ox - mx);
 
-               if(iy >= c->rgeo.y + (c->geo.h >> 1))
+               if(iy >= c->rgeo.y + (c->geo.h / 2))
                     _fac_resize(c, Bottom, my - oy);
                else
                     _fac_resize(c, Top, oy - my);
