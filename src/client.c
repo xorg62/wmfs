@@ -195,9 +195,6 @@ client_next_with_pos(struct client *bc, enum position p)
           y += scanfac[ip];
      }
 
-     if(c && c->flags & CLIENT_TABBED)
-          c = c->tabmaster;
-
      return c;
 }
 
