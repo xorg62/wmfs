@@ -119,7 +119,7 @@ draw_textw(struct theme *t, const char *str)
 {
      XGlyphInfo r;
      XftTextExtents8(W->dpy, t->font, (XftChar8*) str, strlen(str), &r);
-     return r.width;
+     return r.width + t->font->descent;
 }
 #else
 static inline unsigned short
