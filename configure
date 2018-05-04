@@ -31,7 +31,7 @@ while true; do
 	    echo "Usage: ./configure [options]
 	--without-xinerama		: compile without xinerama support
         --without-imlib2                : compile without imlib2 support
-	--without-xft			: compile with xft support
+	--without-xft			: compile without xft support
 	--prefix DIRECTORY		: install binary with specified prefix (default $PREFIX)
 	--man-prefix DIRECTORY		: install binary with specified prefix (default $PREFIX)
 	--xdg-config-dir DIRECTORY	: install configuration to specified directory (default $XDG_CONFIG_DIR)"
