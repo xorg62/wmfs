@@ -248,7 +248,7 @@ status_parse(struct status_ctx *ctx)
                sq->data[1] = ((tmp = ATOI(arg[4 + shift])) ? tmp : 1); /* Value */
                sq->data[2] = ATOI(arg[5 + shift]);                     /* Value Max */
 
-               sq->bg = fgcolor_atoh(arg[6 + shift]);
+               sq->bg = bgcolor_atoh(arg[6 + shift]);
                sq->bg2 = bgcolor_atoh(arg[7 + shift]);
 
                break;
@@ -267,7 +267,7 @@ status_parse(struct status_ctx *ctx)
                sq->data[1] = ATOI(arg[3 + shift]); /* Value */
                sq->data[2] = ATOI(arg[4 + shift]); /* Value Max */
 
-               sq->bg = fgcolor_atoh(arg[5 + shift]);
+               sq->bg = bgcolor_atoh(arg[5 + shift]);
                sq->bg2 = bgcolor_atoh(arg[6 + shift]);
 
                sq->str = xstrdup(arg[7 + shift]);
