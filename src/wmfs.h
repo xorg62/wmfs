@@ -21,6 +21,11 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 
+#ifdef HAVE_XFT
+/* Xft */
+#include <X11/Xft/Xft.h>
+#endif /* HAVE_XFT */
+
 /* Local */
 #include "log.h"
 
@@ -33,6 +38,14 @@
 typedef unsigned long Flags;
 typedef unsigned int Color;
 typedef const char* Uicb;
+
+#ifdef HAVE_XFT
+typedef Color BgColor;
+typedef XftColor FgColor;
+#else
+typedef Color BgColor;
+typedef Color FgColor;
+#endif /* HAVE_XFT */
 
 enum barpos
 {
@@ -81,7 +94,8 @@ struct geo_list
 
 struct colpair
 {
-     Color fg, bg;
+     FgColor fg;
+     BgColor bg;
 };
 
 struct barwin
@@ -89,7 +103,11 @@ struct barwin
      struct geo geo;
      Window win;
      Drawable dr;
-     Color fg, bg;
+#ifdef HAVE_XFT
+     XftDraw *xftdraw;
+#endif /* HAVE_XFT */
+     FgColor fg;
+     BgColor bg;
      void *ptr; /* Special cases */
      SLIST_HEAD(mbhead, mousebind) mousebinds;
      SLIST_HEAD(, mousebind) statusmousebinds;
@@ -105,7 +123,8 @@ struct status_seq
      int data[4];
      char type;
      char *str;
-     Color color, color2;
+     FgColor fg;
+     BgColor bg;
      SLIST_HEAD(, mousebind) mousebinds;
      SLIST_ENTRY(status_seq) next;
 };
@@ -256,11 +275,15 @@ struct theme
      char *name;
 
      /* Font */
+#ifdef HAVE_XFT
+     XftFont *font;
+#else
      struct
      {
           int as, de, width, height;
           XFontSet fontset;
      } font;
+#endif /* HAVE_XFT */
 
      /* Bars */
      struct colpair bars;
@@ -270,12 +293,12 @@ struct theme
      struct colpair tags_n, tags_s, tags_o, tags_u; /* normal / selected / occupied */
      struct status_ctx tags_n_sl, tags_s_sl, tags_o_sl, tags_u_sl; /* status line */
      int tags_border_width;
-     Color tags_border_col;
+     BgColor tags_border_col;
 
      /* client / frame */
      struct colpair client_n, client_s;
      struct status_ctx client_n_sl, client_s_sl, client_f_sl;
-     Color frame_bg;
+     BgColor frame_bg;
      int client_titlebar_width;
      int client_border_width;
 

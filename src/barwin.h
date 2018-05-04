@@ -30,7 +30,7 @@ barwin_move(struct barwin *b, int x, int y)
      XMoveWindow(W->dpy, b->win, (b->geo.x = x), (b->geo.y = y));
 }
 
-struct barwin* barwin_new(Window parent, int x, int y, int w, int h, Color fg, Color bg, bool entermask);
+struct barwin* barwin_new(Window parent, int x, int y, int w, int h, FgColor fg, BgColor bg, bool entermask);
 void barwin_remove(struct barwin *b);
 void barwin_resize(struct barwin *b, int w, int h);
 void barwin_refresh_color(struct barwin *b);

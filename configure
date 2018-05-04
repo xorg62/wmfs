@@ -16,6 +16,8 @@ while true; do
 	    USE_XINERAMA="";  shift;;
         --without-imlib2)
             USE_IMLIB2="";  shift;;
+	--without-xft)
+	    USE_XFT="";  shift;;
 	--prefix)
 	    [ -z "$2" ] && echo "Missing argument" && exit 1
 	    PREFIX=$2; shift 2;;
@@ -29,6 +31,7 @@ while true; do
 	    echo "Usage: ./configure [options]
 	--without-xinerama		: compile without xinerama support
         --without-imlib2                : compile without imlib2 support
+	--without-xft			: compile with xft support
 	--prefix DIRECTORY		: install binary with specified prefix (default $PREFIX)
 	--man-prefix DIRECTORY		: install binary with specified prefix (default $PREFIX)
 	--xdg-config-dir DIRECTORY	: install configuration to specified directory (default $XDG_CONFIG_DIR)"
@@ -37,7 +40,7 @@ while true; do
     esac
 done
 
-LIBS="$LIBS $USE_XINERAMA $USE_IMLIB2"
+LIBS="$LIBS $USE_XINERAMA $USE_IMLIB2 $USE_XFT"
 
 which pkg-config > /dev/null 2>&1
 
@@ -49,13 +52,13 @@ else
 	# Try to use some known paths
     case $OS in
 	FreeBSD)
-	    CFLAGS="-I/usr/local/include"
+	    CFLAGS="-I/usr/local/include -I/usr/local/include/freetype2"
 	    LDFLAGS="-L/usr/local/lib";;
 	OpenBSD)
-	    CFLAGS="-I/usr/X11R6/include -I/usr/local/include"
+	    CFLAGS="-I/usr/X11R6/include -I/usr/local/include -I/usr/local/include/freetype2"
 	    LDFLAGS="-L/usr/X11R6/lib -L/usr/local/lib";;
 	NetBSD)
-	    CFLAGS="-I/usr/X11R7/include -I/usr/pkg/include"
+	    CFLAGS="-I/usr/X11R7/include -I/usr/pkg/include -I/usr/local/include/freetype2"
 	    LDFLAGS="-L/usr/X11R7/lib -L/usr/pkg/lib";;
 	Linux)
 	    CFLAGS=""
@@ -70,10 +73,12 @@ else
 
     [ -n "$USE_XINERAMA" ] && LDFLAGS="$LDFLAGS -lXinerama"
     [ -n "$USE_IMLIB2" ] && LDFLAGS="$LDFLAGS -lImlib2"
+    [ -n "$USE_XFT" ] && LDFLAGS="$LDFLAGS -lxft -lfreetype"
 fi
 
 [ -n "$USE_XINERAMA" ] && CFLAGS="$CFLAGS -DHAVE_XINERAMA"
 [ -n "$USE_IMLIB2" ] && CFLAGS="$CFLAGS -DHAVE_IMLIB2"
+[ -n "$USE_XFT" ] && CFLAGS="$CFLAGS -DHAVE_XFT"
 
 # Debian hardening options http://wiki.debian.org/Hardening
 which dpkg-buildflags > /dev/null 2>&1
