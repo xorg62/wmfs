@@ -30,7 +30,7 @@
 static inline void
 draw_text(XftDraw *xftdraw, struct theme *t, int x, int y, FgColor fg, const char *str)
 {
-     XftDrawString8(xftdraw, &fg, t->font, x, y, (XftChar8*) str, strlen(str));
+     XftDrawStringUtf8(xftdraw, &fg, t->font, x, y, (XftChar8*)str, strlen(str));
 }
 #else
 static inline void
@@ -118,7 +118,7 @@ static inline unsigned short
 draw_textw(struct theme *t, const char *str)
 {
      XGlyphInfo r;
-     XftTextExtents8(W->dpy, t->font, (XftChar8*) str, strlen(str), &r);
+     XftTextExtentsUtf8(W->dpy, t->font, (XftChar8*) str, strlen(str), &r);
      return r.width + t->font->descent;
 }
 #else
