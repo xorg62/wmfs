@@ -448,11 +448,7 @@ client_frame_update(struct client *c, struct colpair *cp)
 
           _STATUSLINE(c, (cp == &c->scol));
 
-#ifdef HAVE_XFT
-          draw_text(c->titlebar->xftdraw, c->theme, xt, y, cp->fg, c->title);
-#else
-          draw_text(c->titlebar->dr, c->theme, xt, y, cp->fg, c->title);
-#endif /* HAVE_XFT */
+          barwin_draw_text(c->titlebar, c->theme, xt, y, cp->fg, c->title);
           barwin_refresh(c->titlebar);
      }
      /* Tabbing case, multiple titlebar in frame */
@@ -480,11 +476,8 @@ client_frame_update(struct client *c, struct colpair *cp)
 
                     _STATUSLINE(c, true);
                     draw_rect(c->titlebar->dr, &g, c->scol.bg);
-#ifdef HAVE_XFT
-                    draw_text(c->titlebar->xftdraw, c->theme, xt, y, cp->fg, title);
-#else
-                    draw_text(c->titlebar->dr, c->theme, xt, y, cp->fg, title);
-#endif /* HAVE_XFT */
+
+                    barwin_draw_text(c->titlebar, c->theme, xt, y, cp->fg, title);
                     barwin_refresh(c->titlebar);
 
                     x += f;
@@ -502,11 +495,8 @@ client_frame_update(struct client *c, struct colpair *cp)
 
                     _STATUSLINE(cc, false);
                     draw_rect(cc->titlebar->dr, &g, c->scol.bg);
-#ifdef HAVE_XFT
-                    draw_text(cc->titlebar->xftdraw, c->theme, xt, y - 1, c->ncol.fg, title);
-#else
-                    draw_text(cc->titlebar->dr, c->theme, xt, y - 1, c->ncol.fg, title);
-#endif /* HAVE_XFT */
+
+                    barwin_draw_text(cc->titlebar, c->theme, xt, y - 1, c->ncol.fg, title);
                     barwin_refresh(cc->titlebar);
 
                     x += f;

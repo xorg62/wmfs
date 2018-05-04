@@ -6,6 +6,7 @@
 #include "wmfs.h"
 #include "barwin.h"
 #include "util.h"
+#include "draw.h"
 
 /** Create a barwin
  * \param parent Parent window of the BarWindow
@@ -62,8 +63,26 @@ barwin_new(Window parent, int x, int y, int w, int h, FgColor fg, BgColor bg, bo
      return b;
 }
 
+/** Draw text in a barwin
+ * \param b barwin pointer
+ * \param t theme pointer
+ * \param x x position
+ * \param y y position
+ * \param fg Foreground color
+ * \param str text string
+*/
+void
+barwin_draw_text(struct barwin *b, struct theme *t, int x, int y, FgColor fg, const char *str)
+{
+#ifdef HAVE_XFT
+     draw_text(b->xftdraw, t, x, y, fg, str);
+#else
+     draw_text(b->dr, t, x, y, fg, str);
+#endif /* HAVE_XFT */
+}
+
 /** Delete a barwin
- * \param bw barwin pointer
+ * \param b barwin pointer
 */
 void
 barwin_remove(struct barwin *b)
@@ -81,7 +100,7 @@ barwin_remove(struct barwin *b)
 }
 
 /** Resize a barwin
- * \param bw barwin pointer
+ * \param b barwin pointer
  * \param w Width
  * \param h Height
 */
@@ -106,7 +125,7 @@ barwin_resize(struct barwin *b, int w, int h)
 }
 
 /** Refresh the barwin Color
- * \param bw barwin pointer
+ * \param b barwin pointer
 */
 void
 barwin_refresh_color(struct barwin *b)
@@ -114,6 +133,3 @@ barwin_refresh_color(struct barwin *b)
      XSetForeground(W->dpy, W->gc, b->bg);
      XFillRectangle(W->dpy, b->dr, W->gc, 0, 0, b->geo.w, b->geo.h);
 }
-
-
-

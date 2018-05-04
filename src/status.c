@@ -349,6 +349,7 @@ status_apply_list(struct status_ctx *ctx)
           /* Text */
           case 's':
                sq->geo.w = draw_textw(ctx->theme, sq->str);
+
 #ifdef HAVE_XFT
                sq->geo.h = ctx->theme->font->height;
 #else
@@ -360,11 +361,7 @@ status_apply_list(struct status_ctx *ctx)
 
                STATUS_ALIGN(sq->align);
 
-#ifdef HAVE_XFT
-               draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, sq->str);
-#else
-               draw_text(ctx->barwin->dr, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, sq->str);
-#endif /* HAVE_XFT */
+               barwin_draw_text(ctx->barwin, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, sq->str);
 
                if(!SLIST_EMPTY(&sq->mousebinds))
                     SLIST_FOREACH(m, &sq->mousebinds, snext)
@@ -489,13 +486,9 @@ status_render(struct status_ctx *ctx)
      if(SLIST_EMPTY(&ctx->statushead))
      {
           int l = draw_textw(ctx->theme, ctx->status);
-#ifdef HAVE_XFT
-          draw_text(ctx->barwin->xftdraw, ctx->theme, ctx->barwin->geo.w - l,
-                    TEXTY(ctx->theme, ctx->barwin->geo.h), ctx->barwin->fg, ctx->status);
-#else
-          draw_text(ctx->barwin->dr, ctx->theme, ctx->barwin->geo.w - l,
-                    TEXTY(ctx->theme, ctx->barwin->geo.h), ctx->barwin->fg, ctx->status);
-#endif /* HAVE_XFT */
+
+          barwin_draw_text(ctx->barwin, ctx->theme, ctx->barwin->geo.w - l,
+                           TEXTY(ctx->theme, ctx->barwin->geo.h), ctx->barwin->fg, ctx->status);
      }
      else
           status_apply_list(ctx);

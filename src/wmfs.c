@@ -81,20 +81,16 @@ wmfs_numlockmask(void)
      XFreeModifiermap(mm);
 }
 
-#ifdef HAVE_XFT
 void
 wmfs_init_font(char *font, struct theme *t)
 {
+#ifdef HAVE_XFT
      if(!(t->font = XftFontOpenName(W->dpy, W->xscreen, font)))
      {
           warnxl("Can't load font '%s'", font);
           t->font = XftFontOpenName(W->dpy, W->xscreen, "fixed");
      }
-}
 #else
-void
-wmfs_init_font(char *font, struct theme *t)
-{
      XFontStruct **xfs = NULL;
      char **misschar, **names, *defstring;
      int d;
@@ -116,8 +112,8 @@ wmfs_init_font(char *font, struct theme *t)
 
      if(misschar)
           XFreeStringList(misschar);
-}
 #endif /* HAVE_XFT */
+}
 
 static void
 wmfs_xinit(void)
