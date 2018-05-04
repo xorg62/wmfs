@@ -125,6 +125,7 @@ struct status_seq
      char *str;
      FgColor fg;
      BgColor bg;
+     BgColor bg2;
      SLIST_HEAD(, mousebind) mousebinds;
      SLIST_ENTRY(status_seq) next;
 };

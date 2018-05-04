@@ -90,7 +90,7 @@ status_graph_draw(struct status_ctx *ctx, struct status_seq *sq, struct status_g
      else
         max = sq->data[2];
 
-     XSetForeground(W->dpy, W->gc, sq->bg);
+     XSetForeground(W->dpy, W->gc, sq->bg2);
 
      for(i = sq->geo.x + sq->geo.w - 1, j = gc->ndata - 1;
          j >= 0 && i >= sq->geo.x;
@@ -248,8 +248,8 @@ status_parse(struct status_ctx *ctx)
                sq->data[1] = ((tmp = ATOI(arg[4 + shift])) ? tmp : 1); /* Value */
                sq->data[2] = ATOI(arg[5 + shift]);                     /* Value Max */
 
-               sq->fg = fgcolor_atoh(arg[6 + shift]);
-               sq->bg = bgcolor_atoh(arg[7 + shift]);
+               sq->bg = fgcolor_atoh(arg[6 + shift]);
+               sq->bg2 = bgcolor_atoh(arg[7 + shift]);
 
                break;
 
@@ -267,8 +267,8 @@ status_parse(struct status_ctx *ctx)
                sq->data[1] = ATOI(arg[3 + shift]); /* Value */
                sq->data[2] = ATOI(arg[4 + shift]); /* Value Max */
 
-               sq->fg = fgcolor_atoh(arg[5 + shift]);
-               sq->bg = bgcolor_atoh(arg[6 + shift]);
+               sq->bg = fgcolor_atoh(arg[5 + shift]);
+               sq->bg2 = bgcolor_atoh(arg[6 + shift]);
 
                sq->str = xstrdup(arg[7 + shift]);
 
@@ -408,7 +408,7 @@ status_apply_list(struct status_ctx *ctx)
                     g.y -= g.h;
                }
 
-               draw_rect(ctx->barwin->dr, &g, sq->bg);
+               draw_rect(ctx->barwin->dr, &g, sq->bg2);
 
                STORE_MOUSEBIND();
 
@@ -429,7 +429,7 @@ status_apply_list(struct status_ctx *ctx)
                g.w = sq->data[0];
                g.h = sq->geo.h;
 
-               draw_rect(ctx->barwin->dr, &g, sq->bg);
+               draw_rect(ctx->barwin->dr, &g, sq->bg2);
 
                STORE_MOUSEBIND();
 
