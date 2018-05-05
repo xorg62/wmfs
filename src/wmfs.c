@@ -559,6 +559,7 @@ signal_handle(int sig)
      {
      case SIGQUIT:
      case SIGTERM:
+     case SIGINT:
           W->flags &= ~WMFS_RUNNING;
           break;
      case SIGCHLD:
@@ -624,11 +625,13 @@ main(int argc, char **argv)
      W->confpath = path;
 
      /* Get X display */
-     if(!(W->dpy = XOpenDisplay(NULL)))
+     if(!(dpy = XOpenDisplay(NULL)))
      {
           fprintf(stderr, "%s: Can't open X server\n", argv[0]);
           exit(EXIT_FAILURE);
      }
+
+     W->dpy = dpy;
 
      /* Set signal handler */
      memset(&sa, 0, sizeof(sa));
@@ -636,6 +639,7 @@ main(int argc, char **argv)
      sigemptyset(&sa.sa_mask);
      sigaction(SIGQUIT, &sa, NULL);
      sigaction(SIGTERM, &sa, NULL);
+     sigaction(SIGINT, &sa, NULL);
      sigaction(SIGCHLD, &sa, NULL);
 
      /* Core */
@@ -650,7 +654,7 @@ main(int argc, char **argv)
      if(r)
           execvp(argv[0], argv);
 
-     XCloseDisplay(W->dpy);
+     XCloseDisplay(dpy);
 
      return 1;
 }
