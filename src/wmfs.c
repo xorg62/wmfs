@@ -396,7 +396,7 @@ wmfs_loop(void)
 {
      XEvent ev;
 
-     while((W->flags & WMFS_RUNNING) && !XNextEvent(W->dpy, &ev))
+     while(W->flags & WMFS_RUNNING && !XNextEvent(W->dpy, &ev))
      {
           /* Manage SIGCHLD event here, X is not safe with it */
           wmfs_sigchld();
@@ -557,8 +557,6 @@ signal_handle(int sig)
 {
      switch (sig)
      {
-     case SIGQUIT:
-     case SIGTERM:
      case SIGINT:
           W->flags &= ~WMFS_RUNNING;
           break;
@@ -637,8 +635,6 @@ main(int argc, char **argv)
      memset(&sa, 0, sizeof(sa));
      sa.sa_handler = signal_handle;
      sigemptyset(&sa.sa_mask);
-     sigaction(SIGQUIT, &sa, NULL);
-     sigaction(SIGTERM, &sa, NULL);
      sigaction(SIGINT, &sa, NULL);
      sigaction(SIGCHLD, &sa, NULL);
 
