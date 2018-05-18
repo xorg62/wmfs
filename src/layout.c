@@ -422,15 +422,6 @@ layout_split_integrate(struct client *c, struct client *sc)
           }
      }
 
-     /* Tab Next Opened Client option */
-     if(W->flags & WMFS_TABNOC && COMPCLIENT(c, sc))
-     {
-          W->flags ^= WMFS_TABNOC;
-          _client_tab(c, sc);
-          return;
-     }
-
-     /* If there are clients but we can tab with them, split the screen. */
      c->flags |= CLIENT_TILED;
 
      g = layout_split(sc, (sc->geo.h < sc->geo.w));
@@ -442,7 +433,6 @@ layout_split_integrate(struct client *c, struct client *sc)
      client_fac_hint(sc);
 
      layout_save_set(c->tag);
-     W->flags &= ~WMFS_TABNOC;
 }
 
 /* Arrange inter-clients holes:

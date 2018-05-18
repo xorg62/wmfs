@@ -641,6 +641,7 @@ void
 _client_focus(struct client *c, const char *caller_func)
 {
      (void)caller_func;
+
      /* Unfocus selected */
      if(W->client && W->client != c)
      {
@@ -854,6 +855,7 @@ client_frame_new(struct client *c)
           c->titlebar->mousebinds = W->tmp_head.client;
      }
 
+
      XReparentWindow(W->dpy, c->win, c->frame, c->border, c->tbarw);
 }
 
@@ -1025,6 +1027,13 @@ client_new(Window w, XWindowAttributes *wa, bool scan)
 
      /* Attach */
      SLIST_INSERT_HEAD(&W->h.client, c, next);
+
+     /* Tab next opened client thing */
+     if(W->flags & WMFS_TABNOC)
+     {
+          _client_tab(c, c->tag->sel);
+          W->flags &= ~WMFS_TABNOC;
+     }
 
      if(!scan)
      {
