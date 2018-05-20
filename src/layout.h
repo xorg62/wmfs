@@ -35,6 +35,7 @@ void layout_split_integrate(struct client *c, struct client *sc);
 void layout_split_arrange_closed(struct client *ghost);
 void layout_fix_hole(struct client *c);
 void layout_client(struct client *c);
+void layout_integrate(struct client *c, struct client *nc);
 void uicb_layout_vmirror(Uicb cmd);
 void uicb_layout_hmirror(Uicb cmd);
 void uicb_layout_rotate_left(Uicb cmd);
@@ -50,4 +51,3 @@ void uicb_layout_integrate_Bottom(Uicb);
 
 
 #endif /* LAYOUT_H */
-

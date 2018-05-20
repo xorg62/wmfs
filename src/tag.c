@@ -154,7 +154,6 @@ tag_client(struct tag *t, struct client *c)
           }
      }
 
-
      layout_client(c);
 
      if(t != c->screen->seltag || c->flags & CLIENT_TABBED)

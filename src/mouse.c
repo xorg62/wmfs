@@ -7,6 +7,7 @@
 #include "mouse.h"
 #include "barwin.h"
 #include "client.h"
+#include "layout.h"
 #include "draw.h"
 
 #define _REV_SBORDER(c) draw_reversed_rect(W->root, c, false);
@@ -255,4 +256,13 @@ uicb_mouse_tab(Uicb cmd)
      if(W->client && mouse_check_client(W->client))
           mouse_move(W->client, _client_tab);
 
+}
+
+void
+uicb_mouse_integrate(Uicb cmd)
+{
+     (void)cmd;
+
+     if(W->client && mouse_check_client(W->client))
+          mouse_move(W->client, layout_integrate);
 }

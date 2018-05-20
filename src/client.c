@@ -381,7 +381,7 @@ client_grabbuttons(struct client *c, bool focused)
 }
 
 #define _XTEXT()                          \
-     if((xt = ((f / 2) - (w / 2))) < 0) \
+     if((xt = ((f / 2) - (w / 2))) < 0)   \
           xt = c->border * 2;
 
 #define _REMAINDER()                                            \
@@ -854,7 +854,6 @@ client_frame_new(struct client *c)
 
           c->titlebar->mousebinds = W->tmp_head.client;
      }
-
 
      XReparentWindow(W->dpy, c->win, c->frame, c->border, c->tbarw);
 }

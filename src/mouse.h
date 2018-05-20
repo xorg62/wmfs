@@ -11,6 +11,7 @@
 void uicb_mouse_resize(Uicb);
 void uicb_mouse_move(Uicb);
 void uicb_mouse_tab(Uicb);
+void uicb_mouse_integrate(Uicb);
 
 static inline bool
 mouse_check_client(struct client *c)
