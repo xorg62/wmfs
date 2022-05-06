@@ -25,6 +25,8 @@
 #include "layout.h"
 #include "systray.h"
 
+struct wmfs *W;
+
 int
 wmfs_error_handler(Display *d, XErrorEvent *event)
 {

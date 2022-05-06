@@ -17,6 +17,6 @@
 
 void event_init(void);
 
-void (*event_handle[MAX_EV])(XEvent*);
+extern void (*event_handle[MAX_EV])(XEvent*);
 
 #endif /* EVENT_H */
