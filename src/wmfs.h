@@ -444,6 +444,6 @@ void uicb_reload(Uicb cmd);
 void uicb_quit(Uicb cmd);
 
 /* Single global variable */
-struct wmfs *W;
+extern struct wmfs *W;
 
 #endif /* WMFS_H */

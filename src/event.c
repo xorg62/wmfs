@@ -21,6 +21,9 @@
           if(!m->use_area || (m->use_area && INAREA(ev->x, ev->y, m->area))) \
                if(m->func)                                                   \
                     m->func(m->cmd);
+
+void (*event_handle[MAX_EV])(XEvent*);
+
 static void
 event_buttonpress(XEvent *e)
 {
